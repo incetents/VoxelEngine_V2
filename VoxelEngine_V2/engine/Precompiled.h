@@ -1,0 +1,34 @@
+// Copyright (c) 2018 Emmanuel Lajeunesse
+#pragma once
+
+// STL
+#include <cstring>
+#include <functional>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <unordered_map>
+#include <vector>
+
+// Engine
+#include "opengl/glUtil.h"
+#include "opengl/Mesh.h"
+#include "opengl/Shader.h"
+#include "math/Camera.h"
+#include "math/Color.h"
+#include "math/Lerp.h"
+#include "math/MathCore.h"
+#include "math/Matrix2x2.h"
+#include "math/Matrix3x3.h"
+#include "math/Matrix4x4.h"
+#include "math/Vector2.h"
+#include "math/Vector3.h"
+#include "math/Vector4.h"
+#include "math/MatrixStack.h"
+#include "math/Quaternion.h"
+#include "math/Random.h"
+#include "math/Rotation.h"
+#include "math/Transform.h"
