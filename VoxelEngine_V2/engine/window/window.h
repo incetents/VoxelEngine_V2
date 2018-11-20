@@ -33,6 +33,10 @@ namespace Vxl
 
 	public:
 
+		inline GLFWwindow* GetContext() const
+		{
+			return m_window;
+		}
 		inline bool	GetClosed()  const
 		{
 			return m_close;

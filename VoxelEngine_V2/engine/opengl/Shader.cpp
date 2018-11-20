@@ -117,6 +117,11 @@ namespace Vxl
 		detachShaders();
 		glDeleteProgram(m_id);
 		m_id = -1;
+
+		// cleanup uniform blocks
+		for (auto it = m_uniformBlocks.begin(); it != m_uniformBlocks.end(); it++)
+			delete it->second;
+
 	}
 
 	void ShaderProgram::attachShaders()
@@ -214,7 +219,7 @@ namespace Vxl
 			if (!bindingPointStr.empty())
 				bindingPoint = std::stoi(bindingPointStr);
 		
-			m_uniformBlocks[name_str] = glUniformBlock(*this, name_str, bindingPoint, (GLuint)size);
+			m_uniformBlocks[name_str] = new glUniformBlock(*this, name_str, bindingPoint, (GLuint)size);
 		}
 	}
 

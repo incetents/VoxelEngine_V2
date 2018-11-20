@@ -5,6 +5,7 @@
 
 #include "../utilities/logger.h"
 #include "../Math/Color.h"
+#include "../math/Vector4.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -227,6 +228,22 @@ namespace Vxl
 		glEnableVertexAttribArray(bufferIndex);
 		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, GL_FALSE, 0, 0);
 	}
+	void glUtil::setVertexAttribInstancing(GLuint bufferIndex)
+	{
+		glEnableVertexAttribArray(bufferIndex + 0);
+		glVertexAttribPointer(bufferIndex + 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)0);
+		glEnableVertexAttribArray(bufferIndex + 1);
+		glVertexAttribPointer(bufferIndex + 1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(sizeof(Vector4)));
+		glEnableVertexAttribArray(bufferIndex + 2);
+		glVertexAttribPointer(bufferIndex + 2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(2 * sizeof(Vector4)));
+		glEnableVertexAttribArray(bufferIndex + 3);
+		glVertexAttribPointer(bufferIndex + 3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(3 * sizeof(Vector4)));
+
+		glVertexAttribDivisor(bufferIndex + 0, 1);
+		glVertexAttribDivisor(bufferIndex + 1, 1);
+		glVertexAttribDivisor(bufferIndex + 2, 1);
+		glVertexAttribDivisor(bufferIndex + 3, 1);
+	}
 
 	void glUtil::bindIndices(GLuint VBO, GLsizeiptr length, GLvoid* data, GLenum usage)
 	{
@@ -272,9 +289,16 @@ namespace Vxl
 	}
 
 	// TEXTURES //
-	void glUtil::setActiveTexture(GLuint level)
+	void glUtil::setActiveTexture(Active_Texture level)
 	{
-		assert(level >= 0 && level <= 32);
+		glActiveTexture(GLenum(level));
+	}
+	void glUtil::setActiveTexture(int level)
+	{
+		glActiveTexture(GL_TEXTURE0 + level);
+	}
+	void glUtil::setActiveTexture(unsigned int level)
+	{
 		glActiveTexture(GL_TEXTURE0 + level);
 	}
 
@@ -316,5 +340,11 @@ namespace Vxl
 		GLint MaxBindingPoints;
 		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &MaxBindingPoints);
 		return MaxBindingPoints;
+	}
+	GLint glUtil::GetMaxFBOColorAttachments()
+	{
+		GLint maxAttach = 0;
+		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxAttach);
+		return maxAttach;
 	}
 }

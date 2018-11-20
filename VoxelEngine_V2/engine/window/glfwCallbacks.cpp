@@ -2,8 +2,9 @@
 #include "Precompiled.h"
 #include "glfwCallbacks.h"
 
-#include "glfwUtil.h"
 #include "window.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Vxl
 {

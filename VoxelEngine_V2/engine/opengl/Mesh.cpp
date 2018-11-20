@@ -15,19 +15,44 @@ namespace Vxl
 	{
 		glDrawElements((GLenum)m_type, m_drawCount, GL_UNSIGNED_INT, 0);
 	}
+	void Mesh::DrawArrayInstances()
+	{
+		glDrawArraysInstanced((GLenum)m_type, 0, m_drawCount, m_instances.getLength());
+	}
+	void Mesh::DrawIndexedInstances()
+	{
+		glDrawElementsInstanced((GLenum)m_type, m_drawCount, GL_UNSIGNED_INT, 0, m_instances.getLength());
+	}
 
 	void Mesh::UpdateDrawInfo()
 	{
+		// Set Mode
 		m_mode = (m_indices.getLength() == 0) ? Draw_Mode::ARRAY : Draw_Mode::INDEXED;
+		if (m_instances.getLength() > 1)
+			if (m_mode == Draw_Mode::ARRAY)
+				m_mode = Draw_Mode::ARRAY_INSTANCED;
+			else
+				m_mode = Draw_Mode::INDEXED_INSTANCED;
 
+		// Set Draw Data
 		if (m_mode == Draw_Mode::ARRAY)
 		{
 			Draw_Function = &Mesh::DrawArray;
 			m_drawCount = m_positions.getLength();
 		}
-		else
+		else if (m_mode == Draw_Mode::ARRAY_INSTANCED)
+		{
+			Draw_Function = &Mesh::DrawArrayInstances;
+			m_drawCount = m_positions.getLength();
+		}
+		else if (m_mode == Draw_Mode::INDEXED)
 		{
 			Draw_Function = &Mesh::DrawIndexed;
+			m_drawCount = m_indices.getLength();
+		}
+		else
+		{
+			Draw_Function = &Mesh::DrawIndexedInstances;
 			m_drawCount = m_indices.getLength();
 		}
 	}
@@ -36,14 +61,15 @@ namespace Vxl
 	{
 		// Buffer Objects
 		delete[] m_VBOs;
-		m_VBOs = new GLuint[4];
-		glUtil::generateVAO(m_VAO, m_VBOs[0], 4);
+		m_VBOs = new GLuint[5];
+		glUtil::generateVAO(m_VAO, m_VBOs[0], 5);
 
 		// Buffers
 		m_positions.setup	(m_VBOs[0], 0);
 		m_uvs.setup			(m_VBOs[1], 1);
 		m_normals.setup		(m_VBOs[2], 2);
-		m_indices.setup		(m_VBOs[3]);
+		m_instances.setup   (m_VBOs[3], 3);
+		m_indices.setup		(m_VBOs[4]);
 	}
 	Mesh::~Mesh()
 	{
@@ -51,8 +77,9 @@ namespace Vxl
 		delete[] m_VBOs;
 	}
 
-	void Mesh::Bind()
+	void Mesh::Bind(Draw_Type type)
 	{
+		m_type = type;
 		UpdateDrawInfo();
 
 		// SIZE CHECK //
@@ -78,17 +105,11 @@ namespace Vxl
 		/*	Bind Data	*/
 		glUtil::bindVAO(m_VAO);
 
-		if(m_positions.getLength())
-			m_positions.bind();
-
-		if (m_uvs.getLength())
-			m_uvs.bind();
-
-		if (m_normals.getLength())
-			m_normals.bind();
-
-		if (m_indices.getLength())
-			m_indices.bind();
+		m_positions.bind();
+		m_uvs.bind();
+		m_normals.bind();
+		m_instances.bind();
+		m_indices.bind();
 
 		glUtil::unbindVAO();
 		/*				*/	

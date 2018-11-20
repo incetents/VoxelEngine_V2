@@ -260,7 +260,7 @@ namespace Vxl
 	Vector3 operator*(const Quaternion& q, const Vector3& v)
 	{
 		// Extract the vector part of the quaternion
-		Vector3 u(-q.x, -q.y, -q.z); // Flip sign, matches up with matrix math
+		Vector3 u(q.x, q.y, q.z);
 
 		// Extract the scalar part of the quaternion
 		float s = q.w;
@@ -271,19 +271,6 @@ namespace Vxl
 			+ 2.0f * s * Vector3::Cross(u, v);
 
 		return vprime;
-
-		// nVidia SDK implementation
-		// I'm not sure why i still have this reference here anymore
-		// I guess it makes me feel clever
-
-		//	Vector3 uv, uuv;
-		//	Vector3 qvec(q.x, q.y, q.z);
-		//	uv = qvec.Cross(v);
-		//	uuv = qvec.Cross(uv);
-		//	uv *= (2.0f * q.w);
-		//	uuv *= 2.0f;
-		//	
-		//	return v + uv + uuv;
 	}
 	// Operator Overload (Math Change)
 	Quaternion& Quaternion::operator*=(const Quaternion& q)

@@ -20,10 +20,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="engine\math\MathCore.cpp" />
+    <ClCompile Include="engine\modules\Entity.cpp" />
+    <ClCompile Include="engine\modules\Material.cpp" />
+    <ClCompile Include="engine\opengl\MeshRenderer.cpp" />
     <ClCompile Include="engine\opengl\FramebufferObject.cpp" />
     <ClCompile Include="engine\opengl\Geometry.cpp" />
     <ClCompile Include="engine\opengl\Texture.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
+    <ClCompile Include="game\Scene.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="include\GL\gl3w.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -51,10 +61,13 @@
     </ClCompile>
     <ClCompile Include="engine\utilities\stringUtil.cpp" />
     <ClCompile Include="engine\window\glfwCallbacks.cpp" />
-    <ClCompile Include="engine\window\glfwUtil.cpp" />
     <ClCompile Include="engine\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\modules\Component.h" />
+    <ClInclude Include="engine\modules\Entity.h" />
+    <ClInclude Include="engine\modules\Material.h" />
+    <ClInclude Include="engine\opengl\MeshRenderer.h" />
     <ClInclude Include="engine\opengl\FramebufferObject.h" />
     <ClInclude Include="engine\opengl\Geometry.h" />
     <ClInclude Include="engine\opengl\Shader.h" />
@@ -85,9 +98,17 @@
     <ClInclude Include="engine\utilities\singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\window\glfwCallbacks.h" />
-    <ClInclude Include="engine\window\glfwUtil.h" />
     <ClInclude Include="engine\opengl\glUtil.h" />
     <ClInclude Include="engine\window\window.h" />
+    <ClInclude Include="game\Scene.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

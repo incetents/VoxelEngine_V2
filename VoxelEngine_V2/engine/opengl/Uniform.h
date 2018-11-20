@@ -52,11 +52,7 @@ namespace Vxl
 	public:
 		glUniformBlock() {}
 		glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize);
-		~glUniformBlock()
-		{
-			if (m_array)
-				delete[] m_array;
-		}
+		~glUniformBlock();
 
 		void set(GLfloat* arr, GLuint arrLength, size_t startOffset = 0);
 	};
@@ -64,7 +60,7 @@ namespace Vxl
 	class glUniform
 	{
 	private:
-		GLuint m_location;
+		GLuint m_location = -1;
 
 	public:
 		glUniform(GLuint location = -1) : m_location(location) {}

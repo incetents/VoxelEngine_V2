@@ -10,19 +10,22 @@ namespace Vxl
 	Camera::Camera(const Vector3& _position, const Vector3& _forward, float _znear, float _zfar)
 	{
 		// Data
-		m_transform.setPosition(_position);
-		m_transform.setForward(_forward);
+		setPosition(_position);
+		setForward(_forward);
 
-		// View
-		update();
 		// Projection Empty
 		m_projection = new CameraProjection(_znear, _zfar);
+		// View
+		update();
 	}
 
 	void Camera::update()
 	{
-		m_view.LookAt(m_transform.getPosition(), m_transform.getPosition() - m_transform.getForward(), m_transform.getUp());
+		m_view = Matrix4x4::LookAt(Transform::getPosition(), Transform::getPosition() + Transform::getForward(), Vector3::UP);
 		m_viewInverse = m_view.Inverse();
+
+		m_viewProjection = m_view * m_projection->getProjection();
+		m_viewProjectionInverse = m_viewProjection.Inverse();
 	}
 
 	Camera& Camera::setPerspective(float _fov, float _aspect)
@@ -37,11 +40,8 @@ namespace Vxl
 		}
 		else
 		{
-			CameraProjection_Perspective* pp = dynamic_cast<CameraProjection_Perspective*>(m_projection);
-#if _DEBUG
-			assert(pp);
-#endif
-			pp->Set(_fov, _aspect);
+			assert(dynamic_cast<CameraProjection_Perspective*>(m_projection));
+			m_projection->Set(_fov, _aspect);
 		}
 
 		return *this;
@@ -58,13 +58,37 @@ namespace Vxl
 		}
 		else
 		{
-			CameraProjection_Orthographic* po = dynamic_cast<CameraProjection_Orthographic*>(m_projection);
-#if _DEBUG
-			assert(po);
-#endif
-			po->Set(_xmin, _xmax, _ymin, _ymax);;
+			assert(dynamic_cast<CameraProjection_Orthographic*>(m_projection));
+			m_projection->Set(_xmin, _xmax, _ymin, _ymax);;
 		}
-		
+
+		return *this;
+	}
+	Camera& Camera::updatePerspective(float _fov, float _aspect)
+	{
+		m_projection->Update_FovAspect(_fov, _aspect);
+		return *this;
+	}
+	Camera& Camera::updateOrtho_X(float _xmin, float _xmax)
+	{
+		m_projection->Update_X(_xmin, _xmax);
+		return *this;
+	}
+	Camera& Camera::updateOrtho_Y(float _ymin, float _ymax)
+	{
+		m_projection->Update_Y(_ymin, _ymax);
+		return *this;
+	}
+	Camera& Camera::setZnear(float _znear)
+	{
+		m_projection->m_Znear = _znear;
+		m_projection->Update_Z(_znear, getZfar());
+		return *this;
+	}
+	Camera& Camera::setZfar(float _zfar)
+	{
+		m_projection->m_Zfar = _zfar;
+		m_projection->Update_Z(getZnear(), _zfar);
 		return *this;
 	}
 }

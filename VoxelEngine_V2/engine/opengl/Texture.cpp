@@ -9,36 +9,38 @@
 
 namespace Vxl
 {
-	Texture::Texture(
-		const std::string& filePath,
+	Database<Texture> Texture::m_database;
+
+	/* BASE TEXTURE */
+
+	BaseTexture::BaseTexture(
 		Wrap_Mode WrapMode,
 		Filter_Mode MinFilter,
 		Filter_Mode MaxFilter
-	)
-		: m_wrapMode(WrapMode), m_maxFilter(MaxFilter), m_minFilter(MinFilter)
+	) : m_minFilter(MinFilter), m_maxFilter(MaxFilter)
 	{
 		assert(m_maxFilter == Filter_Mode::LINEAR || m_maxFilter == Filter_Mode::NEAREST);
 
 		glGenTextures(1, &m_id);
 
-		update();
-
-		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-
-		if (!m_image)
-		{
-			Logger.error("Could not load Image: " + filePath);
+		updateParameters();
+	}
+	BaseTexture::~BaseTexture()
+	{
+		if(m_id != -1)
 			glDeleteTextures(1, &m_id);
-			return;
-		}
-
-		GLenum Format = (GLenum)glUtil::getFormatFloat(m_channels);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, Format, m_width, m_height, 0, Format, GL_UNSIGNED_BYTE, m_image);
-		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
-	void Texture::update()
+	void BaseTexture::Bind()
+	{
+		glBindTexture(GL_TEXTURE_2D, m_id);
+	}
+	void BaseTexture::Unbind()
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void BaseTexture::updateParameters()
 	{
 		glBindTexture(GL_TEXTURE_2D, m_id);
 
@@ -48,44 +50,71 @@ namespace Vxl
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLenum)m_minFilter);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLenum)m_maxFilter);
 
-		if(m_wrapMode == Wrap_Mode::CLAMP_BORDER)
+		if (m_wrapMode == Wrap_Mode::CLAMP_BORDER)
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &(m_borderColor[0]));
 	}
 
-	Texture::~Texture()
-	{
-		delete[] m_image;
-		glDeleteTextures(1, &m_id);
-	}
-
-	void Texture::setWrapMode(Wrap_Mode W)
+	void BaseTexture::setWrapMode(Wrap_Mode W)
 	{
 		m_wrapMode = W;
 
-		update();
+		updateParameters();
 	}
-	void Texture::setFilterMode(Filter_Mode Min, Filter_Mode Max)
+	void BaseTexture::setFilterMode(Filter_Mode Min, Filter_Mode Max)
 	{
 		m_minFilter = Min;
 		m_maxFilter = Max;
 		assert(m_maxFilter == Filter_Mode::LINEAR || m_maxFilter == Filter_Mode::NEAREST);
 
-		update();
+		updateParameters();
 	}
-	// Only works for 
-	void Texture::setBorderColor(Color4F color)
+	void BaseTexture::setBorderColor(Color4F color)
 	{
 		m_borderColor = color;
 
-		update();
+		updateParameters();
 	}
 
-	void Texture::bind()
+	/* TEXTURE */
+
+	Texture::Texture(const std::string& filePath, Wrap_Mode WrapMode, Filter_Mode MinFilter, Filter_Mode MaxFilter)
+		: BaseTexture(WrapMode, MinFilter, MaxFilter)
 	{
-		glBindTexture(GL_TEXTURE_2D, m_id);
+		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
+
+		if (!m_image)
+		{
+			Logger.error("Could not load Image: " + filePath);
+			glDeleteTextures(1, &m_id);
+			return;
+		}
+
+		m_loaded = true;
+
+		GLenum Format = (GLenum)glUtil::getFormatFloat(m_channels);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, Format, m_width, m_height, 0, Format, GL_UNSIGNED_BYTE, m_image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		Unbind();
 	}
-	void Texture::unbind()
+
+	Texture::~Texture()
 	{
-		glBindTexture(GL_TEXTURE_2D, 0);
+		delete[] m_image;
 	}
+
+	/* RENDER TEXTURE */
+
+	RenderTexture::RenderTexture(int Width, int Height, Format_Type Format, Wrap_Mode WrapMode, Filter_Mode MinFilter, Filter_Mode MaxFilter)
+		: BaseTexture(WrapMode, MinFilter, MaxFilter), m_format(Format)
+	{
+		m_width = Width;
+		m_height = Height;
+
+		glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)Format, m_width, m_height, 0, (GLenum)Format, GL_UNSIGNED_BYTE, NULL);
+	
+		Unbind();
+	}
+
 }

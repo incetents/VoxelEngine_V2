@@ -19,6 +19,7 @@ namespace Vxl
 		// Projection Matrices
 		Matrix4x4 m_projection;
 		Matrix4x4 m_projectionInverse;
+
 	public:
 		CameraProjection(float znear, float zfar)
 			: m_Znear(znear), m_Zfar(zfar) {}
@@ -30,38 +31,58 @@ namespace Vxl
 		}
 		Matrix4x4 & getProjectionInverse()
 		{
-			return m_projection;
+			return m_projectionInverse;
 		}
 		// Data
 		float m_Znear;
 		float m_Zfar;
 		// Orthographic
-		virtual float getXmin() const { return 0.0f; }
-		virtual float getXmax() const { return 0.0f; }
-		virtual float getYmin() const { return 0.0f; }
-		virtual float getYmax() const { return 0.0f; }
+		virtual float getXmin() const { assert(false); return 0.0f; }
+		virtual float getXmax() const { assert(false); return 0.0f; }
+		virtual float getYmin() const { assert(false); return 0.0f; }
+		virtual float getYmax() const { assert(false); return 0.0f; }
+		virtual void Set(float xmin, float xmax, float ymin, float ymax) { assert(false); }
 		// Perspective
-		virtual float getFov() const { return 0.0f; }
-		virtual float getAspect() const { return 0.0f; }
+		virtual float getFov() const { assert(false); return 0.0f; }
+		virtual float getAspect() const { assert(false); return 0.0f; }
+		virtual void Set(float _fov, float _aspect) { assert(false); }
+
+		// Special OVerrides
+		virtual void Update_X(float _xmin, float _xmax) { assert(false); }
+		virtual void Update_Y(float _ymin, float _ymax) { assert(false); }
+		virtual void Update_Z(float _zmin, float _zmax) { assert(false); }
+		virtual void Update_FovAspect(float _fov, float _aspect) { assert(false); }
+
 	};
 
 	class CameraProjection_Perspective : public CameraProjection
 	{
-	private:
+	protected:
 		float m_fov;
 		float m_aspect;
 	public:
 		float getFov() const override { return m_fov; }
 		float getAspect() const override { return m_aspect; }
 
-		void Set(float fov, float aspect)
+		void Set(float fov, float aspect) override
 		{
 			m_fov = fov;
 			m_aspect = aspect;
 
-			m_projection.Perspective(fov, aspect, m_Znear, m_Zfar);
-			m_projectionInverse = m_projection.Inverse();
+			m_projection = Matrix4x4::Perspective(fov, aspect, m_Znear, m_Zfar);
+			m_projectionInverse = Matrix4x4::PerspectiveInverse(fov, aspect, m_Znear, m_Zfar);
 		}
+		void Update_FovAspect(float _fov, float _aspect) override
+		{
+			Matrix4x4::Perspective_UpdateFov(m_projection, _fov, _aspect);
+			Matrix4x4::PerspectiveInverse_UpdateFov(m_projectionInverse, _fov, _aspect);
+		}
+		void Update_Z(float _znear, float _zfar)
+		{
+			Matrix4x4::Perspective_UpdateZ(m_projection, _znear, _zfar);
+			Matrix4x4::PerspectiveInverse_UpdateZ(m_projectionInverse, _znear, _zfar);
+		}
+
 		CameraProjection_Perspective(float fov, float aspect, float znear, float zfar)
 			: CameraProjection(znear, zfar)
 		{
@@ -72,7 +93,7 @@ namespace Vxl
 
 	class CameraProjection_Orthographic : public CameraProjection
 	{
-	private:
+	protected:
 		float m_boundaries[4];
 	public:
 		float getXmin() const override { return m_boundaries[0]; }
@@ -80,15 +101,27 @@ namespace Vxl
 		float getYmin() const override { return m_boundaries[2]; }
 		float getYmax() const override { return m_boundaries[3]; }
 
-		void Set(float xmin, float xmax, float ymin, float ymax)
+		void Set(float xmin, float xmax, float ymin, float ymax) override
 		{
 			m_boundaries[0] = xmin;
 			m_boundaries[1] = xmax;
 			m_boundaries[2] = ymin;
 			m_boundaries[3] = ymax;
 
-			m_projection.Orthographic(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
-			m_projectionInverse = m_projection.Inverse();
+			m_projection = Matrix4x4::Orthographic(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
+			m_projectionInverse = Matrix4x4::OrthographicInverse(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
+		}
+		void Update_X(float _xmin, float _xmax)
+		{
+
+		}
+		void Update_Y(float _ymin, float _ymax)
+		{
+
+		}
+		void Update_Z(float _znear, float _zfar)
+		{
+			
 		}
 		CameraProjection_Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
 			: CameraProjection(znear, zfar)
@@ -98,8 +131,11 @@ namespace Vxl
 		~CameraProjection_Orthographic() {}
 	};
 
-	class Camera
+	class Camera : public Transform
 	{
+		friend class CameraProjection;
+		friend class CameraProjection_Perspective;
+		friend class CameraProjection_Orthographic;
 	private:
 		enum Type
 		{
@@ -123,21 +159,16 @@ namespace Vxl
 			delete m_projection;
 		}
 	
-		// Data
-		Transform m_transform;
 		void update();
 
 		// Utility
 		Camera& setPerspective(float _fov, float _aspect);
 		Camera& setOrthographic(float _xmin, float _xmax, float _ymin, float _ymax);
-		inline void setZnear(float _znear)
-		{
-			m_projection->m_Znear = _znear;
-		}
-		inline void setZfar(float _zfar)
-		{
-			m_projection->m_Zfar = _zfar;
-		}
+		Camera& updatePerspective(float _fov, float _aspect);  // If already perspective, this will update its values faster
+		Camera& updateOrtho_X(float _xmin, float _xmax);  // If already ortho, this will update its values faster
+		Camera& updateOrtho_Y(float _ymin, float _ymax);  // If already ortho, this will update its values faster
+		Camera& setZnear(float _znear);
+		Camera& setZfar(float _zfar);
 
 		// Get Data	
 		inline const Matrix4x4&	getView() const
@@ -165,18 +196,54 @@ namespace Vxl
 			return m_viewProjectionInverse;
 		}
 
-		inline Type			getType() const
+		inline Type	 getType() const
 		{
 			return m_type;
 		}
-		inline float		getZnear() const
+		inline float getZnear() const
 		{
 			return m_projection->m_Znear;
 		}
-		inline float		getZfar() const
+		inline float getZfar() const
 		{
 			return m_projection->m_Zfar;
 		}
+		inline float getFOV() const
+		{
+			return m_projection->getFov();
+		}
+		inline float getAspect() const
+		{
+			return m_projection->getAspect();
+		}
+		inline float getXmin() const
+		{
+			return m_projection->getXmin();
+		}
+		inline float getXmax() const
+		{
+			return m_projection->getXmax();
+		}
+		inline float getYmin() const
+		{
+			return m_projection->getYmin();
+		}
+		inline float getYmax() const
+		{
+			return m_projection->getYmax();
+		}
 
+		// Override for transform class (forward directions are reversed)
+		Vector3 getForward(void) override
+		{
+			updateValues();
+			return -m_forward;
+		}
+		Vector3 getBackwards(void) override
+		{
+			updateValues();
+			return m_forward;
+		}
+		
 	};
 }

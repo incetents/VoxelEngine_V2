@@ -1,0 +1,24 @@
+----------------------------------------
+#SHADER
+
+#VERT test_vert ./shaders/test.vert
+#FRAG test_frag ./shaders/test.frag
+
+#VERT gbuffer_vert ./shaders/gbuffer.vert
+#VERT gbuffer_instancing_vert ./shaders/gbuffer_instancing.vert
+#FRAG gbuffer_frag ./shaders/gbuffer.frag
+
+#VERT passthrough_vert ./shaders/passthrough.vert
+#FRAG passthrough_frag ./shaders/passthrough.frag
+
+----------------------------------------
+#SHADERPROGRAM
+
+test test_vert test_frag
+gbuffer gbuffer_vert gbuffer_frag
+gbuffer_instancing gbuffer_instancing_vert gbuffer_frag
+passthrough passthrough_vert passthrough_frag
+
+----------------------------------------
+#TEXTURE
+beato ./assets/textures/beato.png

@@ -155,6 +155,13 @@ namespace Vxl
 		glBufferData(GL_UNIFORM_BUFFER, bufferSize, m_array, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, m_bindingPoint, m_buffer);
 	}
+	glUniformBlock::~glUniformBlock()
+	{
+		glDeleteBuffers(1, &m_buffer);
+
+		if (m_array != nullptr)
+			delete[] m_array;
+	}
 
 	void glUniformBlock::set(GLfloat* arr, GLuint arrLength, size_t startOffset)
 	{

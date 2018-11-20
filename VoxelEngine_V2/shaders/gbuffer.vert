@@ -17,8 +17,7 @@ out fragment_data
 
 // Uniforms
 uniform mat4 model		= mat4(1.0);
-uniform mat4 view		= mat4(1.0);
-uniform mat4 projection = mat4(1.0);
+uniform mat4 viewProjection = mat4(1.0);
 
 // Main
 void main()
@@ -29,5 +28,5 @@ void main()
 	f_data.uv = m_uv;
 	f_data.normal = vec3(model * vec4(normalize(m_normal), 0));
 
-	gl_Position = projection * view * object_position; 
+	gl_Position = viewProjection * object_position; 
 }

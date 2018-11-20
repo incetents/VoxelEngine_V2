@@ -1,6 +1,8 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #pragma once
 
+#include "../modules/Component.h"
+
 #include "Matrix2x2.h"
 #include "Matrix3x3.h"
 #include "Matrix4x4.h"
@@ -15,9 +17,9 @@
 
 namespace Vxl
 {
-	class Transform// : public Component
+	class Transform : public Component
 	{
-	private:
+	protected:
 		// Model for transformations
 		Matrix4x4	m_ModelMatrix;
 
@@ -450,7 +452,7 @@ namespace Vxl
 		}
 
 		// Turn object into a 4x4 matrix for math
-		const Matrix4x4 getModel();
+		Matrix4x4* getModel();
 
 		// Getters
 		inline Vector3		getPosition() const
@@ -470,17 +472,32 @@ namespace Vxl
 			updateValues();
 			return m_rotation;
 		}
-		Vector3				getForward()
+		virtual Vector3		getForward()
 		{
 			updateValues();
 			return m_forward;
 		}
-		Vector3				getUp()
+		virtual Vector3		getBackwards()
+		{
+			updateValues();
+			return -m_forward;
+		}
+		virtual Vector3		getUp()
 		{
 			updateValues();
 			return m_up;
 		}
-		Vector3				getRight()
+		virtual Vector3		getDown()
+		{
+			updateValues();
+			return -m_up;
+		}
+		virtual Vector3		getLeft()
+		{
+			updateValues();
+			return -m_right;
+		}
+		virtual Vector3		getRight()
 		{
 			updateValues();
 			return m_right;

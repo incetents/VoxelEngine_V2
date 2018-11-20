@@ -15,8 +15,12 @@
 
 // Engine
 #include "opengl/glUtil.h"
+#include "opengl/FramebufferObject.h"
+#include "opengl/Geometry.h"
 #include "opengl/Mesh.h"
 #include "opengl/Shader.h"
+#include "opengl/Texture.h"
+
 #include "math/Camera.h"
 #include "math/Color.h"
 #include "math/Lerp.h"

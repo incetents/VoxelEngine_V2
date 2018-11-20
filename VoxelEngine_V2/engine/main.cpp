@@ -2,33 +2,31 @@
 #include "Precompiled.h"
 
 #include "opengl/glUtil.h"
-#include "window/glfwUtil.h"
 
 #include "window/window.h"
 #include "input/Input.h"
 
 #include "utilities/Loader.h"
 #include "utilities/logger.h"
-#include "utilities/stringUtil.h"
 
-#include "opengl/Geometry.h"
-#include "opengl/Mesh.h"
-#include "opengl/Shader.h"
-#include "opengl/Texture.h"
-
-#include "math/Camera.h"
-#include "math/Color.h"
-#include "math/Transform.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 
-#include <iostream>
+#include "../game/Scene.h"
 
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_glfw.h"
+#include "../imgui/imgui_impl_opengl3.h"
+
+// Include glfw3.h after our OpenGL definitions
+#include <GLFW/glfw3.h> 
 
 /**/
 using namespace Vxl;
 using namespace std;
+
+Scene* _scene = new Scene();
 
 #if _DEBUG
 // Console Mode
@@ -38,10 +36,24 @@ int main()
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 #endif
 {
-	glfwUtil::init();
+	// WINDOW Setup
+	if (!glfwInit())
+		return 1;
 
-	Window.Setup("Vxl Engine", 800, 800);
+	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
 
+	// IMGUI Setup
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	ImGui_ImplGlfw_InitForOpenGL(Window.GetContext(), true);
+	ImGui_ImplOpenGL3_Init("#version 430");
+
+	ImGui::StyleColorsDark();
+
+
+	// Glew/Opengl Init
 	glUtil::initGlew();
 	glUtil::initHints();
 
@@ -49,126 +61,50 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	std::cout << glUtil::getRendererVersion() << std::endl;
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
-	/**/
+	// Special
+	/* ~ */
 	Geometry::Setup();
-	/**/
-	Loader::LoadScript_Shaders("./scripts/ShaderLoader.txt");
-	/**/
-	ShaderProgram* Sp = ShaderProgram::m_database.Get("gbuffer");
+	Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
 
-	/**/
+	/* ~ */
+	_scene->setup();
 
-	Mesh* m = new Mesh();
-
-	Vector3 pos[] = {
-		Vector3(-0.5f, -0.5f, 0.0f),
-		Vector3(0.5f, -0.5f, 0.0f),
-		Vector3(0.5f, 0.5f, 0.0f),
-		Vector3(-0.5f, 0.5f, 0.0f)
-	};
-	Vector2 uvs[] = {
-		Vector2(0,0),
-		Vector2(1,0),
-		Vector2(1,1),
-		Vector2(0,1)
-	};
-	Vector3 nor[] = {
-		Vector3(0,0,1),
-		Vector3(0,0,1),
-		Vector3(0,0,1),
-		Vector3(0,0,1)
-	};
-	GLuint indices[6] = { 0, 1, 2, 0, 2, 3 };
-
-	m->m_positions.set(pos, 4);
-	m->m_uvs.set(uvs, 4);
-	m->m_normals.set(nor, 4);
-	m->m_indices.set(indices, 6);
-
-	m->Bind();
-
-	// Texture
-	Texture* tex = new Texture("./assets/textures/beato.png");
-
-	// Transform
-	Camera cam(Vector3(0,0,0));
-	cam.setOrthographic(-5, 5, -5, 5);
-	cam.update();
-
-	static float rot = 0.0f;
-	Transform model(Vector3(0, 0.5f, 0), Vector3(0, 0, 0));
-
+	/* ~ */
 	while (!Window.GetClosed())
 	{
-		glUtil::clearBuffer();
-		glUtil::clearColor(Color3F(0.1f, 0.1f, 0.3f));
-
-		if (Input.getKeyDown(KeyCode::ESCAPE))
-			Window.Close();
-
-		Sp->Bind();
-
-		model.setRotationX(rot / 2);
-		model.setRotationY(rot++);
-		//model.setScale(0.2f);
-
-		// SUBROUTINES
-		// glSubroutine Sub = Sp->GetSubroutine(ShaderType::FRAGMENT);
-		// Sub.set("Colour1", "ColorRed");
-		// Sub.set("Colour2", "ColorGreen");
-		// Sub.set("myNum", "t2");
-		// Sub.bind();
-
-		// UNIFORM BLOCKS
-		//auto block = Sp->GetUniformBlock("ColorBlock_0");
-		//float myFloats[3] = { 0.5f, 0.0f, 1.0f };
-		//block->set(myFloats, 3);
-		//float r = 0.5f;
-		//float g = 1.0f;
-		//float b = 0.0f;
-		//block->set(&r, 1, 0);
-		//block->set(&g, 1, 1);
-
-		// UNIFORMS
-		// Sp->SetUniform("value1", 0.1f);
-		// Sp->SetUniform("value2", 0.1f);
-		// Sp->SetUniform("value3", 0.1f);
-
-		// Uniform a = Sp->GetUniform("value1");
-		// a.set<float>(1.0f);
-		// Uniform b = Sp->GetUniform("value2");
-		// b.set<float>(0.0f);
-		// Uniform c = Sp->GetUniform("value3");
-		// c.set<float>(0.5f);
-
-		Sp->SetUniform("model", model.getModel());
-		
-		Sp->SetUniform("view", cam.getView());
-		Sp->SetUniform("projection", cam.getProjection());
-
-		if (Input.getKey(KeyCode::LEFT))
+		// OpenGl Reset
+		if (Input.getKeyDown(KeyCode::R))
 		{
-			//cam.m_transform.increasePositionX(-1.0f);
+			ShaderProgram::m_database.DeleteAndClear();
+			Shader::m_database.DeleteAndClear();
+			Texture::m_database.DeleteAndClear();
+			// Reload Framebuffer Objects too
+
+			Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
+
+			//Shader_Gbuffer = ShaderProgram::m_database.Get("gbuffer");
+			//Shader_Passthrough = ShaderProgram::m_database.Get("passthrough");
+
+			//tex = Texture::m_database.Get("beato");
 		}
-		else if (Input.getKey(KeyCode::RIGHT))
-		{
-			//cam.m_transform.increasePositionX(+1.0f);
-		}
-		cam.update();
 
-		// TEX 
-		glActiveTexture(GL_TEXTURE0);
-		tex->bind();
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
 
-		// MESHES
-		//glUtil::cullMode(Cull_Type::NONE);
-		Geometry::GetCube()->Draw();
-		//Geometry::GetFullQuad()->Draw();
+		_scene->update();
+		_scene->draw();
 
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		//
 		Input.Update();
 		Window.Update();
 	}
+
+
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	Window.Terminate();
 

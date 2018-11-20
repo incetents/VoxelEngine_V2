@@ -12,11 +12,13 @@ namespace Vxl
 		{
 			NONE,
 			SHADER,
-			SHADER_PROGRAM
+			SHADER_PROGRAM,
+			TEXTURE
 		};
 
 		static const std::string TAG_LOAD_SHADER;
 		static const std::string TAG_LOAD_SHADERPROGRAM;
+		static const std::string TAG_LOAD_TEXTURE;
 
 		static const std::string TAG_VERT;
 		static const std::string TAG_GEOM;
@@ -25,7 +27,7 @@ namespace Vxl
 		static const std::string TAG_TESS_EVAL;
 		static const std::string TAG_COMP;
 	public:
-		static bool LoadScript_Shaders(const std::string& fullpath);
+		static bool LoadScript_ImportFiles(const std::string& fullpath);
 	};
 }
 

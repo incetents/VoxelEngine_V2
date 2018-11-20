@@ -13,12 +13,11 @@
 namespace Vxl
 {
 	typedef std::unordered_map<std::string, glUniform> UniformStorage;
-	typedef std::unordered_map<std::string, glUniformBlock> UniformBlockStorage;
+	typedef std::unordered_map<std::string, glUniformBlock*> UniformBlockStorage;
 	typedef std::unordered_map<ShaderType, glSubroutine> SubroutineStorage;
 
 	class Shader
 	{
-		friend class Loader;
 	private:
 		bool				m_fail = true;
 		GLuint				m_id = -1;
@@ -58,7 +57,6 @@ namespace Vxl
 
 	class ShaderProgram
 	{
-		friend class Loader;
 	private:
 		// Program //
 		bool				m_linked = false;
@@ -104,7 +102,7 @@ namespace Vxl
 		inline const glUniform& GetUniform(const std::string& name)
 		{
 #if _DEBUG
-			assert(m_uniforms.find(name) != m_uniforms.end());
+			assert(CheckUniform(name));
 #endif
 			return m_uniforms[name];
 		}
@@ -112,13 +110,17 @@ namespace Vxl
 		{
 			return m_uniformCount;
 		}
+		inline bool				CheckUniform(const std::string& name)
+		{
+			return (m_uniforms.find(name) != m_uniforms.end());
+		}
 		// Uniform Blocks
 		inline glUniformBlock*  GetUniformBlock(const std::string& name)
 		{
 #if _DEBUG
 			assert(m_uniformBlocks.find(name) != m_uniformBlocks.end());
 #endif
-			return &m_uniformBlocks[name];
+			return m_uniformBlocks[name];
 		}
 		inline GLuint			GetUniformBlockCount(void) const
 		{

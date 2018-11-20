@@ -172,76 +172,108 @@ namespace Vxl
 		*this = Matrix4x4::Identity;
 	}
 
-	// Become View Matrix
-	Matrix4x4& Matrix4x4::LookAt(Vector3 Eye, Vector3 Target, Vector3 Up = Vector3(0, 1, 0))
+	// View Matrix
+	Matrix4x4 Matrix4x4::LookAt(Vector3 Eye, Vector3 Target, Vector3 Up = Vector3(0, 1, 0))
 	{
 		Vector3 f = Vector3::Normalize(Target - Eye);
-		Vector3 u = Vector3::Normalize(Up);
-		Vector3 s = Vector3::Normalize(Vector3::Cross(f, u));
-		u = Vector3::Cross(s, f);
-		
-		BeIdentity();
-		_Val[0x0] = s.x;
-		_Val[0x4] = s.y;
-		_Val[0x8] = s.z;
-		
-		_Val[0x1] = u.x;
-		_Val[0x5] = u.y;
-		_Val[0x9] = u.z;
-		
-		_Val[0x2] = -f.x;
-		_Val[0x6] = -f.y;
-		_Val[0xA] = -f.z;
-		
-		_Val[0xC] = -Vector3::Dot(s, Eye);
-		_Val[0xD] = -Vector3::Dot(u, Eye);
-		_Val[0xE] = -Vector3::Dot(f, Eye);
-		return *this;
-	}
-	Matrix4x4 Matrix4x4::GetLookAt(Vector3 Eye, Vector3 Target, Vector3 Up = Vector3(0, 1, 0))
-	{
-		Matrix4x4 Result;
-		return Result.LookAt(Eye, Target, Up);
-	}
-	// Become Perspective Matrix
-	Matrix4x4& Matrix4x4::Perspective(float fovy, float aspect, float znear, float zfar)
-	{
-		float zdistance = zfar - znear;
-		float halfFovRadians = Deg_To_Rad(fovy * 0.5f);
-		BeIdentity();
-		_Val[0x0] = +1.0f / (aspect * tanf(halfFovRadians));
-		_Val[0x5] = +1.0f / tanf(halfFovRadians);
-		_Val[0xA] = -(zfar + znear) / zdistance;
-		_Val[0xB] = -1.0f;
-		_Val[0xE] = (-2.0f * zfar * znear) / zdistance;
-		_Val[0xF] = 0;
+		Vector3 s = Vector3::Normalize(Vector3::Cross(Up, f));
+		Vector3 u = Vector3::Cross(f, s);
 
-		return *this;
-	}
-	Matrix4x4 Matrix4x4::GetPerspective(float fovy, float aspect, float znear, float zfar)
-	{
-		Matrix4x4 Result;
-		return Result.Perspective(fovy, aspect, znear, zfar);
-	}
-	// Become Orthographic Matrix
-	Matrix4x4& Matrix4x4::Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
-	{
-		BeIdentity();
-		_Val[0x0] = +2.0f / (xmax - xmin);
-		_Val[0x5] = +2.0f / (ymax - ymin);
-		_Val[0xA] = -2.0f / (zfar - znear);
-		_Val[0xC] = -1.0f * (xmax + xmin) / (xmax - xmin);
-		_Val[0xD] = -1.0f * (ymax + ymin) / (ymax - ymin);
-		_Val[0xE] = -1.0f * (zfar + znear) / (zfar - znear);
-
-		return *this;
-	}
-	Matrix4x4 Matrix4x4::GetOrthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
-	{
-		Matrix4x4 Result;
-		return Result.Orthographic(xmin, xmax, ymin, ymax, znear, zfar);
+		return Matrix4x4
+		(
+			s.x, u.x, f.x, 0,
+			s.y, u.y, f.y, 0,
+			s.z, u.z, f.z, 0,
+			-Vector3::Dot(s, Eye), -Vector3::Dot(u, Eye), -Vector3::Dot(f, Eye), 1.f
+		);
 	}
 
+	// Perspective Matrix
+	Matrix4x4 Matrix4x4::Perspective(float fovy, float aspect, float znear, float zfar)
+	{
+		Matrix4x4 M;
+
+		float temp = 1.0f / tanf(Deg_To_Rad(fovy) * 0.5f);
+		
+		M[0x0] = temp / aspect;
+		M[0x5] = temp;
+		M[0xA] = (zfar + znear) / (znear - zfar);
+		M[0xB] = -1.0f;
+		M[0xE] = (2.0f * zfar * znear) / (znear - zfar);
+		M[0xF] = 0.0f;
+
+		return M;
+	}
+	Matrix4x4 Matrix4x4::PerspectiveInverse(float fovy, float aspect, float znear, float zfar)
+	{
+		Matrix4x4 M;
+
+		float temp = 1.0f / tanf(Deg_To_Rad(fovy) * 0.5f);
+
+		M[0x0] = aspect / temp;
+		M[0x5] = 1.0f / temp;
+		M[0xA] = 1.0f;
+		M[0xB] = (znear - zfar) / (2.0f * zfar * znear);
+		M[0xE] = -1.0f;
+		M[0xF] = +0.5f;
+
+		return M;
+	}
+	void Matrix4x4::Perspective_UpdateFov(Matrix4x4& M, float fovy, float aspect)
+	{
+		float temp = 1.0f / tanf(Deg_To_Rad(fovy) * 0.5f);
+
+		M[0x0] = temp / aspect;
+		M[0x5] = temp;
+	}
+	void Matrix4x4::Perspective_UpdateZ(Matrix4x4& M, float znear, float zfar)
+	{
+		M[0xA] = (zfar + znear) / (znear - zfar);
+		M[0xE] = (2.0f * zfar * znear) / (znear - zfar);
+	}
+	void Matrix4x4::PerspectiveInverse_UpdateFov(Matrix4x4& M, float fovy, float aspect)
+	{
+		float temp = 1.0f / tanf(Deg_To_Rad(fovy) * 0.5f);
+
+		M[0x0] = aspect / temp;
+		M[0x5] = 1.0f / temp;
+	}
+	void Matrix4x4::PerspectiveInverse_UpdateZ(Matrix4x4& M, float znear, float zfar)
+	{
+		M[0xB] = (znear - zfar) / (2.0f * zfar * znear);
+	}
+
+	// Orthographic Matrix
+	Matrix4x4 Matrix4x4::Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
+	{
+		Matrix4x4 M;
+
+		M[0x0] = +2.0f / (xmax - xmin);
+		M[0x5] = +2.0f / (ymax - ymin);
+		M[0xA] = -2.0f / (zfar - znear);
+		M[0xC] = -(xmax + xmin) / (xmax - xmin);
+		M[0xD] = -(ymax + ymin) / (ymax - ymin);
+		M[0xE] = -(zfar + znear) / (zfar - znear);
+		M[0xF] = 1.0f;
+
+		return M;
+	}
+	Matrix4x4 Matrix4x4::OrthographicInverse(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
+	{
+		Matrix4x4 M;
+
+		M[0x0] = (xmax - xmin)  / +2.0f;
+		M[0x5] = (ymax - ymin)  / +2.0f;
+		M[0xA] = (zfar - znear) / -2.0f;
+		M[0xC] = (xmax + xmin)  / +2.0f;
+		M[0xD] = (ymax + ymin)  / +2.0f;
+		M[0xE] = (zfar + znear) / -2.0f;
+		M[0xF] = 1.0f;
+
+		return M;
+	}
+
+	
 	// Become Rotation Matrix (Degrees)
 	Matrix4x4 Matrix4x4::RotationX(const Degrees& deg, RotationDirection rot)
 	{

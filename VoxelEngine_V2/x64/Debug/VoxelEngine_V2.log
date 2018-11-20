@@ -1,0 +1,10 @@
+﻿  Material.cpp
+  FramebufferObject.cpp
+  main.cpp
+  Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+soil.lib(image_DXT.obj) : warning LNK4099: PDB 'SOIL.pdb' was not found with 'soil.lib(image_DXT.obj)' or at 'C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\x64\Debug\SOIL.pdb'; linking object as if no debug info
+soil.lib(image_helper.obj) : warning LNK4099: PDB 'SOIL.pdb' was not found with 'soil.lib(image_helper.obj)' or at 'C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\x64\Debug\SOIL.pdb'; linking object as if no debug info
+soil.lib(SOIL.obj) : warning LNK4099: PDB 'SOIL.pdb' was not found with 'soil.lib(SOIL.obj)' or at 'C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\x64\Debug\SOIL.pdb'; linking object as if no debug info
+soil.lib(stb_image_aug.obj) : warning LNK4099: PDB 'SOIL.pdb' was not found with 'soil.lib(stb_image_aug.obj)' or at 'C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\x64\Debug\SOIL.pdb'; linking object as if no debug info
+  VoxelEngine_V2.vcxproj -> C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\x64\Debug\VoxelEngine_V2.exe

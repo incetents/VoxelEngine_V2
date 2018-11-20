@@ -11,15 +11,28 @@ in fragment_data
 } f_data;
 
 // Output
-layout (location = 0) out vec4 final_color;
+layout (location = 0) out vec4 final_color1;
+layout (location = 1) out vec4 final_color2;
 
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
 
+uniform vec3 camForward = vec3(0,0,1);
+
 //Main
 void main()
 {
+	//gl_FragColor 
+
 	//final_color = vec4(normalize(f_data.normal) * 0.5 + vec3(0.5, 0.5, 0.5), 1);
 	//final_color = vec4(f_data.uv.x,f_data.uv.y,1,1);
-	final_color = texture(albedo_handler, f_data.uv);
+	float d = dot(camForward, normalize(f_data.normal));
+	vec3 n = normalize(f_data.normal) * 0.5 + 0.5;
+	vec2 uv = f_data.uv;
+	
+	//final_color1 = vec4(d,0,0.2,1);
+	final_color1 = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0);
+	
+	final_color2 = texture(albedo_handler, f_data.uv);
 }
+//gbuffer gbuffer_vert gbuffer_frag

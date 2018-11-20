@@ -3,9 +3,10 @@
 #include "window.h"
 
 #include "glfwCallbacks.h"
-#include "glfwUtil.h"
 
 #include "../utilities/logger.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Vxl
 {

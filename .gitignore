@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+\.vs/VoxelEngine_V2/v15/
+
+Debug/
+
+x64/

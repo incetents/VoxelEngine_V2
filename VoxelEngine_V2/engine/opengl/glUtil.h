@@ -65,6 +65,7 @@ namespace Vxl
 		// VBO - Array
 		void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
 		void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT);
+		void setVertexAttribInstancing(GLuint bufferIndex);
 		// VBO - Index
 		void bindIndices(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
 
@@ -78,7 +79,9 @@ namespace Vxl
 		bool isDrawTypePoints(Draw_Type type);
 
 		// TEXTURES //
-		void setActiveTexture(GLuint level);
+		void setActiveTexture(Active_Texture level);
+		void setActiveTexture(int level);
+		void setActiveTexture(unsigned int level);
 
 		void bindTexture(Texture_Type type, GLuint& texture_id);
 		void unbindTexture(Texture_Type type);
@@ -88,5 +91,6 @@ namespace Vxl
 
 		// GET OPENGL INFO //
 		GLint GetMaxUniformBufferBindings();
+		GLint GetMaxFBOColorAttachments();
 	}
 }

@@ -23,6 +23,18 @@ public:
 			m_database.erase(name);
 		}
 	}
+	inline void DeleteAndClear()
+	{
+		for (auto it = m_database.begin(); it != m_database.end(); it++)
+		{
+			delete it->second;
+		}
+		m_database.clear();
+	}
+	inline void Clear()
+	{
+		m_database.clear();
+	}
 	inline void Set(const std::string& name, Type* data)
 	{
 		if (m_database.find(name) != m_database.end())

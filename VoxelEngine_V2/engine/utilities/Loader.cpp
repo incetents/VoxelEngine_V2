@@ -3,6 +3,7 @@
 #include "Loader.h"
 
 #include "../opengl/Shader.h"
+#include "../opengl/Texture.h"
 
 #include "logger.h"
 
@@ -12,6 +13,7 @@ namespace Vxl
 {
 	const std::string Loader::TAG_LOAD_SHADER = "#SHADER";
 	const std::string Loader::TAG_LOAD_SHADERPROGRAM = "#SHADERPROGRAM";
+	const std::string Loader::TAG_LOAD_TEXTURE = "#TEXTURE";
 
 	const std::string Loader::TAG_VERT = "#VERT";
 	const std::string Loader::TAG_GEOM = "#GEOM";
@@ -20,11 +22,14 @@ namespace Vxl
 	const std::string Loader::TAG_TESS_EVAL = "#TESS_EVAL";
 	const std::string Loader::TAG_COMP = "#COMP";
 
-	bool Loader::LoadScript_Shaders(const std::string& fullpath)
+	bool Loader::LoadScript_ImportFiles(const std::string& fullpath)
 	{
 		std::string File = stringUtil::readFile(fullpath);
 		if (File.empty())
 			return false;
+
+		Logger.log("Loading Files: " + fullpath);
+		Logger.log("~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
 		LoadState _state = LoadState::NONE; // STATE
 
@@ -33,18 +38,27 @@ namespace Vxl
 		{
 			if (!Line.empty())
 			{
+				// Ignore comments
+				//
+
 				auto Segments = stringUtil::splitStr(Line, ' ');
-				if (Segments.size() == 1)
+				unsigned int SegmentCount = (unsigned int)Segments.size();
+
+				if (SegmentCount == 1)
 				{
+					/* STATE */
 					auto Tag = Segments[0];
 					if (Tag.compare(TAG_LOAD_SHADER) == 0)
 						_state = LoadState::SHADER;
 					else if (Tag.compare(TAG_LOAD_SHADERPROGRAM) == 0)
 						_state = LoadState::SHADER_PROGRAM;
+					else if (Tag.compare(TAG_LOAD_TEXTURE) == 0)
+						_state = LoadState::TEXTURE;
 				}
-				else if (Segments.size() >= 3)
+				else
 				{
-					if (_state == LoadState::SHADER)
+					/* SHADER */
+					if (_state == LoadState::SHADER && SegmentCount == 3)
 					{
 						auto Tag = Segments[0];
 						auto Name = Segments[1];
@@ -75,6 +89,7 @@ namespace Vxl
 							if (Shader::m_database.Check(Name))
 							{
 								Logger.error("Duplicate Shader: " + Name);
+								delete S;
 							}
 							else
 							{
@@ -82,8 +97,11 @@ namespace Vxl
 								Shader::m_database.Set(Name, S);
 							}
 						}
+						else
+							delete S;
 					}
-					else if (_state == LoadState::SHADER_PROGRAM)
+					/* SHADER PROGRAM */
+					else if (_state == LoadState::SHADER_PROGRAM && SegmentCount >= 3)
 					{
 						auto Name = Segments[0];
 						ShaderProgram* Sp = new ShaderProgram(Name);
@@ -101,6 +119,7 @@ namespace Vxl
 							if (Shader::m_database.Check(Name))
 							{
 								Logger.error("Duplicate Shader Program: " + Name);
+								delete Sp;
 							}
 							else
 							{
@@ -108,6 +127,29 @@ namespace Vxl
 								ShaderProgram::m_database.Set(Name, Sp);
 							}
 						}
+						else
+							delete Sp;
+					}
+					/* TEXTURE */
+					else if(_state == LoadState::TEXTURE && SegmentCount == 2)
+					{
+						auto Name = Segments[0];
+						Texture* tex = new Texture(Segments[1]);
+						if (tex->IsLoaded())
+						{
+							if (Texture::m_database.Check(Name))
+							{
+								Logger.error("Duplicate Texture: " + Name);
+								delete tex;
+							}
+							else
+							{
+								Logger.log("Loaded Texture: " + Name);
+								Texture::m_database.Set(Name, tex);
+							}
+						}
+						else
+							delete tex;
 					}
 				}
 			}
