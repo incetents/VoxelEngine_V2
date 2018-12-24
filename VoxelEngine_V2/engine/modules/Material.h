@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include "Component.h"
 #include "../opengl/glUtil.h"
 #include "../opengl/Uniform.h"
 //
@@ -14,30 +15,37 @@ namespace Vxl
 	class ShaderProgram;
 	class Texture;
 	class Matrix4x4;
+	class Transform;
 
-
-	class Material
+	template<typename Type>
+	class MaterialPackage
 	{
-		friend class Entity;
-	private:
+	public:
+		bool		m_exists = false;
+		Type*		m_data	= nullptr;
+		glUniform	m_uniform;
+	};
+
+	class Material : public Component
+	{
+	protected:
+		// Shader
 		ShaderProgram* m_shaderProgram;
+
+		// Texture Package
 		std::unordered_map<Active_Texture, Texture*> m_textures;
 
 		// Uniform Package
-		bool		m_hasModelMatrix;
-		glUniform	m_modelMatrixUniform;
-		Matrix4x4*	m_modelMatrix;
+		virtual void UpdateMaterialPackages();
+		MaterialPackage<Transform> Mat_modelMatrix;
 
 	public:
-		Material(ShaderProgram* _shader);
+		Material() {}
+
+		void SetShader(ShaderProgram* _shader);
+		void SetTexture(Texture* tex, Active_Texture level);
+		void SetTransformReference(Transform* _transform);
 
 		virtual void Bind();
-
-		// Set Data
-		void SetTexture(Texture* tex, Active_Texture level);
-		void SetModelMatrix(Matrix4x4* model)
-		{
-			m_modelMatrix = model;
-		}
 	};
 }

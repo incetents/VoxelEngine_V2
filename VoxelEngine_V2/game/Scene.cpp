@@ -63,13 +63,11 @@ namespace Vxl
 		_camera->setPerspective(110.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT);
 		_camera->update();
 
-		// Render Textures
-		RenderTexture* r2 = new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
-		RenderTexture* r1 = new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
 		// FBO
 		_fbo = new FramebufferObject();
-		_fbo->addTexture(r1);
-		_fbo->addTexture(r2);
+		_fbo->addTexture(new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT));
+		_fbo->addTexture(new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT));
+		_fbo->addTexture(new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT));
 		_fbo->addDepth(SCREEN_WIDTH, SCREEN_HEIGHT);
 		_fbo->unbind();
 
@@ -111,8 +109,8 @@ namespace Vxl
 		{
 			for (float y = 0; y < 5.0f; y++)
 			{
-				Transform t(Vec3(x * 1.2, y * 1.2, -3.0f));
-				m_models.push_back(*t.getModel());
+				Transform t(Vec3(x * 1.2f, y * 1.2f, -3.0f));
+				m_models.push_back(t.getModel());
 			}
 		}
 
@@ -120,25 +118,24 @@ namespace Vxl
 
 		_mesh->Bind();
 
-		// Material
-		Material* _mat_instance = new Material(_shader_gbuffer_instancing);
-		Material* _mat_normal = new Material(_shader_gbuffer);
-
 		// Entity
 		_entity1 = new Entity();
-		_entity1->SetMaterial(_mat_instance);
+		_entity1->SetMaterial(_shader_gbuffer_instancing);
+		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity1->m_mesh = _mesh;
-		//_entity1->m_transform.setScale(+0.2f);
+		//_entity1->m_transform.setScale(+0.5f);
 
 		_entity2 = new Entity();
-		_entity2->SetMaterial(_mat_normal);
+		_entity2->SetMaterial(_shader_gbuffer);
+		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity2->m_mesh = Geometry::GetCube();
-		_entity2->m_transform.setPositionX(+1.2f);
+		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		
 		_entity3 = new Entity();
-		_entity3->SetMaterial(_mat_normal);
+		_entity3->SetMaterial(_shader_gbuffer);
+		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity3->m_mesh = Geometry::GetCube();
-		_entity3->m_transform.setPositionX(+2.4);
+		_entity3->m_transform.setPosition(Vector3(-1.5f, 0, -3.0f));
 
 		for (int x = -1; x <= 1; x++)
 		{
@@ -150,7 +147,7 @@ namespace Vxl
 						continue;
 
 					Entity* ent = new Entity();
-					ent->SetMaterial(_mat_normal);
+					ent->SetMaterial(_shader_gbuffer);
 					ent->m_mesh = Geometry::GetCube();
 					
 					ent->m_transform.setPosition(Vector3(x * 1.1f, y * 1.1f, z * 1.1f));
@@ -221,7 +218,6 @@ namespace Vxl
 		_fbo->bind();
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-		
 
 		_shader_gbuffer_instancing->Bind();
 		_shader_gbuffer_instancing->SetUniform("camForward", _camera->getForward());
@@ -234,8 +230,11 @@ namespace Vxl
 		_shader_gbuffer->SetUniform("camForward", _camera->getForward());
 		_shader_gbuffer->SetUniform("viewProjection", _camera->getViewProjection());
 		
-		//_shader_gbuffer->Bind();
+		//auto test = _entity2->m_transform.getModel();
+		//_shader_gbuffer->SetUniform("model", _entity2->m_transform.getModel());
 		_entity2->Draw();
+		
+		//_shader_gbuffer->SetUniform("model", _entity3->m_transform.getModel());
 		_entity3->Draw();
 		
 
@@ -292,7 +291,7 @@ namespace Vxl
 		
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		_fbo->bindTexture(0, Active_Texture::LEVEL0);
+		_fbo->bindTexture(2, Active_Texture::LEVEL0);
 		Geometry::GetFullQuad()->Draw();
 		
 		// glViewport(0, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);

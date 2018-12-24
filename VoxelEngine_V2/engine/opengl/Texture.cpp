@@ -77,7 +77,7 @@ namespace Vxl
 
 	/* TEXTURE */
 
-	Texture::Texture(const std::string& filePath, Wrap_Mode WrapMode, Filter_Mode MinFilter, Filter_Mode MaxFilter)
+	Texture::Texture(const std::string& filePath, Wrap_Mode WrapMode, Filter_Mode MinFilter, Filter_Mode MaxFilter, bool InvertY)
 		: BaseTexture(WrapMode, MinFilter, MaxFilter)
 	{
 		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
@@ -85,9 +85,29 @@ namespace Vxl
 		if (!m_image)
 		{
 			Logger.error("Could not load Image: " + filePath);
+			Logger.error("SOIL: " + std::string(SOIL_last_result()));
 			glDeleteTextures(1, &m_id);
 			return;
 		}
+
+		// Invert Y
+
+		if (InvertY)
+		{
+			unsigned char* Tmp = new unsigned char[m_width * m_channels];
+			for (int y = 0; y < m_height / 2; y++)
+			{
+				// Top row
+				UINT index1 = ((m_height - y) - 1) * m_width * m_channels;
+				UINT index2 = y * m_width * m_channels;
+				// Temp
+				memcpy(Tmp, &m_image[index1], m_width * m_channels);
+				// Swap
+				memcpy(&m_image[index1], &m_image[index2], m_width * m_channels);
+				memcpy(&m_image[index2], Tmp, m_width * m_channels);
+			}
+		}
+		//
 
 		m_loaded = true;
 

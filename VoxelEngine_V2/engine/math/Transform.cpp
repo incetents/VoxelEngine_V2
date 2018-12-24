@@ -28,7 +28,7 @@ namespace Vxl
 		}
 	}
 
-	Matrix4x4* Transform::getModel()
+	Matrix4x4& Transform::getModel()
 	{
 		updateValues();
 
@@ -43,7 +43,7 @@ namespace Vxl
 		// }
 
 		// Orphan
-		return &m_ModelMatrix;
+		return m_ModelMatrix;
 	}
 
 	Transform::Transform()

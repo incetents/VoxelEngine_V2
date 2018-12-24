@@ -13,6 +13,7 @@ in fragment_data
 // Output
 layout (location = 0) out vec4 final_color1;
 layout (location = 1) out vec4 final_color2;
+layout (location = 2) out vec4 final_color3;
 
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
@@ -33,6 +34,8 @@ void main()
 	//final_color1 = vec4(d,0,0.2,1);
 	final_color1 = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0);
 	
-	final_color2 = texture(albedo_handler, f_data.uv);
+	final_color2 = vec4(d, 0, 0.2, 1);
+	
+	final_color3 = texture(albedo_handler, f_data.uv);
 }
 //gbuffer gbuffer_vert gbuffer_frag

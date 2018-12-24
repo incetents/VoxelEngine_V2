@@ -102,7 +102,8 @@ namespace Vxl
 			const std::string& filePath,
 			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
 			Filter_Mode MinFilter = Filter_Mode::LINEAR,
-			Filter_Mode MaxFilter = Filter_Mode::LINEAR
+			Filter_Mode MaxFilter = Filter_Mode::LINEAR,
+			bool InvertY = true
 		);
 		~Texture();
 		// Database

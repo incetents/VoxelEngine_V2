@@ -16,7 +16,7 @@ out fragment_data
 } f_data;
 
 // Uniforms
-uniform mat4 model		= mat4(1.0);
+uniform mat4 model			= mat4(1.0);
 uniform mat4 viewProjection = mat4(1.0);
 
 // Main

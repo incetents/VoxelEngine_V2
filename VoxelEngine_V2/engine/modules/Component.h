@@ -6,9 +6,13 @@
 
 namespace Vxl
 {
+	class Entity;
+
 	class Component
 	{
-
+		friend class ComponentHandler;
+	protected:
+		Entity* m_owner;
 	};
 
 	class ComponentHandler
@@ -26,11 +30,12 @@ namespace Vxl
 
 		// Add Component
 		template <typename T = Component *>
-		T* AddComponent(T* a_component)
+		T* AddComponent(T* a_component, Entity* owner)
 		{
 			if (a_component != nullptr && m_components.count(&typeid(*a_component)) == 0)
 			{
 				m_components[&typeid(*a_component)] = (a_component);
+				m_components[&typeid(*a_component)]->m_owner = owner;
 
 				return a_component;
 			}
@@ -39,10 +44,10 @@ namespace Vxl
 
 		// Add Component (new)
 		template <typename T = Component * >
-		T* AddComponent()
+		T* AddComponent(Entity* owner)
 		{
 			T* _data = new T();
-			return AddComponent(_data);
+			return AddComponent(_data, owner);
 		}
 
 		// Get Component

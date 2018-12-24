@@ -452,7 +452,7 @@ namespace Vxl
 		}
 
 		// Turn object into a 4x4 matrix for math
-		Matrix4x4* getModel();
+		Matrix4x4& getModel();
 
 		// Getters
 		inline Vector3		getPosition() const

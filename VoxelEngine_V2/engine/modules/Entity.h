@@ -4,18 +4,16 @@
 #include "Component.h"
 #include "../math/Transform.h"
 #include "../opengl/MeshRenderer.h"
+#include "../modules/Material.h"
 
 namespace Vxl
 {
 	class Mesh;
 	class Material;
+	class ShaderProgram;
 
 	class Entity : public ComponentHandler
 	{
-	private:
-		// Material
-		Material* m_material;
-		
 	public:
 		Entity();
 		virtual ~Entity() {}
@@ -27,11 +25,12 @@ namespace Vxl
 		// Data
 		Transform m_transform;
 		MeshRenderer m_meshRenderer;
+		Material m_material;
 		
 		// Mesh Rendering
 		Mesh* m_mesh;
 
-		void SetMaterial(Material*);
+		void SetMaterial(ShaderProgram* _shader);
 	};
 }
 

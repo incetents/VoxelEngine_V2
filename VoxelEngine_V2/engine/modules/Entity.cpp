@@ -10,8 +10,9 @@ namespace Vxl
 {
 	Entity::Entity()
 	{
-		AddComponent(&m_transform);
-		AddComponent(&m_meshRenderer);
+		AddComponent(&m_transform, this);
+		AddComponent(&m_meshRenderer, this);
+		AddComponent(&m_material, this);
 	}
 
 	void Entity::Update()
@@ -21,24 +22,15 @@ namespace Vxl
 
 	void Entity::Draw()
 	{
-		if (m_mesh && m_material)
-		{
-			m_material->Bind();
+		m_material.Bind();
 
-			//if(_shader->check)
-			//_shader->SetUniform("model", m_transform.getModel());
-
-			m_mesh->Draw();
-		}
+		m_mesh->Draw();
 	}
 
-	void Entity::SetMaterial(Material* material)
+	void Entity::SetMaterial(ShaderProgram* _shader)
 	{
-		m_material = material;
-		if (material->m_hasModelMatrix)
-		{
-			material->m_modelMatrix = m_transform.getModel();
-		}
+		m_material.SetShader(_shader);
+		m_material.SetTransformReference(&m_transform);
 	}
 }
 
