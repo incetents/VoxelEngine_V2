@@ -41,7 +41,7 @@ enum class Axis
 #define SQRT_THREE 1.73205080756887729352f
 #define SQRT_1OVER2 0.70710678118654752440f
 #define SQRT_1OVER3 0.57735026918962576450f
-#define SQRT_TWO_INV 0.70710678118654752440f
+#define SQRT_HALF SQRT_1OVER2
 #define SEC_TO_MS 1000.0f
 #define MS_TO_SEC 0.001f
 #define MAX_FLOAT 1e30f
@@ -57,6 +57,7 @@ enum class Axis
 #define MacroMin(a,b) (((a) < (b)) ? (a) : (b))
 #define MacroRound(x) (std::ceilf(value * (float)std::pow(10, x)) / (float)pow(10, x))
 #define MacroClamp(n,_min,_max) MacroMax(_min, MacroMin(n, _max))
+#define MacroClamp01(n) MacroClamp(n, 0, 1)
 
 namespace Vxl
 {

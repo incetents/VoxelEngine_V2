@@ -44,6 +44,7 @@ namespace Vxl
 		{
 			Draw_Function = &Mesh::DrawArrayInstances;
 			m_drawCount = m_positions.getLength();
+			
 		}
 		else if (m_mode == Draw_Mode::INDEXED)
 		{
@@ -55,6 +56,76 @@ namespace Vxl
 			Draw_Function = &Mesh::DrawIndexedInstances;
 			m_drawCount = m_indices.getLength();
 		}
+
+		// Update Special Data
+		switch (m_type)
+		{
+		case Draw_Type::NO_DRAW:
+			m_faces = 0;
+			m_lines = 0;
+			break;
+		case Draw_Type::POINTS:
+			m_faces = 0;
+			m_lines = 0;
+			break;
+		case Draw_Type::LINES:
+			assert(m_drawCount % 2 == 0);
+			m_faces = 0;
+			m_lines = m_drawCount / 2;
+			break;
+		case Draw_Type::LINE_STRIP:
+			m_faces = 0;
+			m_lines = m_drawCount - 1;
+			break;
+		case Draw_Type::LINE_LOOP:
+			m_faces = 0;
+			m_lines = m_drawCount;
+			break;
+		case Draw_Type::LINES_ADJACENCY:
+			assert(m_drawCount % 4 == 0);
+			m_faces = 0;
+			m_lines = m_drawCount / 4;
+			break;
+		case Draw_Type::LINE_STRIP_ADJACENCY:
+			assert(m_drawCount > 1);
+			m_faces = 0;
+			m_lines = m_drawCount - 2;
+			break;
+
+		case Draw_Type::TRIANGLES:
+			assert(m_drawCount % 3 == 0);
+			m_faces = m_drawCount / 3;
+			m_lines = m_drawCount;
+			break;
+		case Draw_Type::TRIANGLE_STRIP:
+		case Draw_Type::TRIANGLE_FAN:
+			assert(m_drawCount > 2);
+			m_faces = m_drawCount - 2;
+			m_lines = ((m_drawCount - 3) * 2) + 3;
+			break;
+		case Draw_Type::TRIANGLES_ADJACENCY:
+			assert(m_drawCount % 6 == 0);
+			m_faces = m_drawCount / 6;
+			m_lines = m_drawCount / 3;
+			break;
+		
+
+		case Draw_Type::TRIANGLE_STRIP_ADJACENCY:
+			// Not understood
+			m_faces = 0;
+			m_lines = 0;
+			assert(false);
+			break;
+
+		case Draw_Type::PATCHES:
+			// Not implemented
+			m_faces = 0;
+			m_lines = 0;
+			assert(false);
+			break;
+			
+		}
+		
 	}
 
 	Mesh::Mesh()

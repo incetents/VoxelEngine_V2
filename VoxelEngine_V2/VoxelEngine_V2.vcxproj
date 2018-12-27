@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
     <ClCompile Include="engine\modules\Material.cpp" />
@@ -26,8 +27,11 @@
     <ClCompile Include="engine\opengl\FramebufferObject.cpp" />
     <ClCompile Include="engine\opengl\Geometry.cpp" />
     <ClCompile Include="engine\opengl\Texture.cpp" />
+    <ClCompile Include="engine\opengl\TextureTracker.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="game\Scene.cpp" />
+    <ClCompile Include="game\terrain\Block.cpp" />
+    <ClCompile Include="game\terrain\Chunk.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -64,6 +68,8 @@
     <ClCompile Include="engine\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\input\XGamePad.h" />
+    <ClInclude Include="engine\light\Light.h" />
     <ClInclude Include="engine\modules\Component.h" />
     <ClInclude Include="engine\modules\Entity.h" />
     <ClInclude Include="engine\modules\Material.h" />
@@ -90,6 +96,7 @@
     <ClInclude Include="engine\opengl\Enums.h" />
     <ClInclude Include="engine\opengl\Mesh.h" />
     <ClInclude Include="engine\opengl\Texture.h" />
+    <ClInclude Include="engine\opengl\TextureTracker.h" />
     <ClInclude Include="engine\opengl\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\utilities\Database.h" />
@@ -101,6 +108,9 @@
     <ClInclude Include="engine\opengl\glUtil.h" />
     <ClInclude Include="engine\window\window.h" />
     <ClInclude Include="game\Scene.h" />
+    <ClInclude Include="game\terrain\Block.h" />
+    <ClInclude Include="game\terrain\Chunk.h" />
+    <ClInclude Include="game\terrain\ChunkGenerator.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_glfw.h" />

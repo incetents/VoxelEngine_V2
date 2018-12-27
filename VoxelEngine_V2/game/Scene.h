@@ -1,8 +1,8 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #pragma once
 
-static int SCREEN_WIDTH = 800;
-static int SCREEN_HEIGHT = 800;
+static int SCREEN_WIDTH = 1080;
+static int SCREEN_HEIGHT = 720;
 
 namespace Vxl
 {
@@ -12,6 +12,10 @@ namespace Vxl
 	class Mesh;
 	class Transform;
 	class Entity;
+	class XGamePad;
+	class Texture;
+	class Cubemap;
+	class Light;
 
 	class Scene
 	{
@@ -19,14 +23,18 @@ namespace Vxl
 		ShaderProgram* _shader_gbuffer;
 		ShaderProgram* _shader_gbuffer_instancing;
 		ShaderProgram* _shader_passthrough;
+		ShaderProgram* _shader_skybox;
 		FramebufferObject * _fbo;
 		Camera* _camera;
 		Mesh* _mesh;
 		Texture* _tex;
+		Texture* _tex_crate;
+		Cubemap* _cubemap1;
 
 		Entity* _entity1;
 		Entity* _entity2;
 		Entity* _entity3;
+		Entity* _entity4;
 		
 		std::vector<Entity*> _cubes;
 

@@ -11,6 +11,9 @@
 #VERT passthrough_vert ./shaders/passthrough.vert
 #FRAG passthrough_frag ./shaders/passthrough.frag
 
+#VERT skybox_vert ./shaders/skybox.vert
+#FRAG skybox_frag ./shaders/skybox.frag
+
 ----------------------------------------
 #SHADERPROGRAM
 
@@ -18,7 +21,16 @@ test test_vert test_frag
 gbuffer gbuffer_vert gbuffer_frag
 gbuffer_instancing gbuffer_instancing_vert gbuffer_frag
 passthrough passthrough_vert passthrough_frag
+skybox skybox_vert skybox_frag
 
 ----------------------------------------
 #TEXTURE
+null ./assets/textures/null_texture.png
+grid_test ./assets/textures/grid_test.png
 beato ./assets/textures/beato.png
+crate_diffuse ./assets/textures/crate_diffuse.png
+TextureAtlas ./assets/textures/TextureAtlas.png
+
+----------------------------------------
+#CUBEMAP
+craterlake ./assets/cubemaps/craterlake_ft.tga ./assets/cubemaps/craterlake_bk.tga ./assets/cubemaps/craterlake_up.tga ./assets/cubemaps/craterlake_dn.tga ./assets/cubemaps/craterlake_rt.tga ./assets/cubemaps/craterlake_lf.tga

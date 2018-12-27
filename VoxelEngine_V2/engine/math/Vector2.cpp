@@ -11,6 +11,45 @@
 
 namespace Vxl
 {
+	const Vector2i Vector2i::ZERO = Vector2i(0, 0);
+	const Vector2i Vector2i::ONE = Vector2i(1, 1);
+	const Vector2i Vector2i::UP = Vector2i(0, +1);
+	const Vector2i Vector2i::DOWN = Vector2i(0, -1);
+	const Vector2i Vector2i::LEFT = Vector2i(-1, 0);
+	const Vector2i Vector2i::RIGHT = Vector2i(+1, 0);
+
+	// Empty Constructor
+	Vector2i::Vector2i(void) : x(0), y(0) {}
+	Vector2i::Vector2i(int all) : x(all), y(all) {}
+	Vector2i::Vector2i(Vector3i v) : x(v.x), y(v.y) {}
+	Vector2i::Vector2i(Vector4i v) : x(v.x), y(v.y) {}
+
+	Vector2i::Vector2i(Radians all)
+	{
+		x = (int)all.Get();
+		y = (int)all.Get();
+	}
+	Vector2i::Vector2i(Degrees all)
+	{
+		x = (int)all.Get();
+		y = (int)all.Get();
+	}
+	Vector2i::Vector2i(int _x, int _y)
+	{
+		x = _x;
+		y = _y;
+	}
+	Vector2i::Vector2i(Radians _x, Radians _y)
+	{
+		x = (int)_x.Get();
+		y = (int)_y.Get();
+	}
+	Vector2i::Vector2i(Degrees _x, Degrees _y)
+	{
+		x = (int)_x.Get();
+		y = (int)_y.Get();
+	}
+
 	const Vector2 Vector2::ZERO = Vector2(0, 0);
 	const Vector2 Vector2::ONE = Vector2(1, 1);
 	const Vector2 Vector2::UP = Vector2(0, +1);

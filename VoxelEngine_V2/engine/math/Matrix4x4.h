@@ -62,6 +62,12 @@ namespace Vxl
 		// Orthographic Matrix
 		static	Matrix4x4  Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
 		static	Matrix4x4  OrthographicInverse(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
+		static void Orthographic_UpdateX(Matrix4x4&, float xmin, float xmax);
+		static void Orthographic_UpdateY(Matrix4x4&, float ymin, float ymax);
+		static void Orthographic_UpdateZ(Matrix4x4&, float zmin, float zmax);
+		static void OrthographicInverse_UpdateX(Matrix4x4&, float xmin, float xmax);
+		static void OrthographicInverse_UpdateY(Matrix4x4&, float ymin, float ymax);
+		static void OrthographicInverse_UpdateZ(Matrix4x4&, float zmin, float zmax);
 
 		// Special Sets
 		Matrix4x4& OverrideCenter(const Vector3& center);

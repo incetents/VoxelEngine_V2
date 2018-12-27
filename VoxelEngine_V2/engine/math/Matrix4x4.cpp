@@ -272,6 +272,36 @@ namespace Vxl
 
 		return M;
 	}
+	void Matrix4x4::Orthographic_UpdateX(Matrix4x4& M, float xmin, float xmax)
+	{
+		M[0x0] = +2.0f / (xmax - xmin);
+		M[0xC] = -(xmax + xmin) / (xmax - xmin);
+	}
+	void Matrix4x4::Orthographic_UpdateY(Matrix4x4& M, float ymin, float ymax)
+	{
+		M[0x5] = +2.0f / (ymax - ymin);
+		M[0xD] = -(ymax + ymin) / (ymax - ymin);
+	}
+	void Matrix4x4::Orthographic_UpdateZ(Matrix4x4& M, float znear, float zfar)
+	{
+		M[0xA] = -2.0f / (zfar - znear);
+		M[0xE] = -(zfar + znear) / (zfar - znear);
+	}
+	void Matrix4x4::OrthographicInverse_UpdateX(Matrix4x4& M, float xmin, float xmax)
+	{
+		M[0x0] = (xmax - xmin) / +2.0f;
+		M[0xC] = (xmax + xmin) / +2.0f;
+	}
+	void Matrix4x4::OrthographicInverse_UpdateY(Matrix4x4& M, float ymin, float ymax)
+	{
+		M[0x5] = (ymax - ymin) / +2.0f;
+		M[0xD] = (ymax + ymin) / +2.0f;
+	}
+	void Matrix4x4::OrthographicInverse_UpdateZ(Matrix4x4& M, float znear, float zfar)
+	{
+		M[0xA] = (zfar - znear) / -2.0f;
+		M[0xE] = (zfar + znear) / -2.0f;
+	}
 
 	
 	// Become Rotation Matrix (Degrees)

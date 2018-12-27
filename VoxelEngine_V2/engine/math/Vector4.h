@@ -6,12 +6,39 @@
 namespace Vxl
 {
 	class Vector2;
+	class Vector2i;
 	class Vector3;
+	class Vector3i;
 	class Matrix4x4;
 	class Radians;
 	class Degrees;
 	enum class RotationDirection;
 	enum class Axis;
+
+	class Vector4i
+	{
+	public:
+		// Data
+		int x, y, z, w;
+
+		// Is Empty
+		inline bool Is_Empty()
+		{
+			return (x && y && z);
+		}
+
+		// Constructors
+		Vector4i(void);
+		explicit Vector4i(int all);
+		explicit Vector4i(Vector2i v);
+		explicit Vector4i(Vector3i v);
+		explicit Vector4i(Radians all);
+		explicit Vector4i(Degrees all);
+		explicit Vector4i(int _x, int _y, int _z, int _w);
+		explicit Vector4i(Radians _x, Radians _y, Radians _z, Radians _w);
+		explicit Vector4i(Degrees _x, Degrees _y, Degrees _z, Degrees _w);
+		explicit Vector4i(Vector3i v, int _w);
+	};
 
 	class Vector4
 	{
@@ -22,8 +49,7 @@ namespace Vxl
 		// Is Empty
 		inline bool Is_Empty()
 		{
-			if (x && y && z) return true;
-			return false;
+			return (x && y && z);
 		}
 
 		// Constructors
@@ -193,4 +219,6 @@ namespace Vxl
 	// Shorthand
 	typedef Vector4 Vec4;
 	typedef Vector4 vec4;
+	typedef Vector4i Vec4i;
+	typedef Vector4i vec4i;
 }

@@ -30,7 +30,6 @@ namespace Vxl
 	void Entity::SetMaterial(ShaderProgram* _shader)
 	{
 		m_material.SetShader(_shader);
-		m_material.SetTransformReference(&m_transform);
 	}
 }
 

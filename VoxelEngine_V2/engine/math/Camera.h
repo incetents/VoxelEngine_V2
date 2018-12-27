@@ -50,7 +50,7 @@ namespace Vxl
 		// Special OVerrides
 		virtual void Update_X(float _xmin, float _xmax) { assert(false); }
 		virtual void Update_Y(float _ymin, float _ymax) { assert(false); }
-		virtual void Update_Z(float _zmin, float _zmax) { assert(false); }
+		virtual void Update_Z() { assert(false); }
 		virtual void Update_FovAspect(float _fov, float _aspect) { assert(false); }
 
 	};
@@ -77,10 +77,10 @@ namespace Vxl
 			Matrix4x4::Perspective_UpdateFov(m_projection, _fov, _aspect);
 			Matrix4x4::PerspectiveInverse_UpdateFov(m_projectionInverse, _fov, _aspect);
 		}
-		void Update_Z(float _znear, float _zfar)
+		void Update_Z() override
 		{
-			Matrix4x4::Perspective_UpdateZ(m_projection, _znear, _zfar);
-			Matrix4x4::PerspectiveInverse_UpdateZ(m_projectionInverse, _znear, _zfar);
+			Matrix4x4::Perspective_UpdateZ(m_projection, m_Znear, m_Zfar);
+			Matrix4x4::PerspectiveInverse_UpdateZ(m_projectionInverse, m_Znear, m_Zfar);
 		}
 
 		CameraProjection_Perspective(float fov, float aspect, float znear, float zfar)
@@ -111,17 +111,26 @@ namespace Vxl
 			m_projection = Matrix4x4::Orthographic(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
 			m_projectionInverse = Matrix4x4::OrthographicInverse(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
 		}
-		void Update_X(float _xmin, float _xmax)
+		void Update_X(float _xmin, float _xmax) override
 		{
+			m_boundaries[0] = _xmin;
+			m_boundaries[1] = _xmax;
 
+			Matrix4x4::Orthographic_UpdateX(m_projection, _xmin, _xmax);
+			Matrix4x4::OrthographicInverse_UpdateX(m_projection, _xmin, _xmax);
 		}
-		void Update_Y(float _ymin, float _ymax)
+		void Update_Y(float _ymin, float _ymax) override
 		{
+			m_boundaries[2] = _ymin;
+			m_boundaries[3] = _ymax;
 
+			Matrix4x4::Orthographic_UpdateY(m_projection, _ymin, _ymax);
+			Matrix4x4::OrthographicInverse_UpdateY(m_projection, _ymin, _ymax);
 		}
-		void Update_Z(float _znear, float _zfar)
+		void Update_Z() override
 		{
-			
+			Matrix4x4::Orthographic_UpdateZ(m_projection, m_Znear, m_Zfar);
+			Matrix4x4::OrthographicInverse_UpdateZ(m_projection, m_Znear, m_Zfar);
 		}
 		CameraProjection_Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
 			: CameraProjection(znear, zfar)
@@ -152,6 +161,8 @@ namespace Vxl
 		Matrix4x4			m_viewProjection;
 		Matrix4x4			m_viewProjectionInverse;
 		
+		static Camera* m_main;
+
 	public:
 		explicit Camera(const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
 		~Camera()
@@ -160,6 +171,15 @@ namespace Vxl
 		}
 	
 		void update();
+
+		static Camera* GetMain(void)
+		{
+			return m_main;
+		}
+		void SetMain(void)
+		{
+			m_main = this;
+		}
 
 		// Utility
 		Camera& setPerspective(float _fov, float _aspect);

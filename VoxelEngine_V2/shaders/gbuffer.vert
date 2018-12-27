@@ -1,6 +1,7 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
 #version 430
 
+// Input
 layout (location = 0) in vec3 m_position;
 layout (location = 1) in vec2 m_uv;
 layout (location = 2) in vec3 m_normal;

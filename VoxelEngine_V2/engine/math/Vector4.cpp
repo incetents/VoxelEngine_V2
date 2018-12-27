@@ -12,6 +12,55 @@
 namespace Vxl
 {
 	// Constructors
+	Vector4i::Vector4i(void) : x(0), y(0), z(0), w(0) {}
+	Vector4i::Vector4i(int all) : x(all), y(all), z(all), w(all) {}
+	Vector4i::Vector4i(Vector2i v) : x(v.x), y(v.y), z(0), w(0) {}
+	Vector4i::Vector4i(Vector3i v) : x(v.x), y(v.y), z(v.z), w(0) {}
+	Vector4i::Vector4i(Radians all)
+	{
+		x = (int)all.Get();
+		y = (int)all.Get();
+		z = (int)all.Get();
+		w = (int)all.Get();
+	}
+	Vector4i::Vector4i(Degrees all)
+	{
+		x = (int)all.Get();
+		y = (int)all.Get();
+		z = (int)all.Get();
+		w = (int)all.Get();
+	}
+	Vector4i::Vector4i(int _x, int _y, int _z, int _w)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+		w = _w;
+	}
+	Vector4i::Vector4i(Radians _x, Radians _y, Radians _z, Radians _w)
+	{
+		x = (int)_x.Get();
+		y = (int)_y.Get();
+		z = (int)_z.Get();
+		w = (int)_w.Get();
+	}
+	Vector4i::Vector4i(Degrees _x, Degrees _y, Degrees _z, Degrees _w)
+	{
+		x = (int)_x.Get();
+		y = (int)_y.Get();
+		z = (int)_z.Get();
+		w = (int)_w.Get();
+	}
+	Vector4i::Vector4i(Vector3i v, int _w)
+	{
+		x = v.x;
+		y = v.y;
+		z = v.z;
+		w = _w;
+	}
+
+
+	// Constructors
 	Vector4::Vector4(void) : x(0), y(0), z(0), w(0) {}
 	Vector4::Vector4(float all) : x(all), y(all), z(all), w(all) {}
 	Vector4::Vector4(Vector2 v) : x(v.x), y(v.y), z(0), w(0) {}

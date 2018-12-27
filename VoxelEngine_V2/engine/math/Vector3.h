@@ -6,12 +6,51 @@
 namespace Vxl
 {
 	class Vector2;
+	class Vector2i;
 	class Vector4;
+	class Vector4i;
 	class Matrix3x3;
 	class Radians;
 	class Degrees;
 	enum class RotationDirection;
 	enum class Axis;
+
+	class Vector3i
+	{
+	public:
+		// Common Vector Types
+		static const Vector3i ZERO;
+		static const Vector3i ONE;
+		static const Vector3i N_ONE;
+		static const Vector3i UP;
+		static const Vector3i DOWN;
+		static const Vector3i FORWARD;
+		static const Vector3i BACK;
+		static const Vector3i LEFT;
+		static const Vector3i RIGHT;
+
+		// Data
+		int x, y, z;
+
+		// Is Empty
+		inline bool Is_Empty()
+		{
+			return (x && y && z);
+		}
+
+		// Constructors
+		Vector3i(void);
+		explicit Vector3i(int all);
+		explicit Vector3i(Vector2i all);
+		explicit Vector3i(Vector4i all);
+		explicit Vector3i(Radians all);
+		explicit Vector3i(Degrees all);
+		explicit Vector3i(int _x, int _y, int _z);
+		explicit Vector3i(Radians _x, Radians _y, Radians _z);
+		explicit Vector3i(Degrees _x, Degrees _y, Degrees _z);
+		explicit Vector3i(Vector2i v, int z);
+		explicit Vector3i(int x, Vector2i v);
+	};
 
 	class Vector3
 	{
@@ -21,6 +60,7 @@ namespace Vxl
 		static const Vector3 ONE;
 		static const Vector3 N_ONE;
 		static const Vector3 HALF;
+		static const Vector3 MINUS_HALF;
 		static const Vector3 UP;
 		static const Vector3 DOWN;
 		static const Vector3 FORWARD;
@@ -34,8 +74,7 @@ namespace Vxl
 		// Is Empty
 		inline bool Is_Empty()
 		{
-			if (x && y && z) return true;
-			return false;
+			return (x && y && z);
 		}
 
 		// Constructors
@@ -214,4 +253,6 @@ namespace Vxl
 	// Shorthand
 	typedef Vector3 Vec3;
 	typedef Vector3 vec3;
+	typedef Vector3i Vec3i;
+	typedef Vector3i vec3i;
 }

@@ -8,29 +8,44 @@ namespace Vxl
 	class Geometry
 	{
 	private:
+		// Special Utility
+		static Mesh* GenerateIcosahdron(unsigned int subdivisions);
+
+	private:
+		static bool m_isSetup;
 		static Mesh* m_fullQuad;
 		static Mesh* m_quad;
 		static Mesh* m_cube;
 		static Mesh* m_inverseCube;
+		static Mesh* m_octahedron;
+		static Mesh* m_icosahedron;
+		static Mesh* m_icoSphere;
+		static Mesh* m_sphere;
 
 		static void CreateFullQuad();
 		static void CreateQuad();
 		static void CreateCube();
 		static void CreateInverseCube();
+		static void CreateOctahedron();
+		static void CreateIcosahedron();
+		static void CreateIcosphere();
+		static void CreateSphere();
 	public:
 		static void Setup()
 		{
-			if (!m_fullQuad)
-				CreateFullQuad();
+			if (m_isSetup)
+				return;
 
-			if (!m_quad)
-				CreateQuad();
+			CreateFullQuad();
+			CreateQuad();
+			CreateCube();
+			CreateInverseCube();
+			CreateOctahedron();
+			CreateIcosahedron();
+			CreateIcosphere();
+			CreateSphere();
 
-			if (!m_cube)
-				CreateCube();
-
-			if (!m_inverseCube)
-				CreateInverseCube();
+			m_isSetup = true;
 		}
 
 		static Mesh* GetFullQuad()
@@ -48,6 +63,22 @@ namespace Vxl
 		static Mesh* GetInverseCube()
 		{
 			return m_inverseCube;
+		}
+		static Mesh* GetOctahedron()
+		{
+			return m_octahedron;
+		}
+		static Mesh* GetIcosahedron()
+		{
+			return m_icosahedron;
+		}
+		static Mesh* GetIcoSphere()
+		{
+			return m_icoSphere;
+		}
+		static Mesh* GetSphere()
+		{
+			return m_sphere;
 		}
 	};
 }

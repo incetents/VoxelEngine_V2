@@ -4,30 +4,9 @@
 
 #include "../imgui/imgui.h"
 
-
-//#include <stdio.h>
-
-//#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
-//#pragma comment(lib, "legacy_stdio_definitions")
-//#endif
-
-//#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-//#include <GL/gl3w.h>    // Initialize with gl3wInit()
-//#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-//#include <GL/glew.h>    // Initialize with glewInit()
-//#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-//#include <glad/glad.h>  // Initialize with gladLoadGL()
-//#else
-//#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
-//#endif
-
-// Include glfw3.h after our OpenGL definitions
-//#include <GLFW/glfw3.h> 
-
-
-
 #include "../engine/window/window.h"
 #include "../engine/input/Input.h"
+#include "../engine/input/XGamePad.h"
 
 #include "../engine/utilities/Loader.h"
 #include "../engine/utilities/logger.h"
@@ -38,6 +17,7 @@
 #include "../engine/opengl/Mesh.h"
 #include "../engine/opengl/Shader.h"
 #include "../engine/opengl/Texture.h"
+#include "../engine/opengl/TextureTracker.h"
 
 #include "../engine/math/Camera.h"
 #include "../engine/math/Color.h"
@@ -45,11 +25,12 @@
 #include "../engine/math/Vector2.h"
 #include "../engine/math/Vector3.h"
 #include "../engine/math/Vector4.h"
+#include "../engine/math/MathCore.h"
 
 #include "../engine/modules/Entity.h"
 #include "../engine/modules/Material.h"
 
-
+#include "../game/terrain/Block.h"
 
 #include <iostream>
 
@@ -62,6 +43,7 @@ namespace Vxl
 		//_camera->setOrthographic(-15, 15, -15, 15);
 		_camera->setPerspective(110.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT);
 		_camera->update();
+		_camera->SetMain();
 
 		// FBO
 		_fbo = new FramebufferObject();
@@ -74,8 +56,17 @@ namespace Vxl
 		_shader_gbuffer = ShaderProgram::m_database.Get("gbuffer");
 		_shader_gbuffer_instancing = ShaderProgram::m_database.Get("gbuffer_instancing");
 		_shader_passthrough = ShaderProgram::m_database.Get("passthrough");
+		_shader_skybox = ShaderProgram::m_database.Get("skybox");
 
 		_tex = Texture::m_database.Get("beato");
+		_tex_crate = Texture::m_database.Get("crate_diffuse");
+
+		_cubemap1 = Cubemap::m_database.Get("craterlake");
+		
+		// Voxel Stuff
+		BlockAtlas.Setup(Texture::m_database.Get("TextureAtlas"), 16);
+		BlockDictionary.Setup();
+		//
 
 		_mesh = new Mesh();
 
@@ -127,15 +118,21 @@ namespace Vxl
 
 		_entity2 = new Entity();
 		_entity2->SetMaterial(_shader_gbuffer);
-		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
+		_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->m_mesh = Geometry::GetCube();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		
 		_entity3 = new Entity();
 		_entity3->SetMaterial(_shader_gbuffer);
-		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
+		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity3->m_mesh = Geometry::GetCube();
 		_entity3->m_transform.setPosition(Vector3(-1.5f, 0, -3.0f));
+
+		_entity4 = new Entity();
+		_entity4->SetMaterial(_shader_skybox);
+		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
+		_entity4->m_mesh = Geometry::GetInverseCube();
+		_entity4->m_transform.setPosition(Vector3(0, 0, -3.0f));
 
 		for (int x = -1; x <= 1; x++)
 		{
@@ -148,9 +145,10 @@ namespace Vxl
 
 					Entity* ent = new Entity();
 					ent->SetMaterial(_shader_gbuffer);
+					ent->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 					ent->m_mesh = Geometry::GetCube();
 					
-					ent->m_transform.setPosition(Vector3(x * 1.1f, y * 1.1f, z * 1.1f));
+					ent->m_transform.setPosition(Vector3(x * 2.0f, y * 2.0f, z * 2.0f));
 
 					if (x == 1 || y == 1 || z == 1)
 					{
@@ -207,7 +205,17 @@ namespace Vxl
 
 		_camera->increaseRotation(CamRotation);
 
+		// Edge case for vertical rotation
+		float Xrot = _camera->getRotationEuler().x;
+		Xrot = MacroClamp(Xrot, -89.9f, 89.9f);
+		_camera->setRotationX(Xrot);
+		//
+
 		_camera->update();
+
+		// End Frame Updates
+		TextureTracker.NewFrame();
+		XGamePadManager.Update();
 	}
 
 	void Scene::draw()
@@ -218,25 +226,28 @@ namespace Vxl
 		_fbo->bind();
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+		
 
+		// GBUFFER Instancing
 		_shader_gbuffer_instancing->Bind();
-		_shader_gbuffer_instancing->SetUniform("camForward", _camera->getForward());
-		_shader_gbuffer_instancing->SetUniform("viewProjection", _camera->getViewProjection());
 		
 		_entity1->Draw();
-
 		
+		
+		// GBUFFER
 		_shader_gbuffer->Bind();
-		_shader_gbuffer->SetUniform("camForward", _camera->getForward());
-		_shader_gbuffer->SetUniform("viewProjection", _camera->getViewProjection());
 		
-		//auto test = _entity2->m_transform.getModel();
-		//_shader_gbuffer->SetUniform("model", _entity2->m_transform.getModel());
-		_entity2->Draw();
+		//_entity2->Draw();
+		//_entity3->Draw();
+		for (int i = 0; i < _cubes.size(); i++)
+			_cubes[i]->Draw();
 		
-		//_shader_gbuffer->SetUniform("model", _entity3->m_transform.getModel());
-		_entity3->Draw();
-		
+		// Skybox
+		_shader_skybox->Bind();
+
+
+		_entity4->Draw();
+		//
 
 
 		//for (int i = 0; i < _cubes.size(); i++)
@@ -351,7 +362,7 @@ namespace Vxl
 		// IMGUI TEST
 		ImGui::NewFrame();
 		
-		if(ImGui::Begin("TEST WINDOW"))
+		if(ImGui::Begin("ImGUI"))
 		{
 			ImGui::Separator();
 
@@ -361,7 +372,21 @@ namespace Vxl
 
 			ImGui::Separator();
 			//ImGui::Text("Dear ImGui, %s", ImGui::GetVersion());
+
+			if (GamePad1.IsConnected())
+				ImGui::Text("CONNECTED");
+			else
+				ImGui::Text("NOT connected");
+
 			//ImGui::Separator();
+			if (GamePad1.GetButton(XGamePad::Buttons::A))
+				ImGui::Text("[A] YES");
+			else
+				ImGui::Text("[A] NO");
+
+			ImGui::Text("Left Analog Mag: %f", GamePad1.GetLeftAnalogMagnitude());
+			ImGui::Text("Left Analog X: %f", GamePad1.GetLeftAnalogNormalized().x);
+			ImGui::Text("Left Analog Y: %f", GamePad1.GetLeftAnalogNormalized().y);
 		
 		}
 		ImGui::End();
@@ -383,5 +408,6 @@ namespace Vxl
 			N_ZFAR = ZFAR;
 			_camera->setZfar(ZFAR);
 		}
+
 	}
 }

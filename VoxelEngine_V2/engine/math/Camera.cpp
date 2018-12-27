@@ -7,6 +7,8 @@
 
 namespace Vxl
 {
+	Camera* Camera::m_main = nullptr;
+
 	Camera::Camera(const Vector3& _position, const Vector3& _forward, float _znear, float _zfar)
 	{
 		// Data
@@ -82,13 +84,13 @@ namespace Vxl
 	Camera& Camera::setZnear(float _znear)
 	{
 		m_projection->m_Znear = _znear;
-		m_projection->Update_Z(_znear, getZfar());
+		m_projection->Update_Z();
 		return *this;
 	}
 	Camera& Camera::setZfar(float _zfar)
 	{
 		m_projection->m_Zfar = _zfar;
-		m_projection->Update_Z(getZnear(), _zfar);
+		m_projection->Update_Z();
 		return *this;
 	}
 }

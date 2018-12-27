@@ -11,10 +11,66 @@
 
 namespace Vxl
 {
+	const Vector3i Vector3i::ZERO = Vector3i(0, 0, 0);
+	const Vector3i Vector3i::ONE = Vector3i(1, 1, 1);
+	const Vector3i Vector3i::N_ONE = Vector3i(-1, -1, -1);
+	const Vector3i Vector3i::UP = Vector3i(0, +1, 0);
+	const Vector3i Vector3i::DOWN = Vector3i(0, -1, 0);
+	const Vector3i Vector3i::FORWARD = Vector3i(0, 0, +1);
+	const Vector3i Vector3i::BACK = Vector3i(0, 0, -1);
+	const Vector3i Vector3i::LEFT = Vector3i(-1, 0, 0);
+	const Vector3i Vector3i::RIGHT = Vector3i(+1, 0, 0);
+
+	// Constructors
+	Vector3i::Vector3i(void) : x(0), y(0), z(0) {}
+	Vector3i::Vector3i(int all) : x(all), y(all), z(all) {}
+	Vector3i::Vector3i(Vector2i v) : x(v.x), y(v.y), z(0) {}
+	Vector3i::Vector3i(Vector4i v) : x(v.x), y(v.y), z(v.z) {}
+	Vector3i::Vector3i(Radians all)
+	{
+		x = (int)all.Get();
+		y = (int)all.Get();
+		z = (int)all.Get();
+	}
+	Vector3i::Vector3i(Degrees all)
+	{
+		x = (int)all.Get();
+		y = (int)all.Get();
+		z = (int)all.Get();
+	}
+	Vector3i::Vector3i(int _x, int _y, int _z) : x(_x), y(_y), z(_z) {}
+
+	Vector3i::Vector3i(Radians _x, Radians _y, Radians _z)
+	{
+		x = (int)_x.Get();
+		y = (int)_y.Get();
+		z = (int)_z.Get();
+	}
+	Vector3i::Vector3i(Degrees _x, Degrees _y, Degrees _z)
+	{
+		x = (int)_x.Get();
+		y = (int)_y.Get();
+		z = (int)_z.Get();
+	}
+	Vector3i::Vector3i(Vector2i _v, int _z)
+	{
+		x = _v.x;
+		y = _v.y;
+		z = _z;
+	}
+	Vector3i::Vector3i(int _x, Vector2i _v)
+	{
+		x = _x;
+		y = _v.x;
+		z = _v.y;
+	}
+
+
 	const Vector3 Vector3::ZERO = Vector3(0, 0, 0);
 	const Vector3 Vector3::ONE = Vector3(1, 1, 1);
 	const Vector3 Vector3::N_ONE = Vector3(-1, -1, -1);
 	const Vector3 Vector3::HALF = Vector3(0.5f, 0.5f, 0.5f);
+	const Vector3 Vector3::MINUS_HALF = Vector3(0.5f, 0.5f, 0.5f);
 	const Vector3 Vector3::UP = Vector3(0, +1, 0);
 	const Vector3 Vector3::DOWN = Vector3(0, -1, 0);
 	const Vector3 Vector3::FORWARD = Vector3(0, 0, +1);

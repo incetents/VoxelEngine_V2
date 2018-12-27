@@ -43,6 +43,8 @@ namespace Vxl
 		// Set Default Wireframe Mode
 		wireframe(false);
 
+		// Cubemap edges are hidden
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
 	void glUtil::CheckVersion()

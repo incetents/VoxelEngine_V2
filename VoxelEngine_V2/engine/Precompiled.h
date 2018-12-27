@@ -14,6 +14,9 @@
 #include <vector>
 
 // Engine
+#include "input/Input.h"
+#include "input/XGamePad.h"
+
 #include "opengl/glUtil.h"
 #include "opengl/FramebufferObject.h"
 #include "opengl/Geometry.h"

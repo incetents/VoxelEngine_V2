@@ -206,7 +206,9 @@ namespace Vxl
 
 		Draw_Type m_type = Draw_Type::TRIANGLES;
 		Draw_Mode m_mode = Draw_Mode::ARRAY;
-		GLuint	  m_drawCount = 0;
+		GLuint	  m_drawCount = 0;	// Vertices Drawn
+		GLuint	  m_faces = 0;		// Triangles Drawn
+		GLuint	  m_lines = 0;		// Lines Drawn
 
 		void (Mesh::*Draw_Function)(void) = &Mesh::DrawArray;
 

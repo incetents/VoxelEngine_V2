@@ -8,11 +8,45 @@
 namespace Vxl
 {
 	class Vector3;
+	class Vector3i;
 	class Vector4;
+	class Vector4i;
 	class Matrix2x2;
 	class Radians;
 	class Degrees;
 	enum class RotationDirection;
+
+	class Vector2i
+	{
+	public:
+		// Common Vector Types
+		static const Vector2i ZERO;
+		static const Vector2i ONE;
+		static const Vector2i UP;
+		static const Vector2i DOWN;
+		static const Vector2i LEFT;
+		static const Vector2i RIGHT;
+
+		// Data
+		int x, y;
+
+		// Is Empty
+		inline bool Is_Empty()
+		{
+			return (x && y);
+		}
+
+		// Empty Constructor
+		explicit Vector2i(void);
+		explicit Vector2i(int all);
+		explicit Vector2i(Vector3i v);
+		explicit Vector2i(Vector4i v);
+		explicit Vector2i(Radians all);
+		explicit Vector2i(Degrees all);
+		explicit Vector2i(int _x, int _y);
+		explicit Vector2i(Radians _x, Radians _y);
+		explicit Vector2i(Degrees _x, Degrees _y);
+	};
 
 	class Vector2
 	{
@@ -31,8 +65,7 @@ namespace Vxl
 		// Is Empty
 		inline bool Is_Empty()
 		{
-			if (x && y) return true;
-			return false;
+			return (x && y);
 		}
 
 		// Empty Constructor
@@ -202,4 +235,6 @@ namespace Vxl
 	// Shorthand
 	typedef Vector2 Vec2;
 	typedef Vector2 vec2;
+	typedef Vector2i Vec2i;
+	typedef Vector2i vec2i;
 };
