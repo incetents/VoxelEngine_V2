@@ -9,7 +9,6 @@ layout (location = 2) in vec3 m_normal;
 // Output
 out fragment_data
 {
-
 	vec3 pos;
 	vec2 uv;
 	vec3 normal;
@@ -27,7 +26,7 @@ void main()
 
 	f_data.pos = vec3(object_position);
 	f_data.uv = m_uv;
-	f_data.normal = vec3(model * vec4(normalize(m_normal), 0));
+	f_data.normal = vec3(model * vec4(m_normal, 0));
 
 	gl_Position = viewProjection * object_position; 
 }

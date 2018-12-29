@@ -40,11 +40,29 @@ namespace Vxl
 		}
 	};
 
+	class MaterialBase
+	{
+		friend class Material;
+	private:
+		// Shader
+		ShaderProgram* m_shaderProgram;
+	public:
+		MaterialBase(ShaderProgram* _shader);
+		// Uniform Packages
+		MaterialPackage Mat_viewProjection	= MaterialPackage("viewProjection");
+		MaterialPackage Mat_view			= MaterialPackage("view");
+		MaterialPackage Mat_projection		= MaterialPackage("projection");
+		MaterialPackage Mat_camForward		= MaterialPackage("camForward");
+		MaterialPackage Mat_camPosition		= MaterialPackage("camPosition");
+		// Send Uniforms to shader
+		void Bind();
+	};
+
 	class Material : public Component
 	{
 	protected:
-		// Shader
-		ShaderProgram* m_shaderProgram;
+		// Material Base
+		MaterialBase* m_base;
 
 		// Texture Package
 		std::unordered_map<Active_Texture, BaseTexture*> m_textures;
@@ -52,16 +70,12 @@ namespace Vxl
 		// Uniform Packages
 		virtual void UpdateMaterialPackages();
 		MaterialPackage Mat_model			= MaterialPackage("model");
-		MaterialPackage Mat_viewProjection	= MaterialPackage("viewProjection");
-		MaterialPackage Mat_view			= MaterialPackage("view");
-		MaterialPackage Mat_projection		= MaterialPackage("projection");
-		MaterialPackage Mat_camForward		= MaterialPackage("camForward");
-		MaterialPackage Mat_camPosition		= MaterialPackage("camPosition");
+
 
 	public:
 		Material() {}
 
-		void SetShader(ShaderProgram* _shader);
+		void SetBase(MaterialBase* _base);
 		void SetTexture(BaseTexture* tex, Active_Texture level);
 
 		virtual void Bind();

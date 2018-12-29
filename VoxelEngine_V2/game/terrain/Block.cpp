@@ -7,6 +7,27 @@
 
 namespace Vxl
 {
+	void Block::SetID(Block::ID _id)
+	{
+		m_base = BlockDictionary.GetBlockBase(_id);
+	}
+	void Block::SetSubID(UINT subID)
+	{
+		m_subID = subID;
+	}
+	const Block::ID Block::GetID(void) const
+	{
+		return m_base->m_id;
+	}
+	const Block::Shape Block::GetShape(void) const
+	{
+		return m_base->m_shape;
+	}
+	const Vector4 Block::GetUV(Block::Direction _direction) const
+	{
+		return m_base->m_uvs[(int)_direction];
+	}
+
 	void BlockAtlas::Setup(Texture* atlas, UINT blockPixelLength)
 	{
 		if (m_setup)
@@ -37,17 +58,29 @@ namespace Vxl
 		{
 			for (UINT y = 0; y < m_rows; y++)
 			{
-				m_uvs[x][y] = Vector4
-				(
-					(float)(x + 0) / (float)m_columns,
-					(float)(x + 1) / (float)m_columns,
-					(float)(y + 0) / (float)m_rows,
-					(float)(y + 1) / (float)m_rows
-				);
+				float u1 = (float)(x + 0) / (float)m_columns;
+				float u2 = (float)(x + 1) / (float)m_columns;
+				float v1 = (float)(y + 0) / (float)m_rows;
+				float v2 = (float)(y + 1) / (float)m_rows;
+				// Flip Y
+				float temp = v1;
+				v1 = 1.0f - v2;
+				v2 = 1.0f - temp;
+				//
+				m_uvs[x][y] = Vector4(u1, u2, v1, v2);
 			}
 		}
 
 		m_setup = true;
+	}
+	Texture* BlockAtlas::GetTexture(void) const
+	{
+		return m_AtlasTexture;
+	}
+	void BlockAtlas::BindAtlas()
+	{
+		assert(m_AtlasTexture);
+		m_AtlasTexture->Bind();
 	}
 	Vector4 BlockAtlas::GetUvs(UINT Column, UINT Row)
 	{
@@ -58,11 +91,14 @@ namespace Vxl
 
 	void BlockDictionary::Setup()
 	{
+		if (m_init)
+			return;
+
 		// Initialize list of all blocks
 		{
 			BlockBase* B = new BlockBase(
 				Block::ID::AIR,
-				BlockBase::Shape::CUBE,
+				Block::Shape::EMPTY,
 				BlockBase::UVMap::ALL
 			);
 			m_blocks[Block::ID::AIR] = B;
@@ -70,7 +106,7 @@ namespace Vxl
 		{
 			BlockBase* B = new BlockBase(
 				Block::ID::STONE,
-				BlockBase::Shape::CUBE,
+				Block::Shape::CUBE,
 				BlockBase::UVMap::ALL,
 				BlockAtlas.GetUvs(1, 0),
 				BlockAtlas.GetUvs(1, 0),
@@ -81,5 +117,26 @@ namespace Vxl
 			);
 			m_blocks[Block::ID::STONE] = B;
 		}
+		{
+			BlockBase* B = new BlockBase(
+				Block::ID::GRASS,
+				Block::Shape::CUBE,
+				BlockBase::UVMap::TOP_AROUND_BOT,
+				BlockAtlas.GetUvs(0, 0),
+				BlockAtlas.GetUvs(2, 0),
+				BlockAtlas.GetUvs(3, 0),
+				BlockAtlas.GetUvs(3, 0),
+				BlockAtlas.GetUvs(3, 0),
+				BlockAtlas.GetUvs(3, 0)
+			);
+			m_blocks[Block::ID::GRASS] = B;
+		}
+
+		m_init = true;
+	}
+	BlockBase* BlockDictionary::GetBlockBase(Block::ID _id)
+	{
+		assert(m_init);
+		return m_blocks[_id];
 	}
 }

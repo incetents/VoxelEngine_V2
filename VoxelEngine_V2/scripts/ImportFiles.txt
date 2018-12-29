@@ -6,7 +6,9 @@
 
 #VERT gbuffer_vert ./shaders/gbuffer.vert
 #VERT gbuffer_instancing_vert ./shaders/gbuffer_instancing.vert
+#VERT gbuffer_no_model_vert ./shaders/gbuffer_no_model.vert
 #FRAG gbuffer_frag ./shaders/gbuffer.frag
+#FRAG gbuffer_color_frag ./shaders/gbuffer_color.frag
 
 #VERT passthrough_vert ./shaders/passthrough.vert
 #FRAG passthrough_frag ./shaders/passthrough.frag
@@ -20,6 +22,8 @@
 test test_vert test_frag
 gbuffer gbuffer_vert gbuffer_frag
 gbuffer_instancing gbuffer_instancing_vert gbuffer_frag
+gbuffer_color gbuffer_vert gbuffer_color_frag
+gbuffer_no_model gbuffer_no_model_vert gbuffer_frag
 passthrough passthrough_vert passthrough_frag
 skybox skybox_vert skybox_frag
 
@@ -29,7 +33,7 @@ null ./assets/textures/null_texture.png
 grid_test ./assets/textures/grid_test.png
 beato ./assets/textures/beato.png
 crate_diffuse ./assets/textures/crate_diffuse.png
-TextureAtlas ./assets/textures/TextureAtlas.png
+TextureAtlas ./assets/textures/TextureAtlas.png CLAMP_STRETCH NEAREST
 
 ----------------------------------------
 #CUBEMAP

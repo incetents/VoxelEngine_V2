@@ -156,35 +156,35 @@ namespace Vxl
 		};
 		Vector3 normals[] = {
 			//
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			//
 			Vector3(0, 0, +1),
 			Vector3(0, 0, +1),
 			Vector3(0, 0, +1),
 			Vector3(0, 0, +1),
 			//
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
+			Vector3(0, 0, -1),
+			Vector3(0, 0, -1),
+			Vector3(0, 0, -1),
+			Vector3(0, 0, -1),
 			//
 			Vector3(0, +1, 0),
 			Vector3(0, +1, 0),
 			Vector3(0, +1, 0),
 			Vector3(0, +1, 0),
 			//
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
+			Vector3(0, -1, 0),
+			Vector3(0, -1, 0),
+			Vector3(0, -1, 0),
+			Vector3(0, -1, 0),
 			//
 			Vector3(-1, 0, 0),
 			Vector3(-1, 0, 0),
 			Vector3(-1, 0, 0),
 			Vector3(-1, 0, 0),
+			//
+			Vector3(+1, 0, 0),
+			Vector3(+1, 0, 0),
+			Vector3(+1, 0, 0),
+			Vector3(+1, 0, 0),
 		};
 		GLuint indices[] = {
 			0, 1, 2, 0, 2, 3,
@@ -273,35 +273,35 @@ namespace Vxl
 		};
 		Vector3 normals[] = {
 			//
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			//
 			Vector3(0, 0, -1),
 			Vector3(0, 0, -1),
 			Vector3(0, 0, -1),
 			Vector3(0, 0, -1),
 			//
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1),
 			//
 			Vector3(0, -1, 0),
 			Vector3(0, -1, 0),
 			Vector3(0, -1, 0),
 			Vector3(0, -1, 0),
 			//
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
+			Vector3(0, +1, 0),
+			Vector3(0, +1, 0),
+			Vector3(0, +1, 0),
+			Vector3(0, +1, 0),
 			//
 			Vector3(+1, 0, 0),
 			Vector3(+1, 0, 0),
 			Vector3(+1, 0, 0),
 			Vector3(+1, 0, 0),
+			//
+			Vector3(-1, 0, 0),
+			Vector3(-1, 0, 0),
+			Vector3(-1, 0, 0),
+			Vector3(-1, 0, 0),
 		};
 		GLuint indices[] = {
 			1, 0, 2, 2, 0, 3,
@@ -354,14 +354,14 @@ namespace Vxl
 			Vector2(0.5f, 0.0f)
 		};
 		GLuint indices[] = {
-			4, 0, 1,
-			4, 1, 2,
-			4, 2, 3,
-			4, 3, 0,
-			5, 1, 0,
-			5, 2, 1,
-			5, 3, 2,
-			5, 0, 3
+			0, 4, 1,
+			1, 4, 2,
+			2, 4, 3,
+			3, 4, 0,
+			1, 5, 0,
+			2, 5, 1,
+			3, 5, 2,
+			0, 5, 3
 		};
 
 		m_octahedron = new Mesh();

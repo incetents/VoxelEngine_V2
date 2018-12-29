@@ -11,37 +11,20 @@
 
 namespace Vxl
 {
-	void Material::UpdateMaterialPackages()
+	MaterialBase::MaterialBase(ShaderProgram* _shader)
+		: m_shaderProgram(_shader)
 	{
-		Mat_model.GetUniform(m_shaderProgram);
 		Mat_viewProjection.GetUniform(m_shaderProgram);
 		Mat_view.GetUniform(m_shaderProgram);
 		Mat_projection.GetUniform(m_shaderProgram);
 		Mat_camForward.GetUniform(m_shaderProgram);
 		Mat_camPosition.GetUniform(m_shaderProgram);
 	}
-
-	void Material::SetShader(ShaderProgram* _shader)
+	void MaterialBase::Bind()
 	{
-		m_shaderProgram = _shader;
-		UpdateMaterialPackages();
-	}
+		// Bind Shader
+		m_shaderProgram->Bind();
 
-	void Material::SetTexture(BaseTexture* tex, Active_Texture level)
-	{
-		assert((int)level - GL_TEXTURE0 < MAX_MATERIAL_TEXTURES);
-		m_textures[level] = tex;
-	}
-
-	void Material::Bind()
-	{
-		// Bind Uniforms
-
-		// ~ Model ~ //
-		if (Mat_model.m_exists)
-		{
-			Mat_model.m_uniform.set(m_owner->m_transform.getModel());
-		}
 		// ~ View Projection ~ //
 		if (Mat_viewProjection.m_exists)
 		{
@@ -67,6 +50,36 @@ namespace Vxl
 		{
 			Mat_camPosition.m_uniform.set<Vector3>(Camera::GetMain()->getPosition());
 		}
+	}
+
+	void Material::UpdateMaterialPackages()
+	{
+		Mat_model.GetUniform(m_base->m_shaderProgram);
+	}
+
+	void Material::SetBase(MaterialBase* _base)
+	{
+		m_base = _base;
+		UpdateMaterialPackages();
+	}
+
+	void Material::SetTexture(BaseTexture* tex, Active_Texture level)
+	{
+		assert((int)level - GL_TEXTURE0 < MAX_MATERIAL_TEXTURES);
+		m_textures[level] = tex;
+	}
+
+	void Material::Bind()
+	{
+		assert(m_base);
+		// Bind Uniforms for this object
+
+		// ~ Model ~ //
+		if (Mat_model.m_exists)
+		{
+			Mat_model.m_uniform.set(m_owner->m_transform.getModel());
+		}
+		
 
 		// Bind Textures
 		for (auto it = m_textures.begin(); it != m_textures.end(); it++)

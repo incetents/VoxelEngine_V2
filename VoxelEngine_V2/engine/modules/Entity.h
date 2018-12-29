@@ -10,6 +10,7 @@ namespace Vxl
 {
 	class Mesh;
 	class Material;
+	class MaterialBase;
 	class ShaderProgram;
 
 	class Entity : public ComponentHandler
@@ -17,10 +18,6 @@ namespace Vxl
 	public:
 		Entity();
 		virtual ~Entity() {}
-
-		// Utility
-		virtual void Update();
-		virtual void Draw();
 
 		// Data
 		Transform m_transform;
@@ -30,7 +27,13 @@ namespace Vxl
 		// Mesh Rendering
 		Mesh* m_mesh;
 
-		void SetMaterial(ShaderProgram* _shader);
+		// Utility
+		void SetMaterialBase(MaterialBase* _base);
+
+		// Behaviour
+		virtual void Update();
+		virtual void Draw();
+
 	};
 }
 

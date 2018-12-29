@@ -78,9 +78,9 @@ namespace Vxl
 	// Turn Quaternion into euler rotation
 	void Quaternion::ToEuler(const Quaternion& q, Degrees& roll, Degrees& pitch, Degrees& yaw)
 	{
-		Radians r = Radians(roll);
-		Radians p = Radians(pitch);
-		Radians y = Radians(yaw);
+		Radians r(0);
+		Radians p(0);
+		Radians y(0);
 
 		Quaternion::ToEuler(q, r, p, y);
 
@@ -91,21 +91,21 @@ namespace Vxl
 	void Quaternion::ToEuler(const Quaternion& q, Radians& roll, Radians& pitch, Radians& yaw)
 	{
 		// Formula retrieved from wiki link:
-		// ***
+		// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 
-		// roll (x-axis rotation)
+		// x-axis
 		float sinr = +2.0f * (q.w * q.x + q.y * q.z);
 		float cosr = +1.0f - 2.0f * (q.x * q.x + q.y * q.y);
 		roll = atan2f(sinr, cosr);
 
-		// pitch (y-axis rotation)
+		// y-axis
 		float sinp = +2.0f * (q.w * q.y - q.z * q.x);
 		if (fabs(sinp) >= 1)
 			pitch = copysignf(PI / 2, sinp); // use 90 degrees if out of range
 		else
 			pitch = asinf(sinp);
 
-		// yaw (z-axis rotation)
+		// z-axis
 		float siny = +2.0f * (q.w * q.z + q.x * q.y);
 		float cosy = +1.0f - 2.0f * (q.y * q.y + q.z * q.z);
 		yaw = atan2f(siny, cosy);

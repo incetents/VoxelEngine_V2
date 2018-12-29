@@ -16,14 +16,25 @@ namespace Vxl
 	class Texture;
 	class Cubemap;
 	class Light;
+	class MaterialBase;
 
 	class Scene
 	{
 	private:
 		ShaderProgram* _shader_gbuffer;
 		ShaderProgram* _shader_gbuffer_instancing;
+		ShaderProgram* _shader_gbuffer_color;
+		ShaderProgram* _shader_gbuffer_no_model;
 		ShaderProgram* _shader_passthrough;
 		ShaderProgram* _shader_skybox;
+
+		MaterialBase* _material_gbuffer;
+		MaterialBase* _material_gbuffer_instancing;
+		MaterialBase* _material_gbuffer_color;
+		MaterialBase* _material_gbuffer_no_model;
+		MaterialBase* _material_passthrough;
+		MaterialBase* _material_skybox;
+
 		FramebufferObject * _fbo;
 		Camera* _camera;
 		Mesh* _mesh;
@@ -35,6 +46,7 @@ namespace Vxl
 		Entity* _entity2;
 		Entity* _entity3;
 		Entity* _entity4;
+		Entity* _entity5;
 		
 		std::vector<Entity*> _cubes;
 

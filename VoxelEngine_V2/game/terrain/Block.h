@@ -1,6 +1,8 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
 #pragma once
 
+#include "../engine/math/Vector2.h"
+#include "../engine/math/Vector3.h"
 #include "../engine/math/Vector4.h"
 #include "../engine/utilities/singleton.h"
 
@@ -10,12 +12,15 @@
 
 namespace Vxl
 {
+	class BlockBase;
 	class Texture;
 
 	class Block
 	{
+		friend class BlockDictionary;
 	private:
-
+		UINT		m_subID = 0;
+		BlockBase*	m_base = nullptr;
 	public:
 		enum ID
 		{
@@ -30,19 +35,27 @@ namespace Vxl
 			LEFT,
 			RIGHT,
 			FRONT,
-			BACK,
-			TOTAL
+			BACK
 		};
+		enum Shape
+		{
+			EMPTY = 0,
+			CUBE
+		};
+
+		Block(BlockBase* base) : m_base(base) {}
+
+		void SetID(ID _id);
+		void SetSubID(UINT subID = 0);
+		const ID GetID(void) const;
+		const Shape GetShape(void) const;
+		const Vector4 GetUV(Direction _direction) const;
 	};
 
 	class BlockBase
 	{
 		friend class BlockDictionary;
 	private:
-		enum Shape
-		{
-			CUBE = 0
-		};
 		enum UVMap
 		{
 			ALL,
@@ -51,7 +64,7 @@ namespace Vxl
 	public:
 		BlockBase(
 			Block::ID id,
-			Shape shape,
+			Block::Shape shape,
 			UVMap map,
 			Vector4 uvUp = Vector4(),
 			Vector4 uvDown = Vector4(),
@@ -69,23 +82,25 @@ namespace Vxl
 			m_uvs[5] = uvBack;
 		}
 
-		const Block::ID m_id;
-		const Shape		m_shape;
-		const UVMap		m_UVmap;
-		Vector4			m_uvs[6];
+		const Block::ID		m_id;
+		const Block::Shape	m_shape;
+		const UVMap			m_UVmap;
+		Vector4				m_uvs[6];
 	};
 
 	static class BlockAtlas : public Singleton<class BlockDictionary>
 	{
 	private:
 		bool		m_setup = false;
-		Texture*	m_AtlasTexture;
+		Texture*	m_AtlasTexture = nullptr;
 		UINT		m_blockPixelLength;
 		UINT		m_columns;
 		UINT		m_rows;
 		Vector4**	m_uvs;
 	public:
 		void Setup(Texture* atlas, UINT blockPixelLength);
+		Texture* GetTexture(void) const;
+		void BindAtlas();
 		Vector4 GetUvs(UINT Column, UINT Row);
 
 	} SingletonInstance(BlockAtlas);
@@ -93,9 +108,11 @@ namespace Vxl
 	static class BlockDictionary : public Singleton<class BlockDictionary>
 	{
 	private:
+		bool m_init = false;
 		std::unordered_map<Block::ID, BlockBase*> m_blocks;
 	public:
 		void Setup();
+		BlockBase* GetBlockBase(Block::ID _id);
 
 	} SingletonInstance(BlockDictionary);
 }

@@ -15,6 +15,11 @@ namespace Vxl
 		AddComponent(&m_material, this);
 	}
 
+	void Entity::SetMaterialBase(MaterialBase* _base)
+	{
+		m_material.SetBase(_base);
+	}
+
 	void Entity::Update()
 	{
 
@@ -27,9 +32,5 @@ namespace Vxl
 		m_mesh->Draw();
 	}
 
-	void Entity::SetMaterial(ShaderProgram* _shader)
-	{
-		m_material.SetShader(_shader);
-	}
 }
 

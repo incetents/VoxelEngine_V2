@@ -30,7 +30,7 @@
 #include "../engine/modules/Entity.h"
 #include "../engine/modules/Material.h"
 
-#include "../game/terrain/Block.h"
+#include "../game/terrain/TerrainManager.h"
 
 #include <iostream>
 
@@ -39,7 +39,7 @@ namespace Vxl
 {
 	void Scene::setup()
 	{
-		_camera = new Camera(Vector3(0, 0, 0), Vector3(0, 0, 1), 0.01f, 50.0f);
+		_camera = new Camera(Vector3(0, 1, -1), Vector3(0, 0, 1), 0.01f, 50.0f);
 		//_camera->setOrthographic(-15, 15, -15, 15);
 		_camera->setPerspective(110.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT);
 		_camera->update();
@@ -53,10 +53,19 @@ namespace Vxl
 		_fbo->addDepth(SCREEN_WIDTH, SCREEN_HEIGHT);
 		_fbo->unbind();
 
-		_shader_gbuffer = ShaderProgram::m_database.Get("gbuffer");
-		_shader_gbuffer_instancing = ShaderProgram::m_database.Get("gbuffer_instancing");
-		_shader_passthrough = ShaderProgram::m_database.Get("passthrough");
-		_shader_skybox = ShaderProgram::m_database.Get("skybox");
+		_shader_gbuffer				= ShaderProgram::m_database.Get("gbuffer");
+		_shader_gbuffer_instancing	= ShaderProgram::m_database.Get("gbuffer_instancing");
+		_shader_gbuffer_color		= ShaderProgram::m_database.Get("gbuffer_color");
+		_shader_gbuffer_no_model	= ShaderProgram::m_database.Get("gbuffer_no_model");
+		_shader_passthrough			= ShaderProgram::m_database.Get("passthrough");
+		_shader_skybox				= ShaderProgram::m_database.Get("skybox");
+
+		_material_gbuffer				= new MaterialBase(_shader_gbuffer);
+		_material_gbuffer_instancing	= new MaterialBase(_shader_gbuffer_instancing);
+		_material_gbuffer_color			= new MaterialBase(_shader_gbuffer_color);
+		_material_gbuffer_no_model		= new MaterialBase(_shader_gbuffer_no_model);
+		_material_passthrough			= new MaterialBase(_shader_passthrough);
+		_material_skybox				= new MaterialBase(_shader_skybox);
 
 		_tex = Texture::m_database.Get("beato");
 		_tex_crate = Texture::m_database.Get("crate_diffuse");
@@ -64,8 +73,9 @@ namespace Vxl
 		_cubemap1 = Cubemap::m_database.Get("craterlake");
 		
 		// Voxel Stuff
-		BlockAtlas.Setup(Texture::m_database.Get("TextureAtlas"), 16);
-		BlockDictionary.Setup();
+		BlockAtlas.Setup(Texture::m_database.Get("TextureAtlas"), 16); // texture of all blocks
+		BlockDictionary.Setup(); // info of all blocks
+		TerrainManager.Setup(); // keeps track of terrain info
 		//
 
 		_mesh = new Mesh();
@@ -111,28 +121,27 @@ namespace Vxl
 
 		// Entity
 		_entity1 = new Entity();
-		_entity1->SetMaterial(_shader_gbuffer_instancing);
+		_entity1->SetMaterialBase(_material_gbuffer);
 		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity1->m_mesh = _mesh;
 		//_entity1->m_transform.setScale(+0.5f);
 
 		_entity2 = new Entity();
-		_entity2->SetMaterial(_shader_gbuffer);
+		_entity2->SetMaterialBase(_material_gbuffer);
 		_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->m_mesh = Geometry::GetCube();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		
 		_entity3 = new Entity();
-		_entity3->SetMaterial(_shader_gbuffer);
+		_entity3->SetMaterialBase(_material_gbuffer);
 		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity3->m_mesh = Geometry::GetCube();
 		_entity3->m_transform.setPosition(Vector3(-1.5f, 0, -3.0f));
 
 		_entity4 = new Entity();
-		_entity4->SetMaterial(_shader_skybox);
+		_entity4->SetMaterialBase(_material_skybox);
 		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_entity4->m_mesh = Geometry::GetInverseCube();
-		_entity4->m_transform.setPosition(Vector3(0, 0, -3.0f));
 
 		for (int x = -1; x <= 1; x++)
 		{
@@ -144,7 +153,7 @@ namespace Vxl
 						continue;
 
 					Entity* ent = new Entity();
-					ent->SetMaterial(_shader_gbuffer);
+					ent->SetMaterialBase(_material_gbuffer);
 					ent->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 					ent->m_mesh = Geometry::GetCube();
 					
@@ -161,7 +170,9 @@ namespace Vxl
 			}
 		}
 
-		
+		_entity5 = new Entity();
+		_entity5->SetMaterialBase(_material_gbuffer_color);
+		_entity5->m_mesh = Geometry::GetOctahedron();
 
 	}
 
@@ -229,22 +240,52 @@ namespace Vxl
 		
 
 		// GBUFFER Instancing
-		_shader_gbuffer_instancing->Bind();
+		//_shader_gbuffer_instancing->Bind();
 		
-		_entity1->Draw();
+		//_entity1->Draw();
 		
 		
 		// GBUFFER
-		_shader_gbuffer->Bind();
+		_material_gbuffer->Bind();
 		
-		//_entity2->Draw();
-		//_entity3->Draw();
-		for (int i = 0; i < _cubes.size(); i++)
-			_cubes[i]->Draw();
+		_entity2->Draw();
+		_entity3->Draw();
+
+		//for (int i = 0; i < _cubes.size(); i++)
+		//	_cubes[i]->Draw();
+
+		// GBUFFER No model
+		_material_gbuffer_no_model->Bind();
+
+		glUtil::setActiveTexture(Active_Texture::LEVEL0);
+		BlockAtlas.BindAtlas();
+
+		TerrainManager.Draw();
+
+
+		// GBUFFER Color
+		_material_gbuffer_color->Bind();
+
+		_entity5->m_transform.setScale(0.4f);
+
+		_shader_gbuffer_color->SetUniform("color", vec3(1, 1, 1));
+		_entity5->m_transform.setPosition(Vector3(0, 0, 0));
+		_entity5->Draw();
+
+		_shader_gbuffer_color->SetUniform("color", vec3(1, 0, 0));
+		_entity5->m_transform.setPosition(Vector3(1, 0, 0));
+		_entity5->Draw();
+
+		_shader_gbuffer_color->SetUniform("color", vec3(0, 1, 0));
+		_entity5->m_transform.setPosition(Vector3(0, 1, 0));
+		_entity5->Draw();
+
+		_shader_gbuffer_color->SetUniform("color", vec3(0, 0, 1));
+		_entity5->m_transform.setPosition(Vector3(0, 0, 1));
+		_entity5->Draw();
 		
 		// Skybox
-		_shader_skybox->Bind();
-
+		_material_skybox->Bind();
 
 		_entity4->Draw();
 		//
@@ -302,9 +343,19 @@ namespace Vxl
 		
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		_fbo->bindTexture(2, Active_Texture::LEVEL0);
+		_fbo->bindTexture(0, Active_Texture::LEVEL0);
 		Geometry::GetFullQuad()->Draw();
 		
+		// Normals test
+		static bool SHOW_NORMAL_QUAD = false;
+
+		if (SHOW_NORMAL_QUAD)
+		{
+			glViewport(0, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
+			_fbo->bindTexture(1, Active_Texture::LEVEL0);
+			Geometry::GetFullQuad()->Draw();
+		}
+
 		// glViewport(0, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
 		// _fbo->bindDepth(Active_Texture::LEVEL0);
 		// Geometry::GetFullQuad()->Draw();
@@ -371,6 +422,9 @@ namespace Vxl
 			ImGui::SliderFloat("ZFAR", &ZFAR, 1.0, 50.0f);
 
 			ImGui::Separator();
+
+			ImGui::Checkbox("SHOW NORMALS", &SHOW_NORMAL_QUAD);
+
 			//ImGui::Text("Dear ImGui, %s", ImGui::GetVersion());
 
 			if (GamePad1.IsConnected())

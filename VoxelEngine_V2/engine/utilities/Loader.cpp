@@ -4,6 +4,7 @@
 
 #include "../opengl/Shader.h"
 #include "../opengl/Texture.h"
+#include "../opengl/Enums.h"
 
 #include "logger.h"
 
@@ -22,6 +23,40 @@ namespace Vxl
 	const std::string Loader::TAG_TESS_CTRL = "#TESS_CTRL";
 	const std::string Loader::TAG_TESS_EVAL = "#TESS_EVAL";
 	const std::string Loader::TAG_COMP = "#COMP";
+
+	const std::string Loader::TAG_WRAPMODE_REPEAT = "REPEAT";
+	const std::string Loader::TAG_WRAPMODE_CLAMP_BORDER = "CLAMP_BORDER";
+	const std::string Loader::TAG_WRAPMODE_CLAMP_STRETCH = "CLAMP_STRETCH";
+	const std::string Loader::TAG_WRAPMODE_MIRROR_REPEAT = "MIRROR_REPEAT";
+	const std::string Loader::TAG_WRAPMODE_MIRROR_CLAMP = "MIRROR_CLAMP";
+
+	const std::string Loader::TAG_FILTERMODE_NEAREST = "NEAREST";
+	const std::string Loader::TAG_FILTERMODE_LINEAR = "LINEAR";
+
+	Wrap_Mode Loader::DecipherWrapMode(const std::string& str)
+	{
+		if (str.compare(TAG_WRAPMODE_REPEAT) == 0)
+			return Wrap_Mode::REPEAT;
+		else if (str.compare(TAG_WRAPMODE_CLAMP_BORDER) == 0)
+			return Wrap_Mode::CLAMP_BORDER;
+		else if (str.compare(TAG_WRAPMODE_CLAMP_STRETCH) == 0)
+			return Wrap_Mode::CLAMP_STRETCH;
+		else if (str.compare(TAG_WRAPMODE_MIRROR_REPEAT) == 0)
+			return Wrap_Mode::MIRROR_REPEAT;
+		else if (str.compare(TAG_WRAPMODE_MIRROR_CLAMP) == 0)
+			return Wrap_Mode::MIRROR_CLAMP;
+		else
+			return Wrap_Mode::NONE;
+	}
+	Filter_Mode Loader::DecipherFilterMode(const std::string& str)
+	{
+		if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
+			return Filter_Mode::NEAREST;
+		else if (str.compare(TAG_FILTERMODE_LINEAR) == 0)
+			return Filter_Mode::LINEAR;
+		else
+			return Filter_Mode::NONE;
+	}
 
 	bool Loader::CheckFile(const std::string& filePath)
 	{
@@ -140,10 +175,26 @@ namespace Vxl
 						delete Sp;
 				}
 				/* TEXTURE */
-				else if (_state == LoadState::TEXTURE && SegmentCount == 2)
+				else if (_state == LoadState::TEXTURE && SegmentCount >= 2)
 				{
 					auto Name = Segments[0];
-					Texture* tex = new Texture(Segments[1]);
+					Texture* tex;
+					if (SegmentCount == 2)
+						tex = new Texture(Segments[1]);
+					else if (SegmentCount == 3)
+					{
+						Wrap_Mode WM = DecipherWrapMode(Segments[2]);
+						tex = new Texture(Segments[1], WM);
+					}
+					else if (SegmentCount == 4)
+					{
+						Wrap_Mode WM = DecipherWrapMode(Segments[2]);
+						Filter_Mode FM = DecipherFilterMode(Segments[3]);
+						tex = new Texture(Segments[1], WM, FM, FM);
+					}
+					else
+						continue;
+
 					if (tex->IsLoaded())
 					{
 						if (Texture::m_database.Check(Name))

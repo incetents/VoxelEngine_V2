@@ -13,7 +13,7 @@ namespace Vxl
 	{
 		// Data
 		setPosition(_position);
-		setForward(_forward);
+		setForward(-_forward.Normalize());
 
 		// Projection Empty
 		m_projection = new CameraProjection(_znear, _zfar);

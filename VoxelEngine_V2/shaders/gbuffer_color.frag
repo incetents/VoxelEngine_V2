@@ -16,9 +16,10 @@ layout (location = 1) out vec4 output_normal;
 layout (location = 2) out vec4 output_test;
 
 // Uniform Textures
-layout (binding = 0) uniform sampler2D albedo_handler;
+//layout (binding = 0) uniform sampler2D albedo_handler;
 // Uniforms
 uniform vec3 camForward = vec3(0,0,1);
+uniform vec3 color = vec3(1,1,1);
 
 //Main
 void main()
@@ -31,7 +32,7 @@ void main()
 	vec3 n = normalize(f_data.normal) * 0.5 + 0.5;
 	vec2 uv = f_data.uv;
 	
-	output_albedo = texture(albedo_handler, f_data.uv);
+	output_albedo = vec4(color, 1);
 	output_normal = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0);
 	output_test = vec4(d, 0, 0.2, 1);
 	

@@ -50,6 +50,66 @@ namespace Vxl
 		explicit Vector3i(Degrees _x, Degrees _y, Degrees _z);
 		explicit Vector3i(Vector2i v, int z);
 		explicit Vector3i(int x, Vector2i v);
+
+		// Compare
+		inline bool Compare(const Vector3i&) const;
+		static bool Compare(const Vector3i&, const Vector3i&);
+
+		// Special Operator Overloads
+		int operator[](const int) const;
+		int& operator[](const int);
+		Vector3i operator-() const;
+
+		// Basic Operator Overloading
+		Vector3i operator+ (const Vector2i& v) const;
+		Vector3i operator- (const Vector2i& v) const;
+		Vector3i operator* (const Vector2i& v) const;
+		Vector3i operator/ (const Vector2i& v) const;
+		Vector3i& operator+= (const Vector2i& v);
+		Vector3i& operator-= (const Vector2i& v);
+		Vector3i& operator*= (const Vector2i& v);
+		Vector3i& operator/= (const Vector2i& v);
+
+		Vector3i operator+ (const Vector3i& v) const;
+		Vector3i operator- (const Vector3i& v) const;
+		Vector3i operator* (const Vector3i& v) const;
+		Vector3i operator/ (const Vector3i& v) const;
+		Vector3i& operator+= (const Vector3i& v);
+		Vector3i& operator-= (const Vector3i& v);
+		Vector3i& operator*= (const Vector3i& v);
+		Vector3i& operator/= (const Vector3i& v);
+
+		Vector3i operator+ (const Vector4i&) const;
+		Vector3i operator- (const Vector4i&) const;
+		Vector3i operator* (const Vector4i&) const;
+		Vector3i operator/ (const Vector4i&) const;
+		Vector3i& operator+= (const Vector4i&);
+		Vector3i& operator-= (const Vector4i&);
+		Vector3i& operator*= (const Vector4i&);
+		Vector3i& operator/= (const Vector4i&);
+
+		// Operator Overloading with Float
+		friend Vector3i operator+ (const Vector3i&, const int);
+		friend Vector3i operator- (const Vector3i&, const int);
+		friend Vector3i operator* (const Vector3i&, const int);
+		friend Vector3i operator/ (const Vector3i&, const int);
+
+		friend Vector3i operator+ (const int, const Vector3i&);
+		friend Vector3i operator- (const int, const Vector3i&);
+		friend Vector3i operator* (const int, const Vector3i&);
+		friend Vector3i operator/ (const int, const Vector3i&);
+
+		Vector3i& operator+= (const int);
+		Vector3i& operator-= (const int);
+		Vector3i& operator*= (const int);
+		Vector3i& operator/= (const int);
+
+		// Operator Comparison Overloading
+		Vector3i& operator= (const Vector2i&);
+		Vector3i& operator= (const Vector3i&);
+		Vector3i& operator= (const Vector4i&);
+		bool operator== (const Vector3i&) const;
+		bool operator!= (const Vector3i&) const;
 	};
 
 	class Vector3
@@ -102,7 +162,13 @@ namespace Vxl
 		Vector3& NormalizeSelf();
 		// Normalize
 		Vector3 Normalize() const;
+		Vector3 NormalizeXY() const; // Remove Z and normalize
+		Vector3 NormalizeXZ() const; // Remove Y and normalize
+		Vector3 NormalizeYZ() const; // Remove X and normalize
 		static Vector3 Normalize(const Vector3&);
+		static Vector3 NormalizeXY(const Vector3&); // Remove Z and normalize
+		static Vector3 NormalizeXZ(const Vector3&);	// Remove Y and normalize
+		static Vector3 NormalizeYZ(const Vector3&);	// Remove X and normalize
 		// Magnitude
 		float Magnitude() const;
 		static float Magnitude(const Vector3&);
@@ -145,11 +211,11 @@ namespace Vxl
 		Vector3 Rotate(const Radians&, const Vector3&, RotationDirection = RotationDirection(1)) const;
 
 		// Get Angle Degrees
-		Degrees GetAngleDegrees(Vector3&);
-		static Degrees GetAngleDegrees(Vector3&, Vector3&);
+		Degrees GetAngleDegrees(const Vector3&) const;
+		static Degrees GetAngleDegrees(const Vector3&, const Vector3&);
 		// Get Angle Radians
-		Radians GetAngleRadians(Vector3&);
-		static Radians GetAngleRadians(Vector3&, Vector3&);
+		Radians GetAngleRadians(const Vector3&) const;
+		static Radians GetAngleRadians(const Vector3&, const Vector3&);
 
 		// Random Vector3 Unit Vector
 		static Vector3 GetRandomUnitVector();

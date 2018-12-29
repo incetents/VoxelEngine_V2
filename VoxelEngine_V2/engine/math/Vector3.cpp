@@ -65,6 +65,260 @@ namespace Vxl
 		z = _v.y;
 	}
 
+	// Compare
+	bool Vector3i::Compare(const Vector3i& v) const
+	{
+		return x == v.x && y == v.y && z == v.z;
+	}
+	bool Vector3i::Compare(const Vector3i& v1, const Vector3i& v2)
+	{
+		return v1.Compare(v2);
+	}
+
+	// Special Operator Overloads
+	int Vector3i::operator[](const int index) const
+	{
+		assert((index >= 0) && (index < 3));
+		return (&x)[index];
+	}
+	int& Vector3i::operator[](const int index)
+	{
+		assert((index >= 0) && (index < 3));
+		return (&x)[index];
+	}
+	Vector3i Vector3i::operator-() const
+	{
+		return Vector3i(-x, -y, -z);
+	}
+
+	// Basic Operator Overloading
+	Vector3i Vector3i::operator+ (const Vector2i& v) const
+	{
+		return Vector3i(x + v.x, y + v.y, z);
+	}
+	Vector3i Vector3i::operator- (const Vector2i& v) const
+	{
+		return Vector3i(x - v.x, y - v.y, z);
+	}
+	Vector3i Vector3i::operator* (const Vector2i& v) const
+	{
+		return Vector3i(x * v.x, y * v.y, z);
+	}
+	Vector3i Vector3i::operator/ (const Vector2i& v) const
+	{
+		return Vector3i(x / v.x, y / v.y, z);
+	}
+	Vector3i& Vector3i::operator+= (const Vector2i& v)
+	{
+		x += v.x;
+		y += v.y;
+		return *this;
+	}
+	Vector3i& Vector3i::operator-= (const Vector2i& v)
+	{
+		x -= v.x;
+		y -= v.y;
+		return *this;
+	}
+	Vector3i& Vector3i::operator*= (const Vector2i& v)
+	{
+		x *= v.x;
+		y *= v.y;
+		return *this;
+	}
+	Vector3i& Vector3i::operator/= (const Vector2i& v)
+	{
+		x /= v.x;
+		y /= v.y;
+		return *this;
+	}
+
+	Vector3i Vector3i::operator+ (const Vector3i& v) const
+	{
+		return Vector3i(x + v.x, y + v.y, z + v.z);
+	}
+	Vector3i Vector3i::operator- (const Vector3i& v) const
+	{
+		return Vector3i(x - v.x, y - v.y, z - v.z);
+	}
+	Vector3i Vector3i::operator* (const Vector3i& v) const
+	{
+		return Vector3i(x * v.x, y * v.y, z * v.z);
+	}
+	Vector3i Vector3i::operator/ (const Vector3i& v) const
+	{
+		return Vector3i(x / v.x, y / v.y, z / v.z);
+	}
+	Vector3i& Vector3i::operator+= (const Vector3i& v)
+	{
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return *this;
+	}
+	Vector3i& Vector3i::operator-= (const Vector3i& v)
+	{
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+		return *this;
+	}
+	Vector3i& Vector3i::operator*= (const Vector3i& v)
+	{
+		x *= v.x;
+		y *= v.y;
+		z *= v.z;
+		return *this;
+	}
+	Vector3i& Vector3i::operator/= (const Vector3i& v)
+	{
+		x /= v.x;
+		y /= v.y;
+		z /= v.z;
+		return *this;
+	}
+
+	Vector3i Vector3i::operator+ (const Vector4i& v) const
+	{
+		return Vector3i(x + v.x, y + v.y, z + v.z);
+	}
+	Vector3i Vector3i::operator- (const Vector4i& v) const
+	{
+		return Vector3i(x - v.x, y - v.y, z - v.z);
+	}
+	Vector3i Vector3i::operator* (const Vector4i& v) const
+	{
+		return Vector3i(x * v.x, y * v.y, z * v.z);
+	}
+	Vector3i Vector3i::operator/ (const Vector4i& v) const
+	{
+		return Vector3i(x / v.x, y / v.y, z / v.z);
+	}
+	Vector3i& Vector3i::operator+= (const Vector4i& v)
+	{
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return *this;
+	}
+	Vector3i& Vector3i::operator-= (const Vector4i& v)
+	{
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+		return *this;
+	}
+	Vector3i& Vector3i::operator*= (const Vector4i& v)
+	{
+		x *= v.x;
+		y *= v.y;
+		z *= v.z;
+		return *this;
+	}
+	Vector3i& Vector3i::operator/= (const Vector4i& v)
+	{
+		x /= v.x;
+		y /= v.y;
+		z /= v.z;
+		return *this;
+	}
+
+	// Operator Overloading with Float
+	Vector3i operator+ (const Vector3i& v, const int f)
+	{
+		return Vector3i(v.x + f, v.y + f, v.z + f);
+	}
+	Vector3i operator- (const Vector3i& v, const int f)
+	{
+		return Vector3i(v.x - f, v.y - f, v.z - f);
+	}
+	Vector3i operator* (const Vector3i& v, const int f)
+	{
+		return Vector3i(v.x * f, v.y * f, v.z * f);
+	}
+	Vector3i operator/ (const Vector3i& v, const int f)
+	{
+		return Vector3i(v.x / f, v.y / f, v.z / f);
+	}
+
+	Vector3i operator+ (const int f, const Vector3i& v)
+	{
+		return v + f;
+	}
+	Vector3i operator- (const int f, const Vector3i& v)
+	{
+		return v - f;
+	}
+	Vector3i operator* (const int f, const Vector3i& v)
+	{
+		return v * f;
+	}
+	Vector3i operator/ (const int f, const Vector3i& v)
+	{
+		return v / f;
+	}
+
+
+	Vector3i& Vector3i::operator+= (int f)
+	{
+		x += f;
+		y += f;
+		z += f;
+		return *this;
+	}
+	Vector3i& Vector3i::operator-= (int f)
+	{
+		x -= f;
+		y -= f;
+		z -= f;
+		return *this;
+	}
+	Vector3i& Vector3i::operator*= (int f)
+	{
+		x *= f;
+		y *= f;
+		z *= f;
+		return *this;
+	}
+	Vector3i& Vector3i::operator/= (int f)
+	{
+		assert(f);
+		x /= f;
+		y /= f;
+		z /= f;
+		return *this;
+	}
+
+	// Comparison Operator Overloading
+	Vector3i& Vector3i::operator= (const Vector2i& v)
+	{
+		x = v.x;
+		y = v.y;
+		return *this;
+	}
+	Vector3i& Vector3i::operator= (const Vector3i& v)
+	{
+		x = v.x;
+		y = v.y;
+		z = v.z;
+		return *this;
+	}
+	Vector3i& Vector3i::operator= (const Vector4i& v)
+	{
+		x = v.x;
+		y = v.y;
+		z = v.z;
+		return *this;
+	}
+	bool Vector3i::operator== (const Vector3i& v) const
+	{
+		return Compare(v);
+	}
+	bool Vector3i::operator!= (const Vector3i& v) const
+	{
+		return !Compare(v);
+	}
+
 
 	const Vector3 Vector3::ZERO = Vector3(0, 0, 0);
 	const Vector3 Vector3::ONE = Vector3(1, 1, 1);
@@ -165,9 +419,34 @@ namespace Vxl
 	{
 		return Vector3(x, y, z) * Vxl::InverseSqrt(x * x + y * y + z * z);
 	}
+	Vector3 Vector3::NormalizeXY() const // Remove Z and normalize
+	{
+		return Vector3(x, y, 0) * Vxl::InverseSqrt(x * x + y * y);
+	}
+	Vector3 Vector3::NormalizeXZ() const // Remove Y and normalize
+	{
+		return Vector3(x, 0, z) * Vxl::InverseSqrt(x * x + z * z);
+	}
+	Vector3 Vector3::NormalizeYZ() const // Remove X and normalize
+	{
+		return Vector3(0, y, z) * Vxl::InverseSqrt(y * y + z * z);
+
+	}
 	Vector3 Vector3::Normalize(const Vector3& v)
 	{
 		return v.Normalize();
+	}
+	Vector3 Vector3::NormalizeXY(const Vector3& v)
+	{
+		return v.NormalizeXY();
+	}
+	Vector3 Vector3::NormalizeXZ(const Vector3& v)
+	{
+		return v.NormalizeXZ();
+	}
+	Vector3 Vector3::NormalizeYZ(const Vector3& v)
+	{
+		return v.NormalizeYZ();
 	}
 	// Magnitude
 	float Vector3::Magnitude() const
@@ -312,17 +591,17 @@ namespace Vxl
 	}
 
 	// Get Angle Degrees
-	Degrees Vector3::GetAngleDegrees(Vector3& v)
+	Degrees Vector3::GetAngleDegrees(const Vector3& v) const
 	{
 		return Degrees(GetAngleRadians(v));
 	}
-	Degrees Vector3::GetAngleDegrees(Vector3& v1, Vector3& v2)
+	Degrees Vector3::GetAngleDegrees(const Vector3& v1, const Vector3& v2)
 	{
 		return v1.GetAngleDegrees(v2);
 	}
 
 	// Get Angle Radians
-	Radians Vector3::GetAngleRadians(Vector3& v)
+	Radians Vector3::GetAngleRadians(const Vector3& v) const
 	{
 		return Radians(
 			acosf(
@@ -330,7 +609,7 @@ namespace Vxl
 			)
 		);
 	}
-	Radians Vector3::GetAngleRadians(Vector3& v1, Vector3& v2)
+	Radians Vector3::GetAngleRadians(const Vector3& v1, const Vector3& v2)
 	{
 		return v1.GetAngleRadians(v2);
 	}

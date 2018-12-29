@@ -330,16 +330,35 @@ namespace Vxl
 		// Special
 		inline Transform& setForward(const Vector3& forward)
 		{
-			Degrees roll(m_euler_rotation.x);
-			Degrees pitch(m_euler_rotation.y);
-			Degrees yaw(m_euler_rotation.z);
+			Vector3 Nforward = forward.Normalize();
 
-			Quaternion::ToEuler(Quaternion(Radians(0.0f), forward), roll, pitch, yaw);
+			if (Nforward == Vector3::UP)
+			{
+				m_euler_rotation.x = 90;
+				m_euler_rotation.y = 0;
+				m_euler_rotation.z = 0; // This should never change
+				return *this;
+			}
+			else if (Nforward == Vector3::DOWN)
+			{
+				m_euler_rotation.x = -90;
+				m_euler_rotation.y = 0;
+				m_euler_rotation.z = 0; // This should never change
+				return *this;
+			}
 
-			m_euler_rotation.x = roll.Get();
-			m_euler_rotation.y = pitch.Get();
-			m_euler_rotation.z = yaw.Get();
+			//Quaternion::ToEuler(Quaternion(forward.x, forward.y, forward.z, 0), roll, pitch, yaw);
+			Degrees yaw = Vector3::GetAngleDegrees(Vector3::FORWARD, Nforward.NormalizeXZ());
+			if (Nforward.z < 0)
+				yaw = -yaw;
+			Degrees pitch = Vector3::GetAngleDegrees(Vector3::UP, Nforward);
+
+			m_euler_rotation = Vector3(pitch.Get() - 90.0f, yaw.Get(), 0);
+
 			isDirty = true;
+
+			auto test = Transform::getForward();
+
 			return *this;
 		}
 
