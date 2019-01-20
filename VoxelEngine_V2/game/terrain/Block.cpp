@@ -28,14 +28,8 @@ namespace Vxl
 		return m_base->m_uvs[(int)_direction];
 	}
 
-	void BlockAtlas::Setup(Texture* atlas, UINT blockPixelLength)
+	void BlockAtlas::Set(Texture* atlas, UINT blockPixelLength)
 	{
-		if (m_setup)
-		{
-			assert(false);
-			return;
-		}
-
 		if (atlas == nullptr)
 		{
 			Logger.error("BlockAtlas using nullptr texture");
@@ -48,6 +42,9 @@ namespace Vxl
 
 		m_columns = m_AtlasTexture->GetWidth() / blockPixelLength;
 		m_rows = m_AtlasTexture->GetHeight() / blockPixelLength;
+
+		if (m_uvs != nullptr)
+			delete[] m_uvs;
 
 		m_uvs = new Vector4*[m_columns];
 		for (UINT i = 0; i < m_columns; i++)
@@ -70,8 +67,6 @@ namespace Vxl
 				m_uvs[x][y] = Vector4(u1, u2, v1, v2);
 			}
 		}
-
-		m_setup = true;
 	}
 	Texture* BlockAtlas::GetTexture(void) const
 	{
@@ -84,15 +79,19 @@ namespace Vxl
 	}
 	Vector4 BlockAtlas::GetUvs(UINT Column, UINT Row)
 	{
-		assert(m_setup);
-		// Existing uv set
 		return m_uvs[Column][Row];
 	}
 
 	void BlockDictionary::Setup()
 	{
 		if (m_init)
-			return;
+		{
+			for (auto it = m_blocks.begin(); it != m_blocks.end(); it++)
+			{
+				delete it->second;
+			}
+			m_blocks.clear();
+		}
 
 		// Initialize list of all blocks
 		{

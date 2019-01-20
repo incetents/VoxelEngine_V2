@@ -201,17 +201,17 @@ namespace Vxl
 	}
 
 	// BUFFERS //
-	void glUtil::generateVAO(GLuint& VAO, GLuint& VBO_Start, const GLuint& TotalVBOs)
+	GLuint glUtil::generateVAO()
 	{
+		GLuint VAO;
 		glGenVertexArrays(1, &VAO);
-		glGenBuffers(TotalVBOs, &VBO_Start);
+		return VAO;
 	}
-	void glUtil::deleteVAO(GLuint& VAO, GLuint& VBO_Start, const GLuint& TotalVBOs)
+	void glUtil::deleteVAO(GLuint& VAO)
 	{
-		glDeleteBuffers(TotalVBOs, &VBO_Start);
 		glDeleteVertexArrays(1, &VAO);
 	}
-	void glUtil::bindVAO(GLuint& VAO)
+	void glUtil::bindVAO(GLuint VAO)
 	{
 		glBindVertexArray(VAO);
 	}
@@ -220,15 +220,23 @@ namespace Vxl
 		glBindVertexArray(0);
 	}
 
+	void glUtil::bindVBO(GLuint VBO)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	}
+	void glUtil::bindVBOSubData(GLsizei Offset, GLsizei Size, GLvoid* Data)
+	{
+		glBufferSubData(GL_ARRAY_BUFFER, Offset, Size, Data);
+	}
 	void glUtil::bindArray(GLuint VBO, GLsizeiptr length, GLvoid* data, GLenum usage)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, length, data, usage);
 	}
-	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType)
+	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType, GLuint m_strideSize, GLuint m_strideOffset)
 	{
 		glEnableVertexAttribArray(bufferIndex);
-		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, GL_FALSE, 0, 0);
+		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, GL_FALSE, m_strideSize, BUFFER_OFFSET(m_strideOffset));
 	}
 	void glUtil::setVertexAttribInstancing(GLuint bufferIndex)
 	{
@@ -247,6 +255,10 @@ namespace Vxl
 		glVertexAttribDivisor(bufferIndex + 3, 1);
 	}
 
+	void glUtil::bindVBOI(GLuint VBOI)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBOI);
+	}
 	void glUtil::bindIndices(GLuint VBO, GLsizeiptr length, GLvoid* data, GLenum usage)
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBO);

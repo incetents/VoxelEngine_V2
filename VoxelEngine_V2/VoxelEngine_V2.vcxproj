@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,14 +22,19 @@
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
+    <ClCompile Include="engine\modules\Layer.cpp" />
     <ClCompile Include="engine\modules\Material.cpp" />
-    <ClCompile Include="engine\opengl\MeshRenderer.cpp" />
+    <ClCompile Include="engine\modules\RenderManager.cpp" />
+    <ClCompile Include="engine\modules\Scene.cpp" />
+    <ClCompile Include="engine\opengl\DebugLines.cpp" />
     <ClCompile Include="engine\opengl\FramebufferObject.cpp" />
     <ClCompile Include="engine\opengl\Geometry.cpp" />
+    <ClCompile Include="engine\opengl\VBO.cpp" />
+    <ClCompile Include="engine\opengl\MeshRenderer.cpp" />
     <ClCompile Include="engine\opengl\Texture.cpp" />
     <ClCompile Include="engine\opengl\TextureTracker.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
-    <ClCompile Include="game\Scene.cpp" />
+    <ClCompile Include="game\Scene_Game.cpp" />
     <ClCompile Include="game\terrain\Block.cpp" />
     <ClCompile Include="game\terrain\Chunk.cpp" />
     <ClCompile Include="game\terrain\ChunkMesh.cpp" />
@@ -74,7 +79,13 @@
     <ClInclude Include="engine\light\Light.h" />
     <ClInclude Include="engine\modules\Component.h" />
     <ClInclude Include="engine\modules\Entity.h" />
+    <ClInclude Include="engine\modules\Layer.h" />
     <ClInclude Include="engine\modules\Material.h" />
+    <ClInclude Include="engine\modules\MaterialPackage.h" />
+    <ClInclude Include="engine\modules\RenderManager.h" />
+    <ClInclude Include="engine\modules\Scene.h" />
+    <ClInclude Include="engine\opengl\DebugLines.h" />
+    <ClInclude Include="engine\opengl\VBO.h" />
     <ClInclude Include="engine\opengl\MeshRenderer.h" />
     <ClInclude Include="engine\opengl\FramebufferObject.h" />
     <ClInclude Include="engine\opengl\Geometry.h" />
@@ -106,10 +117,11 @@
     <ClInclude Include="engine\utilities\logger.h" />
     <ClInclude Include="engine\utilities\singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
+    <ClInclude Include="engine\utilities\Time.h" />
     <ClInclude Include="engine\window\glfwCallbacks.h" />
     <ClInclude Include="engine\opengl\glUtil.h" />
     <ClInclude Include="engine\window\window.h" />
-    <ClInclude Include="game\Scene.h" />
+    <ClInclude Include="game\Scene_Game.h" />
     <ClInclude Include="game\terrain\Block.h" />
     <ClInclude Include="game\terrain\Chunk.h" />
     <ClInclude Include="game\terrain\ChunkMesh.h" />

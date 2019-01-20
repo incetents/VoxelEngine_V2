@@ -1,6 +1,8 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #pragma once
 
+#include "../engine/modules/Scene.h"
+
 static int SCREEN_WIDTH = 1080;
 static int SCREEN_HEIGHT = 720;
 
@@ -17,43 +19,56 @@ namespace Vxl
 	class Cubemap;
 	class Light;
 	class MaterialBase;
+	class Clock;
 
-	class Scene
+	class Scene_Game : public Scene
 	{
 	private:
+		// Assets Loaded
 		ShaderProgram* _shader_gbuffer;
-		ShaderProgram* _shader_gbuffer_instancing;
-		ShaderProgram* _shader_gbuffer_color;
 		ShaderProgram* _shader_gbuffer_no_model;
 		ShaderProgram* _shader_passthrough;
 		ShaderProgram* _shader_skybox;
+		ShaderProgram* _shader_debugLines;
 
-		MaterialBase* _material_gbuffer;
-		MaterialBase* _material_gbuffer_instancing;
-		MaterialBase* _material_gbuffer_color;
-		MaterialBase* _material_gbuffer_no_model;
-		MaterialBase* _material_passthrough;
-		MaterialBase* _material_skybox;
-
-		FramebufferObject * _fbo;
-		Camera* _camera;
-		Mesh* _mesh;
 		Texture* _tex;
 		Texture* _tex_crate;
 		Cubemap* _cubemap1;
+
+		// Assets Created
+		FramebufferObject* _fbo;
+		Camera* _camera;
+		Mesh* _mesh;
+
+		// Assets Automated
+		MaterialBase* _material_gbuffer;
+		MaterialBase* _material_gbuffer_no_model;
+		MaterialBase* _material_passthrough;
+		MaterialBase* _material_skybox;
+		MaterialBase* _material_debugLines;
 
 		Entity* _entity1;
 		Entity* _entity2;
 		Entity* _entity3;
 		Entity* _entity4;
-		Entity* _entity5;
+
+		Entity* _crate1;
+		Entity* _crate2;
+
+		Entity* _octo1;
+		Entity* _octo2;
+		Entity* _octo3;
+		Entity* _octo4;
 		
 		std::vector<Entity*> _cubes;
 
-	public:
-		void setup();
+		Clock* clock1;
 
-		void update();
-		void draw();
+	public:
+		void Setup() override;
+		void Destroy() override;
+
+		void Update() override;
+		void Draw() override;
 	};
 }

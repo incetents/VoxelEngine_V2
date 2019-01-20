@@ -68,6 +68,21 @@ namespace Vxl
 
 		m_init = true;
 	}
+	void TerrainManager::Destroy()
+	{
+		for (auto itx = m_chunks.begin(); itx != m_chunks.end(); itx++)
+		{
+			for (auto ity = itx->second.begin(); ity != itx->second.end(); ity++)
+			{
+				for (auto itz = ity->second.begin(); itz != ity->second.end(); itz++)
+				{
+					delete itz->second;
+				}
+			}
+		}
+		m_chunks.clear();
+		m_init = false;
+	}
 
 	void TerrainManager::Draw()
 	{

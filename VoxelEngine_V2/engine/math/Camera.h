@@ -13,6 +13,8 @@
 
 namespace Vxl
 {
+	class Transform;
+
 	class CameraProjection
 	{
 	protected:
@@ -264,6 +266,7 @@ namespace Vxl
 			updateValues();
 			return m_forward;
 		}
-		
+
+		Transform& setForward(const Vector3& forward);
 	};
 }

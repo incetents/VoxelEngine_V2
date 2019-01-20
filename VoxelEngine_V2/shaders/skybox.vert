@@ -12,8 +12,8 @@ out fragment_data
 } f_data;
 
 // Uniforms
-uniform mat4 view = mat4(1.0);
-uniform mat4 projection = mat4(1.0);
+uniform mat4 VXL_view = mat4(1.0);
+uniform mat4 VXL_projection = mat4(1.0);
 
 // Main
 void main()
@@ -21,12 +21,12 @@ void main()
 	f_data.uvw = m_position;
 	
 	// Remove position from view matrix since skybox doesn't move
-	mat4 viewStill = view;
+	mat4 viewStill = VXL_view;
 	viewStill[3][0] = 0;
 	viewStill[3][1] = 0;
 	viewStill[3][2] = 0;
 	
-	vec4 pos = projection * viewStill * vec4(m_position, 1.0);
+	vec4 pos = VXL_projection * viewStill * vec4(m_position, 1.0);
 
 	gl_Position = pos.xyww;
 }

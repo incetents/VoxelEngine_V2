@@ -9,11 +9,14 @@
 #include "../math/Vector4.h"
 #include "../math/Matrix4x4.h"
 
+#include "VBO.h"
+
 #include <Windows.h>
 #include <vector>
 
 namespace Vxl
 {
+	/*
 	class MeshBufferBase
 	{
 		friend class Mesh;
@@ -196,13 +199,123 @@ namespace Vxl
 		}
 
 	};
+	*/
 
+	template<typename Type, UINT ValueCount, BufferType Buf>
+	class MeshBuffer
+	{
+		friend class Mesh;
+	private:
+		VBO m_vbo;
+	public:
+		MeshBuffer()
+		{
+			m_vbo.AddStrideHint(Buf, ValueCount);
+		}
+
+		void set(Type* arr, GLuint count)
+		{
+			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
+		}
+		void set(std::vector<Type> vec)
+		{
+			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+		}
+		MeshBuffer& operator=(std::vector<Type> vec)
+		{
+			set(vec);
+			return *this;
+		}
+
+		inline UINT GetDrawCount(void) const
+		{
+			return m_vbo.GetDrawCount();
+		}
+		inline UINT GetSize(void) const
+		{
+			return m_vbo.GetSize();
+		}
+	};
+
+	class MeshBufferIndices
+	{
+		friend class Mesh;
+	private:
+		VBOI m_vboi;
+	public:
+		void set(GLuint* arr, GLuint count)
+		{
+			m_vboi.SetIndices(arr, count, BufferBind_Mode::STATIC);
+		}
+		void set(std::vector<GLuint> vec)
+		{
+			m_vboi.SetIndices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+		}
+		MeshBufferIndices& operator=(std::vector<GLuint> vec)
+		{
+			set(vec);
+			return *this;
+		}
+
+		inline UINT GetDrawCount(void) const
+		{
+			return m_vboi.GetDrawCount();
+		}
+		inline UINT GetSize(void) const
+		{
+			return m_vboi.GetSize();
+		}
+	};
+
+	class MeshBufferInstancing
+	{
+		friend class Mesh;
+	private:
+		VBO m_vbo;
+	public:
+		MeshBufferInstancing()
+		{
+			m_vbo.AddStrideHint(BufferType::InstancingStart, 0);
+		}
+
+		void set(Matrix4x4* arr, GLuint count)
+		{
+			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
+		}
+		void set(std::vector<Matrix4x4> vec)
+		{
+			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+		}
+		MeshBufferInstancing& operator=(std::vector<Matrix4x4> vec)
+		{
+			set(vec);
+			return *this;
+		}
+
+		inline UINT GetDrawCount(void) const
+		{
+			return m_vbo.GetDrawCount();
+		}
+		inline UINT GetSize(void) const
+		{
+			return m_vbo.GetSize();
+		}
+	};
+
+
+
+	// Send Array Of Data
+	//glUtil::bindArray(*m_VBO_ref, m_length * sizeof(Matrix4x4), &((Matrix4x4*)m_array)[0], (GLenum)m_bindMode);
+
+	// Vertex Attribute Number
+	//glUtil::setVertexAttribInstancing((GLuint)m_VBO_index);
+	
 
 	class Mesh
 	{
 	protected:
 		GLuint  m_VAO;
-		GLuint* m_VBOs;
+		//GLuint* m_VBOs;
 
 		Draw_Type m_type = Draw_Type::TRIANGLES;
 		Draw_Mode m_mode = Draw_Mode::ARRAY;
@@ -223,11 +336,17 @@ namespace Vxl
 		Mesh();
 		virtual ~Mesh();
 
-		MeshBuffer<Vector3>	 m_positions;
-		MeshBuffer<Vector2>	 m_uvs;
-		MeshBuffer<Vector3>	 m_normals;
+		MeshBuffer<Vector3, 3, BufferType::VERTEX> m_positions;
+		MeshBuffer<Vector2, 2, BufferType::UV> m_uvs;
+		MeshBuffer<Vector3, 3, BufferType::NORMAL> m_normals;
 		MeshBufferInstancing m_instances;
-		MeshBufferIndices	 m_indices;
+		MeshBufferIndices m_indices;
+
+		//MeshBuffer<Vector3>	 m_positions;
+		//MeshBuffer<Vector2>	 m_uvs;
+		//MeshBuffer<Vector3>	 m_normals;
+		//MeshBufferInstancing m_instances;
+		//MeshBufferIndices	 m_indices;
 
 		inline GLuint		GetDrawCount() const
 		{

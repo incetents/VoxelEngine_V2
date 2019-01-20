@@ -433,6 +433,29 @@ namespace Vxl
 		return *this;
 	}
 
+	// Become Translation Matrix
+	Matrix4x4 Matrix4x4::Translate(const Vector3& center)
+	{
+		return Translate(center.x, center.y, center.z);
+	}
+	Matrix4x4 Matrix4x4::Translate(float x, float y, float z)
+	{
+		Matrix4x4 M;
+		M.OverrideCenter(x, y, z);
+		return M;
+	}
+	// Become Scale Matrix
+	Matrix4x4 Matrix4x4::Scale(const Vector3& center)
+	{
+		return Scale(center.x, center.y, center.z);
+	}
+	Matrix4x4 Matrix4x4::Scale(float x, float y, float z)
+	{
+		Matrix4x4 M;
+		M.OverrideScale(x, y, z);
+		return M;
+	}
+
 	// Determinant
 	float Matrix4x4::Determinant() const
 	{

@@ -59,9 +59,9 @@ namespace Vxl
 	{
 	private:
 		// Program //
-		bool				m_linked = false;
-		GLuint				m_id = -1;
 		const std::string   m_name;
+		GLuint				m_id = -1;
+		bool				m_linked = false;
 		BYTE				m_shaderCount : 3; // 3 bits, val is 8 max
 		std::vector<Shader*> m_shaders;
 		// Uniform //
@@ -109,6 +109,10 @@ namespace Vxl
 		inline GLuint			GetUniformCount(void) const
 		{
 			return m_uniformCount;
+		}
+		const UniformStorage	GetAllUniforms(void) const
+		{
+			return m_uniforms;
 		}
 		inline bool				CheckUniform(const std::string& name)
 		{

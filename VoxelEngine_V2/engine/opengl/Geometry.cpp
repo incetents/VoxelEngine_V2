@@ -13,6 +13,21 @@ namespace Vxl
 {
 	bool Geometry::m_isSetup = false;
 
+	void Geometry::Destroy()
+	{
+		if (!m_isSetup)
+			return;
+
+		delete m_fullQuad;
+		delete m_quad;
+		delete m_cube;
+		delete m_inverseCube;
+		delete m_octahedron;
+		delete m_icosahedron;
+		delete m_icoSphere;
+		delete m_sphere;
+	}
+
 	// Shapes
 	Mesh* Geometry::m_fullQuad = nullptr;
 	Mesh* Geometry::m_quad = nullptr;

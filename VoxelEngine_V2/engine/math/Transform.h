@@ -232,6 +232,12 @@ namespace Vxl
 		}
 
 		// Setters
+		inline Transform& setPosition(float x, float y, float z)
+		{
+			m_position = Vector3(x, y, z);
+			isDirty = true;
+			return *this;
+		}
 		inline Transform& setPosition(const Vector2& position)
 		{
 			m_position = position;
@@ -250,21 +256,33 @@ namespace Vxl
 			isDirty = true;
 			return *this;
 		}
+		inline Transform& setRotation(float x, float y, float z)
+		{
+			m_euler_rotation = Vector3(x, y, z);
+			isDirty = true;
+			return *this;
+		}
 		inline Transform& setRotation(const Vector3& euler_rotation)
 		{
 			m_euler_rotation = euler_rotation;
 			isDirty = true;
 			return *this;
 		}
-		inline Transform& setScale(const Vector3 scale)
-		{
-			m_scale = scale;
-			isDirty = true;
-			return *this;
-		}
 		inline Transform& setScale(float scaleAll)
 		{
 			m_scale = Vector3(scaleAll);
+			isDirty = true;
+			return *this;
+		}
+		inline Transform& setScale(float x, float y, float z)
+		{
+			m_scale = Vector3(x, y, z);
+			isDirty = true;
+			return *this;
+		}
+		inline Transform& setScale(const Vector3 scale)
+		{
+			m_scale = scale;
 			isDirty = true;
 			return *this;
 		}
@@ -328,7 +346,7 @@ namespace Vxl
 		}
 
 		// Special
-		inline Transform& setForward(const Vector3& forward)
+		virtual Transform& setForward(const Vector3& forward)
 		{
 			Vector3 Nforward = forward.Normalize();
 
@@ -363,6 +381,12 @@ namespace Vxl
 		}
 
 		// Increasers
+		inline Transform& increasePosition(float x, float y, float z)
+		{
+			m_position += Vector3(x, y, z);
+			isDirty = true;
+			return *this;
+		}
 		inline Transform& increasePosition(const Vector2& translate)
 		{
 			m_position += Vector3(translate);
@@ -382,6 +406,12 @@ namespace Vxl
 			return *this;
 		}
 
+		inline Transform& increaseRotation(float x, float y, float z)
+		{
+			m_euler_rotation += Vector3(x, y, z);
+			isDirty = true;
+			return *this;
+		}
 		inline Transform& increaseRotation(const Vector3& euler_increase)
 		{
 			m_euler_rotation += euler_increase;
@@ -389,6 +419,12 @@ namespace Vxl
 			return *this;
 		}
 
+		inline Transform& increaseScale(float x, float y, float z)
+		{
+			m_scale += Vector3(x, y, z);
+			isDirty = true;
+			return *this;
+		}
 		inline Transform& increaseScale(const Vector3& scaler)
 		{
 			m_scale += scaler;
@@ -471,7 +507,7 @@ namespace Vxl
 		}
 
 		// Turn object into a 4x4 matrix for math
-		Matrix4x4& getModel();
+		Matrix4x4 getModel();
 
 		// Getters
 		inline Vector3		getPosition() const

@@ -16,7 +16,7 @@ out fragment_data
 } f_data;
 
 // Uniforms
-uniform mat4 viewProjection = mat4(1.0);
+uniform mat4 VXL_viewProjection = mat4(1.0);
 
 // Main
 void main()
@@ -27,5 +27,5 @@ void main()
 	f_data.uv = m_uv;
 	f_data.normal = m_normal;
 
-	gl_Position = viewProjection * object_position; 
+	gl_Position = VXL_viewProjection * object_position; 
 }

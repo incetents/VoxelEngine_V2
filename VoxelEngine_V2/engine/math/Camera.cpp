@@ -13,7 +13,7 @@ namespace Vxl
 	{
 		// Data
 		setPosition(_position);
-		setForward(-_forward.Normalize());
+		setForward(_forward.Normalize());
 
 		// Projection Empty
 		m_projection = new CameraProjection(_znear, _zfar);
@@ -92,5 +92,10 @@ namespace Vxl
 		m_projection->m_Zfar = _zfar;
 		m_projection->Update_Z();
 		return *this;
+	}
+
+	Transform& Camera::setForward(const Vector3& forward)
+	{
+		return Transform::setForward(-forward);
 	}
 }

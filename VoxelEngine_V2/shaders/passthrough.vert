@@ -1,4 +1,5 @@
-#version 420
+// Copyright(c) 2018 Emmanuel Lajeunesse
+#version 430
 //precision highp float;
 
 layout (location = 0) in vec3 m_position;

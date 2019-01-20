@@ -25,6 +25,7 @@ namespace Vxl
 
 		// Behaviour
 		void Setup();
+		void Destroy();
 		void Draw();
 
 	} SingletonInstance(TerrainManager);

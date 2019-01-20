@@ -186,7 +186,7 @@ namespace Vxl
 		{
 			glGetActiveUniform(m_id, (GLuint)i, bufSize, &length, &size, &type, name);
 			//printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
-			glUniform U(glGetUniformLocation(m_id, name));
+			glUniform U(glGetUniformLocation(m_id, name), type);
 			m_uniforms[std::string(name)] = U;
 		}
 	}

@@ -10,6 +10,7 @@
 #include "../math/Matrix2x2.h"
 #include "../math/Matrix3x3.h"
 #include "../math/Matrix4x4.h"
+#include "../math/Color.h"
 
 namespace Vxl
 {
@@ -21,7 +22,7 @@ namespace Vxl
 		memset(m_locations, 0, subroutine_count * sizeof(GLuint));
 	}
 
-	void glSubroutine::set(const std::string& UniformName, const std::string& FunctionName)
+	void glSubroutine::Set(const std::string& UniformName, const std::string& FunctionName)
 	{
 		if (m_uniforms.find(UniformName) != m_uniforms.end() && m_functions.find(FunctionName) != m_functions.end())
 		{
@@ -33,104 +34,116 @@ namespace Vxl
 		assert(FALSE);
 	}
 
-	void glSubroutine::bind()
+	void glSubroutine::Bind()
 	{
 		glUniformSubroutinesuiv((GLenum)m_type, m_locationCount, m_locations);
 	}
 
 	template<>
-	void glUniform::set<bool>(bool data)
+	void glUniform::Set<bool>(bool data)
 	{
 		glUniform1i(m_location, (int)data);
 	}
 	template<>
-	void glUniform::set<int>(int data)
+	void glUniform::Set<int>(int data)
 	{
 		glUniform1i(m_location, data);
 	}
 	template<>
-	void glUniform::set<unsigned int>(unsigned int data)
+	void glUniform::Set<unsigned int>(unsigned int data)
 	{
 		glUniform1ui(m_location, data);
 	}
 	template<>
-	void glUniform::set<float>(float data)
+	void glUniform::Set<float>(float data)
 	{
 		glUniform1f(m_location, data);
 	}
 	template<>
-	void glUniform::set<double>(double data)
+	void glUniform::Set<double>(double data)
 	{
 		glUniform1d(m_location, data);
 	}
 	template<>
-	void glUniform::set<Vector2&>(Vector2& data)
+	void glUniform::Set<Vector2&>(Vector2& data)
 	{
 		glUniform2f(m_location, data.x, data.y);
 	}
 	template<>
-	void glUniform::set<Vector2>(Vector2 data)
+	void glUniform::Set<Vector2>(Vector2 data)
 	{
 		glUniform2f(m_location, data.x, data.y);
 	}
 	template<>
-	void glUniform::set<Vector3&>(Vector3& data)
+	void glUniform::Set<Vector3&>(Vector3& data)
 	{
 		glUniform3f(m_location, data.x, data.y, data.z);
 	}
 	template<>
-	void glUniform::set<Vector3>(Vector3 data)
+	void glUniform::Set<Vector3>(Vector3 data)
 	{
 		glUniform3f(m_location, data.x, data.y, data.z);
 	}
 	template<>
-	void glUniform::set<Vector4&>(Vector4& data)
+	void glUniform::Set<Vector4&>(Vector4& data)
 	{
 		glUniform4f(m_location, data.x, data.y, data.z, data.w);
 	}
 	template<>
-	void glUniform::set<Vector4>(Vector4 data)
+	void glUniform::Set<Vector4>(Vector4 data)
 	{
 		glUniform4f(m_location, data.x, data.y, data.z, data.w);
 	}
 	template<>
-	void glUniform::set<Matrix2x2&>(Matrix2x2& data)
+	void glUniform::Set<Color3F&>(Color3F& data)
+	{
+		glUniform3f(m_location, data.r, data.g, data.b);
+	}
+	template<>
+	void glUniform::Set<Color3F>(Color3F data)
+	{
+		glUniform3f(m_location, data.r, data.g, data.b);
+	}
+	template<>
+	void glUniform::Set<Color4F&>(Color4F& data)
+	{
+		glUniform4f(m_location, data.r, data.g, data.b, data.a);
+	}
+	template<>
+	void glUniform::Set<Color4F>(Color4F data)
+	{
+		glUniform4f(m_location, data.r, data.g, data.b, data.a);
+	}
+	template<>
+	void glUniform::Set<Matrix2x2&>(Matrix2x2& data)
 	{
 		glUniformMatrix2fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
 	template<>
-	void glUniform::set<Matrix2x2>(Matrix2x2 data)
+	void glUniform::Set<Matrix2x2>(Matrix2x2 data)
 	{
 		glUniformMatrix2fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
 	template<>
-	void glUniform::set<Matrix3x3&>(Matrix3x3& data)
+	void glUniform::Set<Matrix3x3&>(Matrix3x3& data)
 	{
 		glUniformMatrix3fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
 	template<>
-	void glUniform::set<Matrix3x3>(Matrix3x3 data)
+	void glUniform::Set<Matrix3x3>(Matrix3x3 data)
 	{
 		glUniformMatrix3fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
 	template<>
-	void glUniform::set<Matrix4x4&>(Matrix4x4& data)
+	void glUniform::Set<Matrix4x4&>(Matrix4x4& data)
 	{
 		glUniformMatrix4fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
 	template<>
-	void glUniform::set<Matrix4x4>(Matrix4x4 data)
+	void glUniform::Set<Matrix4x4>(Matrix4x4 data)
 	{
 		glUniformMatrix4fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
-	//	template<>
-	//	void Uniform::set<Texture>(Texture& data)
-	//	{
-	//		assert(m_bindingPoint != -1);
-	//		glBindSampler(m_location, m_bindingPoint);
-	//		GraphicsWrapper::setActiveTexture(m_bindingPoint);
-	//		data.bind();
-	//	}
 
 	glUniformBlock::glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize)
 		: m_bindingPoint(bindingPoint), m_bufferSize(bufferSize)
@@ -163,7 +176,7 @@ namespace Vxl
 			delete[] m_array;
 	}
 
-	void glUniformBlock::set(GLfloat* arr, GLuint arrLength, size_t startOffset)
+	void glUniformBlock::Set(GLfloat* arr, GLuint arrLength, size_t startOffset)
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
 		//

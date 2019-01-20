@@ -5,6 +5,8 @@
 
 #include <string>
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i)) 
+
 namespace Vxl
 {
 	class Color3F;
@@ -57,16 +59,20 @@ namespace Vxl
 
 		// BUFFERS //
 		// VAO
-		void generateVAO(GLuint& VAO, GLuint& VBO_Start, const GLuint& TotalVBOs);
-		void deleteVAO(GLuint& VAO, GLuint& VBO_Start, const GLuint& TotalVBOs);
-		void bindVAO(GLuint& VAO);
+		GLuint generateVAO();
+		void deleteVAO(GLuint& VAO);
+		void bindVAO(GLuint VAO);
 		void unbindVAO();
 
+		// VBO
+		void bindVBO(GLuint VBO);
+		void bindVBOSubData(GLsizei Offset, GLsizei Size, GLvoid* Data);
 		// VBO - Array
 		void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
-		void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT);
+		void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT, GLuint m_strideSize = 0, GLuint m_strideOffset = 0);
 		void setVertexAttribInstancing(GLuint bufferIndex);
 		// VBO - Index
+		void bindVBOI(GLuint VBOI);
 		void bindIndices(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
 
 		// Draw Buffer (VAO needs to be bound before this call)

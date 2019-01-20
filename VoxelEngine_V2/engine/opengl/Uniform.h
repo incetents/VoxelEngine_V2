@@ -14,6 +14,8 @@ namespace Vxl
 	class Vector2;
 	class Vector3;
 	class Vector4;
+	class Color3F;
+	class Color4F;
 	class Matrix2x2;
 	class Matrix3x3;
 	class Matrix4x4;
@@ -36,8 +38,8 @@ namespace Vxl
 				delete[] m_locations;
 		}
 
-		void set(const std::string& UniformName, const std::string& FunctionName);
-		void bind();
+		void Set(const std::string& UniformName, const std::string& FunctionName);
+		void Bind();
 	};
 
 	class glUniformBlock
@@ -54,62 +56,86 @@ namespace Vxl
 		glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize);
 		~glUniformBlock();
 
-		void set(GLfloat* arr, GLuint arrLength, size_t startOffset = 0);
+		void Set(GLfloat* arr, GLuint arrLength, size_t startOffset = 0);
 	};
 
 	class glUniform
 	{
 	private:
 		GLuint m_location = -1;
+		GLenum m_type = 0;
 
 	public:
-		glUniform(GLuint location = -1) : m_location(location) {}
-		glUniform(const glUniform& U) : m_location(U.m_location) {}
-		glUniform& operator=(const glUniform& U) { m_location = U.m_location; return *this; }
+		glUniform(GLuint location = -1, GLenum type = 0)
+			: m_location(location), m_type(type) {}
+
+		glUniform(const glUniform& U)
+			: m_location(U.m_location), m_type(U.m_type) {}
+
+		glUniform& operator=(const glUniform& U)
+		{
+			m_location = U.m_location;
+			m_type = U.m_type;
+			return *this;
+		}
 
 		template<typename Type>
-		void set(Type data)
+		void Set(Type data)
 		{
 			assert(false);
 		}
 
+		inline GLenum GetLocation(void) const
+		{
+			return m_location;
+		}
+		inline GLenum GetType(void) const
+		{
+			return m_type;
+		}
 	};
 
 	template<>
-	void glUniform::set<bool>(bool data);
+	void glUniform::Set<bool>(bool data);
 	template<>
-	void glUniform::set<int>(int data);
+	void glUniform::Set<int>(int data);
 	template<>
-	void glUniform::set<unsigned int>(unsigned int data);
+	void glUniform::Set<unsigned int>(unsigned int data);
 	template<>
-	void glUniform::set<float>(float data);
+	void glUniform::Set<float>(float data);
 	template<>
-	void glUniform::set<double>(double data);
+	void glUniform::Set<double>(double data);
 	template<>
-	void glUniform::set<Vector2&>(Vector2& data);
+	void glUniform::Set<Vector2&>(Vector2& data);
 	template<>
-	void glUniform::set<Vector2>(Vector2 data);
+	void glUniform::Set<Vector2>(Vector2 data);
 	template<>
-	void glUniform::set<Vector3&>(Vector3& data);
+	void glUniform::Set<Vector3&>(Vector3& data);
 	template<>
-	void glUniform::set<Vector3>(Vector3 data);
+	void glUniform::Set<Vector3>(Vector3 data);
 	template<>
-	void glUniform::set<Vector4&>(Vector4& data);
+	void glUniform::Set<Vector4&>(Vector4& data);
 	template<>
-	void glUniform::set<Vector4>(Vector4 data);
+	void glUniform::Set<Vector4>(Vector4 data);
 	template<>
-	void glUniform::set<Matrix2x2&>(Matrix2x2& data);
+	void glUniform::Set<Color3F&>(Color3F& data);
 	template<>
-	void glUniform::set<Matrix2x2>(Matrix2x2 data);
+	void glUniform::Set<Color3F>(Color3F data);
 	template<>
-	void glUniform::set<Matrix3x3&>(Matrix3x3& data);
+	void glUniform::Set<Color4F&>(Color4F& data);
 	template<>
-	void glUniform::set<Matrix3x3>(Matrix3x3 data);
+	void glUniform::Set<Color4F>(Color4F data);
 	template<>
-	void glUniform::set<Matrix4x4&>(Matrix4x4& data);
+	void glUniform::Set<Matrix2x2&>(Matrix2x2& data);
 	template<>
-	void glUniform::set<Matrix4x4>(Matrix4x4 data);
-	//template<>
-	//void Uniform::setUniform<Texture>(Texture& data);
+	void glUniform::Set<Matrix2x2>(Matrix2x2 data);
+	template<>
+	void glUniform::Set<Matrix3x3&>(Matrix3x3& data);
+	template<>
+	void glUniform::Set<Matrix3x3>(Matrix3x3 data);
+	template<>
+	void glUniform::Set<Matrix4x4&>(Matrix4x4& data);
+	template<>
+	void glUniform::Set<Matrix4x4>(Matrix4x4 data);
 
 }

@@ -17,18 +17,18 @@ namespace Vxl
 	}
 	void Mesh::DrawArrayInstances()
 	{
-		glDrawArraysInstanced((GLenum)m_type, 0, m_drawCount, m_instances.getLength());
+		glDrawArraysInstanced((GLenum)m_type, 0, m_drawCount, m_instances.GetDrawCount());
 	}
 	void Mesh::DrawIndexedInstances()
 	{
-		glDrawElementsInstanced((GLenum)m_type, m_drawCount, GL_UNSIGNED_INT, 0, m_instances.getLength());
+		glDrawElementsInstanced((GLenum)m_type, m_drawCount, GL_UNSIGNED_INT, 0, m_instances.GetDrawCount());
 	}
 
 	void Mesh::UpdateDrawInfo()
 	{
 		// Set Mode
-		m_mode = (m_indices.getLength() == 0) ? Draw_Mode::ARRAY : Draw_Mode::INDEXED;
-		if (m_instances.getLength() > 1)
+		m_mode = (m_indices.GetDrawCount() == 0) ? Draw_Mode::ARRAY : Draw_Mode::INDEXED;
+		if (m_instances.GetDrawCount() > 1)
 			if (m_mode == Draw_Mode::ARRAY)
 				m_mode = Draw_Mode::ARRAY_INSTANCED;
 			else
@@ -38,23 +38,23 @@ namespace Vxl
 		if (m_mode == Draw_Mode::ARRAY)
 		{
 			Draw_Function = &Mesh::DrawArray;
-			m_drawCount = m_positions.getLength();
+			m_drawCount = m_positions.GetDrawCount();
 		}
 		else if (m_mode == Draw_Mode::ARRAY_INSTANCED)
 		{
 			Draw_Function = &Mesh::DrawArrayInstances;
-			m_drawCount = m_positions.getLength();
+			m_drawCount = m_positions.GetDrawCount();
 			
 		}
 		else if (m_mode == Draw_Mode::INDEXED)
 		{
 			Draw_Function = &Mesh::DrawIndexed;
-			m_drawCount = m_indices.getLength();
+			m_drawCount = m_indices.GetDrawCount();
 		}
 		else
 		{
 			Draw_Function = &Mesh::DrawIndexedInstances;
-			m_drawCount = m_indices.getLength();
+			m_drawCount = m_indices.GetDrawCount();
 		}
 
 		// Update Special Data
@@ -130,22 +130,11 @@ namespace Vxl
 
 	Mesh::Mesh()
 	{
-		// Buffer Objects
-		delete[] m_VBOs;
-		m_VBOs = new GLuint[5];
-		glUtil::generateVAO(m_VAO, m_VBOs[0], 5);
-
-		// Buffers
-		m_positions.setup	(m_VBOs[0], 0);
-		m_uvs.setup			(m_VBOs[1], 1);
-		m_normals.setup		(m_VBOs[2], 2);
-		m_instances.setup   (m_VBOs[3], 3);
-		m_indices.setup		(m_VBOs[4]);
+		m_VAO = glUtil::generateVAO();
 	}
 	Mesh::~Mesh()
 	{
-		glUtil::deleteVAO(m_VAO, m_VBOs[0], 4);
-		delete[] m_VBOs;
+		glUtil::deleteVAO(m_VAO);
 	}
 
 	void Mesh::Bind(Draw_Type type)
@@ -155,7 +144,7 @@ namespace Vxl
 
 		// SIZE CHECK //
 #ifdef _DEBUG
-		GLuint indicesCount = m_indices.getLength();
+		GLuint indicesCount = m_indices.GetDrawCount();
 		if (indicesCount)
 		{
 			if (glUtil::isDrawTypeTriangles(m_type))
@@ -165,7 +154,7 @@ namespace Vxl
 		}
 		else
 		{
-			GLuint posCount = m_positions.getLength();
+			GLuint posCount = m_positions.GetDrawCount();
 			if (glUtil::isDrawTypeTriangles(m_type))
 				assert(posCount % 3 == 0);
 			else if (glUtil::isDrawTypeLines(m_type))
@@ -176,11 +165,11 @@ namespace Vxl
 		/*	Bind Data	*/
 		glUtil::bindVAO(m_VAO);
 
-		m_positions.bind();
-		m_uvs.bind();
-		m_normals.bind();
-		m_instances.bind();
-		m_indices.bind();
+		m_positions.m_vbo.Bind();
+		m_uvs.m_vbo.Bind();
+		m_normals.m_vbo.Bind();
+		m_instances.m_vbo.Bind();
+		m_indices.m_vboi.Bind();
 
 		glUtil::unbindVAO();
 		/*				*/	

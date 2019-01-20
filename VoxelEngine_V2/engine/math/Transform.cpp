@@ -28,19 +28,15 @@ namespace Vxl
 		}
 	}
 
-	Matrix4x4& Transform::getModel()
+	Matrix4x4 Transform::getModel()
 	{
 		updateValues();
 
-		// Affected by parent
-		// if (m_parent != nullptr)
-		// {
-		// 	Matrix4x4 Parent = m_parent->getModel();
-		// 	Matrix4x4 Self = m_ModelMatrix;
-		// 	Matrix4x4 Final = Parent * Self;
-		// 
-		// 	return m_parent->getModel() * m_ModelMatrix;
-		// }
+		// Affected by parent transformations
+		if (m_parent != nullptr)
+		{
+			return m_ModelMatrix * m_parent->getModel();
+		}
 
 		// Orphan
 		return m_ModelMatrix;

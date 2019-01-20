@@ -6,7 +6,7 @@
 
 namespace Vxl
 {
-	// Overloads
+	// C3 Overloads
 	Color3F Color3F::operator+(const Color3F& c) const
 	{
 		Color3F m;
@@ -39,8 +39,36 @@ namespace Vxl
 		m.b = b / c.b;
 		return m;
 	}
+	Color3F& Color3F::operator+=(const Color3F& c)
+	{
+		r += c.r;
+		g += c.g;
+		b += c.b;
+		return *this;
+	}
+	Color3F& Color3F::operator-=(const Color3F& c)
+	{
+		r -= c.r;
+		g -= c.g;
+		b -= c.b;
+		return *this;
+	}
+	Color3F& Color3F::operator*=(const Color3F& c)
+	{
+		r *= c.r;
+		g *= c.g;
+		b *= c.b;
+		return *this;
+	}
+	Color3F& Color3F::operator/=(const Color3F& c)
+	{
+		r /= c.r;
+		g /= c.g;
+		b /= c.b;
+		return *this;
+	}
 
-	Color3F Color3F::operator+(const float t) const
+	Color3F Color3F::operator+(float t) const
 	{
 		Color3F m;
 		m.r = r + t;
@@ -48,7 +76,7 @@ namespace Vxl
 		m.b = b + t;
 		return m;
 	}
-	Color3F Color3F::operator-(const float t) const
+	Color3F Color3F::operator-(float t) const
 	{
 		Color3F m;
 		m.r = r - t;
@@ -56,7 +84,7 @@ namespace Vxl
 		m.b = b - t;
 		return m;
 	}
-	Color3F Color3F::operator*(const float t) const
+	Color3F Color3F::operator*(float t) const
 	{
 		Color3F m;
 		m.r = r * t;
@@ -64,13 +92,41 @@ namespace Vxl
 		m.b = b * t;
 		return m;
 	}
-	Color3F Color3F::operator/(const float t) const
+	Color3F Color3F::operator/(float t) const
 	{
 		Color3F m;
 		m.r = r / t;
 		m.g = g / t;
 		m.b = b / t;
 		return m;
+	}
+	Color3F& Color3F::operator+=(float t)
+	{
+		r += t;
+		g += t;
+		b += t;
+		return *this;
+	}
+	Color3F& Color3F::operator-=(float t)
+	{
+		r -= t;
+		g -= t;
+		b -= t;
+		return *this;
+	}
+	Color3F& Color3F::operator*=(float t)
+	{
+		r *= t;
+		g *= t;
+		b *= t;
+		return *this;
+	}
+	Color3F& Color3F::operator/=(float t)
+	{
+		r /= t;
+		g /= t;
+		b /= t;
+		return *this;
 	}
 
 	float Color3F::operator[](const int index) const
@@ -84,7 +140,7 @@ namespace Vxl
 		return (&r)[index];
 	}
 
-	// Overloads
+	// C4 Overloads
 	Color4F Color4F::operator+(const Color4F& c) const
 	{
 		Color4F m;
@@ -121,8 +177,40 @@ namespace Vxl
 		m.a = a / c.a;
 		return m;
 	}
+	Color4F& Color4F::operator+=(const Color4F& c)
+	{
+		r += c.r;
+		g += c.g;
+		b += c.b;
+		a += c.a;
+		return *this;
+	}
+	Color4F& Color4F::operator-=(const Color4F& c)
+	{
+		r -= c.r;
+		g -= c.g;
+		b -= c.b;
+		a -= c.a;
+		return *this;
+	}
+	Color4F& Color4F::operator*=(const Color4F& c)
+	{
+		r *= c.r;
+		g *= c.g;
+		b *= c.b;
+		a *= c.a;
+		return *this;
+	}
+	Color4F& Color4F::operator/=(const Color4F& c)
+	{
+		r /= c.r;
+		g /= c.g;
+		b /= c.b;
+		a /= c.a;
+		return *this;
+	}
 
-	Color4F Color4F::operator+(const float t) const
+	Color4F Color4F::operator+(float t) const
 	{
 		Color4F m;
 		m.r = r + t;
@@ -131,7 +219,7 @@ namespace Vxl
 		m.a = a + t;
 		return m;
 	}
-	Color4F Color4F::operator-(const float t) const
+	Color4F Color4F::operator-(float t) const
 	{
 		Color4F m;
 		m.r = r - t;
@@ -140,7 +228,7 @@ namespace Vxl
 		m.a = a - t;
 		return m;
 	}
-	Color4F Color4F::operator*(const float t) const
+	Color4F Color4F::operator*(float t) const
 	{
 		Color4F m;
 		m.r = r * t;
@@ -149,7 +237,7 @@ namespace Vxl
 		m.a = a * t;
 		return m;
 	}
-	Color4F Color4F::operator/(const float t) const
+	Color4F Color4F::operator/(float t) const
 	{
 		Color4F m;
 		m.r = r / t;
@@ -157,6 +245,38 @@ namespace Vxl
 		m.b = b / t;
 		m.a = a / t;
 		return m;
+	}
+	Color4F& Color4F::operator+=(float t)
+	{
+		r += t;
+		g += t;
+		b += t;
+		a += t;
+		return *this;
+	}
+	Color4F& Color4F::operator-=(float t)
+	{
+		r -= t;
+		g -= t;
+		b -= t;
+		a -= t;
+		return *this;
+	}
+	Color4F& Color4F::operator*=(float t)
+	{
+		r *= t;
+		g *= t;
+		b *= t;
+		a *= t;
+		return *this;
+	}
+	Color4F& Color4F::operator/=(float t)
+	{
+		r /= t;
+		g /= t;
+		b /= t;
+		a /= t;
+		return *this;
 	}
 
 	float Color4F::operator[](const int index) const

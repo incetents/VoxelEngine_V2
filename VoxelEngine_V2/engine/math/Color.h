@@ -40,31 +40,39 @@ namespace Vxl
 		Color3F operator-(const Color3F& c) const;
 		Color3F operator*(const Color3F& c) const;
 		Color3F operator/(const Color3F& c) const;
+		Color3F& operator+=(const Color3F& c);
+		Color3F& operator-=(const Color3F& c);
+		Color3F& operator*=(const Color3F& c);
+		Color3F& operator/=(const Color3F& c);
 
-		Color3F operator+(const float t) const;
-		Color3F operator-(const float t) const;
-		Color3F operator*(const float t) const;
-		Color3F operator/(const float t) const;
+		Color3F operator+(float t) const;
+		Color3F operator-(float t) const;
+		Color3F operator*(float t) const;
+		Color3F operator/(float t) const;
+		Color3F& operator+=(float t);
+		Color3F& operator-=(float t);
+		Color3F& operator*=(float t);
+		Color3F& operator/=(float t);
 
 		float operator[](const int) const;
 		float& operator[](const int);
 	};
 
-	class Color4F : public Color3F
+	class Color4F
 	{
 	public:
 		constexpr Color4F(float r, float g, float b, float _a)
-			: Color3F(r, g, b), a(_a)
+			: r(r), g(g), b(b), a(a)
 		{}
 		constexpr Color4F()
-			: Color3F(0, 0, 0), a(0)
+			: r(0), g(0), b(0), a(0)
 		{}
 		constexpr Color4F(float _a)
-			: Color3F(_a, _a, _a), a(_a)
+			: r(_a), g(_a), b(_a), a(_a)
 		{}
 
 		// Data
-		float a;
+		float r, g, b, a;
 
 		// Lerp
 		static Color4F lerp(Color4F start, Color4F end, float t)
@@ -77,11 +85,19 @@ namespace Vxl
 		Color4F operator-(const Color4F& c) const;
 		Color4F operator*(const Color4F& c) const;
 		Color4F operator/(const Color4F& c) const;
+		Color4F& operator+=(const Color4F& c);
+		Color4F& operator-=(const Color4F& c);
+		Color4F& operator*=(const Color4F& c);
+		Color4F& operator/=(const Color4F& c);
 
-		Color4F operator+(const float t) const;
-		Color4F operator-(const float t) const;
-		Color4F operator*(const float t) const;
-		Color4F operator/(const float t) const;
+		Color4F operator+(float t) const;
+		Color4F operator-(float t) const;
+		Color4F operator*(float t) const;
+		Color4F operator/(float t) const;
+		Color4F& operator+=(float t);
+		Color4F& operator-=(float t);
+		Color4F& operator*=(float t);
+		Color4F& operator/=(float t);
 
 		float operator[](const int) const;
 		float& operator[](const int);

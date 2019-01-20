@@ -75,6 +75,13 @@ namespace Vxl
 		Matrix4x4&  OverrideScale(const Vector3& scale);
 		Matrix4x4&  OverrideScale(float x, float y, float z);
 
+		// Become Translation Matrix
+		static Matrix4x4 Translate(const Vector3& center);
+		static Matrix4x4 Translate(float x, float y, float z);
+		// Become Scale Matrix
+		static Matrix4x4 Scale(const Vector3& center);
+		static Matrix4x4 Scale(float x, float y, float z);
+
 		// Become Rotation Matrix (Degrees)
 		static	Matrix4x4 RotationX(const Degrees&, RotationDirection = RotationDirection(1));
 		static	Matrix4x4 RotationY(const Degrees&, RotationDirection = RotationDirection(1));

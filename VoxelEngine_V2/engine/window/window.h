@@ -30,7 +30,8 @@ namespace Vxl
 			m_size[1] = height;
 			m_aspectRatio = (float)width / (float)height;
 		}
-
+		void Destroy();
+		void Update();
 	public:
 
 		inline GLFWwindow* GetContext() const
@@ -71,13 +72,17 @@ namespace Vxl
 		void GetPosition(int& x, int& y);
 		void GetSize(int& width, int& height);
 		
+		bool InitGLFW();
 		void Setup(
 			const std::string& name,
 			UINT width,
 			UINT height);
+		void Reload();
 
-		void Update();
-		void Terminate();
+		void Shutdown();
+
+		void StartFrame();
+		void EndFrame();
 
 	} SingletonInstance(Window);
 }

@@ -1,3 +1,4 @@
+// Copyright(c) 2018 Emmanuel Lajeunesse
 #version 430
 //precision highp float;
 

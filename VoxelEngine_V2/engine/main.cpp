@@ -1,32 +1,21 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #include "Precompiled.h"
 
-#include "opengl/glUtil.h"
-
 #include "window/window.h"
 #include "input/Input.h"
 
 #include "utilities/Loader.h"
 #include "utilities/logger.h"
+#include "utilities/Time.h"
 
-#include "math/Vector2.h"
-#include "math/Vector3.h"
-#include "math/Vector4.h"
-
-#include "../game/Scene.h"
-
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_impl_glfw.h"
-#include "../imgui/imgui_impl_opengl3.h"
-
-// Include glfw3.h after our OpenGL definitions
-#include <GLFW/glfw3.h> 
+#include "../game/Scene_Game.h"
+#include "modules/RenderManager.h"
 
 /**/
 using namespace Vxl;
 using namespace std;
 
-Scene* _scene = new Scene();
+Scene_Game* _scene = new Scene_Game();
 
 #if _DEBUG
 // Console Mode
@@ -36,38 +25,19 @@ int main()
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 #endif
 {
-	// WINDOW Setup
-	if (!glfwInit())
-		return 1;
+	// GLFW Setup
+	if (!Window.InitGLFW())
+		return -1;
 
+	// Window
 	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	// IMGUI Setup
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-	ImGui_ImplGlfw_InitForOpenGL(Window.GetContext(), true);
-	ImGui_ImplOpenGL3_Init("#version 430");
-
-	ImGui::StyleColorsDark();
-
-
-	// Glew/Opengl Init
-	glUtil::initGlew();
-	glUtil::initHints();
-
-	std::cout << "OpenGL Vers. " << glUtil::getOpenGLVersion() << std::endl;
-	std::cout << glUtil::getRendererVersion() << std::endl;
-	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-
-	// Special
-	/* ~ */
+	/* Special */
 	Geometry::Setup();
 	Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
-
 	/* ~ */
-	_scene->setup();
+	RenderManager.SetNewScene(_scene);
+	//_scene->setup();
 
 	/* ~ */
 	while (!Window.GetClosed())
@@ -75,38 +45,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		// OpenGl Reset
 		if (Input.getKeyDown(KeyCode::R))
 		{
+			Window.Reload();
+
+			Geometry::Reload();
+
 			ShaderProgram::m_database.DeleteAndClear();
 			Shader::m_database.DeleteAndClear();
 			Texture::m_database.DeleteAndClear();
-			// Reload Framebuffer Objects too
-
+			Cubemap::m_database.DeleteAndClear();
+			// Load Assets
 			Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
 
-			//Shader_Gbuffer = ShaderProgram::m_database.Get("gbuffer");
-			//Shader_Passthrough = ShaderProgram::m_database.Get("passthrough");
-
-			//tex = Texture::m_database.Get("beato");
+			RenderManager.Reload();
 		}
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
+		// Before Frame
+		TimeController.StartFrame();
+		Window.StartFrame();
 
-		_scene->update();
-		_scene->draw();
+		// Scene Update/Render
+		while (TimeController.GetTotalDeltaTime() >= 1.0)
+		{
+			RenderManager.Update();
+			TimeController.DecreaseTotalDeltaTime();
+		}
+		RenderManager.Draw();
 
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		//
+		// End of frame update
 		Input.Update();
-		Window.Update();
+		Window.EndFrame();
+		TimeController.EndFrame();
 	}
 
-
 	// Cleanup
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
-	Window.Terminate();
+	RenderManager.Destroy();
+	Window.Shutdown();
 
 	return 0;
 }

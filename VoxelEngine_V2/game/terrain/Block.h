@@ -91,14 +91,13 @@ namespace Vxl
 	static class BlockAtlas : public Singleton<class BlockDictionary>
 	{
 	private:
-		bool		m_setup = false;
 		Texture*	m_AtlasTexture = nullptr;
 		UINT		m_blockPixelLength;
 		UINT		m_columns;
 		UINT		m_rows;
-		Vector4**	m_uvs;
+		Vector4**	m_uvs = nullptr;
 	public:
-		void Setup(Texture* atlas, UINT blockPixelLength);
+		void Set(Texture* atlas, UINT blockPixelLength);
 		Texture* GetTexture(void) const;
 		void BindAtlas();
 		Vector4 GetUvs(UINT Column, UINT Row);

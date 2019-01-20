@@ -30,6 +30,8 @@ namespace Vxl
 		static void CreateIcosahedron();
 		static void CreateIcosphere();
 		static void CreateSphere();
+
+		static void Destroy();
 	public:
 		static void Setup()
 		{
@@ -46,6 +48,15 @@ namespace Vxl
 			CreateSphere();
 
 			m_isSetup = true;
+		}
+		static void Reload()
+		{
+			if (!m_isSetup)
+				return;
+
+			Destroy();
+			m_isSetup = false;
+			Setup();
 		}
 
 		static Mesh* GetFullQuad()

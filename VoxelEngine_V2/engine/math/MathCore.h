@@ -58,6 +58,8 @@ enum class Axis
 #define MacroRound(x) (std::ceilf(value * (float)std::pow(10, x)) / (float)pow(10, x))
 #define MacroClamp(n,_min,_max) MacroMax(_min, MacroMin(n, _max))
 #define MacroClamp01(n) MacroClamp(n, 0, 1)
+#define MacroSwap_UNSAFE(a, b)	((a)^=(b),(b)^=(a),(a)^=(b)) /* Doesn't work when a and b are the same object - assigns zero (0) to the object in that case */
+#define MacroSwap(a, b)   ((&(a) == &(b)) ? (a) : ((a)^=(b),(b)^=(a),(a)^=(b))) /* checks that the addresses of a and b are different before XOR-ing */
 
 namespace Vxl
 {

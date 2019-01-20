@@ -3,13 +3,22 @@
 #include "window.h"
 
 #include "glfwCallbacks.h"
+#include "../opengl/glUtil.h"
 
 #include "../utilities/logger.h"
 
 #include <GLFW/glfw3.h>
 
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_glfw.h"
+#include "../imgui/imgui_impl_opengl3.h"
+
 namespace Vxl
 {
+	bool Window::InitGLFW()
+	{
+		return glfwInit();
+	}
 	void Window::Setup(
 		const std::string& name,
 		UINT width,
@@ -22,10 +31,10 @@ namespace Vxl
 		m_size[0] = width;
 		m_size[1] = height;
 
-		m_window = glfwCreateWindow(width, height, name.c_str(), NULL, NULL);
+		m_window = glfwCreateWindow(m_size[0], m_size[1], m_name.c_str(), NULL, NULL);
 		if (!m_window)
 		{
-			Logger.error("Glfw could not create a new window: " + name);
+			Logger.error("Glfw could not create a new window: " + m_name);
 			return;
 		}
 
@@ -42,7 +51,49 @@ namespace Vxl
 		glfwSetWindowSizeCallback		(m_window, glfwCallbacks::Window_Resize);
 		glfwSetFramebufferSizeCallback	(m_window, glfwCallbacks::Resolution_Resize);
 
+		// IMGUI Setup
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		//ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+		ImGui_ImplGlfw_InitForOpenGL(GetContext(), true);
+		ImGui_ImplOpenGL3_Init("#version 430");
+
+		ImGui::StyleColorsDark();
+
+		// Glew/Opengl Init
+		glUtil::initGlew();
+		glUtil::initHints();
+
+		std::cout << "OpenGL Vers. " << glUtil::getOpenGLVersion() << std::endl;
+		std::cout << glUtil::getRendererVersion() << std::endl;
+		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
 		m_setup = true;
+	}
+	void Window::Reload()
+	{
+		Destroy();
+		m_setup = false;
+		Setup(m_name, m_size[0], m_size[1]);
+	}
+	void Window::Destroy()
+	{
+		glfwDestroyWindow(m_window);
+
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+	}
+	void Window::StartFrame()
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+	}
+	void Window::EndFrame()
+	{
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		Update();
 	}
 
 	void Window::SetPosition(UINT x, UINT y)
@@ -77,8 +128,12 @@ namespace Vxl
 		glfwPollEvents();
 	}
 
-	void Window::Terminate()
+	void Window::Shutdown()
 	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
 		glfwDestroyWindow(m_window);
 	}
 }
