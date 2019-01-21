@@ -62,7 +62,9 @@ namespace Vxl
 		ImGui::StyleColorsDark();
 
 		// Glew/Opengl Init
-		glUtil::initGlew();
+		if (!glUtil::initGlew())
+			assert(false);
+
 		glUtil::initHints();
 
 		std::cout << "OpenGL Vers. " << glUtil::getOpenGLVersion() << std::endl;

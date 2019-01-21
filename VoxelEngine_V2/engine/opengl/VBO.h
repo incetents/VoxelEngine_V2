@@ -78,6 +78,7 @@ namespace Vxl
 		VBO()
 		{
 			m_TypeSize = sizeof(Type);
+			m_database.Set(this);
 		}
 
 		template<typename Type = GLfloat>
@@ -85,6 +86,7 @@ namespace Vxl
 		{
 			m_TypeSize = sizeof(Type);
 			SetVertices<Type>(_arr, _count, _mode);
+			m_database.Set(this);
 		}
 
 		~VBO();
@@ -154,7 +156,7 @@ namespace Vxl
 
 		BufferBind_Mode m_bindMode;
 	public:
-		VBOI() {}
+		VBOI() { m_database.Set(this); }
 		VBOI(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
 		~VBOI();
 

@@ -43,6 +43,9 @@ void main()
 		output_albedo = texture(albedo_handler, f_data.uv) * vec4(VXL_tint, 1);
 	}
 		
+	// output UV for testing reasons
+	//output_albedo = vec4(f_data.uv, 0, 1);
+	
 	output_normal = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0);
 	output_test = vec4(d, 0, 0.2, 1);
 	

@@ -216,6 +216,7 @@ namespace Vxl
 		m_cube->m_uvs.set(uvs, 24);
 		m_cube->m_normals.set(normals, 24);
 		m_cube->m_indices.set(indices, 36);
+
 		//
 		m_cube->Bind();
 	}
@@ -473,42 +474,90 @@ namespace Vxl
 			faceCount = (GLuint)m_faces.size();
 		}
 
+		// Find North/South Poles of isocahedron
+		float NorthPole = 0;
+		float SouthPole = 0;
+
+		int PositionCount = (int)m_points.size();
+		for (int i = 0; i < PositionCount; i++)
+		{
+			Vector3 v = m_points[i];
+
+			if (v.y > NorthPole)
+				NorthPole = v.y;
+			else if (v.y < SouthPole)
+				SouthPole = v.y;
+		}
+
 		std::vector<Vector3> vertices;
-		std::vector<Vector3> normals;
 		std::vector<Vector2> uvs;
-		Vec3 Tri[3], Normal;
-		Vec2 UV;
+		Vec3 Tri[3];
+		Vec3 Normals[3];
+		Vec2 UVs[3];
+		// Solve for UV
 		for (GLuint i = 0; i < faceCount; i++)
 		{
 			Tri[0] = m_points[m_faces[i].x];
 			Tri[1] = m_points[m_faces[i].y];
 			Tri[2] = m_points[m_faces[i].z];
+
+			Normals[0] = Tri[0].Normalize();
+			Normals[1] = Tri[1].Normalize();
+			Normals[2] = Tri[2].Normalize();
 			
-			Vec3 FlatNormal = Vec3::Cross(Tri[0] - Tri[2], Tri[1] - Tri[2]);
-			bool UVfix = false;//(FlatNormal.x < 0);
-
-			for (int i = 0; i < 3; i++)
+			for (UINT j = 0; j < 3; j++)
 			{
-				Vec3 N = Tri[i].Normalize();
-				
-				UV.x = (std::atan2(N.z, N.x) / PI + 1.f) * .5f;
-				UV.y = 0.5f - std::asin(N.y) / PI;
-
-				//if (UVfix && UV)
-				if(UV.x < 0.25f && UVfix)
-					UV.x += 1.0f;
-
-				vertices.push_back(Tri[i]);
-				normals.push_back(N);
-				uvs.push_back(UV);
+				UVs[j] = Vector2(
+					(atan2(Normals[j].z, Normals[j].x) + PI) / PI / 2,
+					(acos(Normals[j].y / 1.0f) + PI) / PI - 1
+				);
 			}
+
+			// Check for uv flip
+			Vector3 TexA(UVs[0].x, UVs[0].y, 0);
+			Vector3 TexB(UVs[1].x, UVs[1].y, 0);
+			Vector3 TexC(UVs[2].x, UVs[2].y, 0);
+			Vector3 TexNormal = Vector3::Cross((TexC - TexB), (TexA - TexB));
+			bool WrappedUV = (TexNormal.z < 0);
+			// Offset uvs to match up
+			if (WrappedUV)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					if (UVs[j].x < 0.25)
+						UVs[j].x += 1;
+				}
+
+			}
+			// Fix swirl on polar coordinates
+			for (int j = 0; j < 3; j++)
+			{
+				if(fabs(Tri[j].y - NorthPole) <= FUZZ ||
+					fabs(Tri[j].y - SouthPole) <= FUZZ
+				){
+					if (subdivisions > 0)
+						UVs[j].x = (UVs[(j + 1) % 3].x + UVs[(j + 2) % 3].x) / 2.0f;
+			
+					// !!!!!!
+					// It is unknown how to fix UVS properly for Isocahedron without subdivisions
+				}
+			
+			}
+
+			vertices.push_back(Tri[0]);
+			vertices.push_back(Tri[1]);
+			vertices.push_back(Tri[2]);
+
+			uvs.push_back(UVs[0]);
+			uvs.push_back(UVs[1]);
+			uvs.push_back(UVs[2]);
 		}
 
 		Mesh* NewMesh = new Mesh();
 		//
 		NewMesh->m_positions.set(vertices);
 		NewMesh->m_uvs.set(uvs);
-		NewMesh->m_normals.set(normals);
+		NewMesh->GenerateNormals(&vertices[0], (GLuint)vertices.size());
 		//
 		NewMesh->Bind();
 		return NewMesh;

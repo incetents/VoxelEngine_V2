@@ -23,22 +23,22 @@ namespace Vxl
 			MaxSizeFloat = Size;
 			vertices.resize(MaxSizeFloat);
 
-			Lines.SetVertices(&vertices[0], (GLuint)vertices.size(), BufferBind_Mode::DYNAMIC);
+			Lines->SetVertices(&vertices[0], (GLuint)vertices.size(), BufferBind_Mode::DYNAMIC);
 		}
 	private:
-		VBO Lines;
+		VBO* Lines;
 		
 	public:
 		void Setup()
 		{
-			if (m_isInit)
-				return;
+			delete Lines;
+			Lines = new VBO();
 
 			vertices.resize(MaxSizeFloat);
 
-			Lines.SetVertices(&vertices[0], (GLuint)vertices.size(), BufferBind_Mode::DYNAMIC);
-			Lines.AddStrideHint(BufferType::VERTEX, 3);
-			Lines.AddStrideHint(BufferType::COLOR, 3);
+			Lines->SetVertices(&vertices[0], (GLuint)vertices.size(), BufferBind_Mode::DYNAMIC);
+			Lines->AddStrideHint(BufferType::VERTEX, 3);
+			Lines->AddStrideHint(BufferType::COLOR, 3);
 
 			m_isInit = true;
 		}

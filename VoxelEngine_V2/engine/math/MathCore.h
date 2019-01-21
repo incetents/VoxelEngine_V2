@@ -32,6 +32,9 @@ enum class Axis
 #define Matrix3x3_Size 9
 #define Matrix4x4_Size 16
 
+// Floating point comparisons
+#define FUZZ 1e-12f
+
 // Math Macros
 #define PI (std::atanf(1.0f) * 4.0f)
 #define TWO_PI (2.0f*PI)

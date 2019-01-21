@@ -28,6 +28,7 @@ namespace Vxl
 		
 		// Mesh Rendering
 		bool m_isActive = true;
+		bool m_isColoredObject = false;
 		Mesh* m_mesh;
 
 		// Utility
@@ -36,22 +37,14 @@ namespace Vxl
 		UINT			GetMaterialOrder(void) const;
 
 		// Color
-		void SetColor(Color3F color)
+		void SetColor(Color3F color, bool enableIsColoredObject = true)
 		{
 			m_Color = color;
-			m_useColor = true;
+			m_isColoredObject = enableIsColoredObject;
 		}
 		Color3F& GetColor(void)
 		{
 			return m_Color;
-		}
-		void DisableColor(void)
-		{
-			m_useColor = false;
-		}
-		bool IsUsingColor(void) const
-		{
-			return m_useColor;
 		}
 
 		void SetTint(Color3F tint)
@@ -68,7 +61,6 @@ namespace Vxl
 		virtual void Draw();
 
 	protected:
-		bool m_useColor = false;
 		Color3F m_Color = Color3F(1, 1, 1);
 		Color3F m_Tint = Color3F(1, 1, 1);
 

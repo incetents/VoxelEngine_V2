@@ -34,7 +34,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	/* Special */
 	Geometry::Setup();
-	Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
 	/* ~ */
 	RenderManager.SetNewScene(_scene);
 	//_scene->setup();
@@ -48,14 +47,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			Window.Reload();
 
 			Geometry::Reload();
-
+			
 			ShaderProgram::m_database.DeleteAndClear();
 			Shader::m_database.DeleteAndClear();
 			Texture::m_database.DeleteAndClear();
 			Cubemap::m_database.DeleteAndClear();
-			// Load Assets
-			Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
-
+			
 			RenderManager.Reload();
 		}
 

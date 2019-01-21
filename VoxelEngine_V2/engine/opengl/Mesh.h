@@ -302,20 +302,10 @@ namespace Vxl
 		}
 	};
 
-
-
-	// Send Array Of Data
-	//glUtil::bindArray(*m_VBO_ref, m_length * sizeof(Matrix4x4), &((Matrix4x4*)m_array)[0], (GLenum)m_bindMode);
-
-	// Vertex Attribute Number
-	//glUtil::setVertexAttribInstancing((GLuint)m_VBO_index);
-	
-
 	class Mesh
 	{
 	protected:
 		GLuint  m_VAO;
-		//GLuint* m_VBOs;
 
 		Draw_Type m_type = Draw_Type::TRIANGLES;
 		Draw_Mode m_mode = Draw_Mode::ARRAY;
@@ -342,11 +332,11 @@ namespace Vxl
 		MeshBufferInstancing m_instances;
 		MeshBufferIndices m_indices;
 
-		//MeshBuffer<Vector3>	 m_positions;
-		//MeshBuffer<Vector2>	 m_uvs;
-		//MeshBuffer<Vector3>	 m_normals;
-		//MeshBufferInstancing m_instances;
-		//MeshBufferIndices	 m_indices;
+		// Fills m_normals Based on existing positions and/or indices
+		void GenerateNormals(
+			Vector3* _vertices, GLuint _vertCount,
+			GLuint* _indices = nullptr, GLuint _indexCount = 0
+		);
 
 		inline GLuint		GetDrawCount() const
 		{

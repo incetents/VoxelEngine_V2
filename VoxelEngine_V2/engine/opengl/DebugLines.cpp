@@ -33,12 +33,12 @@ namespace Vxl
 
 	void DebugLines::DrawLines()
 	{
-		Lines.Bind();
+		Lines->Bind();
 
 		// Update Vertices
 		glUtil::bindVBOSubData(0, MaxSizeFloat * sizeof(float), &vertices[0]);
 
-		Lines.Draw(Draw_Type::LINES);
+		Lines->Draw(Draw_Type::LINES);
 		vertexIndex = 0;
 	}
 }

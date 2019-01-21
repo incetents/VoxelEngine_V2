@@ -4,6 +4,8 @@
 
 namespace Vxl
 {
+	// VBO //
+
 	VBO::~VBO()
 	{
 		RemoveAllHints();
@@ -98,7 +100,7 @@ namespace Vxl
 		glDrawArrays((GLenum)_draw, 0, m_DrawCount);
 	}
 
-	// ~~~ //
+	// VBOI //
 	VBOI::VBOI(GLuint* _arr, GLuint _count, BufferBind_Mode _mode)
 	{
 		SetIndices(_arr, _count, _mode);
@@ -133,6 +135,7 @@ namespace Vxl
 	}
 }
 
+// Legacy Reference //
 //	glEnableVertexAttribArray((int)BufferType::POSITION);
 //	glEnableVertexAttribArray((int)BufferType::COLOR);
 //	

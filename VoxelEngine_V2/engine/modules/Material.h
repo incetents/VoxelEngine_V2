@@ -37,6 +37,8 @@ namespace Vxl
 		MaterialPackage Mat_camPosition		= MaterialPackage("VXL_camPosition");
 		// Send Uniforms to shader
 		virtual void Bind();
+		// Wireframe
+		bool m_wireframe = false;
 	};
 
 	class Material : public Component
@@ -102,6 +104,6 @@ namespace Vxl
 			return m_base->m_order;
 		}
 
-		virtual void Bind();
+		virtual void Bind(bool BindTextures);
 	};
 }

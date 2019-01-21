@@ -81,7 +81,7 @@ namespace Vxl
 		m_currentScene->Draw();
 	}
 
-	void RenderManager::TEST()
+	void RenderManager::RenderScene()
 	{
 		for (auto mat = m_entities.begin(); mat != m_entities.end(); mat++)
 		{

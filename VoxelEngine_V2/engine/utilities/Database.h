@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <set>
 
 template<class Type>
 class Database
@@ -19,8 +20,8 @@ public:
 	{
 		if (m_database.find(name) != m_database.end())
 		{
-			delete m_database[name];
 			m_database.erase(name);
+			delete m_database[name];
 		}
 	}
 	inline void DeleteAndClear()
@@ -50,5 +51,40 @@ public:
 			return m_database[name];
 		}
 		return nullptr;
+	}
+};
+
+template<class Type>
+class DatabaseSet
+{
+private:
+	std::set<Type*> m_database;
+
+public:
+	inline bool Check(Type* data)
+	{
+		return (m_database.find(data) != m_database.end());
+	}
+	inline void Delete(Type* data)
+	{
+		m_database.erase(data);
+		delete data;
+	}
+	inline void DeleteAndClear()
+	{
+		for (auto it = m_database.begin(); it != m_database.end(); it++)
+		{
+			Type* test = *it;
+			delete *it;
+		}
+		m_database.clear();
+	}
+	inline void Clear()
+	{
+		m_database.clear();
+	}
+	inline void Set(Type* data)
+	{
+		m_database.insert(data);
 	}
 };

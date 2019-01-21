@@ -53,6 +53,9 @@ namespace Vxl
 		{
 			Mat_camPosition.m_uniform.Set<Vector3>(Camera::GetMain()->getPosition());
 		}
+
+		// Wireframe
+		glUtil::wireframe(m_wireframe);
 	}
 
 	void Material::UpdateMaterialPackages()
@@ -122,7 +125,7 @@ namespace Vxl
 		m_activeTextures.erase(level);
 	}
 
-	void Material::Bind()
+	void Material::Bind(bool BindTextures)
 	{
 		assert(m_base);
 		// Bind Uniforms for this object
@@ -143,8 +146,9 @@ namespace Vxl
 		}
 		if (Mat_useColorOverride.m_exists)
 		{
-			Mat_useColorOverride.m_uniform.Set<bool>(m_owner->IsUsingColor());
-			if (m_owner->IsUsingColor() && Mat_color.m_exists)
+			// Color info or wireframe mode will cause color to be used in shader
+			Mat_useColorOverride.m_uniform.Set<bool>(m_owner->m_isColoredObject || m_base->m_wireframe);
+			if ((m_owner->m_isColoredObject || m_base->m_wireframe) && Mat_color.m_exists)
 				Mat_color.m_uniform.Set<Color3F>(m_owner->GetColor());
 		}
 		if (Mat_tint.m_exists)
@@ -158,19 +162,23 @@ namespace Vxl
 			it->second->SendDataAsUniform();
 		}
 		
-		// Bind Textures
-		for (Active_Texture id : m_activeTextures)
+		// Bind Textures (ignore if parameter is OFF or wireframe mode is ON)
+		if (BindTextures && m_base->m_wireframe == false)
 		{
-			BaseTexture* _tex = m_textures[(UINT)id - GL_TEXTURE0];
-			assert(_tex);
-			glUtil::setActiveTexture(id);
-
-			// Don't bind texture on active layer if it's already bound
-			if (TextureTracker.ShouldBindTexture(id, _tex->GetID()))
+			for (Active_Texture id : m_activeTextures)
 			{
-				_tex->Bind();
-				TextureTracker.SetCurrentTexture(id, _tex->GetID());
+				BaseTexture* _tex = m_textures[(UINT)id - GL_TEXTURE0];
+				assert(_tex);
+				glUtil::setActiveTexture(id);
+
+				// Don't bind texture on active layer if it's already bound
+				if (TextureTracker.ShouldBindTexture(id, _tex->GetID()))
+				{
+					_tex->Bind();
+					TextureTracker.SetCurrentTexture(id, _tex->GetID());
+				}
 			}
 		}
+
 	}
 }

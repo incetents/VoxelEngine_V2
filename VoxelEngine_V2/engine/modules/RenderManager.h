@@ -46,7 +46,7 @@ namespace Vxl
 		void Update();
 		void Draw();
 
-		void TEST();
+		void RenderScene();
 
 	} SingletonInstance(RenderManager);
 }

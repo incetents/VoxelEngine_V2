@@ -52,7 +52,7 @@ namespace Vxl
 
 	void Entity::Draw()
 	{
-		m_material.Bind();
+		m_material.Bind(!m_isColoredObject);
 
 		m_mesh->Draw();
 	}

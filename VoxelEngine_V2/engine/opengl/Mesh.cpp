@@ -137,6 +137,83 @@ namespace Vxl
 		glUtil::deleteVAO(m_VAO);
 	}
 
+	void Mesh::GenerateNormals(
+		Vector3* _vertices, GLuint _vertCount,
+		GLuint* _indices, GLuint _indexCount
+	){
+		std::vector<Vector3> Normals;
+		Normals.resize(_vertCount);
+		//
+		if (_vertices == nullptr || _vertCount == 0)
+		{
+			assert(false);
+			return;
+		}
+		// Indexed Normals
+		if (_indices)
+		{
+			assert(_indexCount % 3 == 0 && _indexCount > 0);
+			
+			for (GLuint i = 0; i < _indexCount; i+= 3)
+			{
+				Vector3 P1(
+					_vertices[_indices[i + 0]].x,
+					_vertices[_indices[i + 0]].y,
+					_vertices[_indices[i + 0]].z
+				);
+				Vector3 P2(
+					_vertices[_indices[i + 1]].x,
+					_vertices[_indices[i + 1]].y,
+					_vertices[_indices[i + 1]].z
+				);
+				Vector3 P3(
+					_vertices[_indices[i + 2]].x,
+					_vertices[_indices[i + 2]].y,
+					_vertices[_indices[i + 2]].z
+				);
+				Vector3 N = Vector3::Cross((P2 - P1), (P3 - P1));
+				Normals[_indices[i + 0]] += N;
+				Normals[_indices[i + 1]] += N;
+				Normals[_indices[i + 2]] += N;
+			}
+		}
+		// Position Normals
+		else
+		{
+			assert(_vertCount % 3 == 0);
+
+			for (GLuint i = 0; i < _vertCount; i += 3)
+			{
+				Vector3 P1(
+					_vertices[i + 0].x,
+					_vertices[i + 0].y,
+					_vertices[i + 0].z
+				);
+				Vector3 P2(
+					_vertices[i + 1].x,
+					_vertices[i + 1].y,
+					_vertices[i + 1].z
+				);
+				Vector3 P3(
+					_vertices[i + 2].x,
+					_vertices[i + 2].y,
+					_vertices[i + 2].z
+				);
+				Vector3 N = Vector3::Cross((P2 - P1), (P3 - P1));
+				Normals[i + 0] += N;
+				Normals[i + 1] += N;
+				Normals[i + 2] += N;
+			}
+		}
+		// Normalize the normals
+		for (GLuint i = 0; i < _vertCount; i++)
+		{
+			Normals[i].NormalizeSelf();
+		}
+		//
+		m_normals.set(Normals);
+	}
+
 	void Mesh::Bind(Draw_Type type)
 	{
 		m_type = type;
