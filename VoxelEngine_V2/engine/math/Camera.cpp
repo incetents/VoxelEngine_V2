@@ -7,6 +7,8 @@
 
 namespace Vxl
 {
+	Database<Camera> Camera::m_database;
+
 	Camera* Camera::m_main = nullptr;
 
 	Camera::Camera(const Vector3& _position, const Vector3& _forward, float _znear, float _zfar)
@@ -19,6 +21,13 @@ namespace Vxl
 		m_projection = new CameraProjection(_znear, _zfar);
 		// View
 		update();
+	}
+
+	Camera* Camera::Create(const std::string _name, const Vector3& _position, const Vector3& _forward, float _znear, float _zfar)
+	{
+		Camera* C = new Camera(_position, _forward, _znear, _zfar);
+		m_database.Set(_name, C);
+		return C;
 	}
 
 	void Camera::update()
@@ -68,16 +77,25 @@ namespace Vxl
 	}
 	Camera& Camera::updatePerspective(float _fov, float _aspect)
 	{
+		if (m_type == Type::ORTHOGRAPHIC)
+			return *this;
+
 		m_projection->Update_FovAspect(_fov, _aspect);
 		return *this;
 	}
 	Camera& Camera::updateOrtho_X(float _xmin, float _xmax)
 	{
+		if (m_type == Type::PERSPECTIVE)
+			return *this;
+
 		m_projection->Update_X(_xmin, _xmax);
 		return *this;
 	}
 	Camera& Camera::updateOrtho_Y(float _ymin, float _ymax)
 	{
+		if (m_type == Type::PERSPECTIVE)
+			return *this;
+
 		m_projection->Update_Y(_ymin, _ymax);
 		return *this;
 	}

@@ -38,6 +38,7 @@ public:
 	}
 	inline void Set(const std::string& name, Type* data)
 	{
+		// Delete Existing Item if duplicate is found
 		if (m_database.find(name) != m_database.end())
 		{
 			delete m_database[name];
@@ -51,6 +52,14 @@ public:
 			return m_database[name];
 		}
 		return nullptr;
+	}
+	inline const std::unordered_map<std::string, Type*> Get() const
+	{
+		return m_database;
+	}
+	inline UINT Size(void) const
+	{
+		return (UINT)m_database.size();
 	}
 };
 

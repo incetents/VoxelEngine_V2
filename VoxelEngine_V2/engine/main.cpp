@@ -31,6 +31,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	// Window
 	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
+	Window.SetCustomAspectRatio(true, 1.0f);
 
 	/* Special */
 	Geometry::Setup();
@@ -47,11 +48,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			Window.Reload();
 
 			Geometry::Reload();
-			
-			ShaderProgram::m_database.DeleteAndClear();
-			Shader::m_database.DeleteAndClear();
-			Texture::m_database.DeleteAndClear();
-			Cubemap::m_database.DeleteAndClear();
 			
 			RenderManager.Reload();
 		}

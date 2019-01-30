@@ -33,6 +33,8 @@
 #include "../engine/modules/Material.h"
 #include "../engine/modules/RenderManager.h"
 
+#include "../engine/window/window.h"
+
 #include "../game/terrain/TerrainManager.h"
 
 #include <iostream>
@@ -44,9 +46,9 @@ namespace Vxl
 	{
 		Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
 
-		_camera = new Camera(Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
+		_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
 		//_camera->setOrthographic(-15, 15, -15, 15);
-		_camera->setPerspective(110.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT);
+		_camera->setPerspective(110.0f, Window.GetAspectRatio());
 		_camera->update();
 		_camera->SetMain();
 
@@ -64,11 +66,11 @@ namespace Vxl
 		_shader_debugLines			= ShaderProgram::m_database.Get("debugLines");
 		_shader_passthrough			= ShaderProgram::m_database.Get("passthrough");
 
-		_material_gbuffer				= new MaterialBase(_shader_gbuffer, 1);
-		_material_gbuffer_no_model		= new MaterialBase(_shader_gbuffer_no_model, 2);
-		_material_debugLines			= new MaterialBase(_shader_debugLines, 3);
-		_material_passthrough			= new MaterialBase(_shader_passthrough, 999);
-		_material_skybox				= new MaterialBase(_shader_skybox, 0);
+		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
+		_material_gbuffer_no_model	= Material::Create("gbuffer_no_model", _shader_gbuffer_no_model, 2);
+		_material_debugLines		= Material::Create("debug_lines", _shader_debugLines, 3);
+		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
+		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 
 		_tex = Texture::m_database.Get("beato");
 		_tex_crate = Texture::m_database.Get("crate_diffuse");
@@ -116,31 +118,31 @@ namespace Vxl
 
 		_mesh->Bind();
 
-		//	// Entity
-		//	_entity1 = new Entity();
-		//	_entity1->SetMaterialBase(_material_gbuffer);
-		//	_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
-		//	_entity1->m_mesh = _mesh;
-		//	_entity1->m_transform.setScale(+0.5f);
-		//	
-		//	_entity2 = new Entity();
-		//	_entity2->SetMaterialBase(_material_gbuffer);
-		//	_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		//	_entity2->m_mesh = Geometry::GetIcoSphere();
-		//	_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
-		//	// TEST
-		//	_entity2->SetColor(Color3F(1, 0, 0));
-		//	
-		//	_entity3 = new Entity();
-		//	_entity3->SetMaterialBase(_material_gbuffer);
-		//	_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		//	_entity3->m_mesh = Geometry::GetIcosahedron();
-		//	_entity3->m_transform.setPosition(Vector3(-1.5f, 0, -3.0f));
-		//	
-		//	_entity4 = new Entity();
-		//	_entity4->SetMaterialBase(_material_skybox);
-		//	_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
-		//	_entity4->m_mesh = Geometry::GetInverseCube();
+		// Entities
+		_entity1 = Entity::Create();
+		_entity1->SetMaterial(_material_gbuffer);
+		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
+		_entity1->m_mesh = _mesh;
+		_entity1->m_transform.setScale(+0.5f);
+		
+		_entity2 = Entity::Create();
+		_entity2->SetMaterial(_material_gbuffer);
+		_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_entity2->m_mesh = Geometry::GetIcoSphere();
+		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
+		// TEST
+		_entity2->SetColor(Color3F(1, 0, 0));
+		
+		_entity3 = Entity::Create();
+		_entity3->SetMaterial(_material_gbuffer);
+		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_entity3->m_mesh = Geometry::GetIcosahedron();
+		_entity3->m_transform.setPosition(Vector3(-1.5f, 0, -3.0f));
+		
+		_entity4 = Entity::Create();
+		_entity4->SetMaterial(_material_skybox);
+		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
+		_entity4->m_mesh = Geometry::GetInverseCube();
 
 		for (int x = -1; x <= 1; x++)
 		{
@@ -152,34 +154,34 @@ namespace Vxl
 						continue;
 
 					
-					Entity* ent = new Entity();
-					ent->SetMaterialBase(_material_gbuffer);
-					ent->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-					ent->m_mesh = Geometry::GetCube();
-					
-					ent->m_transform.setPosition(Vector3(x * 4.0f, y * 4.0f, z * 4.0f));
-
-					if (x == 1 || y == 1 || z == 1)
-					{
-						ent->m_transform.setRotationX(45.0f);
-						ent->m_transform.setRotationY(45.0f);
-					}
-
-					_cubes.push_back(ent);
+					//	Entity* ent = new Entity();
+					//	ent->SetMaterial(_material_gbuffer);
+					//	ent->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+					//	ent->m_mesh = Geometry::GetCube();
+					//	
+					//	ent->m_transform.setPosition(Vector3(x * 4.0f, y * 4.0f, z * 4.0f));
+					//	
+					//	if (x == 1 || y == 1 || z == 1)
+					//	{
+					//		ent->m_transform.setRotationX(45.0f);
+					//		ent->m_transform.setRotationY(45.0f);
+					//	}
+					//	
+					//	_cubes.push_back(ent);
 					
 				}
 			}
 		}
 
 		//
-		_crate1 = new Entity();
-		_crate1->SetMaterialBase(_material_gbuffer);
+		_crate1 = Entity::Create();
+		_crate1->SetMaterial(_material_gbuffer);
 		_crate1->m_mesh = Geometry::GetCube();
 		_crate1->m_transform.setPosition(0, 0, 3);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
-		_crate2 = new Entity();
-		_crate2->SetMaterialBase(_material_gbuffer);
+		_crate2 = Entity::Create();
+		_crate2->SetMaterial(_material_gbuffer);
 		_crate2->m_mesh = Geometry::GetCube();
 		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(3, 4, 6);
@@ -187,33 +189,33 @@ namespace Vxl
 		//_crate1->m_transform.setParent(&_crate2->m_transform);
 		_crate2->m_transform.addChild(&_crate1->m_transform);
 		
-		//	_octo1 = new Entity();
-		//	_octo1->SetMaterialBase(_material_gbuffer);
-		//	_octo1->m_mesh = Geometry::GetOctahedron();
-		//	_octo1->m_transform.setPosition(0, 0, 0);
-		//	_octo1->m_transform.setScale(0.5f);
-		//	_octo1->SetColor(Color3F(1, 1, 1));
-		//	
-		//	_octo2 = new Entity();
-		//	_octo2->SetMaterialBase(_material_gbuffer);
-		//	_octo2->m_mesh = Geometry::GetOctahedron();
-		//	_octo2->m_transform.setPosition(1, 0, 0);
-		//	_octo2->m_transform.setScale(0.5f);
-		//	_octo2->SetColor(Color3F(1, 0, 0));
-		//	
-		//	_octo3 = new Entity();
-		//	_octo3->SetMaterialBase(_material_gbuffer);
-		//	_octo3->m_mesh = Geometry::GetOctahedron();
-		//	_octo3->m_transform.setPosition(0, 1, 0);
-		//	_octo3->m_transform.setScale(0.5f);
-		//	_octo3->SetColor(Color3F(0, 1, 0));
-		//	
-		//	_octo4 = new Entity();
-		//	_octo4->SetMaterialBase(_material_gbuffer);
-		//	_octo4->m_mesh = Geometry::GetOctahedron();
-		//	_octo4->m_transform.setPosition(0, 0, 1);
-		//	_octo4->m_transform.setScale(0.5f);
-		//	_octo4->SetColor(Color3F(0, 0, 1));
+		_octo1 = Entity::Create();
+		_octo1->SetMaterial(_material_gbuffer);
+		_octo1->m_mesh = Geometry::GetOctahedron();
+		_octo1->m_transform.setPosition(0, 0, 0);
+		_octo1->m_transform.setScale(0.5f);
+		_octo1->SetColor(Color3F(1, 1, 1));
+		
+		_octo2 = Entity::Create();
+		_octo2->SetMaterial(_material_gbuffer);
+		_octo2->m_mesh = Geometry::GetOctahedron();
+		_octo2->m_transform.setPosition(1, 0, 0);
+		_octo2->m_transform.setScale(0.5f);
+		_octo2->SetColor(Color3F(1, 0, 0));
+		
+		_octo3 = Entity::Create();
+		_octo3->SetMaterial(_material_gbuffer);
+		_octo3->m_mesh = Geometry::GetOctahedron();
+		_octo3->m_transform.setPosition(0, 1, 0);
+		_octo3->m_transform.setScale(0.5f);
+		_octo3->SetColor(Color3F(0, 1, 0));
+		
+		_octo4 = Entity::Create();
+		_octo4->SetMaterial(_material_gbuffer);
+		_octo4->m_mesh = Geometry::GetOctahedron();
+		_octo4->m_transform.setPosition(0, 0, 1);
+		_octo4->m_transform.setScale(0.5f);
+		_octo4->SetColor(Color3F(0, 0, 1));
 
 
 
@@ -224,7 +226,6 @@ namespace Vxl
 	void Scene_Game::Destroy()
 	{
 		delete _fbo;
-		delete _camera;
 		delete _mesh;
 
 		delete clock1;
@@ -298,17 +299,18 @@ namespace Vxl
 		// End Frame Updates
 		TextureTracker.NewFrame();
 		XGamePadManager.Update();
+
+		//_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
 	}
 
 	void Scene_Game::Draw()
 	{
-
-	
 		glUtil::clearBuffer();
 		glUtil::clearColor(Color3F(0.1f, 0.1f, 0.3f));
 
 		_fbo->bind();
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		Window.ViewportToWindowResolution();
 
 		_material_debugLines->Bind();
 		//
@@ -366,13 +368,13 @@ namespace Vxl
 			*/
 		}
 
-		//	// GBUFFER No model
-		//	_material_gbuffer_no_model->Bind();
-		//	
-		//	glUtil::setActiveTexture(Active_Texture::LEVEL0);
-		//	BlockAtlas.BindAtlas();
-		//	
-		//	TerrainManager.Draw();
+		// GBUFFER No model
+		_material_gbuffer_no_model->Bind();
+		
+		glUtil::setActiveTexture(Active_Texture::LEVEL0);
+		BlockAtlas.BindAtlas();
+		
+		TerrainManager.Draw();
 
 
 		//for (int i = 0; i < _cubes.size(); i++)
@@ -415,7 +417,8 @@ namespace Vxl
 		
 
 		_fbo->unbind();
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		Window.ViewportToWindowSize();
+		//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glUtil::wireframe(false);
 
 		// ~~~~~~~~~~~~~~~~~ //
@@ -426,7 +429,7 @@ namespace Vxl
 		_shader_passthrough->Bind();
 		glDepthFunc(GL_ALWAYS);
 
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		_fbo->bindTexture(0, Active_Texture::LEVEL0);
 		Geometry::GetFullQuad()->Draw();
 		
@@ -446,44 +449,44 @@ namespace Vxl
 
 
 		glDepthFunc(GL_LEQUAL);
+		Window.ViewportToWindowSize();
 
 
+		
+		//	// SUBROUTINES
+		//	glSubroutine Sub = *_shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
+		//	Sub.Set("Colour1", "ColorRed");
+		//	Sub.Set("Colour2", "ColorGreen");
+		//	Sub.Set("myNum", "t2");
+		//	Sub.Bind();
+		//	
+		//	// UNIFORM BLOCKS
+		//	auto block = _shader_gbuffer->GetUniformBlock("ColorBlock_0");
+		//	float myFloats[3] = { 0.5f, 0.0f, 1.0f };
+		//	block->Set(myFloats, 3);
+		//	float r = 0.5f;
+		//	float g = 1.0f;
+		//	float b = 0.0f;
+		//	block->Set(&r, 1, 0);
+		//	block->Set(&g, 1, 1);
 
-		/*
-		// SUBROUTINES
-		glSubroutine Sub = Sp->GetSubroutine(ShaderType::FRAGMENT);
-		Sub.set("Colour1", "ColorRed");
-		Sub.set("Colour2", "ColorGreen");
-		Sub.set("myNum", "t2");
-		Sub.bind();
-
-		// UNIFORM BLOCKS
-		auto block = Sp->GetUniformBlock("ColorBlock_0");
-		float myFloats[3] = { 0.5f, 0.0f, 1.0f };
-		block->set(myFloats, 3);
-		float r = 0.5f;
-		float g = 1.0f;
-		float b = 0.0f;
-		block->set(&r, 1, 0);
-		block->set(&g, 1, 1);
-
-		// UNIFORMS
-		Sp->SetUniform("value1", 0.1f);
-		Sp->SetUniform("value2", 0.1f);
-		Sp->SetUniform("value3", 0.1f);
-
-		// Uniform a = Sp->GetUniform("value1");
-		a.set<float>(1.0f);
-		Uniform b = Sp->GetUniform("value2");
-		b.set<float>(0.0f);
-		Uniform c = Sp->GetUniform("value3");
-		c.set<float>(0.5f);
-
-		Shader_Gbuffer->SetUniform("model", model.getModel());
-
-		Shader_Gbuffer->SetUniform("view", cam.getView());
-		Shader_Gbuffer->SetUniform("projection", cam.getProjection());
-		*/
+		//	// UNIFORMS
+		//	_shader_gbuffer->SetUniform("value1", 0.1f);
+		//	_shader_gbuffer->SetUniform("value2", 0.1f);
+		//	_shader_gbuffer->SetUniform("value3", 0.1f);
+		//	
+		//	// Uniform a = Sp->GetUniform("value1");
+		//	a.set<float>(1.0f);
+		//	Uniform b = Sp->GetUniform("value2");
+		//	b.set<float>(0.0f);
+		//	Uniform c = Sp->GetUniform("value3");
+		//	c.set<float>(0.5f);
+		//	
+		//	Shader_Gbuffer->SetUniform("model", model.getModel());
+		//	
+		//	Shader_Gbuffer->SetUniform("view", cam.getView());
+		//	Shader_Gbuffer->SetUniform("projection", cam.getProjection());
+		
 
 
 		static float FOV = _camera->getFOV();
@@ -498,6 +501,22 @@ namespace Vxl
 		// IMGUI TEST
 		ImGui::NewFrame();
 		
+		if (Shader::ShaderErrorLogSize > 0)
+		{
+			bool op;
+			if (ImGui::Begin("ShaderErrors", &op, ImVec2(700, 400), 0.9f))
+			{
+				for (auto Log : Shader::ShaderErrorLog)
+				{
+					if(ImGui::CollapsingHeader(Log.first.c_str()))
+						ImGui::Text(Log.second.c_str());
+
+					ImGui::Separator();
+				}
+			}
+			ImGui::End();
+		}
+
 		bool open;
 		if(ImGui::Begin("ImGUI", &open, ImVec2(280, 380), 0.9f))
 		{
@@ -506,8 +525,20 @@ namespace Vxl
 
 			ImGui::Separator();
 
-			ImGui::Text("CamPos: %f %f %f", _camera->getPosition().x, _camera->getPosition().y, _camera->getPosition().z);
-			ImGui::Text("CamForward: %f %f %f", _camera->getForward().x, _camera->getForward().y, _camera->getForward().z);
+			if (ImGui::CollapsingHeader("Window"))
+			{
+				ImGui::Text("Window Size: %d %d", Window.GetSizeWidth(), Window.GetSizeHeight());
+				ImGui::Text("Window Resolution: %d %d", Window.GetResolutionWidth(), Window.GetResolutionHeight());
+				ImGui::Text("Window Aspect: %f", Window.GetAspectRatio());
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::CollapsingHeader("Camera"))
+			{
+				ImGui::Text("CamPos: %f %f %f", _camera->getPosition().x, _camera->getPosition().y, _camera->getPosition().z);
+				ImGui::Text("CamForward: %f %f %f", _camera->getForward().x, _camera->getForward().y, _camera->getForward().z);
+			}
 
 			ImGui::Separator();
 
@@ -515,7 +546,41 @@ namespace Vxl
 
 			if (ImGui::Button("Reload Shaders"))
 			{
-				
+				Shader::ShaderErrorLog.clear();
+				Shader::ShaderErrorLogSize = 0;
+
+				auto Shaders = Shader::m_database.Get();
+				for (auto Shader : Shaders)
+					Shader.second->reload();
+
+				auto Programs = ShaderProgram::m_database.Get();;
+				for (auto Program : Programs)
+					Program.second->reload();
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::Button("Set Size (1080, 720)"))
+			{
+				Window.SetSize(1080, 720);
+				_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
+			}
+
+			if (ImGui::Button("Set Size (500, 500)"))
+			{
+				Window.SetSize(500, 500);
+				_camera->updatePerspective(_camera->getFOV(), 1.0f);
+			}
+
+			if (ImGui::Button("Free Aspect Ratio"))
+			{
+				Window.SetCustomAspectRatio(false);
+				_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
+			}
+			if (ImGui::Button("Lock Aspect Ratio [1:1]"))
+			{
+				Window.SetCustomAspectRatio(true, 1.0f);
+				_camera->updatePerspective(_camera->getFOV(), 1.0f);
 			}
 
 			ImGui::Separator();
@@ -562,7 +627,7 @@ namespace Vxl
 		if (fabs(FOV - NewFOV) > 0.01f)
 		{
 			NewFOV = FOV;
-			_camera->updatePerspective(FOV, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT);
+			_camera->updatePerspective(FOV, Window.GetAspectRatio());
 		}
 		if (fabs(ZNEAR - N_ZNEAR) > 0.01f)
 		{

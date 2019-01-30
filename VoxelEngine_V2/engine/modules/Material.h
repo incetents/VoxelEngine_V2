@@ -8,6 +8,7 @@
 #include "Component.h"
 #include "../opengl/glUtil.h"
 #include "../opengl/Uniform.h"
+#include "../utilities/Database.h"
 
 #include "MaterialPackage.h"
 //
@@ -19,29 +20,52 @@ namespace Vxl
 	class BaseTexture;
 	class Transform;
 
-	class MaterialBase
+	class Material
 	{
-		friend class Material;
+		friend class MaterialData;
+		friend class RenderManager;
 	protected:
-		// Shader
-		ShaderProgram* m_shaderProgram;
-		// Render Order
-		UINT m_order = 0;
+		// Data
+		const std::string m_name; // Name
+		ShaderProgram* m_shaderProgram; // Shader
+		UINT m_order = 0; // Render Order
+
+		// Locked Constructor
+		Material(const std::string& _name, ShaderProgram* _shader, UINT _order);
+	
+		// Database
+		static Database<Material> m_database;
 	public:
-		MaterialBase(ShaderProgram* _shader, UINT _order);
+		// Database Creation
+		static Material* Create(const std::string& _name, ShaderProgram* _shader, UINT _order);
+
+		// Accessors
+		inline std::string GetName(void) const
+		{
+			return m_name;
+		}
+		inline UINT GetOrder(void) const
+		{
+			return m_order;
+		}
+
 		// Uniform Packages
 		MaterialPackage Mat_viewProjection	= MaterialPackage("VXL_viewProjection");
 		MaterialPackage Mat_view			= MaterialPackage("VXL_view");
 		MaterialPackage Mat_projection		= MaterialPackage("VXL_projection");
 		MaterialPackage Mat_camForward		= MaterialPackage("VXL_camForward");
 		MaterialPackage Mat_camPosition		= MaterialPackage("VXL_camPosition");
+
+		// Reload Packages
+		void ReloadPackages();
 		// Send Uniforms to shader
 		virtual void Bind();
+
 		// Wireframe
 		bool m_wireframe = false;
 	};
 
-	class Material : public Component
+	class MaterialData : public Component
 	{
 		enum DataType
 		{
@@ -51,8 +75,8 @@ namespace Vxl
 		friend class Entity;
 	protected:
 		// Material Base
-		MaterialBase* m_base;
-		void SetBase(MaterialBase* _base);
+		Material* m_base;
+		void SetBase(Material* _base);
 
 		// Texture Package
 		BaseTexture* m_textures[32];
@@ -72,8 +96,8 @@ namespace Vxl
 		bool CheckUniform(const std::string& uniformName);
 		
 	public:
-		Material() {}
-		~Material();
+		MaterialData() {}
+		~MaterialData();
 
 		// Custom Uniform Packages
 		template<typename Type>
@@ -95,7 +119,7 @@ namespace Vxl
 		void SetTexture(BaseTexture* tex, Active_Texture level);
 		void ClearTexture(Active_Texture level);
 
-		inline MaterialBase* GetBase(void) const
+		inline Material* GetBase(void) const
 		{
 			return m_base;
 		}

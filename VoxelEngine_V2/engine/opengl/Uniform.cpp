@@ -180,7 +180,7 @@ namespace Vxl
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
 		//
-		glBufferSubData(GL_UNIFORM_BUFFER, startOffset * 4, arrLength * 4, arr);
+		glBufferSubData(GL_UNIFORM_BUFFER, startOffset * sizeof(GLfloat), arrLength * sizeof(GLfloat), arr);
 		//
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}

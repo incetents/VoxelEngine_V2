@@ -20,16 +20,13 @@ namespace Vxl
 		bool		 m_windowFocus	= false;
 		GLFWwindow*  m_window;
 		std::string  m_name;
-		UINT		 m_size[2];
-		UINT		 m_resolution[2];
-		float		 m_aspectRatio = 1.0f;
+		UINT		 m_size[2]; // Window Size that can change
+		UINT		 m_resolution[2]; // Window Resolution (fbos and cameras will use this)
+		float		 m_aspectRatio = 1.0f; // Based on Window size (resolution shouldn't affect this)
+		bool		 m_useCustomAspectRatio = false;
+		float		 m_customAspectRatio = 1.0f;
 
-		inline void Resize(UINT width, UINT height)
-		{
-			m_size[0] = width;
-			m_size[1] = height;
-			m_aspectRatio = (float)width / (float)height;
-		}
+		void UpdateSizes(UINT width, UINT height);
 		void Destroy();
 		void Update();
 	public:
@@ -68,9 +65,39 @@ namespace Vxl
 		void SetSize(UINT width, UINT height);
 		void SetSizeLimits(UINT xmin, UINT xmax, UINT ymin, UINT ymax);
 		void SetVSynch(bool state);
+		void SetCustomAspectRatio(bool state, float aspect = 1.0f);
 
 		void GetPosition(int& x, int& y);
 		void GetSize(int& width, int& height);
+
+		float GetAspectRatio(void) const
+		{
+			if (m_useCustomAspectRatio)
+				return m_customAspectRatio;
+			else
+				return m_aspectRatio;
+		}
+
+		UINT GetSizeWidth(void) const
+		{
+			return m_size[0];
+		}
+		UINT GetSizeHeight(void) const
+		{
+			return m_size[1];
+		}
+
+		UINT GetResolutionWidth(void) const
+		{
+			return m_resolution[0];
+		}
+		UINT GetResolutionHeight(void) const
+		{
+			return m_resolution[1];
+		}
+
+		void ViewportToWindowSize();
+		void ViewportToWindowResolution();
 		
 		bool InitGLFW();
 		void Setup(

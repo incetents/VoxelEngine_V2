@@ -1,14 +1,9 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
 #pragma once
 
-/*
-#include "Rotation.h"
-#include "Vector3.h"
-#include "Vector4.h"
-#include "Matrix4x4.h"
-*/
 #include "Transform.h"
 
+#include "../utilities/Database.h"
 #include <assert.h>
 
 namespace Vxl
@@ -147,6 +142,8 @@ namespace Vxl
 		friend class CameraProjection;
 		friend class CameraProjection_Perspective;
 		friend class CameraProjection_Orthographic;
+		friend class RenderManager;
+		friend class Window;
 	private:
 		enum Type
 		{
@@ -165,12 +162,19 @@ namespace Vxl
 		
 		static Camera* m_main;
 
+		// Protected
+		Camera(const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
+	
+		// Database
+		static Database<Camera> m_database;
 	public:
-		explicit Camera(const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
 		~Camera()
 		{
 			delete m_projection;
 		}
+
+		// Database Creation
+		static Camera* Create(const std::string _name, const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
 	
 		void update();
 

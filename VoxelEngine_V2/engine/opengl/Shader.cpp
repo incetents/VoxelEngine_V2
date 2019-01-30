@@ -15,24 +15,8 @@ namespace Vxl
 
 	// SHADER //
 
-	Shader::Shader(const std::string& name, const std::string& source, ShaderType type)
-		: m_name(name), m_type(type)
-	{
-		m_id = glCreateShader((GLuint)type);
-		if (m_id == -1)
-		{
-			Logger.error("Unable to create shader: " + name);
-			return;
-		}
-
-		if (!compile(source))
-			Logger.error("Unable to compile shader: " + name);
-	}
-
-	Shader::~Shader()
-	{
-		glDeleteShader(m_id);
-	}
+	std::unordered_map<std::string, std::string> Shader::ShaderErrorLog;
+	UINT Shader::ShaderErrorLogSize = 0;
 
 	bool Shader::compile(const std::string& source)
 	{
@@ -44,9 +28,8 @@ namespace Vxl
 		glCompileShader(m_id);
 
 		// Error Check
-		m_fail = checkError();
-
-		return !m_fail;
+		m_hasCompiled = !checkError();
+		return m_hasCompiled;
 	}
 
 	bool Shader::checkError() const
@@ -58,70 +41,88 @@ namespace Vxl
 		if (result != GL_FALSE)
 			return false;
 
-		Logger.error("Failed to Compile Shader: " + m_name);
+		std::string ErrorMessage = "Failed to Compile Shader\n\n";
+		ErrorMessage += "Name: " + m_name + "\n";
+		ErrorMessage += "Path: " + m_filePath + "\n";
 
-		// Output Error Type
 		switch (m_type)
 		{
 		case ShaderType::VERTEX:
-			Logger.error("(VERTEX SHADER) : ");
+			ErrorMessage += ("Type: VERTEX\n");
 			break;
 		case ShaderType::FRAGMENT:
-			Logger.error("(FRAGMENT SHADER) : ");
+			ErrorMessage += ("Type: FRAGMENT\n");
 			break;
 		case ShaderType::GEOMETRY:
-			Logger.error("(GEOMETRY SHADER) : ");
+			ErrorMessage += ("Type: GEOMETRY\n");
 			break;
 		case ShaderType::TESSELATION_CONTROL:
-			Logger.error("(TESSELATION CONTROL SHADER) : ");
+			ErrorMessage += ("Type: TESSELATION CONTROL\n");
 			break;
 		case ShaderType::TESSELATION_EVALUATION:
-			Logger.error("(TESSELATION EVALUATION SHADER) : ");
+			ErrorMessage += ("Type: TESSELATION EVALUATION\n");
 			break;
 		case ShaderType::COMPUTE:
-			Logger.error("(COMPUTE SHADER) : ");
+			ErrorMessage += ("Type: COMPUTE SHADER\n");
 			break;
 		default:
-			Logger.error("(UNKNOWN SHADER) : ");
+			ErrorMessage += ("Type: UNKNOWN SHADER\n");
 			break;
 		}
+		ErrorMessage += ("\nERROR:\n");
 
 		// Output Error Message
 		GLint length;
 		glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &length);
 		std::vector<char> error(length);
 		glGetShaderInfoLog(m_id, length, &length, &error[0]);
+		ErrorMessage.insert(ErrorMessage.end(), error.begin(), error.end());
 
-		Logger.error(&error[0]);
+		// for logging system
+		Logger.error(ErrorMessage);
+		
+		// store in map
+		ShaderErrorLog[m_name] = ErrorMessage;
+		ShaderErrorLogSize++;
 
 		return true;
 	}
 
-	// SHADER PROGRAM //
-
-	ShaderProgram::ShaderProgram(const std::string& name)
-		: m_shaderCount(0), m_name(name)
+	bool Shader::load()
 	{
-		m_id = glCreateProgram();
+		// Create Shader ID
+		m_id = glCreateShader((GLuint)m_type);
 		if (m_id == -1)
 		{
-			Logger.error("Unable to create shader program " + name);
-			return;
+			Logger.error("Unable to create shader: " + m_name);
+			return false;
 		}
 
-		attachShaders();
+		// Read file
+		std::string source = stringUtil::readFile(m_filePath);
+
+		// Compile Source
+		if (!compile(source))
+		{
+			Logger.error("Unable to compile shader: " + m_name);
+			return false;
+		}
+
+		return true;
 	}
+
+	void Shader::unload()
+	{
+		glDeleteShader(m_id);
+		m_id = -1;
+		m_hasCompiled = false;
+	}
+
+	// SHADER PROGRAM //
 
 	ShaderProgram::~ShaderProgram()
 	{
-		detachShaders();
-		glDeleteProgram(m_id);
-		m_id = -1;
-
-		// cleanup uniform blocks
-		for (auto it = m_uniformBlocks.begin(); it != m_uniformBlocks.end(); it++)
-			delete it->second;
-
+		unload();
 	}
 
 	void ShaderProgram::attachShaders()
@@ -160,6 +161,32 @@ namespace Vxl
 			Logger.error(&infoLog[0]);
 		}
 		return true;
+	}
+
+	bool ShaderProgram::load()
+	{
+		m_id = glCreateProgram();
+		if (m_id == -1)
+		{
+			Logger.error("Unable to create shader program " + m_name);
+			return false;
+		}
+
+		attachShaders();
+		return true;
+	}
+
+	void ShaderProgram::unload()
+	{
+		detachShaders();
+		glDeleteProgram(m_id);
+		m_id = -1;
+		m_linked = false;
+
+		// cleanup uniform blocks
+		for (auto it = m_uniformBlocks.begin(); it != m_uniformBlocks.end(); it++)
+			delete it->second;
+		m_uniformBlocks.clear();
 	}
 
 	void ShaderProgram::AddShader(Shader* _shader)

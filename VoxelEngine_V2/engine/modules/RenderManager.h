@@ -17,7 +17,7 @@ namespace Vxl
 	class Scene;
 	class Layer;
 	class Entity;
-	class MaterialBase;
+	class Material;
 
 	static class RenderManager : public Singleton<class RenderManager>
 	{
@@ -28,7 +28,7 @@ namespace Vxl
 		UINT m_layerToRender = ~0;
 
 		// Rendering stuff // UINT = Material Order
-		std::map<std::pair<UINT, MaterialBase*>, std::set<Entity*>> m_entities; 
+		std::map<std::pair<UINT, Material*>, std::set<Entity*>> m_entities; 
 		
 	public:
 		RenderManager();

@@ -6,22 +6,34 @@
 #include "../opengl/Mesh.h"
 #include "../modules/Material.h"
 #include "../modules/RenderManager.h"
+#include "../utilities/Time.h"
 
 namespace Vxl
 {
+	DatabaseSet<Entity> Entity::m_database;
+
 	Entity::Entity()
 	{
 		AddComponent(&m_transform, this);
 		AddComponent(&m_meshRenderer, this);
 		AddComponent(&m_material, this);
 	}
+
+	Entity* Entity::Create()
+	{
+		// Default Name
+		Entity* E = new Entity();
+		m_database.Set(E);
+		return E;
+	}
+
 	Entity::~Entity()
 	{
 		if (m_material.GetBase())
 			RenderManager.RemoveEntity(this);
 	}
 
-	void Entity::SetMaterialBase(MaterialBase* _base)
+	void Entity::SetMaterial(Material* _base)
 	{
 		// Do nothing if no change
 		if (_base == m_material.GetBase())
@@ -36,7 +48,7 @@ namespace Vxl
 
 		RenderManager.AddEntity(this);
 	}
-	MaterialBase* Entity::GetMaterialBase(void) const
+	Material* Entity::GetMaterial(void) const
 	{
 		return m_material.GetBase();
 	}

@@ -6,6 +6,7 @@
 #include "../opengl/glUtil.h"
 
 #include "../utilities/logger.h"
+#include "../math/Camera.h"
 
 #include <GLFW/glfw3.h>
 
@@ -30,6 +31,8 @@ namespace Vxl
 		m_name = name;
 		m_size[0] = width;
 		m_size[1] = height;
+		m_resolution[0] = width;
+		m_resolution[1] = height;
 
 		m_window = glfwCreateWindow(m_size[0], m_size[1], m_name.c_str(), NULL, NULL);
 		if (!m_window)
@@ -49,7 +52,6 @@ namespace Vxl
 		glfwSetWindowFocusCallback		(m_window, glfwCallbacks::Window_Focus);
 		glfwSetWindowCloseCallback		(m_window, glfwCallbacks::Exit_Button);
 		glfwSetWindowSizeCallback		(m_window, glfwCallbacks::Window_Resize);
-		glfwSetFramebufferSizeCallback	(m_window, glfwCallbacks::Resolution_Resize);
 
 		// IMGUI Setup
 		IMGUI_CHECKVERSION();
@@ -79,6 +81,21 @@ namespace Vxl
 		m_setup = false;
 		Setup(m_name, m_size[0], m_size[1]);
 	}
+	void Window::UpdateSizes(UINT width, UINT height)
+	{
+		m_size[0] = width;
+		m_size[1] = height;
+		m_aspectRatio = (float)width / (float)height;
+		// If using normal aspect ratio, update aspect ratio for all existing cameras
+		if (!m_useCustomAspectRatio)
+		{
+			auto Cameras = Camera::m_database.Get();
+			for (auto it = Cameras.begin(); it != Cameras.end(); it++)
+			{
+				it->second->updatePerspective(it->second->getFOV(), m_aspectRatio);
+			}
+		}
+	}
 	void Window::Destroy()
 	{
 		glfwDestroyWindow(m_window);
@@ -104,6 +121,7 @@ namespace Vxl
 	}
 	void Window::SetSize(UINT width, UINT height)
 	{
+		UpdateSizes(width, height);
 		glfwSetWindowSize(m_window, width, height);
 	}
 	void Window::SetSizeLimits(UINT xmin, UINT xmax, UINT ymin, UINT ymax)
@@ -114,6 +132,21 @@ namespace Vxl
 	{
 		glfwSwapInterval((int)state);
 	}
+	void Window::SetCustomAspectRatio(bool state, float aspect)
+	{
+		// If custom aspect ratio state has been changed, update aspect ratio for all cameras
+		if (m_customAspectRatio != aspect)
+		{
+			auto Cameras = Camera::m_database.Get();
+			for (auto it = Cameras.begin(); it != Cameras.end(); it++)
+			{
+				it->second->updatePerspective(it->second->getFOV(), aspect);
+			}
+		}
+		// Flags
+		m_useCustomAspectRatio = state;
+		m_customAspectRatio = aspect;
+	}
 
 	void Window::GetPosition(int& x, int& y)
 	{
@@ -123,6 +156,35 @@ namespace Vxl
 	{
 		glfwGetWindowSize(m_window, &width, &height);
 	}
+
+	void Window::ViewportToWindowSize()
+	{
+		// Locked Aspect Ratio (Black bars on edges)
+		if (m_useCustomAspectRatio)
+		{
+			// Width clamp
+			if (m_size[0] > m_size[1])
+			{
+				UINT customWidth = (UINT)((float)m_size[1] * m_customAspectRatio);
+				UINT offsetWidth = (m_size[0] >> 1) - (customWidth >> 1);
+				glViewport(offsetWidth, 0, customWidth, m_size[1]);
+			}
+			// Height clamp
+			else
+			{
+				UINT customHeight = (UINT)((float)m_size[0] / m_customAspectRatio);
+				UINT offsetHeight = (m_size[1] >> 1) - (customHeight >> 1);
+				glViewport(0, offsetHeight, m_size[0], customHeight);
+			}
+		}
+		else
+			glViewport(0, 0, m_size[0], m_size[1]);
+	}
+	void Window::ViewportToWindowResolution()
+	{
+		glViewport(0, 0, m_resolution[0], m_resolution[1]);
+	}
+
 
 	void Window::Update()
 	{

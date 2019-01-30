@@ -11,20 +11,44 @@
 #include "../math/Transform.h"
 #include "../math/Camera.h"
 
+#include "../utilities/logger.h"
+
 namespace Vxl
 {
-	MaterialBase::MaterialBase(ShaderProgram* _shader, UINT _order)
-		: m_shaderProgram(_shader), m_order(_order)
+	Database<Material> Material::m_database;
+
+	Material::Material(const std::string& _name, ShaderProgram* _shader, UINT _order)
+		: m_name(_name), m_shaderProgram(_shader), m_order(_order)
 	{
-		assert(_shader);
-		Mat_viewProjection.GetUniform(m_shaderProgram);
-		Mat_view.GetUniform(m_shaderProgram);
-		Mat_projection.GetUniform(m_shaderProgram);
-		Mat_camForward.GetUniform(m_shaderProgram);
-		Mat_camPosition.GetUniform(m_shaderProgram);
+		ReloadPackages();
 	}
-	void MaterialBase::Bind()
+
+	Material* Material::Create(const std::string& _name, ShaderProgram* _shader, UINT _order)
 	{
+		Material* M = new Material(_name, _shader, _order);
+		m_database.Set(_name, M);
+		return M;
+	}
+
+	void Material::ReloadPackages()
+	{
+		if (m_shaderProgram)
+		{
+			Mat_viewProjection.GetUniform(m_shaderProgram);
+			Mat_view.GetUniform(m_shaderProgram);
+			Mat_projection.GetUniform(m_shaderProgram);
+			Mat_camForward.GetUniform(m_shaderProgram);
+			Mat_camPosition.GetUniform(m_shaderProgram);
+		}
+		else
+			Logger.error("Unable to load Material Packages; [Material Name] = " + m_name);
+
+	}
+	void Material::Bind()
+	{
+		if (!m_shaderProgram)
+			return;
+
 		// Bind Shader
 		m_shaderProgram->Bind();
 
@@ -58,7 +82,7 @@ namespace Vxl
 		glUtil::wireframe(m_wireframe);
 	}
 
-	void Material::UpdateMaterialPackages()
+	void MaterialData::UpdateMaterialPackages()
 	{
 		Mat_useModel.GetUniform(m_base->m_shaderProgram);
 		Mat_model.GetUniform(m_base->m_shaderProgram);
@@ -70,7 +94,7 @@ namespace Vxl
 		RemoveAllUniforms();
 	}
 
-	void Material::SetBase(MaterialBase* _base)
+	void MaterialData::SetBase(Material* _base)
 	{
 		if (m_base == _base)
 			return;
@@ -79,18 +103,18 @@ namespace Vxl
 		UpdateMaterialPackages();
 	}
 
-	Material::~Material()
+	MaterialData::~MaterialData()
 	{
 		RemoveAllUniforms();
 	}
 
-	bool Material::CheckUniform(const std::string& uniformName)
+	bool MaterialData::CheckUniform(const std::string& uniformName)
 	{
 		// Check if shader contains uniform
 		return (m_base->m_shaderProgram->CheckUniform(uniformName));
 	}
 
-	void Material::RemoveUniform(const std::string& uniformName)
+	void MaterialData::RemoveUniform(const std::string& uniformName)
 	{
 		// Check if name exists
 		if (m_packages.find(uniformName) != m_packages.end())
@@ -100,7 +124,7 @@ namespace Vxl
 		}
 	}
 
-	void Material::RemoveAllUniforms()
+	void MaterialData::RemoveAllUniforms()
 	{
 		for (auto it = m_packages.begin(); it != m_packages.end(); it++)
 		{
@@ -110,7 +134,7 @@ namespace Vxl
 		m_packages.clear();
 	}
 
-	void Material::SetTexture(BaseTexture* tex, Active_Texture level)
+	void MaterialData::SetTexture(BaseTexture* tex, Active_Texture level)
 	{
 		assert((int)level - GL_TEXTURE0 < MAX_MATERIAL_TEXTURES);
 		m_textures[(UINT)level - GL_TEXTURE0] = tex;
@@ -120,12 +144,12 @@ namespace Vxl
 			m_activeTextures.erase(level);
 	}
 
-	void Material::ClearTexture(Active_Texture level)
+	void MaterialData::ClearTexture(Active_Texture level)
 	{
 		m_activeTextures.erase(level);
 	}
 
-	void Material::Bind(bool BindTextures)
+	void MaterialData::Bind(bool BindTextures)
 	{
 		assert(m_base);
 		// Bind Uniforms for this object

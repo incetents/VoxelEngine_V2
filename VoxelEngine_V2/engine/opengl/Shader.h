@@ -18,24 +18,51 @@ namespace Vxl
 
 	class Shader
 	{
+		friend class ShaderProgram;
 	private:
-		bool				m_fail = true;
+		bool				m_hasLoaded = false;
+		bool				m_hasCompiled = false;
 		GLuint				m_id = -1;
 		const std::string   m_name;
+		const std::string	m_filePath;
 		const ShaderType	m_type;
 		
 		bool compile(const std::string& source);
 		bool checkError() const;
 
+		bool load();
+		void unload();
+
 	public:
-		Shader(const std::string& name, const std::string& source, ShaderType type);
-		~Shader();
+		Shader(const std::string& name, const std::string& filePath, ShaderType type)
+			: m_name(name), m_filePath(filePath), m_type(type)
+		{
+			m_hasLoaded = load();
+		}
+		~Shader()
+		{
+			unload();
+		}
 		// Database
 		static Database<Shader> m_database;
 
-		inline bool					HasFailed(void) const
+		// Current log of all shaders with compilation errors
+		static std::unordered_map<std::string, std::string> ShaderErrorLog;
+		static UINT ShaderErrorLogSize;
+
+		void reload()
 		{
-			return m_fail;
+			unload();
+			m_hasLoaded = load();
+		}
+
+		inline bool					HasLoaded(void) const
+		{
+			return m_hasLoaded;
+		}
+		inline bool					HasCompiled(void) const
+		{
+			return m_hasCompiled;
 		}
 		inline GLuint				GetID(void) const
 		{
@@ -81,11 +108,25 @@ namespace Vxl
 
 		bool checkError();
 
+		bool load();
+		void unload();
+
 	public:
-		ShaderProgram(const std::string& name);
+		ShaderProgram(const std::string& name)
+			: m_name(name)
+		{
+			load();
+		}
 		~ShaderProgram();
 		// Database
 		static Database<ShaderProgram> m_database;
+
+		void reload()
+		{
+			unload();
+			load();
+			Link();
+		}
 
 		void AddShader(Shader* _shader);
 		void Link();

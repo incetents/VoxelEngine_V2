@@ -108,71 +108,61 @@ namespace Vxl
 					auto Tag = Segments[0];
 					auto Name = Segments[1];
 					auto Path = Segments[2];
-					ShaderType Type;
 
-					if (Tag.compare(TAG_VERT) == 0)
-						Type = ShaderType::VERTEX;
-					else if (Tag.compare(TAG_GEOM) == 0)
-						Type = ShaderType::GEOMETRY;
-					else if (Tag.compare(TAG_FRAG) == 0)
-						Type = ShaderType::FRAGMENT;
-					else if (Tag.compare(TAG_TESS_CTRL) == 0)
-						Type = ShaderType::TESSELATION_CONTROL;
-					else if (Tag.compare(TAG_TESS_EVAL) == 0)
-						Type = ShaderType::TESSELATION_EVALUATION;
-					else if (Tag.compare(TAG_COMP) == 0)
-						Type = ShaderType::COMPUTE;
-					else
-						continue;
-
-					std::string File = stringUtil::readFile(Path);
-					Shader* S = new Shader(Name, File, Type);
-					if (!S->HasFailed())
+					if (Shader::m_database.Check(Name))
 					{
-						// Duplicate
-						if (Shader::m_database.Check(Name))
-						{
-							Logger.error("Duplicate Shader: " + Name);
-							delete S;
-						}
-						else
-						{
-							Logger.log("Loaded Shader: " + Name);
-							Shader::m_database.Set(Name, S);
-						}
+						Logger.error("Duplicate Shader: " + Name);
 					}
 					else
-						delete S;
+					{
+						ShaderType Type;
+
+						if (Tag.compare(TAG_VERT) == 0)
+							Type = ShaderType::VERTEX;
+						else if (Tag.compare(TAG_GEOM) == 0)
+							Type = ShaderType::GEOMETRY;
+						else if (Tag.compare(TAG_FRAG) == 0)
+							Type = ShaderType::FRAGMENT;
+						else if (Tag.compare(TAG_TESS_CTRL) == 0)
+							Type = ShaderType::TESSELATION_CONTROL;
+						else if (Tag.compare(TAG_TESS_EVAL) == 0)
+							Type = ShaderType::TESSELATION_EVALUATION;
+						else if (Tag.compare(TAG_COMP) == 0)
+							Type = ShaderType::COMPUTE;
+						else
+							continue;
+
+						Shader* S = new Shader(Name, Path, Type);
+
+						Logger.log("Loaded Shader: " + Name);
+						Shader::m_database.Set(Name, S);
+					}
 				}
 				/* SHADER PROGRAM */
 				else if (_state == LoadState::SHADER_PROGRAM && SegmentCount >= 3)
 				{
 					auto Name = Segments[0];
-					ShaderProgram* Sp = new ShaderProgram(Name);
-					int SegmentCount = (int)Segments.size();
-					for (int i = 1; i < SegmentCount; i++)
+
+					// Check if name is already taken
+					if (Shader::m_database.Check(Name))
 					{
-						Shader* S = Shader::m_database.Get(Segments[i]);
-						if (S != nullptr)
-							Sp->AddShader(S);
-					}
-					Sp->Link();
-					if (Sp->IsLinked())
-					{
-						// Duplicate
-						if (Shader::m_database.Check(Name))
-						{
-							Logger.error("Duplicate Shader Program: " + Name);
-							delete Sp;
-						}
-						else
-						{
-							Logger.log("Created Shader Program: " + Name);
-							ShaderProgram::m_database.Set(Name, Sp);
-						}
+						Logger.error("Duplicate Shader Program: " + Name);
 					}
 					else
-						delete Sp;
+					{
+						ShaderProgram* Sp = new ShaderProgram(Name);
+						int SegmentCount = (int)Segments.size();
+						for (int i = 1; i < SegmentCount; i++)
+						{
+							Shader* S = Shader::m_database.Get(Segments[i]);
+							if (S != nullptr)
+								Sp->AddShader(S);
+						}
+						Sp->Link();
+
+						ShaderProgram::m_database.Set(Name, Sp);
+						Logger.log("Created Shader Program: " + Name);
+					}
 				}
 				/* TEXTURE */
 				else if (_state == LoadState::TEXTURE && SegmentCount >= 2)

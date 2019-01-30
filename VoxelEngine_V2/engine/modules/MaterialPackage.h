@@ -27,7 +27,10 @@ namespace Vxl
 
 		bool GetUniform(ShaderProgram* shader)
 		{
-			assert(shader != nullptr);
+			if (!shader)
+				return false;
+
+			//assert(shader != nullptr);
 			if (shader->CheckUniform(m_uniformName))
 			{
 				m_uniform = shader->GetUniform(m_uniformName);

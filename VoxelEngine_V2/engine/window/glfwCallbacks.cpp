@@ -47,10 +47,6 @@ namespace Vxl
 	}
 	void glfwCallbacks::Window_Resize(GLFWwindow* window, int width, int height)
 	{
-		Window.Resize((UINT)width, (UINT)height);
-	}
-	void glfwCallbacks::Resolution_Resize(GLFWwindow* window, int width, int height)
-	{
-		glViewport(0, 0, width, height);
+		Window.UpdateSizes((UINT)width, (UINT)height);
 	}
 }

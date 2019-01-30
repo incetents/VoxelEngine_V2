@@ -6,25 +6,36 @@
 #include "../math/Color.h"
 #include "../opengl/MeshRenderer.h"
 #include "../modules/Material.h"
+#include "../utilities/Database.h"
 
 namespace Vxl
 {
 	class Mesh;
 	class Material;
-	class MaterialBase;
+	class Material;
 	class ShaderProgram;
 
 	class Entity : public ComponentHandler
 	{
-	public:
+		friend class RenderManager;
+	private:
+		// Protected
 		Entity();
+
+		// Database
+		static DatabaseSet<Entity> m_database;
+	public:
 		virtual ~Entity();
 
+		// Creation
+		static Entity* Create();
+
 		// Data
-		Transform m_transform;
-		bool m_useTransform = true;
-		MeshRenderer m_meshRenderer;
-		Material m_material;
+		std::string			m_name;
+		Transform			m_transform;
+		bool				m_useTransform = true;
+		MeshRenderer		m_meshRenderer;
+		MaterialData		m_material;
 		
 		// Mesh Rendering
 		bool m_isActive = true;
@@ -32,8 +43,12 @@ namespace Vxl
 		Mesh* m_mesh;
 
 		// Utility
-		void			SetMaterialBase(MaterialBase* _base);
-		MaterialBase*	GetMaterialBase(void) const;
+		inline std::string GetName(void) const
+		{
+			return m_name;
+		}
+		void			SetMaterial(Material* _base);
+		Material*		GetMaterial(void) const;
 		UINT			GetMaterialOrder(void) const;
 
 		// Color

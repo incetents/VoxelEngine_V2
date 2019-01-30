@@ -18,7 +18,7 @@ namespace Vxl
 	class Texture;
 	class Cubemap;
 	class Light;
-	class MaterialBase;
+	class Material;
 	class Clock;
 
 	class Scene_Game : public Scene
@@ -37,15 +37,16 @@ namespace Vxl
 
 		// Assets Created
 		FramebufferObject* _fbo;
-		Camera* _camera;
 		Mesh* _mesh;
 
 		// Assets Automated
-		MaterialBase* _material_gbuffer;
-		MaterialBase* _material_gbuffer_no_model;
-		MaterialBase* _material_passthrough;
-		MaterialBase* _material_skybox;
-		MaterialBase* _material_debugLines;
+		Camera* _camera;
+
+		Material* _material_gbuffer;
+		Material* _material_gbuffer_no_model;
+		Material* _material_passthrough;
+		Material* _material_skybox;
+		Material* _material_debugLines;
 
 		Entity* _entity1;
 		Entity* _entity2;
