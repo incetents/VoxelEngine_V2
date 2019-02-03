@@ -35,7 +35,7 @@ namespace Vxl
 		// Is Empty
 		inline bool Is_Empty()
 		{
-			return (x && y && z);
+			return !(x && y && z);
 		}
 
 		// Constructors
@@ -134,7 +134,7 @@ namespace Vxl
 		// Is Empty
 		inline bool Is_Empty()
 		{
-			return (x && y && z);
+			return !(x && y && z);
 		}
 
 		// Constructors
@@ -149,6 +149,10 @@ namespace Vxl
 		explicit Vector3(Degrees _x, Degrees _y, Degrees _z);
 		explicit Vector3(Vector2 v, float z);
 		explicit Vector3(float x, Vector2 v);
+
+		// Cast
+		explicit operator Vector2();
+		explicit operator Vector4();
 
 		// Inverse
 		Vector3 Inverse() const;
@@ -179,6 +183,10 @@ namespace Vxl
 		float LengthSqr() const;
 		static float LengthSqr(const Vector3&);
 
+		// Distance
+		float Distance(const Vector3&);
+		static float Distance(const Vector3&, const Vector3&);
+
 		// Dot Product
 		float Dot() const;
 		float Dot(const Vector3&) const;
@@ -187,6 +195,9 @@ namespace Vxl
 		// Reflect Vector
 		Vector3 Reflect(const Vector3& Normal);
 		static Vector3 Reflect(const Vector3& Incident, const Vector3& Normal);
+		// Refract Vector
+		Vector3 Refract(const Vector3& Normal, float index);
+		static Vector3 Refract(const Vector3& Incident, const Vector3& Normal, float index);
 
 		// Project Vector
 		Vector3 Project(const Vector3&) const;
@@ -227,6 +238,15 @@ namespace Vxl
 		// Resize Vector
 		Vector3 Resize(float length);
 
+		// Abs
+		Vector3& Abs();
+		static Vector3 Abs(const Vector3&);
+		// Min
+		Vector3& Min(const Vector3&);
+		static Vector3 Min(const Vector3&, const Vector3&);
+		// Max
+		Vector3& Max(const Vector3&);
+		static Vector3 Max(const Vector3&, const Vector3&);
 		// Clamp
 		void Clamp(const Vector3& min, const Vector3& max);
 		static Vector3 Clamp(Vector3, const Vector3& min, const Vector3& max);

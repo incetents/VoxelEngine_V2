@@ -29,8 +29,7 @@ namespace Vxl
 			return;
 
 		m_name = name;
-		m_size[0] = width;
-		m_size[1] = height;
+		UpdateSizes(width, height);
 		m_resolution[0] = width;
 		m_resolution[1] = height;
 
@@ -69,6 +68,7 @@ namespace Vxl
 
 		glUtil::initHints();
 
+		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 		std::cout << "OpenGL Vers. " << glUtil::getOpenGLVersion() << std::endl;
 		std::cout << glUtil::getRendererVersion() << std::endl;
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;

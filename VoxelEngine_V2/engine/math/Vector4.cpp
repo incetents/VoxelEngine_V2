@@ -108,6 +108,16 @@ namespace Vxl
 		w = _w;
 	}
 
+	// Cast
+	Vector4::operator Vector2()
+	{
+		return Vector2(x, y);
+	}
+	Vector4::operator Vector3()
+	{
+		return Vector3(x, y, z);
+	}
+
 	// Inverse
 	Vector4 Vector4::Inverse() const
 	{
@@ -187,6 +197,16 @@ namespace Vxl
 		return v.LengthSqr();
 	}
 
+	// Distance
+	float Vector4::Distance(const Vector4& v)
+	{
+		return Length(*this - v);
+	}
+	float Vector4::Distance(const Vector4& v1, const Vector4& v2)
+	{
+		return Length(v1 - v2);
+	}
+
 	// Dot Product
 	float Vector4::Dot() const
 	{
@@ -209,6 +229,21 @@ namespace Vxl
 	Vector4 Vector4::Reflect(const Vector4& Incident, const Vector4& Normal)
 	{
 		return Incident - 2 * (Incident.Dot(Normal)) * Normal;
+	}
+	// Refract Vector
+	Vector4 Vector4::Refract(const Vector4& Normal, float index)
+	{
+		return Refract(*this, Normal, index);
+	}
+	Vector4 Vector4::Refract(const Vector4& Incident, const Vector4& Normal, float index)
+	{
+		float dot = Dot(Incident, Normal);
+		float k = 1.0f - index * index * (1.0f - dot * dot);
+
+		if (k >= 0.0f)
+			return (index * Incident - (index * dot + sqrt(k)) * Normal);
+
+		return Vector4();
 	}
 
 	// Project Vector
@@ -327,6 +362,60 @@ namespace Vxl
 
 	}
 
+	// Abs
+	Vector4& Vector4::Abs()
+	{
+		x = abs(x);
+		y = abs(y);
+		z = abs(z);
+		w = abs(w);
+		return *this;
+	}
+	Vector4 Vector4::Abs(const Vector4& v)
+	{
+		return Vector4(
+			abs(v.x),
+			abs(v.y),
+			abs(v.z),
+			abs(v.w)
+		);
+	}
+	// Min
+	Vector4& Vector4::Min(const Vector4& v)
+	{
+		x = min(x, v.x);
+		y = min(y, v.y);
+		z = min(z, v.z);
+		w = min(w, v.w);
+		return *this;
+	}
+	Vector4 Vector4::Min(const Vector4& v1, const Vector4& v2)
+	{
+		return Vector4(
+			min(v1.x, v2.x),
+			min(v1.y, v2.y),
+			min(v1.z, v2.z),
+			min(v1.w, v2.w)
+		);
+	}
+	// Max
+	Vector4& Vector4::Max(const Vector4& v)
+	{
+		x = max(x, v.x);
+		y = max(y, v.y);
+		z = max(z, v.z);
+		w = max(w, v.w);
+		return *this;
+	}
+	Vector4 Vector4::Max(const Vector4& v1, const Vector4& v2)
+	{
+		return Vector4(
+			max(v1.x, v2.x),
+			max(v1.y, v2.y),
+			max(v1.z, v2.z),
+			max(v1.w, v2.w)
+		);
+	}
 	// Clamp
 	void Vector4::Clamp(const Vector4& lower, const Vector4& upper)
 	{

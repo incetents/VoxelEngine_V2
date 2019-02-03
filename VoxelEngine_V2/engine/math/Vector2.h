@@ -33,7 +33,7 @@ namespace Vxl
 		// Is Empty
 		inline bool Is_Empty()
 		{
-			return (x && y);
+			return !(x && y);
 		}
 
 		// Empty Constructor
@@ -65,7 +65,7 @@ namespace Vxl
 		// Is Empty
 		inline bool Is_Empty()
 		{
-			return (x && y);
+			return !(x && y);
 		}
 
 		// Empty Constructor
@@ -78,6 +78,10 @@ namespace Vxl
 		explicit Vector2(float _x, float _y);
 		explicit Vector2(Radians _x, Radians _y);
 		explicit Vector2(Degrees _x, Degrees _y);
+
+		// Cast
+		explicit operator Vector3();
+		explicit operator Vector4();
 
 		// Switch X and Y values
 		inline Vector2& Flip();
@@ -107,6 +111,10 @@ namespace Vxl
 		float LengthSqr() const;
 		static float LengthSqr(const Vector2&);
 
+		// Distance
+		float Distance(const Vector2&);
+		static float Distance(const Vector2&, const Vector2&);
+
 		// Dot Product
 		float Dot() const;
 		float Dot(const Vector2&) const;
@@ -115,6 +123,9 @@ namespace Vxl
 		// Reflect Vector
 		Vector2 Reflect(const Vector2& Normal);
 		static Vector2 Reflect(const Vector2& Incident, const Vector2& Normal);
+		// Refract Vector
+		Vector2 Refract(const Vector2& Normal, float index);
+		static Vector2 Refract(const Vector2& Incident, const Vector2& Normal, float index);
 
 		// Perpendicular
 		Vector2 Perpendicular() const;
@@ -147,6 +158,15 @@ namespace Vxl
 		// Resize Vector
 		Vector2 Resize(float length);
 
+		// Abs
+		Vector2& Abs();
+		static Vector2 Abs(const Vector2&);
+		// Min
+		Vector2& Min(const Vector2&);
+		static Vector2 Min(const Vector2&, const Vector2&);
+		// Max
+		Vector2& Max(const Vector2&);
+		static Vector2 Max(const Vector2&, const Vector2&);
 		// Clamp
 		void Clamp(const Vector2& min, const Vector2& max);
 		static Vector2 Clamp(Vector2, const Vector2& min, const Vector2& max);

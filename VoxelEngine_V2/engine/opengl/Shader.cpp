@@ -18,6 +18,21 @@ namespace Vxl
 	std::unordered_map<std::string, std::string> Shader::ShaderErrorLog;
 	UINT Shader::ShaderErrorLogSize = 0;
 
+	// Database Creation
+	Shader* Shader::Create(const std::string& name, const std::string& filePath, ShaderType type)
+	{
+		// Name Duplication
+		if (m_database.Check(name))
+		{
+			Logger.error("Duplicate Shader Name: " + name);
+			return nullptr;
+		}
+
+		Shader* S = new Shader(name, filePath, type);
+		m_database.Set(name, S);
+		return S;
+	}
+
 	bool Shader::compile(const std::string& source)
 	{
 		// Convert file to const char
@@ -119,6 +134,21 @@ namespace Vxl
 	}
 
 	// SHADER PROGRAM //
+
+	// Database Creation
+	ShaderProgram* ShaderProgram::Create(const std::string& name)
+	{
+		// Name Duplication
+		if (m_database.Check(name))
+		{
+			Logger.error("Duplicate Shader Program Name: " + name);
+			return nullptr;
+		}
+
+		ShaderProgram* S = new ShaderProgram(name);
+		m_database.Set(name, S);
+		return S;
+	}
 
 	ShaderProgram::~ShaderProgram()
 	{

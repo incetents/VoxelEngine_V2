@@ -19,6 +19,7 @@ namespace Vxl
 	class Shader
 	{
 		friend class ShaderProgram;
+		friend class RenderManager;
 	private:
 		bool				m_hasLoaded = false;
 		bool				m_hasCompiled = false;
@@ -33,18 +34,30 @@ namespace Vxl
 		bool load();
 		void unload();
 
-	public:
+		// Locked Constructor
 		Shader(const std::string& name, const std::string& filePath, ShaderType type)
 			: m_name(name), m_filePath(filePath), m_type(type)
 		{
 			m_hasLoaded = load();
 		}
+		// Database
+		static Database<Shader> m_database;
+
+	public:
+		
+		// Database Creation
+		static Shader* Create(const std::string& name, const std::string& filePath, ShaderType type);
+		// Database Getter
+		static Shader* Get(const std::string& name)
+		{
+			return m_database.Get(name);
+		}
+
 		~Shader()
 		{
 			unload();
 		}
-		// Database
-		static Database<Shader> m_database;
+		
 
 		// Current log of all shaders with compilation errors
 		static std::unordered_map<std::string, std::string> ShaderErrorLog;
@@ -84,6 +97,7 @@ namespace Vxl
 
 	class ShaderProgram
 	{
+		friend class RenderManager;
 	private:
 		// Program //
 		const std::string   m_name;
@@ -111,15 +125,26 @@ namespace Vxl
 		bool load();
 		void unload();
 
-	public:
+		// Locked Constructor
 		ShaderProgram(const std::string& name)
 			: m_name(name)
 		{
 			load();
 		}
-		~ShaderProgram();
 		// Database
 		static Database<ShaderProgram> m_database;
+
+	public:
+		
+		// Database Creation
+		static ShaderProgram* Create(const std::string& name);
+		// Database Getter
+		static ShaderProgram* Get(const std::string& name)
+		{
+			return m_database.Get(name);
+		}
+
+		~ShaderProgram();
 
 		void reload()
 		{

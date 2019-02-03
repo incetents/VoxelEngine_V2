@@ -1,40 +1,73 @@
-----------------------------------------
+//----------------------------------------
 #SHADER
+// order: [Name] [FilePath]
 
-#VERT test_vert ./shaders/test.vert
-#FRAG test_frag ./shaders/test.frag
+#VERT test_vert 		./shaders/test.vert
+#FRAG test_frag 		./shaders/test.frag
 
-#VERT gbuffer_vert ./shaders/gbuffer.vert
-#VERT gbuffer_no_model_vert ./shaders/gbuffer_no_model.vert
-#FRAG gbuffer_frag ./shaders/gbuffer.frag
+#VERT gbuffer_vert 							./shaders/gbuffer.vert
+#VERT gbuffer_no_model_vert 		./shaders/gbuffer_no_model.vert
+#FRAG gbuffer_frag 						./shaders/gbuffer.frag
 
-#VERT passthrough_vert ./shaders/passthrough.vert
-#FRAG passthrough_frag ./shaders/passthrough.frag
+#VERT passthrough_vert 				./shaders/passthrough.vert
+#FRAG passthrough_frag 				./shaders/passthrough.frag
 
-#VERT skybox_vert ./shaders/skybox.vert
-#FRAG skybox_frag ./shaders/skybox.frag
+#VERT skybox_vert 		./shaders/skybox.vert
+#FRAG skybox_frag 	./shaders/skybox.frag
 
-#VERT debugLines_vert ./shaders/debugLines.vert
-#FRAG debugLines_frag ./shaders/debugLines.frag
+#VERT debugLines_vert 		./shaders/debugLines.vert
+#FRAG debugLines_frag 	./shaders/debugLines.frag
 
-----------------------------------------
+//----------------------------------------
 #SHADERPROGRAM
+// order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
 
-test test_vert test_frag
-gbuffer gbuffer_vert gbuffer_frag
-gbuffer_no_model gbuffer_no_model_vert gbuffer_frag
-passthrough passthrough_vert passthrough_frag
-skybox skybox_vert skybox_frag
-debugLines debugLines_vert debugLines_frag
+test								test_vert										test_frag
+gbuffer						gbuffer_vert								gbuffer_frag
+gbuffer_no_model 	gbuffer_no_model_vert 			gbuffer_frag
+passthrough 				passthrough_vert						passthrough_frag
+skybox						skybox_vert								skybox_frag
+debugLines 				debugLines_vert						debugLines_frag
 
-----------------------------------------
+//----------------------------------------
 #TEXTURE
-null ./assets/textures/null_texture.png
-grid_test ./assets/textures/grid_test.png
-beato ./assets/textures/beato.png
-crate_diffuse ./assets/textures/crate_diffuse.png
-TextureAtlas ./assets/textures/TextureAtlas.png CLAMP_STRETCH NEAREST
+// order: [Name] [FilePath] [WrapMode] [FilterMode]
+//
+// [WrapMode] = REPEAT | CLAMP_BORDER | CLAMP_STRETCH | MIRROR_REPEAT |
+// [FilterMode] = NEAREST | LINEAR
 
-----------------------------------------
+null					./assets/textures/null_texture.png
+grid_test			./assets/textures/grid_test.png
+beato				./assets/textures/beato.png
+crate_diffuse	./assets/textures/crate_diffuse.png
+TextureAtlas	./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 		NEAREST
+
+//----------------------------------------
 #CUBEMAP
-craterlake ./assets/cubemaps/craterlake_ft.tga ./assets/cubemaps/craterlake_bk.tga ./assets/cubemaps/craterlake_up.tga ./assets/cubemaps/craterlake_dn.tga ./assets/cubemaps/craterlake_rt.tga ./assets/cubemaps/craterlake_lf.tga
+// order: [Name] [FilePath_FT] [FilePath_BK] [FilePath_UP] [FilePath_DN] [FilePath_RT] [FilePath_LT]
+
+craterlake		./assets/cubemaps/craterlake_ft.tga ./assets/cubemaps/craterlake_bk.tga ./assets/cubemaps/craterlake_up.tga ./assets/cubemaps/craterlake_dn.tga ./assets/cubemaps/craterlake_rt.tga ./assets/cubemaps/craterlake_lf.tga
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

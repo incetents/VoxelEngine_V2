@@ -15,6 +15,7 @@
 
 namespace Vxl
 {
+	// ~ MATERIAL ~ //
 	Database<Material> Material::m_database;
 
 	Material::Material(const std::string& _name, ShaderProgram* _shader, UINT _order)
@@ -82,6 +83,10 @@ namespace Vxl
 		glUtil::wireframe(m_wireframe);
 	}
 
+	// ~ Material Data ~ //
+
+	Texture* MaterialData::NULL_TEXTURE = nullptr;
+
 	void MaterialData::UpdateMaterialPackages()
 	{
 		Mat_useModel.GetUniform(m_base->m_shaderProgram);
@@ -90,8 +95,6 @@ namespace Vxl
 		Mat_useColorOverride.GetUniform(m_base->m_shaderProgram);
 		Mat_color.GetUniform(m_base->m_shaderProgram);
 		Mat_tint.GetUniform(m_base->m_shaderProgram);
-
-		RemoveAllUniforms();
 	}
 
 	void MaterialData::SetBase(Material* _base)
@@ -101,10 +104,12 @@ namespace Vxl
 
 		m_base = _base;
 		UpdateMaterialPackages();
+		RemoveAllUniforms();
 	}
 
 	MaterialData::~MaterialData()
 	{
+		RemoveAllUniforms();
 		RemoveAllUniforms();
 	}
 
@@ -142,11 +147,14 @@ namespace Vxl
 			m_activeTextures.insert(level);
 		else
 			m_activeTextures.erase(level);
+
+		m_activeTextureCount = m_activeTextures.size();
 	}
 
 	void MaterialData::ClearTexture(Active_Texture level)
 	{
 		m_activeTextures.erase(level);
+		m_activeTextureCount = m_activeTextures.size();
 	}
 
 	void MaterialData::Bind(bool BindTextures)
@@ -189,6 +197,14 @@ namespace Vxl
 		// Bind Textures (ignore if parameter is OFF or wireframe mode is ON)
 		if (BindTextures && m_base->m_wireframe == false)
 		{
+			// Null Texture if no textures are used
+			if (!m_activeTextureCount)
+			{
+				//NULL_TEXTURE
+				glUtil::setActiveTexture(0);
+				NULL_TEXTURE->Bind();
+			}
+
 			for (Active_Texture id : m_activeTextures)
 			{
 				BaseTexture* _tex = m_textures[(UINT)id - GL_TEXTURE0];

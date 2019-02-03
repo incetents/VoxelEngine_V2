@@ -89,6 +89,16 @@ namespace Vxl
 		y = _y.Get();
 	}
 
+	// Cast
+	Vector2::operator Vector3()
+	{
+		return Vector3(x, y, 0);
+	}
+	Vector2::operator Vector4()
+	{
+		return Vector4(x, y, 0, 0);
+	}
+
 	// Switch X and Y values
 	Vector2& Vector2::Flip()
 	{
@@ -177,6 +187,16 @@ namespace Vxl
 		return v.LengthSqr();
 	}
 
+	// Distance
+	float Vector2::Distance(const Vector2& v)
+	{
+		return Length(*this - v);
+	}
+	float Vector2::Distance(const Vector2& v1, const Vector2& v2)
+	{
+		return Length(v1 - v2);
+	}
+
 	// Dot Product
 	float Vector2::Dot() const
 	{
@@ -199,6 +219,21 @@ namespace Vxl
 	Vector2 Vector2::Reflect(const Vector2& Incident, const Vector2& Normal)
 	{
 		return Incident - 2 * (Incident.Dot(Normal)) * Normal;
+	}
+	// Refract Vector
+	Vector2 Vector2::Refract(const Vector2& Normal, float index)
+	{
+		return Refract(*this, Normal, index);
+	}
+	Vector2 Vector2::Refract(const Vector2& Incident, const Vector2& Normal, float index)
+	{
+		float dot = Dot(Incident, Normal);
+		float k = 1.0f - index * index * (1.0f - dot * dot);
+
+		if (k >= 0.0f)
+			return (index * Incident - (index * dot + sqrt(k)) * Normal);
+
+		return Vector2();
 	}
 
 	// Perpendicular
@@ -326,6 +361,48 @@ namespace Vxl
 
 	}
 
+	// Abs
+	Vector2& Vector2::Abs()
+	{
+		x = abs(x);
+		y = abs(y);
+		return *this;
+	}
+	Vector2 Vector2::Abs(const Vector2& v)
+	{
+		return Vector2(
+			abs(v.x),
+			abs(v.y)
+		);
+	}
+	// Min
+	Vector2& Vector2::Min(const Vector2& v)
+	{
+		x = min(x, v.x);
+		y = min(y, v.y);
+		return *this;
+	}
+	Vector2 Vector2::Min(const Vector2& v1, const Vector2& v2)
+	{
+		return Vector2(
+			min(v1.x, v2.x),
+			min(v1.y, v2.y)
+		);
+	}
+	// Max
+	Vector2& Vector2::Max(const Vector2& v)
+	{
+		x = max(x, v.x);
+		y = max(y, v.y);
+		return *this;
+	}
+	Vector2 Vector2::Max(const Vector2& v1, const Vector2& v2)
+	{
+		return Vector2(
+			max(v1.x, v2.x),
+			max(v1.y, v2.y)
+		);
+	}
 	// Clamp
 	void Vector2::Clamp(const Vector2& lower, const Vector2& upper)
 	{

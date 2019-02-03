@@ -19,6 +19,7 @@ namespace Vxl
 {
 	class BaseTexture;
 	class Transform;
+	class Texture;
 
 	class Material
 	{
@@ -32,12 +33,13 @@ namespace Vxl
 
 		// Locked Constructor
 		Material(const std::string& _name, ShaderProgram* _shader, UINT _order);
-	
 		// Database
 		static Database<Material> m_database;
+
 	public:
 		// Database Creation
 		static Material* Create(const std::string& _name, ShaderProgram* _shader, UINT _order);
+		
 
 		// Accessors
 		inline std::string GetName(void) const
@@ -73,6 +75,7 @@ namespace Vxl
 		};
 
 		friend class Entity;
+		friend class RenderManager;
 	protected:
 		// Material Base
 		Material* m_base;
@@ -81,6 +84,7 @@ namespace Vxl
 		// Texture Package
 		BaseTexture* m_textures[32];
 		std::set<Active_Texture> m_activeTextures;
+		UINT m_activeTextureCount = 0;
 
 		// Uniform Packages
 		virtual void UpdateMaterialPackages();
@@ -96,8 +100,14 @@ namespace Vxl
 		bool CheckUniform(const std::string& uniformName);
 		
 	public:
-		MaterialData() {}
+		MaterialData()
+		{
+			memset(m_textures, 0, 32 * sizeof(BaseTexture*));
+		}
 		~MaterialData();
+
+		// Null Texture
+		static Texture* NULL_TEXTURE;
 
 		// Custom Uniform Packages
 		template<typename Type>

@@ -8,6 +8,7 @@
 #include "utilities/logger.h"
 #include "utilities/Time.h"
 
+#include "modules/Material.h"
 #include "../game/Scene_Game.h"
 #include "modules/RenderManager.h"
 
@@ -31,9 +32,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	// Window
 	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
-	Window.SetCustomAspectRatio(true, 1.0f);
+	//Window.SetCustomAspectRatio(true, 1.0f);
 
 	/* Special */
+	MaterialData::NULL_TEXTURE = new Texture("./assets/textures/null_texture.png", Wrap_Mode::CLAMP_STRETCH, Filter_Mode::NEAREST, Filter_Mode::NEAREST);
 	Geometry::Setup();
 	/* ~ */
 	RenderManager.SetNewScene(_scene);
@@ -63,6 +65,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			TimeController.DecreaseTotalDeltaTime();
 		}
 		RenderManager.Draw();
+		RenderManager.DrawImGui();
 
 		// End of frame update
 		Input.Update();

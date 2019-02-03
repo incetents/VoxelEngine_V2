@@ -8,7 +8,7 @@
 #include "Material.h"
 #include "../math/Camera.h"
 #include "../opengl/Texture.h"
-
+#include "../imgui/imgui.h"
 
 namespace Vxl
 {
@@ -49,6 +49,31 @@ namespace Vxl
 		m_entities[std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial())].erase(_entity);
 	}
 
+	// Reload Shader System
+	void RenderManager::ReloadShaders()
+	{
+		Shader::ShaderErrorLog.clear();
+		Shader::ShaderErrorLogSize = 0;
+
+		auto Shaders = Shader::m_database.Get();
+		for (auto Shader : Shaders)
+			Shader.second->reload();
+
+		auto Programs = ShaderProgram::m_database.Get();;
+		for (auto Program : Programs)
+			Program.second->reload();
+
+		// Materials are part of Shaders
+		auto Materials = Material::m_database.Get();
+		for (auto Material : Materials)
+			Material.second->ReloadPackages();
+
+		// Entity Materials are part of Shaders
+		auto Entities = Entity::m_database.Get();
+		for (auto Entity : Entities)
+			Entity->m_material.UpdateMaterialPackages();
+	}
+
 	// Behaviour
 	void RenderManager::Reload()
 	{
@@ -57,6 +82,7 @@ namespace Vxl
 		if (m_currentScene)
 			m_currentScene->Reload();
 	}
+	// Destroy all data for next Window context
 	void RenderManager::Destroy()
 	{
 		// Delete Cameras
@@ -77,7 +103,6 @@ namespace Vxl
 		Texture::m_database.DeleteAndClear();
 		Cubemap::m_database.DeleteAndClear();
 
-
 		// Clear Render List
 		m_entities.clear();
 
@@ -89,6 +114,14 @@ namespace Vxl
 	void RenderManager::Draw()
 	{
 		m_currentScene->Draw();
+	}
+	void RenderManager::DrawImGui()
+	{
+		ImGui::NewFrame();
+
+		m_currentScene->DrawImGui();
+
+		ImGui::Render();
 	}
 
 	void RenderManager::RenderScene()

@@ -57,4 +57,23 @@ namespace Vxl
 		}
 		return tokens;
 	}
+	std::vector<std::string> stringUtil::splitStr(const std::string& str, std::string delimiters)
+	{
+		std::vector<std::string> tokens;
+		std::stringstream stringStream(str);
+		std::string line;
+		while (std::getline(stringStream, line))
+		{
+			std::size_t prev = 0, pos;
+			while ((pos = line.find_first_of(delimiters, prev)) != std::string::npos)
+			{
+				if (pos > prev)
+					tokens.push_back(line.substr(prev, pos - prev));
+				prev = pos + 1;
+			}
+			if (prev < line.length())
+				tokens.push_back(line.substr(prev, std::string::npos));
+		}
+		return tokens;
+	}
 }

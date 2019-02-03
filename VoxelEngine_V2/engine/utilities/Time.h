@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #pragma once
 
+#include <Windows.h>
 #include "../utilities/singleton.h"
 #include <GLFW/glfw3.h>
 

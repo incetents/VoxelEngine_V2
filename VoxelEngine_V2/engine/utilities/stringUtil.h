@@ -1,13 +1,16 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #pragma once
 
-#include <vector>
-#include <string>
-#include <fstream>
-#include <streambuf>
 #include <algorithm> 
 #include <cctype>
+#include <fstream>
 #include <locale>
+#include <iostream>
+#include <iterator>
+#include <streambuf>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace Vxl
 {
@@ -24,5 +27,6 @@ namespace Vxl
 		std::string trim_copy(std::string s);
 		// Split
 		std::vector<std::string> splitStr(const std::string& str, char delimiter);
+		std::vector<std::string> splitStr(const std::string& str, std::string delimiters);
 	}
 }

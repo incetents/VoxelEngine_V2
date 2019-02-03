@@ -63,7 +63,7 @@ namespace Vxl
 		
 		std::vector<Entity*> _cubes;
 
-		Clock* clock1;
+		bool ShowNormal_DEV = false;
 
 	public:
 		void Setup() override;
@@ -71,5 +71,6 @@ namespace Vxl
 
 		void Update() override;
 		void Draw() override;
+		void DrawImGui() override;
 	};
 }

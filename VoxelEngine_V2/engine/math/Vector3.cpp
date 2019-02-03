@@ -376,6 +376,16 @@ namespace Vxl
 		z = _v.y;
 	}
 
+	// Cast
+	Vector3::operator Vector2()
+	{
+		return Vector2(x, y);
+	}
+	Vector3::operator Vector4()
+	{
+		return Vector4(x, y, z, 0);
+	}
+
 	// Inverse
 	Vector3 Vector3::Inverse() const
 	{
@@ -476,6 +486,16 @@ namespace Vxl
 		return v.LengthSqr();
 	}
 
+	// Distance
+	float Vector3::Distance(const Vector3& v)
+	{
+		return Length(*this - v);
+	}
+	float Vector3::Distance(const Vector3& v1, const Vector3& v2)
+	{
+		return Length(v1 - v2);
+	}
+
 	// Dot Product
 	float Vector3::Dot() const
 	{
@@ -498,6 +518,21 @@ namespace Vxl
 	Vector3 Vector3::Reflect(const Vector3& Incident, const Vector3& Normal)
 	{
 		return Incident - 2 * (Incident.Dot(Normal)) * Normal;
+	}
+	// Refract Vector
+	Vector3 Vector3::Refract(const Vector3& Normal, float index)
+	{
+		return Refract(*this, Normal, index);
+	}
+	Vector3 Vector3::Refract(const Vector3& Incident, const Vector3& Normal, float index)
+	{
+		float dot = Dot(Incident, Normal);
+		float k = 1.0f - index * index * (1.0f - dot * dot);
+
+		if (k >= 0.0f)
+			return (index * Incident - (index * dot + sqrt(k)) * Normal);
+
+		return Vector3();
 	}
 
 	// Project Vector
@@ -659,6 +694,54 @@ namespace Vxl
 
 	}
 
+	// Abs
+	Vector3& Vector3::Abs()
+	{
+		x = abs(x);
+		y = abs(y);
+		z = abs(z);
+		return *this;
+	}
+	Vector3 Vector3::Abs(const Vector3& v)
+	{
+		return Vector3(
+			abs(v.x),
+			abs(v.y),
+			abs(v.z)
+		);
+	}
+	// Min
+	Vector3& Vector3::Min(const Vector3& v)
+	{
+		x = min(x, v.x);
+		y = min(y, v.y);
+		z = min(z, v.z);
+		return *this;
+	}
+	Vector3 Vector3::Min(const Vector3& v1, const Vector3& v2)
+	{
+		return Vector3(
+			min(v1.x, v2.x),
+			min(v1.y, v2.y),
+			min(v1.z, v2.z)
+		);
+	}
+	// Max
+	Vector3& Vector3::Max(const Vector3& v)
+	{
+		x = max(x, v.x);
+		y = max(y, v.y);
+		z = max(z, v.z);
+		return *this;
+	}
+	Vector3 Vector3::Max(const Vector3& v1, const Vector3& v2)
+	{
+		return Vector3(
+			max(v1.x, v2.x),
+			max(v1.y, v2.y),
+			max(v1.z, v2.z)
+		);
+	}
 	// Clamp
 	void Vector3::Clamp(const Vector3& lower, const Vector3& upper)
 	{

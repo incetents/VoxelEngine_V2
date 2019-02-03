@@ -19,16 +19,17 @@ namespace Vxl
 	{
 		friend class RenderManager;
 	private:
-		// Protected
+		// Locked Constructor
 		Entity();
-
 		// Database
 		static DatabaseSet<Entity> m_database;
+
 	public:
 		virtual ~Entity();
 
-		// Creation
+		// Database Creation
 		static Entity* Create();
+		
 
 		// Data
 		std::string			m_name;
@@ -43,10 +44,15 @@ namespace Vxl
 		Mesh* m_mesh;
 
 		// Utility
-		inline std::string GetName(void) const
+		inline void			SetName(const std::string _name)
+		{
+			m_name = _name;
+		}
+		inline std::string	GetName(void) const
 		{
 			return m_name;
 		}
+
 		void			SetMaterial(Material* _base);
 		Material*		GetMaterial(void) const;
 		UINT			GetMaterialOrder(void) const;

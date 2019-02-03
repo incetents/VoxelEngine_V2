@@ -96,4 +96,8 @@ public:
 	{
 		m_database.insert(data);
 	}
+	inline std::set<Type*> Get(void) const
+	{
+		return m_database;
+	}
 };

@@ -9,15 +9,6 @@
 
 namespace Vxl
 {
-	enum ControllerIndex
-	{
-		Joy1 = 0,
-		Joy2,
-		Joy3,
-		Joy4,
-		TOTAL
-	};
-
 	class XGamePad
 	{
 	private:
@@ -85,30 +76,43 @@ namespace Vxl
 	static class XGamePadManager : public Singleton<class XGamePadManager>
 	{
 	private:
+		// All Gamepad
 		XGamePad** m_GamePads;
 	public:
 		XGamePadManager()
 		{
-			m_GamePads = new XGamePad*[(int)ControllerIndex::TOTAL];
+			m_GamePads = new XGamePad*[4];
 
 			for (int i = 0; i < 4; i++)
 				m_GamePads[i] = new XGamePad(i);
-		}
-		XGamePad& GetGamePad(ControllerIndex index)
-		{
-			return *m_GamePads[(int)index];
 		}
 		void Update()
 		{
 			for (int i = 0; i < 4; i++)
 				m_GamePads[i]->Update();
 		}
+		XGamePad& GetGamePad1(void) const
+		{
+			return *m_GamePads[0];
+		}
+		XGamePad& GetGamePad2(void) const
+		{
+			return *m_GamePads[1];
+		}
+		XGamePad& GetGamePad3(void) const
+		{
+			return *m_GamePads[2];
+		}
+		XGamePad& GetGamePad4(void) const
+		{
+			return *m_GamePads[3];
+		}
 
 	}SingletonInstance(XGamePadManager);
 
 }
 
-#define GamePad1 XGamePadManager.GetGamePad(ControllerIndex::Joy1)
-#define GamePad2 XGamePadManager.GetGamePad(ControllerIndex::Joy2)
-#define GamePad3 XGamePadManager.GetGamePad(ControllerIndex::Joy3)
-#define GamePad4 XGamePadManager.GetGamePad(ControllerIndex::Joy4)
+#define GamePad1 XGamePadManager.GetGamePad1()
+#define GamePad2 XGamePadManager.GetGamePad2()
+#define GamePad3 XGamePadManager.GetGamePad3()
+#define GamePad4 XGamePadManager.GetGamePad4()

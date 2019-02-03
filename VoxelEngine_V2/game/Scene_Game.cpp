@@ -35,6 +35,9 @@
 
 #include "../engine/window/window.h"
 
+#include "../engine/imgui_wrappers/Imgui_ShaderErrors.h"
+#include "../engine/imgui_wrappers/ImGui_DevConsole.h"
+
 #include "../game/terrain/TerrainManager.h"
 
 #include <iostream>
@@ -60,11 +63,11 @@ namespace Vxl
 		_fbo->addDepth(SCREEN_WIDTH, SCREEN_HEIGHT);
 		_fbo->unbind();
 
-		_shader_skybox				= ShaderProgram::m_database.Get("skybox");
-		_shader_gbuffer				= ShaderProgram::m_database.Get("gbuffer");
-		_shader_gbuffer_no_model	= ShaderProgram::m_database.Get("gbuffer_no_model");
-		_shader_debugLines			= ShaderProgram::m_database.Get("debugLines");
-		_shader_passthrough			= ShaderProgram::m_database.Get("passthrough");
+		_shader_skybox				= ShaderProgram::Get("skybox");
+		_shader_gbuffer				= ShaderProgram::Get("gbuffer");
+		_shader_gbuffer_no_model	= ShaderProgram::Get("gbuffer_no_model");
+		_shader_debugLines			= ShaderProgram::Get("debugLines");
+		_shader_passthrough			= ShaderProgram::Get("passthrough");
 
 		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
 		_material_gbuffer_no_model	= Material::Create("gbuffer_no_model", _shader_gbuffer_no_model, 2);
@@ -118,6 +121,7 @@ namespace Vxl
 
 		_mesh->Bind();
 
+		
 		// Entities
 		_entity1 = Entity::Create();
 		_entity1->SetMaterial(_material_gbuffer);
@@ -143,6 +147,7 @@ namespace Vxl
 		_entity4->SetMaterial(_material_skybox);
 		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_entity4->m_mesh = Geometry::GetInverseCube();
+		
 
 		for (int x = -1; x <= 1; x++)
 		{
@@ -176,9 +181,11 @@ namespace Vxl
 		//
 		_crate1 = Entity::Create();
 		_crate1->SetMaterial(_material_gbuffer);
+		//_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate1->m_mesh = Geometry::GetCube();
 		_crate1->m_transform.setPosition(0, 0, 3);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
+		
 		
 		_crate2 = Entity::Create();
 		_crate2->SetMaterial(_material_gbuffer);
@@ -188,6 +195,7 @@ namespace Vxl
 		// Parent Test
 		//_crate1->m_transform.setParent(&_crate2->m_transform);
 		_crate2->m_transform.addChild(&_crate1->m_transform);
+		
 		
 		_octo1 = Entity::Create();
 		_octo1->SetMaterial(_material_gbuffer);
@@ -216,19 +224,14 @@ namespace Vxl
 		_octo4->m_transform.setPosition(0, 0, 1);
 		_octo4->m_transform.setScale(0.5f);
 		_octo4->SetColor(Color3F(0, 0, 1));
-
-
+		
 
 		DebugLines.Setup();
-
-		clock1 = new Clock(5.0);
 	}
 	void Scene_Game::Destroy()
 	{
 		delete _fbo;
 		delete _mesh;
-
-		delete clock1;
 
 		TerrainManager.Destroy();
 	}
@@ -309,7 +312,6 @@ namespace Vxl
 		glUtil::clearColor(Color3F(0.1f, 0.1f, 0.3f));
 
 		_fbo->bind();
-		//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		Window.ViewportToWindowResolution();
 
 		_material_debugLines->Bind();
@@ -418,7 +420,6 @@ namespace Vxl
 
 		_fbo->unbind();
 		Window.ViewportToWindowSize();
-		//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glUtil::wireframe(false);
 
 		// ~~~~~~~~~~~~~~~~~ //
@@ -429,27 +430,23 @@ namespace Vxl
 		_shader_passthrough->Bind();
 		glDepthFunc(GL_ALWAYS);
 
-		//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		_fbo->bindTexture(0, Active_Texture::LEVEL0);
 		Geometry::GetFullQuad()->Draw();
 		
 		// Normals test
-		static bool SHOW_NORMAL_QUAD = false;
-
-		if (SHOW_NORMAL_QUAD)
+		if (ShowNormal_DEV)
 		{
-			glViewport(0, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
+			glViewport(0, 0, Window.GetSizeWidth() / 4, Window.GetSizeHeight() / 4);
 			_fbo->bindTexture(1, Active_Texture::LEVEL0);
 			Geometry::GetFullQuad()->Draw();
 		}
 
-		// glViewport(0, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4);
 		// _fbo->bindDepth(Active_Texture::LEVEL0);
 		// Geometry::GetFullQuad()->Draw();
 
 
 		glDepthFunc(GL_LEQUAL);
-		Window.ViewportToWindowSize();
+		//Window.ViewportToWindowSize();
 
 
 		
@@ -486,159 +483,36 @@ namespace Vxl
 		//	
 		//	Shader_Gbuffer->SetUniform("view", cam.getView());
 		//	Shader_Gbuffer->SetUniform("projection", cam.getProjection());
-		
 
+	}
+	void Scene_Game::DrawImGui()
+	{
+		Imgui_ShaderErrors.Draw();
 
-		static float FOV = _camera->getFOV();
-		static float NewFOV = 0.0f;
+		// Setup
+		Imgui_DevConsole.GBUFFER_WIREFRAME = _material_gbuffer->m_wireframe;
+		Imgui_DevConsole.MAIN_CAMERA = _camera;
+		Imgui_DevConsole.CAMFOV = _camera->getFOV();
+		Imgui_DevConsole.CAM_ZNEAR = _camera->getZnear();
+		Imgui_DevConsole.CAM_ZFAR = _camera->getZfar();
+		// Draw
+		Imgui_DevConsole.Draw();
+		// Update Values from dev console
+		_material_gbuffer->m_wireframe = Imgui_DevConsole.GBUFFER_WIREFRAME;
+		_camera = Imgui_DevConsole.MAIN_CAMERA;
+		ShowNormal_DEV = Imgui_DevConsole.SHOW_NORMALS;
 
-		static float ZNEAR = _camera->getZnear();
-		static float N_ZNEAR = 0.0f;
-
-		static float ZFAR = _camera->getZfar();;
-		static float N_ZFAR = 0.0f;
-
-		// IMGUI TEST
-		ImGui::NewFrame();
-		
-		if (Shader::ShaderErrorLogSize > 0)
+		if (fabs(_camera->getFOV() - Imgui_DevConsole.CAMFOV) > 0.01f)
 		{
-			bool op;
-			if (ImGui::Begin("ShaderErrors", &op, ImVec2(700, 400), 0.9f))
-			{
-				for (auto Log : Shader::ShaderErrorLog)
-				{
-					if(ImGui::CollapsingHeader(Log.first.c_str()))
-						ImGui::Text(Log.second.c_str());
-
-					ImGui::Separator();
-				}
-			}
-			ImGui::End();
+			_camera->updatePerspective(Imgui_DevConsole.CAMFOV, Window.GetAspectRatio());
 		}
-
-		bool open;
-		if(ImGui::Begin("ImGUI", &open, ImVec2(280, 380), 0.9f))
+		if (fabs(_camera->getZnear() - Imgui_DevConsole.CAM_ZNEAR) > 0.01f)
 		{
-			ImGui::Text("FPS: %f", Time.GetFPS());
-			ImGui::Text("Time: %f", Time.GetTime());
-
-			ImGui::Separator();
-
-			if (ImGui::CollapsingHeader("Window"))
-			{
-				ImGui::Text("Window Size: %d %d", Window.GetSizeWidth(), Window.GetSizeHeight());
-				ImGui::Text("Window Resolution: %d %d", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-				ImGui::Text("Window Aspect: %f", Window.GetAspectRatio());
-			}
-
-			ImGui::Separator();
-
-			if (ImGui::CollapsingHeader("Camera"))
-			{
-				ImGui::Text("CamPos: %f %f %f", _camera->getPosition().x, _camera->getPosition().y, _camera->getPosition().z);
-				ImGui::Text("CamForward: %f %f %f", _camera->getForward().x, _camera->getForward().y, _camera->getForward().z);
-			}
-
-			ImGui::Separator();
-
-			ImGui::Checkbox("Wireframe GBUFFER", &_material_gbuffer->m_wireframe);
-
-			if (ImGui::Button("Reload Shaders"))
-			{
-				Shader::ShaderErrorLog.clear();
-				Shader::ShaderErrorLogSize = 0;
-
-				auto Shaders = Shader::m_database.Get();
-				for (auto Shader : Shaders)
-					Shader.second->reload();
-
-				auto Programs = ShaderProgram::m_database.Get();;
-				for (auto Program : Programs)
-					Program.second->reload();
-			}
-
-			ImGui::Separator();
-
-			if (ImGui::Button("Set Size (1080, 720)"))
-			{
-				Window.SetSize(1080, 720);
-				_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
-			}
-
-			if (ImGui::Button("Set Size (500, 500)"))
-			{
-				Window.SetSize(500, 500);
-				_camera->updatePerspective(_camera->getFOV(), 1.0f);
-			}
-
-			if (ImGui::Button("Free Aspect Ratio"))
-			{
-				Window.SetCustomAspectRatio(false);
-				_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
-			}
-			if (ImGui::Button("Lock Aspect Ratio [1:1]"))
-			{
-				Window.SetCustomAspectRatio(true, 1.0f);
-				_camera->updatePerspective(_camera->getFOV(), 1.0f);
-			}
-
-			ImGui::Separator();
-
-			ImGui::InputFloat("FOV", &FOV, 5.0f, 5.0f, 1);
-			ImGui::SliderFloat("ZNEAR", &ZNEAR, 0.01f, 5.0f);
-			ImGui::SliderFloat("ZFAR", &ZFAR, 1.0, 50.0f);
-
-			ImGui::Separator();
-
-			ImGui::Checkbox("SHOW NORMALS", &SHOW_NORMAL_QUAD);
-
-			//ImGui::Text("Dear ImGui, %s", ImGui::GetVersion());
-
-			if (GamePad1.IsConnected())
-				ImGui::Text("CONNECTED");
-			else
-				ImGui::Text("NOT connected");
-
-			//ImGui::Separator();
-			if (GamePad1.GetButton(XGamePad::Buttons::A))
-				ImGui::Text("[A] YES");
-			else
-				ImGui::Text("[A] NO");
-
-			ImGui::Text("Left Analog Mag: %f", GamePad1.GetLeftAnalogMagnitude());
-			ImGui::Text("Left Analog X: %f", GamePad1.GetLeftAnalogNormalized().x);
-			ImGui::Text("Left Analog Y: %f", GamePad1.GetLeftAnalogNormalized().y);
-
-			ImGui::Separator();
-
-			ImGui::Text("Clock: %f", clock1->GetTimeLeft());
-			if (ImGui::Button("Reset Clock at 5 sec"))
-				clock1->Reset(5.0);
-			ImGui::SameLine();
-			if (ImGui::Button("Reset Clock at 3 sec"))
-				clock1->Reset(3.0);
-		
+			_camera->setZnear(Imgui_DevConsole.CAM_ZNEAR);
 		}
-		ImGui::End();
-		
-		ImGui::Render();
-		
-		if (fabs(FOV - NewFOV) > 0.01f)
+		if (fabs(_camera->getZfar() - Imgui_DevConsole.CAM_ZFAR) > 0.01f)
 		{
-			NewFOV = FOV;
-			_camera->updatePerspective(FOV, Window.GetAspectRatio());
+			_camera->setZfar(Imgui_DevConsole.CAM_ZFAR);
 		}
-		if (fabs(ZNEAR - N_ZNEAR) > 0.01f)
-		{
-			N_ZNEAR = ZNEAR;
-			_camera->setZnear(ZNEAR);
-		}
-		if (fabs(ZFAR - N_ZFAR) > 0.01f)
-		{
-			N_ZFAR = ZFAR;
-			_camera->setZfar(ZFAR);
-		}
-
 	}
 }
