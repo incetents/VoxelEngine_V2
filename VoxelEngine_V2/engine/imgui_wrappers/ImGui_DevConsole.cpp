@@ -25,7 +25,8 @@ namespace Vxl
 
 			if (ImGui::CollapsingHeader("Window"))
 			{
-				ImGui::Text("Window Size: %d %d", Window.GetSizeWidth(), Window.GetSizeHeight());
+				ImGui::Text("Window Size: %d %d", Window.GetWindowWidth(), Window.GetWindowHeight());
+				ImGui::Text("Window Viewport: %d %d", Window.GetScreenWidth(), Window.GetScreenHeight());
 				ImGui::Text("Window Resolution: %d %d", Window.GetResolutionWidth(), Window.GetResolutionHeight());
 				ImGui::Text("Window Aspect: %f", Window.GetAspectRatio());
 			}
@@ -55,24 +56,24 @@ namespace Vxl
 			if (ImGui::Button("Set Size (1080, 720)"))
 			{
 				Window.SetSize(1080, 720);
-				MAIN_CAMERA->updatePerspective(MAIN_CAMERA->getFOV(), Window.GetAspectRatio());
+				MAIN_CAMERA->updatePerspectiveAspectRatio(Window.GetAspectRatio());
 			}
 
 			if (ImGui::Button("Set Size (500, 500)"))
 			{
 				Window.SetSize(500, 500);
-				MAIN_CAMERA->updatePerspective(MAIN_CAMERA->getFOV(), 1.0f);
+				MAIN_CAMERA->updatePerspectiveAspectRatio(1.0f);
 			}
 
 			if (ImGui::Button("Free Aspect Ratio"))
 			{
 				Window.SetCustomAspectRatio(false);
-				MAIN_CAMERA->updatePerspective(MAIN_CAMERA->getFOV(), Window.GetAspectRatio());
+				MAIN_CAMERA->updatePerspectiveAspectRatio(Window.GetAspectRatio());
 			}
 			if (ImGui::Button("Lock Aspect Ratio [1:1]"))
 			{
 				Window.SetCustomAspectRatio(true, 1.0f);
-				MAIN_CAMERA->updatePerspective(MAIN_CAMERA->getFOV(), 1.0f);
+				MAIN_CAMERA->updatePerspectiveAspectRatio(1.0f);
 			}
 
 			ImGui::Separator();

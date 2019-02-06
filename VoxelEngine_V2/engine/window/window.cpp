@@ -40,6 +40,12 @@ namespace Vxl
 			return;
 		}
 
+		// Initial Window Position
+		int posx, posy;
+		glfwGetWindowPos(m_window, &posx, &posy);
+		m_position[0] = (UINT)posx;
+		m_position[1] = (UINT)posy;
+
 		glfwMakeContextCurrent(m_window);
 
 		// Setup callbacks
@@ -51,6 +57,7 @@ namespace Vxl
 		glfwSetWindowFocusCallback		(m_window, glfwCallbacks::Window_Focus);
 		glfwSetWindowCloseCallback		(m_window, glfwCallbacks::Exit_Button);
 		glfwSetWindowSizeCallback		(m_window, glfwCallbacks::Window_Resize);
+		glfwSetWindowPosCallback		(m_window, glfwCallbacks::Window_Move);
 
 		// IMGUI Setup
 		IMGUI_CHECKVERSION();
@@ -86,15 +93,58 @@ namespace Vxl
 		m_size[0] = width;
 		m_size[1] = height;
 		m_aspectRatio = (float)width / (float)height;
-		// If using normal aspect ratio, update aspect ratio for all existing cameras
+		// If using normal aspect ratio, 
+		UpdateAspectRatio();
+		// Update screen sizes for viewport rendering
+		UpdateViewport();
+	}
+	void Window::UpdateViewport()
+	{
+		// If using normal aspect ratio, 
 		if (!m_useCustomAspectRatio)
 		{
-			auto Cameras = Camera::m_database.Get();
-			for (auto it = Cameras.begin(); it != Cameras.end(); it++)
+			// update viewport info to be the same as window data
+			m_viewportOffset[0] = 0;
+			m_viewportOffset[1] = 0;
+			m_viewportSize[0] = m_size[0];
+			m_viewportSize[1] = m_size[1];
+		}
+		// Locked Aspect Ratio (Black bars on edges)
+		else
+		{
+			// Width clamp
+			if (m_size[0] > m_size[1])
 			{
-				it->second->updatePerspective(it->second->getFOV(), m_aspectRatio);
+				UINT customWidth = (UINT)((float)m_size[1] * m_customAspectRatio);
+				UINT offsetWidth = (m_size[0] >> 1) - (customWidth >> 1);
+				m_viewportOffset[0] = offsetWidth;
+				m_viewportOffset[1] = 0;
+				m_viewportSize[0] = customWidth;
+				m_viewportSize[1] = m_size[1];
+			}
+			// Height clamp
+			else
+			{
+				UINT customHeight = (UINT)((float)m_size[0] / m_customAspectRatio);
+				UINT offsetHeight = (m_size[1] >> 1) - (customHeight >> 1);
+				m_viewportOffset[0] = 0;
+				m_viewportOffset[1] = offsetHeight;
+				m_viewportSize[0] = m_size[0];
+				m_viewportSize[1] = customHeight;
 			}
 		}
+	}
+	void Window::UpdateAspectRatio()
+	{
+		float CorrectAspectRatio = m_useCustomAspectRatio ? m_customAspectRatio : m_aspectRatio;
+
+		// Update aspect ratio for all existing cameras
+		auto Cameras = Camera::m_database.Get();
+		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
+		{
+			it->second->updatePerspectiveAspectRatio(CorrectAspectRatio);
+		}
+
 	}
 	void Window::Destroy()
 	{
@@ -136,25 +186,12 @@ namespace Vxl
 	{
 		// If custom aspect ratio state has been changed, update aspect ratio for all cameras
 		if (m_customAspectRatio != aspect)
-		{
-			auto Cameras = Camera::m_database.Get();
-			for (auto it = Cameras.begin(); it != Cameras.end(); it++)
-			{
-				it->second->updatePerspective(it->second->getFOV(), aspect);
-			}
-		}
+			UpdateAspectRatio();
 		// Flags
 		m_useCustomAspectRatio = state;
 		m_customAspectRatio = aspect;
-	}
-
-	void Window::GetPosition(int& x, int& y)
-	{
-		glfwGetWindowPos(m_window, &x, &y);
-	}
-	void Window::GetSize(int& width, int& height)
-	{
-		glfwGetWindowSize(m_window, &width, &height);
+		// Update viewport sizes
+		UpdateViewport();
 	}
 
 	void Window::ViewportToWindowSize()

@@ -558,7 +558,5 @@ namespace Vxl
 			return m_right;
 		}
 
-		// Special
-		std::vector<Vector3> getDirections(const Matrix4x4& model);
 	};
 }

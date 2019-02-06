@@ -191,6 +191,8 @@ namespace Vxl
 		Camera& setPerspective(float _fov, float _aspect);
 		Camera& setOrthographic(float _xmin, float _xmax, float _ymin, float _ymax);
 		Camera& updatePerspective(float _fov, float _aspect);  // If already perspective, this will update its values faster
+		Camera& updatePerspectiveFOV(float _fov);  // If already perspective, this will update its values faster
+		Camera& updatePerspectiveAspectRatio(float _aspect);  // If already perspective, this will update its values faster
 		Camera& updateOrtho_X(float _xmin, float _xmax);  // If already ortho, this will update its values faster
 		Camera& updateOrtho_Y(float _ymin, float _ymax);  // If already ortho, this will update its values faster
 		Camera& setZnear(float _znear);

@@ -148,13 +148,13 @@ namespace Vxl
 		else
 			m_activeTextures.erase(level);
 
-		m_activeTextureCount = m_activeTextures.size();
+		m_activeTextureCount = (UINT)m_activeTextures.size();
 	}
 
 	void MaterialData::ClearTexture(Active_Texture level)
 	{
 		m_activeTextures.erase(level);
-		m_activeTextureCount = m_activeTextures.size();
+		m_activeTextureCount = (UINT)m_activeTextures.size();
 	}
 
 	void MaterialData::Bind(bool BindTextures)

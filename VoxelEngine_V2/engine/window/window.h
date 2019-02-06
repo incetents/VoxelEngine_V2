@@ -20,13 +20,19 @@ namespace Vxl
 		bool		 m_windowFocus	= false;
 		GLFWwindow*  m_window;
 		std::string  m_name;
+		UINT		 m_position[2]; // Window position
 		UINT		 m_size[2]; // Window Size that can change
 		UINT		 m_resolution[2]; // Window Resolution (fbos and cameras will use this)
+		UINT		 m_viewportSize[2]; // Same as Window size except it can be smaller if custom aspect ratio makes the view smaller
+		UINT		 m_viewportOffset[2];
 		float		 m_aspectRatio = 1.0f; // Based on Window size (resolution shouldn't affect this)
 		bool		 m_useCustomAspectRatio = false;
 		float		 m_customAspectRatio = 1.0f;
 
 		void UpdateSizes(UINT width, UINT height);
+		void UpdateViewport();
+		// Updates Aspect Ratio values for camears
+		void UpdateAspectRatio();
 		void Destroy();
 		void Update();
 	public:
@@ -67,9 +73,16 @@ namespace Vxl
 		void SetVSynch(bool state);
 		void SetCustomAspectRatio(bool state, float aspect = 1.0f);
 
-		void GetPosition(int& x, int& y);
-		void GetSize(int& width, int& height);
+		UINT GetPositionX(void) const
+		{
+			return m_position[0];
+		}
+		UINT GetPositionY(void) const
+		{
+			return m_position[1];
+		}
 
+		// Get Correct Aspect Ratio based on rendering
 		float GetAspectRatio(void) const
 		{
 			if (m_useCustomAspectRatio)
@@ -78,19 +91,32 @@ namespace Vxl
 				return m_aspectRatio;
 		}
 
-		UINT GetSizeWidth(void) const
+		// Returns Width of the entire window
+		UINT GetWindowWidth(void) const
 		{
 			return m_size[0];
 		}
-		UINT GetSizeHeight(void) const
+		// Returns Height of the entire window
+		UINT GetWindowHeight(void) const
 		{
-			return m_size[1];
+			return m_size[0];
 		}
-
+		// Returns Width of the rendered viewport
+		UINT GetScreenWidth(void) const
+		{
+			return m_viewportSize[0];
+		}
+		// Returns Height of the rendered viewport
+		UINT GetScreenHeight(void) const
+		{
+			return m_viewportSize[1];
+		}
+		// Returns Width of backbuffer resolution
 		UINT GetResolutionWidth(void) const
 		{
 			return m_resolution[0];
 		}
+		// Returns Height of backbuffer resolution
 		UINT GetResolutionHeight(void) const
 		{
 			return m_resolution[1];

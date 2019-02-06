@@ -49,4 +49,9 @@ namespace Vxl
 	{
 		Window.UpdateSizes((UINT)width, (UINT)height);
 	}
+	void glfwCallbacks::Window_Move(GLFWwindow* window, int xpos, int ypos)
+	{
+		Window.m_position[0] = (UINT)xpos;
+		Window.m_position[1] = (UINT)ypos;
+	}
 }

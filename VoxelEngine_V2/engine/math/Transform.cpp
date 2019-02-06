@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "../math/Matrix3x3.h"
 #include "../Math/Matrix4x4.h"
+#include "../math/MathCore.h"
 
 namespace Vxl
 {
@@ -20,7 +21,15 @@ namespace Vxl
 
 			// Update directions
 			m_forward = Vector3::Normalize(m_rotation * Vector3::FORWARD);
-			m_right	= -Vector3::Cross(m_forward, Vector3::UP);
+
+			// If forward is pointing directly up, calculate right the expensive way
+			if (fabs((m_forward - Vector3::UP).Length()) < 0.005f)
+				m_right = Vector3::Normalize(m_rotation * Vector3::RIGHT);
+			// If not, use cheaper method of calculating right
+			else
+				m_right = -Vector3::Cross(m_forward, Vector3::UP);
+
+			// Calculate Up
 			m_up = Vector3::Cross(m_forward, m_right);
 
 			// Set Flag
@@ -53,21 +62,5 @@ namespace Vxl
 		m_position = position;
 		m_euler_rotation = euler_rotation;
 		m_scale = scale;
-	}
-
-	std::vector<Vector3> Transform::getDirections(const Matrix4x4& model)
-	{
-		Vector3 P = model * Vec3::ZERO;
-		Vector3 P_F = model * (Vec3::FORWARD);
-		Vector3 P_U = model * (Vec3::UP);
-		Vector3 P_R = model * (Vec3::RIGHT);
-
-		Vector3 F = (P_F - P).Normalize();
-		Vector3 U = (P_U - P).Normalize();
-		Vector3 R = (P_R - P).Normalize();
-		//
-		Vector3 v[] = { P, F, U, R };
-		std::vector<Vector3> vectors(v, v + sizeof(v) / sizeof(Vector3));
-		return vectors;
 	}
 }

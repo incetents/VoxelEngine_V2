@@ -28,6 +28,7 @@
 #include "../engine/math/Vector3.h"
 #include "../engine/math/Vector4.h"
 #include "../engine/math/MathCore.h"
+#include "../engine/math/Lerp.h"
 
 #include "../engine/modules/Entity.h"
 #include "../engine/modules/Material.h"
@@ -436,7 +437,7 @@ namespace Vxl
 		// Normals test
 		if (ShowNormal_DEV)
 		{
-			glViewport(0, 0, Window.GetSizeWidth() / 4, Window.GetSizeHeight() / 4);
+			glViewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
 			_fbo->bindTexture(1, Active_Texture::LEVEL0);
 			Geometry::GetFullQuad()->Draw();
 		}

@@ -29,7 +29,8 @@ namespace Vxl
 		static void Exit_Button(GLFWwindow* window);
 		// Input - Resize Window
 		static void Window_Resize(GLFWwindow* window, int width, int height);
-
+		// Input - Move Window
+		static void Window_Move(GLFWwindow* window, int xpos, int ypos);
 	};
 }
 

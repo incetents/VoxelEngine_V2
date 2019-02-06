@@ -77,24 +77,35 @@ namespace Vxl
 	}
 	Camera& Camera::updatePerspective(float _fov, float _aspect)
 	{
-		if (m_type == Type::ORTHOGRAPHIC)
-			return *this;
+		assert(m_type == Type::PERSPECTIVE);
 
 		m_projection->Update_FovAspect(_fov, _aspect);
 		return *this;
 	}
+	Camera& Camera::updatePerspectiveFOV(float _fov)
+	{
+		assert(m_type == Type::PERSPECTIVE);
+
+		m_projection->Update_FovAspect(_fov, m_projection->getAspect());
+		return *this;
+	}
+	Camera& Camera::updatePerspectiveAspectRatio(float _aspect)
+	{
+		assert(m_type == Type::PERSPECTIVE);
+
+		m_projection->Update_FovAspect(m_projection->getFov(), _aspect);
+		return *this;
+	}
 	Camera& Camera::updateOrtho_X(float _xmin, float _xmax)
 	{
-		if (m_type == Type::PERSPECTIVE)
-			return *this;
+		assert(m_type == Type::ORTHOGRAPHIC);
 
 		m_projection->Update_X(_xmin, _xmax);
 		return *this;
 	}
 	Camera& Camera::updateOrtho_Y(float _ymin, float _ymax)
 	{
-		if (m_type == Type::PERSPECTIVE)
-			return *this;
+		assert(m_type == Type::ORTHOGRAPHIC);
 
 		m_projection->Update_Y(_ymin, _ymax);
 		return *this;
