@@ -12,16 +12,16 @@
 
 namespace Vxl
 {
-	static class _MatrixStack : Singleton<class _MatrixStack>
-	{
-	private:
-		std::stack<Matrix4x4> m_stack;
-		BYTE m_size = 0;
-	public:
-		_MatrixStack & pushMatrix(const Matrix4x4& matrix);
-		_MatrixStack&	popMatrix();
-		Matrix4x4		getState();
-
-
-	} &MatrixStack = Singleton<class _MatrixStack>::instanceRef;
+	//	static class _MatrixStack : Singleton<class _MatrixStack>
+	//	{
+	//	private:
+	//		std::stack<Matrix4x4> m_stack;
+	//		BYTE m_size = 0;
+	//	public:
+	//		_MatrixStack&	pushMatrix(const Matrix4x4& matrix);
+	//		_MatrixStack&	popMatrix();
+	//		Matrix4x4		getState();
+	//	
+	//	
+	//	} SingletonInstance(_MatrixStack);
 }

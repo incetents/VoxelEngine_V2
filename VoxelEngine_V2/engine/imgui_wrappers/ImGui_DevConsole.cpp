@@ -11,10 +11,16 @@
 #include "../input/XGamePad.h"
 #include "../math/Camera.h"
 
+#include "../game/Scene_Game.h"
+#include "../modules/Entity.h"
+#include "../math/Transform.h"
+
 namespace Vxl
 {
-	void Imgui_DevConsole::Draw()
+	void Imgui_DevConsole::Draw(Scene* scene)
 	{
+		Scene_Game* Game = dynamic_cast<Scene_Game*>(scene);
+
 		static bool open = true;
 		if (ImGui::Begin("DevConsole", &open, ImVec2(280, 380), 0.9f))
 		{
@@ -41,6 +47,18 @@ namespace Vxl
 					ImGui::Text("CamForward: %f %f %f", MAIN_CAMERA->getForward().x, MAIN_CAMERA->getForward().y, MAIN_CAMERA->getForward().z);
 				}
 			}
+
+			ImGui::Separator();
+
+			ImGui::Text("Crate1 Transform");
+			ImGui::Text("Local: %f %f %f", Game->_crate1->m_transform.getPosition().x, Game->_crate1->m_transform.getPosition().y, Game->_crate1->m_transform.getPosition().z);
+			ImGui::Text("World: %f %f %f", Game->_crate1->m_transform.getWorldPosition().x, Game->_crate1->m_transform.getWorldPosition().y, Game->_crate1->m_transform.getWorldPosition().z);
+
+			ImGui::Separator();
+
+			ImGui::Text("Crate2 Transform");
+			ImGui::Text("Local: %f %f %f", Game->_crate2->m_transform.getPosition().x, Game->_crate2->m_transform.getPosition().y, Game->_crate2->m_transform.getPosition().z);
+			ImGui::Text("World: %f %f %f", Game->_crate2->m_transform.getWorldPosition().x, Game->_crate2->m_transform.getWorldPosition().y, Game->_crate2->m_transform.getWorldPosition().z);
 
 			ImGui::Separator();
 

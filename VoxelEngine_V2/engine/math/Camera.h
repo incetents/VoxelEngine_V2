@@ -43,13 +43,14 @@ namespace Vxl
 		virtual float getFov() const { assert(false); return 0.0f; }
 		virtual float getAspect() const { assert(false); return 0.0f; }
 		virtual void Set(float _fov, float _aspect) { assert(false); }
+		// Custom
+		virtual void Set(float* _matrix) { assert(false); }
 
-		// Special OVerrides
+		// Special Overrides
 		virtual void Update_X(float _xmin, float _xmax) { assert(false); }
 		virtual void Update_Y(float _ymin, float _ymax) { assert(false); }
 		virtual void Update_Z() { assert(false); }
 		virtual void Update_FovAspect(float _fov, float _aspect) { assert(false); }
-
 	};
 
 	class CameraProjection_Perspective : public CameraProjection
@@ -137,6 +138,28 @@ namespace Vxl
 		~CameraProjection_Orthographic() {}
 	};
 
+	class CameraProjection_Custom : public CameraProjection
+	{
+	public:
+		void Set(float* _matrix) override
+		{
+			m_projection = Matrix4x4(
+				_matrix[0], _matrix[1], _matrix[2], _matrix[3],
+				_matrix[4], _matrix[5], _matrix[6], _matrix[7],
+				_matrix[8], _matrix[9], _matrix[10], _matrix[11],
+				_matrix[12], _matrix[13], _matrix[14], _matrix[15]
+			);
+			m_projectionInverse = m_projection.Inverse();
+		}
+
+		CameraProjection_Custom(float* _matrix)
+			: CameraProjection(0, 0)
+		{
+			Set(_matrix);
+		}
+		~CameraProjection_Custom() {}
+	};
+
 	class Camera : public Transform
 	{
 		friend class CameraProjection;
@@ -149,7 +172,8 @@ namespace Vxl
 		{
 			NONE,
 			ORTHOGRAPHIC,
-			PERSPECTIVE
+			PERSPECTIVE,
+			CUSTOM
 		};
 
 		// VP DATA
@@ -190,6 +214,7 @@ namespace Vxl
 		// Utility
 		Camera& setPerspective(float _fov, float _aspect);
 		Camera& setOrthographic(float _xmin, float _xmax, float _ymin, float _ymax);
+		Camera& setCustomProjection(float* _matrix);
 		Camera& updatePerspective(float _fov, float _aspect);  // If already perspective, this will update its values faster
 		Camera& updatePerspectiveFOV(float _fov);  // If already perspective, this will update its values faster
 		Camera& updatePerspectiveAspectRatio(float _aspect);  // If already perspective, this will update its values faster
@@ -224,10 +249,19 @@ namespace Vxl
 			return m_viewProjectionInverse;
 		}
 
-		inline Type	 getType() const
+		bool isPerspective() const
 		{
-			return m_type;
+			return m_type == Type::PERSPECTIVE;
 		}
+		bool isOrthographic() const
+		{
+			return m_type == Type::ORTHOGRAPHIC;
+		}
+		bool isCustomProjection() const
+		{
+			return m_type == Type::CUSTOM;
+		}
+
 		inline float getZnear() const
 		{
 			return m_projection->m_Znear;

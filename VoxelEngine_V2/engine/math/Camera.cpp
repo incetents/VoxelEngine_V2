@@ -70,7 +70,25 @@ namespace Vxl
 		else
 		{
 			assert(dynamic_cast<CameraProjection_Orthographic*>(m_projection));
-			m_projection->Set(_xmin, _xmax, _ymin, _ymax);;
+			m_projection->Set(_xmin, _xmax, _ymin, _ymax);
+		}
+
+		return *this;
+	}
+	Camera& Camera::setCustomProjection(float* _matrix)
+	{
+		assert(_matrix);
+
+		if (m_type != Type::CUSTOM)
+		{
+			delete m_projection;
+			m_projection = new CameraProjection_Custom(_matrix);
+			m_type = Type::CUSTOM;
+		}
+		else
+		{
+			assert(dynamic_cast<CameraProjection_Custom*>(m_projection));
+			m_projection->Set(_matrix);
 		}
 
 		return *this;

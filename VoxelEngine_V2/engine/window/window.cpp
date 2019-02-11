@@ -142,7 +142,8 @@ namespace Vxl
 		auto Cameras = Camera::m_database.Get();
 		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
 		{
-			it->second->updatePerspectiveAspectRatio(CorrectAspectRatio);
+			if(it->second->isPerspective())
+				it->second->updatePerspectiveAspectRatio(CorrectAspectRatio);
 		}
 
 	}

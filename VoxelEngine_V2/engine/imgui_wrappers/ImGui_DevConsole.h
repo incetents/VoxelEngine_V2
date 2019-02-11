@@ -5,6 +5,7 @@
 
 namespace Vxl
 {
+	class Scene;
 	class Camera;
 
 	static class Imgui_DevConsole : public Singleton<class Imgui_DevConsole>
@@ -19,7 +20,7 @@ namespace Vxl
 		float CAM_ZFAR = 0;
 
 		// Draw
-		void Draw();
+		void Draw(Scene* scene);
 
 	} SingletonInstance(Imgui_DevConsole);
 }

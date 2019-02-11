@@ -23,7 +23,7 @@ namespace Vxl
 
 	class Scene_Game : public Scene
 	{
-	private:
+	public:
 		// Assets Loaded
 		ShaderProgram* _shader_gbuffer;
 		ShaderProgram* _shader_gbuffer_no_model;

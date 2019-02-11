@@ -24,10 +24,11 @@ namespace Vxl
 		Matrix4x4	m_ModelMatrix;
 
 		// Raw Values
-		Vector3		m_position;
+		Vector3		m_world;	// World Position
+		Vector3		m_position; // Local Position
 		Vector3		m_euler_rotation;
-		Vector3		m_scale;
 		Quaternion	m_rotation;
+		Vector3		m_scale;
 
 		// Direction Space
 		Vector3		m_forward	= Vector3::FORWARD;
@@ -82,7 +83,7 @@ namespace Vxl
 		void updateValues();
 
 	public:
-		Transform();
+		Transform(void);
 		Transform(const Vector3& position, const Vector3& euler_rotation = Vector3(0,0,0), const Vector3& scale = Vector3(1,1,1));
 
 		// Returns index of child in list of children (-1 = child does not exist)
@@ -95,17 +96,17 @@ namespace Vxl
 			}
 			return false;
 		}
-		bool checkParentExists()
+		bool checkParentExists(void)
 		{
 			return m_parent != nullptr;
 		}
 
 		// Get Children Data
-		u_int					getChildCount()
+		u_int					getChildCount(void)
 		{
 			return m_totalChildren;
 		}
-		std::vector<Transform*> getChildren()
+		std::vector<Transform*> getChildren(void)
 		{
 			return m_children;
 		}
@@ -206,7 +207,7 @@ namespace Vxl
 			SimpleAddChild(child);
 
 		}
-		void removeParent()
+		void removeParent(void)
 		{
 			// Ignore if no parent present
 			if (m_parent == nullptr)
@@ -232,6 +233,34 @@ namespace Vxl
 		}
 
 		// Setters
+		inline Transform& setWorldPosition(float x, float y, float z)
+		{
+			Vector3 Move = Vector3(x, y, z) - getWorldPosition();
+			m_position += Move;
+			isDirty = true;
+			return *this;
+		}
+		inline Transform& setWorldPosition(const Vector2& position)
+		{
+			Vector3 Move = Vector3(position) - getWorldPosition();
+			m_position += Move;
+			isDirty = true;
+			return *this;
+		}
+		inline Transform& setWorldPosition(const Vector3& position)
+		{
+			Vector3 Move = position - getWorldPosition();
+			m_position += Move;
+			isDirty = true;
+			return *this;
+		}
+		inline Transform& setWorldPosition(const Vector4& position)
+		{
+			Vector3 Move = Vector3(position) - getWorldPosition();
+			m_position += Move;
+			isDirty = true;
+			return *this;
+		}
 		inline Transform& setPosition(float x, float y, float z)
 		{
 			m_position = Vector3(x, y, z);
@@ -507,52 +536,57 @@ namespace Vxl
 		}
 
 		// Turn object into a 4x4 matrix for math
-		Matrix4x4 getModel();
+		Matrix4x4 getModel(void);
 
 		// Getters
-		inline Vector3		getPosition() const
+		inline Vector3		getWorldPosition(void)
+		{
+			updateValues();
+			return m_world;
+		}
+		inline Vector3		getPosition(void) const
 		{
 			return m_position;
 		}
-		inline Vector3		getRotationEuler() const
+		inline Vector3		getRotationEuler(void) const
 		{
 			return m_euler_rotation;
 		}
-		inline Vector3		getScale() const
+		inline Vector3		getScale(void) const
 		{
 			return m_scale;
 		}
-		Quaternion			getRotation()
+		inline Quaternion	getRotation(void)
 		{
 			updateValues();
 			return m_rotation;
 		}
-		virtual Vector3		getForward()
+		virtual Vector3		getForward(void)
 		{
 			updateValues();
 			return m_forward;
 		}
-		virtual Vector3		getBackwards()
+		virtual Vector3		getBackwards(void)
 		{
 			updateValues();
 			return -m_forward;
 		}
-		virtual Vector3		getUp()
+		virtual Vector3		getUp(void)
 		{
 			updateValues();
 			return m_up;
 		}
-		virtual Vector3		getDown()
+		virtual Vector3		getDown(void)
 		{
 			updateValues();
 			return -m_up;
 		}
-		virtual Vector3		getLeft()
+		virtual Vector3		getLeft(void)
 		{
 			updateValues();
 			return -m_right;
 		}
-		virtual Vector3		getRight()
+		virtual Vector3		getRight(void)
 		{
 			updateValues();
 			return m_right;

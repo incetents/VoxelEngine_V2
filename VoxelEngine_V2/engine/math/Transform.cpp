@@ -16,8 +16,16 @@ namespace Vxl
 			// Update model matrix
 			m_rotation = Quaternion::GetEuler(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
 			Matrix3x3 RotationScale = m_rotation.GetMatrix3x3().Transpose() * Matrix3x3::GetScale(m_scale);
-			// Result
+			// Result Model
 			m_ModelMatrix = Matrix4x4(RotationScale, m_position);
+
+			// Model affected by Parent
+			Matrix4x4 ParentModel = m_ModelMatrix;
+			if (m_parent != nullptr)
+				ParentModel = m_ModelMatrix * m_parent->getModel();
+
+			// Update World position
+			m_world = Vector3(ParentModel[12], ParentModel[13], ParentModel[14]);
 
 			// Update directions
 			m_forward = Vector3::Normalize(m_rotation * Vector3::FORWARD);

@@ -182,9 +182,9 @@ namespace Vxl
 		//
 		_crate1 = Entity::Create();
 		_crate1->SetMaterial(_material_gbuffer);
-		//_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate1->m_mesh = Geometry::GetCube();
-		_crate1->m_transform.setPosition(0, 0, 3);
+		_crate1->m_transform.setPosition(0, 2, 0);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
@@ -192,11 +192,12 @@ namespace Vxl
 		_crate2->SetMaterial(_material_gbuffer);
 		_crate2->m_mesh = Geometry::GetCube();
 		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
-		_crate2->m_transform.setPosition(3, 4, 6);
+		_crate2->m_transform.setPosition(0, 2, 0);
 		// Parent Test
 		//_crate1->m_transform.setParent(&_crate2->m_transform);
 		_crate2->m_transform.addChild(&_crate1->m_transform);
 		
+		_crate1->m_transform.setWorldPosition(0, 0, 0);
 		
 		_octo1 = Entity::Create();
 		_octo1->SetMaterial(_material_gbuffer);
@@ -298,7 +299,8 @@ namespace Vxl
 		//	);
 
 		// Rotate Stuff
-		_crate2->m_transform.increaseRotation(1.0f, 0.2f, 0);
+		//_crate2->m_transform.setRotation(sin(Time.GetTime() / 2) * 90.0, cos(Time.GetTime() / 2) * 90.0, 0);
+		//_crate2->m_transform.increaseRotation(1.0f, 0.2f, 0);
 
 		// End Frame Updates
 		TextureTracker.NewFrame();
@@ -371,13 +373,13 @@ namespace Vxl
 			*/
 		}
 
-		// GBUFFER No model
-		_material_gbuffer_no_model->Bind();
-		
-		glUtil::setActiveTexture(Active_Texture::LEVEL0);
-		BlockAtlas.BindAtlas();
-		
-		TerrainManager.Draw();
+		//	// GBUFFER No model
+		//	_material_gbuffer_no_model->Bind();
+		//	
+		//	glUtil::setActiveTexture(Active_Texture::LEVEL0);
+		//	BlockAtlas.BindAtlas();
+		//	
+		//	TerrainManager.Draw();
 
 
 		//for (int i = 0; i < _cubes.size(); i++)
@@ -497,7 +499,7 @@ namespace Vxl
 		Imgui_DevConsole.CAM_ZNEAR = _camera->getZnear();
 		Imgui_DevConsole.CAM_ZFAR = _camera->getZfar();
 		// Draw
-		Imgui_DevConsole.Draw();
+		Imgui_DevConsole.Draw(this);
 		// Update Values from dev console
 		_material_gbuffer->m_wireframe = Imgui_DevConsole.GBUFFER_WIREFRAME;
 		_camera = Imgui_DevConsole.MAIN_CAMERA;
