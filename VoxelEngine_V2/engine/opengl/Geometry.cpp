@@ -11,8 +11,6 @@
 
 namespace Vxl
 {
-	bool Geometry::m_isSetup = false;
-
 	void Geometry::Destroy()
 	{
 		if (!m_isSetup)
@@ -27,16 +25,6 @@ namespace Vxl
 		delete m_icoSphere;
 		delete m_sphere;
 	}
-
-	// Shapes
-	Mesh* Geometry::m_fullQuad = nullptr;
-	Mesh* Geometry::m_quad = nullptr;
-	Mesh* Geometry::m_cube = nullptr;
-	Mesh* Geometry::m_inverseCube = nullptr;
-	Mesh* Geometry::m_octahedron = nullptr;
-	Mesh* Geometry::m_icosahedron = nullptr;
-	Mesh* Geometry::m_icoSphere = nullptr;
-	Mesh* Geometry::m_sphere = nullptr;
 
 	// Setup
 	void Geometry::CreateFullQuad()

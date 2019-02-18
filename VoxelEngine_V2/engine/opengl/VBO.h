@@ -28,6 +28,7 @@ namespace Vxl
 		UV8 = 15
 	};
 
+	// Vertex Buffer Object Wrapper
 	class VBO
 	{
 	private:
@@ -73,21 +74,30 @@ namespace Vxl
 		
 		void UpdateDrawCount();
 
-	public:
+	public:	
 		template<typename Type = GLfloat>
 		VBO()
 		{
 			m_TypeSize = sizeof(Type);
 		}
-
 		template<typename Type = GLfloat>
 		VBO(Type* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
 		{
 			m_TypeSize = sizeof(Type);
 			SetVertices<Type>(_arr, _count, _mode);
 		}
+		template<typename Type = GLfloat>
+		VBO(std::vector<Type> _arr, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
+		{
+			m_TypeSize = sizeof(Type);
+			SetVertices<Type>(_arr, _mode);
+		}
 
-		~VBO();
+		~VBO()
+		{
+			RemoveAllHints();
+			glDeleteBuffers(1, &m_VBO);
+		}
 
 		// If Type is not a float, it must be an object containing floats
 		template<typename Type = GLfloat>
@@ -105,6 +115,18 @@ namespace Vxl
 			m_bindMode = _mode;
 			glUtil::bindArray(m_VBO, m_Size, _arr, (GLenum)_mode);
 			UpdateDrawCount();
+		}
+		template<typename Type = GLfloat>
+		void SetVertices(std::vector<Type> _arr, BufferBind_Mode _mode)
+		{
+			SetVertices(&_arr[0], (GLuint)_arr.size(), _mode);
+		}
+
+		template<typename Type = GLfloat>
+		void UpdateVertices(Type* _arr)
+		{
+			glUtil::bindVBO(m_VBO);
+			glUtil::bindVBOSubData(0, m_Size, _arr);
 		}
 
 		void AddStrideHint(BufferType _type, GLuint _valueCount);
@@ -144,6 +166,7 @@ namespace Vxl
 		void Draw(Draw_Type _draw);
 	};
 
+	// Vertex Buffer Object for Indices/Elements Wrapper
 	class VBOI
 	{
 	private:
@@ -155,10 +178,23 @@ namespace Vxl
 		BufferBind_Mode m_bindMode;
 	public:
 		VBOI() {}
-		VBOI(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
-		~VBOI();
+		VBOI(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
+		{
+			SetIndices(_arr, _count, _mode);
+		}
+		~VBOI()
+		{
+			glDeleteBuffers(1, &m_VBOI);
+		}
 
 		void SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
+		void SetIndices(std::vector<GLuint> _arr, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
+
+		void UpdateIndices(GLuint* _arr)
+		{
+			glUtil::bindVBO(m_VBOI);
+			glUtil::bindVBOSubData(0, m_Size, _arr);
+		}
 
 		inline GLuint GetVBO(void) const
 		{

@@ -106,9 +106,6 @@ namespace Vxl
 		}
 		~MaterialData();
 
-		// Null Texture
-		static Texture* NULL_TEXTURE;
-
 		// Custom Uniform Packages
 		template<typename Type>
 		void SetUniform(const std::string& uniformName, Type data)
@@ -127,6 +124,7 @@ namespace Vxl
 		void RemoveAllUniforms();
 
 		void SetTexture(BaseTexture* tex, Active_Texture level);
+
 		void ClearTexture(Active_Texture level);
 
 		inline Material* GetBase(void) const

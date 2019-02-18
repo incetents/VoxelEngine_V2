@@ -4,6 +4,7 @@
 
 #include "window.h"
 
+#include <iostream>
 #include <GLFW/glfw3.h>
 
 namespace Vxl
@@ -53,5 +54,13 @@ namespace Vxl
 	{
 		Window.m_position[0] = (UINT)xpos;
 		Window.m_position[1] = (UINT)ypos;
+	}
+	void glfwCallbacks::Drag_File(GLFWwindow* window, int count, const char** paths)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			Window.m_addedPaths.push_back(std::string(paths[i]));
+			std::cout << "Added FilePath: " << (paths[i]) << std::endl;
+		}
 	}
 }

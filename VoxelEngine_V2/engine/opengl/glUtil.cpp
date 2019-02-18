@@ -64,6 +64,13 @@ namespace Vxl
 		return reinterpret_cast<char const*>(glGetString(GL_VERSION)); // version as a string (GLubyte*)
 	}
 
+	// Set OpenGL Name
+	void glUtil::setOpenGLName(GLenum identifier, GLuint name, const std::string &label)
+	{
+		std::string labelEdit = label + " (" + std::to_string(name) + ")";
+		glObjectLabel(identifier, name, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
+	}
+
 	// Get Format Type from channel count
 	Format_Type glUtil::getFormatFloat(int ChannelCount)
 	{

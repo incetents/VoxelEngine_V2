@@ -18,11 +18,22 @@ namespace Vxl
 	class Entity : public ComponentHandler
 	{
 		friend class RenderManager;
+		friend class Transform;
 	private:
 		// Locked Constructor
 		Entity();
 		// Database
 		static DatabaseSet<Entity> m_database;
+
+		// Colors
+		Color3F m_Color = Color3F(1, 1, 1);
+		Color3F m_Tint	= Color3F(1, 1, 1);
+
+		// Bounding Box Data
+		Vector3 m_OBB[8]; // Object Bounding Box from mesh
+		Vector3 m_AABB[2]; // AABB based on OBB
+
+		void TransformChanged();
 
 	public:
 		virtual ~Entity();
@@ -30,7 +41,6 @@ namespace Vxl
 		// Database Creation
 		static Entity* Create();
 		
-
 		// Data
 		std::string			m_name;
 		Transform			m_transform;
@@ -57,6 +67,19 @@ namespace Vxl
 		Material*		GetMaterial(void) const;
 		UINT			GetMaterialOrder(void) const;
 
+		std::vector<Vector3> GetOBB(void) const
+		{
+			return std::vector<Vector3>(m_OBB, m_OBB + 8);
+		}
+		Vector3				 GetAABBMin(void) const
+		{
+			return m_AABB[0];
+		}
+		Vector3				 GetAABBMax(void) const
+		{
+			return m_AABB[1];
+		}
+
 		// Color
 		void SetColor(Color3F color, bool enableIsColoredObject = true)
 		{
@@ -80,10 +103,6 @@ namespace Vxl
 		// Behaviour
 		virtual void Update();
 		virtual void Draw();
-
-	protected:
-		Color3F m_Color = Color3F(1, 1, 1);
-		Color3F m_Tint = Color3F(1, 1, 1);
 
 	};
 }

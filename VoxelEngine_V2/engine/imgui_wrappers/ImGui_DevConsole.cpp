@@ -27,6 +27,10 @@ namespace Vxl
 			ImGui::Text("FPS: %f", Time.GetFPS());
 			ImGui::Text("Time: %f", Time.GetTime());
 
+			float* _fpsGraph = Time.GetFPSHistogram();
+			UINT _fpsGraphSize = Time.GetFPSHistogramSize();
+			ImGui::PlotHistogram("FPS Histogram", _fpsGraph, _fpsGraphSize, 0, NULL, 0.0f, 100.0f, ImVec2(0, 70));
+
 			ImGui::Separator();
 
 			if (ImGui::CollapsingHeader("Window"))

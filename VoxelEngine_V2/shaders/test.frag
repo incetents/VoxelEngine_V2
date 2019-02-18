@@ -2,6 +2,8 @@
 #version 430
 //precision highp float;
 
+//include "math.glsl"  [[replace // with # to get actual include]]
+
 //Values To get from Vertex Shader
 in fragment_data
 {

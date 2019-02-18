@@ -5,13 +5,6 @@
 namespace Vxl
 {
 	// VBO //
-
-	VBO::~VBO()
-	{
-		RemoveAllHints();
-		glDeleteBuffers(1, &m_VBO);
-	}
-
 	void VBO::UpdateDrawCount()
 	{
 		if (m_Stride == 0)
@@ -54,6 +47,7 @@ namespace Vxl
 		// Update Data
 		UpdateDrawCount();
 	}
+
 	void VBO::RemoveStrideHint(BufferType _type)
 	{
 		StrideHint* hint = GetHint(_type);
@@ -95,20 +89,13 @@ namespace Vxl
 			}
 		}
 	}
+
 	void VBO::Draw(Draw_Type _draw)
 	{
 		glDrawArrays((GLenum)_draw, 0, m_DrawCount);
 	}
 
 	// VBOI //
-	VBOI::VBOI(GLuint* _arr, GLuint _count, BufferBind_Mode _mode)
-	{
-		SetIndices(_arr, _count, _mode);
-	}
-	VBOI::~VBOI()
-	{
-		glDeleteBuffers(1, &m_VBOI);
-	}
 
 	void VBOI::SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode)
 	{
@@ -124,6 +111,10 @@ namespace Vxl
 		m_DrawCount = _count;
 		m_bindMode = _mode;
 		glUtil::bindIndices(m_VBOI, m_Size, _arr, (GLenum)_mode);
+	}
+	void VBOI::SetIndices(std::vector<GLuint> _arr, BufferBind_Mode _mode)
+	{
+		SetIndices(&_arr[0], (GLuint)_arr.size(), _mode);
 	}
 	void VBOI::Bind()
 	{

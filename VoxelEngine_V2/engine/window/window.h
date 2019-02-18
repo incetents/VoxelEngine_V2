@@ -5,6 +5,7 @@
 
 #include <Windows.h>
 #include <string>
+#include <vector>
 
 struct GLFWwindow;
 
@@ -28,6 +29,9 @@ namespace Vxl
 		float		 m_aspectRatio = 1.0f; // Based on Window size (resolution shouldn't affect this)
 		bool		 m_useCustomAspectRatio = false;
 		float		 m_customAspectRatio = 1.0f;
+
+		// FilePaths dragged into the Window context
+		std::vector<std::string> m_addedPaths;
 
 		void UpdateSizes(UINT width, UINT height);
 		void UpdateViewport();

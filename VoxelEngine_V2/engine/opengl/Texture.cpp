@@ -6,6 +6,8 @@
 
 #include "glUtil.h"
 #include "../utilities/logger.h"
+#include "../utilities/stringUtil.h"
+#include "../math/Color.h"
 
 namespace Vxl
 {
@@ -41,7 +43,7 @@ namespace Vxl
 		glTexParameteri(Target, GL_TEXTURE_WRAP_T, (GLenum)m_wrapMode);
 
 		glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, (GLenum)m_minFilter);
-		glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, (GLenum)m_maxFilter);
+		glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, (GLenum)m_magFilter);
 
 		if (m_wrapMode == Wrap_Mode::CLAMP_BORDER)
 			glTexParameterfv(Target, GL_TEXTURE_BORDER_COLOR, &(m_borderColor[0]));
@@ -50,12 +52,10 @@ namespace Vxl
 	BaseTexture::BaseTexture(
 		Texture_Type Type,
 		Wrap_Mode WrapMode,
-		Filter_Mode MinFilter,
-		Filter_Mode MaxFilter
-	) : m_type(Type), m_minFilter(MinFilter), m_maxFilter(MaxFilter)
+		Filter_Mode_Min MinFilter,
+		Filter_Mode_Mag MagFilter
+	) : m_type(Type), m_minFilter(MinFilter), m_magFilter(MagFilter)
 	{
-		assert(m_maxFilter == Filter_Mode::LINEAR || m_maxFilter == Filter_Mode::NEAREST);
-
 		glGenTextures(1, &m_id);
 
 		updateParameters();
@@ -81,11 +81,10 @@ namespace Vxl
 
 		updateParameters();
 	}
-	void BaseTexture::setFilterMode(Filter_Mode Min, Filter_Mode Max)
+	void BaseTexture::setFilterMode(Filter_Mode_Min Min, Filter_Mode_Mag Mag)
 	{
 		m_minFilter = Min;
-		m_maxFilter = Max;
-		assert(m_maxFilter == Filter_Mode::LINEAR || m_maxFilter == Filter_Mode::NEAREST);
+		m_magFilter = Mag;
 
 		updateParameters();
 	}
@@ -98,8 +97,8 @@ namespace Vxl
 
 	/* RENDER TEXTURE */
 
-	RenderTexture::RenderTexture(int Width, int Height, Format_Type Format, Wrap_Mode WrapMode, Filter_Mode MinFilter, Filter_Mode MaxFilter)
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MaxFilter), m_format(Format)
+	RenderTexture::RenderTexture(int Width, int Height, Format_Type Format, Wrap_Mode WrapMode, Filter_Mode_Min MinFilter, Filter_Mode_Mag MagFilter)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter), m_format(Format)
 	{
 		m_width = Width;
 		m_height = Height;
@@ -111,10 +110,13 @@ namespace Vxl
 
 	/* TEXTURE */
 
-	Texture::Texture(const std::string& filePath, Wrap_Mode WrapMode, Filter_Mode MinFilter, Filter_Mode MaxFilter, bool InvertY)
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MaxFilter)
+	Texture::Texture(const std::string& filePath, Wrap_Mode WrapMode, Filter_Mode_Min MinFilter, Filter_Mode_Mag MagFilter, bool InvertY)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter)
 	{
 		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
+
+		// Store texture as pixel values
+		//std::vector<UCHAR> STORAGE(m_image, m_image + m_width * m_height * m_channels);
 
 		if (!m_image)
 		{
@@ -137,6 +139,101 @@ namespace Vxl
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		Unbind();
+
+		// glName
+		auto Name = stringUtil::nameFromFilepath(filePath);
+		glUtil::setOpenGLName(GL_TEXTURE, m_id, Name);
+	}
+	Texture::Texture(
+		const std::string& name,
+		std::vector<Color3F> pixels, UINT width,
+		Wrap_Mode WrapMode,
+		Filter_Mode_Min MinFilter,
+		Filter_Mode_Mag MagFilter
+	) 
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter)
+	{
+		UINT pixelsCount = (UINT)pixels.size();
+		m_width = width;
+		m_height = pixelsCount / width;
+		m_channels = 3;
+
+		std::vector<UCHAR> fixed_pixels;
+		fixed_pixels.reserve(pixelsCount * m_channels);
+
+		for (UINT i = 0; i < pixelsCount; i++)
+		{
+			fixed_pixels.push_back((UCHAR)(pixels[i].r * 255.0f));
+			fixed_pixels.push_back((UCHAR)(pixels[i].g * 255.0f));
+			fixed_pixels.push_back((UCHAR)(pixels[i].b * 255.0f));
+		}
+
+		m_image = new UCHAR[pixelsCount * m_channels];
+		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
+
+		m_loaded = true;
+
+		GLenum Format = (GLenum)glUtil::getFormatFloat(m_channels);
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // helps prevent textures smaller than 4x4 not get corrupted
+		glTexImage2D(GL_TEXTURE_2D, 0, Format, m_width, m_height, 0, Format, GL_UNSIGNED_BYTE, m_image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		Unbind();
+
+		// glName
+		glUtil::setOpenGLName(GL_TEXTURE, m_id, name);
+	}
+	Texture* Texture::Create(
+		const std::string& name,
+		const std::string& filePath,
+		Wrap_Mode WrapMode,
+		Filter_Mode_Min MinFilter,
+		Filter_Mode_Mag MagFilter,
+		bool InvertY
+	)
+	{
+		// Name Duplication
+		if (m_database.Check(name))
+		{
+			Logger.error("Duplicate Texture: " + name);
+			return nullptr;
+		}
+
+		Texture* T = new Texture(filePath, WrapMode, MinFilter, MagFilter, InvertY);
+
+		if (T->IsLoaded())
+			Logger.log("Loaded Texture: " + name);
+		else
+			Logger.error("Could not Load Texture: " + name);
+
+		m_database.Set(name, T);
+		return T;
+	}
+	Texture* Texture::Create(
+		const std::string& name,
+		std::vector<Color3F> pixels, UINT width,
+		Wrap_Mode WrapMode,
+		Filter_Mode_Min MinFilter,
+		Filter_Mode_Mag MagFilter
+	)
+	{
+		// Name Duplication
+		if (m_database.Check(name))
+		{
+			Logger.error("Duplicate Texture: " + name);
+			return nullptr;
+		}
+
+		Texture* T = new Texture(name, pixels, width, WrapMode, MinFilter, MagFilter);
+
+		if (T->IsLoaded())
+			Logger.log("Loaded Texture: " + name);
+		else
+			Logger.error("Could not Load Texture: " + name);
+
+		m_database.Set(name, T);
+		return T;
 	}
 
 	Texture::~Texture()
@@ -153,10 +250,10 @@ namespace Vxl
 		const std::string& filePath5,
 		const std::string& filePath6,
 		Wrap_Mode WrapMode,
-		Filter_Mode MinFilter,
-		Filter_Mode MaxFilter,
+		Filter_Mode_Min MinFilter,
+		Filter_Mode_Mag MagFilter,
 		bool InvertY
-	) : BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, MinFilter, MaxFilter)
+	) : BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, MinFilter, MagFilter)
 	{
 		m_image[0] = SOIL_load_image(filePath1.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 		m_image[1] = SOIL_load_image(filePath2.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
@@ -184,6 +281,44 @@ namespace Vxl
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 		Unbind();
+
+		// glName
+		auto Name = stringUtil::nameFromFilepath(filePath1);
+		glUtil::setOpenGLName(GL_TEXTURE, m_id, Name);
+	}
+	Cubemap* Cubemap::Create(
+		const std::string& name,
+		const std::string& filePath1,
+		const std::string& filePath2,
+		const std::string& filePath3,
+		const std::string& filePath4,
+		const std::string& filePath5,
+		const std::string& filePath6,
+		Wrap_Mode WrapMode,
+		Filter_Mode_Min MinFilter,
+		Filter_Mode_Mag MagFilter,
+		bool InvertY
+	)
+	{
+		// Name Duplication
+		if (m_database.Check(name))
+		{
+			Logger.error("Duplicate Cubemap: " + name);
+			return nullptr;
+		}
+
+		Cubemap* C = new Cubemap(
+			filePath1, filePath2, filePath3, filePath4, filePath5, filePath6,
+			WrapMode, MinFilter, MagFilter, InvertY
+		);
+
+		if (C->IsLoaded())
+			Logger.log("Loaded Cubemap: " + name);
+		else
+			Logger.error("Could not Load Cubemap: " + name);
+
+		m_database.Set(name, C);
+		return C;
 	}
 	Cubemap::~Cubemap()
 	{

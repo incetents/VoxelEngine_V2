@@ -31,12 +31,13 @@ debugLines 				debugLines_vert						debugLines_frag
 
 //----------------------------------------
 #TEXTURE
-// order: [Name] [FilePath] [WrapMode] [FilterMode]
+// order: [Name] [FilePath] [WrapMode =repeat] [FilterModeMin =linear] [FilterModeMag =linear][FlipY =true]
 //
 // [WrapMode] = REPEAT | CLAMP_BORDER | CLAMP_STRETCH | MIRROR_REPEAT |
-// [FilterMode] = NEAREST | LINEAR
+// [FilterModeMin] = NEAREST | LINEAR
+// [FilterModeMag] = NEAREST | LINEAR | NEAREST_NEAREST | LINEAR_NEAREST | NEAREST_LINEAR | LINEAR_LINEAR
+// [FlipY] = any_text_here_is_considered_a_flip
 
-null					./assets/textures/null_texture.png
 grid_test			./assets/textures/grid_test.png
 beato				./assets/textures/beato.png
 crate_diffuse	./assets/textures/crate_diffuse.png

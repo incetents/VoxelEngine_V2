@@ -1,12 +1,14 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #pragma once
 
+#include <vector>
 #include <Windows.h>
 #include "../utilities/singleton.h"
 #include <GLFW/glfw3.h>
 
 namespace Vxl
 {
+#define HISTOGRAM_SIZE 50
 	// ~~~ //
 	static class Time : public Singleton<class Time>
 	{
@@ -20,7 +22,13 @@ namespace Vxl
 		double m_limitFPS = 1.0 / 60.0;
 		double m_targetFPS = 60.0;
 		double m_currentFPS = 0.0;
+		float m_histogramFPS[HISTOGRAM_SIZE];
 	public:
+
+		Time()
+		{
+			memset(m_histogramFPS, 0, HISTOGRAM_SIZE * sizeof(float));
+		}
 
 		inline void SetTargetFPS(double FPS)
 		{
@@ -37,6 +45,14 @@ namespace Vxl
 		inline double GetFPS(void) const
 		{
 			return m_currentFPS;
+		}
+		inline float* GetFPSHistogram(void)
+		{
+			return m_histogramFPS;
+		}
+		inline UINT GetFPSHistogramSize(void) const
+		{
+			return HISTOGRAM_SIZE;
 		}
 		inline double GetTime()
 		{
@@ -98,6 +114,10 @@ namespace Vxl
 			Time.m_totalDeltaTime += Time.m_deltaTime;
 			Time.m_lastTime = Time.m_time;
 			Time.m_currentFPS = (Time.m_deltaTime * Time.m_targetFPS);
+
+			Time.m_histogramFPS[HISTOGRAM_SIZE - 1] = (float)Time.m_currentFPS;
+			memcpy(Time.m_histogramFPS, Time.m_histogramFPS + 1, (HISTOGRAM_SIZE - 1) * sizeof(float));
+
 		}
 		void EndFrame()
 		{

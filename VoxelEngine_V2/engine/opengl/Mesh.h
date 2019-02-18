@@ -16,190 +16,6 @@
 
 namespace Vxl
 {
-	/*
-	class MeshBufferBase
-	{
-		friend class Mesh;
-	protected:
-		bool	m_isInit	= false;
-		GLvoid*	m_array		= nullptr;
-		GLuint	m_length	= 0;
-		GLuint* m_VBO_ref	= nullptr;
-		GLuint  m_VBO_index = -1;
-
-		BufferBind_Mode  m_bindMode = BufferBind_Mode::STATIC;
-
-		virtual void bind() = 0;
-
-		template<typename Type>
-		void set(Type* arr, GLuint length)
-		{
-			clear();
-			m_array = new Type[length];
-			m_length = length;
-			memcpy(m_array, arr, length * sizeof(Type));
-		}
-
-	public:
-		inline GLuint getLength() const
-		{
-			return m_length;
-		}
-		inline GLuint getVBOIndex() const
-		{
-			return m_VBO_index;
-		}
-		
-		void clear()
-		{
-			if(m_array)
-				delete[] m_array;
-
-			m_array = nullptr;
-			m_length = 0;
-		}
-	};
-
-
-	template<typename Type>
-	class MeshBuffer : public MeshBufferBase
-	{
-		friend class Mesh;
-	private:
-		void bind() override
-		{
-			// Nothing to bind if it has no data
-			if (m_length == 0)
-				return;
-
-			if (!m_isInit)
-			{
-				Logger.error("Cannot Bind Mesh Buffer because it is not initialiased");
-				return;
-			}
-
-			// Send Array Of Data
-			glUtil::bindArray(*m_VBO_ref, m_length * sizeof(Type), &((Type*)m_array)[0], (GLenum)m_bindMode);
-
-			// Vertex Attribute Number
-			glUtil::setVertexAttrib((GLuint)m_VBO_index, sizeof(Type) / 4, DataType::FLOAT);
-
-		}
-
-	public:
-
-		void setup(GLuint& vbo, GLuint vbo_index)
-		{
-			m_VBO_ref = &vbo;
-			m_VBO_index = vbo_index;
-			m_isInit = true;
-		}
-
-		void set(Type* arr, GLuint length)
-		{
-			MeshBufferBase::set<Type>(arr, length);
-		}
-		void set(std::vector<Type>& vector)
-		{
-			MeshBufferBase::set<Type>(&vector[0], (GLuint)vector.size());
-		}
-		MeshBuffer& operator=(std::vector<Type>& vector)
-		{
-			MeshBuffer::set(vector);
-			return *this;
-		}
-
-		
-	};
-
-	class MeshBufferInstancing : public MeshBufferBase
-	{
-		friend class Mesh;
-	private:
-		void bind() override
-		{
-			// Nothing to bind if it has no data
-			if (m_length == 0)
-				return;
-
-			if (!m_isInit)
-			{
-				Logger.error("Cannot Bind Mesh Buffer because it is not initialiased");
-				return;
-			}
-
-			// Send Array Of Data
-			glUtil::bindArray(*m_VBO_ref, m_length * sizeof(Matrix4x4), &((Matrix4x4*)m_array)[0], (GLenum)m_bindMode);
-
-			// Vertex Attribute Number
-			glUtil::setVertexAttribInstancing((GLuint)m_VBO_index);
-
-		}
-
-	public:
-
-		void setup(GLuint& vbo, GLuint vbo_index)
-		{
-			m_VBO_ref = &vbo;
-			m_VBO_index = vbo_index;
-			m_isInit = true;
-		}
-
-		void set(Matrix4x4* arr, GLuint length)
-		{
-			MeshBufferBase::set<Matrix4x4>(arr, length);
-		}
-		void set(std::vector<Matrix4x4>& vector)
-		{
-			MeshBufferBase::set<Matrix4x4>(&vector[0], (GLuint)vector.size());
-		}
-		MeshBufferInstancing& operator=(std::vector<Matrix4x4>& vector)
-		{
-			MeshBufferInstancing::set(vector);
-			return *this;
-		}
-
-	};
-
-	class MeshBufferIndices : public MeshBufferBase
-	{
-		friend class Mesh;
-	private:
-		void bind() override
-		{
-			if (!m_isInit)
-			{
-				Logger.error("Cannot Bind Mesh Buffer Indices because it is not initialiased");
-				return;
-			}
-
-			// Send Array of Indices
-			glUtil::bindIndices(*m_VBO_ref, m_length * sizeof(GLuint), &((GLuint*)m_array)[0], (GLenum)m_bindMode);
-		}
-	public:
-
-		void setup(GLuint& vbo)
-		{
-			m_VBO_ref = &vbo;
-			m_isInit = true;
-		}
-
-		void set(GLuint* arr, GLuint length)
-		{
-			MeshBufferBase::set<GLuint>(arr, length);
-		}
-		void set(std::vector<GLuint>& vector)
-		{
-			MeshBufferBase::set<GLuint>(&vector[0], (GLuint)vector.size());
-		}
-		MeshBufferIndices& operator=(std::vector<GLuint>& vector)
-		{
-			MeshBufferIndices::set(vector);
-			return *this;
-		}
-
-	};
-	*/
 
 	template<typename Type, UINT ValueCount, BufferType Buf>
 	class MeshBuffer
@@ -222,6 +38,45 @@ namespace Vxl
 			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
 		}
 		MeshBuffer& operator=(std::vector<Type> vec)
+		{
+			set(vec);
+			return *this;
+		}
+
+		inline UINT GetDrawCount(void) const
+		{
+			return m_vbo.GetDrawCount();
+		}
+		inline UINT GetSize(void) const
+		{
+			return m_vbo.GetSize();
+		}
+	};
+
+	class MeshBufferVertices
+	{
+		friend class Mesh;
+	private:
+		VBO m_vbo;
+		std::vector<Vector3> vertices;
+	public:
+		MeshBufferVertices()
+		{
+			m_vbo.AddStrideHint(Vxl::BufferType::VERTEX, 3);
+		}
+
+		void set(Vector3* arr, GLuint count)
+		{
+			vertices.clear();
+			vertices = std::vector<Vector3>(arr, arr + count);
+			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
+		}
+		void set(std::vector<Vector3> vec)
+		{
+			vertices = vec;
+			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+		}
+		MeshBufferVertices& operator=(std::vector<Vector3> vec)
 		{
 			set(vec);
 			return *this;
@@ -304,7 +159,7 @@ namespace Vxl
 
 	class Mesh
 	{
-	protected:
+	private:
 		GLuint  m_VAO;
 
 		Draw_Type m_type = Draw_Type::TRIANGLES;
@@ -313,6 +168,9 @@ namespace Vxl
 		GLuint	  m_faces = 0;		// Triangles Drawn
 		GLuint	  m_lines = 0;		// Lines Drawn
 
+		Vector3 m_min; // smallest vertices of mesh
+		Vector3 m_max; // largest vertices of mesh
+		
 		void (Mesh::*Draw_Function)(void) = &Mesh::DrawArray;
 
 		void DrawArray();
@@ -326,7 +184,7 @@ namespace Vxl
 		Mesh();
 		virtual ~Mesh();
 
-		MeshBuffer<Vector3, 3, BufferType::VERTEX> m_positions;
+		MeshBufferVertices m_positions;
 		MeshBuffer<Vector2, 2, BufferType::UV> m_uvs;
 		MeshBuffer<Vector3, 3, BufferType::NORMAL> m_normals;
 		MeshBufferInstancing m_instances;
@@ -338,17 +196,25 @@ namespace Vxl
 			GLuint* _indices = nullptr, GLuint _indexCount = 0
 		);
 
-		inline GLuint		GetDrawCount() const
+		inline GLuint		GetDrawCount(void) const
 		{
 			return m_drawCount;
 		}
-		inline Draw_Type	GetDrawType() const
+		inline Draw_Type	GetDrawType(void) const
 		{
 			return m_type;
 		}
-		inline Draw_Mode	GetDrawMode() const
+		inline Draw_Mode	GetDrawMode(void) const
 		{
 			return m_mode;
+		}
+		inline Vector3		GetVertexMin(void) const
+		{
+			return m_min;
+		}
+		inline Vector3		GetVertexMax(void) const
+		{
+			return m_max;
 		}
 
 		void Bind(Draw_Type type = Draw_Type::TRIANGLES);

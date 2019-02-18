@@ -86,7 +86,7 @@ namespace Vxl
 			delete _depth;
 
 		// Save Texture
-		_depth = new RenderTexture(width, height, Format_Type::DEPTH, Wrap_Mode::CLAMP_STRETCH, Filter_Mode::NEAREST, Filter_Mode::NEAREST);
+		_depth = new RenderTexture(width, height, Format_Type::DEPTH, Wrap_Mode::CLAMP_STRETCH, Filter_Mode_Min::NEAREST, Filter_Mode_Mag::NEAREST);
 
 		// Add to FBO
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depth->GetID(), 0);

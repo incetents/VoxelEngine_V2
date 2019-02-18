@@ -6,7 +6,17 @@
 
 namespace Vxl
 {
-	// C3 Overloads
+	const Color3F Color3F::WHITE	= Color3F(1, 1, 1);
+	const Color3F Color3F::BLACK	= Color3F(0, 0, 0);
+	const Color3F Color3F::RED		= Color3F(230.f / 255.f, 25.f / 255.f, 75.f / 255.f);
+	const Color3F Color3F::GREEN	= Color3F(60.f / 255.f, 180.f / 255.f, 75.f / 255.f);
+	const Color3F Color3F::BLUE		= Color3F(0, 130.f / 255.f, 200.f / 255.f);
+	const Color3F Color3F::YELLOW	= Color3F(1, 1, 25.f / 255.f);
+	const Color3F Color3F::ORANGE	= Color3F(245.f / 255.f, 130.f / 255.f, 48.f / 255.f);
+	const Color3F Color3F::PURPLE	= Color3F(145.f / 255.f, 30.f / 255.f, 180.f / 255.f);
+	const Color3F Color3F::CYAN		= Color3F(70.f / 255.f, 240.f / 255.f, 240.f / 255.f);
+
+	// Color3f Overloads
 	Color3F Color3F::operator+(const Color3F& c) const
 	{
 		Color3F m;
@@ -140,7 +150,18 @@ namespace Vxl
 		return (&r)[index];
 	}
 
-	// C4 Overloads
+	const Color4F Color4F::ZEROES	= Color4F(0, 0, 0, 0);
+	const Color4F Color4F::WHITE	= Color4F(1, 1, 1, 1);
+	const Color4F Color4F::BLACK	= Color4F(0, 0, 0, 1);
+	const Color4F Color4F::RED		= Color4F(230.f / 255.f, 25.f / 255.f, 75.f / 255.f, 1);
+	const Color4F Color4F::GREEN	= Color4F(60.f / 255.f, 180.f / 255.f, 75.f / 255.f, 1);
+	const Color4F Color4F::BLUE		= Color4F(0, 130.f / 255.f, 200.f / 255.f, 1);
+	const Color4F Color4F::YELLOW	= Color4F(1, 1, 25.f / 255.f, 1);
+	const Color4F Color4F::ORANGE	= Color4F(245.f / 255.f, 130.f / 255.f, 48.f / 255.f, 1);
+	const Color4F Color4F::PURPLE	= Color4F(145.f / 255.f, 30.f / 255.f, 180.f / 255.f, 1);
+	const Color4F Color4F::CYAN		= Color4F(70.f / 255.f, 240.f / 255.f, 240.f / 255.f, 1);
+
+	// Color4f Overloads
 	Color4F Color4F::operator+(const Color4F& c) const
 	{
 		Color4F m;

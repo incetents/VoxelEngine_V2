@@ -5,6 +5,7 @@
 #include "../opengl/Texture.h"
 #include "../opengl/TextureTracker.h"
 #include "../opengl/Shader.h"
+#include "../opengl/Debug.h"
 
 #include "../modules/Entity.h"
 
@@ -85,7 +86,7 @@ namespace Vxl
 
 	// ~ Material Data ~ //
 
-	Texture* MaterialData::NULL_TEXTURE = nullptr;
+	//Texture* MaterialData::NULL_TEXTURE = nullptr;
 
 	void MaterialData::UpdateMaterialPackages()
 	{
@@ -202,7 +203,7 @@ namespace Vxl
 			{
 				//NULL_TEXTURE
 				glUtil::setActiveTexture(0);
-				NULL_TEXTURE->Bind();
+				Debug.BindNullTexture();
 			}
 
 			for (Active_Texture id : m_activeTextures)
@@ -210,6 +211,13 @@ namespace Vxl
 				BaseTexture* _tex = m_textures[(UINT)id - GL_TEXTURE0];
 				assert(_tex);
 				glUtil::setActiveTexture(id);
+
+				// Null texture bound if no textures exist
+				if (!_tex->IsLoaded())
+				{
+					Debug.BindNullTexture();
+					continue;
+				}
 
 				// Don't bind texture on active layer if it's already bound
 				if (TextureTracker.ShouldBindTexture(id, _tex->GetID()))

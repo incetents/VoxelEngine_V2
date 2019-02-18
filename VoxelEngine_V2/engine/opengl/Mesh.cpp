@@ -250,6 +250,16 @@ namespace Vxl
 
 		glUtil::unbindVAO();
 		/*				*/	
+
+		// Min/Max
+		m_min = Vector3::ZERO;
+		m_max = Vector3::ZERO;
+		UINT PosCount = (UINT)m_positions.vertices.size();
+		for (UINT i = 0; i < PosCount; i++)
+		{
+			m_min = Vector3::Min(m_min, m_positions.vertices[i]);
+			m_max = Vector3::Max(m_max, m_positions.vertices[i]);
+		}
 	}
 
 	void Mesh::Draw()

@@ -26,6 +26,9 @@ namespace Vxl
 		const char* getRendererVersion();
 		const char* getOpenGLVersion();
 
+		// Set OpenGL Name
+		void setOpenGLName(GLenum identifier, GLuint name, const std::string &label);
+
 		// Get Format Type from channel count
 		Format_Type getFormatFloat(int ChannelCount);
 		Format_Type getFormatInt(int ChannelCount);

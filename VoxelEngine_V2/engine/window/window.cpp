@@ -58,6 +58,7 @@ namespace Vxl
 		glfwSetWindowCloseCallback		(m_window, glfwCallbacks::Exit_Button);
 		glfwSetWindowSizeCallback		(m_window, glfwCallbacks::Window_Resize);
 		glfwSetWindowPosCallback		(m_window, glfwCallbacks::Window_Move);
+		glfwSetDropCallback				(m_window, glfwCallbacks::Drag_File);
 
 		// IMGUI Setup
 		IMGUI_CHECKVERSION();
@@ -199,22 +200,7 @@ namespace Vxl
 	{
 		// Locked Aspect Ratio (Black bars on edges)
 		if (m_useCustomAspectRatio)
-		{
-			// Width clamp
-			if (m_size[0] > m_size[1])
-			{
-				UINT customWidth = (UINT)((float)m_size[1] * m_customAspectRatio);
-				UINT offsetWidth = (m_size[0] >> 1) - (customWidth >> 1);
-				glViewport(offsetWidth, 0, customWidth, m_size[1]);
-			}
-			// Height clamp
-			else
-			{
-				UINT customHeight = (UINT)((float)m_size[0] / m_customAspectRatio);
-				UINT offsetHeight = (m_size[1] >> 1) - (customHeight >> 1);
-				glViewport(0, offsetHeight, m_size[0], customHeight);
-			}
-		}
+			glViewport(m_viewportOffset[0], m_viewportOffset[1], m_viewportSize[0], m_viewportSize[1]);
 		else
 			glViewport(0, 0, m_size[0], m_size[1]);
 	}

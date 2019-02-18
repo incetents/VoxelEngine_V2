@@ -23,18 +23,20 @@
     <ClCompile Include="engine\imgui_wrappers\Imgui_ShaderErrors.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
+    <ClCompile Include="engine\math\Model.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
     <ClCompile Include="engine\modules\Layer.cpp" />
     <ClCompile Include="engine\modules\Material.cpp" />
     <ClCompile Include="engine\modules\RenderManager.cpp" />
     <ClCompile Include="engine\modules\Scene.cpp" />
-    <ClCompile Include="engine\opengl\DebugLines.cpp" />
+    <ClCompile Include="engine\opengl\Debug.cpp" />
     <ClCompile Include="engine\opengl\FramebufferObject.cpp" />
     <ClCompile Include="engine\opengl\Geometry.cpp" />
     <ClCompile Include="engine\opengl\VBO.cpp" />
     <ClCompile Include="engine\opengl\MeshRenderer.cpp" />
     <ClCompile Include="engine\opengl\Texture.cpp" />
     <ClCompile Include="engine\opengl\TextureTracker.cpp" />
+    <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
     <ClCompile Include="game\terrain\Block.cpp" />
@@ -81,6 +83,7 @@
     <ClInclude Include="engine\imgui_wrappers\Imgui_ShaderErrors.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
     <ClInclude Include="engine\light\Light.h" />
+    <ClInclude Include="engine\math\Model.h" />
     <ClInclude Include="engine\modules\Component.h" />
     <ClInclude Include="engine\modules\Entity.h" />
     <ClInclude Include="engine\modules\Layer.h" />
@@ -88,7 +91,7 @@
     <ClInclude Include="engine\modules\MaterialPackage.h" />
     <ClInclude Include="engine\modules\RenderManager.h" />
     <ClInclude Include="engine\modules\Scene.h" />
-    <ClInclude Include="engine\opengl\DebugLines.h" />
+    <ClInclude Include="engine\opengl\Debug.h" />
     <ClInclude Include="engine\opengl\VBO.h" />
     <ClInclude Include="engine\opengl\MeshRenderer.h" />
     <ClInclude Include="engine\opengl\FramebufferObject.h" />
@@ -117,6 +120,7 @@
     <ClInclude Include="engine\opengl\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\utilities\Database.h" />
+    <ClInclude Include="engine\utilities\FileIO.h" />
     <ClInclude Include="engine\utilities\Loader.h" />
     <ClInclude Include="engine\utilities\logger.h" />
     <ClInclude Include="engine\utilities\singleton.h" />
@@ -217,7 +221,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;opengl32.lib;glu32.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;opengl32.lib;glu32.lib;soil.lib;assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -254,7 +258,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(ProjectDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;opengl32.lib;glu32.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;opengl32.lib;glu32.lib;soil.lib;assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

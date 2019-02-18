@@ -6,6 +6,8 @@
 #include "../Math/Matrix4x4.h"
 #include "../math/MathCore.h"
 
+#include "../modules/Entity.h"
+
 namespace Vxl
 {
 	void Transform::updateValues()
@@ -15,7 +17,7 @@ namespace Vxl
 		{
 			// Update model matrix
 			m_rotation = Quaternion::GetEuler(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
-			Matrix3x3 RotationScale = m_rotation.GetMatrix3x3().Transpose() * Matrix3x3::GetScale(m_scale);
+			Matrix3x3 RotationScale = m_rotation.GetMatrix3x3() * Matrix3x3::GetScale(m_scale);
 			// Result Model
 			m_ModelMatrix = Matrix4x4(RotationScale, m_position);
 
@@ -35,13 +37,17 @@ namespace Vxl
 				m_right = Vector3::Normalize(m_rotation * Vector3::RIGHT);
 			// If not, use cheaper method of calculating right
 			else
-				m_right = -Vector3::Cross(m_forward, Vector3::UP);
+				m_right = -Vector3::Normalize(Vector3::Cross(m_forward, Vector3::UP));
 
 			// Calculate Up
 			m_up = Vector3::Cross(m_forward, m_right);
 
 			// Set Flag
 			isDirty = false;
+
+			// Call entity about change in transform class
+			if (m_owner != nullptr)
+				m_owner->TransformChanged();
 		}
 	}
 

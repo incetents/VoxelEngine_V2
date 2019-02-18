@@ -10,19 +10,22 @@
 
 namespace Vxl
 {
+	class Color3F;
+
 	void FlipTextureY(UCHAR* array, GLuint width, GLuint height, GLuint channels);
 
 	class BaseTexture
 	{
 	protected:
 		GLuint		 m_id = -1;
+		bool		 m_loaded = false;
 		int			 m_width;
 		int			 m_height;
 		int			 m_channels;
 		Texture_Type m_type;
 		Wrap_Mode	 m_wrapMode;
-		Filter_Mode  m_maxFilter;
-		Filter_Mode  m_minFilter;
+		Filter_Mode_Min  m_minFilter;
+		Filter_Mode_Mag  m_magFilter;
 		Color4F		 m_borderColor = Color4F(0, 0, 0, 1);
 
 		void updateParameters();
@@ -32,8 +35,8 @@ namespace Vxl
 		BaseTexture(
 			Texture_Type Type,
 			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode MinFilter = Filter_Mode::LINEAR,
-			Filter_Mode MaxFilter = Filter_Mode::LINEAR
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR
 		);
 		virtual ~BaseTexture();
 
@@ -41,7 +44,7 @@ namespace Vxl
 		virtual void Unbind();
 
 		void setWrapMode(Wrap_Mode W);
-		void setFilterMode(Filter_Mode Min, Filter_Mode Max);
+		void setFilterMode(Filter_Mode_Min Min, Filter_Mode_Mag Mag);
 		// only works if min filter is [clamp to border]
 		void setBorderColor(Color4F color);
 
@@ -65,17 +68,22 @@ namespace Vxl
 		{
 			return m_wrapMode;
 		}
-		inline Filter_Mode GetFilterModeMin(void) const
+		inline Filter_Mode_Min GetFilterModeMin(void) const
 		{
 			return m_minFilter;
 		}
-		inline Filter_Mode GetFilterModeMax(void) const
+		inline Filter_Mode_Mag GetFilterModeMag(void) const
 		{
-			return m_maxFilter;
+			return m_magFilter;
 		}
 		inline Color4F GetBorderColor(void) const
 		{
 			return m_borderColor;
+		}
+
+		virtual bool IsLoaded(void) const
+		{
+			return true;
 		}
 	};
 
@@ -89,30 +97,59 @@ namespace Vxl
 			int Width, int Height,
 			Format_Type Format = Format_Type::RGBA,
 			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode MinFilter = Filter_Mode::LINEAR,
-			Filter_Mode MaxFilter = Filter_Mode::LINEAR
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR
 		);
 	};
 
 	class Texture : public BaseTexture
 	{
+		friend class RenderManager;
 	protected:
-		bool		m_loaded = false;
 		UCHAR*		m_image = nullptr;
-	public:
-		Texture(const Texture&) = delete;
+
 		Texture(
 			const std::string& filePath,
 			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode MinFilter = Filter_Mode::LINEAR,
-			Filter_Mode MaxFilter = Filter_Mode::LINEAR,
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR,
 			bool InvertY = true
 		);
-		~Texture();
+		Texture(
+			const std::string& name,
+			std::vector<Color3F> pixels, UINT width,
+			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR
+		);
 		// Database
 		static Database<Texture> m_database;
+	public:
+		static Texture* Create(
+			const std::string& name,
+			const std::string& filePath,
+			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR,
+			bool InvertY = true
+		);
+		static Texture* Create(
+			const std::string& name,
+			std::vector<Color3F> pixels, UINT width,
+			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR
+		);
+		// Database Getter
+		static Texture* Get(const std::string& name)
+		{
+			return m_database.Get(name);
+		}
 
-		inline bool IsLoaded(void) const
+		Texture(const Texture&) = delete;
+		~Texture();
+
+		inline bool IsLoaded(void) const override
 		{
 			return m_loaded;
 		}
@@ -120,11 +157,10 @@ namespace Vxl
 
 	class Cubemap : public BaseTexture
 	{
+		friend class RenderManager;
 	protected:
-		bool		m_loaded = false;
 		UCHAR**		m_image = new UCHAR*[6];
-	public:
-		Cubemap(const Cubemap&) = delete;
+
 		Cubemap(
 			const std::string& filePath1,
 			const std::string& filePath2,
@@ -132,16 +168,38 @@ namespace Vxl
 			const std::string& filePath4,
 			const std::string& filePath5,
 			const std::string& filePath6,
-			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode MinFilter = Filter_Mode::LINEAR,
-			Filter_Mode MaxFilter = Filter_Mode::LINEAR,
+			Wrap_Mode WrapMode = Wrap_Mode::CLAMP_STRETCH,
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR,
 			bool InvertY = true
 		);
-		~Cubemap();
 		// Database
 		static Database<Cubemap> m_database;
+	public:
+		static Cubemap* Create(
+			const std::string& name,
+			const std::string& filePath1,
+			const std::string& filePath2,
+			const std::string& filePath3,
+			const std::string& filePath4,
+			const std::string& filePath5,
+			const std::string& filePath6,
+			Wrap_Mode WrapMode = Wrap_Mode::CLAMP_STRETCH,
+			Filter_Mode_Min MinFilter = Filter_Mode_Min::LINEAR,
+			Filter_Mode_Mag MagFilter = Filter_Mode_Mag::LINEAR,
+			bool InvertY = true
+		);
+		// Database Getter
+		static Cubemap* Get(const std::string& name)
+		{
+			return m_database.Get(name);
+		}
 
-		inline bool IsLoaded(void) const
+		Cubemap(const Cubemap&) = delete;
+		~Cubemap();
+		
+
+		inline bool IsLoaded(void) const override
 		{
 			return m_loaded;
 		}

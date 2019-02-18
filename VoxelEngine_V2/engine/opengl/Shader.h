@@ -137,7 +137,7 @@ namespace Vxl
 	public:
 		
 		// Database Creation
-		static ShaderProgram* Create(const std::string& name);
+		static ShaderProgram* Create(const std::string& name, std::vector<std::string> shaders);
 		// Database Getter
 		static ShaderProgram* Get(const std::string& name)
 		{

@@ -19,7 +19,7 @@
 #include "../engine/opengl/Shader.h"
 #include "../engine/opengl/Texture.h"
 #include "../engine/opengl/TextureTracker.h"
-#include "../engine/opengl/DebugLines.h"
+#include "../engine/opengl/Debug.h"
 
 #include "../engine/math/Camera.h"
 #include "../engine/math/Color.h"
@@ -43,6 +43,7 @@
 
 #include <iostream>
 
+#include "../engine/math/Model.h"
 
 namespace Vxl
 {
@@ -76,13 +77,13 @@ namespace Vxl
 		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
 		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 
-		_tex = Texture::m_database.Get("beato");
-		_tex_crate = Texture::m_database.Get("crate_diffuse");
+		_tex = Texture::Get("beato");
+		_tex_crate = Texture::Get("crate_diffuse");
 
-		_cubemap1 = Cubemap::m_database.Get("craterlake");
+		_cubemap1 = Cubemap::Get("craterlake");
 		
 		// Voxel Stuff
-		BlockAtlas.Set(Texture::m_database.Get("TextureAtlas"), 16); // texture of all blocks
+		BlockAtlas.Set(Texture::Get("TextureAtlas"), 16); // texture of all blocks
 		BlockDictionary.Setup(); // info of all blocks
 		TerrainManager.Setup(); // keeps track of terrain info
 		//
@@ -117,8 +118,19 @@ namespace Vxl
 				m_models.push_back(t.getModel());
 			}
 		}
-
+		
 		_mesh->m_instances = m_models;
+
+		Model::Create("jiggy", "./assets/models/jiggy.obj");
+		Model* jiggy = Model::Get("jiggy");
+		Mesh* jiggyMesh = new Mesh();
+		jiggyMesh->m_positions.set(jiggy->positions);
+		jiggyMesh->m_uvs.set(jiggy->uvs);
+		jiggyMesh->m_normals.set(jiggy->normals);
+		//jiggyMesh->m_tangents.set(jiggy->tangents);
+		//jiggyMesh->m_bitangents.set(jiggy->bitangents);
+		jiggyMesh->m_indices.set(jiggy->indices);
+		jiggyMesh->Bind();
 
 		_mesh->Bind();
 
@@ -133,7 +145,7 @@ namespace Vxl
 		_entity2 = Entity::Create();
 		_entity2->SetMaterial(_material_gbuffer);
 		_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_entity2->m_mesh = Geometry::GetIcoSphere();
+		_entity2->m_mesh = jiggyMesh;// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		// TEST
 		_entity2->SetColor(Color3F(1, 0, 0));
@@ -141,13 +153,13 @@ namespace Vxl
 		_entity3 = Entity::Create();
 		_entity3->SetMaterial(_material_gbuffer);
 		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_entity3->m_mesh = Geometry::GetIcosahedron();
-		_entity3->m_transform.setPosition(Vector3(-1.5f, 0, -3.0f));
+		_entity3->m_mesh = Geometry.GetIcosahedron();
+		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
 		
 		_entity4 = Entity::Create();
 		_entity4->SetMaterial(_material_skybox);
 		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
-		_entity4->m_mesh = Geometry::GetInverseCube();
+		_entity4->m_mesh = Geometry.GetInverseCube();
 		
 
 		for (int x = -1; x <= 1; x++)
@@ -158,7 +170,6 @@ namespace Vxl
 				{
 					if (x == 0 && y == 0 && z == 0)
 						continue;
-
 					
 					//	Entity* ent = new Entity();
 					//	ent->SetMaterial(_material_gbuffer);
@@ -174,7 +185,6 @@ namespace Vxl
 					//	}
 					//	
 					//	_cubes.push_back(ent);
-					
 				}
 			}
 		}
@@ -183,14 +193,14 @@ namespace Vxl
 		_crate1 = Entity::Create();
 		_crate1->SetMaterial(_material_gbuffer);
 		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_crate1->m_mesh = Geometry::GetCube();
+		_crate1->m_mesh = Geometry.GetCube();
 		_crate1->m_transform.setPosition(0, 2, 0);
-		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
+		//_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
 		_crate2 = Entity::Create();
 		_crate2->SetMaterial(_material_gbuffer);
-		_crate2->m_mesh = Geometry::GetCube();
+		_crate2->m_mesh = Geometry.GetCube();
 		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(0, 2, 0);
 		// Parent Test
@@ -201,34 +211,34 @@ namespace Vxl
 		
 		_octo1 = Entity::Create();
 		_octo1->SetMaterial(_material_gbuffer);
-		_octo1->m_mesh = Geometry::GetOctahedron();
+		_octo1->m_mesh = Geometry.GetOctahedron();
 		_octo1->m_transform.setPosition(0, 0, 0);
 		_octo1->m_transform.setScale(0.5f);
 		_octo1->SetColor(Color3F(1, 1, 1));
 		
 		_octo2 = Entity::Create();
 		_octo2->SetMaterial(_material_gbuffer);
-		_octo2->m_mesh = Geometry::GetOctahedron();
+		_octo2->m_mesh = Geometry.GetOctahedron();
 		_octo2->m_transform.setPosition(1, 0, 0);
 		_octo2->m_transform.setScale(0.5f);
 		_octo2->SetColor(Color3F(1, 0, 0));
 		
 		_octo3 = Entity::Create();
 		_octo3->SetMaterial(_material_gbuffer);
-		_octo3->m_mesh = Geometry::GetOctahedron();
+		_octo3->m_mesh = Geometry.GetOctahedron();
 		_octo3->m_transform.setPosition(0, 1, 0);
 		_octo3->m_transform.setScale(0.5f);
 		_octo3->SetColor(Color3F(0, 1, 0));
 		
 		_octo4 = Entity::Create();
 		_octo4->SetMaterial(_material_gbuffer);
-		_octo4->m_mesh = Geometry::GetOctahedron();
+		_octo4->m_mesh = Geometry.GetOctahedron();
 		_octo4->m_transform.setPosition(0, 0, 1);
 		_octo4->m_transform.setScale(0.5f);
 		_octo4->SetColor(Color3F(0, 0, 1));
 		
 
-		DebugLines.Setup();
+		Debug.Setup();
 	}
 	void Scene_Game::Destroy()
 	{
@@ -240,6 +250,9 @@ namespace Vxl
 
 	void Scene_Game::Update()
 	{
+		// Setup Debug
+		Debug.UpdateStart();
+
 		if (Input.getKeyDown(KeyCode::ESCAPE))
 			Window.Close();
 
@@ -286,21 +299,55 @@ namespace Vxl
 
 		_camera->update();
 
-		//	// Debug Lines
-		//	DebugLines.AddLine(
-		//		Vector3(-1, -1, -1), Vector3(+1, +1, -1),
-		//		Color3F(0, 1, 0), Color3F(1, 0, 1)
-		//	);
-		//	static float time = 0.0f;
-		//	time += 0.2f;
-		//	DebugLines.AddLine(
-		//		Vector3(+1, +1, -1), Vector3(+1, +4 + cosf(time), -1),
-		//		Color3F(1, 1, 0), Color3F(0, 1, 1)
-		//	);
+		// Debug Lines
+		Debug.DrawLine(
+			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
+			Color3F(0, 1, 0), Color3F(1, 0, 1)
+		);
+		static float time = 0.0f;
+		time += 0.2f;
+		Debug.DrawLine(
+			Vector3(+1, +1, -1), Vector3(+1, +4 + cosf(time), -1),
+			Color3F(1, 1, 0), Color3F(0, 1, 1)
+		);
+
+		// Draw OBB for entity 3
+		Vector3 p = _entity3->m_transform.getPosition();
+		Vector3 pmin = _entity3->GetAABBMin();
+		Vector3 pmax = _entity3->GetAABBMax();
+		std::vector<Vector3> OBB = _entity3->GetOBB();
+
+		//DebugLines.AddAABB(pmin, pmax, p);
+		
+		// Bot
+		Debug.DrawLine(p + OBB[0], p + OBB[1]);
+		Debug.DrawLine(p + OBB[1], p + OBB[5]);
+		Debug.DrawLine(p + OBB[5], p + OBB[4]);
+		Debug.DrawLine(p + OBB[4], p + OBB[0]);
+		
+		// Top
+		Debug.DrawLine(p + OBB[2], p + OBB[3]);
+		Debug.DrawLine(p + OBB[3], p + OBB[7]);
+		Debug.DrawLine(p + OBB[7], p + OBB[6]);
+		Debug.DrawLine(p + OBB[6], p + OBB[2]);
+
+		// Mid
+		Debug.DrawLine(p + OBB[0], p + OBB[2]);
+		Debug.DrawLine(p + OBB[1], p + OBB[3]);
+		Debug.DrawLine(p + OBB[4], p + OBB[6]);
+		Debug.DrawLine(p + OBB[5], p + OBB[7]);
+
+		// Transforms
+		Debug.DrawLine(p, p + _entity3->m_transform.getForward() * 4.0f, Color3F::BLUE, Color3F::BLUE);
+		Debug.DrawLine(p, p + _entity3->m_transform.getUp() * 4.0f, Color3F::GREEN, Color3F::GREEN);
+		Debug.DrawLine(p, p + _entity3->m_transform.getRight() * 4.0f, Color3F::RED, Color3F::RED);
+
+		Debug.DrawAABB(pmin, pmax, p, Color3F::BLACK);
 
 		// Rotate Stuff
 		//_crate2->m_transform.setRotation(sin(Time.GetTime() / 2) * 90.0, cos(Time.GetTime() / 2) * 90.0, 0);
 		//_crate2->m_transform.increaseRotation(1.0f, 0.2f, 0);
+		_entity3->m_transform.increaseRotation(0.2f, 1, 0);
 
 		// End Frame Updates
 		TextureTracker.NewFrame();
@@ -317,15 +364,13 @@ namespace Vxl
 		_fbo->bind();
 		Window.ViewportToWindowResolution();
 
+		// ~~ //
 		_material_debugLines->Bind();
-		//
-		glUtil::unbindVAO();
+
 		glLineWidth(9.0f);
-
-		DebugLines.DrawLines();
-
+		Debug.RenderLines();
 		glLineWidth(1.0f);
-
+		// ~~ //
 
 		RenderManager.RenderScene();
 		{
@@ -434,14 +479,14 @@ namespace Vxl
 		glDepthFunc(GL_ALWAYS);
 
 		_fbo->bindTexture(0, Active_Texture::LEVEL0);
-		Geometry::GetFullQuad()->Draw();
+		Geometry.GetFullQuad()->Draw();
 		
 		// Normals test
 		if (ShowNormal_DEV)
 		{
 			glViewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
 			_fbo->bindTexture(1, Active_Texture::LEVEL0);
-			Geometry::GetFullQuad()->Draw();
+			Geometry.GetFullQuad()->Draw();
 		}
 
 		// _fbo->bindDepth(Active_Texture::LEVEL0);

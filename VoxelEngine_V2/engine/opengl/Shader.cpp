@@ -5,7 +5,8 @@
 #include <GL/gl3w.h>
 
 #include "../utilities/logger.h"
-#include "../utilities/stringUtil.h"
+//#include "../utilities/stringUtil.h"
+#include "../utilities/FileIO.h"
 
 namespace Vxl
 {
@@ -29,6 +30,12 @@ namespace Vxl
 		}
 
 		Shader* S = new Shader(name, filePath, type);
+
+		if (S->HasCompiled() && S->HasLoaded())
+			Logger.log("Loaded Shader: " + name);
+		else
+			Logger.error("Could not Load Shader: " + name);
+
 		m_database.Set(name, S);
 		return S;
 	}
@@ -114,7 +121,8 @@ namespace Vxl
 		}
 
 		// Read file
-		std::string source = stringUtil::readFile(m_filePath);
+		std::string source = IO::readFile(m_filePath);
+		source = IO::addInclude(source, m_filePath);
 
 		// Compile Source
 		if (!compile(source))
@@ -122,6 +130,9 @@ namespace Vxl
 			Logger.error("Unable to compile shader: " + m_name);
 			return false;
 		}
+
+		// set gl name
+		glUtil::setOpenGLName(GL_SHADER, m_id, m_name);
 
 		return true;
 	}
@@ -136,7 +147,7 @@ namespace Vxl
 	// SHADER PROGRAM //
 
 	// Database Creation
-	ShaderProgram* ShaderProgram::Create(const std::string& name)
+	ShaderProgram* ShaderProgram::Create(const std::string& name, std::vector<std::string> shaders)
 	{
 		// Name Duplication
 		if (m_database.Check(name))
@@ -145,9 +156,24 @@ namespace Vxl
 			return nullptr;
 		}
 
-		ShaderProgram* S = new ShaderProgram(name);
-		m_database.Set(name, S);
-		return S;
+		ShaderProgram* Sp = new ShaderProgram(name);
+
+		int shaderCount = (int)shaders.size();
+		for (int i = 0; i < shaderCount; i++)
+		{
+			Shader* S = Shader::Get(shaders[i]);
+			if (S != nullptr)
+				Sp->AddShader(S);
+		}
+		Sp->Link();
+
+		if (Sp->IsLinked())
+			Logger.log("Loaded Shader Program: " + name);
+		else
+			Logger.error("Could not Load Shader Program: " + name);
+
+		m_database.Set(name, Sp);
+		return Sp;
 	}
 
 	ShaderProgram::~ShaderProgram()
@@ -344,6 +370,9 @@ namespace Vxl
 			acquireUniforms();
 			acquireUniformBlocks();
 			acquireSubroutines();
+
+			// set gl name
+			glUtil::setOpenGLName(GL_PROGRAM, m_id, m_name);
 		}
 	}
 

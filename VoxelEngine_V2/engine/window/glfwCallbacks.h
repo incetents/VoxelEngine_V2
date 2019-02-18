@@ -31,6 +31,8 @@ namespace Vxl
 		static void Window_Resize(GLFWwindow* window, int width, int height);
 		// Input - Move Window
 		static void Window_Move(GLFWwindow* window, int xpos, int ypos);
+		// Input - Drag File into Context
+		static void Drag_File(GLFWwindow* window, int count, const char** paths);
 	};
 }
 

@@ -12,6 +12,8 @@
 #include "../game/Scene_Game.h"
 #include "modules/RenderManager.h"
 
+#include "opengl/Debug.h"
+
 /**/
 using namespace Vxl;
 using namespace std;
@@ -35,8 +37,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	//Window.SetCustomAspectRatio(true, 1.0f);
 
 	/* Special */
-	MaterialData::NULL_TEXTURE = new Texture("./assets/textures/null_texture.png", Wrap_Mode::CLAMP_STRETCH, Filter_Mode::NEAREST, Filter_Mode::NEAREST);
-	Geometry::Setup();
+	Debug.CreateDebugTextures();
+	Geometry.Setup();
 	/* ~ */
 	RenderManager.SetNewScene(_scene);
 	//_scene->setup();
@@ -48,10 +50,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		if (Input.getKeyDown(KeyCode::R))
 		{
 			Window.Reload();
-
-			Geometry::Reload();
+			Geometry.Reload();
 			
 			RenderManager.Reload();
+
+			Debug.CreateDebugTextures();
 		}
 
 		// Before Frame

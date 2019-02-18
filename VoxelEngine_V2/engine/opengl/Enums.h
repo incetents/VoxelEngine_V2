@@ -30,6 +30,7 @@ namespace Vxl
 	// Shader Types
 	enum class ShaderType
 	{
+		NONE = 0,
 		VERTEX = GL_VERTEX_SHADER,
 		FRAGMENT = GL_FRAGMENT_SHADER,
 		GEOMETRY = GL_GEOMETRY_SHADER,
@@ -154,7 +155,7 @@ namespace Vxl
 		MIRROR_REPEAT = GL_MIRRORED_REPEAT,
 		MIRROR_CLAMP = GL_MIRROR_CLAMP_TO_EDGE
 	};
-	enum class Filter_Mode
+	enum class Filter_Mode_Min
 	{
 		NONE = 0,
 		NEAREST = GL_NEAREST,
@@ -163,6 +164,12 @@ namespace Vxl
 		LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
 		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
 		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR
+	};
+	enum class Filter_Mode_Mag
+	{
+		NONE = 0,
+		NEAREST = GL_NEAREST,
+		LINEAR = GL_LINEAR
 	};
 	enum class Format_Count
 	{

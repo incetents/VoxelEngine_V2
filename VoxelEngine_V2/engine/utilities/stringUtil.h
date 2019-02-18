@@ -16,8 +16,6 @@ namespace Vxl
 {
 	namespace stringUtil
 	{
-		// File
-		std::string readFile(const std::string& filePath);
 		// Trim
 		void ltrim(std::string &s);
 		void rtrim(std::string &s);
@@ -25,6 +23,11 @@ namespace Vxl
 		std::string ltrim_copy(std::string s);
 		std::string rtrim_copy(std::string s);
 		std::string trim_copy(std::string s);
+		// Get name from file path
+		std::string nameFromFilepath(const std::string& filePath);
+		// Remove characters from string
+		void removeChar(std::string& str, char c);
+		void removeChar(std::string& str, std::string chars);
 		// Split
 		std::vector<std::string> splitStr(const std::string& str, char delimiter);
 		std::vector<std::string> splitStr(const std::string& str, std::string delimiters);

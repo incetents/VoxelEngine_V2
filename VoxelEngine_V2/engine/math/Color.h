@@ -6,24 +6,24 @@ namespace Vxl
 	class Color3F
 	{
 	public:
+		// Common Color Types
+		static const Color3F WHITE;
+		static const Color3F BLACK;
+		static const Color3F RED;
+		static const Color3F GREEN;
+		static const Color3F BLUE;
+		static const Color3F YELLOW;
+		static const Color3F ORANGE;
+		static const Color3F PURPLE;
+		static const Color3F CYAN;
 
-		static constexpr  Color3F WHITE()	{ return Color3F(1, 1, 1); }
-		static constexpr  Color3F BLACK()	{ return Color3F(0, 0, 0); }
-		static constexpr  Color3F RED()		{ return Color3F(230.f / 255.f, 25.f / 255.f, 75.f / 255.f); }
-		static constexpr  Color3F GREEN()	{ return Color3F(60.f / 255.f, 180.f / 255.f, 75.f / 255.f); }
-		static constexpr  Color3F BLUE()	{ return Color3F(0, 130.f / 255.f, 200.f / 255.f); }
-		static constexpr  Color3F YELLOW()	{ return Color3F(1, 1, 25.f / 255.f); }
-		static constexpr  Color3F ORANGE()	{ return Color3F(245.f / 255.f, 130.f / 255.f, 48.f / 255.f); }
-		static constexpr  Color3F PURPLE()	{ return Color3F(145.f / 255.f, 30.f / 255.f, 180.f / 255.f); }
-		static constexpr  Color3F CYAN()	{ return Color3F(70.f / 255.f, 240.f / 255.f, 240.f / 255.f); }
-
-		constexpr Color3F(float r, float g, float b)
+		Color3F(float r, float g, float b)
 			: r(r), g(g), b(b)
 		{}
-		constexpr Color3F()
+		Color3F()
 			: r(0), g(0), b(0)
 		{}
-		constexpr Color3F(float a)
+		Color3F(float a)
 			: r(a), g(a), b(a)
 		{}
 
@@ -61,13 +61,25 @@ namespace Vxl
 	class Color4F
 	{
 	public:
-		constexpr Color4F(float r, float g, float b, float _a)
+		// Common Color Types
+		static const Color4F ZEROES;
+		static const Color4F WHITE;
+		static const Color4F BLACK;
+		static const Color4F RED;
+		static const Color4F GREEN;
+		static const Color4F BLUE;
+		static const Color4F YELLOW;
+		static const Color4F ORANGE;
+		static const Color4F PURPLE;
+		static const Color4F CYAN;
+
+		Color4F(float r, float g, float b, float _a)
 			: r(r), g(g), b(b), a(a)
 		{}
-		constexpr Color4F()
+		Color4F()
 			: r(0), g(0), b(0), a(0)
 		{}
-		constexpr Color4F(float _a)
+		Color4F(float _a)
 			: r(_a), g(_a), b(_a), a(_a)
 		{}
 
