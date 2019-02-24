@@ -163,7 +163,7 @@ namespace Vxl
 		template<typename Type>
 		void					SetUniform(const std::string& name, Type data)
 		{
-			m_uniforms[name].set<Type>(data);
+			m_uniforms[name].Set<Type>(data);
 		}
 		inline const glUniform& GetUniform(const std::string& name)
 		{

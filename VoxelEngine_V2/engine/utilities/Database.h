@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Emmanuel Lajeunesse
 #pragma once
 
+#include <Windows.h>
 #include <unordered_map>
 #include <string>
 #include <set>

@@ -195,7 +195,7 @@ namespace Vxl
 		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate1->m_mesh = Geometry.GetCube();
 		_crate1->m_transform.setPosition(0, 2, 0);
-		//_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
+		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
 		_crate2 = Entity::Create();
