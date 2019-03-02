@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
 #include <algorithm> 
@@ -31,5 +31,7 @@ namespace Vxl
 		// Split
 		std::vector<std::string> splitStr(const std::string& str, char delimiter);
 		std::vector<std::string> splitStr(const std::string& str, std::string delimiters);
+		// Extract Data Simply
+		std::string extractFirst(const std::string& str, char start, char end);
 	}
 }

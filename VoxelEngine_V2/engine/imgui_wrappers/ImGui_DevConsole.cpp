@@ -1,19 +1,25 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "ImGui_DevConsole.h"
 
 #include "../imgui/imgui.h"
 
 #include "../utilities/Time.h"
+#include "../utilities/Util.h"
+
 #include "../window/window.h"
+
 #include "../modules/RenderManager.h"
+#include "../modules/Entity.h"
+
 #include "../input/Input.h"
 #include "../input/XGamePad.h"
+
 #include "../math/Camera.h"
+#include "../math/Transform.h"
 
 #include "../game/Scene_Game.h"
-#include "../modules/Entity.h"
-#include "../math/Transform.h"
+
 
 namespace Vxl
 {
@@ -75,27 +81,43 @@ namespace Vxl
 
 			ImGui::Separator();
 
-			if (ImGui::Button("Set Size (1080, 720)"))
+			if (ImGui::CollapsingHeader("Resolutions"))
 			{
-				Window.SetSize(1080, 720);
-				MAIN_CAMERA->updatePerspectiveAspectRatio(Window.GetAspectRatio());
+				ImGui::BeginChild("Resolutions", ImVec2(0, 150), true);
+				{
+					for (unsigned int i = 0; i < Util::ResolutionInfo::VariationsCount; i++)
+					{
+						std::string Name = "Set Size: " + Util::ResolutionInfo::Variations[i].StrFormat;
+						if (ImGui::Button(Name.c_str()))
+						{
+							Window.SetSize(
+								Util::ResolutionInfo::Variations[i].Width,
+								Util::ResolutionInfo::Variations[i].Height
+							);
+						}
+					}
+				}
+				ImGui::EndChild();
 			}
 
-			if (ImGui::Button("Set Size (500, 500)"))
+			if (ImGui::CollapsingHeader("Aspect Ratios"))
 			{
-				Window.SetSize(500, 500);
-				MAIN_CAMERA->updatePerspectiveAspectRatio(1.0f);
-			}
+				ImGui::BeginChild("Aspect Ratios", ImVec2(0, 150), true);
+				{
+					if (ImGui::Button("Free Aspect Ratio"))
+					{
+						Window.SetCustomAspectRatio(false);
+					}
 
-			if (ImGui::Button("Free Aspect Ratio"))
-			{
-				Window.SetCustomAspectRatio(false);
-				MAIN_CAMERA->updatePerspectiveAspectRatio(Window.GetAspectRatio());
-			}
-			if (ImGui::Button("Lock Aspect Ratio [1:1]"))
-			{
-				Window.SetCustomAspectRatio(true, 1.0f);
-				MAIN_CAMERA->updatePerspectiveAspectRatio(1.0f);
+					for (unsigned int i = 0; i < Util::AspectRatioInfo::VariationsCount; i++)
+					{
+						if (ImGui::Button(Util::AspectRatioInfo::Variations[i].StrFormat.c_str()))
+						{
+							Window.SetCustomAspectRatio(true, Util::AspectRatioInfo::Variations[i].AspectRatio);
+						}
+					}
+				}
+				ImGui::EndChild();
 			}
 
 			ImGui::Separator();
@@ -107,6 +129,7 @@ namespace Vxl
 			ImGui::Separator();
 
 			ImGui::Checkbox("SHOW NORMALS", &SHOW_NORMALS);
+			ImGui::Checkbox("SHOW DEPTH", &SHOW_DEPTH);
 
 			//ImGui::Text("Dear ImGui, %s", ImGui::GetVersion());
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Scene_Game.h"
 
@@ -59,10 +59,10 @@ namespace Vxl
 
 		// FBO
 		_fbo = new FramebufferObject();
-		_fbo->addTexture(new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT));
-		_fbo->addTexture(new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT));
-		_fbo->addTexture(new RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT));
-		_fbo->addDepth(SCREEN_WIDTH, SCREEN_HEIGHT);
+		_fbo->addTexture(Window.GetResolutionWidth(), Window.GetResolutionHeight());
+		_fbo->addTexture(Window.GetResolutionWidth(), Window.GetResolutionHeight());
+		_fbo->addTexture(Window.GetResolutionWidth(), Window.GetResolutionHeight());
+		_fbo->addDepth(Window.GetResolutionWidth(), Window.GetResolutionHeight());
 		_fbo->unbind();
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
@@ -121,17 +121,6 @@ namespace Vxl
 		
 		_mesh->m_instances = m_models;
 
-		Model::Create("jiggy", "./assets/models/jiggy.obj");
-		Model* jiggy = Model::Get("jiggy");
-		Mesh* jiggyMesh = new Mesh();
-		jiggyMesh->m_positions.set(jiggy->positions);
-		jiggyMesh->m_uvs.set(jiggy->uvs);
-		jiggyMesh->m_normals.set(jiggy->normals);
-		//jiggyMesh->m_tangents.set(jiggy->tangents);
-		//jiggyMesh->m_bitangents.set(jiggy->bitangents);
-		jiggyMesh->m_indices.set(jiggy->indices);
-		jiggyMesh->Bind();
-
 		_mesh->Bind();
 
 		
@@ -142,13 +131,24 @@ namespace Vxl
 		_entity1->m_mesh = _mesh;
 		_entity1->m_transform.setScale(+0.5f);
 		
+		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
+		Model* jiggy = Model::Get("jiggy");
+		Mesh* jiggyMesh = new Mesh();
+		jiggyMesh->m_positions.set(jiggy->positions);
+		jiggyMesh->m_uvs.set(jiggy->uvs);
+		jiggyMesh->m_normals.set(jiggy->normals);
+		//jiggyMesh->m_tangents.set(jiggy->tangents);
+		//jiggyMesh->m_bitangents.set(jiggy->bitangents);
+		jiggyMesh->m_indices.set(jiggy->indices);
+		jiggyMesh->Bind();
+
 		_entity2 = Entity::Create();
 		_entity2->SetMaterial(_material_gbuffer);
-		_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->m_mesh = jiggyMesh;// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		// TEST
-		_entity2->SetColor(Color3F(1, 0, 0));
+		_entity2->SetColor(Color3F(1, 1, 0));
 		
 		_entity3 = Entity::Create();
 		_entity3->SetMaterial(_material_gbuffer);
@@ -488,6 +488,13 @@ namespace Vxl
 			_fbo->bindTexture(1, Active_Texture::LEVEL0);
 			Geometry.GetFullQuad()->Draw();
 		}
+		// Depth test
+		if (ShowDepth_DEV)
+		{
+			glViewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
+			_fbo->bindDepth(Active_Texture::LEVEL0);
+			Geometry.GetFullQuad()->Draw();
+		}
 
 		// _fbo->bindDepth(Active_Texture::LEVEL0);
 		// Geometry::GetFullQuad()->Draw();
@@ -549,6 +556,7 @@ namespace Vxl
 		_material_gbuffer->m_wireframe = Imgui_DevConsole.GBUFFER_WIREFRAME;
 		_camera = Imgui_DevConsole.MAIN_CAMERA;
 		ShowNormal_DEV = Imgui_DevConsole.SHOW_NORMALS;
+		ShowDepth_DEV = Imgui_DevConsole.SHOW_DEPTH;
 
 		if (fabs(_camera->getFOV() - Imgui_DevConsole.CAMFOV) > 0.01f)
 		{

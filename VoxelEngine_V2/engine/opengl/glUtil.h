@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
 #include "Enums.h"
@@ -11,6 +11,7 @@ namespace Vxl
 {
 	class Color3F;
 	class Color4F;
+	enum class Channel_Type;
 
 	namespace glUtil
 	{
@@ -30,8 +31,7 @@ namespace Vxl
 		void setOpenGLName(GLenum identifier, GLuint name, const std::string &label);
 
 		// Get Format Type from channel count
-		Format_Type getFormatFloat(int ChannelCount);
-		Format_Type getFormatInt(int ChannelCount);
+		Channel_Type getFormat(int ChannelCount);
 
 		// Clear Color
 		void clearColor();

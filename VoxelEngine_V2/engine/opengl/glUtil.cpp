@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 
 #include "glUtil.h"
@@ -6,6 +6,7 @@
 #include "../utilities/logger.h"
 #include "../Math/Color.h"
 #include "../math/Vector4.h"
+#include "../opengl/Texture.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -72,38 +73,21 @@ namespace Vxl
 	}
 
 	// Get Format Type from channel count
-	Format_Type glUtil::getFormatFloat(int ChannelCount)
+	Channel_Type glUtil::getFormat(int ChannelCount)
 	{
 		switch (ChannelCount)
 		{
 		default:
 		case 0:
-			return Format_Type::NONE;
+			return Channel_Type::NONE;
 		case 1:
-			return Format_Type::GRAYSCALE;
+			return Channel_Type::R;
 		case 2:
-			return Format_Type::RG;
+			return Channel_Type::RG;
 		case 3:
-			return Format_Type::RGB;
+			return Channel_Type::RGB;
 		case 4:
-			return Format_Type::RGBA;
-		}
-	}
-	Format_Type glUtil::getFormatInt(int ChannelCount)
-	{
-		switch (ChannelCount)
-		{
-		default:
-		case 0:
-			return Format_Type::NONE;
-		case 1:
-			return Format_Type::GRAYSCALE_INT;
-		case 2:
-			return Format_Type::RG_INT;
-		case 3:
-			return Format_Type::RGB_INT;
-		case 4:
-			return Format_Type::RGBA_INT;
+			return Channel_Type::RGBA;
 		}
 	}
 

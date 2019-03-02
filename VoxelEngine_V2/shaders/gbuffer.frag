@@ -23,6 +23,14 @@ uniform bool VXL_useColorOverride = false;
 uniform vec3 VXL_color = vec3(1,1,1);
 uniform vec3 VXL_tint = vec3(1,1,1);
 
+// Uniform blocks
+layout (std140) uniform mycolors_0
+{
+	float red;
+	float green;
+	float blue;
+};
+
 //Main
 void main()
 {

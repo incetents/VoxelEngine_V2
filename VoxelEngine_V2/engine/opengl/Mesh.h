@@ -1,9 +1,11 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
 #include "glUtil.h"
 
 #include "../utilities/logger.h"
+#include "../utilities/Database.h"
+
 #include "../math/Vector2.h"
 #include "../math/Vector3.h"
 #include "../math/Vector4.h"
@@ -180,13 +182,25 @@ namespace Vxl
 
 		void UpdateDrawInfo();
 
+		static Database<Mesh> m_database;
 	public:
+		// Stores Mesh in Database optionally
+		static Mesh* Create(const std::string& name);
+		// Get Mesh from database
+		static Mesh* Get(const std::string& name)
+		{
+			return m_database.Get(name);
+		}
+
 		Mesh();
 		virtual ~Mesh();
 
 		MeshBufferVertices m_positions;
 		MeshBuffer<Vector2, 2, BufferType::UV> m_uvs;
 		MeshBuffer<Vector3, 3, BufferType::NORMAL> m_normals;
+		MeshBuffer<Vector3, 3, BufferType::TANGENT> m_tangents;
+		MeshBuffer<Vector3, 3, BufferType::BITANGENT> m_bitangents;
+		MeshBuffer<Vector3, 4, BufferType::COLOR> m_colors;
 		MeshBufferInstancing m_instances;
 		MeshBufferIndices m_indices;
 

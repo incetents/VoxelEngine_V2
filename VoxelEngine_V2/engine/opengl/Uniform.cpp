@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Uniform.h"
 
@@ -145,44 +145,43 @@ namespace Vxl
 		glUniformMatrix4fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
 
-	glUniformBlock::glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize)
-		: m_bindingPoint(bindingPoint), m_bufferSize(bufferSize)
-	{
-		if (m_bindingPoint >= (GLuint)glUtil::GetMaxUniformBufferBindings())
-		{
-
-			assert(FALSE);
-			return;
-		}
-
-		m_array = new GLfloat[bufferSize / 4];
-
-		m_blockIndex = glGetUniformBlockIndex(program.GetID(), blockName.c_str());
-		glUniformBlockBinding(program.GetID(), m_blockIndex, m_bindingPoint);
-		//
-		glGenBuffers(1, &m_buffer);
-		glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
-		//
-		// GL_STATIC_DRAW (modified few times)
-		// GL_DYNAMIC_DRAW (modified many times)
-		glBufferData(GL_UNIFORM_BUFFER, bufferSize, m_array, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_bindingPoint, m_buffer);
-	}
-	glUniformBlock::~glUniformBlock()
-	{
-		glDeleteBuffers(1, &m_buffer);
-
-		if (m_array != nullptr)
-			delete[] m_array;
-	}
-
-	void glUniformBlock::Set(GLfloat* arr, GLuint arrLength, size_t startOffset)
-	{
-		glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
-		//
-		glBufferSubData(GL_UNIFORM_BUFFER, startOffset * sizeof(GLfloat), arrLength * sizeof(GLfloat), arr);
-		//
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	}
+	//	glUniformBlock::glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize)
+	//		: m_bindingPoint(bindingPoint), m_bufferSize(bufferSize)
+	//	{
+	//		if (m_bindingPoint >= (GLuint)glUtil::GetMaxUniformBufferBindings())
+	//		{
+	//			assert(FALSE);
+	//			return;
+	//		}
+	//	
+	//		m_array = new GLfloat[bufferSize / 4];
+	//	
+	//		m_blockIndex = glGetUniformBlockIndex(program.GetID(), blockName.c_str());
+	//		glUniformBlockBinding(program.GetID(), m_blockIndex, m_bindingPoint);
+	//		//
+	//		glGenBuffers(1, &m_buffer);
+	//		glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
+	//		//
+	//		// GL_STATIC_DRAW (modified few times)
+	//		// GL_DYNAMIC_DRAW (modified many times)
+	//		glBufferData(GL_UNIFORM_BUFFER, bufferSize, m_array, GL_DYNAMIC_DRAW);
+	//		glBindBufferBase(GL_UNIFORM_BUFFER, m_bindingPoint, m_buffer);
+	//	}
+	//	glUniformBlock::~glUniformBlock()
+	//	{
+	//		glDeleteBuffers(1, &m_buffer);
+	//	
+	//		if (m_array != nullptr)
+	//			delete[] m_array;
+	//	}
+	//	
+	//	void glUniformBlock::Set(GLfloat* arr, GLuint arrLength, size_t startOffset)
+	//	{
+	//		glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
+	//		//
+	//		glBufferSubData(GL_UNIFORM_BUFFER, startOffset * sizeof(GLfloat), arrLength * sizeof(GLfloat), arr);
+	//		//
+	//		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	//	}
 
 }

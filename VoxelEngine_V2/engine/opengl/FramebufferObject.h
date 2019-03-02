@@ -1,8 +1,10 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include <Windows.h>
 #include "glUtil.h"
 #include "../math/Color.h"
+#include "../utilities/Database.h"
 
 //#include "Texture.h"
 #include <vector>
@@ -15,14 +17,18 @@ namespace Vxl
 	{
 	private:
 		// Fbo
-		GLuint m_id = -1;
+		GLuint	m_id = -1;
 		Color4F m_clearColor = Color4F(0,0,0,1);
+		bool	m_dirtyDrawBuffers = false;
 		// Textures
-		GLuint m_texCount = 0;
 		std::vector<RenderTexture*> m_textures;
-		GLenum* m_attachCallList = nullptr;
+		GLuint						m_textureCount = 0;
+		GLenum*						m_attachments = nullptr;
 		// Depth
-		RenderTexture* _depth = nullptr;
+		RenderTexture*				m_depth = nullptr;
+
+		// Database
+		static Database<FramebufferObject> m_database;
 
 		void FixCallList();
 		bool checkFBOStatus();
@@ -35,8 +41,16 @@ namespace Vxl
 			m_clearColor = c;
 		}
 
-		void addTexture(RenderTexture* _tex);
-		void addDepth(int width, int height);
+		void addTexture(
+			int Width, int Height,
+			Wrap_Mode WrapMode = Wrap_Mode::CLAMP_STRETCH,
+			Filter_Min MinFilter = Filter_Min::NEAREST,
+			Filter_Mag MagFilter = Filter_Mag::NEAREST,
+			Format_Type FormatType = Format_Type::RGBA,
+			Channel_Type ChannelType = Channel_Type::RGBA,
+			Data_Type DataType = Data_Type::UNSIGNED_BYTE
+		);
+		void addDepth(UINT width, UINT height);
 
 		void bind();
 		static void unbind();

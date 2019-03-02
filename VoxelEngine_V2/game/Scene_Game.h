@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
 #include "../engine/modules/Scene.h"
@@ -64,6 +64,7 @@ namespace Vxl
 		std::vector<Entity*> _cubes;
 
 		bool ShowNormal_DEV = false;
+		bool ShowDepth_DEV = false;
 
 	public:
 		void Setup() override;

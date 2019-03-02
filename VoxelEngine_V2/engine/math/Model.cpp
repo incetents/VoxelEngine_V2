@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Model.h"
 
@@ -14,6 +14,10 @@ namespace Vxl
 {
 	Database<Model> Model::m_database;
 
+	Vector4 InterpretAssimpVec4(aiColor4D vec)
+	{
+		return Vector4(vec.r, vec.g, vec.b, vec.a);
+	}
 	Vector3 InterpretAssimpVec3(aiVector3D vec)
 	{
 		return Vector3(vec.x, vec.y, vec.z);
@@ -23,8 +27,12 @@ namespace Vxl
 		return Vector2(vec.x, vec.y);
 	}
 
-	std::vector<Model*> Model::LoadFromAssimp(const std::string& filePath)
-	{
+	std::vector<Model*> Model::LoadFromAssimp(
+		const std::string& filePath,
+		bool mergeMeshes,
+		bool normalize,
+		float normalizeScale
+	) {
 		unsigned int flags = aiProcessPreset_TargetRealtime_MaxQuality;
 
 		const aiScene* scene = aiImportFile(filePath.c_str(), flags);
@@ -39,6 +47,8 @@ namespace Vxl
 		// Start
 		std::vector<Model*> _models;
 		_models.reserve(scene->mNumMeshes);
+
+		float LongestVertexSqr = 0.0f;
 
 		// Iterate each mesh
 		for (std::uint32_t meshIndex = 0u; meshIndex < scene->mNumMeshes; meshIndex++)
@@ -62,10 +72,19 @@ namespace Vxl
 				_model->tangents.reserve(mesh->mNumVertices);
 				_model->bitangents.reserve(mesh->mNumVertices);
 			}
+			// colors
+			if (mesh->HasVertexColors(0))
+				_model->colors.reserve(mesh->mNumVertices);
 
+			// add all data
 			for (std::uint32_t vertIndex = 0u; vertIndex < mesh->mNumVertices; vertIndex++)
 			{
 				_model->positions.push_back(InterpretAssimpVec3(mesh->mVertices[vertIndex]));
+
+				// Longest position
+				if (normalize)
+					LongestVertexSqr = _model->positions.back().LengthSqr();
+
 				if (mesh->HasNormals())
 					_model->normals.push_back(InterpretAssimpVec3(mesh->mNormals[vertIndex]));
 				if (mesh->HasTextureCoords(0))
@@ -74,6 +93,10 @@ namespace Vxl
 				{
 					_model->tangents.push_back(InterpretAssimpVec3(mesh->mTangents[vertIndex]));
 					_model->bitangents.push_back(InterpretAssimpVec3(mesh->mBitangents[vertIndex]));
+				}
+				if (mesh->HasVertexColors(0))
+				{
+					_model->colors.push_back(InterpretAssimpVec4(mesh->mColors[0][vertIndex]));
 				}
 			}
 
@@ -91,47 +114,36 @@ namespace Vxl
 			_models.push_back(_model);
 		}
 
+		// Merge possibility
+		if (mergeMeshes)
+		{
+			int MeshCount = (int)_models.size();
+			for (int i = 1; i < MeshCount; i++)
+			{
+				_models[0]->Merge(*_models[i]);
+				delete _models[i];
+			}
+			_models.resize(1);
+		}
+
+		// normalize size
+		if (normalize)
+		{
+			float LongestVertex = sqrt(LongestVertexSqr);
+			unsigned int MeshCount = (int)_models.size();
+			for (unsigned int M = 0; M < MeshCount; M++)
+			{
+				unsigned int PositionCount = _models[M]->positions.size();
+				for (unsigned int vertIndex = 0u; vertIndex < PositionCount; vertIndex++)
+				{
+					_models[M]->positions[vertIndex] = _models[M]->positions[vertIndex] * normalizeScale / LongestVertex;
+				}
+			}
+		}
+		
+
 		// End
 		aiReleaseImport(scene);
 		return _models;
-	}
-
-	bool Model::Create(const std::string& name, const std::string& filePath)
-	{
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Model: " + name);
-			return false;
-		}
-
-		std::vector<Model*> Models = LoadFromAssimp(filePath);
-		UINT ModelCount = (UINT)Models.size();
-
-		if (ModelCount == 0)
-		{
-			Logger.error("Unable to Load Model: " + name);
-			return false;
-		}
-		else if (ModelCount == 1)
-		{
-			Logger.log("Loaded Model: " + name);
-			m_database.Set(name, Models[0]);
-			return true;
-		}
-		else
-		{
-			for (UINT i = 0; i < ModelCount; i++)
-			{
-				// New Names for extra meshes
-				std::string NameFix = name;
-				if(i > 0)
-					NameFix = name + "(" + std::to_string(i) + ")";
-
-				Logger.log("Loaded Model: " + NameFix);
-				m_database.Set(NameFix, Models[i]);
-			}
-			return true;
-		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "window.h"
 
@@ -194,6 +194,8 @@ namespace Vxl
 		m_customAspectRatio = aspect;
 		// Update viewport sizes
 		UpdateViewport();
+		// Update Aspect ratios
+		UpdateAspectRatio();
 	}
 
 	void Window::ViewportToWindowSize()

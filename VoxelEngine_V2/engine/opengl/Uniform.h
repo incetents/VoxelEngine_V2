@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
 #include <assert.h>
@@ -42,22 +42,22 @@ namespace Vxl
 		void Bind();
 	};
 
-	class glUniformBlock
-	{
-	private:
-		GLfloat* m_array = nullptr;
-		GLuint   m_bufferSize;
-		GLuint	 m_bindingPoint;
-		GLuint	 m_blockIndex;
-		GLuint	 m_buffer;
-
-	public:
-		glUniformBlock() {}
-		glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize);
-		~glUniformBlock();
-
-		void Set(GLfloat* arr, GLuint arrLength, size_t startOffset = 0);
-	};
+	//	class glUniformBlock
+	//	{
+	//	private:
+	//		GLfloat* m_array = nullptr;
+	//		GLuint   m_bufferSize;
+	//		GLuint	 m_bindingPoint;
+	//		GLuint	 m_blockIndex;
+	//		GLuint	 m_buffer;
+	//	
+	//	public:
+	//		glUniformBlock() {}
+	//		glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize);
+	//		~glUniformBlock();
+	//	
+	//		void Set(GLfloat* arr, GLuint arrLength, size_t startOffset = 0);
+	//	};
 
 	class glUniform
 	{

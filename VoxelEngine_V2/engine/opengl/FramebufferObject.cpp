@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "FramebufferObject.h"
 
@@ -58,47 +58,60 @@ namespace Vxl
 
 	void FramebufferObject::FixCallList()
 	{
-		if (m_attachCallList != nullptr)
-			delete[] m_attachCallList;
+		if (m_attachments != nullptr)
+			delete[] m_attachments;
 
-		m_attachCallList = new GLenum[m_texCount];
-		for (GLuint i = 0; i < m_texCount; i++)
-			m_attachCallList[i] = GL_COLOR_ATTACHMENT0 + i;
+		m_attachments = new GLenum[m_textureCount];
+		for (GLuint i = 0; i < m_textureCount; i++)
+			m_attachments[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
 
-	void FramebufferObject::addTexture(RenderTexture* _tex)
+	void FramebufferObject::addTexture(
+		int Width, int Height,
+		Wrap_Mode WrapMode,
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type FormatType,
+		Channel_Type ChannelType,
+		Data_Type DataType
+	)
 	{
-		assert(m_texCount < (GLuint)glUtil::GetMaxFBOColorAttachments());
-		assert(_tex != nullptr);
+		assert(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments());
 
+		// Create new render texture
+		RenderTexture* _tex = new RenderTexture(Width, Height, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, DataType);
+		m_textures.push_back(_tex);
+	
 		// Add to FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + m_texCount, GL_TEXTURE_2D, _tex->GetID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, _tex->GetID(), 0);
 		checkFBOStatus();
 
-		// Add to list
-		m_textures.push_back(_tex);
-		m_texCount++;
-		FixCallList();
+		// fix draw buffer
+		m_dirtyDrawBuffers = true;
 	}
-	void FramebufferObject::addDepth(int width, int height)
+	void FramebufferObject::addDepth(UINT width, UINT height)
 	{
-		if (_depth)
-			delete _depth;
+		if (m_depth)
+			delete m_depth;
 
 		// Save Texture
-		_depth = new RenderTexture(width, height, Format_Type::DEPTH, Wrap_Mode::CLAMP_STRETCH, Filter_Mode_Min::NEAREST, Filter_Mode_Mag::NEAREST);
+		m_depth = new RenderTexture(width, height, Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::DEPTH, Channel_Type::DEPTH, Data_Type::FLOAT);
 
 		// Add to FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depth->GetID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
 		checkFBOStatus();
 	}
 
 	void FramebufferObject::bind()
 	{
-		assert(m_attachCallList != nullptr);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-		glDrawBuffers(m_texCount, m_attachCallList);
+
+		if (m_dirtyDrawBuffers)
+		{
+			FixCallList();
+			glDrawBuffers(m_textureCount, m_attachments);
+			m_dirtyDrawBuffers = false;
+		}
 
 		glUtil::clearBuffer();
 		glUtil::clearColor(m_clearColor);
@@ -110,16 +123,16 @@ namespace Vxl
 
 	void FramebufferObject::bindTexture(int index, Active_Texture layer)
 	{
-		assert(index < (int)m_texCount);
+		assert(index < (int)m_textureCount);
 
 		glActiveTexture((GLenum)layer);
 		m_textures[index]->Bind();
 	}
 	void FramebufferObject::bindDepth(Active_Texture layer)
 	{
-		assert(_depth != nullptr);
+		assert(m_depth != nullptr);
 
 		glActiveTexture((GLenum)layer);
-		_depth->Bind();
+		m_depth->Bind();
 	}
 }

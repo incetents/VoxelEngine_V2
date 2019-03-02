@@ -1,9 +1,10 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Debug.h"
 
 #include "../opengl/Texture.h"
 #include "../math/Color.h"
+#include "../utilities/Loader.h"
 
 namespace Vxl
 {
@@ -109,7 +110,8 @@ namespace Vxl
 		pixels.push_back(Color3F(0, 0, 0));
 		pixels.push_back(Color3F::PURPLE);
 
-		m_null_texture = Texture::Create("null", pixels, 4, Wrap_Mode::CLAMP_STRETCH, Filter_Mode_Min::NEAREST, Filter_Mode_Mag::NEAREST);
+		m_null_texture = Texture::CreateCustom("null", pixels, 4, true, Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST);
+		assert(m_null_texture);
 	}
 	void Debug::BindNullTexture()
 	{

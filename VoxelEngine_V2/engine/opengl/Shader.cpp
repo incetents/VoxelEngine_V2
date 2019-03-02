@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 Emmanuel Lajeunesse
+﻿// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Shader.h"
 
@@ -15,30 +15,8 @@ namespace Vxl
 	Database<ShaderProgram> ShaderProgram::m_database;
 
 	// SHADER //
-
 	std::unordered_map<std::string, std::string> Shader::ShaderErrorLog;
 	UINT Shader::ShaderErrorLogSize = 0;
-
-	// Database Creation
-	Shader* Shader::Create(const std::string& name, const std::string& filePath, ShaderType type)
-	{
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Shader Name: " + name);
-			return nullptr;
-		}
-
-		Shader* S = new Shader(name, filePath, type);
-
-		if (S->HasCompiled() && S->HasLoaded())
-			Logger.log("Loaded Shader: " + name);
-		else
-			Logger.error("Could not Load Shader: " + name);
-
-		m_database.Set(name, S);
-		return S;
-	}
 
 	bool Shader::compile(const std::string& source)
 	{
@@ -146,55 +124,16 @@ namespace Vxl
 
 	// SHADER PROGRAM //
 
-	// Database Creation
-	ShaderProgram* ShaderProgram::Create(const std::string& name, std::vector<std::string> shaders)
-	{
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Shader Program Name: " + name);
-			return nullptr;
-		}
-
-		ShaderProgram* Sp = new ShaderProgram(name);
-
-		int shaderCount = (int)shaders.size();
-		for (int i = 0; i < shaderCount; i++)
-		{
-			Shader* S = Shader::Get(shaders[i]);
-			if (S != nullptr)
-				Sp->AddShader(S);
-		}
-		Sp->Link();
-
-		if (Sp->IsLinked())
-			Logger.log("Loaded Shader Program: " + name);
-		else
-			Logger.error("Could not Load Shader Program: " + name);
-
-		m_database.Set(name, Sp);
-		return Sp;
-	}
-
-	ShaderProgram::~ShaderProgram()
-	{
-		unload();
-	}
-
 	void ShaderProgram::attachShaders()
 	{
 		for (unsigned int i = 0; i < m_shaderCount; i++)
-		{
 			glAttachShader(m_id, m_shaders[i]->GetID());
-		}
 	}
 
 	void ShaderProgram::detachShaders()
 	{
 		for (unsigned int i = 0; i < m_shaderCount; i++)
-		{
 			glDetachShader(m_id, m_shaders[i]->GetID());
-		}
 	}
 
 	bool ShaderProgram::checkError()
@@ -240,9 +179,9 @@ namespace Vxl
 		m_linked = false;
 
 		// cleanup uniform blocks
-		for (auto it = m_uniformBlocks.begin(); it != m_uniformBlocks.end(); it++)
-			delete it->second;
-		m_uniformBlocks.clear();
+		//for (auto it = m_uniformBlocks.begin(); it != m_uniformBlocks.end(); it++)
+		//	delete it->second;
+		//m_uniformBlocks.clear();
 	}
 
 	void ShaderProgram::AddShader(Shader* _shader)
@@ -274,37 +213,37 @@ namespace Vxl
 		}
 	}
 
-	void ShaderProgram::acquireUniformBlocks()
-	{
-		GLint m_uniformBlockCount;
-		glGetProgramiv(m_id, GL_ACTIVE_UNIFORM_BLOCKS, &m_uniformBlockCount);
-		
-		const GLsizei bufSize = 128; // maximum name length
-
-		for (int blockIx = 0; blockIx < m_uniformBlockCount; ++blockIx)
-		{
-			GLint nameLen;
-			glGetActiveUniformBlockiv(m_id, blockIx, GL_UNIFORM_BLOCK_NAME_LENGTH, &nameLen);
-			
-			GLchar name[bufSize];
-			glGetActiveUniformBlockName(m_id, blockIx, nameLen, NULL, &name[0]);
-			std::string name_str(name);
-		
-			GLint size;
-			glGetActiveUniformBlockiv(m_id, blockIx, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
-
-			// Get Binding point from name (ex: "ColorBlock_17" => Binding Point is 17)
-			GLuint bindingPoint = 0;
-			std::string bindingPointStr = "";
-			size_t loc = name_str.find_last_of('_');
-			if (loc != -1)
-				bindingPointStr = name_str.substr(loc + 1, nameLen);
-			if (!bindingPointStr.empty())
-				bindingPoint = std::stoi(bindingPointStr);
-		
-			m_uniformBlocks[name_str] = new glUniformBlock(*this, name_str, bindingPoint, (GLuint)size);
-		}
-	}
+	//	void ShaderProgram::acquireUniformBlocks()
+	//	{
+	//		GLint m_uniformBlockCount;
+	//		glGetProgramiv(m_id, GL_ACTIVE_UNIFORM_BLOCKS, &m_uniformBlockCount);
+	//		
+	//		const GLsizei bufSize = 128; // maximum name length
+	//	
+	//		for (int blockIx = 0; blockIx < m_uniformBlockCount; ++blockIx)
+	//		{
+	//			GLint nameLen;
+	//			glGetActiveUniformBlockiv(m_id, blockIx, GL_UNIFORM_BLOCK_NAME_LENGTH, &nameLen);
+	//			
+	//			GLchar name[bufSize];
+	//			glGetActiveUniformBlockName(m_id, blockIx, nameLen, NULL, &name[0]);
+	//			std::string name_str(name);
+	//		
+	//			GLint size;
+	//			glGetActiveUniformBlockiv(m_id, blockIx, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+	//	
+	//			// Get Binding point from name (ex: "ColorBlock_17" => Binding Point is 17)
+	//			GLuint bindingPoint = 0;
+	//			std::string bindingPointStr = "";
+	//			size_t loc = name_str.find_last_of('_');
+	//			if (loc != -1)
+	//				bindingPointStr = name_str.substr(loc + 1, nameLen);
+	//			if (!bindingPointStr.empty())
+	//				bindingPoint = std::stoi(bindingPointStr);
+	//		
+	//			m_uniformBlocks[name_str] = new glUniformBlock(*this, name_str, bindingPoint, (GLuint)size);
+	//		}
+	//	}
 
 	void ShaderProgram::acquireSubroutines()
 	{
@@ -368,7 +307,7 @@ namespace Vxl
 		if (m_linked)
 		{
 			acquireUniforms();
-			acquireUniformBlocks();
+			//acquireUniformBlocks();
 			acquireSubroutines();
 
 			// set gl name

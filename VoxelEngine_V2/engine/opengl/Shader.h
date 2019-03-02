@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 #include "Enums.h"
 
@@ -13,11 +13,12 @@
 namespace Vxl
 {
 	typedef std::unordered_map<std::string, glUniform> UniformStorage;
-	typedef std::unordered_map<std::string, glUniformBlock*> UniformBlockStorage;
+	//typedef std::unordered_map<std::string, glUniformBlock*> UniformBlockStorage;
 	typedef std::unordered_map<ShaderType, glSubroutine> SubroutineStorage;
 
 	class Shader
 	{
+		friend class Loader;
 		friend class ShaderProgram;
 		friend class RenderManager;
 	private:
@@ -44,9 +45,6 @@ namespace Vxl
 		static Database<Shader> m_database;
 
 	public:
-		
-		// Database Creation
-		static Shader* Create(const std::string& name, const std::string& filePath, ShaderType type);
 		// Database Getter
 		static Shader* Get(const std::string& name)
 		{
@@ -58,7 +56,6 @@ namespace Vxl
 			unload();
 		}
 		
-
 		// Current log of all shaders with compilation errors
 		static std::unordered_map<std::string, std::string> ShaderErrorLog;
 		static UINT ShaderErrorLogSize;
@@ -97,6 +94,7 @@ namespace Vxl
 
 	class ShaderProgram
 	{
+		friend class Loader;
 		friend class RenderManager;
 	private:
 		// Program //
@@ -108,8 +106,8 @@ namespace Vxl
 		// Uniform //
 		UniformStorage		m_uniforms;
 		GLint				m_uniformCount = 0;
-		UniformBlockStorage m_uniformBlocks;
-		GLint				m_uniformBlockCount = 0;
+		//UniformBlockStorage m_uniformBlocks;
+		//GLint				m_uniformBlockCount = 0;
 		SubroutineStorage   m_subroutines;
 		GLint				m_subroutineCount = 0;
 		
@@ -136,15 +134,16 @@ namespace Vxl
 
 	public:
 		
-		// Database Creation
-		static ShaderProgram* Create(const std::string& name, std::vector<std::string> shaders);
 		// Database Getter
 		static ShaderProgram* Get(const std::string& name)
 		{
 			return m_database.Get(name);
 		}
 
-		~ShaderProgram();
+		~ShaderProgram()
+		{
+			unload();
+		}
 
 		void reload()
 		{
@@ -172,6 +171,10 @@ namespace Vxl
 #endif
 			return m_uniforms[name];
 		}
+		inline bool				CheckUniform(const std::string& name)
+		{
+			return (m_uniforms.find(name) != m_uniforms.end());
+		}
 		inline GLuint			GetUniformCount(void) const
 		{
 			return m_uniformCount;
@@ -180,10 +183,7 @@ namespace Vxl
 		{
 			return m_uniforms;
 		}
-		inline bool				CheckUniform(const std::string& name)
-		{
-			return (m_uniforms.find(name) != m_uniforms.end());
-		}
+/*
 		// Uniform Blocks
 		inline glUniformBlock*  GetUniformBlock(const std::string& name)
 		{
@@ -196,6 +196,7 @@ namespace Vxl
 		{
 			return m_uniformBlockCount;
 		}
+*/
 		// Subroutines
 		inline glSubroutine*	GetSubroutine(ShaderType type)
 		{

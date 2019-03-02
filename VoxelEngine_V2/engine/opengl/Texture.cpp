@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Texture.h"
 
@@ -48,13 +48,40 @@ namespace Vxl
 		if (m_wrapMode == Wrap_Mode::CLAMP_BORDER)
 			glTexParameterfv(Target, GL_TEXTURE_BORDER_COLOR, &(m_borderColor[0]));
 	}
+	void BaseTexture::updateTexImage2D(const GLvoid* pixels)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_dataType, pixels);
+	
+		if (m_useMipMapping)
+			glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	void BaseTexture::updateTexImageCubemap(int side, const GLvoid* pixels)
+	{
+		assert(side < 6);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
+			0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_dataType, pixels
+		);
+
+		if (m_useMipMapping)
+			glGenerateMipmap(GL_TEXTURE_2D);
+	}
 
 	BaseTexture::BaseTexture(
 		Texture_Type Type,
 		Wrap_Mode WrapMode,
-		Filter_Mode_Min MinFilter,
-		Filter_Mode_Mag MagFilter
-	) : m_type(Type), m_minFilter(MinFilter), m_magFilter(MagFilter)
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type FormatType,
+		Channel_Type ChannelType,
+		Data_Type DataType
+	) 
+		: m_type(Type),
+		m_wrapMode(WrapMode),
+		m_minFilter(MinFilter),
+		m_magFilter(MagFilter),
+		m_formatType(FormatType),
+		m_channelType(ChannelType),
+		m_dataType(DataType)
 	{
 		glGenTextures(1, &m_id);
 
@@ -72,7 +99,7 @@ namespace Vxl
 	}
 	void BaseTexture::Unbind()
 	{
-		glBindTexture(0, m_id);
+		glBindTexture((GLenum)m_type, 0);
 	}
 
 	void BaseTexture::setWrapMode(Wrap_Mode W)
@@ -81,7 +108,7 @@ namespace Vxl
 
 		updateParameters();
 	}
-	void BaseTexture::setFilterMode(Filter_Mode_Min Min, Filter_Mode_Mag Mag)
+	void BaseTexture::setFilterMode(Filter_Min Min, Filter_Mag Mag)
 	{
 		m_minFilter = Min;
 		m_magFilter = Mag;
@@ -97,62 +124,81 @@ namespace Vxl
 
 	/* RENDER TEXTURE */
 
-	RenderTexture::RenderTexture(int Width, int Height, Format_Type Format, Wrap_Mode WrapMode, Filter_Mode_Min MinFilter, Filter_Mode_Mag MagFilter)
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter), m_format(Format)
+	RenderTexture::RenderTexture(
+		int Width, int Height,
+		Wrap_Mode WrapMode,
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type FormatType,
+		Channel_Type ChannelType,
+		Data_Type DataType
+	)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, DataType)
 	{
 		m_width = Width;
 		m_height = Height;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)Format, m_width, m_height, 0, (GLenum)Format, GL_UNSIGNED_BYTE, NULL);
-
+		updateTexImage2D();
 		Unbind();
 	}
 
 	/* TEXTURE */
 
-	Texture::Texture(const std::string& filePath, Wrap_Mode WrapMode, Filter_Mode_Min MinFilter, Filter_Mode_Mag MagFilter, bool InvertY)
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter)
+	Texture::Texture(
+		const std::string& filePath,
+		bool			InvertY,
+		bool			UseMipMapping,
+		Wrap_Mode		WrapMode,
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type		FormatType,
+		Data_Type		DataType
+	)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, Channel_Type::NONE, DataType)
 	{
-		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
+		m_useMipMapping = UseMipMapping;
 
-		// Store texture as pixel values
-		//std::vector<UCHAR> STORAGE(m_image, m_image + m_width * m_height * m_channels);
+		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 
 		if (!m_image)
 		{
 			Logger.error("Could not load Image: " + filePath);
 			Logger.error("SOIL: " + std::string(SOIL_last_result()));
-			glDeleteTextures(1, &m_id);
 			return;
 		}
+
+		// Get Correct channel data
+		m_channelType = glUtil::getFormat(m_channels);
 
 		// Invert Y
 		if (InvertY)
 			FlipTextureY(m_image, m_width, m_height, m_channels);
-		//
 
-		m_loaded = true;
-
-		GLenum Format = (GLenum)glUtil::getFormatFloat(m_channels);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, Format, m_width, m_height, 0, Format, GL_UNSIGNED_BYTE, m_image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		Unbind();
+		// Storage
+		updateTexImage2D(&m_image[0]);
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath);
 		glUtil::setOpenGLName(GL_TEXTURE, m_id, Name);
+
+		// finished
+		Unbind();
+		m_loaded = true;
 	}
 	Texture::Texture(
 		const std::string& name,
 		std::vector<Color3F> pixels, UINT width,
-		Wrap_Mode WrapMode,
-		Filter_Mode_Min MinFilter,
-		Filter_Mode_Mag MagFilter
+		bool			UseMipMapping,
+		Wrap_Mode		WrapMode,
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type		FormatType,
+		Data_Type		DataType
 	) 
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, Channel_Type::RGB, DataType)
 	{
+		m_useMipMapping = UseMipMapping;
+
 		UINT pixelsCount = (UINT)pixels.size();
 		m_width = width;
 		m_height = pixelsCount / width;
@@ -171,53 +217,28 @@ namespace Vxl
 		m_image = new UCHAR[pixelsCount * m_channels];
 		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
 
-		m_loaded = true;
-
-		GLenum Format = (GLenum)glUtil::getFormatFloat(m_channels);
-
+		// Storage
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // helps prevent textures smaller than 4x4 not get corrupted
-		glTexImage2D(GL_TEXTURE_2D, 0, Format, m_width, m_height, 0, Format, GL_UNSIGNED_BYTE, m_image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		Unbind();
+		updateTexImage2D(&m_image[0]);
 
 		// glName
 		glUtil::setOpenGLName(GL_TEXTURE, m_id, name);
+
+		// finished
+		Unbind();
+		m_loaded = true;
 	}
-	Texture* Texture::Create(
-		const std::string& name,
-		const std::string& filePath,
-		Wrap_Mode WrapMode,
-		Filter_Mode_Min MinFilter,
-		Filter_Mode_Mag MagFilter,
-		bool InvertY
-	)
-	{
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Texture: " + name);
-			return nullptr;
-		}
 
-		Texture* T = new Texture(filePath, WrapMode, MinFilter, MagFilter, InvertY);
-
-		if (T->IsLoaded())
-			Logger.log("Loaded Texture: " + name);
-		else
-			Logger.error("Could not Load Texture: " + name);
-
-		m_database.Set(name, T);
-		return T;
-	}
-	Texture* Texture::Create(
+	Texture* Texture::CreateCustom(
 		const std::string& name,
 		std::vector<Color3F> pixels, UINT width,
-		Wrap_Mode WrapMode,
-		Filter_Mode_Min MinFilter,
-		Filter_Mode_Mag MagFilter
-	)
-	{
+		bool			UseMipMapping,
+		Wrap_Mode		WrapMode,
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type		FormatType,
+		Data_Type		DataType
+	) {
 		// Name Duplication
 		if (m_database.Check(name))
 		{
@@ -225,15 +246,17 @@ namespace Vxl
 			return nullptr;
 		}
 
-		Texture* T = new Texture(name, pixels, width, WrapMode, MinFilter, MagFilter);
+		Texture* Tex = new Texture(name, pixels, width, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, DataType);
 
-		if (T->IsLoaded())
-			Logger.log("Loaded Texture: " + name);
-		else
-			Logger.error("Could not Load Texture: " + name);
+		if (Tex == nullptr)
+			return false;
+		else if (!Tex->IsLoaded())
+			return false;
 
-		m_database.Set(name, T);
-		return T;
+		Logger.log("Loaded Texture: " + name);
+		Texture::m_database.Set(name, Tex);
+
+		return Tex;
 	}
 
 	Texture::~Texture()
@@ -249,12 +272,18 @@ namespace Vxl
 		const std::string& filePath4,
 		const std::string& filePath5,
 		const std::string& filePath6,
-		Wrap_Mode WrapMode,
-		Filter_Mode_Min MinFilter,
-		Filter_Mode_Mag MagFilter,
-		bool InvertY
-	) : BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, MinFilter, MagFilter)
+		bool			InvertY,
+		bool			UseMipMapping,
+		Wrap_Mode		WrapMode,
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type		FormatType,
+		Data_Type		DataType
+	) 
+		: BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, MinFilter, MagFilter, FormatType, Channel_Type::NONE, DataType)
 	{
+		m_useMipMapping = UseMipMapping;
+
 		m_image[0] = SOIL_load_image(filePath1.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 		m_image[1] = SOIL_load_image(filePath2.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 		m_image[2] = SOIL_load_image(filePath3.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
@@ -263,62 +292,30 @@ namespace Vxl
 		m_image[5] = SOIL_load_image(filePath6.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 
 		for (GLuint i = 0; i < 6; i++)
+		{
 			if (!m_image[i])
 				return;
+			else if (InvertY)
+				FlipTextureY(m_image[i], m_width, m_height, m_channels);
+		}
 
-		m_loaded = true;
-
-		GLenum Format = (GLenum)glUtil::getFormatFloat(m_channels);
+		m_channelType = glUtil::getFormat(m_channels);
 
 		for (GLuint i = 0; i < 6; i++)
 		{
-			//FlipTextureY(m_image[i], m_width, m_height, m_channels);
-			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, Format, m_width, m_height, 0, Format, GL_UNSIGNED_BYTE, m_image[i]
-			);
+			updateTexImageCubemap(i, m_image[i]);
 		}
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-		Unbind();
+		//if(m_useMipMapping)
+		//	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath1);
 		glUtil::setOpenGLName(GL_TEXTURE, m_id, Name);
-	}
-	Cubemap* Cubemap::Create(
-		const std::string& name,
-		const std::string& filePath1,
-		const std::string& filePath2,
-		const std::string& filePath3,
-		const std::string& filePath4,
-		const std::string& filePath5,
-		const std::string& filePath6,
-		Wrap_Mode WrapMode,
-		Filter_Mode_Min MinFilter,
-		Filter_Mode_Mag MagFilter,
-		bool InvertY
-	)
-	{
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Cubemap: " + name);
-			return nullptr;
-		}
 
-		Cubemap* C = new Cubemap(
-			filePath1, filePath2, filePath3, filePath4, filePath5, filePath6,
-			WrapMode, MinFilter, MagFilter, InvertY
-		);
-
-		if (C->IsLoaded())
-			Logger.log("Loaded Cubemap: " + name);
-		else
-			Logger.error("Could not Load Cubemap: " + name);
-
-		m_database.Set(name, C);
-		return C;
+		// finished
+		Unbind();
+		m_loaded = true;
 	}
 	Cubemap::~Cubemap()
 	{

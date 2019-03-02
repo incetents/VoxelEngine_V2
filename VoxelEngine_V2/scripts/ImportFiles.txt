@@ -22,24 +22,25 @@
 #SHADERPROGRAM
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
 
-test								test_vert										test_frag
-gbuffer						gbuffer_vert								gbuffer_frag
-gbuffer_no_model 	gbuffer_no_model_vert 			gbuffer_frag
-passthrough 				passthrough_vert						passthrough_frag
-skybox						skybox_vert								skybox_frag
-debugLines 				debugLines_vert						debugLines_frag
+test				test_vert					test_frag
+gbuffer				gbuffer_vert				gbuffer_frag
+gbuffer_no_model 	gbuffer_no_model_vert 		gbuffer_frag
+passthrough 		passthrough_vert			passthrough_frag
+skybox				skybox_vert					skybox_frag
+debugLines 			debugLines_vert				debugLines_frag
 
 //----------------------------------------
 #TEXTURE
-// order: [Name] [FilePath] [WrapMode =repeat] [FilterModeMin =linear] [FilterModeMag =linear][FlipY =true]
+// order: [Name] [FilePath] [WrapMode =repeat] [FilterModeMin =linear] [FilterModeMag =linear] [FlipY =true] [MipMapping =true]
 //
 // [WrapMode] = REPEAT | CLAMP_BORDER | CLAMP_STRETCH | MIRROR_REPEAT |
 // [FilterModeMin] = NEAREST | LINEAR
 // [FilterModeMag] = NEAREST | LINEAR | NEAREST_NEAREST | LINEAR_NEAREST | NEAREST_LINEAR | LINEAR_LINEAR
-// [FlipY] = any_text_here_is_considered_a_flip
+// [FlipY] = YES_FLIP | NO_FLIP
+// [MipMapping] = YES_MIPMAP | NO_MIPMAP
 
-grid_test			./assets/textures/grid_test.png
-beato				./assets/textures/beato.png
+grid_test		./assets/textures/grid_test.png
+beato			./assets/textures/beato.png
 crate_diffuse	./assets/textures/crate_diffuse.png
 TextureAtlas	./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 		NEAREST
 
@@ -48,6 +49,44 @@ TextureAtlas	./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 		NEAREST
 // order: [Name] [FilePath_FT] [FilePath_BK] [FilePath_UP] [FilePath_DN] [FilePath_RT] [FilePath_LT]
 
 craterlake		./assets/cubemaps/craterlake_ft.tga ./assets/cubemaps/craterlake_bk.tga ./assets/cubemaps/craterlake_up.tga ./assets/cubemaps/craterlake_dn.tga ./assets/cubemaps/craterlake_rt.tga ./assets/cubemaps/craterlake_lf.tga
+
+//----------------------------------------
+#MODEL
+// order: [Name] [FilePath] [NORMALIZE] [SCALE[#]]
+//
+// [MERGE] = MERGE "merge all meshes into a singular one"
+// [NORMALIZE] = NORMALIZE "normalize all vertices"
+// [SCALE[#]] = "value to scale all vertices, # = decimal number"
+
+jiggy 	./assets/models/jiggy.obj 	NO_MERGE	NORMALIZE 	SCALE[0.2]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -38,6 +38,7 @@
     <ClCompile Include="engine\opengl\TextureTracker.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
+    <ClCompile Include="engine\utilities\Util.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
     <ClCompile Include="game\terrain\Block.cpp" />
     <ClCompile Include="game\terrain\Chunk.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="engine\utilities\singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\utilities\Time.h" />
+    <ClInclude Include="engine\utilities\Util.h" />
     <ClInclude Include="engine\window\glfwCallbacks.h" />
     <ClInclude Include="engine\opengl\glUtil.h" />
     <ClInclude Include="engine\window\window.h" />

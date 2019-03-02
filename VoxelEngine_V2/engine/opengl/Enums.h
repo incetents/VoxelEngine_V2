@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
 //	extern "C"
@@ -148,16 +148,18 @@ namespace Vxl
 	};
 	enum class Wrap_Mode
 	{
-		NONE = 0,
+		NONE = 0, // error
+
 		REPEAT = GL_REPEAT,
 		CLAMP_BORDER = GL_CLAMP_TO_BORDER,
 		CLAMP_STRETCH = GL_CLAMP_TO_EDGE,
 		MIRROR_REPEAT = GL_MIRRORED_REPEAT,
 		MIRROR_CLAMP = GL_MIRROR_CLAMP_TO_EDGE
 	};
-	enum class Filter_Mode_Min
+	enum class Filter_Min
 	{
-		NONE = 0,
+		NONE = 0, // error
+
 		NEAREST = GL_NEAREST,
 		LINEAR = GL_LINEAR,
 		NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
@@ -165,39 +167,83 @@ namespace Vxl
 		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
 		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR
 	};
-	enum class Filter_Mode_Mag
+	enum class Filter_Mag
 	{
-		NONE = 0,
+		NONE = 0, // error
+
 		NEAREST = GL_NEAREST,
 		LINEAR = GL_LINEAR
 	};
-	enum class Format_Count
-	{
-		R = 1,
-		RG = 2,
-		RGB = 3,
-		RGBA = 4
-	};
 	enum class Format_Type
 	{
-		NONE = 0,
+		NONE = 0, // error
 
-		GRAYSCALE = GL_RED,
+		// 1 channel
+		R = GL_RED,
+		R8 = GL_R8,
+		R16 = GL_R16,
+		R16F = GL_R16F,
+		// 2 channels
 		RG = GL_RG,
+		RG8 = GL_RG8,
+		RG16 = GL_RG16,
+		RG16F = GL_RG16F,
+		// 3 channels
 		RGB = GL_RGB,
-		BGR = GL_BGR,
+		RGB8 = GL_RGB8,
+		RGB16 = GL_RGB16,
+		RGB16F = GL_RGB16F,
+		// 4 channels
 		RGBA = GL_RGBA,
-		BGRA = GL_BGRA,
+		RGBA8 = GL_RGBA8,
+		RGBA16 = GL_RGBA16,
+		RGBA16F = GL_RGBA16F,
+		R11F_G11F_B10F = GL_R11F_G11F_B10F,// GOOD FOR GBUFFER
 
-		GRAYSCALE_INT = GL_RED_INTEGER,
-		RG_INT = GL_RG_INTEGER,
-		RGB_INT = GL_RGB_INTEGER,
-		BGR_INT = GL_BGR_INTEGER,
-		RGBA_INT = GL_RGBA_INTEGER,
-		BGRA_INT = GL_BGRA_INTEGER,
+		// Special
+		DEPTH = GL_DEPTH_COMPONENT,
+		DEPTH16 = GL_DEPTH_COMPONENT16,
+		DEPTH24 = GL_DEPTH_COMPONENT24,
+		DEPTH32 = GL_DEPTH_COMPONENT32,
+		DEPTH32F = GL_DEPTH_COMPONENT32F,
+		DEPTH_STENCIL = GL_DEPTH_STENCIL,
+		DEPTH24_STENCIL8 = GL_DEPTH24_STENCIL8,
+		DEPTH32F_STENCIL8 = GL_DEPTH32F_STENCIL8
+	};
+	enum class Channel_Type
+	{
+		NONE = 0, // error
+
+		R = GL_RED,		// 1 channel
+		RG = GL_RG,		// 2 channels
+		RGB = GL_RGB,	// 3 channels
+		RGBA = GL_RGBA,	// 4 channels
+
+		BGR = GL_BGR,	// 3 channels
+		BGRA = GL_BGRA, // 4 channels
 
 		DEPTH = GL_DEPTH_COMPONENT,
-		DEPTH_STENCIL = GL_DEPTH_STENCIL
+		DEPTH_STENCIL = GL_DEPTH_STENCIL,
+		STENCIL = GL_STENCIL_INDEX
+	};
+	enum class Data_Type
+	{
+		NONE = 0, // error
+
+		UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
+		BYTE = GL_BYTE,
+		UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
+		SHORT = GL_SHORT,
+		UNSIGNED_INT = GL_UNSIGNED_INT,
+		INT = GL_INT,
+		HALF_FLOAT = GL_HALF_FLOAT,
+		FLOAT = GL_FLOAT,
+		UNSIGNED_BYTE_3_3_2 = GL_UNSIGNED_BYTE_3_3_2,
+		UNSIGNED_SHORT_5_6_5 = GL_UNSIGNED_SHORT_5_6_5,
+		UNSIGNED_SHORT_4_4_4_4 = GL_UNSIGNED_SHORT_4_4_4_4,
+		UNSIGNED_SHORT_5_5_5_1 = GL_UNSIGNED_SHORT_5_5_5_1,
+		UNSIGNED_INT_8_8_8_8 = GL_UNSIGNED_INT_8_8_8_8,
+		UNSIGNED_INT_10_10_10_2 = GL_UNSIGNED_INT_10_10_10_2
 	};
 	const GLenum _Global_Color_Attachment_Calls[16] =
 	{

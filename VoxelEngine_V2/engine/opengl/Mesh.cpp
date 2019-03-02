@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Emmanuel Lajeunesse
+// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Mesh.h"
 
@@ -7,6 +7,8 @@
 
 namespace Vxl
 {
+	Database<Mesh> Mesh::m_database;
+
 	void Mesh::DrawArray()
 	{
 		glDrawArrays((GLenum)m_type, 0, m_drawCount);
@@ -132,6 +134,22 @@ namespace Vxl
 	{
 		m_VAO = glUtil::generateVAO();
 	}
+
+	Mesh* Mesh::Create(const std::string& name)
+	{
+		// Name Duplication
+		if (m_database.Check(name))
+		{
+			Logger.error("Duplicate Mesh: " + name);
+			return nullptr;
+		}
+
+		Mesh* M = new Mesh();
+
+		Logger.log("Created Mesh: " + name);
+		return M;
+	}
+
 	Mesh::~Mesh()
 	{
 		glUtil::deleteVAO(m_VAO);
@@ -245,6 +263,9 @@ namespace Vxl
 		m_positions.m_vbo.Bind();
 		m_uvs.m_vbo.Bind();
 		m_normals.m_vbo.Bind();
+		m_tangents.m_vbo.Bind();
+		m_bitangents.m_vbo.Bind();
+		m_colors.m_vbo.Bind();
 		m_instances.m_vbo.Bind();
 		m_indices.m_vboi.Bind();
 
