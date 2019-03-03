@@ -257,6 +257,15 @@ namespace Vxl
 		}
 #endif
 
+		// Generate Missing Normals
+		if (m_normals.Empty() && !m_positions.Empty())
+		{
+			GenerateNormals(
+				&m_positions.vertices[0], m_positions.vertices.size(),
+				&m_indices.indices[0], m_indices.indices.size()
+			);
+		}
+
 		/*	Bind Data	*/
 		glUtil::bindVAO(m_VAO);
 
@@ -267,11 +276,16 @@ namespace Vxl
 		m_bitangents.m_vbo.Bind();
 		m_colors.m_vbo.Bind();
 		m_instances.m_vbo.Bind();
-		m_indices.m_vboi.Bind();
+		m_indices.m_ebo.Bind();
 
 		glUtil::unbindVAO();
 		/*				*/	
 
+		RecalculateMinMax();
+	}
+
+	void Mesh::RecalculateMinMax()
+	{
 		// Min/Max
 		m_min = Vector3::ZERO;
 		m_max = Vector3::ZERO;

@@ -65,6 +65,7 @@ namespace Vxl
 
 	class MaterialData : public Component
 	{
+	private:
 		enum DataType
 		{
 			Vec3 = 0

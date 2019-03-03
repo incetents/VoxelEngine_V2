@@ -151,7 +151,7 @@ namespace Vxl
 		// ~ Special Setters ~ //
 		if (Mat_useInstancing.m_exists)
 		{
-			Mat_useInstancing.m_uniform.Set<bool>(m_owner->m_mesh->m_instances.GetDrawCount() > 0 ? true : false);
+			Mat_useInstancing.m_uniform.Set<bool>(m_owner->GetMesh()->m_instances.GetDrawCount() > 0 ? true : false);
 		}
 		if (Mat_useColorOverride.m_exists)
 		{

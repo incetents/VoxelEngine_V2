@@ -53,6 +53,10 @@ namespace Vxl
 		{
 			return m_vbo.GetSize();
 		}
+		inline bool Empty()
+		{
+			return m_vbo.GetSize() == 0;
+		}
 	};
 
 	class MeshBufferVertices
@@ -92,21 +96,30 @@ namespace Vxl
 		{
 			return m_vbo.GetSize();
 		}
+		inline bool Empty()
+		{
+			return m_vbo.GetSize() == 0;
+		}
 	};
 
 	class MeshBufferIndices
 	{
 		friend class Mesh;
 	private:
-		VBOI m_vboi;
+		EBO m_ebo;
+		std::vector<GLuint> indices;
 	public:
 		void set(GLuint* arr, GLuint count)
 		{
-			m_vboi.SetIndices(arr, count, BufferBind_Mode::STATIC);
+			m_ebo.SetIndices(arr, count, BufferBind_Mode::STATIC);
+			indices.clear();
+			indices = std::vector<GLuint>(arr, arr + count);
 		}
 		void set(std::vector<GLuint> vec)
 		{
-			m_vboi.SetIndices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+			m_ebo.SetIndices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+			indices.clear();
+			indices = vec;
 		}
 		MeshBufferIndices& operator=(std::vector<GLuint> vec)
 		{
@@ -116,11 +129,15 @@ namespace Vxl
 
 		inline UINT GetDrawCount(void) const
 		{
-			return m_vboi.GetDrawCount();
+			return m_ebo.GetDrawCount();
 		}
 		inline UINT GetSize(void) const
 		{
-			return m_vboi.GetSize();
+			return m_ebo.GetSize();
+		}
+		inline bool Empty()
+		{
+			return m_ebo.GetSize() == 0;
 		}
 	};
 
@@ -156,6 +173,10 @@ namespace Vxl
 		inline UINT GetSize(void) const
 		{
 			return m_vbo.GetSize();
+		}
+		inline bool Empty()
+		{
+			return m_vbo.GetSize() == 0;
 		}
 	};
 
@@ -232,6 +253,7 @@ namespace Vxl
 		}
 
 		void Bind(Draw_Type type = Draw_Type::TRIANGLES);
+		void RecalculateMinMax();
 
 		void Draw();
 	};

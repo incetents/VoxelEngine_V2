@@ -108,7 +108,7 @@ namespace Vxl
 		_mesh->m_positions.set(pos, 4);
 		_mesh->m_uvs.set(uvs, 4);
 		_mesh->m_indices.set(indices, 6);
-		_mesh->GenerateNormals(pos, 4, indices, 6);
+		//_mesh->GenerateNormals(pos, 4, indices, 6);
 
 		std::vector<Matrix4x4> m_models;
 		for (float x = 0; x < 5.0f; x++)
@@ -129,7 +129,7 @@ namespace Vxl
 		_entity1 = Entity::Create();
 		_entity1->SetMaterial(_material_gbuffer);
 		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
-		_entity1->m_mesh = _mesh;
+		_entity1->SetMesh(_mesh);
 		_entity1->m_transform.setScale(+0.5f);
 		
 		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
@@ -146,7 +146,7 @@ namespace Vxl
 		_entity2 = Entity::Create();
 		_entity2->SetMaterial(_material_gbuffer);
 		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_entity2->m_mesh = jiggyMesh;// Geometry.GetIcoSphere();
+		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		// TEST
 		_entity2->SetColor(Color3F(1, 1, 0));
@@ -154,13 +154,13 @@ namespace Vxl
 		_entity3 = Entity::Create();
 		_entity3->SetMaterial(_material_gbuffer);
 		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_entity3->m_mesh = Geometry.GetIcosahedron();
+		_entity3->SetMesh(Geometry.GetIcosahedron());
 		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
 		
 		_entity4 = Entity::Create();
 		_entity4->SetMaterial(_material_skybox);
 		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
-		_entity4->m_mesh = Geometry.GetInverseCube();
+		_entity4->SetMesh(Geometry.GetInverseCube());
 		
 
 		for (int x = -1; x <= 1; x++)
@@ -194,14 +194,14 @@ namespace Vxl
 		_crate1 = Entity::Create();
 		_crate1->SetMaterial(_material_gbuffer);
 		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_crate1->m_mesh = Geometry.GetCube();
+		_crate1->SetMesh(Geometry.GetCube());
 		_crate1->m_transform.setPosition(0, 2, 0);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
 		_crate2 = Entity::Create();
 		_crate2->SetMaterial(_material_gbuffer);
-		_crate2->m_mesh = Geometry.GetCube();
+		_crate2->SetMesh(Geometry.GetCube());
 		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(0, 2, 0);
 		// Parent Test
@@ -212,28 +212,28 @@ namespace Vxl
 		
 		_octo1 = Entity::Create();
 		_octo1->SetMaterial(_material_gbuffer);
-		_octo1->m_mesh = Geometry.GetOctahedron();
+		_octo1->SetMesh(Geometry.GetOctahedron());
 		_octo1->m_transform.setPosition(0, 0, 0);
 		_octo1->m_transform.setScale(0.5f);
 		_octo1->SetColor(Color3F(1, 1, 1));
 		
 		_octo2 = Entity::Create();
 		_octo2->SetMaterial(_material_gbuffer);
-		_octo2->m_mesh = Geometry.GetOctahedron();
+		_octo2->SetMesh(Geometry.GetOctahedron());
 		_octo2->m_transform.setPosition(1, 0, 0);
 		_octo2->m_transform.setScale(0.5f);
 		_octo2->SetColor(Color3F(1, 0, 0));
 		
 		_octo3 = Entity::Create();
 		_octo3->SetMaterial(_material_gbuffer);
-		_octo3->m_mesh = Geometry.GetOctahedron();
+		_octo3->SetMesh(Geometry.GetOctahedron());
 		_octo3->m_transform.setPosition(0, 1, 0);
 		_octo3->m_transform.setScale(0.5f);
 		_octo3->SetColor(Color3F(0, 1, 0));
 		
 		_octo4 = Entity::Create();
 		_octo4->SetMaterial(_material_gbuffer);
-		_octo4->m_mesh = Geometry.GetOctahedron();
+		_octo4->SetMesh(Geometry.GetOctahedron());
 		_octo4->m_transform.setPosition(0, 0, 1);
 		_octo4->m_transform.setScale(0.5f);
 		_octo4->SetColor(Color3F(0, 0, 1));
@@ -367,6 +367,10 @@ namespace Vxl
 	{
 		Camera::GetMain()->BindUBO();
 		//
+
+		_shader_gbuffer->Bind();
+		_shader_gbuffer->SetUniform<int>("TESTMODE", Imgui_DevConsole::GetInt("TESTMODE"));
+		_shader_gbuffer->Unbind();
 
 		glUtil::clearBuffer();
 		glUtil::clearColor(Color3F(0.1f, 0.1f, 0.3f));

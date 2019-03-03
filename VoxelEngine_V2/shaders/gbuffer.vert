@@ -6,6 +6,8 @@
 layout (location = 0) in vec3 m_position;
 layout (location = 1) in vec2 m_uv;
 layout (location = 2) in vec3 m_normal;
+layout (location = 6) in vec3 m_tangent;
+layout (location = 7) in vec3 m_bitangent;
 layout (location = 8) in mat4 instanceMatrix;
 
 // Output
@@ -13,15 +15,16 @@ out fragment_data
 {
 	vec3 pos;
 	vec2 uv;
-	vec3 normal; // screenspace
-	vec3 normalWorld; // worldspace
+	vec3 normal;
+	vec3 tangent;
+	vec3 bitangent;
 
 } f_data;
 
 // Uniforms
 uniform mat4 VXL_model			= mat4(1.0);
-uniform bool VXL_useInstancing = false;
-uniform bool VXL_useModel = true;
+uniform bool VXL_useInstancing 	= false;
+uniform bool VXL_useModel 		= true;
 
 // Main
 void main()
@@ -39,16 +42,18 @@ void main()
 		// Position
 		f_data.pos = vec3(object_position);
 		// Normal
-		f_data.normalWorld = vec3(model * vec4(m_normal, 0));
-		f_data.normal = vec3(view * vec4(f_data.normalWorld, 0));
+		f_data.normal = vec3(model * vec4(m_normal, 0));
+		f_data.tangent = vec3(model * vec4(m_tangent, 0));
+		f_data.bitangent = vec3(model * vec4(m_bitangent, 0));
 	}
 	else
 	{
 		// Position
 		f_data.pos = m_position;
 		// Normal
-		f_data.normalWorld = m_normal;
-		f_data.normal = vec3(view * vec4(f_data.normalWorld, 0));
+		f_data.normal = m_normal;
+		f_data.tangent = m_tangent;
+		f_data.bitangent = m_bitangent;
 	}
 	
 	

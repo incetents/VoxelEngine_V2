@@ -95,32 +95,32 @@ namespace Vxl
 		glDrawArrays((GLenum)_draw, 0, m_DrawCount);
 	}
 
-	// VBOI //
+	// EBO //
 
-	void VBOI::SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode)
+	void EBO::SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode)
 	{
 		if (_count == 0)
 			return;
 
 		m_empty = false;
 
-		if (m_VBOI == -1)
-			glGenBuffers(1, &m_VBOI);
+		if (m_EBO == -1)
+			glGenBuffers(1, &m_EBO);
 
 		m_Size = _count * sizeof(GLuint);
 		m_DrawCount = _count;
 		m_bindMode = _mode;
-		glUtil::bindIndices(m_VBOI, m_Size, _arr, (GLenum)_mode);
+		glUtil::bindIndices(m_EBO, m_Size, _arr, (GLenum)_mode);
 	}
-	void VBOI::SetIndices(std::vector<GLuint> _arr, BufferBind_Mode _mode)
+	void EBO::SetIndices(std::vector<GLuint> _arr, BufferBind_Mode _mode)
 	{
 		SetIndices(&_arr[0], (GLuint)_arr.size(), _mode);
 	}
-	void VBOI::Bind()
+	void EBO::Bind()
 	{
-		glUtil::bindVBOI(m_VBOI);
+		glUtil::bindEBO(m_EBO);
 	}
-	void VBOI::Draw(Draw_Type _draw)
+	void EBO::Draw(Draw_Type _draw)
 	{
 		glDrawElements((GLenum)_draw, m_DrawCount, GL_UNSIGNED_INT, 0);
 	}

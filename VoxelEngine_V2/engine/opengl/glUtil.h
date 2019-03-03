@@ -74,9 +74,9 @@ namespace Vxl
 		void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
 		void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT, GLuint m_strideSize = 0, GLuint m_strideOffset = 0);
 		void setVertexAttribInstancing(GLuint bufferIndex);
-		// VBO - Index
-		void bindVBOI(GLuint VBOI);
-		void bindIndices(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
+		// EBO - Index
+		void bindEBO(GLuint EBO);
+		void bindIndices(GLuint EBO, GLsizeiptr length, GLvoid * data, GLenum usage);
 
 		// Draw Buffer (VAO needs to be bound before this call)
 		void drawArray(Draw_Type type, GLuint count);

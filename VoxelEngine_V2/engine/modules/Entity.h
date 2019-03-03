@@ -25,6 +25,9 @@ namespace Vxl
 		// Database
 		static DatabaseSet<Entity> m_database;
 
+		// Mesh
+		Mesh* m_mesh = nullptr;
+
 		// Colors
 		Color3F m_Color = Color3F(1, 1, 1);
 		Color3F m_Tint	= Color3F(1, 1, 1);
@@ -47,11 +50,8 @@ namespace Vxl
 		bool				m_useTransform = true;
 		MeshRenderer		m_meshRenderer;
 		MaterialData		m_material;
-		
-		// Mesh Rendering
 		bool m_isActive = true;
 		bool m_isColoredObject = false;
-		Mesh* m_mesh;
 
 		// Utility
 		inline void			SetName(const std::string _name)
@@ -80,22 +80,34 @@ namespace Vxl
 			return m_AABB[1];
 		}
 
+		// Mesh
+		inline void SetMesh(Mesh* _mesh)
+		{
+			m_mesh = _mesh;
+			// call callbacks since transform might change
+			TransformChanged();
+		}
+		inline Mesh* GetMesh(void) const
+		{
+			return m_mesh;
+		}
+
 		// Color
-		void SetColor(Color3F color, bool enableIsColoredObject = true)
+		inline void SetColor(Color3F color, bool enableIsColoredObject = true)
 		{
 			m_Color = color;
 			m_isColoredObject = enableIsColoredObject;
 		}
-		Color3F& GetColor(void)
+		inline Color3F& GetColor(void)
 		{
 			return m_Color;
 		}
 
-		void SetTint(Color3F tint)
+		inline void SetTint(Color3F tint)
 		{
 			m_Tint = tint;
 		}
-		Color3F GetTint(void)
+		inline Color3F GetTint(void)
 		{
 			return m_Tint;
 		}

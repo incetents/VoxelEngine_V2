@@ -40,16 +40,16 @@ namespace Vxl
 		{
 			Vector3 VMin = m_mesh->GetVertexMin();
 			Vector3 VMax = m_mesh->GetVertexMax();
-			Quaternion Rotatation = m_transform.getRotation();
+			Quaternion Rotation = m_transform.getRotation();
 
-			m_OBB[0] = Rotatation * VMin; // x0 y0 z0
-			m_OBB[1] = Rotatation * Vector3(VMax.x, VMin.y, VMin.z); // x1 y0 z0
-			m_OBB[2] = Rotatation * Vector3(VMin.x, VMax.y, VMin.z); // x0 y1 z0
-			m_OBB[3] = Rotatation * Vector3(VMax.x, VMax.y, VMin.z); // x1 y1 z0
-			m_OBB[4] = Rotatation * Vector3(VMin.x, VMin.y, VMax.z); // x0 y0 z1
-			m_OBB[5] = Rotatation * Vector3(VMax.x, VMin.y, VMax.z); // x1 y0 z1
-			m_OBB[6] = Rotatation * Vector3(VMin.x, VMax.y, VMax.z); // x0 y1 z1
-			m_OBB[7] = Rotatation * VMax; // x1 y1 z1
+			m_OBB[0] = Rotation * VMin; // x0 y0 z0
+			m_OBB[1] = Rotation * Vector3(VMax.x, VMin.y, VMin.z); // x1 y0 z0
+			m_OBB[2] = Rotation * Vector3(VMin.x, VMax.y, VMin.z); // x0 y1 z0
+			m_OBB[3] = Rotation * Vector3(VMax.x, VMax.y, VMin.z); // x1 y1 z0
+			m_OBB[4] = Rotation * Vector3(VMin.x, VMin.y, VMax.z); // x0 y0 z1
+			m_OBB[5] = Rotation * Vector3(VMax.x, VMin.y, VMax.z); // x1 y0 z1
+			m_OBB[6] = Rotation * Vector3(VMin.x, VMax.y, VMax.z); // x0 y1 z1
+			m_OBB[7] = Rotation * VMax; // x1 y1 z1
 
 			m_AABB[0] = Vector3::ZERO;
 			m_AABB[1] = Vector3::ZERO;

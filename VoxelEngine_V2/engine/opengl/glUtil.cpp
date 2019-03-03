@@ -246,13 +246,13 @@ namespace Vxl
 		glVertexAttribDivisor(bufferIndex + 3, 1);
 	}
 
-	void glUtil::bindVBOI(GLuint VBOI)
+	void glUtil::bindEBO(GLuint EBO)
 	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBOI);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	}
-	void glUtil::bindIndices(GLuint VBO, GLsizeiptr length, GLvoid* data, GLenum usage)
+	void glUtil::bindIndices(GLuint EBO, GLsizeiptr length, GLvoid* data, GLenum usage)
 	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, length, data, usage);
 	}
 

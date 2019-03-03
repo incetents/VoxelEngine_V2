@@ -7,8 +7,9 @@ in fragment_data
 {
 	vec3 pos;
 	vec2 uv;
-	vec3 normal; // screenspace
-	vec3 normalWorld; // worldspace
+	vec3 normal;
+	vec3 tangent;
+	vec3 bitangent;
 
 } f_data;
 
@@ -20,9 +21,11 @@ layout (location = 2) out vec4 output_test;
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
 // Uniforms
-uniform bool VXL_useColorOverride = false;
-uniform vec3 VXL_color = vec3(1,1,1);
-uniform vec3 VXL_tint = vec3(1,1,1);
+uniform bool VXL_useColorOverride 	= false;
+uniform vec3 VXL_color 				= vec3(1,1,1);
+uniform vec3 VXL_tint 				= vec3(1,1,1);
+
+uniform int TESTMODE = 0;
 
 //Main
 void main()
@@ -45,15 +48,22 @@ void main()
 	// output UV for testing reasons
 	//output_albedo = vec4(f_data.uv, 0, 1);
 	
-	//output_normal = vec4(normalize(f_data.normalWorld) * 0.5 + 0.5, 1.0); // worldspace Normals
-	output_normal = vec4(normalize(f_data.normal), 1.0); // screenspace Normals
+	output_normal = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0); // worldspace Normals
+	//output_normal = vec4(normalize(f_data.normal), 1.0); // screenspace Normals
+	
+	if(TESTMODE == 1)
+		output_albedo = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0);
+	if(TESTMODE == 2)
+		output_albedo = vec4(normalize(f_data.tangent) * 0.5 + 0.5, 1.0);
+	if(TESTMODE == 3)
+		output_albedo = vec4(normalize(f_data.bitangent) * 0.5 + 0.5, 1.0);
+	
+	float d = dot(-getCameraForwad(), normalize(f_data.normal));
 	
 	output_test = vec4(d, 0, 0.2, 1);
 	
-	//d = dot(-getCameraForwad(), normalize(f_data.normalWorld));
-	d = dot(vec3(0,0,1), normalize(f_data.normal));
-	
-	output_albedo = vec4(d, 0, 0.2, 1);
+	//if(TESTMODE == 1)
+	//output_albedo = vec4(d, 0, 0.2, 1);
 	
 	//output_albedo.r *= red;
 	//output_albedo.g *= green;

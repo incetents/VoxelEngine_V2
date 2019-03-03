@@ -166,25 +166,25 @@ namespace Vxl
 		void Draw(Draw_Type _draw);
 	};
 
-	// Vertex Buffer Object for Indices/Elements Wrapper
-	class VBOI
+	// Element Buffer Object
+	class EBO
 	{
 	private:
-		GLuint m_VBOI = -1;
+		GLuint m_EBO = -1;
 		GLuint m_Size = 0;
 		GLuint m_DrawCount = 0;
 		bool m_empty = true;
 
 		BufferBind_Mode m_bindMode;
 	public:
-		VBOI() {}
-		VBOI(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
+		EBO() {}
+		EBO(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
 		{
 			SetIndices(_arr, _count, _mode);
 		}
-		~VBOI()
+		~EBO()
 		{
-			glDeleteBuffers(1, &m_VBOI);
+			glDeleteBuffers(1, &m_EBO);
 		}
 
 		void SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
@@ -192,13 +192,13 @@ namespace Vxl
 
 		void UpdateIndices(GLuint* _arr)
 		{
-			glUtil::bindVBO(m_VBOI);
+			glUtil::bindVBO(m_EBO);
 			glUtil::bindVBOSubData(0, m_Size, _arr);
 		}
 
 		inline GLuint GetVBO(void) const
 		{
-			return m_VBOI;
+			return m_EBO;
 		}
 		inline GLuint GetSize(void) const
 		{

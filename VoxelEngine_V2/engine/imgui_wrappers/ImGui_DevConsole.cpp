@@ -23,6 +23,8 @@
 
 namespace Vxl
 {
+	std::unordered_map<std::string, int> Imgui_DevConsole::m_integers;
+
 	void Imgui_DevConsole::Draw(Scene* scene)
 	{
 		Scene_Game* Game = dynamic_cast<Scene_Game*>(scene);
@@ -46,6 +48,17 @@ namespace Vxl
 			if (ImGui::Button("Reload Shaders"))
 			{
 				RenderManager.ReloadShaders();
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::CollapsingHeader("Debug Variables"))
+			{
+				ImGui::Text("Integers:");
+				for (auto it = m_integers.begin(); it != m_integers.end(); it++)
+				{
+					ImGui::InputInt(it->first.c_str(), &it->second);
+				}
 			}
 
 			ImGui::Separator();
