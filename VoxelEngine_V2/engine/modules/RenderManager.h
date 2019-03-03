@@ -51,9 +51,11 @@ namespace Vxl
 
 		// Reload Shader System
 		void ReloadShaders();
+		// Reload Window
+		void ReloadWindow();
 
 		// Behaviour
-		void Reload();
+		void ReloadScene();
 		void Destroy();
 		void Update();
 		void Draw();

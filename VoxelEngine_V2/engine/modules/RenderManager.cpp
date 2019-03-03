@@ -9,6 +9,8 @@
 #include "../math/Camera.h"
 #include "../opengl/Texture.h"
 #include "../imgui/imgui.h"
+#include "../window/window.h"
+#include "../opengl/Debug.h"
 
 namespace Vxl
 {
@@ -73,9 +75,18 @@ namespace Vxl
 		for (auto Entity : Entities)
 			Entity->m_material.UpdateMaterialPackages();
 	}
+	void RenderManager::ReloadWindow()
+	{
+		Window.Reload();
+		Geometry.Reload();
+
+		ReloadScene();
+
+		Debug.CreateDebugTextures();
+	}
 
 	// Behaviour
-	void RenderManager::Reload()
+	void RenderManager::ReloadScene()
 	{
 		Destroy();
 

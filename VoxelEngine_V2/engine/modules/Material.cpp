@@ -36,11 +36,7 @@ namespace Vxl
 	{
 		if (m_shaderProgram)
 		{
-			Mat_viewProjection.GetUniform(m_shaderProgram);
-			Mat_view.GetUniform(m_shaderProgram);
-			Mat_projection.GetUniform(m_shaderProgram);
-			Mat_camForward.GetUniform(m_shaderProgram);
-			Mat_camPosition.GetUniform(m_shaderProgram);
+			//Mat_camPosition.GetUniform(m_shaderProgram);
 		}
 		else
 			Logger.error("Unable to load Material Packages; [Material Name] = " + m_name);
@@ -54,31 +50,11 @@ namespace Vxl
 		// Bind Shader
 		m_shaderProgram->Bind();
 
-		// ~ View Projection ~ //
-		if (Mat_viewProjection.m_exists)
-		{
-			Mat_viewProjection.m_uniform.Set<Matrix4x4>(Camera::GetMain()->getViewProjection());
-		}
-		// ~ View ~ //
-		if (Mat_view.m_exists)
-		{
-			Mat_view.m_uniform.Set<Matrix4x4>(Camera::GetMain()->getView());
-		}
-		// ~ Projection ~ //
-		if (Mat_projection.m_exists)
-		{
-			Mat_projection.m_uniform.Set<Matrix4x4>(Camera::GetMain()->getProjection());
-		}
-		// ~ CamForward ~ //
-		if (Mat_camForward.m_exists)
-		{
-			Mat_camForward.m_uniform.Set<Vector3>(Camera::GetMain()->getForward());
-		}
 		// ~ CamPosition ~ //
-		if (Mat_camPosition.m_exists)
-		{
-			Mat_camPosition.m_uniform.Set<Vector3>(Camera::GetMain()->getPosition());
-		}
+		//if (Mat_camPosition.m_exists)
+		//{
+		//	Mat_camPosition.m_uniform.Set<Vector3>(Camera::GetMain()->getPosition());
+		//}
 
 		// Wireframe
 		glUtil::wireframe(m_wireframe);

@@ -32,6 +32,7 @@
     <ClCompile Include="engine\opengl\Debug.cpp" />
     <ClCompile Include="engine\opengl\FramebufferObject.cpp" />
     <ClCompile Include="engine\opengl\Geometry.cpp" />
+    <ClCompile Include="engine\opengl\UBO.cpp" />
     <ClCompile Include="engine\opengl\VBO.cpp" />
     <ClCompile Include="engine\opengl\MeshRenderer.cpp" />
     <ClCompile Include="engine\opengl\Texture.cpp" />
@@ -93,6 +94,7 @@
     <ClInclude Include="engine\modules\RenderManager.h" />
     <ClInclude Include="engine\modules\Scene.h" />
     <ClInclude Include="engine\opengl\Debug.h" />
+    <ClInclude Include="engine\opengl\UBO.h" />
     <ClInclude Include="engine\opengl\VBO.h" />
     <ClInclude Include="engine\opengl\MeshRenderer.h" />
     <ClInclude Include="engine\opengl\FramebufferObject.h" />

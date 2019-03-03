@@ -13,7 +13,7 @@
 namespace Vxl
 {
 	typedef std::unordered_map<std::string, glUniform> UniformStorage;
-	//typedef std::unordered_map<std::string, glUniformBlock*> UniformBlockStorage;
+	typedef std::unordered_map<std::string, glUniformBlock> UniformBlockStorage;
 	typedef std::unordered_map<ShaderType, glSubroutine> SubroutineStorage;
 
 	class Shader
@@ -106,8 +106,8 @@ namespace Vxl
 		// Uniform //
 		UniformStorage		m_uniforms;
 		GLint				m_uniformCount = 0;
-		//UniformBlockStorage m_uniformBlocks;
-		//GLint				m_uniformBlockCount = 0;
+		UniformBlockStorage m_uniformBlocks;
+		GLint				m_uniformBlockCount = 0;
 		SubroutineStorage   m_subroutines;
 		GLint				m_subroutineCount = 0;
 		
@@ -155,7 +155,7 @@ namespace Vxl
 		void AddShader(Shader* _shader);
 		void Link();
 
-		void Bind();
+		void Bind() const;
 		static void Unbind();
 
 		// Uniform
@@ -183,9 +183,9 @@ namespace Vxl
 		{
 			return m_uniforms;
 		}
-/*
+
 		// Uniform Blocks
-		inline glUniformBlock*  GetUniformBlock(const std::string& name)
+		inline glUniformBlock   GetUniformBlock(const std::string& name)
 		{
 #if _DEBUG
 			assert(m_uniformBlocks.find(name) != m_uniformBlocks.end());
@@ -196,7 +196,7 @@ namespace Vxl
 		{
 			return m_uniformBlockCount;
 		}
-*/
+
 		// Subroutines
 		inline glSubroutine*	GetSubroutine(ShaderType type)
 		{
@@ -210,6 +210,7 @@ namespace Vxl
 			return m_subroutineCount;
 		}
 
+		// Misc
 		inline bool		IsLinked(void) const
 		{
 			return m_linked;

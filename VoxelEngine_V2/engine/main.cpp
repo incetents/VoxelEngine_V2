@@ -47,14 +47,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	while (!Window.GetClosed())
 	{
 		// OpenGl Reset
+		if (Input.getKeyDown(KeyCode::F5))
+		{
+			RenderManager.ReloadWindow();
+		}
+		// Shader Reset
 		if (Input.getKeyDown(KeyCode::R))
 		{
-			Window.Reload();
-			Geometry.Reload();
-			
-			RenderManager.Reload();
-
-			Debug.CreateDebugTextures();
+			RenderManager.ReloadShaders();
 		}
 
 		// Before Frame

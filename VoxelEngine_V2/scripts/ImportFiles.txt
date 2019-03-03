@@ -22,7 +22,6 @@
 #SHADERPROGRAM
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
 
-test				test_vert					test_frag
 gbuffer				gbuffer_vert				gbuffer_frag
 gbuffer_no_model 	gbuffer_no_model_vert 		gbuffer_frag
 passthrough 		passthrough_vert			passthrough_frag

@@ -11,7 +11,8 @@ out fragment_data
 {
 	vec3 pos;
 	vec2 uv;
-	vec3 normal;
+	vec3 normal; // screenspace
+	vec3 normalWorld; // worldspace
 
 } f_data;
 
@@ -26,6 +27,8 @@ void main()
 	f_data.pos = m_position;
 	f_data.uv = m_uv;
 	f_data.normal = m_normal;
+	f_data.normalWorld = m_normal;
+	// THIS SHADER IS TEMP
 
 	gl_Position = VXL_viewProjection * object_position; 
 }

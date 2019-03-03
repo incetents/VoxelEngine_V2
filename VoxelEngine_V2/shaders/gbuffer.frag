@@ -1,12 +1,14 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
 #version 430
+#include "_UBO.glsl"
 
 // Input
 in fragment_data
 {
 	vec3 pos;
 	vec2 uv;
-	vec3 normal;
+	vec3 normal; // screenspace
+	vec3 normalWorld; // worldspace
 
 } f_data;
 
@@ -18,18 +20,9 @@ layout (location = 2) out vec4 output_test;
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
 // Uniforms
-uniform vec3 VXL_camForward = vec3(0,0,1);
 uniform bool VXL_useColorOverride = false;
 uniform vec3 VXL_color = vec3(1,1,1);
 uniform vec3 VXL_tint = vec3(1,1,1);
-
-// Uniform blocks
-layout (std140) uniform mycolors_0
-{
-	float red;
-	float green;
-	float blue;
-};
 
 //Main
 void main()
@@ -38,8 +31,6 @@ void main()
 
 	//final_color = vec4(normalize(f_data.normal) * 0.5 + vec3(0.5, 0.5, 0.5), 1);
 	//final_color = vec4(f_data.uv.x,f_data.uv.y,1,1);
-	float d = dot(-VXL_camForward, normalize(f_data.normal));
-	vec3 n = normalize(f_data.normal) * 0.5 + 0.5;
 	vec2 uv = f_data.uv;
 	
 	if(VXL_useColorOverride)
@@ -54,8 +45,20 @@ void main()
 	// output UV for testing reasons
 	//output_albedo = vec4(f_data.uv, 0, 1);
 	
-	output_normal = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0);
+	//output_normal = vec4(normalize(f_data.normalWorld) * 0.5 + 0.5, 1.0); // worldspace Normals
+	output_normal = vec4(normalize(f_data.normal), 1.0); // screenspace Normals
+	
 	output_test = vec4(d, 0, 0.2, 1);
 	
+	//d = dot(-getCameraForwad(), normalize(f_data.normalWorld));
+	d = dot(vec3(0,0,1), normalize(f_data.normal));
+	
+	output_albedo = vec4(d, 0, 0.2, 1);
+	
+	//output_albedo.r *= red;
+	//output_albedo.g *= green;
+	//output_albedo.b *= blue;
 }
 //gbuffer gbuffer_vert gbuffer_frag
+
+

@@ -20,6 +20,7 @@
 #include "../engine/opengl/Texture.h"
 #include "../engine/opengl/TextureTracker.h"
 #include "../engine/opengl/Debug.h"
+#include "../engine/opengl/UBO.h"
 
 #include "../engine/math/Camera.h"
 #include "../engine/math/Color.h"
@@ -71,11 +72,11 @@ namespace Vxl
 		_shader_debugLines			= ShaderProgram::Get("debugLines");
 		_shader_passthrough			= ShaderProgram::Get("passthrough");
 
+		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
 		_material_gbuffer_no_model	= Material::Create("gbuffer_no_model", _shader_gbuffer_no_model, 2);
 		_material_debugLines		= Material::Create("debug_lines", _shader_debugLines, 3);
 		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
-		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 
 		_tex = Texture::Get("beato");
 		_tex_crate = Texture::Get("crate_diffuse");
@@ -239,6 +240,12 @@ namespace Vxl
 		
 
 		Debug.Setup();
+
+		// TEST
+		//UniformBufferObject* UBO = new UniformBufferObject(12, 0, "Ubo1");
+		//UBO->sendFloat(0.0f, 0);
+		//UBO->sendFloat(0.0f, 4);
+		//UBO->sendFloat(1.0f, 8);
 	}
 	void Scene_Game::Destroy()
 	{
@@ -358,6 +365,9 @@ namespace Vxl
 
 	void Scene_Game::Draw()
 	{
+		Camera::GetMain()->BindUBO();
+		//
+
 		glUtil::clearBuffer();
 		glUtil::clearColor(Color3F(0.1f, 0.1f, 0.3f));
 

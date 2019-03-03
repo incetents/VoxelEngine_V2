@@ -52,11 +52,7 @@ namespace Vxl
 		}
 
 		// Uniform Packages
-		MaterialPackage Mat_viewProjection	= MaterialPackage("VXL_viewProjection");
-		MaterialPackage Mat_view			= MaterialPackage("VXL_view");
-		MaterialPackage Mat_projection		= MaterialPackage("VXL_projection");
-		MaterialPackage Mat_camForward		= MaterialPackage("VXL_camForward");
-		MaterialPackage Mat_camPosition		= MaterialPackage("VXL_camPosition");
+		//MaterialPackage Mat_camPosition		= MaterialPackage("VXL_camPosition");
 
 		// Reload Packages
 		void ReloadPackages();

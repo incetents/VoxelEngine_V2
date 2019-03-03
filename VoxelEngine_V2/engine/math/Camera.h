@@ -9,6 +9,7 @@
 namespace Vxl
 {
 	class Transform;
+	class UniformBufferObject;
 
 	class CameraProjection
 	{
@@ -183,6 +184,8 @@ namespace Vxl
 		Matrix4x4			m_viewInverse;
 		Matrix4x4			m_viewProjection;
 		Matrix4x4			m_viewProjectionInverse;
+		// Ubo
+		UniformBufferObject* m_UBO = nullptr;
 		
 		static Camera* m_main;
 
@@ -192,10 +195,7 @@ namespace Vxl
 		// Database
 		static Database<Camera> m_database;
 	public:
-		~Camera()
-		{
-			delete m_projection;
-		}
+		~Camera();
 
 		// Database Creation
 		static Camera* Create(const std::string _name, const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
@@ -222,6 +222,8 @@ namespace Vxl
 		Camera& updateOrtho_Y(float _ymin, float _ymax);  // If already ortho, this will update its values faster
 		Camera& setZnear(float _znear);
 		Camera& setZfar(float _zfar);
+
+		void BindUBO();
 
 		// Get Data	
 		inline const Matrix4x4&	getView() const

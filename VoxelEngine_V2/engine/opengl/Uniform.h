@@ -42,22 +42,25 @@ namespace Vxl
 		void Bind();
 	};
 
-	//	class glUniformBlock
-	//	{
-	//	private:
-	//		GLfloat* m_array = nullptr;
-	//		GLuint   m_bufferSize;
-	//		GLuint	 m_bindingPoint;
-	//		GLuint	 m_blockIndex;
-	//		GLuint	 m_buffer;
-	//	
-	//	public:
-	//		glUniformBlock() {}
-	//		glUniformBlock(const ShaderProgram& program, const std::string& blockName, GLuint bindingPoint, GLuint bufferSize);
-	//		~glUniformBlock();
-	//	
-	//		void Set(GLfloat* arr, GLuint arrLength, size_t startOffset = 0);
-	//	};
+	class glUniformBlock
+	{
+	private:
+		unsigned int m_blockIndex = -1;
+		unsigned int m_bindingPoint = -1;
+	public:
+		glUniformBlock() {}
+		glUniformBlock(unsigned int BlockIndex, unsigned int BindingPoint)
+			: m_blockIndex(BlockIndex), m_bindingPoint(BindingPoint)
+		{}
+		inline unsigned int GetBlockIndex(void) const
+		{
+			return m_blockIndex;
+		}
+		inline unsigned int GetBindingPoint(void) const
+		{
+			return m_bindingPoint;
+		}
+	};
 
 	class glUniform
 	{

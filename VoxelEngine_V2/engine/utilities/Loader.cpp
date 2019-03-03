@@ -302,6 +302,7 @@ namespace Vxl
 		}
 
 		Shader* S = new Shader(name, filePath, type);
+		Shader::m_database.Set(name, S);
 
 		if (S == nullptr)
 			return false;
@@ -309,8 +310,6 @@ namespace Vxl
 			return false;
 
 		Logger.log("Loaded Shader: " + name);
-		Shader::m_database.Set(name, S);
-
 		return true;
 	}
 	bool Loader::Load_ShaderProgram(const std::string& name, std::vector<std::string> shaders)
@@ -323,6 +322,7 @@ namespace Vxl
 		}
 
 		ShaderProgram* Sp = new ShaderProgram(name);
+		ShaderProgram::m_database.Set(name, Sp);
 
 		int shaderCount = (int)shaders.size();
 		for (int i = 0; i < shaderCount; i++)
@@ -339,8 +339,6 @@ namespace Vxl
 			return false;
 		
 		Logger.log("Loaded Shader Program: " + name);
-		ShaderProgram::m_database.Set(name, Sp);
-
 		return true;
 	}
 	bool Loader::Load_Cubemap(

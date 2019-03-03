@@ -133,7 +133,7 @@ namespace Vxl
 			unsigned int MeshCount = (int)_models.size();
 			for (unsigned int M = 0; M < MeshCount; M++)
 			{
-				unsigned int PositionCount = _models[M]->positions.size();
+				unsigned int PositionCount = (unsigned int)_models[M]->positions.size();
 				for (unsigned int vertIndex = 0u; vertIndex < PositionCount; vertIndex++)
 				{
 					_models[M]->positions[vertIndex] = _models[M]->positions[vertIndex] * normalizeScale / LongestVertex;

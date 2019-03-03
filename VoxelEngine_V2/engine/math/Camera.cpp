@@ -2,7 +2,10 @@
 #include "Precompiled.h"
 #include "Camera.h"
 
+#include "../opengl/UBO.h"
+
 #include "Vector3.h"
+
 #include <iostream>
 
 namespace Vxl
@@ -21,6 +24,16 @@ namespace Vxl
 		m_projection = new CameraProjection(_znear, _zfar);
 		// View
 		update();
+
+		// UBO
+		static unsigned int CamerasCreated = 0;
+		m_UBO = new UniformBufferObject(64 * 3, 0, "CameraUBO" + std::to_string(CamerasCreated));
+		CamerasCreated++;
+	}
+	Camera::~Camera()
+	{
+		delete m_projection;
+		delete m_UBO;
 	}
 
 	Camera* Camera::Create(const std::string _name, const Vector3& _position, const Vector3& _forward, float _znear, float _zfar)
@@ -139,6 +152,13 @@ namespace Vxl
 		m_projection->m_Zfar = _zfar;
 		m_projection->Update_Z();
 		return *this;
+	}
+
+	void Camera::BindUBO()
+	{
+		m_UBO->sendMatrix(m_viewProjection, 0);
+		m_UBO->sendMatrix(m_view, 64);
+		m_UBO->sendMatrix(m_projection->getProjection(), 128);
 	}
 
 	Transform& Camera::setForward(const Vector3& forward)

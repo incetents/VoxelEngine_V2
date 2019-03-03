@@ -39,6 +39,17 @@ namespace Vxl
 
 			ImGui::Separator();
 
+			if (ImGui::Button("Reload Window"))
+			{
+				RenderManager.ReloadWindow();
+			}
+			if (ImGui::Button("Reload Shaders"))
+			{
+				RenderManager.ReloadShaders();
+			}
+
+			ImGui::Separator();
+
 			if (ImGui::CollapsingHeader("Window"))
 			{
 				ImGui::Text("Window Size: %d %d", Window.GetWindowWidth(), Window.GetWindowHeight());
@@ -73,11 +84,6 @@ namespace Vxl
 			ImGui::Separator();
 
 			ImGui::Checkbox("Wireframe GBUFFER", &GBUFFER_WIREFRAME);
-
-			if (ImGui::Button("Reload Shaders"))
-			{
-				RenderManager.ReloadShaders();
-			}
 
 			ImGui::Separator();
 
