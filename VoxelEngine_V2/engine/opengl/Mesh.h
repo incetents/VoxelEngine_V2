@@ -10,6 +10,7 @@
 #include "../math/Vector3.h"
 #include "../math/Vector4.h"
 #include "../math/Matrix4x4.h"
+#include "../math/Model.h"
 
 #include "VBO.h"
 
@@ -37,7 +38,7 @@ namespace Vxl
 		}
 		void set(std::vector<Type> vec)
 		{
-			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+			m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), BufferBind_Mode::STATIC);
 		}
 		MeshBuffer& operator=(std::vector<Type> vec)
 		{
@@ -59,30 +60,48 @@ namespace Vxl
 		}
 	};
 
-	class MeshBufferVertices
+	// MeshBuffer except it will remember the array that is passed through
+	template<typename Type, UINT ValueCount, BufferType Buf>
+	class MeshBufferMem
 	{
 		friend class Mesh;
 	private:
 		VBO m_vbo;
-		std::vector<Vector3> vertices;
+		bool alloc = false;
+		std::vector<Type>* vertices = nullptr;
 	public:
-		MeshBufferVertices()
+		MeshBufferMem()
 		{
-			m_vbo.AddStrideHint(Vxl::BufferType::VERTEX, 3);
+			vertices = new std::vector<Type>();
+			m_vbo.AddStrideHint(Buf, ValueCount);
 		}
 
-		void set(Vector3* arr, GLuint count)
+		void setAlloc(std::vector<Type>* arr)
 		{
-			vertices.clear();
-			vertices = std::vector<Vector3>(arr, arr + count);
+			if (alloc)
+				delete vertices;
+			alloc = false;
+			vertices = arr;
+		}
+		void set(Type* arr, GLuint count)
+		{
+			if (alloc)
+				delete vertices;
+			alloc = true;
+			vertices = new std::vector<Type>(arr, arr + count);
+
 			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
 		}
-		void set(std::vector<Vector3> vec)
+		void set(std::vector<Type> vec)
 		{
-			vertices = vec;
-			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+			if (alloc)
+				delete vertices;
+			alloc = true;
+			vertices = new std::vector<Type>(vec);
+
+			m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), BufferBind_Mode::STATIC);
 		}
-		MeshBufferVertices& operator=(std::vector<Vector3> vec)
+		MeshBufferMem& operator=(std::vector<Type> vec)
 		{
 			set(vec);
 			return *this;
@@ -213,21 +232,31 @@ namespace Vxl
 			return m_database.Get(name);
 		}
 
-		Mesh();
+		Mesh(const std::string& glName = "");
+		Mesh(Model* _model);
 		virtual ~Mesh();
 
-		MeshBufferVertices m_positions;
-		MeshBuffer<Vector2, 2, BufferType::UV> m_uvs;
+		MeshBufferMem<Vector3, 3, BufferType::POSITION> m_positions;
+		MeshBufferMem<Vector2, 2, BufferType::UV> m_uvs;
 		MeshBuffer<Vector3, 3, BufferType::NORMAL> m_normals;
 		MeshBuffer<Vector3, 3, BufferType::TANGENT> m_tangents;
 		MeshBuffer<Vector3, 3, BufferType::BITANGENT> m_bitangents;
-		MeshBuffer<Vector3, 4, BufferType::COLOR> m_colors;
+		MeshBuffer<Vector4, 4, BufferType::COLOR> m_colors;
 		MeshBufferInstancing m_instances;
 		MeshBufferIndices m_indices;
+
+		// Update all data from model
+		void Set(Model* _model);
 
 		// Fills m_normals Based on existing positions and/or indices
 		void GenerateNormals(
 			Vector3* _vertices, GLuint _vertCount,
+			GLuint* _indices = nullptr, GLuint _indexCount = 0
+		);
+		// Fills m_tangents and m_bitangents based on existing positions/uvs/indices
+		void GenerateTangents(
+			Vector3* _vertices, GLuint _vertCount,
+			Vector2* _uvs, GLuint _UVCount,
 			GLuint* _indices = nullptr, GLuint _indexCount = 0
 		);
 

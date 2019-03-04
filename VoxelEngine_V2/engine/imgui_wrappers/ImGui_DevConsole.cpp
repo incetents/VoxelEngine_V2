@@ -24,6 +24,11 @@
 namespace Vxl
 {
 	std::unordered_map<std::string, int> Imgui_DevConsole::m_integers;
+	std::unordered_map<std::string, float> Imgui_DevConsole::m_floats;
+	std::unordered_map<std::string, double> Imgui_DevConsole::m_doubles;
+	std::unordered_map<std::string, Vector2> Imgui_DevConsole::m_vec2;
+	std::unordered_map<std::string, Vector3> Imgui_DevConsole::m_vec3;
+	std::unordered_map<std::string, Vector4> Imgui_DevConsole::m_vec4;
 
 	void Imgui_DevConsole::Draw(Scene* scene)
 	{
@@ -54,10 +59,71 @@ namespace Vxl
 
 			if (ImGui::CollapsingHeader("Debug Variables"))
 			{
-				ImGui::Text("Integers:");
-				for (auto it = m_integers.begin(); it != m_integers.end(); it++)
+				// Integers
+				if (m_integers.size() > 0)
 				{
-					ImGui::InputInt(it->first.c_str(), &it->second);
+					ImGui::Text("Integers:");
+					for (auto it = m_integers.begin(); it != m_integers.end(); it++)
+					{
+						ImGui::InputInt(it->first.c_str(), &it->second);
+					}
+				}
+				// Floats
+				if (m_floats.size() > 0)
+				{
+					ImGui::Text("Floats:");
+					for (auto it = m_floats.begin(); it != m_floats.end(); it++)
+					{
+						ImGui::InputFloat(it->first.c_str(), &it->second);
+					}
+				}
+				// Double
+				if (m_doubles.size() > 0)
+				{
+					ImGui::Text("Doubles:");
+					for (auto it = m_doubles.begin(); it != m_doubles.end(); it++)
+					{
+						ImGui::InputDouble(it->first.c_str(), &it->second);
+					}
+				}
+				// Vector2
+				if (m_vec2.size() > 0)
+				{
+					ImGui::Text("Vector2s:");
+					for (auto it = m_vec2.begin(); it != m_vec2.end(); it++)
+					{
+						float val[2] = { it->second.x, it->second.y };
+						ImGui::InputFloat2(it->first.c_str(), val);
+						it->second[0] = val[0];
+						it->second[1] = val[1];
+					}
+				}
+				// Vector3
+				if (m_vec3.size() > 0)
+				{
+					ImGui::Text("Vector3s:");
+					for (auto it = m_vec3.begin(); it != m_vec3.end(); it++)
+					{
+						float val[3] = { it->second.x, it->second.y, it->second.z };
+						ImGui::InputFloat3(it->first.c_str(), val);
+						it->second[0] = val[0];
+						it->second[1] = val[1];
+						it->second[2] = val[2];
+					}
+				}
+				// Vector4
+				if (m_vec4.size() > 0)
+				{
+					ImGui::Text("Vector4s:");
+					for (auto it = m_vec4.begin(); it != m_vec4.end(); it++)
+					{
+						float val[4] = { it->second.x, it->second.y, it->second.z, it->second.w };
+						ImGui::InputFloat4(it->first.c_str(), val);
+						it->second[0] = val[0];
+						it->second[1] = val[1];
+						it->second[2] = val[2];
+						it->second[3] = val[4];
+					}
 				}
 			}
 

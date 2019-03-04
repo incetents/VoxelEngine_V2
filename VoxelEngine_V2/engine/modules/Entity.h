@@ -21,7 +21,7 @@ namespace Vxl
 		friend class Transform;
 	private:
 		// Locked Constructor
-		Entity();
+		Entity(const std::string& displayName);
 		// Database
 		static DatabaseSet<Entity> m_database;
 
@@ -42,7 +42,7 @@ namespace Vxl
 		virtual ~Entity();
 
 		// Database Creation
-		static Entity* Create();
+		static Entity* Create(const std::string& displayName = "");
 		
 		// Data
 		std::string			m_name;

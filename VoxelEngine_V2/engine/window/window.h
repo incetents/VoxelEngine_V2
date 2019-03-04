@@ -57,14 +57,6 @@ namespace Vxl
 		{
 			return m_windowFocus;
 		}
-		inline UINT GetWidth()	 const
-		{
-			return m_size[0];
-		}
-		inline UINT GetHeight()  const
-		{
-			return m_size[1];
-		}
 
 		inline void Close()
 		{
@@ -103,13 +95,24 @@ namespace Vxl
 		// Returns Height of the entire window
 		UINT GetWindowHeight(void) const
 		{
-			return m_size[0];
+			return m_size[1];
 		}
 		// Returns Width of the rendered viewport
 		UINT GetScreenWidth(void) const
 		{
 			return m_viewportSize[0];
 		}
+		// Returns X offset of the rendered viewport
+		UINT GetScreenOffsetX(void) const
+		{
+			return m_viewportOffset[0];
+		}
+		// Returns Y offset of the rendered viewport
+		UINT GetScreenOffsetY(void) const
+		{
+			return m_viewportOffset[1];
+		}
+
 		// Returns Height of the rendered viewport
 		UINT GetScreenHeight(void) const
 		{
@@ -126,8 +129,7 @@ namespace Vxl
 			return m_resolution[1];
 		}
 
-		void ViewportToWindowSize();
-		void ViewportToWindowResolution();
+		void BindWindowViewport();
 		
 		bool InitGLFW();
 		void Setup(

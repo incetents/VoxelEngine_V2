@@ -11,6 +11,7 @@
 #include "../imgui/imgui.h"
 #include "../window/window.h"
 #include "../opengl/Debug.h"
+#include "../opengl/Geometry.h"
 
 namespace Vxl
 {
@@ -42,13 +43,17 @@ namespace Vxl
 
 	void RenderManager::AddEntity(Entity* _entity)
 	{
+		// Makes sure entity has a material/shader
 		assert(_entity && _entity->GetMaterial());
 		m_entities[std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial())].insert(_entity);
+		m_allEntities.insert(_entity);
 	}
 	void RenderManager::RemoveEntity(Entity* _entity)
 	{
+		// Makes sure entity has a material/shader
 		assert(_entity && _entity->GetMaterial());
 		m_entities[std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial())].erase(_entity);
+		m_allEntities.erase(_entity);
 	}
 
 	// Reload Shader System
@@ -83,6 +88,10 @@ namespace Vxl
 		ReloadScene();
 
 		Debug.CreateDebugTextures();
+	}
+	void RenderManager::ReloadFBOS()
+	{
+		// ???
 	}
 
 	// Behaviour

@@ -10,13 +10,13 @@ namespace Vxl
 {
 	void Debug::DrawLine(
 		const Vector3& P1, const Vector3& P2,
-		const Color3F& C1, const Color3F& C2
+		const Color4F& C1, const Color4F& C2
 	)
 	{
 		if (m_lines_vertexIndex >= m_lines_vertices.size())
 		{
 			// Increase vector size
-			m_lines_vertices.resize(m_lines_vertices.size() + 600);
+			m_lines_vertices.resize(m_lines_vertices.size() + 700);
 			m_lines_resizeDirty = true;
 		}
 
@@ -26,19 +26,21 @@ namespace Vxl
 		m_lines_vertices[m_lines_vertexIndex + 3] = C1.r;
 		m_lines_vertices[m_lines_vertexIndex + 4] = C1.g;
 		m_lines_vertices[m_lines_vertexIndex + 5] = C1.b;
+		m_lines_vertices[m_lines_vertexIndex + 6] = C1.a;
 
-		m_lines_vertices[m_lines_vertexIndex + 6] = P2.x;
-		m_lines_vertices[m_lines_vertexIndex + 7] = P2.y;
-		m_lines_vertices[m_lines_vertexIndex + 8] = P2.z;
-		m_lines_vertices[m_lines_vertexIndex + 9] = C2.r;
-		m_lines_vertices[m_lines_vertexIndex + 10] = C2.g;
-		m_lines_vertices[m_lines_vertexIndex + 11] = C2.b;
+		m_lines_vertices[m_lines_vertexIndex + 7] = P2.x;
+		m_lines_vertices[m_lines_vertexIndex + 8] = P2.y;
+		m_lines_vertices[m_lines_vertexIndex + 9] = P2.z;
+		m_lines_vertices[m_lines_vertexIndex + 10] = C2.r;
+		m_lines_vertices[m_lines_vertexIndex + 11] = C2.g;
+		m_lines_vertices[m_lines_vertexIndex + 12] = C2.b;
+		m_lines_vertices[m_lines_vertexIndex + 13] = C2.a;
 
-		m_lines_vertexIndex += 12;
+		m_lines_vertexIndex += 14;
 	}
 	void Debug::DrawAABB(
 		const Vector3& Min, const Vector3& Max, const Vector3& OffsetAll,
-		const Color3F& C
+		const Color4F& C
 	)
 	{
 		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), C, C);
@@ -112,10 +114,5 @@ namespace Vxl
 
 		m_null_texture = Texture::CreateCustom("null", pixels, 4, true, Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST);
 		assert(m_null_texture);
-	}
-	void Debug::BindNullTexture()
-	{
-		assert(m_null_texture);
-		m_null_texture->Bind();
 	}
 }

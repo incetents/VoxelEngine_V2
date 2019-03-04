@@ -130,9 +130,17 @@ namespace Vxl
 		
 	}
 
-	Mesh::Mesh()
+	Mesh::Mesh(const std::string& glName)
 	{
 		m_VAO = glUtil::generateVAO();
+
+		if(!glName.empty())
+			glUtil::setOpenGLName(glNameType::VERTEX_ARRAY, m_VAO, "Mesh_" + glName);
+	}
+	Mesh::Mesh(Model* _model)
+	{
+		m_VAO = glUtil::generateVAO();
+		Set(_model);
 	}
 
 	Mesh* Mesh::Create(const std::string& name)
@@ -144,7 +152,7 @@ namespace Vxl
 			return nullptr;
 		}
 
-		Mesh* M = new Mesh();
+		Mesh* M = new Mesh(name);
 
 		Logger.log("Created Mesh: " + name);
 		return M;
@@ -155,18 +163,32 @@ namespace Vxl
 		glUtil::deleteVAO(m_VAO);
 	}
 
+	void Mesh::Set(Model* _model)
+	{
+		assert(_model);
+		m_positions.set(_model->positions);
+		m_uvs.set(_model->uvs);
+		m_normals.set(_model->normals);
+		m_tangents.set(_model->tangents);
+		m_bitangents.set(_model->bitangents);
+		m_colors.set(_model->colors);
+		m_indices.set(_model->indices);
+
+		Bind();
+	}
+
 	void Mesh::GenerateNormals(
 		Vector3* _vertices, GLuint _vertCount,
 		GLuint* _indices, GLuint _indexCount
 	){
-		std::vector<Vector3> Normals;
-		Normals.resize(_vertCount);
-		//
 		if (_vertices == nullptr || _vertCount == 0)
 		{
 			assert(false);
 			return;
 		}
+		//
+		std::vector<Vector3> Normals;
+		Normals.resize(_vertCount);
 		// Indexed Normals
 		if (_indices)
 		{
@@ -232,12 +254,151 @@ namespace Vxl
 		m_normals.set(Normals);
 	}
 
+	void Mesh::GenerateTangents(
+		Vector3* _vertices, GLuint _vertCount,
+		Vector2* _uvs, GLuint _UVCount,
+		GLuint* _indices, GLuint _indexCount
+	)
+	{
+		if (_vertices == nullptr || _vertCount == 0)
+		{
+			assert(false);
+			return;
+		}
+		//
+		std::vector<Vector3> Tangents;
+		std::vector<Vector3> Bitangents;
+		Tangents.resize(_vertCount);
+		Bitangents.resize(_vertCount);
+		// Indexed Normals
+		if (_indices)
+		{
+			assert(_indexCount % 3 == 0 && _indexCount > 0);
+
+			for (GLuint i = 0; i < _indexCount; i += 3)
+			{
+				// Positions
+				Vector3 P1(
+					_vertices[_indices[i + 0]].x,
+					_vertices[_indices[i + 0]].y,
+					_vertices[_indices[i + 0]].z
+				);
+				Vector3 P2(
+					_vertices[_indices[i + 1]].x,
+					_vertices[_indices[i + 1]].y,
+					_vertices[_indices[i + 1]].z
+				);
+				Vector3 P3(
+					_vertices[_indices[i + 2]].x,
+					_vertices[_indices[i + 2]].y,
+					_vertices[_indices[i + 2]].z
+				);
+				
+				// Uvs
+				Vector2 UV1(
+					_uvs[_indices[i + 0]].x,
+					_uvs[_indices[i + 0]].y
+				);
+				Vector2 UV2(
+					_uvs[_indices[i + 1]].x,
+					_uvs[_indices[i + 1]].y
+				);
+				Vector2 UV3(
+					_uvs[_indices[i + 2]].x,
+					_uvs[_indices[i + 2]].y
+				);
+
+				// Edges of triangle
+				Vector3 deltaPos1 = P2 - P1;
+				Vector3 deltaPos2 = P3 - P1;
+				// UV delta
+				Vector2 deltaUV1 = UV2 - UV1;
+				Vector2 deltaUV2 = UV3 - UV1;
+
+				float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+				Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y)*r;
+				Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r;
+				Tangents[_indices[i + 0]] += tangent;
+				Tangents[_indices[i + 1]] += tangent;
+				Tangents[_indices[i + 2]] += tangent;
+				Bitangents[_indices[i + 0]] += bitangent;
+				Bitangents[_indices[i + 1]] += bitangent;
+				Bitangents[_indices[i + 2]] += bitangent;
+			}
+		}
+		// Position Normals
+		else
+		{
+			assert(_vertCount % 3 == 0);
+
+			for (GLuint i = 0; i < _vertCount; i += 3)
+			{
+				// Positions
+				Vector3 P1(
+					_vertices[i + 0].x,
+					_vertices[i + 0].y,
+					_vertices[i + 0].z
+				);
+				Vector3 P2(
+					_vertices[i + 1].x,
+					_vertices[i + 1].y,
+					_vertices[i + 1].z
+				);
+				Vector3 P3(
+					_vertices[i + 2].x,
+					_vertices[i + 2].y,
+					_vertices[i + 2].z
+				);
+
+				// Uvs
+				Vector2 UV1(
+					_uvs[i + 0].x,
+					_uvs[i + 0].y
+				);
+				Vector2 UV2(
+					_uvs[i + 1].x,
+					_uvs[i + 1].y
+				);
+				Vector2 UV3(
+					_uvs[i + 2].x,
+					_uvs[i + 2].y
+				);
+
+				// Edges of triangle
+				Vector3 deltaPos1 = P2 - P1;
+				Vector3 deltaPos2 = P3 - P1;
+				// UV delta
+				Vector2 deltaUV1 = UV2 - UV1;
+				Vector2 deltaUV2 = UV3 - UV1;
+
+				float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+				Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y)*r;
+				Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r;
+				Tangents[i + 0] += tangent;
+				Tangents[i + 1] += tangent;
+				Tangents[i + 2] += tangent;
+				Bitangents[i + 0] += bitangent;
+				Bitangents[i + 1] += bitangent;
+				Bitangents[i + 2] += bitangent;
+			}
+		}
+		// Normalize the normals
+		for (GLuint i = 0; i < _vertCount; i++)
+		{
+			Tangents[i].NormalizeSelf();
+			Bitangents[i].NormalizeSelf();
+		}
+		//
+		m_tangents.set(Tangents);
+		m_bitangents.set(Bitangents);
+	}
+
 	void Mesh::Bind(Draw_Type type)
 	{
 		m_type = type;
 		UpdateDrawInfo();
 
-		// SIZE CHECK //
+		// SIZE Assert Check //
 #ifdef _DEBUG
 		GLuint indicesCount = m_indices.GetDrawCount();
 		if (indicesCount)
@@ -260,9 +421,19 @@ namespace Vxl
 		// Generate Missing Normals
 		if (m_normals.Empty() && !m_positions.Empty())
 		{
+			Vector3* test = m_positions.vertices->data();
 			GenerateNormals(
-				&m_positions.vertices[0], m_positions.vertices.size(),
-				&m_indices.indices[0], m_indices.indices.size()
+				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
+				m_indices.indices.data(), (GLuint)m_indices.indices.size()
+			);
+		}
+		// Generate Missing Tangents
+		if ((m_tangents.Empty() || m_bitangents.Empty()) && !m_positions.Empty() && !m_uvs.Empty())
+		{
+			GenerateTangents(
+				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
+				m_uvs.vertices->data(), (GLuint)m_uvs.vertices->size(),
+				m_indices.indices.data(), (GLuint)m_indices.indices.size()
 			);
 		}
 
@@ -289,11 +460,11 @@ namespace Vxl
 		// Min/Max
 		m_min = Vector3::ZERO;
 		m_max = Vector3::ZERO;
-		UINT PosCount = (UINT)m_positions.vertices.size();
+		UINT PosCount = (UINT)m_positions.vertices->size();
 		for (UINT i = 0; i < PosCount; i++)
 		{
-			m_min = Vector3::Min(m_min, m_positions.vertices[i]);
-			m_max = Vector3::Max(m_max, m_positions.vertices[i]);
+			m_min = Vector3::Min(m_min, m_positions.vertices->at(i));
+			m_max = Vector3::Max(m_max, m_positions.vertices->at(i));
 		}
 	}
 

@@ -3,6 +3,11 @@
 
 #include "../utilities/singleton.h"
 #include <unordered_map>
+#include <assert.h>
+
+#include "../math/Vector2.h"
+#include "../math/Vector3.h"
+#include "../math/Vector4.h"
 
 namespace Vxl
 {
@@ -14,6 +19,11 @@ namespace Vxl
 	private:
 		// custom data
 		static std::unordered_map<std::string, int> m_integers;
+		static std::unordered_map<std::string, float> m_floats;
+		static std::unordered_map<std::string, double> m_doubles;
+		static std::unordered_map<std::string, Vector2> m_vec2;
+		static std::unordered_map<std::string, Vector3> m_vec3;
+		static std::unordered_map<std::string, Vector4> m_vec4;
 	public:
 		// Data
 		bool GBUFFER_WIREFRAME = false;
@@ -29,6 +39,31 @@ namespace Vxl
 		{
 			assert(m_integers.size() < 1000); // in case something went wrong
 			return m_integers[str];
+		}
+		static float GetFloat(const std::string& str)
+		{
+			assert(m_floats.size() < 1000); // in case something went wrong
+			return m_floats[str];
+		}
+		static double GetDouble(const std::string& str)
+		{
+			assert(m_doubles.size() < 1000); // in case something went wrong
+			return m_doubles[str];
+		}
+		static Vector2 GetVec2(const std::string& str)
+		{
+			assert(m_vec2.size() < 1000); // in case something went wrong
+			return m_vec2[str];
+		}
+		static Vector3 GetVec3(const std::string& str)
+		{
+			assert(m_vec3.size() < 1000); // in case something went wrong
+			return m_vec3[str];
+		}
+		static Vector4 GetVec4(const std::string& str)
+		{
+			assert(m_vec4.size() < 1000); // in case something went wrong
+			return m_vec4[str];
 		}
 
 		// Const

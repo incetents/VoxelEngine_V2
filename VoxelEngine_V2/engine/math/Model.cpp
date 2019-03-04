@@ -41,6 +41,7 @@ namespace Vxl
 		{
 			// Error
 			auto Name = stringUtil::nameFromFilepath(filePath);
+			Logger.error("Unable to load Mode: " + Name);
 			return std::vector<Model*>();
 		}
 
@@ -59,6 +60,9 @@ namespace Vxl
 
 			// Start
 			Model* _model = new Model();
+			_model->vertexCount = mesh->mNumVertices;
+			_model->indexCount = mesh->mNumFaces * 3u;
+
 			// position space
 			_model->positions.reserve(mesh->mNumVertices);
 			if (mesh->HasNormals())

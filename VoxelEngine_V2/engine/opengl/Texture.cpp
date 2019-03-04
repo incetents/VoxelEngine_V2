@@ -93,11 +93,16 @@ namespace Vxl
 			glDeleteTextures(1, &m_id);
 	}
 
-	void BaseTexture::Bind()
+	void BaseTexture::Bind(Active_Texture layer) const
+	{
+		glActiveTexture((GLenum)layer);
+		glBindTexture((GLenum)m_type, m_id);
+	}
+	void BaseTexture::Bind() const
 	{
 		glBindTexture((GLenum)m_type, m_id);
 	}
-	void BaseTexture::Unbind()
+	void BaseTexture::Unbind() const
 	{
 		glBindTexture((GLenum)m_type, 0);
 	}
@@ -179,7 +184,7 @@ namespace Vxl
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath);
-		glUtil::setOpenGLName(GL_TEXTURE, m_id, Name);
+		glUtil::setOpenGLName(glNameType::TEXTURE, m_id, "Tex_" + Name);
 
 		// finished
 		Unbind();
@@ -222,7 +227,7 @@ namespace Vxl
 		updateTexImage2D(&m_image[0]);
 
 		// glName
-		glUtil::setOpenGLName(GL_TEXTURE, m_id, name);
+		glUtil::setOpenGLName(glNameType::TEXTURE, m_id, "Tex_" + name);
 
 		// finished
 		Unbind();
@@ -311,7 +316,7 @@ namespace Vxl
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath1);
-		glUtil::setOpenGLName(GL_TEXTURE, m_id, Name);
+		glUtil::setOpenGLName(glNameType::TEXTURE, m_id, "Cubemap_" + Name);
 
 		// finished
 		Unbind();

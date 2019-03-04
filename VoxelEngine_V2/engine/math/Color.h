@@ -73,9 +73,13 @@ namespace Vxl
 		static const Color4F PURPLE;
 		static const Color4F CYAN;
 
-		Color4F(float r, float g, float b, float _a)
+		Color4F(float r, float g, float b, float a)
 			: r(r), g(g), b(b), a(a)
 		{}
+		Color4F(float r, float g, float b)
+			: r(r), g(g), b(b), a(1)
+		{}
+
 		Color4F()
 			: r(0), g(0), b(0), a(0)
 		{}

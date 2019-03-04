@@ -12,6 +12,7 @@ namespace Vxl
 	private:
 		// Special Utility
 		Mesh* GenerateIcosahdron(unsigned int subdivisions);
+		Mesh* GenerateSphereUV(unsigned int xSlice, unsigned int ySlice);
 
 	private:
 		bool m_isSetup = false;
@@ -22,7 +23,9 @@ namespace Vxl
 		Mesh* m_octahedron = nullptr;
 		Mesh* m_icosahedron = nullptr;
 		Mesh* m_icoSphere = nullptr;
-		Mesh* m_sphere = nullptr;
+		Mesh* m_sphere = nullptr; // made from icosahedron subdivded
+		Mesh* m_sphereUV_16 = nullptr;
+		Mesh* m_sphereUV_64 = nullptr;
 
 		void CreateFullQuad();
 		void CreateQuad();
@@ -32,6 +35,7 @@ namespace Vxl
 		void CreateIcosahedron();
 		void CreateIcosphere();
 		void CreateSphere();
+		void CreateSphereUV();
 
 		void Destroy();
 	public:
@@ -48,6 +52,7 @@ namespace Vxl
 			CreateIcosahedron();
 			CreateIcosphere();
 			CreateSphere();
+			CreateSphereUV();
 
 			m_isSetup = true;
 		}
@@ -93,6 +98,15 @@ namespace Vxl
 		{
 			return m_sphere;
 		}
+		Mesh* GetSphereUV_Cheap()
+		{
+			return m_sphereUV_16;
+		}
+		Mesh* GetSphereUV_Good()
+		{
+			return m_sphereUV_64;
+		}
+
 	} SingletonInstance(Geometry);
 }
 

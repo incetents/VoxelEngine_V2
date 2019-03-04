@@ -9,10 +9,33 @@
 
 namespace Vxl
 {
-	FramebufferObject::FramebufferObject()
+	Database<FramebufferObject> FramebufferObject::m_database;
+
+	FramebufferObject::FramebufferObject(const std::string& name, UINT viewportWidth, UINT viewportHeight)
+		: m_name(name)
 	{
 		glGenFramebuffers(1, &m_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+
+		glUtil::setOpenGLName(glNameType::FRAMEBUFFER, m_id, "FBO_" + name);
+		setViewport(0, 0, viewportWidth, viewportHeight);
+	}
+
+	FramebufferObject* FramebufferObject::Create(const std::string& name, UINT viewportWidth, UINT viewportHeight)
+	{
+		// Name Duplication
+		if (m_database.Check(name))
+		{
+			Logger.error("Duplicate Framebuffer: " + name);
+			return nullptr;
+		}
+
+		FramebufferObject* FBO = new FramebufferObject(name, viewportWidth, viewportHeight);
+
+		Logger.log("Created FBO: " + name);
+		m_database.Set(name, FBO);
+
+		return FBO;
 	}
 
 	FramebufferObject::~FramebufferObject()
@@ -67,6 +90,7 @@ namespace Vxl
 	}
 
 	void FramebufferObject::addTexture(
+		const std::string& name,
 		int Width, int Height,
 		Wrap_Mode WrapMode,
 		Filter_Min MinFilter,
@@ -82,6 +106,9 @@ namespace Vxl
 		RenderTexture* _tex = new RenderTexture(Width, Height, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, DataType);
 		m_textures.push_back(_tex);
 	
+		// Name
+		glUtil::setOpenGLName(glNameType::TEXTURE, _tex->GetID(), "FBO_" + m_name + "_Tex_" + name);
+
 		// Add to FBO
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, _tex->GetID(), 0);
 		checkFBOStatus();
@@ -96,6 +123,9 @@ namespace Vxl
 
 		// Save Texture
 		m_depth = new RenderTexture(width, height, Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::DEPTH, Channel_Type::DEPTH, Data_Type::FLOAT);
+
+		// Name
+		glUtil::setOpenGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
 
 		// Add to FBO
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
@@ -119,6 +149,11 @@ namespace Vxl
 	void FramebufferObject::unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void FramebufferObject::bindViewport()
+	{
+		glViewport(m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
 	}
 
 	void FramebufferObject::bindTexture(int index, Active_Texture layer)

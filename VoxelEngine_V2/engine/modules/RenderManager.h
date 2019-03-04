@@ -18,7 +18,6 @@ namespace Vxl
 	class Layer;
 	class Entity;
 	class Material;
-	class ImguiCaller;
 
 	static class RenderManager : public Singleton<class RenderManager>
 	{
@@ -28,11 +27,11 @@ namespace Vxl
 		Layer* m_layers;
 		UINT m_layerToRender = ~0;
 
+		// Masterlist of entities
+		std::set<Entity*> m_allEntities;
+
 		// Rendering stuff // UINT = Material Order
 		std::map<std::pair<UINT, Material*>, std::set<Entity*>> m_entities; 
-
-		// ImguiDrawers
-		std::set<ImguiCaller*> m_ImGui_Drawers;
 		
 	public:
 		RenderManager();
@@ -44,15 +43,10 @@ namespace Vxl
 		void AddEntity(Entity* _entity);
 		void RemoveEntity(Entity* _entity);
 
-		void AddImGuiDrawer(ImguiCaller* Drawer)
-		{
-			m_ImGui_Drawers.insert(Drawer);
-		}
-
-		// Reload Shader System
+		// Reload Systems
 		void ReloadShaders();
-		// Reload Window
 		void ReloadWindow();
+		void ReloadFBOS();
 
 		// Behaviour
 		void ReloadScene();

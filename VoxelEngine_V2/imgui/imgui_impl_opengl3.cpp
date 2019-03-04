@@ -290,6 +290,8 @@ bool ImGui_ImplOpenGL3_CreateFontsTexture()
     GLint last_texture;
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
     glGenTextures(1, &g_FontTexture);
+	const char* glName = "Tex_Imgui_Fonts";
+	glObjectLabel(GL_TEXTURE, g_FontTexture, static_cast<GLsizei>(strlen(glName)), glName);
     glBindTexture(GL_TEXTURE_2D, g_FontTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -506,6 +508,14 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
     glAttachShader(g_ShaderHandle, g_FragHandle);
     glLinkProgram(g_ShaderHandle);
     CheckProgram(g_ShaderHandle, "shader program");
+
+	// glNames
+	const char* glName_v = "Shader_Imgui_Vert";
+	const char* glName_f = "Shader_Imgui_Frag";
+	const char* glName_p = "Program_Imgui";
+	glObjectLabel(GL_SHADER, g_VertHandle, static_cast<GLsizei>(strlen(glName_v)), glName_v);
+	glObjectLabel(GL_SHADER, g_FragHandle, static_cast<GLsizei>(strlen(glName_f)), glName_f);
+	glObjectLabel(GL_PROGRAM, g_ShaderHandle, static_cast<GLsizei>(strlen(glName_p)), glName_p);
 
     g_AttribLocationTex = glGetUniformLocation(g_ShaderHandle, "Texture");
     g_AttribLocationProjMtx = glGetUniformLocation(g_ShaderHandle, "ProjMtx");

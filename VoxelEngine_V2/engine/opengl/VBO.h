@@ -123,10 +123,10 @@ namespace Vxl
 		}
 
 		template<typename Type = GLfloat>
-		void UpdateVertices(Type* _arr)
+		void UpdateVertices(Type* _arr, int offset = 0)
 		{
 			glUtil::bindVBO(m_VBO);
-			glUtil::bindVBOSubData(0, m_Size, _arr);
+			glUtil::bindVBOSubData(offset, m_Size, _arr);
 		}
 
 		void AddStrideHint(BufferType _type, GLuint _valueCount);
@@ -190,10 +190,10 @@ namespace Vxl
 		void SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
 		void SetIndices(std::vector<GLuint> _arr, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
 
-		void UpdateIndices(GLuint* _arr)
+		void UpdateIndices(GLuint* _arr, int offset = 0)
 		{
 			glUtil::bindVBO(m_EBO);
-			glUtil::bindVBOSubData(0, m_Size, _arr);
+			glUtil::bindVBOSubData(offset, m_Size, _arr);
 		}
 
 		inline GLuint GetVBO(void) const

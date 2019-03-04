@@ -110,7 +110,7 @@ namespace Vxl
 		}
 
 		// set gl name
-		glUtil::setOpenGLName(GL_SHADER, m_id, m_name);
+		glUtil::setOpenGLName(glNameType::SHADER, m_id, "Shader_" + m_name);
 
 		return true;
 	}
@@ -146,7 +146,9 @@ namespace Vxl
 		GLint maxLength = 0;
 		glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
 		if (maxLength <= 0)
+		{
 			Logger.error("Could not retrieve program compilation log");
+		}
 		else
 		{
 			//The maxLength includes the NULL character
@@ -325,7 +327,7 @@ namespace Vxl
 			acquireSubroutines();
 
 			// set gl name
-			glUtil::setOpenGLName(GL_PROGRAM, m_id, m_name);
+			glUtil::setOpenGLName(glNameType::PROGRAM, m_id, "Program_" + m_name);
 		}
 	}
 

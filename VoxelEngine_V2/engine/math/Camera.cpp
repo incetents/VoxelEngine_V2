@@ -27,7 +27,7 @@ namespace Vxl
 
 		// UBO
 		static unsigned int CamerasCreated = 0;
-		m_UBO = new UniformBufferObject(64 * 3, 0, "CameraUBO" + std::to_string(CamerasCreated));
+		m_UBO = new UniformBufferObject(64 * 3, 0, "Camera");
 		CamerasCreated++;
 	}
 	Camera::~Camera()

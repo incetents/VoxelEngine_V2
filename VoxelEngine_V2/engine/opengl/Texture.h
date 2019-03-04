@@ -49,8 +49,9 @@ namespace Vxl
 		);
 		virtual ~BaseTexture();
 
-		void Bind();
-		void Unbind();
+		void Bind(Active_Texture layer) const;
+		void Bind() const;
+		void Unbind() const;
 
 		void setWrapMode(Wrap_Mode W);
 		void setFilterMode(Filter_Min Min, Filter_Mag Mag);

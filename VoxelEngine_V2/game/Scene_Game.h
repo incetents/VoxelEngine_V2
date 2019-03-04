@@ -29,10 +29,11 @@ namespace Vxl
 		ShaderProgram* _shader_gbuffer_no_model;
 		ShaderProgram* _shader_passthrough;
 		ShaderProgram* _shader_skybox;
-		ShaderProgram* _shader_debugLines;
+		ShaderProgram* _shader_lines;
 
 		Texture* _tex;
 		Texture* _tex_crate;
+		Texture* _tex_gridtest;
 		Cubemap* _cubemap1;
 
 		// Assets Created
@@ -46,7 +47,7 @@ namespace Vxl
 		Material* _material_gbuffer_no_model;
 		Material* _material_passthrough;
 		Material* _material_skybox;
-		Material* _material_debugLines;
+		Material* _material_lines;
 
 		Entity* _entity1;
 		Entity* _entity2;

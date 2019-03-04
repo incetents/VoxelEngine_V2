@@ -19,7 +19,7 @@ namespace Vxl
 	private:
 		// Debug Lines
 		VBO*				m_lines;
-		std::vector<float>	m_lines_vertices;  // 12 floats = 2 lines // 600 floats = 100 lines
+		std::vector<float>	m_lines_vertices;  // 14 floats = 2 lines // 700 floats = 100 lines
 		UINT				m_lines_vertexIndex = 0;
 		bool				m_lines_resizeDirty = false;
 		// Debug Textures
@@ -30,27 +30,30 @@ namespace Vxl
 		void Setup()
 		{
 			m_lines_vertices.clear();
-			m_lines_vertices.resize(600);
+			m_lines_vertices.resize(700);
 
 			delete m_lines;
 			m_lines = new VBO();
 			m_lines->SetVertices(m_lines_vertices, BufferBind_Mode::DYNAMIC);
 			m_lines->AddStrideHint(BufferType::VERTEX, 3);
-			m_lines->AddStrideHint(BufferType::COLOR, 3);
+			m_lines->AddStrideHint(BufferType::COLOR, 4);
 		}
 		void DrawLine(
 			const Vector3& P1, const Vector3& P2,
-			const Color3F& C1 = Color3F(1, 1, 1), const Color3F& C2 = Color3F(1, 1, 1)
+			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
 		);
 		void DrawAABB(
 			const Vector3& Min, const Vector3& Max, const Vector3& OffsetAll = Vector3(0, 0, 0),
-			const Color3F& C = Color3F(1, 1, 1)
+			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
 		void UpdateStart();
 		void RenderLines();
 		// Debug Textures
 		void CreateDebugTextures();
-		void BindNullTexture();
+		Texture* GetNullTexture(void) const
+		{
+			return m_null_texture;
+		}
 
 	} SingletonInstance(Debug);
 }

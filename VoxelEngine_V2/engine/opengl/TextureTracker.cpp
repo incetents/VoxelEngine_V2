@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "TextureTracker.h"
 
+#include "Texture.h"
+
 namespace Vxl
 {
 	bool TextureTracker::ShouldBindTexture(Active_Texture Active, UINT ID)
@@ -19,9 +21,18 @@ namespace Vxl
 	{
 		m_activeTextures[Active] = ID;
 	}
-	void TextureTracker::NewFrame()
+
+	void TextureTracker::BindSafe(Active_Texture Active, BaseTexture* tex)
+	{
+		if (ShouldBindTexture(Active, tex->GetID()))
+		{
+			SetCurrentTexture(Active, tex->GetID());
+			tex->Bind(Active);
+		}
+	}
+
+	void TextureTracker::Clear()
 	{
 		m_activeTextures.clear();
 	}
-
 }

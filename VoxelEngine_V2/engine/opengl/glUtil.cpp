@@ -66,10 +66,10 @@ namespace Vxl
 	}
 
 	// Set OpenGL Name
-	void glUtil::setOpenGLName(GLenum identifier, GLuint name, const std::string &label)
+	void glUtil::setOpenGLName(glNameType identifier, GLuint id, const std::string &label)
 	{
-		std::string labelEdit = label + " (" + std::to_string(name) + ")";
-		glObjectLabel(identifier, name, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
+		std::string labelEdit = label + " (" + std::to_string(id) + ")";
+		glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
 	}
 
 	// Get Format Type from channel count

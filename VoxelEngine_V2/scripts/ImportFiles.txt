@@ -2,21 +2,19 @@
 #SHADER
 // order: [Name] [FilePath]
 
-#VERT test_vert 		./shaders/test.vert
-#FRAG test_frag 		./shaders/test.frag
-
-#VERT gbuffer_vert 							./shaders/gbuffer.vert
+#VERT gbuffer_vert 					./shaders/gbuffer.vert
 #VERT gbuffer_no_model_vert 		./shaders/gbuffer_no_model.vert
-#FRAG gbuffer_frag 						./shaders/gbuffer.frag
+#FRAG gbuffer_frag 					./shaders/gbuffer.frag
 
 #VERT passthrough_vert 				./shaders/passthrough.vert
 #FRAG passthrough_frag 				./shaders/passthrough.frag
 
-#VERT skybox_vert 		./shaders/skybox.vert
+#VERT skybox_vert 	./shaders/skybox.vert
 #FRAG skybox_frag 	./shaders/skybox.frag
 
-#VERT debugLines_vert 		./shaders/debugLines.vert
-#FRAG debugLines_frag 	./shaders/debugLines.frag
+#VERT lines_vert 	./shaders/lines.vert
+#GEOM lines_geom 	./shaders/lines.geom
+#FRAG lines_frag 	./shaders/lines.frag
 
 //----------------------------------------
 #SHADERPROGRAM
@@ -26,7 +24,7 @@ gbuffer				gbuffer_vert				gbuffer_frag
 gbuffer_no_model 	gbuffer_no_model_vert 		gbuffer_frag
 passthrough 		passthrough_vert			passthrough_frag
 skybox				skybox_vert					skybox_frag
-debugLines 			debugLines_vert				debugLines_frag
+lines 				lines_vert					lines_geom 				lines_frag
 
 //----------------------------------------
 #TEXTURE

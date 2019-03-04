@@ -177,29 +177,26 @@ namespace Vxl
 			// Null Texture if no textures are used
 			if (!m_activeTextureCount)
 			{
-				//NULL_TEXTURE
-				glUtil::setActiveTexture(0);
-				Debug.BindNullTexture();
+				// Bind null texture on first active layer
+				TextureTracker.BindSafe(Active_Texture::LEVEL0, Debug.GetNullTexture());
 			}
-
-			for (Active_Texture id : m_activeTextures)
+			else
 			{
-				BaseTexture* _tex = m_textures[(UINT)id - GL_TEXTURE0];
-				assert(_tex);
-				glUtil::setActiveTexture(id);
-
-				// Null texture bound if no textures exist
-				if (!_tex->IsLoaded())
+				for (Active_Texture id : m_activeTextures)
 				{
-					Debug.BindNullTexture();
-					continue;
-				}
+					// Get Current texture
+					BaseTexture* _tex = m_textures[(UINT)id - GL_TEXTURE0];
 
-				// Don't bind texture on active layer if it's already bound
-				if (TextureTracker.ShouldBindTexture(id, _tex->GetID()))
-				{
-					_tex->Bind();
-					TextureTracker.SetCurrentTexture(id, _tex->GetID());
+					// Bind Null texture if texture isn't loaded
+					if (_tex == nullptr || !_tex->IsLoaded())
+					{
+						TextureTracker.BindSafe(id, Debug.GetNullTexture());
+					}
+					// Bind texture normally
+					else
+					{
+						TextureTracker.BindSafe(id, _tex);
+					}
 				}
 			}
 		}

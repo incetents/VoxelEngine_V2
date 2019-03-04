@@ -12,17 +12,19 @@ namespace Vxl
 {
 	DatabaseSet<Entity> Entity::m_database;
 
-	Entity::Entity()
+	Entity::Entity(const std::string& displayName)
 	{
+		m_name = displayName;
+
 		AddComponent(&m_transform, this);
 		AddComponent(&m_meshRenderer, this);
 		AddComponent(&m_material, this);
 	}
 
-	Entity* Entity::Create()
+	Entity* Entity::Create(const std::string& displayName)
 	{
 		// Default Name
-		Entity* E = new Entity();
+		Entity* E = new Entity(displayName);
 		m_database.Set(E);
 		return E;
 	}

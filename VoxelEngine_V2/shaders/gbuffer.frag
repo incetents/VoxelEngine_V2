@@ -52,11 +52,11 @@ void main()
 	//output_normal = vec4(normalize(f_data.normal), 1.0); // screenspace Normals
 	
 	if(TESTMODE == 1)
-		output_albedo = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0);
+		output_albedo = vec4(normalize(f_data.normal), 1.0);
 	if(TESTMODE == 2)
-		output_albedo = vec4(normalize(f_data.tangent) * 0.5 + 0.5, 1.0);
+		output_albedo = vec4(normalize(f_data.tangent), 1.0);
 	if(TESTMODE == 3)
-		output_albedo = vec4(normalize(f_data.bitangent) * 0.5 + 0.5, 1.0);
+		output_albedo = vec4(normalize(f_data.bitangent), 1.0);
 	
 	float d = dot(-getCameraForwad(), normalize(f_data.normal));
 	
