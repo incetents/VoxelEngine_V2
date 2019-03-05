@@ -159,10 +159,18 @@ namespace Vxl
 		static void Unbind();
 
 		// Uniform
+
+		// [Faster] Set uniform
 		template<typename Type>
 		void					SetUniform(const std::string& name, Type data)
 		{
 			m_uniforms[name].Set<Type>(data);
+		}
+		// [Slower] Set uniform, regardless if shader is bound
+		template<typename Type>
+		void					SetProgramUniform(const std::string& name, Type data)
+		{
+			m_uniforms[name].Set<Type>(m_id, data);
 		}
 		inline const glUniform& GetUniform(const std::string& name)
 		{
@@ -183,6 +191,7 @@ namespace Vxl
 		{
 			return m_uniforms;
 		}
+
 
 		// Uniform Blocks
 		inline glUniformBlock   GetUniformBlock(const std::string& name)

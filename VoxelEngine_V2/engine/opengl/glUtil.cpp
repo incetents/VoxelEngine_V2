@@ -40,7 +40,7 @@ namespace Vxl
 		// Set Default Blend Mode
 		blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
 		// Set Default Depth Test
-		depthTest(Depth_Pass_Rule::LESS);
+		depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
 		// Set Default Wireframe Mode
 		wireframe(false);
 

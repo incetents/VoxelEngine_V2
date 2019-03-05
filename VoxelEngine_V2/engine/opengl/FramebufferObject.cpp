@@ -110,8 +110,10 @@ namespace Vxl
 		glUtil::setOpenGLName(glNameType::TEXTURE, _tex->GetID(), "FBO_" + m_name + "_Tex_" + name);
 
 		// Add to FBO
+		bind();
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, _tex->GetID(), 0);
 		checkFBOStatus();
+		unbind();
 
 		// fix draw buffer
 		m_dirtyDrawBuffers = true;
@@ -128,8 +130,10 @@ namespace Vxl
 		glUtil::setOpenGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
 
 		// Add to FBO
+		bind();
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
 		checkFBOStatus();
+		unbind();
 	}
 
 	void FramebufferObject::bind()

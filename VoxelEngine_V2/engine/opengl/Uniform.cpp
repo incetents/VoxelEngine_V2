@@ -145,4 +145,111 @@ namespace Vxl
 		glUniformMatrix4fv(m_location, 1, GL_FALSE, data.GetStartPointer());
 	}
 
+	//
+
+	template<>
+	void glUniform::Set<bool>(GLuint Programid, bool data)
+	{
+		glProgramUniform1i(Programid, m_location, (int)data);
+	}
+	template<>
+	void glUniform::Set<int>(GLuint Programid, int data)
+	{
+		glProgramUniform1i(Programid, m_location, data);
+	}
+	template<>
+	void glUniform::Set<unsigned int>(GLuint Programid, unsigned int data)
+	{
+		glProgramUniform1ui(Programid, m_location, data);
+	}
+	template<>
+	void glUniform::Set<float>(GLuint Programid, float data)
+	{
+		glProgramUniform1f(Programid, m_location, data);
+	}
+	template<>
+	void glUniform::Set<double>(GLuint Programid, double data)
+	{
+		glProgramUniform1d(Programid, m_location, data);
+	}
+	template<>
+	void glUniform::Set<Vector2&>(GLuint Programid, Vector2& data)
+	{
+		glProgramUniform2f(Programid, m_location, data.x, data.y);
+	}
+	template<>
+	void glUniform::Set<Vector2>(GLuint Programid, Vector2 data)
+	{
+		glProgramUniform2f(Programid, m_location, data.x, data.y);
+	}
+	template<>
+	void glUniform::Set<Vector3&>(GLuint Programid, Vector3& data)
+	{
+		glProgramUniform3f(Programid, m_location, data.x, data.y, data.z);
+	}
+	template<>
+	void glUniform::Set<Vector3>(GLuint Programid, Vector3 data)
+	{
+		glProgramUniform3f(Programid, m_location, data.x, data.y, data.z);
+	}
+	template<>
+	void glUniform::Set<Vector4&>(GLuint Programid, Vector4& data)
+	{
+		glProgramUniform4f(Programid, m_location, data.x, data.y, data.z, data.w);
+	}
+	template<>
+	void glUniform::Set<Vector4>(GLuint Programid, Vector4 data)
+	{
+		glProgramUniform4f(Programid, m_location, data.x, data.y, data.z, data.w);
+	}
+	template<>
+	void glUniform::Set<Color3F&>(GLuint Programid, Color3F& data)
+	{
+		glProgramUniform3f(Programid, m_location, data.r, data.g, data.b);
+	}
+	template<>
+	void glUniform::Set<Color3F>(GLuint Programid, Color3F data)
+	{
+		glProgramUniform3f(Programid, m_location, data.r, data.g, data.b);
+	}
+	template<>
+	void glUniform::Set<Color4F&>(GLuint Programid, Color4F& data)
+	{
+		glProgramUniform4f(Programid, m_location, data.r, data.g, data.b, data.a);
+	}
+	template<>
+	void glUniform::Set<Color4F>(GLuint Programid, Color4F data)
+	{
+		glProgramUniform4f(Programid, m_location, data.r, data.g, data.b, data.a);
+	}
+	template<>
+	void glUniform::Set<Matrix2x2&>(GLuint Programid, Matrix2x2& data)
+	{
+		glProgramUniformMatrix2fv(Programid, m_location, 1, GL_FALSE, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::Set<Matrix2x2>(GLuint Programid, Matrix2x2 data)
+	{
+		glProgramUniformMatrix2fv(Programid, m_location, 1, GL_FALSE, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::Set<Matrix3x3&>(GLuint Programid, Matrix3x3& data)
+	{
+		glProgramUniformMatrix3fv(Programid, m_location, 1, GL_FALSE, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::Set<Matrix3x3>(GLuint Programid, Matrix3x3 data)
+	{
+		glProgramUniformMatrix3fv(Programid, m_location, 1, GL_FALSE, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::Set<Matrix4x4&>(GLuint Programid, Matrix4x4& data)
+	{
+		glProgramUniformMatrix4fv(Programid, m_location, 1, GL_FALSE, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::Set<Matrix4x4>(GLuint Programid, Matrix4x4 data)
+	{
+		glProgramUniformMatrix4fv(Programid, m_location, 1, GL_FALSE, data.GetStartPointer());
+	}
 }

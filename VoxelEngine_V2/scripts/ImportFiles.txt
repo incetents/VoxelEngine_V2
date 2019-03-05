@@ -16,6 +16,8 @@
 #GEOM lines_geom 	./shaders/lines.geom
 #FRAG lines_frag 	./shaders/lines.frag
 
+#FRAG colorPicker_frag 	./shaders/colorPicker.frag
+
 //----------------------------------------
 #SHADERPROGRAM
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
@@ -25,6 +27,7 @@ gbuffer_no_model 	gbuffer_no_model_vert 		gbuffer_frag
 passthrough 		passthrough_vert			passthrough_frag
 skybox				skybox_vert					skybox_frag
 lines 				lines_vert					lines_geom 				lines_frag
+colorPicker 		gbuffer_vert 				colorPicker_frag
 
 //----------------------------------------
 #TEXTURE

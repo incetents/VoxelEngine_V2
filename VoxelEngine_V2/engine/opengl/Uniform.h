@@ -82,8 +82,16 @@ namespace Vxl
 			return *this;
 		}
 
+		// [Faster] Set uniform
 		template<typename Type>
 		void Set(Type data)
+		{
+			assert(false);
+		}
+
+		// [Slower] Set uniform, regardless if shader is bound
+		template<typename Type>
+		void Set(GLuint id, Type data)
 		{
 			assert(false);
 		}
@@ -140,5 +148,50 @@ namespace Vxl
 	void glUniform::Set<Matrix4x4&>(Matrix4x4& data);
 	template<>
 	void glUniform::Set<Matrix4x4>(Matrix4x4 data);
+
+	//
+
+	template<>
+	void glUniform::Set<bool>(GLuint Programid, bool data);
+	template<>
+	void glUniform::Set<int>(GLuint Programid, int data);
+	template<>
+	void glUniform::Set<unsigned int>(GLuint Programid, unsigned int data);
+	template<>
+	void glUniform::Set<float>(GLuint Programid, float data);
+	template<>
+	void glUniform::Set<double>(GLuint Programid, double data);
+	template<>
+	void glUniform::Set<Vector2&>(GLuint Programid, Vector2& data);
+	template<>
+	void glUniform::Set<Vector2>(GLuint Programid, Vector2 data);
+	template<>
+	void glUniform::Set<Vector3&>(GLuint Programid, Vector3& data);
+	template<>
+	void glUniform::Set<Vector3>(GLuint Programid, Vector3 data);
+	template<>
+	void glUniform::Set<Vector4&>(GLuint Programid, Vector4& data);
+	template<>
+	void glUniform::Set<Vector4>(GLuint Programid, Vector4 data);
+	template<>
+	void glUniform::Set<Color3F&>(GLuint Programid, Color3F& data);
+	template<>
+	void glUniform::Set<Color3F>(GLuint Programid, Color3F data);
+	template<>
+	void glUniform::Set<Color4F&>(GLuint Programid, Color4F& data);
+	template<>
+	void glUniform::Set<Color4F>(GLuint Programid, Color4F data);
+	template<>
+	void glUniform::Set<Matrix2x2&>(GLuint Programid, Matrix2x2& data);
+	template<>
+	void glUniform::Set<Matrix2x2>(GLuint Programid, Matrix2x2 data);
+	template<>
+	void glUniform::Set<Matrix3x3&>(GLuint Programid, Matrix3x3& data);
+	template<>
+	void glUniform::Set<Matrix3x3>(GLuint Programid, Matrix3x3 data);
+	template<>
+	void glUniform::Set<Matrix4x4&>(GLuint Programid, Matrix4x4& data);
+	template<>
+	void glUniform::Set<Matrix4x4>(GLuint Programid, Matrix4x4 data);
 
 }

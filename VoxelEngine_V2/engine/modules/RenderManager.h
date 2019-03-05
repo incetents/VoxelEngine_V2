@@ -21,6 +21,7 @@ namespace Vxl
 
 	static class RenderManager : public Singleton<class RenderManager>
 	{
+		friend class Imgui_Hierarchy;
 	private:
 		Scene* m_currentScene = nullptr;
 
@@ -28,7 +29,7 @@ namespace Vxl
 		UINT m_layerToRender = ~0;
 
 		// Masterlist of entities
-		std::set<Entity*> m_allEntities;
+		std::vector<Entity*> m_allEntities;
 
 		// Rendering stuff // UINT = Material Order
 		std::map<std::pair<UINT, Material*>, std::set<Entity*>> m_entities; 
@@ -39,7 +40,12 @@ namespace Vxl
 		// Utility
 		void SetNewScene(Scene* _scene);
 		const Layer& GetLayer(UINT index);
+		inline const std::vector<Entity*> GetAllEntities(void) const
+		{
+			return m_allEntities;
+		}
 
+		// Entity
 		void AddEntity(Entity* _entity);
 		void RemoveEntity(Entity* _entity);
 
@@ -55,7 +61,7 @@ namespace Vxl
 		void Draw();
 		void DrawImGui();
 
-		void RenderScene();
+		void RenderScene_ByMaterial();
 
 	} SingletonInstance(RenderManager);
 }

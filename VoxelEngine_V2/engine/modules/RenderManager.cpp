@@ -13,6 +13,8 @@
 #include "../opengl/Debug.h"
 #include "../opengl/Geometry.h"
 
+#include <algorithm>
+
 namespace Vxl
 {
 	RenderManager::RenderManager()
@@ -45,15 +47,27 @@ namespace Vxl
 	{
 		// Makes sure entity has a material/shader
 		assert(_entity && _entity->GetMaterial());
-		m_entities[std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial())].insert(_entity);
-		m_allEntities.insert(_entity);
+
+		// Check duplicate
+		auto Key = std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial());
+		if (m_entities.find(Key) != m_entities.end())
+		{
+			if (m_entities[Key].find(_entity) != m_entities[Key].end())
+			{
+				// Duplicate found, don't add anything
+				return;
+			}
+		}
+
+		m_entities[Key].insert(_entity);
+		m_allEntities.push_back(_entity);
 	}
 	void RenderManager::RemoveEntity(Entity* _entity)
 	{
 		// Makes sure entity has a material/shader
 		assert(_entity && _entity->GetMaterial());
 		m_entities[std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial())].erase(_entity);
-		m_allEntities.erase(_entity);
+		m_allEntities.erase(std::remove(m_allEntities.begin(), m_allEntities.end(), _entity), m_allEntities.end());
 	}
 
 	// Reload Shader System
@@ -144,7 +158,7 @@ namespace Vxl
 		ImGui::Render();
 	}
 
-	void RenderManager::RenderScene()
+	void RenderManager::RenderScene_ByMaterial()
 	{
 		for (auto mat = m_entities.begin(); mat != m_entities.end(); mat++)
 		{

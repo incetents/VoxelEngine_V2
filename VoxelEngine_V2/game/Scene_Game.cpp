@@ -39,6 +39,8 @@
 
 #include "../engine/imgui_wrappers/Imgui_ShaderErrors.h"
 #include "../engine/imgui_wrappers/ImGui_DevConsole.h"
+#include "../engine/imgui_wrappers/ImGui_Hierarchy.h"
+#include "../engine/imgui_wrappers/ImGui_Inspector.h"
 
 #include "../game/terrain/TerrainManager.h"
 
@@ -64,13 +66,17 @@ namespace Vxl
 		_fbo->addTexture("normal", Window.GetResolutionWidth(), Window.GetResolutionHeight());
 		_fbo->addTexture("test", Window.GetResolutionWidth(), Window.GetResolutionHeight());
 		_fbo->addDepth(Window.GetResolutionWidth(), Window.GetResolutionHeight());
-		_fbo->unbind();
+
+		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight());
+		_fbo_colorpicker->addTexture("color", Window.GetResolutionWidth(), Window.GetResolutionHeight());
+		_fbo_colorpicker->addDepth(Window.GetResolutionWidth(), Window.GetResolutionHeight());
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
 		_shader_gbuffer				= ShaderProgram::Get("gbuffer");
 		_shader_gbuffer_no_model	= ShaderProgram::Get("gbuffer_no_model");
 		_shader_lines				= ShaderProgram::Get("lines");
 		_shader_passthrough			= ShaderProgram::Get("passthrough");
+		_shader_colorPicker			= ShaderProgram::Get("colorPicker");
 
 		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
@@ -127,7 +133,7 @@ namespace Vxl
 		
 		
 		// Entities
-		_entity1 = Entity::Create();
+		_entity1 = Entity::Create("_entity1");
 		_entity1->SetMaterial(_material_gbuffer);
 		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity1->SetMesh(_mesh);
@@ -136,7 +142,7 @@ namespace Vxl
 		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
 		Mesh* jiggyMesh = new Mesh(Model::Get("jiggy"));
 		
-		_entity2 = Entity::Create();
+		_entity2 = Entity::Create("_entity2");
 		_entity2->SetMaterial(_material_gbuffer);
 		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
@@ -208,28 +214,28 @@ namespace Vxl
 		
 		_crate1->m_transform.setWorldPosition(0, 0, 0);
 		
-		_octo1 = Entity::Create();
+		_octo1 = Entity::Create("_octo1");
 		_octo1->SetMaterial(_material_gbuffer);
 		_octo1->SetMesh(Geometry.GetOctahedron());
 		_octo1->m_transform.setPosition(0, 0, 0);
 		_octo1->m_transform.setScale(0.5f);
 		_octo1->SetColor(Color3F(1, 1, 1));
 		
-		_octo2 = Entity::Create();
+		_octo2 = Entity::Create("_octo2");
 		_octo2->SetMaterial(_material_gbuffer);
 		_octo2->SetMesh(Geometry.GetOctahedron());
 		_octo2->m_transform.setPosition(1, 0, 0);
 		_octo2->m_transform.setScale(0.5f);
 		_octo2->SetColor(Color3F(1, 0, 0));
 		
-		_octo3 = Entity::Create();
+		_octo3 = Entity::Create("_octo3");
 		_octo3->SetMaterial(_material_gbuffer);
 		_octo3->SetMesh(Geometry.GetOctahedron());
 		_octo3->m_transform.setPosition(0, 1, 0);
 		_octo3->m_transform.setScale(0.5f);
 		_octo3->SetColor(Color3F(0, 1, 0));
 		
-		_octo4 = Entity::Create();
+		_octo4 = Entity::Create("_octo4");
 		_octo4->SetMaterial(_material_gbuffer);
 		_octo4->SetMesh(Geometry.GetOctahedron());
 		_octo4->m_transform.setPosition(0, 0, 1);
@@ -242,6 +248,7 @@ namespace Vxl
 	void Scene_Game::Destroy()
 	{
 		delete _fbo;
+		delete _fbo_colorpicker;
 		delete _mesh;
 
 		TerrainManager.Destroy();
@@ -359,19 +366,19 @@ namespace Vxl
 	{
 		Camera::GetMain()->BindUBO();
 		//
-
-		_shader_gbuffer->Bind();
-		_shader_gbuffer->SetUniform<int>("TESTMODE", Imgui_DevConsole::GetInt("TESTMODE"));
-		_shader_gbuffer->Unbind();
+		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", Imgui_DevConsole::GetInt("TESTMODE"));
+		//
 
 		glUtil::clearBuffer();
 		glUtil::clearColor(Color3F(0.1f, 0.1f, 0.3f));
+
+		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
 
 		//glViewport(0, 0, 500, 500);
 		_fbo->bind();
 		_fbo->bindViewport();
 
-		RenderManager.RenderScene();
+		RenderManager.RenderScene_ByMaterial();
 		{
 			/*
 			// GBUFFER Instancing
@@ -477,9 +484,74 @@ namespace Vxl
 		//	_shader_gbuffer->SetUniform("model", model5.getModel());
 		//	Geometry::GetCube()->Draw();
 
-		
+		// ~~ //
+		_fbo_colorpicker->bind();
+		_fbo_colorpicker->bindViewport();
+		glUtil::clearBuffer();
+		glUtil::clearColor(Color4F(0,0,0,0));
 
-		_fbo->unbind();
+		_shader_colorPicker->Bind();
+		glUtil::blendMode(Blend_Source::ONE, Blend_Destination::ZERO);
+
+		auto Entities = RenderManager.GetAllEntities();
+		unsigned int EntityCount = Entities.size();
+		union FloatChar
+		{
+			unsigned int ui_ID = 0;
+			unsigned char f_ID[4];
+		};
+		FloatChar mem;
+		for (unsigned int i = 0; i < EntityCount; i++)
+		{
+			auto Entity = Entities[i];
+		
+			_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
+			_shader_colorPicker->SetUniform("VXL_useInstancing", !Entity->GetMesh()->m_instances.Empty());
+			_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
+		
+			// Convert ID into color
+			mem.ui_ID = i + 1;
+			float x = (float)mem.f_ID[0] / 255.0f;
+			float y = (float)mem.f_ID[1] / 255.0f;
+			float z = (float)mem.f_ID[2] / 255.0f;
+		
+			_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, 1));
+			Entity->Draw();
+		}
+
+		//std::cout << "Mouse: " << Input.getMouseX() << " " << Input.getMouseY() << std::endl;
+		GLubyte *data = new GLubyte[4];
+		glReadPixels(
+			(GLint)Input.getMouseX(),
+			Window.GetResolutionHeight() - (GLint)Input.getMouseY(),
+			1,
+			1,
+			(GLenum)Format_Type::RGBA,
+			(GLenum)Data_Type::UNSIGNED_BYTE,
+			data
+		);
+		//	std::cout <<
+		//		(unsigned int)data[0] << ' ' <<
+		//		(unsigned int)data[1] << ' ' <<
+		//		(unsigned int)data[2] << ' ' <<
+		//		(unsigned int)data[3] << ' ' <<
+		//		std::endl;
+
+		mem.f_ID[0] = data[0];
+		mem.f_ID[1] = data[1];
+		mem.f_ID[2] = data[2];
+		mem.ui_ID--;//offset
+
+		if (mem.ui_ID < EntityCount)
+			std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
+
+		delete data;
+		// ~~ //
+
+		// Backbuffer
+		FramebufferObject::unbind();
+		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
+
 		Window.BindWindowViewport();
 		glUtil::wireframe(false);
 
@@ -505,7 +577,7 @@ namespace Vxl
 		else if (ShowDepth_DEV)
 		{
 			glViewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
-			_fbo->bindDepth(Active_Texture::LEVEL0);
+			//_fbo->bindDepth(Active_Texture::LEVEL0);
 			Geometry.GetFullQuad()->Draw();
 		}
 
@@ -555,7 +627,12 @@ namespace Vxl
 	}
 	void Scene_Game::DrawImGui()
 	{
+		// Shader Errors
 		Imgui_ShaderErrors.Draw();
+		// Inspector
+		Imgui_Inspector.Draw();
+		// Hierarchy
+		Imgui_Hierarchy.Draw();
 
 		// Setup
 		Imgui_DevConsole.GBUFFER_WIREFRAME = _material_gbuffer->m_wireframe;

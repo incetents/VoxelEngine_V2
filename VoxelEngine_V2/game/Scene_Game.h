@@ -3,8 +3,8 @@
 
 #include "../engine/modules/Scene.h"
 
-static int SCREEN_WIDTH = 1080;
-static int SCREEN_HEIGHT = 720;
+static int SCREEN_WIDTH = 800;//1600;
+static int SCREEN_HEIGHT = 800;//900;
 
 namespace Vxl
 {
@@ -30,6 +30,8 @@ namespace Vxl
 		ShaderProgram* _shader_passthrough;
 		ShaderProgram* _shader_skybox;
 		ShaderProgram* _shader_lines;
+		// Non-material Shader
+		ShaderProgram* _shader_colorPicker;
 
 		Texture* _tex;
 		Texture* _tex_crate;
@@ -38,6 +40,7 @@ namespace Vxl
 
 		// Assets Created
 		FramebufferObject* _fbo;
+		FramebufferObject* _fbo_colorpicker;
 		Mesh* _mesh;
 
 		// Assets Automated

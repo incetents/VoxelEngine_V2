@@ -156,9 +156,6 @@
     <ClCompile Include="engine\opengl\VBO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\imgui_wrappers\Imgui_ShaderErrors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\imgui_wrappers\ImGui_DevConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -175,6 +172,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\opengl\UBO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\imgui_wrappers\ImGui_Inspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\imgui_wrappers\ImGui_ShaderErrors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\imgui_wrappers\ImGui_Hierarchy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -353,9 +359,6 @@
     <ClInclude Include="engine\utilities\Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\imgui_wrappers\Imgui_ShaderErrors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\imgui_wrappers\ImGui_DevConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -372,6 +375,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\opengl\UBO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\imgui_wrappers\ImGui_Inspector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\imgui_wrappers\ImGui_ShaderErrors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\imgui_wrappers\ImGui_Hierarchy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

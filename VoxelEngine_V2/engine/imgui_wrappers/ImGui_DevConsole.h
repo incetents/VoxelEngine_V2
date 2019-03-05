@@ -66,9 +66,6 @@ namespace Vxl
 			return m_vec4[str];
 		}
 
-		// Const
-		//static const CommonResolutions
-
 		// Draw
 		void Draw(Scene* scene);
 

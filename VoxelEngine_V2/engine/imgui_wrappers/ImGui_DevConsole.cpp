@@ -32,10 +32,17 @@ namespace Vxl
 
 	void Imgui_DevConsole::Draw(Scene* scene)
 	{
+		static bool open = true;
+
+		if (Input.getKeyDown(KeyCode::F1))
+			open = !open;
+
+		if (!open)
+			return;
+
 		Scene_Game* Game = dynamic_cast<Scene_Game*>(scene);
 
-		static bool open = true;
-		if (ImGui::Begin("DevConsole", &open, ImVec2(280, 380), 0.9f))
+		if (ImGui::Begin("[F1] DevConsole", &open, ImVec2(280, 380), 0.9f))
 		{
 			ImGui::Text("FPS: %f", Time.GetFPS());
 			ImGui::Text("Time: %f", Time.GetTime());

@@ -13,6 +13,11 @@ namespace Vxl
 		friend class ComponentHandler;
 	protected:
 		Entity* m_owner;
+	public:
+		Entity* GetEntityOwner(void) const
+		{
+			return m_owner;
+		}
 	};
 
 	class ComponentHandler

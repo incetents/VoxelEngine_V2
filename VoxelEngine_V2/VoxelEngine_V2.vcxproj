@@ -20,7 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="engine\imgui_wrappers\ImGui_DevConsole.cpp" />
-    <ClCompile Include="engine\imgui_wrappers\Imgui_ShaderErrors.cpp" />
+    <ClCompile Include="engine\imgui_wrappers\ImGui_Hierarchy.cpp" />
+    <ClCompile Include="engine\imgui_wrappers\ImGui_Inspector.cpp" />
+    <ClCompile Include="engine\imgui_wrappers\ImGui_ShaderErrors.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
@@ -82,7 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\imgui_wrappers\ImGui_DevConsole.h" />
-    <ClInclude Include="engine\imgui_wrappers\Imgui_ShaderErrors.h" />
+    <ClInclude Include="engine\imgui_wrappers\ImGui_Hierarchy.h" />
+    <ClInclude Include="engine\imgui_wrappers\ImGui_Inspector.h" />
+    <ClInclude Include="engine\imgui_wrappers\ImGui_ShaderErrors.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
     <ClInclude Include="engine\light\Light.h" />
     <ClInclude Include="engine\math\Model.h" />

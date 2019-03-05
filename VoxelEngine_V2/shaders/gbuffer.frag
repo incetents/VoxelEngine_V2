@@ -1,4 +1,4 @@
-// Copyright(c) 2018 Emmanuel Lajeunesse
+// Copyright(c) 2019 Emmanuel Lajeunesse
 #version 430
 #include "_UBO.glsl"
 
@@ -17,6 +17,7 @@ in fragment_data
 layout (location = 0) out vec4 output_albedo;
 layout (location = 1) out vec4 output_normal;
 layout (location = 2) out vec4 output_test;
+// colorID, emissions, metallicness, roughness
 
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
