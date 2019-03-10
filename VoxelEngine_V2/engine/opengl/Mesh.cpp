@@ -134,8 +134,9 @@ namespace Vxl
 	{
 		m_VAO = glUtil::generateVAO();
 
-		if(!glName.empty())
-			glUtil::setOpenGLName(glNameType::VERTEX_ARRAY, m_VAO, "Mesh_" + glName);
+		if (!glName.empty())
+			glUtil::setGLName(glNameType::VERTEX_ARRAY, m_VAO, "Mesh_" + glName);
+
 	}
 	Mesh::Mesh(Model* _model)
 	{

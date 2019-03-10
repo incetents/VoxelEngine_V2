@@ -33,12 +33,17 @@ namespace Vxl
 		m_resolution[0] = width;
 		m_resolution[1] = height;
 
+		//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 		m_window = glfwCreateWindow(m_size[0], m_size[1], m_name.c_str(), NULL, NULL);
 		if (!m_window)
 		{
 			Logger.error("Glfw could not create a new window: " + m_name);
 			return;
 		}
+		// default position
+		SetPosition(50, 50);
 
 		// Initial Window Position
 		int posx, posy;
@@ -59,6 +64,8 @@ namespace Vxl
 		glfwSetWindowSizeCallback		(m_window, glfwCallbacks::Window_Resize);
 		glfwSetWindowPosCallback		(m_window, glfwCallbacks::Window_Move);
 		glfwSetDropCallback				(m_window, glfwCallbacks::Drag_File);
+		glfwSetErrorCallback			(glfwCallbacks::Error);
+		
 
 		// IMGUI Setup
 		IMGUI_CHECKVERSION();
@@ -75,11 +82,10 @@ namespace Vxl
 			assert(false);
 
 		glUtil::initHints();
+		glUtil::CheckVersion();
 
-		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-		std::cout << "OpenGL Vers. " << glUtil::getOpenGLVersion() << std::endl;
-		std::cout << glUtil::getRendererVersion() << std::endl;
-		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+		// opengl error callback
+		glUtil::initOpenglErrorCallback();
 
 		m_setup = true;
 	}

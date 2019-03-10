@@ -11,9 +11,9 @@ namespace Vxl
 	{
 		friend class Imgui_Inspector;
 	private:
-		Entity* _selectedEntity = nullptr;
 		void DisplayEntity(Entity* _ent, int _depth);
 	public:
+		Entity* _selectedEntity = nullptr;
 		void Draw();
 
 	} SingletonInstance(Imgui_Hierarchy);;

@@ -13,6 +13,8 @@ namespace Vxl
 		friend class InputMutator;
 
 	public:
+		// Error
+		static void Error(int error, const char* description);
 		// Input - Keyboard
 		static void Keyboard(GLFWwindow* window, int key, int scancode, int action, int mods);
 		// Input - Mouse

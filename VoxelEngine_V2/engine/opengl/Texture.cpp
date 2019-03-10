@@ -184,7 +184,7 @@ namespace Vxl
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath);
-		glUtil::setOpenGLName(glNameType::TEXTURE, m_id, "Tex_" + Name);
+		glUtil::setGLName(glNameType::TEXTURE, m_id, "Tex_" + Name);
 
 		// finished
 		Unbind();
@@ -227,7 +227,7 @@ namespace Vxl
 		updateTexImage2D(&m_image[0]);
 
 		// glName
-		glUtil::setOpenGLName(glNameType::TEXTURE, m_id, "Tex_" + name);
+		glUtil::setGLName(glNameType::TEXTURE, m_id, "Tex_" + name);
 
 		// finished
 		Unbind();
@@ -311,12 +311,12 @@ namespace Vxl
 			updateTexImageCubemap(i, m_image[i]);
 		}
 
-		//if(m_useMipMapping)
-		//	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		if(m_useMipMapping)
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath1);
-		glUtil::setOpenGLName(glNameType::TEXTURE, m_id, "Cubemap_" + Name);
+		glUtil::setGLName(glNameType::TEXTURE, m_id, "Cubemap_" + Name);
 
 		// finished
 		Unbind();

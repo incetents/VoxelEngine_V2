@@ -50,7 +50,7 @@ namespace Vxl
 			CreateInverseCube();
 			CreateOctahedron();
 			CreateIcosahedron();
-			CreateIcosphere();
+ 			CreateIcosphere();
 			CreateSphere();
 			CreateSphereUV();
 

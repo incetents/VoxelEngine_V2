@@ -16,8 +16,37 @@ namespace Vxl
 			{
 				for (auto Log : Shader::ShaderErrorLog)
 				{
-					if (ImGui::CollapsingHeader(Log.first.c_str()))
-						ImGui::Text(Log.second.c_str());
+					if (ImGui::TreeNode(Log.first.c_str()))
+					{
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0.5f, 0, 1));
+						if (ImGui::TreeNode("Error"))
+						{
+							ImGui::PopStyleColor();
+
+							ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8, 0.2f, 0, 1));
+
+							ImGui::Text(Log.second->GetErrorMessage().c_str());
+							ImGui::TreePop();
+
+							ImGui::PopStyleColor();
+						}
+						else
+							ImGui::PopStyleColor();
+
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0.5f, 0, 1));
+						if (ImGui::TreeNode("Source"))
+						{
+							ImGui::PopStyleColor();
+
+							ImGui::Text(Log.second->GetCompiledCode().c_str());
+							ImGui::TreePop();
+						}
+						else
+							ImGui::PopStyleColor();
+
+						ImGui::TreePop();
+					}
+
 
 					ImGui::Separator();
 				}

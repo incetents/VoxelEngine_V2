@@ -11,18 +11,27 @@ namespace Vxl
 {
 	Database<FramebufferObject> FramebufferObject::m_database;
 
-	FramebufferObject::FramebufferObject(const std::string& name, UINT viewportWidth, UINT viewportHeight)
-		: m_name(name)
+	FramebufferObject::FramebufferObject(
+		const std::string& name,
+		UINT FBO_width, UINT FBO_height,
+		Color4F ClearColor
+	)
+		: m_name(name), m_clearColor(ClearColor)
 	{
+		m_size[0] = FBO_width;
+		m_size[1] = FBO_height;
+
 		glGenFramebuffers(1, &m_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 
-		glUtil::setOpenGLName(glNameType::FRAMEBUFFER, m_id, "FBO_" + name);
-		setViewport(0, 0, viewportWidth, viewportHeight);
+		glUtil::setGLName(glNameType::FRAMEBUFFER, m_id, "FBO_" + name);
 	}
 
-	FramebufferObject* FramebufferObject::Create(const std::string& name, UINT viewportWidth, UINT viewportHeight)
-	{
+	FramebufferObject* FramebufferObject::Create(
+		const std::string& name,
+		UINT FBO_width, UINT FBO_height,
+		Color4F ClearColor
+	){
 		// Name Duplication
 		if (m_database.Check(name))
 		{
@@ -30,7 +39,7 @@ namespace Vxl
 			return nullptr;
 		}
 
-		FramebufferObject* FBO = new FramebufferObject(name, viewportWidth, viewportHeight);
+		FramebufferObject* FBO = new FramebufferObject(name, FBO_width, FBO_height, ClearColor);
 
 		Logger.log("Created FBO: " + name);
 		m_database.Set(name, FBO);
@@ -79,6 +88,23 @@ namespace Vxl
 		return (e == GL_FRAMEBUFFER_COMPLETE) ? true : false;
 	}
 
+	void FramebufferObject::bindFBO()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+
+		if (m_dirtyDrawBuffers)
+		{
+			FixCallList();
+			glDrawBuffers(m_textureCount, m_attachments);
+			m_dirtyDrawBuffers = false;
+		}
+	}
+	void FramebufferObject::clearColor()
+	{
+		glUtil::clearBuffer();
+		glUtil::clearColor(m_clearColor);
+	}
+
 	void FramebufferObject::FixCallList()
 	{
 		if (m_attachments != nullptr)
@@ -91,7 +117,6 @@ namespace Vxl
 
 	void FramebufferObject::addTexture(
 		const std::string& name,
-		int Width, int Height,
 		Wrap_Mode WrapMode,
 		Filter_Min MinFilter,
 		Filter_Mag MagFilter,
@@ -103,11 +128,11 @@ namespace Vxl
 		assert(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments());
 
 		// Create new render texture
-		RenderTexture* _tex = new RenderTexture(Width, Height, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, DataType);
+		RenderTexture* _tex = new RenderTexture(m_size[0], m_size[1], WrapMode, MinFilter, MagFilter, FormatType, ChannelType, DataType);
 		m_textures.push_back(_tex);
-	
+
 		// Name
-		glUtil::setOpenGLName(glNameType::TEXTURE, _tex->GetID(), "FBO_" + m_name + "_Tex_" + name);
+		glUtil::setGLName(glNameType::TEXTURE, _tex->GetID(), "FBO_" + m_name + "_Tex_" + name);
 
 		// Add to FBO
 		bind();
@@ -118,16 +143,16 @@ namespace Vxl
 		// fix draw buffer
 		m_dirtyDrawBuffers = true;
 	}
-	void FramebufferObject::addDepth(UINT width, UINT height)
+	void FramebufferObject::addDepth()
 	{
 		if (m_depth)
 			delete m_depth;
 
 		// Save Texture
-		m_depth = new RenderTexture(width, height, Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::DEPTH, Channel_Type::DEPTH, Data_Type::FLOAT);
+		m_depth = new RenderTexture(m_size[0], m_size[1], Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::DEPTH, Channel_Type::DEPTH, Data_Type::FLOAT);
 
 		// Name
-		glUtil::setOpenGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
+		glUtil::setGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
 
 		// Add to FBO
 		bind();
@@ -138,26 +163,21 @@ namespace Vxl
 
 	void FramebufferObject::bind()
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+		bindFBO();
+		clearColor();
 
-		if (m_dirtyDrawBuffers)
-		{
-			FixCallList();
-			glDrawBuffers(m_textureCount, m_attachments);
-			m_dirtyDrawBuffers = false;
-		}
+		glViewport(0, 0, m_size[0], m_size[1]);
+	}
+	void FramebufferObject::bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH)
+	{
+		bindFBO();
+		clearColor();
 
-		glUtil::clearBuffer();
-		glUtil::clearColor(m_clearColor);
+		glViewport(viewportX, viewportY, viewportW, viewportH);
 	}
 	void FramebufferObject::unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-
-	void FramebufferObject::bindViewport()
-	{
-		glViewport(m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
 	}
 
 	void FramebufferObject::bindTexture(int index, Active_Texture layer)

@@ -27,10 +27,13 @@ namespace Vxl
 		GLuint				m_id = -1;
 		const std::string   m_name;
 		const std::string	m_filePath;
+		std::string			m_sourceBackup; // has line numbers appended
+		std::string			m_errorMessage;
 		const ShaderType	m_type;
 		
 		bool compile(const std::string& source);
 		bool checkError() const;
+		void readError();
 
 		bool load();
 		void unload();
@@ -57,7 +60,7 @@ namespace Vxl
 		}
 		
 		// Current log of all shaders with compilation errors
-		static std::unordered_map<std::string, std::string> ShaderErrorLog;
+		static std::unordered_map<std::string, const Shader*> ShaderErrorLog;
 		static UINT ShaderErrorLogSize;
 
 		void reload()
@@ -85,6 +88,14 @@ namespace Vxl
 		inline const std::string&	GetName(void) const
 		{
 			return m_name;
+		}
+		inline const std::string&	GetErrorMessage(void) const
+		{
+			return m_errorMessage;
+		}
+		inline const std::string&	GetCompiledCode(void) const
+		{
+			return m_sourceBackup;
 		}
 
 		// Remove default
@@ -164,12 +175,23 @@ namespace Vxl
 		template<typename Type>
 		void					SetUniform(const std::string& name, Type data)
 		{
+#if _DEBUG
+			// Check if uniform is missing
+			if (m_uniforms.find(name) == m_uniforms.end())
+				return;
+#endif
 			m_uniforms[name].Set<Type>(data);
 		}
 		// [Slower] Set uniform, regardless if shader is bound
 		template<typename Type>
 		void					SetProgramUniform(const std::string& name, Type data)
 		{
+#if _DEBUG
+			// Check if uniform is missing
+			if (m_uniforms.find(name) == m_uniforms.end())
+				return;
+#endif
+
 			m_uniforms[name].Set<Type>(m_id, data);
 		}
 		inline const glUniform& GetUniform(const std::string& name)

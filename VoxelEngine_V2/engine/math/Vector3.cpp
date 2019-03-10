@@ -540,7 +540,7 @@ namespace Vxl
 	{
 		// Formula:	(Dot / (b length * b length)) * b
 		float D = Vector3::Dot(*this, v);
-		float S = (v.x * v.x + v.y * v.y + v.z + v.z);
+		float S = v.LengthSqr();
 
 		return v * (D / S);
 	}

@@ -3,6 +3,7 @@
 #include "glfwCallbacks.h"
 
 #include "window.h"
+#include "../utilities/logger.h"
 
 #include <iostream>
 #include <GLFW/glfw3.h>
@@ -10,6 +11,12 @@
 namespace Vxl
 {
 	// Callback
+	void glfwCallbacks::Error(int error, const char* description)
+	{
+		std::string Msg = "GLFW ERROR: " + std::string(description);
+		Logger.error(Msg);
+		std::system("PAUSE");
+	}
 	void glfwCallbacks::Keyboard(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		switch (action)

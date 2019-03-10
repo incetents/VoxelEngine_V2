@@ -22,9 +22,14 @@ namespace Vxl
 			std::system("pause");
 			return false;
 		}
-		if (!gl3wIsSupported(3, 2))
+
+		// Acquire openglversion
+		glGetIntegerv(GL_MAJOR_VERSION, &GLVersionMajor);
+		glGetIntegerv(GL_MINOR_VERSION, &GLVersionMinor);
+
+		if (!gl3wIsSupported(GLVersionMajor, GLVersionMinor))
 		{
-			Logger.error("OpenGL 3.2 not supported");
+			Logger.error("OpenGL " + std::to_string(GLVersionMajor) + '.' + std::to_string(GLVersionMinor) + " not supported");
 			std::system("pause");
 			return false;
 		}
@@ -39,6 +44,7 @@ namespace Vxl
 		cullMode(Cull_Type::COUNTER_CLOCKWISE);
 		// Set Default Blend Mode
 		blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
+		blendEquation(Blend_Equation::FUNC_ADD);
 		// Set Default Depth Test
 		depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
 		// Set Default Wireframe Mode
@@ -48,14 +54,17 @@ namespace Vxl
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
+	// Check Version Wrapped
 	void glUtil::CheckVersion()
 	{
 		// Get version info
+		Logger.log("~~~~~~~~~~~~~~~~~~");
 		Logger.log("Renderer: " + std::string(glUtil::getRendererVersion()));
 		Logger.log("OpenGL version supported: " + std::string(glUtil::getOpenGLVersion()));
-		Logger.log("~~~");
+		Logger.log("~~~~~~~~~~~~~~~~~~");
 	}
 
+	// Get Version Data
 	const char* glUtil::getRendererVersion()
 	{
 		return reinterpret_cast<char const*>(glGetString(GL_RENDERER)); // get renderer string (GLubyte*)
@@ -65,10 +74,116 @@ namespace Vxl
 		return reinterpret_cast<char const*>(glGetString(GL_VERSION)); // version as a string (GLubyte*)
 	}
 
-	// Set OpenGL Name
-	void glUtil::setOpenGLName(glNameType identifier, GLuint id, const std::string &label)
+	// Error Message
+	void CALLBACK OpenGLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data)
 	{
+		char buffer[9] = { '\0' };
+		sprintf_s(buffer, "%.8x", id);
+
+		std::string message("OpenGL(0x");
+		message += buffer;
+		message += "): ";
+
+		switch (type)
+		{
+		case GL_DEBUG_TYPE_ERROR:
+			message += "Error";
+			break;
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+			message += "Deprecated behavior";
+			break;
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+			message += "Undefined behavior";
+			break;
+		case GL_DEBUG_TYPE_PORTABILITY:
+			message += "Portability issue";
+			break;
+		case GL_DEBUG_TYPE_PERFORMANCE:
+			message += "Performance issue";
+			break;
+		case GL_DEBUG_TYPE_MARKER:
+			message += "Stream annotation";
+			break;
+		case GL_DEBUG_TYPE_OTHER_ARB:
+			message += "Other";
+			break;
+		}
+
+		message += " \nSource: ";
+		switch (source)
+		{
+		case GL_DEBUG_SOURCE_API:
+			message += "API";
+			break;
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+			message += "Window system";
+			break;
+		case GL_DEBUG_SOURCE_SHADER_COMPILER:
+			message += "Shader compiler";
+			break;
+		case GL_DEBUG_SOURCE_THIRD_PARTY:
+			message += "Third party";
+			break;
+		case GL_DEBUG_SOURCE_APPLICATION:
+			message += "Application";
+			break;
+		case GL_DEBUG_SOURCE_OTHER:
+			message += "Other";
+		}
+
+		message += " \nSeverity: ";
+		switch (severity)
+		{
+		case GL_DEBUG_SEVERITY_HIGH:
+			message += "HIGH";
+			break;
+		case GL_DEBUG_SEVERITY_MEDIUM:
+			message += "Medium";
+			break;
+		case GL_DEBUG_SEVERITY_LOW:
+			message += "Low";
+			break;
+		case GL_DEBUG_SEVERITY_NOTIFICATION:
+			message += "Notification";
+		}
+
+		message += " \n";
+		message += msg;
+		message += " \n";
+
+		if (type == GL_DEBUG_TYPE_ERROR || severity == GL_DEBUG_SEVERITY_HIGH)
+		{
+			Logger.error(message);
+			std::system("PAUSE");
+		}
+		else
+		{
+			Logger.log(message);
+		}
+	}
+
+	// Gives errors in random locations, cannot use for now
+	void glUtil::initOpenglErrorCallback()
+	{
+		GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+		{
+			UsingErrorCallback = true;
+			//	glEnable(GL_DEBUG_OUTPUT);
+			//	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			//	glDebugMessageCallback(OpenGLDebugCallback, stderr);
+			//	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, 0, GL_FALSE);
+		}
+	}
+
+	// Set OpenGL Name
+	void glUtil::setGLName(glNameType identifier, GLuint id, const std::string &label)
+	{
+		if(GLNameMaxLength == -1)
+			glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLNameMaxLength);
+
 		std::string labelEdit = label + " (" + std::to_string(id) + ")";
+		assert(labelEdit.size() < GLNameMaxLength);
 		glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
 	}
 
@@ -168,6 +283,10 @@ namespace Vxl
 		glEnable(GL_BLEND);
 		glBlendFunc((GLenum)src, (GLenum)dst);
 	}
+	void glUtil::blendEquation(Blend_Equation equation)
+	{
+		glBlendEquation((GLenum)equation);
+	}
 
 	// Depth Test (What depth value will overwrite the existing one)
 	void glUtil::depthTest(Depth_Pass_Rule Rule = Depth_Pass_Rule::LESS_OR_EQUAL)
@@ -194,7 +313,7 @@ namespace Vxl
 	// BUFFERS //
 	GLuint glUtil::generateVAO()
 	{
-		GLuint VAO;
+		GLuint VAO = 0;
 		glGenVertexArrays(1, &VAO);
 		return VAO;
 	}

@@ -19,14 +19,21 @@ namespace Vxl
 	// ~ MATERIAL ~ //
 	Database<Material> Material::m_database;
 
-	Material::Material(const std::string& _name, ShaderProgram* _shader, UINT _order)
+	Material::Material(
+		const std::string& _name,
+		ShaderProgram* _shader,
+		UINT _order
+	)
 		: m_name(_name), m_shaderProgram(_shader), m_order(_order)
 	{
 		ReloadPackages();
 	}
 
-	Material* Material::Create(const std::string& _name, ShaderProgram* _shader, UINT _order)
-	{
+	Material* Material::Create(
+		const std::string& _name,
+		ShaderProgram* _shader,
+		UINT _order
+	){
 		Material* M = new Material(_name, _shader, _order);
 		m_database.Set(_name, M);
 		return M;
@@ -50,11 +57,11 @@ namespace Vxl
 		// Bind Shader
 		m_shaderProgram->Bind();
 
-		// ~ CamPosition ~ //
-		//if (Mat_camPosition.m_exists)
-		//{
-		//	Mat_camPosition.m_uniform.Set<Vector3>(Camera::GetMain()->getPosition());
-		//}
+		// Bind Modes
+		glUtil::cullMode(m_CullType);
+		glUtil::blendMode(m_BlendSource, m_BlendDest);
+		glUtil::blendEquation(m_BlendEq);
+		glUtil::depthTest(m_DepthFunc);
 
 		// Wireframe
 		glUtil::wireframe(m_wireframe);

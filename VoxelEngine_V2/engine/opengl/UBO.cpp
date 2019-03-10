@@ -25,7 +25,7 @@ namespace Vxl
 		glBindBufferBase(GL_UNIFORM_BUFFER, slot, m_id);
 
 		// set name
-		glUtil::setOpenGLName(glNameType::BUFFER, m_id, "UBO_" + glName);
+		glUtil::setGLName(glNameType::BUFFER, m_id, "UBO_" + glName);
 	}
 	void UniformBufferObject::unload()
 	{

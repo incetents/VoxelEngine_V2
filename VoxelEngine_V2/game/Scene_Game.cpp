@@ -61,15 +61,15 @@ namespace Vxl
 		_camera->SetMain();
 
 		// FBO
-		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-		_fbo->addTexture("albedo", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-		_fbo->addTexture("normal", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-		_fbo->addTexture("test", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-		_fbo->addDepth(Window.GetResolutionWidth(), Window.GetResolutionHeight());
+		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0.1f, 0.1f, 0.3f, 0.0f));
+		_fbo->addTexture("albedo");
+		_fbo->addTexture("normal");
+		_fbo->addTexture("test");
+		_fbo->addDepth();
 
-		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-		_fbo_colorpicker->addTexture("color", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-		_fbo_colorpicker->addDepth(Window.GetResolutionWidth(), Window.GetResolutionHeight());
+		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
+		_fbo_colorpicker->addTexture("color");
+		_fbo_colorpicker->addDepth();
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
 		_shader_gbuffer				= ShaderProgram::Get("gbuffer");
@@ -115,7 +115,6 @@ namespace Vxl
 		_mesh->m_positions.set(pos, 4);
 		_mesh->m_uvs.set(uvs, 4);
 		_mesh->m_indices.set(indices, 6);
-		//_mesh->GenerateNormals(pos, 4, indices, 6);
 		
 		std::vector<Matrix4x4> m_models;
 		for (float x = 0; x < 5.0f; x++)
@@ -369,14 +368,7 @@ namespace Vxl
 		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", Imgui_DevConsole::GetInt("TESTMODE"));
 		//
 
-		glUtil::clearBuffer();
-		glUtil::clearColor(Color3F(0.1f, 0.1f, 0.3f));
-
-		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
-
-		//glViewport(0, 0, 500, 500);
 		_fbo->bind();
-		_fbo->bindViewport();
 
 		RenderManager.RenderScene_ByMaterial();
 		{
@@ -486,15 +478,12 @@ namespace Vxl
 
 		// ~~ //
 		_fbo_colorpicker->bind();
-		_fbo_colorpicker->bindViewport();
-		glUtil::clearBuffer();
-		glUtil::clearColor(Color4F(0,0,0,0));
 
 		_shader_colorPicker->Bind();
 		glUtil::blendMode(Blend_Source::ONE, Blend_Destination::ZERO);
 
 		auto Entities = RenderManager.GetAllEntities();
-		unsigned int EntityCount = Entities.size();
+		unsigned int EntityCount = (unsigned int)Entities.size();
 		union FloatChar
 		{
 			unsigned int ui_ID = 0;
@@ -542,8 +531,11 @@ namespace Vxl
 		mem.f_ID[2] = data[2];
 		mem.ui_ID--;//offset
 
-		if (mem.ui_ID < EntityCount)
-			std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
+		if (Input.getMouseButton(MouseButton::LEFT) && mem.ui_ID < EntityCount)
+			Imgui_Hierarchy._selectedEntity = Entities[mem.ui_ID];
+
+		//if ()
+		//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
 
 		delete data;
 		// ~~ //

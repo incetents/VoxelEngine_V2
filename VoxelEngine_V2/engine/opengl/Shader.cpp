@@ -15,7 +15,7 @@ namespace Vxl
 	Database<ShaderProgram> ShaderProgram::m_database;
 
 	// SHADER //
-	std::unordered_map<std::string, std::string> Shader::ShaderErrorLog;
+	std::unordered_map<std::string, const Shader*> Shader::ShaderErrorLog; // name - [error, source]
 	UINT Shader::ShaderErrorLogSize = 0;
 
 	bool Shader::compile(const std::string& source)
@@ -23,12 +23,36 @@ namespace Vxl
 		// Convert file to const char
 		const GLchar* Source = static_cast<const GLchar *>(source.c_str());
 
+		// Keep backup with line numbers
+		m_sourceBackup.clear();
+		auto lines = stringUtil::splitStr(source, '\n');
+		//m_sourceBackup = source;
+		int lineNumber = 0;
+		for (auto line : lines)
+		{
+			m_sourceBackup += std::to_string(++lineNumber) + '\t' + line + '\n';
+		}
+
 		// Attach Shader and Compile
 		glShaderSource(m_id, 1, &Source, NULL);
 		glCompileShader(m_id);
 
 		// Error Check
 		m_hasCompiled = !checkError();
+
+		if (!m_hasCompiled)
+		{
+			// update error message
+			readError();
+
+			// for logging system
+			Logger.error(m_errorMessage);
+
+			// store in map of shaders with errors
+			ShaderErrorLog[m_name] = this;
+			ShaderErrorLogSize++;
+		}
+
 		return m_hasCompiled;
 	}
 
@@ -36,56 +60,47 @@ namespace Vxl
 	{
 		GLint result;
 		glGetShaderiv(m_id, GL_COMPILE_STATUS, &result);
-
-		// No errors = exit
-		if (result != GL_FALSE)
-			return false;
-
-		std::string ErrorMessage = "Failed to Compile Shader\n\n";
-		ErrorMessage += "Name: " + m_name + "\n";
-		ErrorMessage += "Path: " + m_filePath + "\n";
+		return result == GL_FALSE;
+	}
+	void Shader::readError()
+	{
+		m_errorMessage.clear();
+		m_errorMessage = "Failed to Compile Shader\n\n";
+		m_errorMessage += "Name: " + m_name + "\n";
+		m_errorMessage += "Path: " + m_filePath + "\n";
 
 		switch (m_type)
 		{
 		case ShaderType::VERTEX:
-			ErrorMessage += ("Type: VERTEX\n");
+			m_errorMessage += ("Type: VERTEX\n");
 			break;
 		case ShaderType::FRAGMENT:
-			ErrorMessage += ("Type: FRAGMENT\n");
+			m_errorMessage += ("Type: FRAGMENT\n");
 			break;
 		case ShaderType::GEOMETRY:
-			ErrorMessage += ("Type: GEOMETRY\n");
+			m_errorMessage += ("Type: GEOMETRY\n");
 			break;
 		case ShaderType::TESSELATION_CONTROL:
-			ErrorMessage += ("Type: TESSELATION CONTROL\n");
+			m_errorMessage += ("Type: TESSELATION CONTROL\n");
 			break;
 		case ShaderType::TESSELATION_EVALUATION:
-			ErrorMessage += ("Type: TESSELATION EVALUATION\n");
+			m_errorMessage += ("Type: TESSELATION EVALUATION\n");
 			break;
 		case ShaderType::COMPUTE:
-			ErrorMessage += ("Type: COMPUTE SHADER\n");
+			m_errorMessage += ("Type: COMPUTE SHADER\n");
 			break;
 		default:
-			ErrorMessage += ("Type: UNKNOWN SHADER\n");
+			m_errorMessage += ("Type: UNKNOWN SHADER\n");
 			break;
 		}
-		ErrorMessage += ("\nERROR:\n");
+		m_errorMessage += ("\nERROR:\n");
 
 		// Output Error Message
 		GLint length;
 		glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &length);
 		std::vector<char> error(length);
 		glGetShaderInfoLog(m_id, length, &length, &error[0]);
-		ErrorMessage.insert(ErrorMessage.end(), error.begin(), error.end());
-
-		// for logging system
-		Logger.error(ErrorMessage);
-		
-		// store in map
-		ShaderErrorLog[m_name] = ErrorMessage;
-		ShaderErrorLogSize++;
-
-		return true;
+		m_errorMessage.insert(m_errorMessage.end(), error.begin(), error.end());
 	}
 
 	bool Shader::load()
@@ -110,7 +125,7 @@ namespace Vxl
 		}
 
 		// set gl name
-		glUtil::setOpenGLName(glNameType::SHADER, m_id, "Shader_" + m_name);
+		glUtil::setGLName(glNameType::SHADER, m_id, "Shader_" + m_name);
 
 		return true;
 	}
@@ -327,7 +342,7 @@ namespace Vxl
 			acquireSubroutines();
 
 			// set gl name
-			glUtil::setOpenGLName(glNameType::PROGRAM, m_id, "Program_" + m_name);
+			glUtil::setGLName(glNameType::PROGRAM, m_id, "Program_" + m_name);
 		}
 	}
 

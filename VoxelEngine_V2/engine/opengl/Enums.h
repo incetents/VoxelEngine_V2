@@ -103,6 +103,14 @@ namespace Vxl
 		SRC_ALPHA = GL_SRC_ALPHA,
 		ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA
 	};
+	enum class Blend_Equation
+	{
+		FUNC_ADD = GL_FUNC_ADD,
+		FUNC_SUBTRACT = GL_FUNC_SUBTRACT,
+		FUNC_REVERSE_SUBTRACT = GL_FUNC_REVERSE_SUBTRACT,
+		MIN = GL_MIN,
+		MAX = GL_MAX
+	};
 	// Depth Mode (What depth value will overwrite the existing one) 0=you, 1=farthest point
 	enum class Depth_Pass_Rule
 	{

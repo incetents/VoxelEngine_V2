@@ -15,6 +15,10 @@ namespace Vxl
 
 	namespace glUtil
 	{
+		// OpenGL Version
+		static int GLVersionMajor = 0;
+		static int GLVersionMinor = 0;
+
 		// Setup Glew for OpenGL
 		bool initGlew();
 
@@ -27,8 +31,13 @@ namespace Vxl
 		const char* getRendererVersion();
 		const char* getOpenGLVersion();
 
+		// Error Message
+		static bool UsingErrorCallback = false;
+		void initOpenglErrorCallback();
+
 		// Set OpenGL Name
-		void setOpenGLName(glNameType identifier, GLuint name, const std::string &label);
+		static int GLNameMaxLength = -1;
+		void setGLName(glNameType identifier, GLuint name, const std::string &label);
 
 		// Get Format Type from channel count
 		Channel_Type getFormat(int ChannelCount);
@@ -52,6 +61,7 @@ namespace Vxl
 
 		// Blend Data
 		void blendMode(Blend_Source src, Blend_Destination dst);
+		void blendEquation(Blend_Equation equation);
 
 		// Depth Rule
 		void depthTest(Depth_Pass_Rule Rule);
