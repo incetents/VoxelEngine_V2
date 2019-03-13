@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="engine\imgui_wrappers\ImGui_DevConsole.cpp" />
-    <ClCompile Include="engine\imgui_wrappers\ImGui_Hierarchy.cpp" />
-    <ClCompile Include="engine\imgui_wrappers\ImGui_Inspector.cpp" />
-    <ClCompile Include="engine\imgui_wrappers\ImGui_ShaderErrors.cpp" />
+    <ClCompile Include="engine\imgui_wrappers\DevConsole.cpp" />
+    <ClCompile Include="engine\imgui_wrappers\Hierarchy.cpp" />
+    <ClCompile Include="engine\imgui_wrappers\Inspector.cpp" />
+    <ClCompile Include="engine\imgui_wrappers\ShaderErrors.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
@@ -36,9 +36,7 @@
     <ClCompile Include="engine\opengl\Geometry.cpp" />
     <ClCompile Include="engine\opengl\UBO.cpp" />
     <ClCompile Include="engine\opengl\VBO.cpp" />
-    <ClCompile Include="engine\opengl\MeshRenderer.cpp" />
     <ClCompile Include="engine\opengl\Texture.cpp" />
-    <ClCompile Include="engine\opengl\TextureTracker.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
@@ -83,10 +81,10 @@
     <ClCompile Include="engine\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\imgui_wrappers\ImGui_DevConsole.h" />
-    <ClInclude Include="engine\imgui_wrappers\ImGui_Hierarchy.h" />
-    <ClInclude Include="engine\imgui_wrappers\ImGui_Inspector.h" />
-    <ClInclude Include="engine\imgui_wrappers\ImGui_ShaderErrors.h" />
+    <ClInclude Include="engine\imgui_wrappers\DevConsole.h" />
+    <ClInclude Include="engine\imgui_wrappers\Hierarchy.h" />
+    <ClInclude Include="engine\imgui_wrappers\Inspector.h" />
+    <ClInclude Include="engine\imgui_wrappers\ShaderErrors.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
     <ClInclude Include="engine\light\Light.h" />
     <ClInclude Include="engine\math\Model.h" />
@@ -100,7 +98,6 @@
     <ClInclude Include="engine\opengl\Debug.h" />
     <ClInclude Include="engine\opengl\UBO.h" />
     <ClInclude Include="engine\opengl\VBO.h" />
-    <ClInclude Include="engine\opengl\MeshRenderer.h" />
     <ClInclude Include="engine\opengl\FramebufferObject.h" />
     <ClInclude Include="engine\opengl\Geometry.h" />
     <ClInclude Include="engine\opengl\Shader.h" />
@@ -123,7 +120,6 @@
     <ClInclude Include="engine\opengl\Enums.h" />
     <ClInclude Include="engine\opengl\Mesh.h" />
     <ClInclude Include="engine\opengl\Texture.h" />
-    <ClInclude Include="engine\opengl\TextureTracker.h" />
     <ClInclude Include="engine\opengl\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\utilities\Database.h" />

@@ -19,9 +19,10 @@ namespace Vxl
 	private:
 		// Debug Lines
 		VBO*				m_lines;
-		std::vector<float>	m_lines_vertices;  // 14 floats = 2 lines // 700 floats = 100 lines
+		std::vector<float>	m_lines_vertices;  // 16 floats = 2 lines // 800 floats = 100 lines
 		UINT				m_lines_vertexIndex = 0;
 		bool				m_lines_resizeDirty = false;
+		static const UINT	m_lines_vertexIncrementAmount;
 		// Debug Textures
 		Texture*			m_null_texture;
 
@@ -30,20 +31,24 @@ namespace Vxl
 		void Setup()
 		{
 			m_lines_vertices.clear();
-			m_lines_vertices.resize(700);
+			m_lines_vertices.resize(m_lines_vertexIncrementAmount);
 
 			delete m_lines;
 			m_lines = new VBO();
 			m_lines->SetVertices(m_lines_vertices, BufferBind_Mode::DYNAMIC);
-			m_lines->AddStrideHint(BufferType::VERTEX, 3);
-			m_lines->AddStrideHint(BufferType::COLOR, 4);
+			m_lines->AddStrideHint(BufferType::VERTEX, 3); // loc 0
+			m_lines->AddStrideHint(BufferType::COLOR, 4); // loc 3
+			m_lines->AddStrideHint(BufferType::UV, 1); // loc 1 (WIDTH)
 		}
 		void DrawLine(
 			const Vector3& P1, const Vector3& P2,
+			float Width,
 			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
 		);
 		void DrawAABB(
-			const Vector3& Min, const Vector3& Max, const Vector3& OffsetAll = Vector3(0, 0, 0),
+			const Vector3& Min, const Vector3& Max,
+			const Vector3& OffsetAll = Vector3(0, 0, 0),
+			float Width = 1.0f,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
 		void UpdateStart();

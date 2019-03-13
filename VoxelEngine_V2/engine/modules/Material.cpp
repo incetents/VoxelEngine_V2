@@ -6,6 +6,7 @@
 #include "../opengl/TextureTracker.h"
 #include "../opengl/Shader.h"
 #include "../opengl/Debug.h"
+#include "../opengl/Mesh.h"
 
 #include "../modules/Entity.h"
 
@@ -62,9 +63,8 @@ namespace Vxl
 		glUtil::blendMode(m_BlendSource, m_BlendDest);
 		glUtil::blendEquation(m_BlendEq);
 		glUtil::depthTest(m_DepthFunc);
-
-		// Wireframe
-		glUtil::wireframe(m_wireframe);
+		glDepthMask(m_DepthMask);
+		glUtil::wireframe(m_Wireframe);
 	}
 
 	// ~ Material Data ~ //
@@ -163,8 +163,8 @@ namespace Vxl
 		if (Mat_useColorOverride.m_exists)
 		{
 			// Color info or wireframe mode will cause color to be used in shader
-			Mat_useColorOverride.m_uniform.Set<bool>(m_owner->m_isColoredObject || m_base->m_wireframe);
-			if ((m_owner->m_isColoredObject || m_base->m_wireframe) && Mat_color.m_exists)
+			Mat_useColorOverride.m_uniform.Set<bool>(m_owner->m_isColoredObject || m_base->m_Wireframe);
+			if ((m_owner->m_isColoredObject || m_base->m_Wireframe) && Mat_color.m_exists)
 				Mat_color.m_uniform.Set<Color3F>(m_owner->GetColor());
 		}
 		if (Mat_tint.m_exists)
@@ -179,13 +179,13 @@ namespace Vxl
 		}
 		
 		// Bind Textures (ignore if parameter is OFF or wireframe mode is ON)
-		if (BindTextures && m_base->m_wireframe == false)
+		if (BindTextures && m_base->m_Wireframe == false)
 		{
 			// Null Texture if no textures are used
 			if (!m_activeTextureCount)
 			{
 				// Bind null texture on first active layer
-				TextureTracker.BindSafe(Active_Texture::LEVEL0, Debug.GetNullTexture());
+				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
 			}
 			else
 			{
@@ -197,12 +197,12 @@ namespace Vxl
 					// Bind Null texture if texture isn't loaded
 					if (_tex == nullptr || !_tex->IsLoaded())
 					{
-						TextureTracker.BindSafe(id, Debug.GetNullTexture());
+						Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
 					}
 					// Bind texture normally
 					else
 					{
-						TextureTracker.BindSafe(id, _tex);
+						_tex->Bind(id);
 					}
 				}
 			}

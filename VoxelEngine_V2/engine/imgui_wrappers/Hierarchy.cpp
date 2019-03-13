@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "ImGui_Hierarchy.h"
+#include "Hierarchy.h"
 
 #include "../imgui/imgui.h"
 
@@ -13,8 +13,11 @@
 
 namespace Vxl
 {
-	void Imgui_Hierarchy::DisplayEntity(Entity* _entity, int _depth)
+	void Hierarchy::DisplayEntity(Entity* _entity, int _depth)
 	{
+		static ImVec4 Color_Normal = ImVec4(1, 1, 1, 1);
+		static ImVec4 Color_Grey = ImVec4(0.3f, 0.3f, 0.3f, 1);
+
 		// Only show entities with names
 		if (!_entity->m_name.empty())
 		{
@@ -24,32 +27,55 @@ namespace Vxl
 			auto ChildCount = _entity->m_transform.getChildCount();
 			if (ChildCount == 0)
 			{
+				// flags
 				int flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog;
 				if (_entity == _selectedEntity)
 					flags |= ImGuiTreeNodeFlags_Selected;
 
+				// color start
+				if (!_entity->IsFamilyActive())
+					ImGui::PushStyleColor(ImGuiCol_Text, Color_Grey);
+
+				// node
 				ImGui::TreeNodeEx(_entity->m_name.c_str(), flags);
+				// selection case
 				if (ImGui::IsItemClicked())
 					_selectedEntity = _entity;
+
+				// color end
+				if (!_entity->IsFamilyActive())
+					ImGui::PopStyleColor();
 			}
 			else
 			{
+				// flags
 				int flags = ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
 				if (_entity == _selectedEntity)
 					flags |= ImGuiTreeNodeFlags_Selected;
 
+				// color start
+				if (!_entity->IsFamilyActive())
+					ImGui::PushStyleColor(ImGuiCol_Text, Color_Grey);
+
+				// node
 				bool node_open = ImGui::TreeNodeEx(_entity->m_name.c_str(), flags);
 
+				// selection
 				if (ImGui::IsItemClicked())
 					_selectedEntity = _entity;
 
+				// color end
+				if (!_entity->IsFamilyActive())
+					ImGui::PopStyleColor();
+
+				// recursion node
 				if (node_open)
 				{
 					ImGui::Indent();
 					auto children = _entity->m_transform.getChildren();
 					for (auto it = children.begin(); it != children.end(); it++)
 					{
-						DisplayEntity((*it)->GetEntityOwner(), _depth+1);
+						DisplayEntity((*it)->GetOwner(), _depth+1);
 					}
 					ImGui::Unindent();
 				}
@@ -58,7 +84,7 @@ namespace Vxl
 		}
 	}
 
-	void Imgui_Hierarchy::Draw()
+	void Hierarchy::Draw()
 	{
 		static bool open = true;
 

@@ -165,18 +165,38 @@ namespace Vxl
 		friend class Mesh;
 	private:
 		VBO m_vbo;
+		bool alloc = false;
+		std::vector<Matrix4x4>* vertices = nullptr;
 	public:
 		MeshBufferInstancing()
 		{
+			vertices = new std::vector<Matrix4x4>();
 			m_vbo.AddStrideHint(BufferType::InstancingStart, 0);
 		}
 
+		void setAlloc(std::vector<Matrix4x4>* arr)
+		{
+			if (alloc)
+				delete vertices;
+			alloc = false;
+			vertices = arr;
+		}
 		void set(Matrix4x4* arr, GLuint count)
 		{
+			if (alloc)
+				delete vertices;
+			alloc = true;
+			vertices = new std::vector<Matrix4x4>(arr, arr + count);
+
 			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
 		}
 		void set(std::vector<Matrix4x4> vec)
 		{
+			if (alloc)
+				delete vertices;
+			alloc = true;
+			vertices = new std::vector<Matrix4x4>(vec);
+
 			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
 		}
 		MeshBufferInstancing& operator=(std::vector<Matrix4x4> vec)
@@ -185,6 +205,10 @@ namespace Vxl
 			return *this;
 		}
 
+		inline std::vector<Matrix4x4>* GetVertices(void) const
+		{
+			return vertices;
+		}
 		inline UINT GetDrawCount(void) const
 		{
 			return m_vbo.GetDrawCount();

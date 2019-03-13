@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "ImGui_DevConsole.h"
+#include "DevConsole.h"
 
 #include "../imgui/imgui.h"
 
@@ -23,14 +23,9 @@
 
 namespace Vxl
 {
-	std::unordered_map<std::string, int> Imgui_DevConsole::m_integers;
-	std::unordered_map<std::string, float> Imgui_DevConsole::m_floats;
-	std::unordered_map<std::string, double> Imgui_DevConsole::m_doubles;
-	std::unordered_map<std::string, Vector2> Imgui_DevConsole::m_vec2;
-	std::unordered_map<std::string, Vector3> Imgui_DevConsole::m_vec3;
-	std::unordered_map<std::string, Vector4> Imgui_DevConsole::m_vec4;
+	static ImVec4 Color_Orange = ImVec4(1.0f, 0.5f, 0.0f, 1.0f);
 
-	void Imgui_DevConsole::Draw(Scene* scene)
+	void DevConsole::Draw(Scene* scene)
 	{
 		static bool open = true;
 
@@ -66,51 +61,78 @@ namespace Vxl
 
 			if (ImGui::CollapsingHeader("Debug Variables"))
 			{
+				ImGui::PushItemWidth(-1);
 				// Integers
+				ImGui::Text("Integers:");
 				if (m_integers.size() > 0)
 				{
-					ImGui::Text("Integers:");
 					for (auto it = m_integers.begin(); it != m_integers.end(); it++)
 					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
 						ImGui::InputInt(it->first.c_str(), &it->second);
 					}
 				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator();
+
 				// Floats
+				ImGui::Text("Floats:");
 				if (m_floats.size() > 0)
 				{
-					ImGui::Text("Floats:");
 					for (auto it = m_floats.begin(); it != m_floats.end(); it++)
 					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
 						ImGui::InputFloat(it->first.c_str(), &it->second);
 					}
 				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator();
+				
 				// Double
+				ImGui::Text("Doubles:");
 				if (m_doubles.size() > 0)
 				{
-					ImGui::Text("Doubles:");
 					for (auto it = m_doubles.begin(); it != m_doubles.end(); it++)
 					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
 						ImGui::InputDouble(it->first.c_str(), &it->second);
 					}
 				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator();
+				
 				// Vector2
+				ImGui::Text("Vector2s:");
 				if (m_vec2.size() > 0)
 				{
-					ImGui::Text("Vector2s:");
 					for (auto it = m_vec2.begin(); it != m_vec2.end(); it++)
 					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
 						float val[2] = { it->second.x, it->second.y };
 						ImGui::InputFloat2(it->first.c_str(), val);
 						it->second[0] = val[0];
 						it->second[1] = val[1];
 					}
 				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator();
+
 				// Vector3
+				ImGui::Text("Vector3s:");
 				if (m_vec3.size() > 0)
 				{
-					ImGui::Text("Vector3s:");
 					for (auto it = m_vec3.begin(); it != m_vec3.end(); it++)
 					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
 						float val[3] = { it->second.x, it->second.y, it->second.z };
 						ImGui::InputFloat3(it->first.c_str(), val);
 						it->second[0] = val[0];
@@ -118,12 +140,18 @@ namespace Vxl
 						it->second[2] = val[2];
 					}
 				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator();
+
 				// Vector4
+				ImGui::Text("Vector4s:");
 				if (m_vec4.size() > 0)
 				{
-					ImGui::Text("Vector4s:");
 					for (auto it = m_vec4.begin(); it != m_vec4.end(); it++)
 					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
 						float val[4] = { it->second.x, it->second.y, it->second.z, it->second.w };
 						ImGui::InputFloat4(it->first.c_str(), val);
 						it->second[0] = val[0];
@@ -132,6 +160,50 @@ namespace Vxl
 						it->second[3] = val[4];
 					}
 				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator(); 
+
+				// Color3F
+				ImGui::Text("Color3F:");
+				if (m_color3.size() > 0)
+				{
+					for (auto it = m_color3.begin(); it != m_color3.end(); it++)
+					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
+						float val[3] = { it->second.r, it->second.g, it->second.b, };
+						ImGui::ColorEdit3(it->first.c_str(), val);
+						it->second[0] = val[0];
+						it->second[1] = val[1];
+						it->second[2] = val[2];
+					}
+				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator();
+
+				// Color4F
+				ImGui::Text("Color3F:");
+				if (m_color4.size() > 0)
+				{
+					for (auto it = m_color4.begin(); it != m_color4.end(); it++)
+					{
+						ImGui::Text(it->first.c_str());
+						ImGui::SameLine();
+						float val[4] = { it->second.r, it->second.g, it->second.b, it->second.a };
+						ImGui::ColorEdit3(it->first.c_str(), val);
+						it->second[0] = val[0];
+						it->second[1] = val[1];
+						it->second[2] = val[2];
+						it->second[3] = val[3];
+					}
+				}
+				else
+					ImGui::TextColored(Color_Orange, "~None~");
+				ImGui::Separator();
+				
+				ImGui::PopItemWidth();
 			}
 
 			ImGui::Separator();
@@ -157,19 +229,7 @@ namespace Vxl
 
 			ImGui::Separator();
 
-			ImGui::Text("Crate1 Transform");
-			ImGui::Text("Local: %f %f %f", Game->_crate1->m_transform.getPosition().x, Game->_crate1->m_transform.getPosition().y, Game->_crate1->m_transform.getPosition().z);
-			ImGui::Text("World: %f %f %f", Game->_crate1->m_transform.getWorldPosition().x, Game->_crate1->m_transform.getWorldPosition().y, Game->_crate1->m_transform.getWorldPosition().z);
-
-			ImGui::Separator();
-
-			ImGui::Text("Crate2 Transform");
-			ImGui::Text("Local: %f %f %f", Game->_crate2->m_transform.getPosition().x, Game->_crate2->m_transform.getPosition().y, Game->_crate2->m_transform.getPosition().z);
-			ImGui::Text("World: %f %f %f", Game->_crate2->m_transform.getWorldPosition().x, Game->_crate2->m_transform.getWorldPosition().y, Game->_crate2->m_transform.getWorldPosition().z);
-
-			ImGui::Separator();
-
-			ImGui::Checkbox("Wireframe GBUFFER", &GBUFFER_WIREFRAME);
+			ImGui::Checkbox("Wireframe GBUFFER", &Game->_material_gbuffer->m_Wireframe);
 
 			ImGui::Separator();
 

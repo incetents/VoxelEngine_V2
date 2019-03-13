@@ -21,7 +21,7 @@ namespace Vxl
 
 	static class RenderManager : public Singleton<class RenderManager>
 	{
-		friend class Imgui_Hierarchy;
+		friend class Hierarchy;
 	private:
 		Scene* m_currentScene = nullptr;
 

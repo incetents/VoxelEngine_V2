@@ -139,6 +139,8 @@ namespace Vxl
 
 	// SHADER PROGRAM //
 
+	GLuint ShaderProgram::m_boundID = 0;
+
 	void ShaderProgram::attachShaders()
 	{
 		for (unsigned int i = 0; i < m_shaderCount; i++)
@@ -348,11 +350,21 @@ namespace Vxl
 
 	void ShaderProgram::Bind() const
 	{
-		glUseProgram(m_id);
+		// Don't bind program if it hasn't changed
+		if (m_boundID != m_id)
+			glUseProgram(m_id);
+
+		// update bound program
+		ShaderProgram::m_boundID = m_id;
 	}
 
 	void ShaderProgram::Unbind()
 	{
-		glUseProgram(0);
+		// Don't bind program if it hasn't changed
+		if (m_boundID != 0)
+			glUseProgram(0);
+
+		// update bound program
+		ShaderProgram::m_boundID = 0;
 	}
 }

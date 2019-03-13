@@ -169,7 +169,7 @@ namespace Vxl
 
 			for (auto ent : _entites)
 			{
-				if(ent->m_isActive)
+				if(ent->IsFamilyActive())
 					ent->Draw();
 			}
 		}

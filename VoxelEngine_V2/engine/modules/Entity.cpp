@@ -17,7 +17,6 @@ namespace Vxl
 		m_name = displayName;
 
 		AddComponent(&m_transform, this);
-		AddComponent(&m_meshRenderer, this);
 		AddComponent(&m_material, this);
 	}
 
@@ -40,8 +39,8 @@ namespace Vxl
 		// Update Bounding Box information
 		if (m_mesh != nullptr)
 		{
-			Vector3 VMin = m_mesh->GetVertexMin();
-			Vector3 VMax = m_mesh->GetVertexMax();
+			Vector3 VMin = m_mesh->GetVertexMin() * m_transform.getScale();
+			Vector3 VMax = m_mesh->GetVertexMax() * m_transform.getScale();
 			Quaternion Rotation = m_transform.getRotation();
 
 			m_OBB[0] = Rotation * VMin; // x0 y0 z0

@@ -1,10 +1,10 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "ImGui_Inspector.h"
+#include "Inspector.h"
 
 #include "../imgui/imgui.h"
 
-#include "ImGui_Hierarchy.h"
+#include "Hierarchy.h"
 #include "../modules/Entity.h"
 
 #include "../math/Vector2.h"
@@ -15,7 +15,7 @@
 
 namespace Vxl
 {
-	void Imgui_Inspector::Draw()
+	void Inspector::Draw()
 	{
 		static bool open = true;
 
@@ -27,7 +27,7 @@ namespace Vxl
 
 		if (ImGui::Begin("[F2] Inspector", &open, ImVec2(380, 280), 0.9f))
 		{
-			auto Entity = Imgui_Hierarchy._selectedEntity;
+			auto Entity = Hierarchy._selectedEntity;
 			if (Entity != nullptr)
 			{
 				static float DragSpeed = 0.1f;
@@ -39,6 +39,8 @@ namespace Vxl
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();
+
+				ImGui::Checkbox("Active", &Entity->m_isActive);
 
 				// Transform
 				if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))

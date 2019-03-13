@@ -28,6 +28,8 @@ namespace Vxl
 		GLenum*						m_attachments = nullptr;
 		// Depth
 		RenderTexture*				m_depth = nullptr;
+		// Tracker //
+		static GLuint m_boundID;
 
 		// Utility
 		void FixCallList();

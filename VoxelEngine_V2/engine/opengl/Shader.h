@@ -121,7 +121,9 @@ namespace Vxl
 		GLint				m_uniformBlockCount = 0;
 		SubroutineStorage   m_subroutines;
 		GLint				m_subroutineCount = 0;
-		
+		// Tracker //
+		static GLuint		m_boundID;
+
 		void attachShaders();
 		void detachShaders();
 

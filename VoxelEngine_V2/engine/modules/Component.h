@@ -14,7 +14,7 @@ namespace Vxl
 	protected:
 		Entity* m_owner;
 	public:
-		Entity* GetEntityOwner(void) const
+		Entity* GetOwner(void) const
 		{
 			return m_owner;
 		}

@@ -123,9 +123,6 @@
     <ClCompile Include="engine\input\XGamePad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\opengl\TextureTracker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\terrain\Block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -150,13 +147,7 @@
     <ClCompile Include="engine\modules\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\opengl\MeshRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\opengl\VBO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\imgui_wrappers\ImGui_DevConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\utilities\FileIO.cpp">
@@ -174,13 +165,16 @@
     <ClCompile Include="engine\opengl\UBO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\imgui_wrappers\ImGui_Inspector.cpp">
+    <ClCompile Include="engine\imgui_wrappers\DevConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\imgui_wrappers\ImGui_ShaderErrors.cpp">
+    <ClCompile Include="engine\imgui_wrappers\Hierarchy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\imgui_wrappers\ImGui_Hierarchy.cpp">
+    <ClCompile Include="engine\imgui_wrappers\Inspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\imgui_wrappers\ShaderErrors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -287,9 +281,6 @@
     <ClInclude Include="engine\modules\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\opengl\MeshRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -318,9 +309,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\input\XGamePad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\opengl\TextureTracker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\light\Light.h">
@@ -359,9 +347,6 @@
     <ClInclude Include="engine\utilities\Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\imgui_wrappers\ImGui_DevConsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\utilities\FileIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -377,13 +362,16 @@
     <ClInclude Include="engine\opengl\UBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\imgui_wrappers\ImGui_Inspector.h">
+    <ClInclude Include="engine\imgui_wrappers\DevConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\imgui_wrappers\ImGui_ShaderErrors.h">
+    <ClInclude Include="engine\imgui_wrappers\Hierarchy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\imgui_wrappers\ImGui_Hierarchy.h">
+    <ClInclude Include="engine\imgui_wrappers\Inspector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\imgui_wrappers\ShaderErrors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

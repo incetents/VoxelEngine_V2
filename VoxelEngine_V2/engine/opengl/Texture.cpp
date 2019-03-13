@@ -11,6 +11,9 @@
 
 namespace Vxl
 {
+	Active_Texture BaseTexture::m_activeSlot = Active_Texture::LEVEL0;
+	std::unordered_map<Texture_Type, UINT> BaseTexture::m_activeTextures;
+
 	void FlipTextureY(UCHAR* array, GLuint width, GLuint height, GLuint channels)
 	{
 		unsigned char* Tmp = new unsigned char[width * channels];
@@ -95,16 +98,37 @@ namespace Vxl
 
 	void BaseTexture::Bind(Active_Texture layer) const
 	{
-		glActiveTexture((GLenum)layer);
-		glBindTexture((GLenum)m_type, m_id);
+		// Don't set active texture if it hasn't changed
+		if(m_activeSlot != layer)
+			glActiveTexture((GLenum)layer);
+
+		// Update active texture
+		m_activeSlot = layer;
+
+		// Don't bind texture if it hasn't changed
+		if (m_activeTextures[m_type] != m_id)
+			glBindTexture((GLenum)m_type, m_id);
+
+		// update bound texture
+		m_activeTextures[m_type] = m_id;
 	}
 	void BaseTexture::Bind() const
 	{
-		glBindTexture((GLenum)m_type, m_id);
+		// Don't bind texture if it hasn't changed
+		if (m_activeTextures[m_type] != m_id)
+			glBindTexture((GLenum)m_type, m_id);
+
+		// update bound texture
+		m_activeTextures[m_type] = m_id;
 	}
 	void BaseTexture::Unbind() const
 	{
-		glBindTexture((GLenum)m_type, 0);
+		// Don't bind texture if it hasn't changed
+		if (m_activeTextures[m_type] != 0)
+			glBindTexture((GLenum)m_type, 0);
+
+		// update bound texture
+		m_activeTextures[m_type] = 0;
 	}
 
 	void BaseTexture::setWrapMode(Wrap_Mode W)

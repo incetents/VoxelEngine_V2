@@ -37,10 +37,10 @@
 
 #include "../engine/window/window.h"
 
-#include "../engine/imgui_wrappers/Imgui_ShaderErrors.h"
-#include "../engine/imgui_wrappers/ImGui_DevConsole.h"
-#include "../engine/imgui_wrappers/ImGui_Hierarchy.h"
-#include "../engine/imgui_wrappers/ImGui_Inspector.h"
+#include "../engine/imgui_wrappers/ShaderErrors.h"
+#include "../engine/imgui_wrappers/DevConsole.h"
+#include "../engine/imgui_wrappers/Hierarchy.h"
+#include "../engine/imgui_wrappers/Inspector.h"
 
 #include "../game/terrain/TerrainManager.h"
 
@@ -307,14 +307,37 @@ namespace Vxl
 		// Debug Lines
 		Debug.DrawLine(
 			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
+			10.0f,
 			Color4F(0, 1, 0, 1), Color4F(1, 0, 1, 0)
 		);
 		static float time = 0.0f;
 		time += 0.2f;
 		Debug.DrawLine(
 			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
+			10.0f,
 			Color4F(1, 1, 0, 1), Color4F(0, 1, 1, 0)
 		);
+
+		if (Hierarchy._selectedEntity != nullptr)
+		{
+			auto Entity = Hierarchy._selectedEntity;
+			static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
+
+			// Draw Outline around Entity
+			if(Entity->GetMesh()->m_instances.Empty())
+				Debug.DrawAABB(Entity->GetLocalAABBMin() - Epsilon, Entity->GetLocalAABBMax() + Epsilon, Entity->m_transform.getWorldPosition(), 5.0f, Color4F::YELLOW);
+			// Draw outline around all instances
+			else
+			{
+				Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
+				auto Instances = Entity->GetMesh()->m_instances.GetVertices();
+				for (auto instanceMatrix : *Instances)
+				{
+					Vector4 Pos = instanceMatrix.Transpose() * WPosition;
+					Debug.DrawAABB(Entity->GetLocalAABBMin() - Epsilon, Entity->GetLocalAABBMax() + Epsilon, Vector3(Pos), 5.0f, Color4F::YELLOW);
+				}
+			}
+		}
 
 		//	// Draw OBB for entity 3
 		//	Vector3 p = _entity3->m_transform.getPosition();
@@ -355,7 +378,6 @@ namespace Vxl
 		//	_entity3->m_transform.increaseRotation(0.2f, 1, 0);
 
 		// End Frame Updates
-		TextureTracker.Clear();
 		XGamePadManager.Update();
 
 		//_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
@@ -363,9 +385,11 @@ namespace Vxl
 
 	void Scene_Game::Draw()
 	{
+		Texture::ClearTrackingData();
+		//
 		Camera::GetMain()->BindUBO();
 		//
-		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", Imgui_DevConsole::GetInt("TESTMODE"));
+		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole::GetInt("TESTMODE"));
 		//
 
 		_fbo->bind();
@@ -426,13 +450,13 @@ namespace Vxl
 
 		// ~~ //
 		_material_lines->Bind();
+		
 		_shader_lines->SetUniform<Vector4>("_viewport", Vector4(
 			(float)Window.GetScreenOffsetX(),
 			(float)Window.GetScreenOffsetY(),
 			(float)Window.GetScreenWidth(),
 			(float)Window.GetScreenHeight()
 		));
-		_shader_lines->SetUniform<Vector2>("_line_width", Vector2(9.0f, 0.0f));
 
 		//glLineWidth(9.0f);
 		Debug.RenderLines();
@@ -494,6 +518,10 @@ namespace Vxl
 		{
 			auto Entity = Entities[i];
 		
+			// Ignore if not active
+			if (!Entity->IsFamilyActive())
+				continue;
+
 			_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
 			_shader_colorPicker->SetUniform("VXL_useInstancing", !Entity->GetMesh()->m_instances.Empty());
 			_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
@@ -531,8 +559,13 @@ namespace Vxl
 		mem.f_ID[2] = data[2];
 		mem.ui_ID--;//offset
 
-		if (Input.getMouseButton(MouseButton::LEFT) && mem.ui_ID < EntityCount)
-			Imgui_Hierarchy._selectedEntity = Entities[mem.ui_ID];
+		if (Input.getMouseButton(MouseButton::LEFT) && !ImGui::GetIO().WantCaptureMouse)
+		{
+			if(mem.ui_ID < EntityCount)
+				Hierarchy._selectedEntity = Entities[mem.ui_ID];
+			else
+				Hierarchy._selectedEntity = nullptr;
+		}
 
 		//if ()
 		//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
@@ -559,17 +592,17 @@ namespace Vxl
 		Geometry.GetFullQuad()->Draw();
 		
 		// Normals test
-		if (ShowNormal_DEV)
+		if (DevConsole::GetBool("Show Normals"))
 		{
 			glViewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
 			_fbo->bindTexture(1, Active_Texture::LEVEL0);
 			Geometry.GetFullQuad()->Draw();
 		}
 		// Depth test
-		else if (ShowDepth_DEV)
+		if (DevConsole::GetBool("Show Depth"))
 		{
-			glViewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
-			//_fbo->bindDepth(Active_Texture::LEVEL0);
+			glViewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
+			_fbo->bindDepth(Active_Texture::LEVEL0);
 			Geometry.GetFullQuad()->Draw();
 		}
 
@@ -620,37 +653,35 @@ namespace Vxl
 	void Scene_Game::DrawImGui()
 	{
 		// Shader Errors
-		Imgui_ShaderErrors.Draw();
+		ShaderErrors.Draw();
 		// Inspector
-		Imgui_Inspector.Draw();
+		Inspector.Draw();
 		// Hierarchy
-		Imgui_Hierarchy.Draw();
+		Hierarchy.Draw();
 
 		// Setup
-		Imgui_DevConsole.GBUFFER_WIREFRAME = _material_gbuffer->m_wireframe;
-		Imgui_DevConsole.MAIN_CAMERA = _camera;
-		Imgui_DevConsole.CAMFOV = _camera->getFOV();
-		Imgui_DevConsole.CAM_ZNEAR = _camera->getZnear();
-		Imgui_DevConsole.CAM_ZFAR = _camera->getZfar();
+		DevConsole.MAIN_CAMERA = _camera;
+		DevConsole.CAMFOV = _camera->getFOV();
+		DevConsole.CAM_ZNEAR = _camera->getZnear();
+		DevConsole.CAM_ZFAR = _camera->getZfar();
 		// Draw
-		Imgui_DevConsole.Draw(this);
+		DevConsole.Draw(this);
 		// Update Values from dev console
-		_material_gbuffer->m_wireframe = Imgui_DevConsole.GBUFFER_WIREFRAME;
-		_camera = Imgui_DevConsole.MAIN_CAMERA;
-		ShowNormal_DEV = Imgui_DevConsole.SHOW_NORMALS;
-		ShowDepth_DEV = Imgui_DevConsole.SHOW_DEPTH;
+		_camera = DevConsole.MAIN_CAMERA;
+		ShowNormal_DEV = DevConsole.SHOW_NORMALS;
+		ShowDepth_DEV = DevConsole.SHOW_DEPTH;
 
-		if (fabs(_camera->getFOV() - Imgui_DevConsole.CAMFOV) > 0.01f)
+		if (fabs(_camera->getFOV() - DevConsole.CAMFOV) > 0.01f)
 		{
-			_camera->updatePerspective(Imgui_DevConsole.CAMFOV, Window.GetAspectRatio());
+			_camera->updatePerspective(DevConsole.CAMFOV, Window.GetAspectRatio());
 		}
-		if (fabs(_camera->getZnear() - Imgui_DevConsole.CAM_ZNEAR) > 0.01f)
+		if (fabs(_camera->getZnear() - DevConsole.CAM_ZNEAR) > 0.01f)
 		{
-			_camera->setZnear(Imgui_DevConsole.CAM_ZNEAR);
+			_camera->setZnear(DevConsole.CAM_ZNEAR);
 		}
-		if (fabs(_camera->getZfar() - Imgui_DevConsole.CAM_ZFAR) > 0.01f)
+		if (fabs(_camera->getZfar() - DevConsole.CAM_ZFAR) > 0.01f)
 		{
-			_camera->setZfar(Imgui_DevConsole.CAM_ZFAR);
+			_camera->setZfar(DevConsole.CAM_ZFAR);
 		}
 	}
 }

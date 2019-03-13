@@ -8,15 +8,18 @@
 
 namespace Vxl
 {
+	const UINT Debug::m_lines_vertexIncrementAmount = 800;
+
 	void Debug::DrawLine(
 		const Vector3& P1, const Vector3& P2,
+		float Width,
 		const Color4F& C1, const Color4F& C2
 	)
 	{
 		if (m_lines_vertexIndex >= m_lines_vertices.size())
 		{
 			// Increase vector size
-			m_lines_vertices.resize(m_lines_vertices.size() + 700);
+			m_lines_vertices.resize(m_lines_vertices.size() + m_lines_vertexIncrementAmount);
 			m_lines_resizeDirty = true;
 		}
 
@@ -28,41 +31,48 @@ namespace Vxl
 		m_lines_vertices[m_lines_vertexIndex + 5] = C1.b;
 		m_lines_vertices[m_lines_vertexIndex + 6] = C1.a;
 
-		m_lines_vertices[m_lines_vertexIndex + 7] = P2.x;
-		m_lines_vertices[m_lines_vertexIndex + 8] = P2.y;
-		m_lines_vertices[m_lines_vertexIndex + 9] = P2.z;
-		m_lines_vertices[m_lines_vertexIndex + 10] = C2.r;
-		m_lines_vertices[m_lines_vertexIndex + 11] = C2.g;
-		m_lines_vertices[m_lines_vertexIndex + 12] = C2.b;
-		m_lines_vertices[m_lines_vertexIndex + 13] = C2.a;
+		m_lines_vertices[m_lines_vertexIndex + 7] = Width;
 
-		m_lines_vertexIndex += 14;
+		m_lines_vertices[m_lines_vertexIndex + 8] = P2.x;
+		m_lines_vertices[m_lines_vertexIndex + 9] = P2.y;
+		m_lines_vertices[m_lines_vertexIndex + 10] = P2.z;
+		m_lines_vertices[m_lines_vertexIndex + 11] = C2.r;
+		m_lines_vertices[m_lines_vertexIndex + 12] = C2.g;
+		m_lines_vertices[m_lines_vertexIndex + 13] = C2.b;
+		m_lines_vertices[m_lines_vertexIndex + 14] = C2.a;
+
+		m_lines_vertices[m_lines_vertexIndex + 15] = Width;
+
+		m_lines_vertexIndex += 16;
 	}
 	void Debug::DrawAABB(
-		const Vector3& Min, const Vector3& Max, const Vector3& OffsetAll,
+		const Vector3& Min, const Vector3& Max,
+		const Vector3& OffsetAll,
+		float Width,
 		const Color4F& C
 	)
 	{
-		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), C, C);
-		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Min.x, Min.y, Max.z), C, C);
-		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), C, C);
-		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Min.x, Min.y, Max.z), C, C);
+		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Min.x, Min.y, Max.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Min.x, Min.y, Max.z), Width, C, C);
 
-		DrawLine(OffsetAll + Vector3(Min.x, Max.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), C, C);
-		DrawLine(OffsetAll + Vector3(Min.x, Max.y, Min.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), C, C);
-		DrawLine(OffsetAll + Vector3(Max.x, Max.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), C, C);
-		DrawLine(OffsetAll + Vector3(Max.x, Max.y, Max.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), C, C);
+		DrawLine(OffsetAll + Vector3(Min.x, Max.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Min.x, Max.y, Min.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Max.x, Max.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Max.x, Max.y, Max.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), Width, C, C);
 
-		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Min.x, Max.y, Min.z), C, C);
-		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Max.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), C, C);
-		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), C, C);
-		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Max.z), C, C);
+		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Min.x, Max.y, Min.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Max.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
+		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Max.z), Width, C, C);
 	}
 
 	void Debug::UpdateStart()
 	{
 		// reset index flag
 		m_lines_vertexIndex = 0;
+		std::fill(m_lines_vertices.begin(), m_lines_vertices.end(), 0);
 	}
 	void Debug::RenderLines()
 	{

@@ -17,6 +17,7 @@ namespace Vxl
 	class BaseTexture
 	{
 	protected:
+		// Data //
 		GLuint		 m_id = -1;
 		bool		 m_loaded = false;
 		bool		 m_useMipMapping = false;
@@ -31,6 +32,10 @@ namespace Vxl
 		Channel_Type m_channelType;
 		Data_Type	 m_dataType;
 		Color4F		 m_borderColor = Color4F(0, 0, 0, 1);
+
+		// Tracker //
+		static Active_Texture m_activeSlot;
+		static std::unordered_map<Texture_Type, UINT> m_activeTextures;
 
 		void updateParameters();
 		void updateTexImage2D(const GLvoid* pixels = nullptr);
@@ -52,6 +57,12 @@ namespace Vxl
 		void Bind(Active_Texture layer) const;
 		void Bind() const;
 		void Unbind() const;
+
+		static void ClearTrackingData()
+		{
+			m_activeSlot = Active_Texture::LEVEL0;
+			m_activeTextures.clear();
+		}
 
 		void setWrapMode(Wrap_Mode W);
 		void setFilterMode(Filter_Min Min, Filter_Mag Mag);

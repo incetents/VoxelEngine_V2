@@ -121,6 +121,8 @@ namespace Vxl
 		static const Vector3 N_ONE;
 		static const Vector3 HALF;
 		static const Vector3 MINUS_HALF;
+		static const Vector3 QUARTER;
+		static const Vector3 MINUS_QUARTER;
 		static const Vector3 UP;
 		static const Vector3 DOWN;
 		static const Vector3 FORWARD;

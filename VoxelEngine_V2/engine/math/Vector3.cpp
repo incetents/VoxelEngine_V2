@@ -324,7 +324,9 @@ namespace Vxl
 	const Vector3 Vector3::ONE = Vector3(1, 1, 1);
 	const Vector3 Vector3::N_ONE = Vector3(-1, -1, -1);
 	const Vector3 Vector3::HALF = Vector3(0.5f, 0.5f, 0.5f);
-	const Vector3 Vector3::MINUS_HALF = Vector3(0.5f, 0.5f, 0.5f);
+	const Vector3 Vector3::MINUS_HALF = Vector3(-0.5f, -0.5f, -0.5f);
+	const Vector3 Vector3::QUARTER = Vector3(0.25f, 0.25f, 0.25f);
+	const Vector3 Vector3::MINUS_QUARTER = Vector3(-0.25f, -0.25f, -0.25f);
 	const Vector3 Vector3::UP = Vector3(0, +1, 0);
 	const Vector3 Vector3::DOWN = Vector3(0, -1, 0);
 	const Vector3 Vector3::FORWARD = Vector3(0, 0, +1);

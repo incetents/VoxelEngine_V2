@@ -14,16 +14,12 @@ layout(triangle_strip, max_vertices = 6) out;
 #endif
 
 uniform vec4 _viewport;
-uniform vec2 _line_width;
 
 in vec3 _position[];
 in vec4 vs_color[];
+in float vs_width[];
 
-
-//out vec2    v_start;
-//out vec2    v_line;
 out vec4    v_color;
-//out float   v_l2;
 
 void main(void) 
 {
@@ -79,17 +75,13 @@ void main(void)
     vec2 sideInScreen   = vec2(-axisInScreen.y, axisInScreen.x);    // rotate
     vec2 axisInNDC      = axisInScreen / vpSize;                    // screen to NDC
     vec2 sideInNDC      = sideInScreen / vpSize;
-    vec4 axis           = vec4(axisInNDC, 0.0, 0.0) * _line_width.x;  // NDC to clip (delta vector)
-    vec4 side           = vec4(sideInNDC, 0.0, 0.0) * _line_width.x;
+    vec4 axis           = vec4(axisInNDC, 0.0, 0.0) * vs_width[0];//_line_width.x;  // NDC to clip (delta vector)
+    vec4 side           = vec4(sideInNDC, 0.0, 0.0) * vs_width[1];//_line_width.x;
 
     vec4 a = (start + (side - axis) * start.w); 
     vec4 b = (end   + (side + axis) * end.w);
     vec4 c = (end   - (side - axis) * end.w);
     vec4 d = (start - (side + axis) * start.w);
-
-    //v_start = startInScreen;
-    //v_line  = endInScreen - startInScreen;
-    //v_l2    = dot(v_line, v_line);
 
 #if SHOW_DEBUG_LINES
     gl_Position = gl_in[0].gl_Position; v_color = vs_color[0]; EmitVertex();

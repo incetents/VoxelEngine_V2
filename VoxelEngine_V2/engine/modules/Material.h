@@ -60,14 +60,14 @@ namespace Vxl
 		Blend_Destination	m_BlendDest		= Blend_Destination::ONE_MINUS_SRC_ALPHA;
 		Blend_Equation		m_BlendEq		= Blend_Equation::FUNC_ADD;
 		Depth_Pass_Rule		m_DepthFunc		= Depth_Pass_Rule::LESS_OR_EQUAL;
-
+		bool				m_DepthMask		= true;
+		bool				m_Wireframe		= false;
+		
 		// Reload Packages
 		void ReloadPackages();
 		// Send Uniforms to shader
 		virtual void Bind();
 
-		// Wireframe
-		bool m_wireframe = false;
 	};
 
 	class MaterialData : public Component

@@ -9,6 +9,7 @@
 
 namespace Vxl
 {
+	GLuint FramebufferObject::m_boundID = 0;
 	Database<FramebufferObject> FramebufferObject::m_database;
 
 	FramebufferObject::FramebufferObject(
@@ -90,14 +91,20 @@ namespace Vxl
 
 	void FramebufferObject::bindFBO()
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-
-		if (m_dirtyDrawBuffers)
+		// Don't bind FBO if it hasn't changed
+		if (m_boundID != m_id)
 		{
-			FixCallList();
-			glDrawBuffers(m_textureCount, m_attachments);
-			m_dirtyDrawBuffers = false;
+			glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+
+			if (m_dirtyDrawBuffers)
+			{
+				FixCallList();
+				glDrawBuffers(m_textureCount, m_attachments);
+				m_dirtyDrawBuffers = false;
+			}
 		}
+		// update bound FBO
+		m_boundID = m_id;
 	}
 	void FramebufferObject::clearColor()
 	{
@@ -135,10 +142,10 @@ namespace Vxl
 		glUtil::setGLName(glNameType::TEXTURE, _tex->GetID(), "FBO_" + m_name + "_Tex_" + name);
 
 		// Add to FBO
-		bind();
+		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, _tex->GetID(), 0);
 		checkFBOStatus();
-		unbind();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// fix draw buffer
 		m_dirtyDrawBuffers = true;
@@ -155,10 +162,10 @@ namespace Vxl
 		glUtil::setGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
 
 		// Add to FBO
-		bind();
+		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
 		checkFBOStatus();
-		unbind();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void FramebufferObject::bind()

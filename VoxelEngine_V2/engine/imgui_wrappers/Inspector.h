@@ -5,11 +5,12 @@
 
 namespace Vxl
 {
-	static class Imgui_ShaderErrors : public Singleton<class Imgui_ShaderErrors>
+	static class Inspector : public Singleton<class Inspector>
 	{
-	public:
+	private:
 
+	public:
 		void Draw();
 
-	} SingletonInstance(Imgui_ShaderErrors);
+	} SingletonInstance(Inspector);;
 }

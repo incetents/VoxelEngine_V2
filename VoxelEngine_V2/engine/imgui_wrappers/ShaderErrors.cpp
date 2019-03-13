@@ -1,13 +1,13 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "Imgui_ShaderErrors.h"
+#include "ShaderErrors.h"
 
 #include "../imgui/imgui.h"
 #include "../engine/opengl/Shader.h"
 
 namespace Vxl
 {
-	void Imgui_ShaderErrors::Draw()
+	void ShaderErrors::Draw()
 	{
 		if (Shader::ShaderErrorLogSize > 0)
 		{
@@ -23,7 +23,7 @@ namespace Vxl
 						{
 							ImGui::PopStyleColor();
 
-							ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8, 0.2f, 0, 1));
+							ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.f, 1.f));
 
 							ImGui::Text(Log.second->GetErrorMessage().c_str());
 							ImGui::TreePop();

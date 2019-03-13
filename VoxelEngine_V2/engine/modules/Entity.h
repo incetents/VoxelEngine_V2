@@ -4,7 +4,6 @@
 #include "Component.h"
 #include "../math/Transform.h"
 #include "../math/Color.h"
-#include "../opengl/MeshRenderer.h"
 #include "../modules/Material.h"
 #include "../utilities/Database.h"
 
@@ -48,10 +47,9 @@ namespace Vxl
 		std::string			m_name;
 		Transform			m_transform;
 		bool				m_useTransform = true;
-		MeshRenderer		m_meshRenderer;
 		MaterialData		m_material;
-		bool m_isActive = true;
-		bool m_isColoredObject = false;
+		bool				m_isActive = true;
+		bool				m_isColoredObject = false;
 
 		// Utility
 		inline void			SetName(const std::string _name)
@@ -62,6 +60,30 @@ namespace Vxl
 		{
 			return m_name;
 		}
+		// check if all parents are active
+		bool IsFamilyActive()
+		{
+			// if no parent, check normal active state
+			Transform* parent = m_transform.getParent();
+			if (parent == nullptr)
+				return m_isActive;
+
+			// auto fail if off
+			if (!m_isActive)
+				return false;
+
+			// iterate through all parents
+			while (parent != nullptr)
+			{
+				if (!parent->GetOwner()->m_isActive)
+					return false;
+				// Acquire new parent
+				else
+					parent = parent->GetOwner()->m_transform.getParent();
+			}
+			// If no parents failed, that means it's all good
+			return true;
+		}
 
 		void			SetMaterial(Material* _base);
 		Material*		GetMaterial(void) const;
@@ -71,11 +93,11 @@ namespace Vxl
 		{
 			return std::vector<Vector3>(m_OBB, m_OBB + 8);
 		}
-		Vector3				 GetAABBMin(void) const
+		Vector3				 GetLocalAABBMin(void) const
 		{
 			return m_AABB[0];
 		}
-		Vector3				 GetAABBMax(void) const
+		Vector3				 GetLocalAABBMax(void) const
 		{
 			return m_AABB[1];
 		}
