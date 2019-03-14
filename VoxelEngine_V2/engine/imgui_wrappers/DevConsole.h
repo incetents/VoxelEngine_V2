@@ -32,59 +32,59 @@ namespace Vxl
 		std::unordered_map<std::string, Color4F> m_color4;
 		
 		// Menu Mode
-
+		enum class MenuState
+		{
+			MASTER,
+			CUSTOM_VALUES
+		};
+		MenuState m_State = MenuState::MASTER;
+		// Draw Menu Section
+		void Draw_Master(Scene* scene);
+		void Draw_CustomValues();
 	public:
-		// Data
-		//bool GBUFFER_WIREFRAME = false;
-		bool SHOW_NORMALS = false;
-		bool SHOW_DEPTH = false;
-		Camera* MAIN_CAMERA = nullptr;
-		float CAMFOV = 0;
-		float CAM_ZNEAR = 0;
-		float CAM_ZFAR = 0;
 
 		// custom data
-		static bool GetBool(const std::string& str)
+		bool	GetBool		(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_bools.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_bools[str];
 		}
-		static int GetInt(const std::string& str)
+		int		GetInt		(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_integers.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_integers[str];
 		}
-		static float GetFloat(const std::string& str)
+		float	GetFloat	(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_floats.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_floats[str];
 		}
-		static double GetDouble(const std::string& str)
+		double	GetDouble	(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_doubles.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_doubles[str];
 		}
-		static Vector2 GetVec2(const std::string& str)
+		Vector2 GetVec2		(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_vec2.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_vec2[str];
 		}
-		static Vector3 GetVec3(const std::string& str)
+		Vector3 GetVec3		(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_vec3.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_vec3[str];
 		}
-		static Vector4 GetVec4(const std::string& str)
+		Vector4 GetVec4		(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_vec4.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_vec4[str];
 		}
-		static Color3F GetColor3(const std::string& str)
+		Color3F GetColor3	(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_color3.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_color3[str];
 		}
-		static Color4F GetColor4(const std::string& str)
+		Color4F GetColor4	(const std::string& str)
 		{
 			assert(DevConsole::instanceRef.m_color4.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_color4[str];

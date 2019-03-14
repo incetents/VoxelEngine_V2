@@ -73,6 +73,8 @@ namespace Vxl
 		}
 		void Update_FovAspect(float _fov, float _aspect) override
 		{
+			m_fov = _fov;
+			m_aspect = _aspect;
 			Matrix4x4::Perspective_UpdateFov(m_projection, _fov, _aspect);
 			Matrix4x4::PerspectiveInverse_UpdateFov(m_projectionInverse, _fov, _aspect);
 		}

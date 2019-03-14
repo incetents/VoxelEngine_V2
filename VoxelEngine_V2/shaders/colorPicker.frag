@@ -22,5 +22,5 @@ uniform vec4 colorID;
 //Main
 void main()
 {
-	output_color = vec4(colorID.rgb,1);
+	output_color = colorID;
 }

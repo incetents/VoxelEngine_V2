@@ -86,6 +86,14 @@ namespace Vxl
 		Transform(void);
 		Transform(const Vector3& position, const Vector3& euler_rotation = Vector3(0,0,0), const Vector3& scale = Vector3(1,1,1));
 
+		// Dirty Setter
+		void SetDirty()
+		{
+			isDirty = true;
+			for (auto child : m_children)
+				child->SetDirty();
+		}
+
 		// Returns index of child in list of children (-1 = child does not exist)
 		bool checkChildDuplicate(Transform* c)
 		{
@@ -167,7 +175,8 @@ namespace Vxl
 			// Make sure parent has child
 			m_parent->addChild(this);
 
-
+			// Flag
+			SetDirty();
 		}
 		void addChild(Transform* child)
 		{
@@ -206,6 +215,8 @@ namespace Vxl
 			// Add child
 			SimpleAddChild(child);
 
+			// Flag
+			child->SetDirty();
 		}
 		void removeParent(void)
 		{
@@ -218,6 +229,9 @@ namespace Vxl
 
 			// Child removes parent
 			m_parent = nullptr;
+
+			// Flag
+			SetDirty();
 		}
 		void removeChild(Transform* child)
 		{
@@ -230,6 +244,9 @@ namespace Vxl
 
 			// This loses child
 			SimpleRemoveChild(child_index);
+
+			// Flag
+			child->SetDirty();
 		}
 
 		// Setters
@@ -237,82 +254,82 @@ namespace Vxl
 		{
 			Vector3 Move = Vector3(x, y, z) - getWorldPosition();
 			m_position += Move;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setWorldPosition(const Vector2& position)
 		{
 			Vector3 Move = Vector3(position) - getWorldPosition();
 			m_position += Move;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setWorldPosition(const Vector3& position)
 		{
 			Vector3 Move = position - getWorldPosition();
 			m_position += Move;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setWorldPosition(const Vector4& position)
 		{
 			Vector3 Move = Vector3(position) - getWorldPosition();
 			m_position += Move;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setPosition(float x, float y, float z)
 		{
 			m_position = Vector3(x, y, z);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setPosition(const Vector2& position)
 		{
 			m_position = position;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setPosition(const Vector3& position)
 		{
 			m_position = position;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setPosition(const Vector4& position)
 		{
 			m_position = position;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setRotation(float x, float y, float z)
 		{
 			m_euler_rotation = Vector3(x, y, z);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setRotation(const Vector3& euler_rotation)
 		{
 			m_euler_rotation = euler_rotation;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setScale(float scaleAll)
 		{
 			m_scale = Vector3(scaleAll);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setScale(float x, float y, float z)
 		{
 			m_scale = Vector3(x, y, z);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setScale(const Vector3 scale)
 		{
 			m_scale = scale;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
@@ -320,57 +337,57 @@ namespace Vxl
 		inline Transform& setPositionX(float x)
 		{
 			m_position.x = x;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setPositionY(float y)
 		{
 			m_position.y = y;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setPositionZ(float z)
 		{
 			m_position.z = z;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
 		inline Transform& setRotationX(float x)
 		{
 			m_euler_rotation.x = x;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setRotationY(float y)
 		{
 			m_euler_rotation.y = y;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setRotationZ(float z)
 		{
 			m_euler_rotation.z = z;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
 		inline Transform& setScaleX(float x)
 		{
 			m_scale.x = x;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setScaleY(float y)
 		{
 			m_scale.y = y;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& setScaleZ(float z)
 		{
 			m_scale.z = z;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
@@ -402,7 +419,7 @@ namespace Vxl
 
 			m_euler_rotation = Vector3(pitch.Get() - 90.0f, yaw.Get(), 0);
 
-			isDirty = true;
+			SetDirty();
 
 			auto test = Transform::getForward();
 
@@ -413,57 +430,57 @@ namespace Vxl
 		inline Transform& increasePosition(float x, float y, float z)
 		{
 			m_position += Vector3(x, y, z);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increasePosition(const Vector2& translate)
 		{
 			m_position += Vector3(translate);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increasePosition(const Vector3& translate)
 		{
 			m_position += translate;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increasePosition(const Vector4& translate)
 		{
 			m_position += translate;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
 		inline Transform& increaseRotation(float x, float y, float z)
 		{
 			m_euler_rotation += Vector3(x, y, z);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increaseRotation(const Vector3& euler_increase)
 		{
 			m_euler_rotation += euler_increase;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
 		inline Transform& increaseScale(float x, float y, float z)
 		{
 			m_scale += Vector3(x, y, z);
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increaseScale(const Vector3& scaler)
 		{
 			m_scale += scaler;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increaseScale(float scaleAll)
 		{
 			m_scale += scaleAll;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
@@ -471,57 +488,57 @@ namespace Vxl
 		inline Transform& increasePositionX(float x)
 		{
 			m_position.x += x;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increasePositionY(float y)
 		{
 			m_position.y += y;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increasePositionZ(float z)
 		{
 			m_position.z += z;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
 		inline Transform& increaseRotationX(float x)
 		{
 			m_euler_rotation.x += x;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increaseRotationY(float y)
 		{
 			m_euler_rotation.y += y;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increaseRotationZ(float z)
 		{
 			m_euler_rotation.z += z;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 
 		inline Transform& increaseScaleX(float x)
 		{
 			m_scale.x += x;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increaseScaleY(float y)
 		{
 			m_scale.y += y;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 		inline Transform& increaseScaleZ(float z)
 		{
 			m_scale.z += z;
-			isDirty = true;
+			SetDirty();
 			return *this;
 		}
 

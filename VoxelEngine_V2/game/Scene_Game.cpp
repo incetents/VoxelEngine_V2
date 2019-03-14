@@ -18,7 +18,6 @@
 #include "../engine/opengl/Mesh.h"
 #include "../engine/opengl/Shader.h"
 #include "../engine/opengl/Texture.h"
-#include "../engine/opengl/TextureTracker.h"
 #include "../engine/opengl/Debug.h"
 #include "../engine/opengl/UBO.h"
 
@@ -381,15 +380,19 @@ namespace Vxl
 		XGamePadManager.Update();
 
 		//_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
+
+		// Imgui Specials
+		if(_material_gbuffer)
+		{
+			_material_gbuffer->m_Wireframe = DevConsole.GetBool("Gbuffer Wireframe");
+		}
 	}
 
 	void Scene_Game::Draw()
 	{
-		Texture::ClearTrackingData();
-		//
 		Camera::GetMain()->BindUBO();
 		//
-		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole::GetInt("TESTMODE"));
+		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE"));
 		//
 
 		_fbo->bind();
@@ -501,10 +504,11 @@ namespace Vxl
 		//	Geometry::GetCube()->Draw();
 
 		// ~~ //
+		//glClearColor(0, 0, 0, 0);
 		_fbo_colorpicker->bind();
 
 		_shader_colorPicker->Bind();
-		glUtil::blendMode(Blend_Source::ONE, Blend_Destination::ZERO);
+		glUtil::blendDisable();
 
 		auto Entities = RenderManager.GetAllEntities();
 		unsigned int EntityCount = (unsigned int)Entities.size();
@@ -527,16 +531,16 @@ namespace Vxl
 			_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
 		
 			// Convert ID into color
-			mem.ui_ID = i + 1;
+			mem.ui_ID = i + 1; // offset (0 = nothing instead of first value)
 			float x = (float)mem.f_ID[0] / 255.0f;
 			float y = (float)mem.f_ID[1] / 255.0f;
 			float z = (float)mem.f_ID[2] / 255.0f;
+			float w = (float)mem.f_ID[3] / 255.0f;
 		
-			_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, 1));
+			_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, w));
 			Entity->Draw();
 		}
 
-		//std::cout << "Mouse: " << Input.getMouseX() << " " << Input.getMouseY() << std::endl;
 		GLubyte *data = new GLubyte[4];
 		glReadPixels(
 			(GLint)Input.getMouseX(),
@@ -557,7 +561,7 @@ namespace Vxl
 		mem.f_ID[0] = data[0];
 		mem.f_ID[1] = data[1];
 		mem.f_ID[2] = data[2];
-		mem.ui_ID--;//offset
+		mem.ui_ID--;//offset (0 = nothing instead of first value)
 
 		if (Input.getMouseButton(MouseButton::LEFT) && !ImGui::GetIO().WantCaptureMouse)
 		{
@@ -581,8 +585,8 @@ namespace Vxl
 		glUtil::wireframe(false);
 
 		// ~~~~~~~~~~~~~~~~~ //
-		glUtil::clearBuffer();
 		glUtil::clearColor(Color3F(0, 0, 0));
+		glUtil::clearBuffer();
 
 		// Final Pass / Back Buffer
 		_shader_passthrough->Bind();
@@ -592,14 +596,14 @@ namespace Vxl
 		Geometry.GetFullQuad()->Draw();
 		
 		// Normals test
-		if (DevConsole::GetBool("Show Normals"))
+		if (DevConsole.GetBool("Show Normals"))
 		{
 			glViewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
 			_fbo->bindTexture(1, Active_Texture::LEVEL0);
 			Geometry.GetFullQuad()->Draw();
 		}
 		// Depth test
-		if (DevConsole::GetBool("Show Depth"))
+		if (DevConsole.GetBool("Show Depth"))
 		{
 			glViewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
 			_fbo->bindDepth(Active_Texture::LEVEL0);
@@ -658,30 +662,7 @@ namespace Vxl
 		Inspector.Draw();
 		// Hierarchy
 		Hierarchy.Draw();
-
-		// Setup
-		DevConsole.MAIN_CAMERA = _camera;
-		DevConsole.CAMFOV = _camera->getFOV();
-		DevConsole.CAM_ZNEAR = _camera->getZnear();
-		DevConsole.CAM_ZFAR = _camera->getZfar();
-		// Draw
+		// Dev Console
 		DevConsole.Draw(this);
-		// Update Values from dev console
-		_camera = DevConsole.MAIN_CAMERA;
-		ShowNormal_DEV = DevConsole.SHOW_NORMALS;
-		ShowDepth_DEV = DevConsole.SHOW_DEPTH;
-
-		if (fabs(_camera->getFOV() - DevConsole.CAMFOV) > 0.01f)
-		{
-			_camera->updatePerspective(DevConsole.CAMFOV, Window.GetAspectRatio());
-		}
-		if (fabs(_camera->getZnear() - DevConsole.CAM_ZNEAR) > 0.01f)
-		{
-			_camera->setZnear(DevConsole.CAM_ZNEAR);
-		}
-		if (fabs(_camera->getZfar() - DevConsole.CAM_ZFAR) > 0.01f)
-		{
-			_camera->setZfar(DevConsole.CAM_ZFAR);
-		}
 	}
 }

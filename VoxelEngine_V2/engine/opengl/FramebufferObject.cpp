@@ -108,8 +108,8 @@ namespace Vxl
 	}
 	void FramebufferObject::clearColor()
 	{
-		glUtil::clearBuffer();
 		glUtil::clearColor(m_clearColor);
+		glUtil::clearBuffer(m_clearBuffers);
 	}
 
 	void FramebufferObject::FixCallList()

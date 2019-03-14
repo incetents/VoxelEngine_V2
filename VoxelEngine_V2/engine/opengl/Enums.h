@@ -73,9 +73,11 @@ namespace Vxl
 	// Buffer Bit Type
 	enum class Buffer_Bit_Type
 	{
+		NONE = 0,
 		COLOR = GL_COLOR_BUFFER_BIT,
 		DEPTH = GL_DEPTH_BUFFER_BIT,
-		STENCIL = GL_STENCIL_BUFFER_BIT
+		STENCIL = GL_STENCIL_BUFFER_BIT,
+		ACCUM = GL_ACCUM_BUFFER_BIT
 	};
 	// Cull Mode
 	enum class Cull_Type

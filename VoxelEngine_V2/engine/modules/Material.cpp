@@ -3,7 +3,6 @@
 #include "Material.h"
 
 #include "../opengl/Texture.h"
-#include "../opengl/TextureTracker.h"
 #include "../opengl/Shader.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Mesh.h"
@@ -63,7 +62,7 @@ namespace Vxl
 		glUtil::blendMode(m_BlendSource, m_BlendDest);
 		glUtil::blendEquation(m_BlendEq);
 		glUtil::depthTest(m_DepthFunc);
-		glDepthMask(m_DepthMask);
+		glUtil::depthMask(m_DepthMask);
 		glUtil::wireframe(m_Wireframe);
 	}
 

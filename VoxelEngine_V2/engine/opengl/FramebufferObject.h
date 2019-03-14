@@ -20,6 +20,7 @@ namespace Vxl
 		const std::string m_name;
 		GLuint	m_id = -1;
 		Color4F m_clearColor = Color4F(0,0,0,1);
+		UINT    m_clearBuffers = (GLbitfield)Buffer_Bit_Type::COLOR | (GLbitfield)Buffer_Bit_Type::DEPTH;
 		UINT	m_size[2];
 		bool	m_dirtyDrawBuffers = false;
 		// Textures
@@ -64,6 +65,11 @@ namespace Vxl
 		{
 			m_clearColor = c;
 		}
+		inline void setClearBuffer(Buffer_Bit_Type b1, Buffer_Bit_Type b2 = Buffer_Bit_Type::NONE, Buffer_Bit_Type b3 = Buffer_Bit_Type::NONE, Buffer_Bit_Type b4 = Buffer_Bit_Type::NONE)
+		{
+			m_clearBuffers = (GLbitfield)b1 | (GLbitfield)b2 | (GLbitfield)b3 | (GLbitfield)b4;
+		}
+
 
 		void addTexture(
 			const std::string& name,

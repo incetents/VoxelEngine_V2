@@ -206,23 +206,11 @@ namespace Vxl
 		}
 	}
 
-	void glUtil::clearColor()
-	{
-		clearColor(0.f, 0.f, 0.f, 0.f);
-	}
 	void glUtil::clearColor(float r, float g, float b, float a)
 	{
 		glClearColor(r, g, b, a);
 	}
-	void glUtil::clearColor(int r, int g, int b, int a)
-	{
-		glClearColor(
-			static_cast<float>(r) / 255.0f,
-			static_cast<float>(g) / 255.0f,
-			static_cast<float>(b) / 255.0f,
-			static_cast<float>(a) / 255.0f);
-	}
-	void glUtil::clearColor(const Color3F& c)
+	void glUtil::clearColor(const Color3F& c, float a)
 	{
 		clearColor(c.r, c.g, c.b, 1.0f);
 	}
@@ -233,28 +221,26 @@ namespace Vxl
 
 	void glUtil::clearBuffer()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
-	void glUtil::clearBuffer(Buffer_Bit_Type a)
+	void glUtil::clearBuffer(UINT bitCode)
 	{
-		glClear(GLbitfield(a));
+		glClear(bitCode);
 	}
-	void glUtil::clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b)
+	void glUtil::clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b, Buffer_Bit_Type c, Buffer_Bit_Type d)
 	{
-		glClear(GLbitfield(a) | GLbitfield(b));
+		glClear(GLbitfield(a) | GLbitfield(b) | GLbitfield(c) | GLbitfield(d));
 	}
 
 	void glUtil::clearDepth(float f)
 	{
-		assert(f >= 0.0f && f <= 0.0f);
+		assert(f >= 0.0f && f <= 1.0f);
 		glClearDepth(f);
-		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 	void glUtil::clearStencil(int f)
 	{
-		assert(f >= 0.0f && f <= 0.0f);
+		assert(f >= 0.0f && f <= 1.0f);
 		glClearStencil(f);
-		glClear(GL_STENCIL_BUFFER_BIT);
 	}
 
 	void glUtil::cullMode(Cull_Type cull)
@@ -277,7 +263,11 @@ namespace Vxl
 		}
 	}
 
-	// Blend Mode (Calculates transparency in shaders)
+	// Blend Mode (affects rgb of colors based on alpha/rgb of source and destination pixels in shaders)
+	void glUtil::blendDisable()
+	{
+		glDisable(GL_BLEND);
+	}
 	void glUtil::blendMode(Blend_Source src = Blend_Source::SRC_ALPHA, Blend_Destination dst = Blend_Destination::ONE_MINUS_SRC_ALPHA)
 	{
 		glEnable(GL_BLEND);
@@ -293,6 +283,10 @@ namespace Vxl
 	{
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc((GLenum)Rule);
+	}
+	void glUtil::depthMask(bool state)
+	{
+		glDepthMask(state);
 	}
 
 	// Wireframe Mode

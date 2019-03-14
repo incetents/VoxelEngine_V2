@@ -43,15 +43,13 @@ namespace Vxl
 		Channel_Type getFormat(int ChannelCount);
 
 		// Clear Color
-		void clearColor();
 		void clearColor(float r, float g, float b, float a = 1.0f);
-		void clearColor(int r, int g, int b, int a = 255);
-		void clearColor(const Color3F& c);
+		void clearColor(const Color3F& c, float a = 1.0f);
 		void clearColor(const Color4F& c);
 		// Clear Buffer
 		void clearBuffer();
-		void clearBuffer(Buffer_Bit_Type);
-		void clearBuffer(Buffer_Bit_Type, Buffer_Bit_Type);
+		void clearBuffer(UINT bitCode);
+		void clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b = Buffer_Bit_Type::NONE, Buffer_Bit_Type c = Buffer_Bit_Type::NONE, Buffer_Bit_Type d = Buffer_Bit_Type::NONE);
 		// Clear Special
 		void clearDepth(float);
 		void clearStencil(int);
@@ -62,9 +60,11 @@ namespace Vxl
 		// Blend Data
 		void blendMode(Blend_Source src, Blend_Destination dst);
 		void blendEquation(Blend_Equation equation);
+		void blendDisable();
 
 		// Depth Rule
 		void depthTest(Depth_Pass_Rule Rule);
+		void depthMask(bool state);
 
 		// Wireframe Data
 		void wireframe(bool state);

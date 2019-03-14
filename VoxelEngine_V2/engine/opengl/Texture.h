@@ -58,12 +58,6 @@ namespace Vxl
 		void Bind() const;
 		void Unbind() const;
 
-		static void ClearTrackingData()
-		{
-			m_activeSlot = Active_Texture::LEVEL0;
-			m_activeTextures.clear();
-		}
-
 		void setWrapMode(Wrap_Mode W);
 		void setFilterMode(Filter_Min Min, Filter_Mag Mag);
 		// only works if min filter is [clamp to border]
