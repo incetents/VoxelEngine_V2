@@ -93,11 +93,11 @@ namespace Vxl
 		{
 			return std::vector<Vector3>(m_OBB, m_OBB + 8);
 		}
-		Vector3				 GetLocalAABBMin(void) const
+		Vector3				 GetAABBMin(void) const
 		{
 			return m_AABB[0];
 		}
-		Vector3				 GetLocalAABBMax(void) const
+		Vector3				 GetAABBMax(void) const
 		{
 			return m_AABB[1];
 		}

@@ -27,7 +27,11 @@ namespace Vxl
 				ParentModel = m_ModelMatrix * m_parent->getModel();
 
 			// Update World position
-			m_world = Vector3(ParentModel[12], ParentModel[13], ParentModel[14]);
+			m_worldPosition = Vector3(ParentModel[12], ParentModel[13], ParentModel[14]);
+			// Update World Scale
+			m_lossyScale.x = Vector3::Length(ParentModel[0], ParentModel[1], ParentModel[2]);
+			m_lossyScale.y = Vector3::Length(ParentModel[4], ParentModel[5], ParentModel[6]);
+			m_lossyScale.z = Vector3::Length(ParentModel[8], ParentModel[9], ParentModel[10]);
 
 			// Update directions
 			m_forward = Vector3::Normalize(m_rotation * Vector3::FORWARD);

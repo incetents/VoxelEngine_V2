@@ -66,9 +66,11 @@ namespace Vxl
 		void depthTest(Depth_Pass_Rule Rule);
 		void depthMask(bool state);
 
-		// Wireframe Data
+		// Wireframe
 		void wireframe(bool state);
-		void wireframeWidth(float value);
+
+		// viewport
+		void viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h);
 
 		// BUFFERS //
 		// VAO

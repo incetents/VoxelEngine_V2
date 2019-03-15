@@ -15,8 +15,11 @@ namespace Vxl
 	Database<ShaderProgram> ShaderProgram::m_database;
 
 	// SHADER //
-	std::unordered_map<std::string, const Shader*> Shader::ShaderErrorLog; // name - [error, source]
+	std::unordered_map<std::string, const Shader*> Shader::ShaderErrorLog;
 	UINT Shader::ShaderErrorLogSize = 0;
+
+	std::set<const ShaderProgram*> ShaderProgram::ProgramsFailed;
+	UINT ShaderProgram::ProgramsFailedSize = 0;
 
 	bool Shader::compile(const std::string& source)
 	{
@@ -169,10 +172,12 @@ namespace Vxl
 		else
 		{
 			//The maxLength includes the NULL character
-			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
+			std::vector<GLchar> ErrorMessage(maxLength);
+			glGetProgramInfoLog(m_id, maxLength, &maxLength, &m_errorMessage[0]);
 
-			Logger.error(&infoLog[0]);
+			m_errorMessage = std::string(ErrorMessage.begin(), ErrorMessage.end());
+
+			Logger.error(&m_errorMessage[0]);
 		}
 		return true;
 	}
@@ -345,6 +350,11 @@ namespace Vxl
 
 			// set gl name
 			glUtil::setGLName(glNameType::PROGRAM, m_id, "Program_" + m_name);
+		}
+		else
+		{
+			ProgramsFailed.insert(this);
+			ProgramsFailedSize = (UINT)ProgramsFailed.size();
 		}
 	}
 

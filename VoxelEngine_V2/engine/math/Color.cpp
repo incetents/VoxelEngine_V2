@@ -138,6 +138,13 @@ namespace Vxl
 		b /= t;
 		return *this;
 	}
+	Color3F& Color3F::operator=(const Color3F& other)
+	{
+		r = other.r;
+		g = other.g;
+		b = other.b;
+		return *this;
+	}
 
 	float Color3F::operator[](const int index) const
 	{
@@ -297,6 +304,21 @@ namespace Vxl
 		g /= t;
 		b /= t;
 		a /= t;
+		return *this;
+	}
+	Color4F& Color4F::operator=(const Color3F& other)
+	{
+		r = other.r;
+		g = other.g;
+		b = other.b;
+		return *this;
+	}
+	Color4F& Color4F::operator=(const Color4F& other)
+	{
+		r = other.r;
+		g = other.g;
+		b = other.b;
+		a = other.a;
 		return *this;
 	}
 

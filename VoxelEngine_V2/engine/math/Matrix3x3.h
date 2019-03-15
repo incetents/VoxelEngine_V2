@@ -7,6 +7,7 @@
 namespace Vxl
 {
 	class Matrix2x2;
+	class Matrix4x4;
 	class Vector2;
 	class Vector3;
 	class Degrees;
@@ -16,6 +17,8 @@ namespace Vxl
 
 	class Matrix3x3
 	{
+		friend class Matrix2x2;
+		friend class Matrix4x4;
 	private:
 		// Data
 		float _Val[9];
@@ -30,6 +33,7 @@ namespace Vxl
 		// Constructors
 		Matrix3x3(void);
 		explicit Matrix3x3(const Matrix2x2& m);
+		explicit Matrix3x3(const Matrix4x4& m);
 		explicit Matrix3x3(const Vector3* Rows);
 		explicit Matrix3x3(const Vector3& Row1, const Vector3& Row2, const Vector3& Row3);
 		explicit Matrix3x3(const float Values[3][3]);
@@ -143,6 +147,7 @@ namespace Vxl
 		Matrix3x3& operator/=(const float);
 
 		// Operator Comparison Overloading
+		Matrix3x3& operator= (const Matrix4x4&);
 		Matrix3x3& operator= (const Matrix3x3&);
 		Matrix3x3& operator= (const Matrix2x2&);
 		bool operator== (const Matrix3x3&) const;

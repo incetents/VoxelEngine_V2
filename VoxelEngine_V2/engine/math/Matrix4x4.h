@@ -17,6 +17,8 @@ namespace Vxl
 
 	class Matrix4x4
 	{
+		friend class Matrix2x2;
+		friend class Matrix3x3;
 	public:
 
 		// Data

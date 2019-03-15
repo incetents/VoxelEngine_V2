@@ -18,7 +18,8 @@ namespace Vxl
 		
 	public:
 		// Behaviours
-		virtual void Update() = 0;
+		virtual void Update() = 0; // update per frame
+		virtual void UpdateFixed() = 0; // update at framerate
 		virtual void Draw() = 0;
 		virtual void DrawImGui() {}
 

@@ -173,18 +173,20 @@ namespace Vxl
 		bindFBO();
 		clearColor();
 
-		glViewport(0, 0, m_size[0], m_size[1]);
+		glUtil::viewport(0, 0, m_size[0], m_size[1]);
 	}
 	void FramebufferObject::bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH)
 	{
 		bindFBO();
 		clearColor();
 
-		glViewport(viewportX, viewportY, viewportW, viewportH);
+		glUtil::viewport(viewportX, viewportY, viewportW, viewportH);
 	}
 	void FramebufferObject::unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		m_boundID = 0;
 	}
 
 	void FramebufferObject::bindTexture(int index, Active_Texture layer)

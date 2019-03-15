@@ -49,15 +49,35 @@ namespace Vxl
 					float r[3] = { Entity->m_transform.getRotationEuler().x, Entity->m_transform.getRotationEuler().y, Entity->m_transform.getRotationEuler().z };
 					float s[3] = { Entity->m_transform.getScale().x, Entity->m_transform.getScale().y, Entity->m_transform.getScale().z };
 
+					float pw[3] = { Entity->m_transform.getWorldPosition().x, Entity->m_transform.getWorldPosition().y, Entity->m_transform.getWorldPosition().z };
+					//float rw[3] = { Entity->m_transform.getRotationEuler().x, Entity->m_transform.getRotationEuler().y, Entity->m_transform.getRotationEuler().z };
+					float sw[3] = { Entity->m_transform.getWorldScale().x, Entity->m_transform.getWorldScale().y, Entity->m_transform.getWorldScale().z };
+
+
+					ImGui::Text("LOCAL:");
 					ImGui::PushItemWidth(-1);
-					ImGui::Text("Position:"); ImGui::SameLine(); ImGui::DragFloat3("Position", p, DragSpeed);
-					ImGui::Text("Rotation:"); ImGui::SameLine(); ImGui::DragFloat3("Rotation", r, DragSpeed);
-					ImGui::Text("Scale:   "); ImGui::SameLine(); ImGui::DragFloat3("Scale", s, DragSpeed);
+
+					ImGui::Text("Position:"); ImGui::SameLine();
+					if(ImGui::DragFloat3("Position", p, DragSpeed))
+						Entity->m_transform.setPosition(p[0], p[1], p[2]);
+
+					ImGui::Text("Rotation:"); ImGui::SameLine();
+					if(ImGui::DragFloat3("Rotation", r, DragSpeed))
+						Entity->m_transform.setRotation(r[0], r[1], r[2]);
+
+					ImGui::Text("Scale:   "); ImGui::SameLine(); 
+					if(ImGui::DragFloat3("Scale", s, DragSpeed))
+						Entity->m_transform.setScale(s[0], s[1], s[2]);
+
+					ImGui::Separator();
+					ImGui::Text("WORLD (PEAK ONLY):");
+					ImGui::Text("WPosition:"); ImGui::SameLine(); ImGui::DragFloat3("PositionW", pw, DragSpeed);
+					//ImGui::Text("Rotation:"); ImGui::SameLine(); ImGui::DragFloat3("Rotation", r, DragSpeed);
+					ImGui::Text("WScale:   "); ImGui::SameLine(); ImGui::DragFloat3("ScaleW", sw, DragSpeed);
 					ImGui::PopItemWidth();
 
-					Entity->m_transform.setPosition(p[0], p[1], p[2]);
-					Entity->m_transform.setRotation(r[0], r[1], r[2]);
-					Entity->m_transform.setScale(s[0], s[1], s[2]);
+					
+					
 				}
 			}
 		}

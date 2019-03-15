@@ -181,9 +181,11 @@ namespace Vxl
 		// Length
 		float Length() const;
 		static float Length(const Vector3&);
+		static float Length(float x, float y, float z);
 		// Length Squared
 		float LengthSqr() const;
 		static float LengthSqr(const Vector3&);
+		static float LengthSqr(float x, float y, float z);
 
 		// Distance
 		float Distance(const Vector3&);

@@ -62,7 +62,7 @@ namespace Vxl
 		// Update Special Data
 		switch (m_type)
 		{
-		case Draw_Type::NO_DRAW:
+		case Draw_Type::NONE:
 			m_faces = 0;
 			m_lines = 0;
 			break;

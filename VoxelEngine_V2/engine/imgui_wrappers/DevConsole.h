@@ -44,48 +44,75 @@ namespace Vxl
 	public:
 
 		// custom data
-		bool	GetBool		(const std::string& str)
+		bool	GetBool		(const std::string& str, bool _default)
 		{
+			if (DevConsole::instanceRef.m_bools.find(str) == DevConsole::instanceRef.m_bools.end())
+				DevConsole::instanceRef.m_bools[str] = _default;
+
 			assert(DevConsole::instanceRef.m_bools.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_bools[str];
 		}
-		int		GetInt		(const std::string& str)
+		int		GetInt		(const std::string& str, int _default)
 		{
+			if (DevConsole::instanceRef.m_integers.find(str) == DevConsole::instanceRef.m_integers.end())
+				DevConsole::instanceRef.m_integers[str] = _default;
+
 			assert(DevConsole::instanceRef.m_integers.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_integers[str];
 		}
-		float	GetFloat	(const std::string& str)
+		float	GetFloat	(const std::string& str, float _default)
 		{
+			if (DevConsole::instanceRef.m_floats.find(str) == DevConsole::instanceRef.m_floats.end())
+				DevConsole::instanceRef.m_floats[str] = _default;
+
 			assert(DevConsole::instanceRef.m_floats.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_floats[str];
 		}
-		double	GetDouble	(const std::string& str)
+		double	GetDouble	(const std::string& str, double _default)
 		{
+			if (DevConsole::instanceRef.m_doubles.find(str) == DevConsole::instanceRef.m_doubles.end())
+				DevConsole::instanceRef.m_doubles[str] = _default;
+
 			assert(DevConsole::instanceRef.m_doubles.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_doubles[str];
 		}
-		Vector2 GetVec2		(const std::string& str)
+		Vector2 GetVec2		(const std::string& str, Vector2 _default)
 		{
+			if (DevConsole::instanceRef.m_vec2.find(str) == DevConsole::instanceRef.m_vec2.end())
+				DevConsole::instanceRef.m_vec2[str] = _default;
+
 			assert(DevConsole::instanceRef.m_vec2.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_vec2[str];
 		}
-		Vector3 GetVec3		(const std::string& str)
+		Vector3 GetVec3		(const std::string& str, Vector3 _default)
 		{
+			if (DevConsole::instanceRef.m_vec3.find(str) == DevConsole::instanceRef.m_vec3.end())
+				DevConsole::instanceRef.m_vec3[str] = _default;
+
 			assert(DevConsole::instanceRef.m_vec3.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_vec3[str];
 		}
-		Vector4 GetVec4		(const std::string& str)
+		Vector4 GetVec4		(const std::string& str, Vector4 _default)
 		{
+			if (DevConsole::instanceRef.m_vec4.find(str) == DevConsole::instanceRef.m_vec4.end())
+				DevConsole::instanceRef.m_vec4[str] = _default;
+
 			assert(DevConsole::instanceRef.m_vec4.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_vec4[str];
 		}
-		Color3F GetColor3	(const std::string& str)
+		Color3F GetColor3	(const std::string& str, Color3F _default)
 		{
+			if (DevConsole::instanceRef.m_color3.find(str) == DevConsole::instanceRef.m_color3.end())
+				DevConsole::instanceRef.m_color3[str] = _default;
+
 			assert(DevConsole::instanceRef.m_color3.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_color3[str];
 		}
-		Color4F GetColor4	(const std::string& str)
+		Color4F GetColor4	(const std::string& str, Color4F _default)
 		{
+			if (DevConsole::instanceRef.m_color4.find(str) == DevConsole::instanceRef.m_color4.end())
+				DevConsole::instanceRef.m_color4[str] = _default;
+
 			assert(DevConsole::instanceRef.m_color4.size() < DEV_CONSOLE_MAX_ITEM_SIZE); // in case something went wrong
 			return DevConsole::instanceRef.m_color4[str];
 		}

@@ -13,6 +13,8 @@ namespace Vxl
 	// glNameType
 	enum class glNameType
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		BUFFER = GL_BUFFER,
 		SHADER = GL_SHADER,
 		PROGRAM = GL_PROGRAM,
@@ -28,6 +30,8 @@ namespace Vxl
 	// Data Types
 	enum class DataType
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		BYTE = GL_BYTE,
 		UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
 		SHORT = GL_SHORT,
@@ -45,7 +49,8 @@ namespace Vxl
 	// Shader Types
 	enum class ShaderType
 	{
-		NONE = 0,
+		NONE = -1, // Error (Used for placeholder)
+
 		VERTEX = GL_VERTEX_SHADER,
 		FRAGMENT = GL_FRAGMENT_SHADER,
 		GEOMETRY = GL_GEOMETRY_SHADER,
@@ -57,6 +62,8 @@ namespace Vxl
 	// Uniform Types
 	enum class UniformType
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		BOOL = GL_BOOL,
 		INT = GL_INT,
 		UNSIGNED_INT = GL_UNSIGNED_INT,
@@ -73,7 +80,8 @@ namespace Vxl
 	// Buffer Bit Type
 	enum class Buffer_Bit_Type
 	{
-		NONE = 0,
+		NONE = -1, // Error (Used for placeholder)
+
 		COLOR = GL_COLOR_BUFFER_BIT,
 		DEPTH = GL_DEPTH_BUFFER_BIT,
 		STENCIL = GL_STENCIL_BUFFER_BIT,
@@ -82,13 +90,17 @@ namespace Vxl
 	// Cull Mode
 	enum class Cull_Type
 	{
-		NONE,
+		NONE = -1, // Error (Used for placeholder)
+
+		NO_CULL,
 		COUNTER_CLOCKWISE,
 		CLOCKWISE
 	};
 	// Blend type
 	enum class Blend_Source
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		ZERO = GL_ZERO,
 		ONE = GL_ONE,
 		DST_COLOR = GL_DST_COLOR,
@@ -98,6 +110,8 @@ namespace Vxl
 	};
 	enum class Blend_Destination
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		ZERO = GL_ZERO,
 		ONE = GL_ONE,
 		SRC_COLOR = GL_DST_COLOR,
@@ -107,6 +121,8 @@ namespace Vxl
 	};
 	enum class Blend_Equation
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		FUNC_ADD = GL_FUNC_ADD,
 		FUNC_SUBTRACT = GL_FUNC_SUBTRACT,
 		FUNC_REVERSE_SUBTRACT = GL_FUNC_REVERSE_SUBTRACT,
@@ -116,6 +132,8 @@ namespace Vxl
 	// Depth Mode (What depth value will overwrite the existing one) 0=you, 1=farthest point
 	enum class Depth_Pass_Rule
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		LESS = GL_LESS,
 		EQUAL = GL_EQUAL,
 		GREATER = GL_GREATER,
@@ -127,7 +145,8 @@ namespace Vxl
 	// Draw Type
 	enum class Draw_Type
 	{
-		NO_DRAW = -1,
+		NONE = -1, // Error (Used for placeholder)
+
 		POINTS = GL_POINTS,								// Geom / Frag	(points)
 		LINES = GL_LINES,								// Geom / Frag	(lines)
 		LINE_STRIP = GL_LINE_STRIP,						// Geom / Frag	(lines)
@@ -144,6 +163,8 @@ namespace Vxl
 	// Draw Mode
 	enum class Draw_Mode
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		ARRAY,
 		ARRAY_INSTANCED,
 		INDEXED,
@@ -152,6 +173,8 @@ namespace Vxl
 	// Buffer Bind Type
 	enum class BufferBind_Mode
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		STREAM = GL_STREAM_DRAW, // The data store contents will be modified once and used at most a few times.
 		STATIC = GL_STATIC_DRAW, // The data store contents will be modified once and used many times.
 		DYNAMIC = GL_DYNAMIC_DRAW // The data store contents will be modified repeatedly and used many times.
@@ -159,6 +182,8 @@ namespace Vxl
 	// Texture Data
 	enum class Texture_Type
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		TEX_1D = GL_TEXTURE_1D,
 		TEX_2D = GL_TEXTURE_2D,
 		TEX_3D = GL_TEXTURE_3D,
@@ -173,7 +198,7 @@ namespace Vxl
 	};
 	enum class Wrap_Mode
 	{
-		NONE = 0, // error
+		NONE = -1, // Error (Used for placeholder)
 
 		REPEAT = GL_REPEAT,
 		CLAMP_BORDER = GL_CLAMP_TO_BORDER,
@@ -183,7 +208,7 @@ namespace Vxl
 	};
 	enum class Filter_Min
 	{
-		NONE = 0, // error
+		NONE = -1, // Error (Used for placeholder)
 
 		NEAREST = GL_NEAREST,
 		LINEAR = GL_LINEAR,
@@ -194,34 +219,42 @@ namespace Vxl
 	};
 	enum class Filter_Mag
 	{
-		NONE = 0, // error
+		NONE = -1, // Error (Used for placeholder)
 
 		NEAREST = GL_NEAREST,
 		LINEAR = GL_LINEAR
 	};
 	enum class Format_Type
 	{
-		NONE = 0, // error
+		NONE = -1, // Error (Used for placeholder)
 
 		// 1 channel
 		R = GL_RED,
 		R8 = GL_R8,
+		R8_SNORM = GL_R8_SNORM,
 		R16 = GL_R16,
+		R16_SNORM = GL_R16_SNORM,
 		R16F = GL_R16F,
 		// 2 channels
 		RG = GL_RG,
 		RG8 = GL_RG8,
+		RG8_SNORM = GL_RG8_SNORM,
 		RG16 = GL_RG16,
+		RG16_SNORM = GL_RG16_SNORM,
 		RG16F = GL_RG16F,
 		// 3 channels
 		RGB = GL_RGB,
 		RGB8 = GL_RGB8,
+		RGB8_SNORM = GL_RGB8_SNORM,
 		RGB16 = GL_RGB16,
+		RGB16_SNORM = GL_RGB16_SNORM,
 		RGB16F = GL_RGB16F,
 		// 4 channels
 		RGBA = GL_RGBA,
 		RGBA8 = GL_RGBA8,
+		RGBA8_SNORM = GL_RGBA8_SNORM,
 		RGBA16 = GL_RGBA16,
+		RGBA16_SNORM = GL_RGBA16_SNORM,
 		RGBA16F = GL_RGBA16F,
 		R11F_G11F_B10F = GL_R11F_G11F_B10F,// GOOD FOR GBUFFER
 
@@ -237,7 +270,7 @@ namespace Vxl
 	};
 	enum class Channel_Type
 	{
-		NONE = 0, // error
+		NONE = -1, // Error (Used for placeholder)
 
 		R = GL_RED,		// 1 channel
 		RG = GL_RG,		// 2 channels
@@ -253,7 +286,7 @@ namespace Vxl
 	};
 	enum class Data_Type
 	{
-		NONE = 0, // error
+		NONE = -1, // Error (Used for placeholder)
 
 		UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
 		BYTE = GL_BYTE,
@@ -283,6 +316,8 @@ namespace Vxl
 	};
 	enum class Active_Texture
 	{
+		NONE = -1, // Error (Used for placeholder)
+
 		LEVEL0 = GL_TEXTURE0,
 		LEVEL1 = GL_TEXTURE1,
 		LEVEL2 = GL_TEXTURE2,

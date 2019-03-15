@@ -54,6 +54,8 @@ namespace Vxl
 		Color3F& operator*=(float t);
 		Color3F& operator/=(float t);
 
+		Color3F& operator=(const Color3F& other);
+
 		float operator[](const int) const;
 		float& operator[](const int);
 	};
@@ -114,6 +116,9 @@ namespace Vxl
 		Color4F& operator-=(float t);
 		Color4F& operator*=(float t);
 		Color4F& operator/=(float t);
+
+		Color4F& operator=(const Color3F& other);
+		Color4F& operator=(const Color4F& other);
 
 		float operator[](const int) const;
 		float& operator[](const int);

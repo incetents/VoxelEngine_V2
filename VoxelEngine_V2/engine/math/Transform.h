@@ -24,11 +24,12 @@ namespace Vxl
 		Matrix4x4	m_ModelMatrix;
 
 		// Raw Values
-		Vector3		m_world;	// World Position
+		Vector3		m_worldPosition;	// World Position
 		Vector3		m_position; // Local Position
-		Vector3		m_euler_rotation;
-		Quaternion	m_rotation;
-		Vector3		m_scale;
+		Vector3		m_euler_rotation; // Local Euler
+		Quaternion	m_rotation; // Local Rotation
+		Vector3		m_scale;		// Local Scale
+		Vector3		m_lossyScale;   // World Scale (Not supper accurate)
 
 		// Direction Space
 		Vector3		m_forward	= Vector3::FORWARD;
@@ -559,7 +560,7 @@ namespace Vxl
 		inline Vector3		getWorldPosition(void)
 		{
 			updateValues();
-			return m_world;
+			return m_worldPosition;
 		}
 		inline Vector3		getPosition(void) const
 		{
@@ -568,6 +569,11 @@ namespace Vxl
 		inline Vector3		getRotationEuler(void) const
 		{
 			return m_euler_rotation;
+		}
+		inline Vector3		getWorldScale(void)
+		{
+			updateValues();
+			return m_lossyScale;
 		}
 		inline Vector3		getScale(void) const
 		{

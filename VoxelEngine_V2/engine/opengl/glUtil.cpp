@@ -243,24 +243,30 @@ namespace Vxl
 		glClearStencil(f);
 	}
 
+	Cull_Type _cullmode = Cull_Type::NONE;
 	void glUtil::cullMode(Cull_Type cull)
 	{
-		switch (cull)
+		if (_cullmode != cull)
 		{
-		case Cull_Type::NONE:
-			glDisable(GL_CULL_FACE);
-			break;
+			switch (cull)
+			{
+			case Cull_Type::NO_CULL:
+				glDisable(GL_CULL_FACE);
+				break;
 
-		case Cull_Type::COUNTER_CLOCKWISE:
-			glEnable(GL_CULL_FACE);
-			glFrontFace(GL_CCW);
-			break;
+			case Cull_Type::COUNTER_CLOCKWISE:
+				glEnable(GL_CULL_FACE);
+				glFrontFace(GL_CCW);
+				break;
 
-		case Cull_Type::CLOCKWISE:
-			glEnable(GL_CULL_FACE);
-			glFrontFace(GL_CW);
-			break;
+			case Cull_Type::CLOCKWISE:
+				glEnable(GL_CULL_FACE);
+				glFrontFace(GL_CW);
+				break;
+			}
 		}
+
+		_cullmode = cull;
 	}
 
 	// Blend Mode (affects rgb of colors based on alpha/rgb of source and destination pixels in shaders)
@@ -268,40 +274,73 @@ namespace Vxl
 	{
 		glDisable(GL_BLEND);
 	}
-	void glUtil::blendMode(Blend_Source src = Blend_Source::SRC_ALPHA, Blend_Destination dst = Blend_Destination::ONE_MINUS_SRC_ALPHA)
+	Blend_Source _blendsrc = Blend_Source::NONE;
+	Blend_Destination _blenddest = Blend_Destination::NONE;
+	void glUtil::blendMode(Blend_Source src = Blend_Source::SRC_ALPHA, Blend_Destination dest = Blend_Destination::ONE_MINUS_SRC_ALPHA)
 	{
 		glEnable(GL_BLEND);
-		glBlendFunc((GLenum)src, (GLenum)dst);
+
+		if(_blendsrc != src || _blenddest != dest)
+			glBlendFunc((GLenum)src, (GLenum)dest);
+
+		_blendsrc = src;
+		_blenddest = dest;
 	}
+	Blend_Equation _blendequation = Blend_Equation::NONE;
 	void glUtil::blendEquation(Blend_Equation equation)
 	{
-		glBlendEquation((GLenum)equation);
+		if(_blendequation != equation)
+			glBlendEquation((GLenum)equation);
+
+		_blendequation = equation;
 	}
 
 	// Depth Test (What depth value will overwrite the existing one)
+	Depth_Pass_Rule _rule = Depth_Pass_Rule::NONE;
 	void glUtil::depthTest(Depth_Pass_Rule Rule = Depth_Pass_Rule::LESS_OR_EQUAL)
 	{
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc((GLenum)Rule);
+
+		if(_rule != Rule)
+			glDepthFunc((GLenum)Rule);
+
+		_rule = Rule;
 	}
+	bool _depthMask = true;
 	void glUtil::depthMask(bool state)
 	{
-		glDepthMask(state);
+		if(_depthMask != state)
+			glDepthMask(state);
+
+		_depthMask = state;
 	}
 
 	// Wireframe Mode
+	bool _wireframe = false;
 	void glUtil::wireframe(bool state)
 	{
-		if (state)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		if (_wireframe != state)
+		{
+			if (state)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		_wireframe = state;
 	}
 
-	// Wireframe Line Width
-	void glUtil::wireframeWidth(float value)
+	// viewport
+	GLsizei _viewport[4] = { -1, -1, -1, -1 };
+	void glUtil::viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h)
 	{
-		glLineWidth(value);
+		if(_viewport[0] != x || _viewport[1] != y || _viewport[2] != w || _viewport[3] != h)
+			glViewport(x, y, w, h);
+
+		_viewport[0] = x;
+		_viewport[1] = y;
+		_viewport[2] = w;
+		_viewport[3] = h;
 	}
 
 	// BUFFERS //
@@ -342,6 +381,7 @@ namespace Vxl
 		glEnableVertexAttribArray(bufferIndex);
 		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, GL_FALSE, m_strideSize, BUFFER_OFFSET(m_strideOffset));
 	}
+	// notice takes 4 attribute array slots (starting from given index)
 	void glUtil::setVertexAttribInstancing(GLuint bufferIndex)
 	{
 		glEnableVertexAttribArray(bufferIndex + 0);
@@ -455,14 +495,20 @@ namespace Vxl
 	// GET OPENGL INFO //
 	GLint glUtil::GetMaxUniformBufferBindings()
 	{
-		GLint MaxBindingPoints;
-		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &MaxBindingPoints);
+		static GLint MaxBindingPoints = -1;
+
+		if(MaxBindingPoints == -1)
+			glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &MaxBindingPoints);
+
 		return MaxBindingPoints;
 	}
 	GLint glUtil::GetMaxFBOColorAttachments()
 	{
-		GLint maxAttach = 0;
-		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxAttach);
+		static GLint maxAttach = -1;
+
+		if(maxAttach == -1)
+			glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxAttach);
+
 		return maxAttach;
 	}
 }

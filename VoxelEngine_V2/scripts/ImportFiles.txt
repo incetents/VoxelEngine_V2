@@ -18,6 +18,8 @@
 
 #FRAG colorPicker_frag 	./shaders/colorPicker.frag
 
+#FRAG showRenderTarget  ./shaders/showRenderTarget.frag
+
 //----------------------------------------
 #SHADERPROGRAM
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
@@ -28,6 +30,7 @@ passthrough 		passthrough_vert			passthrough_frag
 skybox				skybox_vert					skybox_frag
 lines 				lines_vert					lines_geom 				lines_frag
 colorPicker 		gbuffer_vert 				colorPicker_frag
+showRenderTarget 	passthrough_vert 			showRenderTarget
 
 //----------------------------------------
 #TEXTURE

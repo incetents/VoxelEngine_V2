@@ -166,6 +166,24 @@ namespace Vxl
 		);
 	}
 
+	// Haven't checked if formula copied has incorrect row/column major
+	Quaternion Quaternion::AngleAxis(const Matrix3x3& matrix)
+	{
+		float w = sqrtf(1 + matrix[0] + matrix[4] + matrix[8]) / 2;
+		float four_w = 4 * w;
+		return Quaternion(
+			(matrix[7] - matrix[5]) / four_w,
+			(matrix[2] - matrix[6]) / four_w,
+			(matrix[3] - matrix[1]) / four_w,
+			w
+		);
+	}
+	Quaternion Quaternion::AngleAxis(const Matrix4x4& matrix)
+	{
+		Matrix3x3 m(matrix);
+		return AngleAxis(m);
+	}
+
 	// Inverse
 	Quaternion& Quaternion::InverseSelf()
 	{

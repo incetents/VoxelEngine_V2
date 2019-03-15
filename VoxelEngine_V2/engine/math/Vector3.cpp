@@ -478,6 +478,10 @@ namespace Vxl
 	{
 		return Magnitude(v);
 	}
+	float Vector3::Length(float x, float y, float z)
+	{
+		return Magnitude(Vector3(x, y, z));
+	}
 	// Length Squared
 	float Vector3::LengthSqr() const
 	{
@@ -486,6 +490,10 @@ namespace Vxl
 	float Vector3::LengthSqr(const Vector3& v)
 	{
 		return v.LengthSqr();
+	}
+	float Vector3::LengthSqr(float x, float y, float z)
+	{
+		return Vector3(x, y, z).Dot();
 	}
 
 	// Distance

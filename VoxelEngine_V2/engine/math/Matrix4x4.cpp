@@ -908,20 +908,23 @@ namespace Vxl
 	}
 	Matrix4x4& Matrix4x4::operator= (const Matrix3x3& m)
 	{
-		for (int i = 0; i < Matrix3x3_Size; i++)
-		{
-			_Val[i] = m[i];
-		}
-
+		_Val[0] = m[0];
+		_Val[1] = m[1];
+		_Val[2] = m[2];
+		_Val[4] = m[3];
+		_Val[5] = m[4];
+		_Val[6] = m[5];
+		_Val[8] = m[6];
+		_Val[9] = m[7];
+		_Val[10] = m[8];
 		return *this;
 	}
 	Matrix4x4& Matrix4x4::operator= (const Matrix2x2& m)
 	{
-		for (int i = 0; i < Matrix2x2_Size; i++)
-		{
-			_Val[i] = m[i];
-		}
-
+		_Val[0] = m._Val[0];
+		_Val[1] = m._Val[1];
+		_Val[3] = m._Val[2];
+		_Val[4] = m._Val[3];
 		return *this;
 	}
 	bool Matrix4x4::operator== (const Matrix4x4& m) const

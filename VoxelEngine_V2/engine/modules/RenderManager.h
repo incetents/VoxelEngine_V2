@@ -58,6 +58,7 @@ namespace Vxl
 		void ReloadScene();
 		void Destroy();
 		void Update();
+		void UpdateFixed();
 		void Draw();
 		void DrawImGui();
 

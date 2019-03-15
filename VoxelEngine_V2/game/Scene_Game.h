@@ -32,6 +32,7 @@ namespace Vxl
 		ShaderProgram* _shader_lines;
 		// Non-material Shader
 		ShaderProgram* _shader_colorPicker;
+		ShaderProgram* _shader_showRenderTarget;
 
 		Texture* _tex;
 		Texture* _tex_crate;
@@ -75,6 +76,7 @@ namespace Vxl
 		void Destroy() override;
 
 		void Update() override;
+		void UpdateFixed() override;
 		void Draw() override;
 		void DrawImGui() override;
 	};

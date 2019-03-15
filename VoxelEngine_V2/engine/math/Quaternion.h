@@ -49,6 +49,10 @@ namespace Vxl
 		static Quaternion AngleAxis(const Degrees& rotation, const Vector3& axis, RotationDirection = RotationDirection(0));
 		static Quaternion AngleAxis(const Radians& rotation, const Vector3& axis, RotationDirection = RotationDirection(0));
 
+		// Create Angle Axis from Matrix
+		static Quaternion AngleAxis(const Matrix3x3& matrix);
+		static Quaternion AngleAxis(const Matrix4x4& matrix);
+
 		// Inverse
 		Quaternion& InverseSelf();
 		Quaternion  Inverse() const;

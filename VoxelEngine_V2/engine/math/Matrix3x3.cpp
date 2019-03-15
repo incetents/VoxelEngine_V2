@@ -2,6 +2,7 @@
 #include "Precompiled.h"
 #include "Matrix2x2.h"
 #include "Matrix3x3.h"
+#include "Matrix4x4.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "MathCore.h"
@@ -23,6 +24,10 @@ namespace Vxl
 	Matrix3x3::Matrix3x3(const Matrix2x2& m)
 	{
 		*this = Matrix2x2(m);
+	}
+	Matrix3x3::Matrix3x3(const Matrix4x4& m)
+	{
+		*this = Matrix4x4(m);
 	}
 	Matrix3x3::Matrix3x3(const Vector3* Rows)
 	{
@@ -618,6 +623,19 @@ namespace Vxl
 	}
 
 	// Operator Comparison Overloading
+	Matrix3x3& Matrix3x3::operator= (const Matrix4x4& m)
+	{
+		_Val[0] = m._Val[0];
+		_Val[1] = m._Val[1];
+		_Val[2] = m._Val[2];
+		_Val[3] = m._Val[4];
+		_Val[4] = m._Val[5];
+		_Val[5] = m._Val[6];
+		_Val[6] = m._Val[8];
+		_Val[7] = m._Val[9];
+		_Val[8] = m._Val[10];
+		return *this;
+	}
 	Matrix3x3& Matrix3x3::operator= (const Matrix3x3& m)
 	{
 		for (int i = 0; i < Matrix3x3_Size; i++)
@@ -628,10 +646,10 @@ namespace Vxl
 	}
 	Matrix3x3& Matrix3x3::operator= (const Matrix2x2& m)
 	{
-		for (int i = 0; i < Matrix2x2_Size; i++)
-		{
-			_Val[i] = m[i];
-		}
+		_Val[0] = m._Val[0];
+		_Val[1] = m._Val[1];
+		_Val[3] = m._Val[2];
+		_Val[4] = m._Val[3];
 		return *this;
 	}
 	bool Matrix3x3::operator== (const Matrix3x3& m) const

@@ -51,6 +51,12 @@ namespace Vxl
 			float Width = 1.0f,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
+		void DrawOBB(
+			const Entity& entity,
+			const Vector3& OffsetAll,
+			float Width,
+			const Color4F& C = Color4F(1, 1, 1, 1)
+		);
 		void UpdateStart();
 		void RenderLines();
 		// Debug Textures

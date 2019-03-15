@@ -5,6 +5,7 @@
 #include "../opengl/Texture.h"
 #include "../math/Color.h"
 #include "../utilities/Loader.h"
+#include "../modules/Entity.h"
 
 namespace Vxl
 {
@@ -66,6 +67,32 @@ namespace Vxl
 		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Max.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), Width, C, C);
 		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
 		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Max.z), Width, C, C);
+	}
+	void Debug::DrawOBB(
+		const Entity& entity,
+		const Vector3& OffsetAll,
+		float Width,
+		const Color4F& C
+	)
+	{
+		auto OBB = entity.GetOBB();
+		// Bot
+		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[1], Width, C, C);
+		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[5], Width, C, C);
+		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[4], Width, C, C);
+		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[0], Width, C, C);
+
+		// Top
+		DrawLine(OffsetAll + OBB[2], OffsetAll + OBB[3], Width, C, C);
+		DrawLine(OffsetAll + OBB[3], OffsetAll + OBB[7], Width, C, C);
+		DrawLine(OffsetAll + OBB[7], OffsetAll + OBB[6], Width, C, C);
+		DrawLine(OffsetAll + OBB[6], OffsetAll + OBB[2], Width, C, C);
+
+		// Mid
+		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[2], Width, C, C);
+		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[3], Width, C, C);
+		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[6], Width, C, C);
+		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[7], Width, C, C);
 	}
 
 	void Debug::UpdateStart()

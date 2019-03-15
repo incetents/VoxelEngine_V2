@@ -40,7 +40,7 @@ namespace Vxl
 
 		// Locked Constructor
 		Shader(const std::string& name, const std::string& filePath, ShaderType type)
-			: m_name(name), m_filePath(filePath), m_type(type)
+			: m_name(name + '[' + glUtil::shaderTypeToString(type) + ']'), m_filePath(filePath), m_type(type)
 		{
 			m_hasLoaded = load();
 		}
@@ -121,6 +121,8 @@ namespace Vxl
 		GLint				m_uniformBlockCount = 0;
 		SubroutineStorage   m_subroutines;
 		GLint				m_subroutineCount = 0;
+		// Error //
+		std::string			m_errorMessage;
 		// Tracker //
 		static GLuint		m_boundID;
 
@@ -157,6 +159,9 @@ namespace Vxl
 		{
 			unload();
 		}
+
+		static std::set<const ShaderProgram*> ProgramsFailed;
+		static UINT ProgramsFailedSize;
 
 		void reload()
 		{
@@ -251,6 +256,14 @@ namespace Vxl
 		inline GLuint	GetID(void) const
 		{
 			return m_id;
+		}
+		inline const std::string& GetName(void) const
+		{
+			return m_name;
+		}
+		inline std::string GetErrorMessage(void) const
+		{
+			return m_errorMessage;
 		}
 
 		// Remove default

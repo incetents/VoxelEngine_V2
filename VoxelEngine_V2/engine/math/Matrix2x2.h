@@ -14,6 +14,8 @@ namespace Vxl
 
 	class Matrix2x2
 	{
+		friend class Matrix3x3;
+		friend class Matrix4x4;
 	private:
 		// Data in Row Format
 		float _Val[4];

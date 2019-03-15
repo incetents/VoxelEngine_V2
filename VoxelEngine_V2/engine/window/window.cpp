@@ -208,9 +208,9 @@ namespace Vxl
 	{
 		// Locked Aspect Ratio (Black bars on edges)
 		if (m_useCustomAspectRatio)
-			glViewport(m_viewportOffset[0], m_viewportOffset[1], m_viewportSize[0], m_viewportSize[1]);
+			glUtil::viewport(m_viewportOffset[0], m_viewportOffset[1], m_viewportSize[0], m_viewportSize[1]);
 		else
-			glViewport(0, 0, m_size[0], m_size[1]);
+			glUtil::viewport(0, 0, m_size[0], m_size[1]);
 	}
 
 	void Window::Update()

@@ -75,6 +75,8 @@ namespace Vxl
 	{
 		Shader::ShaderErrorLog.clear();
 		Shader::ShaderErrorLogSize = 0;
+		ShaderProgram::ProgramsFailed.clear();
+		ShaderProgram::ProgramsFailedSize = 0;
 
 		auto Shaders = Shader::m_database.Get();
 		for (auto Shader : Shaders)
@@ -129,6 +131,8 @@ namespace Vxl
 		// Clear Shader Error Log
 		Shader::ShaderErrorLog.clear();
 		Shader::ShaderErrorLogSize = 0;
+		ShaderProgram::ProgramsFailed.clear();
+		ShaderProgram::ProgramsFailedSize = 0;
 		// Delete Shaders
 		Shader::m_database.DeleteAndClear();
 		ShaderProgram::m_database.DeleteAndClear();
@@ -144,6 +148,10 @@ namespace Vxl
 	void RenderManager::Update()
 	{
 		m_currentScene->Update();
+	}
+	void RenderManager::UpdateFixed()
+	{
+		m_currentScene->UpdateFixed();
 	}
 	void RenderManager::Draw()
 	{

@@ -62,7 +62,7 @@ namespace Vxl
 		// FBO
 		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0.1f, 0.1f, 0.3f, 0.0f));
 		_fbo->addTexture("albedo");
-		_fbo->addTexture("normal");
+		_fbo->addTexture("normal", Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
 		_fbo->addTexture("test");
 		_fbo->addDepth();
 
@@ -76,6 +76,7 @@ namespace Vxl
 		_shader_lines				= ShaderProgram::Get("lines");
 		_shader_passthrough			= ShaderProgram::Get("passthrough");
 		_shader_colorPicker			= ShaderProgram::Get("colorPicker");
+		_shader_showRenderTarget	= ShaderProgram::Get("showRenderTarget");
 
 		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
@@ -323,17 +324,21 @@ namespace Vxl
 			static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
 
 			// Draw Outline around Entity
-			if(Entity->GetMesh()->m_instances.Empty())
-				Debug.DrawAABB(Entity->GetLocalAABBMin() - Epsilon, Entity->GetLocalAABBMax() + Epsilon, Entity->m_transform.getWorldPosition(), 5.0f, Color4F::YELLOW);
+			if (Entity->GetMesh()->m_instances.Empty())
+			{
+				Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, Color4F::YELLOW);
+				Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, Color4F::GREEN);
+			}
 			// Draw outline around all instances
 			else
 			{
-				Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
+				//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
 				auto Instances = Entity->GetMesh()->m_instances.GetVertices();
-				for (auto instanceMatrix : *Instances)
+				for (Matrix4x4 instanceMatrix : *Instances)
 				{
-					Vector4 Pos = instanceMatrix.Transpose() * WPosition;
-					Debug.DrawAABB(Entity->GetLocalAABBMin() - Epsilon, Entity->GetLocalAABBMax() + Epsilon, Vector3(Pos), 5.0f, Color4F::YELLOW);
+					Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
+					Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, Color4F::YELLOW);
+					Debug.DrawOBB(*Entity, Pos, 5.0f, Color4F::GREEN);
 				}
 			}
 		}
@@ -384,15 +389,19 @@ namespace Vxl
 		// Imgui Specials
 		if(_material_gbuffer)
 		{
-			_material_gbuffer->m_Wireframe = DevConsole.GetBool("Gbuffer Wireframe");
+			_material_gbuffer->m_Wireframe = DevConsole.GetBool("Gbuffer Wireframe", false);
 		}
 	}
 
+	void Scene_Game::UpdateFixed()
+	{
+
+	}
 	void Scene_Game::Draw()
 	{
 		Camera::GetMain()->BindUBO();
 		//
-		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE"));
+		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE", 0));
 		//
 
 		_fbo->bind();
@@ -462,7 +471,9 @@ namespace Vxl
 		));
 
 		//glLineWidth(9.0f);
+		glDepthMask(false);
 		Debug.RenderLines();
+		glDepthMask(true);
 		//glLineWidth(1.0f);
 		// ~~ //
 
@@ -504,77 +515,79 @@ namespace Vxl
 		//	Geometry::GetCube()->Draw();
 
 		// ~~ //
-		//glClearColor(0, 0, 0, 0);
-		_fbo_colorpicker->bind();
-
-		_shader_colorPicker->Bind();
-		glUtil::blendDisable();
-
-		auto Entities = RenderManager.GetAllEntities();
-		unsigned int EntityCount = (unsigned int)Entities.size();
-		union FloatChar
+		if (DevConsole.GetBool("Objects are Clickable", false))
 		{
-			unsigned int ui_ID = 0;
-			unsigned char f_ID[4];
-		};
-		FloatChar mem;
-		for (unsigned int i = 0; i < EntityCount; i++)
-		{
-			auto Entity = Entities[i];
-		
-			// Ignore if not active
-			if (!Entity->IsFamilyActive())
-				continue;
+			_fbo_colorpicker->bind();
+			glUtil::blendDisable();
 
-			_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
-			_shader_colorPicker->SetUniform("VXL_useInstancing", !Entity->GetMesh()->m_instances.Empty());
-			_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
-		
-			// Convert ID into color
-			mem.ui_ID = i + 1; // offset (0 = nothing instead of first value)
-			float x = (float)mem.f_ID[0] / 255.0f;
-			float y = (float)mem.f_ID[1] / 255.0f;
-			float z = (float)mem.f_ID[2] / 255.0f;
-			float w = (float)mem.f_ID[3] / 255.0f;
-		
-			_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, w));
-			Entity->Draw();
+			_shader_colorPicker->Bind();
+
+			auto Entities = RenderManager.GetAllEntities();
+			unsigned int EntityCount = (unsigned int)Entities.size();
+			union FloatChar
+			{
+				unsigned int ui_ID = 0;
+				unsigned char f_ID[4];
+			};
+			FloatChar mem;
+			for (unsigned int i = 0; i < EntityCount; i++)
+			{
+				auto Entity = Entities[i];
+
+				// Ignore if not active
+				if (!Entity->IsFamilyActive())
+					continue;
+
+				_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
+				_shader_colorPicker->SetUniform("VXL_useInstancing", !Entity->GetMesh()->m_instances.Empty());
+				_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
+
+				// Convert ID into color
+				mem.ui_ID = i + 1; // offset (0 = nothing instead of first value)
+				float x = (float)mem.f_ID[0] / 255.0f;
+				float y = (float)mem.f_ID[1] / 255.0f;
+				float z = (float)mem.f_ID[2] / 255.0f;
+				float w = (float)mem.f_ID[3] / 255.0f;
+
+				_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, w));
+				Entity->Draw();
+			}
+
+			GLubyte *data = new GLubyte[4];
+			glReadPixels(
+				(GLint)Input.getMouseX(),
+				Window.GetResolutionHeight() - (GLint)Input.getMouseY(),
+				1,
+				1,
+				(GLenum)Format_Type::RGBA,
+				(GLenum)Data_Type::UNSIGNED_BYTE,
+				data
+			);
+			//	std::cout <<
+			//		(unsigned int)data[0] << ' ' <<
+			//		(unsigned int)data[1] << ' ' <<
+			//		(unsigned int)data[2] << ' ' <<
+			//		(unsigned int)data[3] << ' ' <<
+			//		std::endl;
+
+			mem.f_ID[0] = data[0];
+			mem.f_ID[1] = data[1];
+			mem.f_ID[2] = data[2];
+			mem.ui_ID--;//offset (0 = nothing instead of first value)
+
+			if (Input.getMouseButton(MouseButton::LEFT) && !ImGui::GetIO().WantCaptureMouse)
+			{
+				if (mem.ui_ID < EntityCount)
+					Hierarchy._selectedEntity = Entities[mem.ui_ID];
+				else
+					Hierarchy._selectedEntity = nullptr;
+			}
+
+			//if ()
+			//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
+
+			delete data;
 		}
-
-		GLubyte *data = new GLubyte[4];
-		glReadPixels(
-			(GLint)Input.getMouseX(),
-			Window.GetResolutionHeight() - (GLint)Input.getMouseY(),
-			1,
-			1,
-			(GLenum)Format_Type::RGBA,
-			(GLenum)Data_Type::UNSIGNED_BYTE,
-			data
-		);
-		//	std::cout <<
-		//		(unsigned int)data[0] << ' ' <<
-		//		(unsigned int)data[1] << ' ' <<
-		//		(unsigned int)data[2] << ' ' <<
-		//		(unsigned int)data[3] << ' ' <<
-		//		std::endl;
-
-		mem.f_ID[0] = data[0];
-		mem.f_ID[1] = data[1];
-		mem.f_ID[2] = data[2];
-		mem.ui_ID--;//offset (0 = nothing instead of first value)
-
-		if (Input.getMouseButton(MouseButton::LEFT) && !ImGui::GetIO().WantCaptureMouse)
-		{
-			if(mem.ui_ID < EntityCount)
-				Hierarchy._selectedEntity = Entities[mem.ui_ID];
-			else
-				Hierarchy._selectedEntity = nullptr;
-		}
-
-		//if ()
-		//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
-
-		delete data;
 		// ~~ //
 
 		// Backbuffer
@@ -585,7 +598,7 @@ namespace Vxl
 		glUtil::wireframe(false);
 
 		// ~~~~~~~~~~~~~~~~~ //
-		glUtil::clearColor(Color3F(0, 0, 0));
+		glUtil::clearColor(Color4F(0, 0, 0, 0));
 		glUtil::clearBuffer();
 
 		// Final Pass / Back Buffer
@@ -595,17 +608,24 @@ namespace Vxl
 		_fbo->bindTexture(0, Active_Texture::LEVEL0);
 		Geometry.GetFullQuad()->Draw();
 		
+		_shader_showRenderTarget->Bind();
 		// Normals test
-		if (DevConsole.GetBool("Show Normals"))
+		if (DevConsole.GetBool("Show Normals", false))
 		{
-			glViewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
+			_shader_showRenderTarget->SetUniform("outputMode", 1);
+			
+			glUtil::viewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
 			_fbo->bindTexture(1, Active_Texture::LEVEL0);
 			Geometry.GetFullQuad()->Draw();
 		}
 		// Depth test
-		if (DevConsole.GetBool("Show Depth"))
+		if (DevConsole.GetBool("Show Depth", false))
 		{
-			glViewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
+			_shader_showRenderTarget->SetUniform("outputMode", 2);
+			_shader_showRenderTarget->SetUniform("zNear", Camera::GetMain()->getZnear());
+			_shader_showRenderTarget->SetUniform("zFar", Camera::GetMain()->getZfar());
+
+			glUtil::viewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
 			_fbo->bindDepth(Active_Texture::LEVEL0);
 			Geometry.GetFullQuad()->Draw();
 		}
