@@ -17,6 +17,7 @@ namespace Vxl
 	private:
 		bool m_isSetup = false;
 		Mesh* m_fullQuad = nullptr;
+		Mesh* m_fullTriangle = nullptr;
 		Mesh* m_quad = nullptr;
 		Mesh* m_cube = nullptr;
 		Mesh* m_inverseCube = nullptr;
@@ -28,6 +29,7 @@ namespace Vxl
 		Mesh* m_sphereUV_64 = nullptr;
 
 		void CreateFullQuad();
+		void CreateFullTriangle();
 		void CreateQuad();
 		void CreateCube();
 		void CreateInverseCube();
@@ -45,6 +47,7 @@ namespace Vxl
 				return;
 
 			CreateFullQuad();
+			CreateFullTriangle();
 			CreateQuad();
 			CreateCube();
 			CreateInverseCube();
@@ -69,6 +72,10 @@ namespace Vxl
 		Mesh* GetFullQuad()
 		{
 			return m_fullQuad;
+		}
+		Mesh* GetFullTriangle()
+		{
+			return m_fullTriangle;
 		}
 		Mesh* GetQuad()
 		{

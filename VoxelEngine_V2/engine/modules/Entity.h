@@ -4,62 +4,66 @@
 #include "Component.h"
 #include "../math/Transform.h"
 #include "../math/Color.h"
-#include "../modules/Material.h"
 #include "../utilities/Database.h"
+
+#define MAX_ENTITY_NAME_LENGTH 256
 
 namespace Vxl
 {
 	class Mesh;
 	class Material;
-	class Material;
 	class ShaderProgram;
+
+	enum class EntityType
+	{
+		GAMEOBJECT,
+		LIGHT
+	};
 
 	class Entity : public ComponentHandler
 	{
 		friend class RenderManager;
 		friend class Transform;
-	private:
+		friend class GameObject;
+	protected:
 		// Locked Constructor
-		Entity(const std::string& displayName);
+		Entity(const std::string& name, EntityType type);
 		// Database
 		static DatabaseSet<Entity> m_database;
 
-		// Mesh
-		Mesh* m_mesh = nullptr;
-
-		// Colors
-		Color3F m_Color = Color3F(1, 1, 1);
-		Color3F m_Tint	= Color3F(1, 1, 1);
-
-		// Bounding Box Data
-		Vector3 m_OBB[8]; // Object Bounding Box from mesh
-		Vector3 m_AABB[2]; // AABB based on OBB
-
-		void TransformChanged();
+		// Data
+		Mesh*		m_mesh = nullptr;
+		EntityType  m_type;
+		std::string	m_name;
+		Color3F		m_Color = Color3F(1, 1, 1);
+		Color3F		m_Tint	= Color3F(1, 1, 1);
+		Vector3		m_OBB[8]; // Object Bounding Box from mesh
+		Vector3		m_AABB[2]; // AABB based on OBB
 
 	public:
-		virtual ~Entity();
-
-		// Database Creation
-		static Entity* Create(const std::string& displayName = "");
+		// Destructor
+		virtual ~Entity() {}
 		
 		// Data
-		std::string			m_name;
 		Transform			m_transform;
 		bool				m_useTransform = true;
-		MaterialData		m_material;
 		bool				m_isActive = true;
 		bool				m_isColoredObject = false;
+		bool				m_isClickable = true;
 
-		// Utility
-		inline void			SetName(const std::string _name)
+		// Type
+		EntityType GetType(void) const
 		{
-			m_name = _name;
+			return m_type;
 		}
+		
+		// Name
+		void SetName(const std::string _name);
 		inline std::string	GetName(void) const
 		{
 			return m_name;
 		}
+		
 		// check if all parents are active
 		bool IsFamilyActive()
 		{
@@ -85,10 +89,7 @@ namespace Vxl
 			return true;
 		}
 
-		void			SetMaterial(Material* _base);
-		Material*		GetMaterial(void) const;
-		UINT			GetMaterialOrder(void) const;
-
+		// Bounding Box
 		std::vector<Vector3> GetOBB(void) const
 		{
 			return std::vector<Vector3>(m_OBB, m_OBB + 8);
@@ -100,18 +101,6 @@ namespace Vxl
 		Vector3				 GetAABBMax(void) const
 		{
 			return m_AABB[1];
-		}
-
-		// Mesh
-		inline void SetMesh(Mesh* _mesh)
-		{
-			m_mesh = _mesh;
-			// call callbacks since transform might change
-			TransformChanged();
-		}
-		inline Mesh* GetMesh(void) const
-		{
-			return m_mesh;
 		}
 
 		// Color
@@ -134,10 +123,17 @@ namespace Vxl
 			return m_Tint;
 		}
 
-		// Behaviour
-		virtual void Update();
-		virtual void Draw();
+		// Mesh
+		inline Mesh* GetMesh(void) const
+		{
+			return m_mesh;
+		}
 
+		// Behaviour
+		virtual void Update() = 0;
+		virtual void Draw() = 0;
+	protected:
+		virtual void TransformChanged() = 0;
 	};
 }
 

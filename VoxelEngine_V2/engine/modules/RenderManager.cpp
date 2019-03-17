@@ -2,7 +2,8 @@
 #include "Precompiled.h"
 #include "RenderManager.h"
 
-#include "Entity.h"
+#include "GameObject.h"
+#include "Light.h"
 #include "Scene.h"
 #include "Layer.h"
 #include "Material.h"
@@ -12,6 +13,9 @@
 #include "../window/window.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Geometry.h"
+#include "../opengl/Mesh.h"
+#include "../opengl/FramebufferObject.h"
+#include "../imgui_wrappers/Hierarchy.h"
 
 #include <algorithm>
 
@@ -43,7 +47,7 @@ namespace Vxl
 		return m_layers[index];
 	}
 
-	void RenderManager::AddEntity(Entity* _entity)
+	void RenderManager::AddEntity(GameObject* _entity)
 	{
 		// Makes sure entity has a material/shader
 		assert(_entity && _entity->GetMaterial());
@@ -62,7 +66,7 @@ namespace Vxl
 		m_entities[Key].insert(_entity);
 		m_allEntities.push_back(_entity);
 	}
-	void RenderManager::RemoveEntity(Entity* _entity)
+	void RenderManager::RemoveEntity(GameObject* _entity)
 	{
 		// Makes sure entity has a material/shader
 		assert(_entity && _entity->GetMaterial());
@@ -94,10 +98,18 @@ namespace Vxl
 		// Entity Materials are part of Shaders
 		auto Entities = Entity::m_database.Get();
 		for (auto Entity : Entities)
-			Entity->m_material.UpdateMaterialPackages();
+		{
+			if (Entity->GetType() == EntityType::GAMEOBJECT)
+			{
+				GameObject* G_Object = dynamic_cast<GameObject*>(Entity);
+				G_Object->m_material.UpdateMaterialPackages();
+			}
+		}
 	}
 	void RenderManager::ReloadWindow()
 	{
+		glUtil::initHints(); // important for reset reasons
+
 		Window.Reload();
 		Geometry.Reload();
 
@@ -141,13 +153,23 @@ namespace Vxl
 		Texture::m_database.DeleteAndClear();
 		Cubemap::m_database.DeleteAndClear();
 
+		// Delete Framebuffers
+		FramebufferObject::m_database.DeleteAndClear();
+
 		// Clear Render List
 		m_entities.clear();
+
+		// Remove selected entity
+		Hierarchy._selectedEntity = nullptr;
 
 	}
 	void RenderManager::Update()
 	{
 		m_currentScene->Update();
+
+		// Update all entities
+		for (auto it = m_allEntities.begin(); it != m_allEntities.end(); it++)
+			(*it)->Update();
 	}
 	void RenderManager::UpdateFixed()
 	{
@@ -164,6 +186,14 @@ namespace Vxl
 		m_currentScene->DrawImGui();
 
 		ImGui::Render();
+	}
+
+	void RenderManager::RenderFullScreen()
+	{
+		if(m_FSQMode)
+			Geometry.GetFullQuad()->Draw();
+		else
+			Geometry.GetFullTriangle()->Draw();
 	}
 
 	void RenderManager::RenderScene_ByMaterial()

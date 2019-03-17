@@ -1,9 +1,10 @@
-// Copyright(c) 2018 Emmanuel Lajeunesse
+// Copyright(c) 2019 Emmanuel Lajeunesse
 #pragma once
 
 #include "../utilities/singleton.h"
 
 #include <Windows.h>
+#include "../imgui/imgui.h"
 
 namespace Vxl
 {
@@ -145,26 +146,28 @@ namespace Vxl
 	{
 		friend class InputMutator;
 	protected:
-	public:
-
 		// Keyboard Data
 		bool	m_Key_Previous[TotalKeys];
 		bool	m_Key_Current[TotalKeys];
 		// Mouse Data
-		int		m_MousePos[2];
-		bool	m_MouseButtons[8];
-		double  m_MouseScroll[2];
+		int		m_MousePrevPos[2] = { 0 };
+		int		m_MousePos[2] = { 0 };
+		int		m_MouseDeltaPos[2] = { 0 };
+		bool	m_MouseButtons[8] = { false };
+		double  m_MouseScroll[2] = { 0.0 };
 
 	public:
 		// Keyboard Data
-		inline bool   getKey(KeyCode K)		const { return  m_Key_Current[(int)K]; }
-		inline bool   getKeyDown(KeyCode K) const { return  m_Key_Current[(int)K] && !m_Key_Previous[(int)K]; }
-		inline bool   getKeyUp(KeyCode K)	const { return !m_Key_Current[(int)K] && m_Key_Previous[(int)K]; }
+		inline bool   getKey(KeyCode K)		const { return  m_Key_Current[(int)K] && !ImGui::GetIO().WantCaptureKeyboard; }
+		inline bool   getKeyDown(KeyCode K) const { return  m_Key_Current[(int)K] && !m_Key_Previous[(int)K] && !ImGui::GetIO().WantCaptureKeyboard; }
+		inline bool   getKeyUp(KeyCode K)	const { return !m_Key_Current[(int)K] && m_Key_Previous[(int)K] && !ImGui::GetIO().WantCaptureKeyboard; }
 		// Mouse Data
 		inline int	  getMouseX() const { return m_MousePos[0]; }
 		inline int	  getMouseY() const { return m_MousePos[1]; }
-		void		  getMouse(float& x, float& y)  const { x = static_cast<float>(m_MousePos[0]); y = static_cast<float>(m_MousePos[1]); }
-		bool		  getMouseButton(MouseButton M) const { return m_MouseButtons[static_cast<int>(M)]; }
+		inline int	  getMouseDeltaX() const { return m_MouseDeltaPos[0]; }
+		inline int	  getMouseDeltaY() const { return m_MouseDeltaPos[1]; }
+		void		  getMousePos(float& x, float& y)  const { x = static_cast<float>(m_MousePos[0]); y = static_cast<float>(m_MousePos[1]); }
+		bool		  getMouseButton(MouseButton M) const { return m_MouseButtons[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse; }
 		inline double getHorizontalScroll()			const { return m_MouseScroll[0]; }
 		inline double getVerticalScroll()			const { return m_MouseScroll[1]; }
 
@@ -172,6 +175,12 @@ namespace Vxl
 		void Update()
 		{
 			memcpy(m_Key_Previous, m_Key_Current, sizeof(bool) * TotalKeys);
+
+			m_MouseDeltaPos[0] = m_MousePos[0] - m_MousePrevPos[0];
+			m_MouseDeltaPos[1] = m_MousePos[1] - m_MousePrevPos[1];
+
+			m_MousePrevPos[0] = m_MousePos[0];
+			m_MousePrevPos[1] = m_MousePos[1];
 		}
 
 	} SingletonInstance(Input);

@@ -17,6 +17,7 @@ namespace Vxl
 			return;
 
 		delete m_fullQuad;
+		delete m_fullTriangle;
 		delete m_quad;
 		delete m_cube;
 		delete m_inverseCube;
@@ -24,6 +25,8 @@ namespace Vxl
 		delete m_icosahedron;
 		delete m_icoSphere;
 		delete m_sphere;
+		delete m_sphereUV_16;
+		delete m_sphereUV_64;
 	}
 
 	// Generators
@@ -306,6 +309,34 @@ namespace Vxl
 		m_fullQuad->m_indices.set(indices, 6);
 		//
 		m_fullQuad->Bind();
+	}
+	void Geometry::CreateFullTriangle()
+	{
+		Vector3 pos[] = {
+			Vector3(-1, -1, +0),
+			Vector3(+3, -1, +0),
+			Vector3(-1, +3, +0)
+		};
+		Vector2 uvs[] = {
+			Vector2(0, 0),
+			Vector2(2, 0),
+			Vector2(0, 2)
+		};
+		Vector3 normals[] = {
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1)
+		};
+		GLuint indices[] = { 0, 1, 2 };
+
+		m_fullTriangle = new Mesh("FullTriangle");
+		//
+		m_fullTriangle->m_positions.set(pos, 3);
+		m_fullTriangle->m_uvs.set(uvs, 3);
+		m_fullTriangle->m_normals.set(normals, 3);
+		//m_fullTriangle->m_indices.set(indices, 6);
+		//
+		m_fullTriangle->Bind();
 	}
 
 	void Geometry::CreateQuad()

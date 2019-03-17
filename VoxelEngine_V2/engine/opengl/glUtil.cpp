@@ -8,9 +8,13 @@
 #include "../math/Vector4.h"
 #include "../opengl/Texture.h"
 
+#include <algorithm>
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
+
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
 namespace Vxl
 {
@@ -34,12 +38,41 @@ namespace Vxl
 			return false;
 		}
 
+		std::string VendorStr = getVendor();
+		std::transform(VendorStr.begin(), VendorStr.end(), VendorStr.begin(), ::tolower);
+		if (VendorStr.find("nvidia") != -1)
+			Vendor = VendorType::NVIDIA;
+		else if (VendorStr.find("ati") != -1)
+			Vendor = VendorType::ATI;
+		else if (VendorStr.find("intel") != -1)
+			Vendor = VendorType::INTEL;
+
 		return true;
 	}
 
 	// Init GL Hints
+	Cull_Type			_cullmode = Cull_Type::NONE;
+	Blend_Source		_blendsrc = Blend_Source::NONE;
+	Blend_Destination	_blenddest = Blend_Destination::NONE;
+	Blend_Equation		_blendequation = Blend_Equation::NONE;
+	Depth_Pass_Rule		_rule = Depth_Pass_Rule::NONE;
+	bool				_depthMask = true;
+	bool				_wireframe = false;
+	GLsizei				_viewport[4] = { -1, -1, -1, -1 };
+
 	void glUtil::initHints()
 	{
+		// Reset
+		_cullmode = Cull_Type::NONE;
+		_blendsrc = Blend_Source::NONE;
+		_blenddest = Blend_Destination::NONE;
+		_blendequation = Blend_Equation::NONE;
+		_rule = Depth_Pass_Rule::NONE;
+		_depthMask = true;
+		_wireframe = false;
+		for(int i = 0; i < 4; i++)
+			_viewport[i] = -1;
+
 		// Set Default Cull Mode
 		cullMode(Cull_Type::COUNTER_CLOCKWISE);
 		// Set Default Blend Mode
@@ -61,6 +94,7 @@ namespace Vxl
 		Logger.log("~~~~~~~~~~~~~~~~~~");
 		Logger.log("Renderer: " + std::string(glUtil::getRendererVersion()));
 		Logger.log("OpenGL version supported: " + std::string(glUtil::getOpenGLVersion()));
+		Logger.log("Vendor: " + std::string(glUtil::getVendor()));
 		Logger.log("~~~~~~~~~~~~~~~~~~");
 	}
 
@@ -72,6 +106,34 @@ namespace Vxl
 	const char* glUtil::getOpenGLVersion()
 	{
 		return reinterpret_cast<char const*>(glGetString(GL_VERSION)); // version as a string (GLubyte*)
+	}
+	const char* glUtil::getVendor()
+	{
+		return reinterpret_cast<char const*>(glGetString(GL_VENDOR)); // vendor as a string (GLubyte*)
+	}
+
+	// Get Memory
+	int glUtil::GetGPUMem_TotalKB()
+	{
+		if (Vendor == VendorType::NVIDIA)
+		{
+			GLint total_mem_kb = 0;
+			glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+			return total_mem_kb;
+		}
+		else
+			return -1;
+	}
+	int glUtil::GetGPUMem_CurrentKB()
+	{
+		if (Vendor == VendorType::NVIDIA)
+		{
+			GLint cur_avail_mem_kb = 0;
+			glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+			return cur_avail_mem_kb;
+		}
+		else
+			return -1;
 	}
 
 	// Error Message
@@ -243,7 +305,6 @@ namespace Vxl
 		glClearStencil(f);
 	}
 
-	Cull_Type _cullmode = Cull_Type::NONE;
 	void glUtil::cullMode(Cull_Type cull)
 	{
 		if (_cullmode != cull)
@@ -274,8 +335,7 @@ namespace Vxl
 	{
 		glDisable(GL_BLEND);
 	}
-	Blend_Source _blendsrc = Blend_Source::NONE;
-	Blend_Destination _blenddest = Blend_Destination::NONE;
+	
 	void glUtil::blendMode(Blend_Source src = Blend_Source::SRC_ALPHA, Blend_Destination dest = Blend_Destination::ONE_MINUS_SRC_ALPHA)
 	{
 		glEnable(GL_BLEND);
@@ -286,7 +346,7 @@ namespace Vxl
 		_blendsrc = src;
 		_blenddest = dest;
 	}
-	Blend_Equation _blendequation = Blend_Equation::NONE;
+	
 	void glUtil::blendEquation(Blend_Equation equation)
 	{
 		if(_blendequation != equation)
@@ -296,17 +356,15 @@ namespace Vxl
 	}
 
 	// Depth Test (What depth value will overwrite the existing one)
-	Depth_Pass_Rule _rule = Depth_Pass_Rule::NONE;
 	void glUtil::depthTest(Depth_Pass_Rule Rule = Depth_Pass_Rule::LESS_OR_EQUAL)
 	{
 		glEnable(GL_DEPTH_TEST);
 
-		if(_rule != Rule)
+		if (_rule != Rule)
 			glDepthFunc((GLenum)Rule);
 
 		_rule = Rule;
 	}
-	bool _depthMask = true;
 	void glUtil::depthMask(bool state)
 	{
 		if(_depthMask != state)
@@ -316,7 +374,6 @@ namespace Vxl
 	}
 
 	// Wireframe Mode
-	bool _wireframe = false;
 	void glUtil::wireframe(bool state)
 	{
 		if (_wireframe != state)
@@ -331,7 +388,6 @@ namespace Vxl
 	}
 
 	// viewport
-	GLsizei _viewport[4] = { -1, -1, -1, -1 };
 	void glUtil::viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h)
 	{
 		if(_viewport[0] != x || _viewport[1] != y || _viewport[2] != w || _viewport[3] != h)

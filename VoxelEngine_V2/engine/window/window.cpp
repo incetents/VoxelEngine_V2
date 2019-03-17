@@ -44,6 +44,8 @@ namespace Vxl
 		}
 		// default position
 		SetPosition(50, 50);
+		// default cursor
+		SetCursor(CursorMode::NORMAL);
 
 		// Initial Window Position
 		int posx, posy;
@@ -70,7 +72,6 @@ namespace Vxl
 		// IMGUI Setup
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		//ImGuiIO& io = ImGui::GetIO(); (void)io;
 
 		ImGui_ImplGlfw_InitForOpenGL(GetContext(), true);
 		ImGui_ImplOpenGL3_Init("#version 430");
@@ -202,6 +203,31 @@ namespace Vxl
 		UpdateViewport();
 		// Update Aspect ratios
 		UpdateAspectRatio();
+	}
+	void Window::SetCursor(CursorMode mode)
+	{
+		m_cursorMode = mode;
+		switch (mode)
+		{
+		case CursorMode::NORMAL:
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			break;
+		case CursorMode::HIDDEN:
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+			break;
+		case CursorMode::LOCKED :
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			break;
+		}
+	}
+	void Window::SetCursorPosition(double x, double y)
+	{
+		glfwSetCursorPos(m_window, x, y);
+	}
+
+	bool Window::IsCursorOnImguiWindow()
+	{
+		return ImGui::GetIO().WantCaptureMouse;
 	}
 
 	void Window::BindWindowViewport()

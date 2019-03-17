@@ -15,6 +15,7 @@ namespace Vxl
 
 	class FramebufferObject
 	{
+		friend class RenderManager;
 	private:
 		// Fbo
 		const std::string m_name;

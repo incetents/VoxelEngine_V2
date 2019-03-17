@@ -11,6 +11,13 @@ struct GLFWwindow;
 
 namespace Vxl
 {
+	enum class CursorMode
+	{
+		NORMAL,
+		HIDDEN,
+		LOCKED
+	};
+
 	static class Window : public Singleton<class Window>
 	{
 		friend class glfwCallbacks;
@@ -29,6 +36,7 @@ namespace Vxl
 		float		 m_aspectRatio = 1.0f; // Based on Window size (resolution shouldn't affect this)
 		bool		 m_useCustomAspectRatio = false;
 		float		 m_customAspectRatio = 1.0f;
+		CursorMode   m_cursorMode = CursorMode::NORMAL;
 
 		// FilePaths dragged into the Window context
 		std::vector<std::string> m_addedPaths;
@@ -68,7 +76,12 @@ namespace Vxl
 		void SetSizeLimits(UINT xmin, UINT xmax, UINT ymin, UINT ymax);
 		void SetVSynch(bool state);
 		void SetCustomAspectRatio(bool state, float aspect = 1.0f);
+		void SetCursor(CursorMode mode);
+		void SetCursorPosition(double x, double y);
 
+		bool IsCursorOnImguiWindow();
+
+		// Window Pos
 		UINT GetPositionX(void) const
 		{
 			return m_position[0];
@@ -127,6 +140,12 @@ namespace Vxl
 		UINT GetResolutionHeight(void) const
 		{
 			return m_resolution[1];
+		}
+
+		// Get Cursors active mode
+		CursorMode GetCursor(void) const
+		{
+			return m_cursorMode;
 		}
 
 		void BindWindowViewport();

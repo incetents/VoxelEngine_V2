@@ -3,6 +3,9 @@
 #include "DevConsole.h"
 
 #include "../imgui/imgui.h"
+#include "../imgui/imgui_colors.h"
+
+#include "../opengl/glUtil.h"
 
 #include "../utilities/Time.h"
 #include "../utilities/Util.h"
@@ -20,10 +23,10 @@
 
 #include "../game/Scene_Game.h"
 
+#include "windows.h"
 
 namespace Vxl
 {
-	static ImVec4 Color_Orange = ImVec4(1.0f, 0.5f, 0.0f, 1.0f);
 
 	void DevConsole::Draw_Master(Scene* scene)
 	{
@@ -35,6 +38,14 @@ namespace Vxl
 		float* _fpsGraph = Time.GetFPSHistogram();
 		UINT _fpsGraphSize = Time.GetFPSHistogramSize();
 		ImGui::PlotHistogram("FPS Histogram", _fpsGraph, _fpsGraphSize, 0, NULL, 0.0f, 100.0f, ImVec2(0, 70));
+
+		ImGui::Separator();
+
+		std::string m1 = "GPU TOTAL: " + std::to_string(glUtil::GetGPUMem_TotalKB() / 1000) + " [MB]";
+		ImGui::Text(m1.c_str());
+		
+		std::string m2 = "GPU Current: " + std::to_string(glUtil::GetGPUMem_CurrentKB() / 1000) + " [MB]";
+		ImGui::Text(m2.c_str());
 
 		ImGui::Separator();
 
@@ -111,6 +122,22 @@ namespace Vxl
 
 		ImGui::Separator();
 
+		if (ImGui::CollapsingHeader("FBO Override"))
+		{
+			const char* fbo_override_choices[] = {
+				"[Default]",
+				"Albedo",
+				"Normal",
+				"Depth"
+			};
+			static int fbo_override_current = 0;
+			ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);
+
+			Game->FBO_OVERRIDE = fbo_override_current;
+		}
+
+		ImGui::Separator();
+
 		if (Game->_camera)
 		{
 			float cameraFOV = Game->_camera->getFOV();
@@ -160,7 +187,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Integers
@@ -175,7 +202,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Floats
@@ -190,7 +217,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Double
@@ -205,7 +232,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Vector2
@@ -223,7 +250,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Vector3
@@ -242,7 +269,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Vector4
@@ -262,7 +289,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Color3F
@@ -281,7 +308,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		// Color4F
@@ -301,7 +328,7 @@ namespace Vxl
 			}
 		}
 		else
-			ImGui::TextColored(Color_Orange, "~None~");
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
 		ImGui::PopItemWidth();

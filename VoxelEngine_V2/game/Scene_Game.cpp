@@ -30,7 +30,8 @@
 #include "../engine/math/MathCore.h"
 #include "../engine/math/Lerp.h"
 
-#include "../engine/modules/Entity.h"
+#include "../engine/modules/Light.h"
+#include "../engine/modules/GameObject.h"
 #include "../engine/modules/Material.h"
 #include "../engine/modules/RenderManager.h"
 
@@ -132,7 +133,7 @@ namespace Vxl
 		
 		
 		// Entities
-		_entity1 = Entity::Create("_entity1");
+		_entity1 = GameObject::Create("_entity1");
 		_entity1->SetMaterial(_material_gbuffer);
 		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity1->SetMesh(_mesh);
@@ -141,25 +142,27 @@ namespace Vxl
 		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
 		Mesh* jiggyMesh = new Mesh(Model::Get("jiggy"));
 		
-		_entity2 = Entity::Create("_entity2");
+		_entity2 = GameObject::Create("_entity2");
 		_entity2->SetMaterial(_material_gbuffer);
 		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		_entity2->SetColor(Color3F(1, 1, 0));
 		
-		_entity3 = Entity::Create("_entity3");
+		_entity3 = GameObject::Create("_entity3");
 		_entity3->SetMaterial(_material_gbuffer);
 		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity3->SetMesh(Geometry.GetIcosahedron());
 		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
 		
-		_entity4 = Entity::Create("_entity4");
+		_entity4 = GameObject::Create("_entity4");
 		_entity4->SetMaterial(_material_skybox);
 		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_entity4->SetMesh(Geometry.GetInverseCube());
+		_entity4->m_isClickable = false;
+		_entity4->m_useTransform = false;
 		
-		Entity* _entity5 = Entity::Create("_entity5");
+		GameObject* _entity5 = GameObject::Create("_entity5");
 		_entity5->SetMaterial(_material_gbuffer);
 		_entity5->SetMesh(Geometry.GetSphereUV_Good());
 		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
@@ -194,7 +197,7 @@ namespace Vxl
 		}
 
 		//
-		_crate1 = Entity::Create("_crate1");
+		_crate1 = GameObject::Create("_crate1");
 		_crate1->SetMaterial(_material_gbuffer);
 		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate1->SetMesh(Geometry.GetCube());
@@ -202,7 +205,7 @@ namespace Vxl
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
-		_crate2 = Entity::Create("_crate2");
+		_crate2 = GameObject::Create("_crate2");
 		_crate2->SetMaterial(_material_gbuffer);
 		_crate2->SetMesh(Geometry.GetCube());
 		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
@@ -213,41 +216,41 @@ namespace Vxl
 		
 		_crate1->m_transform.setWorldPosition(0, 0, 0);
 		
-		_octo1 = Entity::Create("_octo1");
+		_octo1 = GameObject::Create("_octo1");
 		_octo1->SetMaterial(_material_gbuffer);
 		_octo1->SetMesh(Geometry.GetOctahedron());
 		_octo1->m_transform.setPosition(0, 0, 0);
 		_octo1->m_transform.setScale(0.5f);
 		_octo1->SetColor(Color3F(1, 1, 1));
 		
-		_octo2 = Entity::Create("_octo2");
+		_octo2 = GameObject::Create("_octo2");
 		_octo2->SetMaterial(_material_gbuffer);
 		_octo2->SetMesh(Geometry.GetOctahedron());
 		_octo2->m_transform.setPosition(1, 0, 0);
 		_octo2->m_transform.setScale(0.5f);
 		_octo2->SetColor(Color3F(1, 0, 0));
 		
-		_octo3 = Entity::Create("_octo3");
+		_octo3 = GameObject::Create("_octo3");
 		_octo3->SetMaterial(_material_gbuffer);
 		_octo3->SetMesh(Geometry.GetOctahedron());
 		_octo3->m_transform.setPosition(0, 1, 0);
 		_octo3->m_transform.setScale(0.5f);
 		_octo3->SetColor(Color3F(0, 1, 0));
 		
-		_octo4 = Entity::Create("_octo4");
+		_octo4 = GameObject::Create("_octo4");
 		_octo4->SetMaterial(_material_gbuffer);
 		_octo4->SetMesh(Geometry.GetOctahedron());
 		_octo4->m_transform.setPosition(0, 0, 1);
 		_octo4->m_transform.setScale(0.5f);
 		_octo4->SetColor(Color3F(0, 0, 1));
 		
+		_light1 = Light::Create("light1");
+
 
 		Debug.Setup();
 	}
 	void Scene_Game::Destroy()
 	{
-		delete _fbo;
-		delete _fbo_colorpicker;
 		delete _mesh;
 
 		TerrainManager.Destroy();
@@ -296,12 +299,36 @@ namespace Vxl
 
 		_camera->increaseRotation(CamRotation);
 
+		// Camera Lock
+		if (Input.getKeyDown(KeyCode::Z))
+		{
+			if (Window.GetCursor() == CursorMode::LOCKED)
+				Window.SetCursor(CursorMode::NORMAL);
+			else
+				Window.SetCursor(CursorMode::LOCKED);
+		}
+
+		float CameraHorizontalRotation = DevConsole.GetFloat("Camera Horizontal Rotation", 0.2f);
+		float CameraVerticalRotation = DevConsole.GetFloat("Camera Vertical Rotation", 0.2f);
+
+		// Lock = mouse rotates camera
+		if (Window.GetCursor() == CursorMode::LOCKED)
+		{
+			float deltax = Input.getMouseDeltaX() * (float)Time.GetDeltaTime() * CameraVerticalRotation;
+			float deltay = Input.getMouseDeltaY() * (float)Time.GetDeltaTime() * CameraHorizontalRotation;
+			// clamp delta for safety
+			deltax = MacroClamp(deltax, -100, +100);
+			deltay = MacroClamp(deltay, -100, +100);
+
+			_camera->increaseRotation(-deltay, -deltax, 0);;
+		}
+
 		// Edge case for vertical rotation
-		float Xrot = _camera->getRotationEuler().x;
-		Xrot = MacroClamp(Xrot, -89.9f, 89.9f);
+		float Xrot = MacroClamp(_camera->getRotationEuler().x, -89.9f, 89.9f);
 		_camera->setRotationX(Xrot);
 		//
 
+		// Update Cam
 		_camera->update();
 
 		// Debug Lines
@@ -318,7 +345,8 @@ namespace Vxl
 			Color4F(1, 1, 0, 1), Color4F(0, 1, 1, 0)
 		);
 
-		if (Hierarchy._selectedEntity != nullptr)
+		// Selection
+		if (Hierarchy._selectedEntity != nullptr && Hierarchy._selectedEntity->m_useTransform)
 		{
 			auto Entity = Hierarchy._selectedEntity;
 			static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
@@ -387,7 +415,7 @@ namespace Vxl
 		//_camera->updatePerspective(_camera->getFOV(), Window.GetAspectRatio());
 
 		// Imgui Specials
-		if(_material_gbuffer)
+		if (_material_gbuffer)
 		{
 			_material_gbuffer->m_Wireframe = DevConsole.GetBool("Gbuffer Wireframe", false);
 		}
@@ -515,7 +543,7 @@ namespace Vxl
 		//	Geometry::GetCube()->Draw();
 
 		// ~~ //
-		if (DevConsole.GetBool("Objects are Clickable", false))
+		if (DevConsole.GetBool("Objects are Clickable", true) && Window.GetCursor() == CursorMode::NORMAL)
 		{
 			_fbo_colorpicker->bind();
 			glUtil::blendDisable();
@@ -534,8 +562,8 @@ namespace Vxl
 			{
 				auto Entity = Entities[i];
 
-				// Ignore if not active
-				if (!Entity->IsFamilyActive())
+				// Ignore if not active or not clickable
+				if (!Entity->IsFamilyActive() || !Entity->m_isClickable)
 					continue;
 
 				_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
@@ -575,7 +603,7 @@ namespace Vxl
 			mem.f_ID[2] = data[2];
 			mem.ui_ID--;//offset (0 = nothing instead of first value)
 
-			if (Input.getMouseButton(MouseButton::LEFT) && !ImGui::GetIO().WantCaptureMouse)
+			if (Input.getMouseButton(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow())
 			{
 				if (mem.ui_ID < EntityCount)
 					Hierarchy._selectedEntity = Entities[mem.ui_ID];
@@ -596,45 +624,83 @@ namespace Vxl
 
 		Window.BindWindowViewport();
 		glUtil::wireframe(false);
+		glUtil::depthTest(Depth_Pass_Rule::ALWAYS);
 
 		// ~~~~~~~~~~~~~~~~~ //
 		glUtil::clearColor(Color4F(0, 0, 0, 0));
 		glUtil::clearBuffer();
 
 		// Final Pass / Back Buffer
-		_shader_passthrough->Bind();
-		glDepthFunc(GL_ALWAYS);
+		switch (FBO_OVERRIDE)
+		{
+			// Output Normally
+			case 0:
+			{
+				_shader_passthrough->Bind();
 
-		_fbo->bindTexture(0, Active_Texture::LEVEL0);
-		Geometry.GetFullQuad()->Draw();
+				_fbo->bindTexture(0, Active_Texture::LEVEL0);
+				break;
+			}
+			// Show Albedo
+			case 1:
+			{
+				_shader_showRenderTarget->Bind();
+				_shader_showRenderTarget->SetUniform("outputMode", 0);
+
+				_fbo->bindTexture(0, Active_Texture::LEVEL0);
+				break;
+			}
+			// Show Normal
+			case 2:
+			{
+				_shader_showRenderTarget->Bind();
+				_shader_showRenderTarget->SetUniform("outputMode", 1);
+
+				_fbo->bindTexture(1, Active_Texture::LEVEL0);
+				break;
+			}
+			// Show Depth
+			case 3:
+			{
+				_shader_showRenderTarget->Bind();
+				_shader_showRenderTarget->SetUniform("outputMode", 2);
+				_shader_showRenderTarget->SetUniform("zNear", Camera::GetMain()->getZnear());
+				_shader_showRenderTarget->SetUniform("zFar", Camera::GetMain()->getZfar());
+
+				_fbo->bindDepth(Active_Texture::LEVEL0);
+				break;
+			}
+		}
+		RenderManager.RenderFullScreen();
 		
-		_shader_showRenderTarget->Bind();
-		// Normals test
-		if (DevConsole.GetBool("Show Normals", false))
-		{
-			_shader_showRenderTarget->SetUniform("outputMode", 1);
-			
-			glUtil::viewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
-			_fbo->bindTexture(1, Active_Texture::LEVEL0);
-			Geometry.GetFullQuad()->Draw();
-		}
-		// Depth test
-		if (DevConsole.GetBool("Show Depth", false))
-		{
-			_shader_showRenderTarget->SetUniform("outputMode", 2);
-			_shader_showRenderTarget->SetUniform("zNear", Camera::GetMain()->getZnear());
-			_shader_showRenderTarget->SetUniform("zFar", Camera::GetMain()->getZfar());
-
-			glUtil::viewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
-			_fbo->bindDepth(Active_Texture::LEVEL0);
-			Geometry.GetFullQuad()->Draw();
-		}
+		
+		
+		//	// Normals test
+		//	if (DevConsole.GetBool("Show Normals", false))
+		//	{
+		//		
+		//		
+		//		glUtil::viewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
+		//		
+		//		Geometry.GetFullQuad()->Draw();
+		//	}
+		//	// Depth test
+		//	if (DevConsole.GetBool("Show Depth", false))
+		//	{
+		//		_shader_showRenderTarget->SetUniform("outputMode", 2);
+		//		_shader_showRenderTarget->SetUniform("zNear", Camera::GetMain()->getZnear());
+		//		_shader_showRenderTarget->SetUniform("zFar", Camera::GetMain()->getZfar());
+		//	
+		//		glUtil::viewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
+		//		_fbo->bindDepth(Active_Texture::LEVEL0);
+		//		Geometry.GetFullQuad()->Draw();
+		//	}
 
 		// _fbo->bindDepth(Active_Texture::LEVEL0);
 		// Geometry::GetFullQuad()->Draw();
 
 
-		glDepthFunc(GL_LEQUAL);
+		//glDepthFunc(GL_LEQUAL);
 		//Window.ViewportToWindowSize();
 
 

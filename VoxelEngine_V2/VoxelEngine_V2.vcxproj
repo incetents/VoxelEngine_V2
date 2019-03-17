@@ -27,7 +27,9 @@
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
+    <ClCompile Include="engine\modules\GameObject.cpp" />
     <ClCompile Include="engine\modules\Layer.cpp" />
+    <ClCompile Include="engine\modules\Light.cpp" />
     <ClCompile Include="engine\modules\Material.cpp" />
     <ClCompile Include="engine\modules\RenderManager.cpp" />
     <ClCompile Include="engine\modules\Scene.cpp" />
@@ -46,6 +48,7 @@
     <ClCompile Include="game\terrain\ChunkMesh.cpp" />
     <ClCompile Include="game\terrain\TerrainManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_colors.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_glfw.cpp" />
@@ -86,10 +89,11 @@
     <ClInclude Include="engine\imgui_wrappers\Inspector.h" />
     <ClInclude Include="engine\imgui_wrappers\ShaderErrors.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
-    <ClInclude Include="engine\light\Light.h" />
+    <ClInclude Include="engine\modules\Light.h" />
     <ClInclude Include="engine\math\Model.h" />
     <ClInclude Include="engine\modules\Component.h" />
     <ClInclude Include="engine\modules\Entity.h" />
+    <ClInclude Include="engine\modules\GameObject.h" />
     <ClInclude Include="engine\modules\Layer.h" />
     <ClInclude Include="engine\modules\Material.h" />
     <ClInclude Include="engine\modules\MaterialPackage.h" />
@@ -140,6 +144,7 @@
     <ClInclude Include="game\terrain\TerrainManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_colors.h" />
     <ClInclude Include="imgui\imgui_impl_glfw.h" />
     <ClInclude Include="imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="imgui\imgui_internal.h" />

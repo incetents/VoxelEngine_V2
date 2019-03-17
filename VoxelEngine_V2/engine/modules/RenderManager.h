@@ -17,6 +17,7 @@ namespace Vxl
 	class Scene;
 	class Layer;
 	class Entity;
+	class GameObject;
 	class Material;
 
 	static class RenderManager : public Singleton<class RenderManager>
@@ -25,6 +26,8 @@ namespace Vxl
 	private:
 		Scene* m_currentScene = nullptr;
 
+		// [True = FullQuad] or [False = Fulltriangle]
+		bool m_FSQMode = false;
 		Layer* m_layers;
 		UINT m_layerToRender = ~0;
 
@@ -46,8 +49,8 @@ namespace Vxl
 		}
 
 		// Entity
-		void AddEntity(Entity* _entity);
-		void RemoveEntity(Entity* _entity);
+		void AddEntity(GameObject* _entity);
+		void RemoveEntity(GameObject* _entity);
 
 		// Reload Systems
 		void ReloadShaders();
@@ -62,6 +65,8 @@ namespace Vxl
 		void Draw();
 		void DrawImGui();
 
+		// Render
+		void RenderFullScreen();
 		void RenderScene_ByMaterial();
 
 	} SingletonInstance(RenderManager);

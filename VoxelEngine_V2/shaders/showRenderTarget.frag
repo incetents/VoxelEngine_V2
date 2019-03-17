@@ -32,19 +32,20 @@ void main()
 	//Output Mode
 	if(outputMode == 1)
 	{
-		_texture.rgb = (_texture.rgb) * 2.0 - 1.0; // deserialize
+		// normal
+		_texture.rgb = _texture.rgb * 2.0 - 1.0; // deserialize
 		_texture.rgb = abs(_texture.rgb); // make it visible on both sides
 		
 		output_color = _texture;
 	}
 	else if(outputMode == 2)
 	{
+		// depth
 		float depth = LinearizeDepth(_texture.r);
 		output_color = vec4(depth,depth,depth,1);
 	}
 	else
 		output_color = _texture;
-	
 }
 
 

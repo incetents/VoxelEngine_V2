@@ -78,7 +78,7 @@ namespace Vxl
 			Vec3 = 0
 		};
 
-		friend class Entity;
+		friend class GameObject;
 		friend class RenderManager;
 	protected:
 		// Material Base

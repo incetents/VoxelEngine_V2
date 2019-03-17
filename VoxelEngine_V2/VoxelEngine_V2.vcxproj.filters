@@ -177,6 +177,15 @@
     <ClCompile Include="engine\imgui_wrappers\ShaderErrors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\modules\GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\modules\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_colors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\Input.h">
@@ -311,9 +320,6 @@
     <ClInclude Include="engine\input\XGamePad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\light\Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\terrain\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -372,6 +378,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\imgui_wrappers\ShaderErrors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\modules\GameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\modules\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

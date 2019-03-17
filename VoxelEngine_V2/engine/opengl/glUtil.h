@@ -13,11 +13,21 @@ namespace Vxl
 	class Color4F;
 	enum class Channel_Type;
 
+	enum class VendorType
+	{
+		UNKNOWN,
+		NVIDIA, 
+		ATI,
+		INTEL
+	};
+
 	namespace glUtil
 	{
 		// OpenGL Version
 		static int GLVersionMajor = 0;
 		static int GLVersionMinor = 0;
+		// Vendor Information
+		static VendorType Vendor = VendorType::UNKNOWN;
 
 		// Setup Glew for OpenGL
 		bool initGlew();
@@ -30,6 +40,11 @@ namespace Vxl
 		// Get Version Data
 		const char* getRendererVersion();
 		const char* getOpenGLVersion();
+		const char* getVendor();
+
+		// Get Memory
+		int GetGPUMem_TotalKB();
+		int GetGPUMem_CurrentKB();
 
 		// Error Message
 		static bool UsingErrorCallback = false;

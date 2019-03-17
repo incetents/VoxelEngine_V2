@@ -13,13 +13,13 @@ namespace Vxl
 	class Camera;
 	class Mesh;
 	class Transform;
-	class Entity;
 	class XGamePad;
 	class Texture;
 	class Cubemap;
-	class Light;
 	class Material;
 	class Clock;
+	class GameObject;
+	class Light;
 
 	class Scene_Game : public Scene
 	{
@@ -40,12 +40,13 @@ namespace Vxl
 		Cubemap* _cubemap1;
 
 		// Assets Created
-		FramebufferObject* _fbo;
-		FramebufferObject* _fbo_colorpicker;
 		Mesh* _mesh;
 
 		// Assets Automated
 		Camera* _camera;
+
+		FramebufferObject* _fbo;
+		FramebufferObject* _fbo_colorpicker;
 
 		Material* _material_gbuffer;
 		Material* _material_gbuffer_no_model;
@@ -53,23 +54,25 @@ namespace Vxl
 		Material* _material_skybox;
 		Material* _material_lines;
 
-		Entity* _entity1;
-		Entity* _entity2;
-		Entity* _entity3;
-		Entity* _entity4;
+		GameObject* _entity1;
+		GameObject* _entity2;
+		GameObject* _entity3;
+		GameObject* _entity4;
 
-		Entity* _crate1;
-		Entity* _crate2;
+		GameObject* _crate1;
+		GameObject* _crate2;
 
-		Entity* _octo1;
-		Entity* _octo2;
-		Entity* _octo3;
-		Entity* _octo4;
-		
-		std::vector<Entity*> _cubes;
+		GameObject* _octo1;
+		GameObject* _octo2;
+		GameObject* _octo3;
+		GameObject* _octo4;
+
+		Light* _light1;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;
+
+		int FBO_OVERRIDE = 0;
 
 	public:
 		void Setup() override;

@@ -3,6 +3,8 @@
 #include "Inspector.h"
 
 #include "../imgui/imgui.h"
+#include "../imgui/imgui_internal.h"
+#include "../imgui/imgui_colors.h"
 
 #include "Hierarchy.h"
 #include "../modules/Entity.h"
@@ -30,11 +32,16 @@ namespace Vxl
 			auto Entity = Hierarchy._selectedEntity;
 			if (Entity != nullptr)
 			{
-				static float DragSpeed = 0.1f;
-
-				ImGui::Text(("Name: " + Entity->m_name).c_str());
+				static char Name[MAX_ENTITY_NAME_LENGTH];
+				strcpy_s(Name, Entity->GetName().c_str());
+				
+				ImGui::Text("Name: "); ImGui::SameLine();
 
 				ImGui::PushItemWidth(-1);
+				if (ImGui::InputText("input text", Name, IM_ARRAYSIZE(Name)))
+					Entity->SetName(std::string(Name));
+
+				static float DragSpeed = 0.1f;
 				ImGui::Text("DragSpeed: "); ImGui::SameLine(); ImGui::DragFloat("DragSpeed", &DragSpeed, 0.05f, 0.1f, 10.0f);
 				ImGui::PopItemWidth();
 
@@ -54,30 +61,48 @@ namespace Vxl
 					float sw[3] = { Entity->m_transform.getWorldScale().x, Entity->m_transform.getWorldScale().y, Entity->m_transform.getWorldScale().z };
 
 
-					ImGui::Text("LOCAL:");
 					ImGui::PushItemWidth(-1);
 
+					ImGui::TextColored(ImGuiColor::Orange, Entity->m_useTransform ? "Local:" : "Local: [LOCKED]");
+
+					if (!Entity->m_useTransform)
+					{
+						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+						ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+					}
+
 					ImGui::Text("Position:"); ImGui::SameLine();
-					if(ImGui::DragFloat3("Position", p, DragSpeed))
+					if (ImGui::DragFloat3("Position", p, DragSpeed))
 						Entity->m_transform.setPosition(p[0], p[1], p[2]);
 
 					ImGui::Text("Rotation:"); ImGui::SameLine();
-					if(ImGui::DragFloat3("Rotation", r, DragSpeed))
+					if (ImGui::DragFloat3("Rotation", r, DragSpeed))
 						Entity->m_transform.setRotation(r[0], r[1], r[2]);
 
-					ImGui::Text("Scale:   "); ImGui::SameLine(); 
-					if(ImGui::DragFloat3("Scale", s, DragSpeed))
+					ImGui::Text("Scale:   "); ImGui::SameLine();
+					if (ImGui::DragFloat3("Scale", s, DragSpeed))
 						Entity->m_transform.setScale(s[0], s[1], s[2]);
 
-					ImGui::Separator();
-					ImGui::Text("WORLD (PEAK ONLY):");
-					ImGui::Text("WPosition:"); ImGui::SameLine(); ImGui::DragFloat3("PositionW", pw, DragSpeed);
-					//ImGui::Text("Rotation:"); ImGui::SameLine(); ImGui::DragFloat3("Rotation", r, DragSpeed);
-					ImGui::Text("WScale:   "); ImGui::SameLine(); ImGui::DragFloat3("ScaleW", sw, DragSpeed);
-					ImGui::PopItemWidth();
+					if (!Entity->m_useTransform)
+					{
+						ImGui::PopItemFlag();
+						ImGui::PopStyleVar();
+					}
 
+					ImGui::Separator();
+
+					ImGui::TextColored(ImGuiColor::Orange, "World: [READ ONLY]");
 					
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 					
+					ImGui::Text("World Position:"); ImGui::SameLine(); ImGui::DragFloat3("PositionW", pw, DragSpeed);
+					ImGui::Text("World Scale:   "); ImGui::SameLine(); ImGui::DragFloat3("ScaleW", sw, DragSpeed);
+
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
+
+					ImGui::PopItemWidth();
 				}
 			}
 		}
