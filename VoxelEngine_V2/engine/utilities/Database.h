@@ -75,6 +75,10 @@ public:
 	{
 		return (m_database.find(data) != m_database.end());
 	}
+	inline void Erase(Type* data)
+	{
+		m_database.erase(data);
+	}
 	inline void Delete(Type* data)
 	{
 		m_database.erase(data);
@@ -85,7 +89,7 @@ public:
 		for (auto it = m_database.begin(); it != m_database.end(); it++)
 		{
 			Type* test = *it;
-			delete *it;
+			delete test;
 		}
 		m_database.clear();
 	}
@@ -101,4 +105,5 @@ public:
 	{
 		return m_database;
 	}
+
 };

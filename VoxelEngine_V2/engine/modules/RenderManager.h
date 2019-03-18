@@ -17,8 +17,9 @@ namespace Vxl
 	class Scene;
 	class Layer;
 	class Entity;
-	class GameObject;
 	class Material;
+	class GameObject;
+	class CameraObject;
 
 	static class RenderManager : public Singleton<class RenderManager>
 	{
@@ -33,9 +34,13 @@ namespace Vxl
 
 		// Masterlist of entities
 		std::vector<Entity*> m_allEntities;
+		// Masterlist of GameObject
+		std::vector<GameObject*> m_allGameObjects;
+		// Masterlist of CameraObjects
+		std::vector<CameraObject*> m_allCameraObjects;
 
-		// Rendering stuff // UINT = Material Order
-		std::map<std::pair<UINT, Material*>, std::set<Entity*>> m_entities; 
+		// Rendering Gbuffer stuff // UINT = Material Order
+		std::map<UINT, std::pair<Material*, std::set<GameObject*>>> m_gbufferObjects;
 		
 	public:
 		RenderManager();
@@ -49,8 +54,8 @@ namespace Vxl
 		}
 
 		// Entity
-		void AddEntity(GameObject* _entity);
-		void RemoveEntity(GameObject* _entity);
+		void AddEntity(Entity* _entity);
+		void RemoveEntity(Entity* _entity);
 
 		// Reload Systems
 		void ReloadShaders();
@@ -67,7 +72,7 @@ namespace Vxl
 
 		// Render
 		void RenderFullScreen();
-		void RenderScene_ByMaterial();
+		void RenderSceneGameObjects();
 
 	} SingletonInstance(RenderManager);
 }

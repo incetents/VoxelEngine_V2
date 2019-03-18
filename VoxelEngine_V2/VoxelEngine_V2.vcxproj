@@ -19,17 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="engine\imgui_wrappers\DevConsole.cpp" />
-    <ClCompile Include="engine\imgui_wrappers\Hierarchy.cpp" />
-    <ClCompile Include="engine\imgui_wrappers\Inspector.cpp" />
-    <ClCompile Include="engine\imgui_wrappers\ShaderErrors.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
+    <ClCompile Include="engine\modules\CameraObject.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
     <ClCompile Include="engine\modules\GameObject.cpp" />
     <ClCompile Include="engine\modules\Layer.cpp" />
-    <ClCompile Include="engine\modules\Light.cpp" />
+    <ClCompile Include="engine\modules\LightObject.cpp" />
     <ClCompile Include="engine\modules\Material.cpp" />
     <ClCompile Include="engine\modules\RenderManager.cpp" />
     <ClCompile Include="engine\modules\Scene.cpp" />
@@ -42,6 +39,10 @@
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
+    <ClCompile Include="engine\window\DevConsole.cpp" />
+    <ClCompile Include="engine\window\Hierarchy.cpp" />
+    <ClCompile Include="engine\window\Inspector.cpp" />
+    <ClCompile Include="engine\window\ShaderErrors.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
     <ClCompile Include="game\terrain\Block.cpp" />
     <ClCompile Include="game\terrain\Chunk.cpp" />
@@ -84,12 +85,9 @@
     <ClCompile Include="engine\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\imgui_wrappers\DevConsole.h" />
-    <ClInclude Include="engine\imgui_wrappers\Hierarchy.h" />
-    <ClInclude Include="engine\imgui_wrappers\Inspector.h" />
-    <ClInclude Include="engine\imgui_wrappers\ShaderErrors.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
-    <ClInclude Include="engine\modules\Light.h" />
+    <ClInclude Include="engine\modules\CameraObject.h" />
+    <ClInclude Include="engine\modules\LightObject.h" />
     <ClInclude Include="engine\math\Model.h" />
     <ClInclude Include="engine\modules\Component.h" />
     <ClInclude Include="engine\modules\Entity.h" />
@@ -128,14 +126,19 @@
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\utilities\Database.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />
+    <ClInclude Include="engine\utilities\GlobalMacros.h" />
     <ClInclude Include="engine\utilities\Loader.h" />
     <ClInclude Include="engine\utilities\logger.h" />
     <ClInclude Include="engine\utilities\singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\utilities\Time.h" />
     <ClInclude Include="engine\utilities\Util.h" />
+    <ClInclude Include="engine\window\DevConsole.h" />
     <ClInclude Include="engine\window\glfwCallbacks.h" />
     <ClInclude Include="engine\opengl\glUtil.h" />
+    <ClInclude Include="engine\window\Hierarchy.h" />
+    <ClInclude Include="engine\window\Inspector.h" />
+    <ClInclude Include="engine\window\ShaderErrors.h" />
     <ClInclude Include="engine\window\window.h" />
     <ClInclude Include="game\Scene_Game.h" />
     <ClInclude Include="game\terrain\Block.h" />

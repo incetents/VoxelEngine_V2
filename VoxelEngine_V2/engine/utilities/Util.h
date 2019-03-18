@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 
 namespace Vxl
 {
@@ -13,6 +15,25 @@ namespace Vxl
 		void MergeVectors(std::vector<Type>& dest, const std::vector<Type>& src)
 		{
 			dest.insert(dest.end(), src.begin(), src.end());
+		}
+
+		// Vector find
+		template<typename Type>
+		bool IsInVector(const std::vector<Type>& vec, Type data)
+		{
+			return (std::find(vec.begin(), vec.end(), data) != vec.end());
+		}
+		// Vector count
+		template<typename Type>
+		int CountInVector(const std::vector<Type>& vec, Type data)
+		{
+			return std::count(vec.begin(), vec.end(), data);
+		}
+		// Vector removal
+		template<typename Type>
+		void RemoveFromVector(std::vector<Type>& vec, Type data)
+		{
+			std::remove(vec.begin(), vec.end(), data);
 		}
 
 		// Aspect Ratio //
@@ -31,7 +52,6 @@ namespace Vxl
 				StrFormat(std::to_string(Num) + '|' + std::to_string(Denom))
 			{}
 		};
-
 
 		// Resolution //
 		class ResolutionInfo

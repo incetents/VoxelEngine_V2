@@ -121,7 +121,9 @@ namespace Vxl
 		// Update Vertices
 		m_lines->UpdateVertices(&m_lines_vertices[0]);
 		// Draw Lines
+		glUtil::depthMask(false);
 		m_lines->Draw(Draw_Type::LINES);
+		glUtil::depthMask(true);
 	}
 
 	void Debug::CreateDebugTextures()

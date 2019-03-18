@@ -16,8 +16,7 @@ namespace Vxl
 
 	GameObject::~GameObject()
 	{
-		if (m_material.GetBase())
-			RenderManager.RemoveEntity(this);
+
 	}
 
 	GameObject* GameObject::Create(const std::string& name)

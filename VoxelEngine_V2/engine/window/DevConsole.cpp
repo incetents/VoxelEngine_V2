@@ -76,6 +76,21 @@ namespace Vxl
 			{
 				ImGui::Text("CamPos: %f %f %f", Game->_camera->getPosition().x, Game->_camera->getPosition().y, Game->_camera->getPosition().z);
 				ImGui::Text("CamForward: %f %f %f", Game->_camera->getForward().x, Game->_camera->getForward().y, Game->_camera->getForward().z);
+
+				float cameraFOV = Game->_camera->getFOV();
+				float cameraZNear = Game->_camera->getZnear();
+				float cameraZFar = Game->_camera->getZfar();
+
+				if (ImGui::SliderFloat("FOV", &cameraFOV, 60.0f, 180.0f))
+					Game->_camera->updatePerspective(cameraFOV, Window.GetAspectRatio());
+
+				if (ImGui::SliderFloat("ZNEAR", &cameraZNear, 0.01f, 5.0f))
+					Game->_camera->setZnear(cameraZNear);
+
+				if (ImGui::SliderFloat("ZFAR", &cameraZFar, 1.0f, 50.0f))
+					Game->_camera->setZfar(cameraZFar);
+
+				ImGui::Separator();
 			}
 		}
 
@@ -137,24 +152,6 @@ namespace Vxl
 		}
 
 		ImGui::Separator();
-
-		if (Game->_camera)
-		{
-			float cameraFOV = Game->_camera->getFOV();
-			float cameraZNear = Game->_camera->getZnear();
-			float cameraZFar = Game->_camera->getZfar();
-
-			if (ImGui::SliderFloat("FOV", &cameraFOV, 60.0f, 180.0f))
-				Game->_camera->updatePerspective(cameraFOV, Window.GetAspectRatio());
-
-			if (ImGui::SliderFloat("ZNEAR", &cameraZNear, 0.01f, 5.0f))
-				Game->_camera->setZnear(cameraZNear);
-
-			if (ImGui::SliderFloat("ZFAR", &cameraZFar, 1.0f, 50.0f))
-				Game->_camera->setZfar(cameraZFar);
-
-			ImGui::Separator();
-		}
 
 		//ImGui::Text("Dear ImGui, %s", ImGui::GetVersion());
 

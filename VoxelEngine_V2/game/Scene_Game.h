@@ -19,7 +19,8 @@ namespace Vxl
 	class Material;
 	class Clock;
 	class GameObject;
-	class Light;
+	class LightObject;
+	class CameraObject;
 
 	class Scene_Game : public Scene
 	{
@@ -66,8 +67,6 @@ namespace Vxl
 		GameObject* _octo2;
 		GameObject* _octo3;
 		GameObject* _octo4;
-
-		Light* _light1;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

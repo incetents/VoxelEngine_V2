@@ -46,6 +46,7 @@ namespace Vxl
 		virtual void Set(float _fov, float _aspect) { assert(false); }
 		// Custom
 		virtual void Set(float* _matrix) { assert(false); }
+		virtual bool IsWindowAspectRatio(void) const { return false; }
 
 		// Special Overrides
 		virtual void Update_X(float _xmin, float _xmax) { assert(false); }
@@ -59,9 +60,11 @@ namespace Vxl
 	protected:
 		float m_fov;
 		float m_aspect;
+		bool m_windowAspectLock;
 	public:
 		float getFov() const override { return m_fov; }
 		float getAspect() const override { return m_aspect; }
+		bool IsWindowAspectRatio(void) const override { return m_windowAspectLock; }
 
 		void Set(float fov, float aspect) override
 		{
@@ -84,8 +87,8 @@ namespace Vxl
 			Matrix4x4::PerspectiveInverse_UpdateZ(m_projectionInverse, m_Znear, m_Zfar);
 		}
 
-		CameraProjection_Perspective(float fov, float aspect, float znear, float zfar)
-			: CameraProjection(znear, zfar)
+		CameraProjection_Perspective(bool windowAspectLock, float fov, float aspect, float znear, float zfar)
+			: CameraProjection(znear, zfar), m_windowAspectLock(windowAspectLock)
 		{
 			Set(fov, aspect);
 		}
@@ -170,7 +173,7 @@ namespace Vxl
 		friend class CameraProjection_Orthographic;
 		friend class RenderManager;
 		friend class Window;
-	private:
+	protected:
 		enum Type
 		{
 			NONE,
@@ -179,6 +182,8 @@ namespace Vxl
 			CUSTOM
 		};
 
+		// Main
+		static Camera* m_main;
 		// VP DATA
 		Type				m_type = Type::NONE;
 		CameraProjection*	m_projection;
@@ -189,7 +194,6 @@ namespace Vxl
 		// Ubo
 		UniformBufferObject* m_UBO = nullptr;
 		
-		static Camera* m_main;
 
 		// Protected
 		Camera(const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
@@ -208,15 +212,20 @@ namespace Vxl
 		{
 			return m_main;
 		}
-		void SetMain(void)
+		inline void SetMain(void)
 		{
 			m_main = this;
 		}
 
-		// Utility
+		// Perspective Matrix except the aspect ratio is based on the window
+		Camera& setPerspectiveWindowAspectLock(float _fov);
+		// Perspective Matrix
 		Camera& setPerspective(float _fov, float _aspect);
+		// Orthographic Matrix
 		Camera& setOrthographic(float _xmin, float _xmax, float _ymin, float _ymax);
+		// Set Custom Projection Matrix [16 float array]
 		Camera& setCustomProjection(float* _matrix);
+		
 		Camera& updatePerspective(float _fov, float _aspect);  // If already perspective, this will update its values faster
 		Camera& updatePerspectiveFOV(float _fov);  // If already perspective, this will update its values faster
 		Camera& updatePerspectiveAspectRatio(float _aspect);  // If already perspective, this will update its values faster

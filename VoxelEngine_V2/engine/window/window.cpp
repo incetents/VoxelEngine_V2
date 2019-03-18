@@ -102,7 +102,7 @@ namespace Vxl
 		m_size[1] = height;
 		m_aspectRatio = (float)width / (float)height;
 		// If using normal aspect ratio, 
-		UpdateAspectRatio();
+		UpdateCameraAspectRatios();
 		// Update screen sizes for viewport rendering
 		UpdateViewport();
 	}
@@ -142,18 +142,18 @@ namespace Vxl
 			}
 		}
 	}
-	void Window::UpdateAspectRatio()
+	void Window::UpdateCameraAspectRatios()
 	{
-		float CorrectAspectRatio = m_useCustomAspectRatio ? m_customAspectRatio : m_aspectRatio;
-
-		// Update aspect ratio for all existing cameras
+		// Update aspect ratio for all existing cameras that are locked to this aspect ratio
 		auto Cameras = Camera::m_database.Get();
 		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
 		{
-			if(it->second->isPerspective())
-				it->second->updatePerspectiveAspectRatio(CorrectAspectRatio);
+			auto Cam = it->second;
+			if (Cam->isPerspective() && Cam->m_projection->IsWindowAspectRatio())
+			{
+				Cam->m_projection->Update_FovAspect(Cam->m_projection->getFov(), GetAspectRatio());
+			}
 		}
-
 	}
 	void Window::Destroy()
 	{
@@ -193,16 +193,13 @@ namespace Vxl
 	}
 	void Window::SetCustomAspectRatio(bool state, float aspect)
 	{
-		// If custom aspect ratio state has been changed, update aspect ratio for all cameras
-		if (m_customAspectRatio != aspect)
-			UpdateAspectRatio();
 		// Flags
 		m_useCustomAspectRatio = state;
 		m_customAspectRatio = aspect;
+		// Update Aspect ratios
+		UpdateCameraAspectRatios();
 		// Update viewport sizes
 		UpdateViewport();
-		// Update Aspect ratios
-		UpdateAspectRatio();
 	}
 	void Window::SetCursor(CursorMode mode)
 	{

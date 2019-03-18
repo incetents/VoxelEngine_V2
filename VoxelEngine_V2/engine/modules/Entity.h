@@ -17,7 +17,8 @@ namespace Vxl
 	enum class EntityType
 	{
 		GAMEOBJECT,
-		LIGHT
+		LIGHT,
+		CAMERA
 	};
 
 	class Entity : public ComponentHandler
@@ -42,8 +43,11 @@ namespace Vxl
 
 	public:
 		// Destructor
-		virtual ~Entity() {}
-		
+		virtual ~Entity();
+
+		// Database Deletion
+		static void Delete(Entity* _entity);
+
 		// Data
 		Transform			m_transform;
 		bool				m_useTransform = true;

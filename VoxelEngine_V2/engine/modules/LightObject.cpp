@@ -1,24 +1,24 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "Light.h"
+#include "LightObject.h"
 
 namespace Vxl
 {
-	Light::Light(const std::string& name)
+	LightObject::LightObject(const std::string& name)
 		: Entity(name, EntityType::LIGHT)
 	{
 
 	}
 
-	Light::~Light()
+	LightObject::~LightObject()
 	{
 	
 	}
 
-	Light* Light::Create(const std::string& name)
+	LightObject* LightObject::Create(const std::string& name)
 	{
 		// Create
-		Light* _entity = new Light(name);
+		LightObject* _entity = new LightObject(name);
 		// Store in entity database
 		m_database.Set(_entity);
 		// Return
@@ -26,17 +26,17 @@ namespace Vxl
 	}
 
 	// Behaviour
-	void Light::Update()
+	void LightObject::Update()
 	{
 
 	}
 
-	void Light::Draw()
+	void LightObject::Draw()
 	{
 
 	}
 
-	void Light::TransformChanged()
+	void LightObject::TransformChanged()
 	{
 
 	}

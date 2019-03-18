@@ -5,17 +5,17 @@
 
 namespace Vxl
 {
-	class Light : public Entity
+	class LightObject : public Entity
 	{
 	private:
-		Light(const std::string& name);
+		LightObject(const std::string& name);
 
 	public:
 		// Destructor
-		~Light();
+		~LightObject();
 
 		// Database Creation
-		static Light* Create(const std::string& name);
+		static LightObject* Create(const std::string& name);
 
 		// Behaviour
 		virtual void Update() override;

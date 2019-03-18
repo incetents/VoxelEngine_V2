@@ -3,19 +3,21 @@
 #include "RenderManager.h"
 
 #include "GameObject.h"
-#include "Light.h"
+#include "LightObject.h"
+#include "CameraObject.h"
 #include "Scene.h"
 #include "Layer.h"
 #include "Material.h"
+#include "../utilities/Util.h"
+#include "../imgui/imgui.h"
 #include "../math/Camera.h"
 #include "../opengl/Texture.h"
-#include "../imgui/imgui.h"
-#include "../window/window.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Geometry.h"
 #include "../opengl/Mesh.h"
 #include "../opengl/FramebufferObject.h"
-#include "../imgui_wrappers/Hierarchy.h"
+#include "../window/window.h"
+#include "../window/Hierarchy.h"
 
 #include <algorithm>
 
@@ -47,31 +49,85 @@ namespace Vxl
 		return m_layers[index];
 	}
 
-	void RenderManager::AddEntity(GameObject* _entity)
+	void RenderManager::AddEntity(Entity* _entity)
 	{
-		// Makes sure entity has a material/shader
-		assert(_entity && _entity->GetMaterial());
+		assert(_entity);
 
-		// Check duplicate
-		auto Key = std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial());
-		if (m_entities.find(Key) != m_entities.end())
+		switch (_entity->GetType())
 		{
-			if (m_entities[Key].find(_entity) != m_entities[Key].end())
+			case EntityType::GAMEOBJECT:
 			{
-				// Duplicate found, don't add anything
-				return;
+				auto _GameObject = (GameObject*)_entity;
+
+				// Check if entity already exists
+				if (Util::IsInVector(m_allGameObjects, _GameObject))
+					return;
+
+				// Key
+				auto Key = _GameObject->GetMaterialOrder();
+
+				// New Material = New Set
+				if (m_gbufferObjects.find(Key) == m_gbufferObjects.end())
+					m_gbufferObjects[Key] = std::make_pair(_GameObject->GetMaterial(), std::set<GameObject*>());
+
+				// Add
+				m_gbufferObjects[Key].second.insert(_GameObject);
+				m_allGameObjects.push_back(_GameObject);
+				m_allEntities.push_back(_entity);
+
+				break;
+			}
+			case EntityType::CAMERA:
+			{
+				auto _Camera = (CameraObject*)_entity;
+
+				// Check if entity already exists
+				if (Util::IsInVector(m_allCameraObjects, _Camera))
+					return;
+
+				// Add
+				m_allCameraObjects.push_back(_Camera);
+				m_allEntities.push_back(_entity);
+
+				break;
 			}
 		}
-
-		m_entities[Key].insert(_entity);
-		m_allEntities.push_back(_entity);
 	}
-	void RenderManager::RemoveEntity(GameObject* _entity)
+
+	void RenderManager::RemoveEntity(Entity* _entity)
 	{
-		// Makes sure entity has a material/shader
-		assert(_entity && _entity->GetMaterial());
-		m_entities[std::make_pair(_entity->GetMaterialOrder(), _entity->GetMaterial())].erase(_entity);
-		m_allEntities.erase(std::remove(m_allEntities.begin(), m_allEntities.end(), _entity), m_allEntities.end());
+		assert(_entity);
+
+		switch (_entity->GetType())
+		{
+			case EntityType::GAMEOBJECT:
+			{
+				auto _GameObject = (GameObject*)_entity;
+
+				// Makes sure entity has a material/shader
+				if (!_GameObject->GetMaterial())
+					return;
+
+				// Remove
+				m_gbufferObjects[_GameObject->GetMaterialOrder()].second.erase(_GameObject);
+
+				// Remove
+				Util::RemoveFromVector(m_allGameObjects, _GameObject);
+				Util::RemoveFromVector(m_allEntities, _entity);
+
+				break;
+			}
+			case EntityType::CAMERA:
+			{
+				auto _Camera = (CameraObject*)_entity;
+
+				// Remove
+				Util::RemoveFromVector(m_allCameraObjects, _Camera);
+				Util::RemoveFromVector(m_allEntities, _entity);
+
+				break;
+			}
+		}
 	}
 
 	// Reload Shader System
@@ -157,7 +213,9 @@ namespace Vxl
 		FramebufferObject::m_database.DeleteAndClear();
 
 		// Clear Render List
-		m_entities.clear();
+		m_allEntities.clear();
+		m_allGameObjects.clear();
+		m_gbufferObjects.clear();
 
 		// Remove selected entity
 		Hierarchy._selectedEntity = nullptr;
@@ -196,14 +254,14 @@ namespace Vxl
 			Geometry.GetFullTriangle()->Draw();
 	}
 
-	void RenderManager::RenderScene_ByMaterial()
+	void RenderManager::RenderSceneGameObjects()
 	{
-		for (auto mat = m_entities.begin(); mat != m_entities.end(); mat++)
+		for (auto renderList = m_gbufferObjects.begin(); renderList != m_gbufferObjects.end(); renderList++)
 		{
-			Material* _base = mat->first.second;
+			Material* _base = renderList->second.first;
 			_base->Bind();
 
-			std::set<Entity*> _entites = mat->second;
+			std::set<GameObject*> _entites = renderList->second.second;
 
 			for (auto ent : _entites)
 			{

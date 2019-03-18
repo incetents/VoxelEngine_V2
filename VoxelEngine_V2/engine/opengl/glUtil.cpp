@@ -7,6 +7,7 @@
 #include "../Math/Color.h"
 #include "../math/Vector4.h"
 #include "../opengl/Texture.h"
+#include "../utilities/GlobalMacros.h"
 
 #include <algorithm>
 #include <iostream>
@@ -241,12 +242,16 @@ namespace Vxl
 	// Set OpenGL Name
 	void glUtil::setGLName(glNameType identifier, GLuint id, const std::string &label)
 	{
+#ifdef GLOBAL_USE_GLNAMES
+		//
 		if(GLNameMaxLength == -1)
 			glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLNameMaxLength);
 
 		std::string labelEdit = label + " (" + std::to_string(id) + ")";
 		assert(labelEdit.size() < GLNameMaxLength);
 		glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
+		//
+#endif
 	}
 
 	// Get Format Type from channel count

@@ -3,6 +3,7 @@
 #include "Camera.h"
 
 #include "../opengl/UBO.h"
+#include "../window/window.h"
 
 #include "Vector3.h"
 
@@ -52,20 +53,39 @@ namespace Vxl
 		m_viewProjectionInverse = m_viewProjection.Inverse();
 	}
 
-	Camera& Camera::setPerspective(float _fov, float _aspect)
+	Camera& Camera::setPerspectiveWindowAspectLock(float _fov)
 	{
-		float zNear = getZnear();
-		float zFar = getZfar();
+		float znear = getZnear();
+		float zfar = getZfar();
 		if (m_type != Type::PERSPECTIVE)
 		{
 			delete m_projection;
-			m_projection = new CameraProjection_Perspective(_fov, _aspect, zNear, zFar);
+			m_projection = new CameraProjection_Perspective(true, _fov, Window.GetAspectRatio(), znear, zfar);
 			m_type = Type::PERSPECTIVE;
 		}
 		else
 		{
 			assert(dynamic_cast<CameraProjection_Perspective*>(m_projection));
-			m_projection->Set(_fov, _aspect);
+			m_projection->Update_FovAspect(_fov, Window.GetAspectRatio());
+		}
+
+		return *this;
+	}
+
+	Camera& Camera::setPerspective(float _fov, float _aspect)
+	{
+		float znear = getZnear();
+		float zfar = getZfar();
+		if (m_type != Type::PERSPECTIVE)
+		{
+			delete m_projection;
+			m_projection = new CameraProjection_Perspective(false, _fov, _aspect, znear, zfar);
+			m_type = Type::PERSPECTIVE;
+		}
+		else
+		{
+			assert(dynamic_cast<CameraProjection_Perspective*>(m_projection));
+			m_projection->Update_FovAspect(_fov, _aspect);
 		}
 
 		return *this;
@@ -110,7 +130,12 @@ namespace Vxl
 	{
 		assert(m_type == Type::PERSPECTIVE);
 
-		m_projection->Update_FovAspect(_fov, _aspect);
+		// Ignore aspect change if aspect ratio is locked
+		if (m_projection->IsWindowAspectRatio())
+			m_projection->Update_FovAspect(_fov, Window.GetAspectRatio());
+		else
+			m_projection->Update_FovAspect(_fov, _aspect);
+
 		return *this;
 	}
 	Camera& Camera::updatePerspectiveFOV(float _fov)
@@ -118,13 +143,19 @@ namespace Vxl
 		assert(m_type == Type::PERSPECTIVE);
 
 		m_projection->Update_FovAspect(_fov, m_projection->getAspect());
+
 		return *this;
 	}
 	Camera& Camera::updatePerspectiveAspectRatio(float _aspect)
 	{
 		assert(m_type == Type::PERSPECTIVE);
 
-		m_projection->Update_FovAspect(m_projection->getFov(), _aspect);
+		// Ignore aspect change if aspect ratio is locked
+		if (m_projection->IsWindowAspectRatio())
+			m_projection->Update_FovAspect(m_projection->getFov(), Window.GetAspectRatio());
+		else
+			m_projection->Update_FovAspect(m_projection->getFov(), _aspect);
+
 		return *this;
 	}
 	Camera& Camera::updateOrtho_X(float _xmin, float _xmax)

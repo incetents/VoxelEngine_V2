@@ -30,17 +30,18 @@
 #include "../engine/math/MathCore.h"
 #include "../engine/math/Lerp.h"
 
-#include "../engine/modules/Light.h"
+#include "../engine/modules/LightObject.h"
+#include "../engine/modules/CameraObject.h"
 #include "../engine/modules/GameObject.h"
 #include "../engine/modules/Material.h"
 #include "../engine/modules/RenderManager.h"
 
 #include "../engine/window/window.h"
 
-#include "../engine/imgui_wrappers/ShaderErrors.h"
-#include "../engine/imgui_wrappers/DevConsole.h"
-#include "../engine/imgui_wrappers/Hierarchy.h"
-#include "../engine/imgui_wrappers/Inspector.h"
+#include "../engine/window/ShaderErrors.h"
+#include "../engine/window/DevConsole.h"
+#include "../engine/window/Hierarchy.h"
+#include "../engine/window/Inspector.h"
 
 #include "../game/terrain/TerrainManager.h"
 
@@ -56,7 +57,8 @@ namespace Vxl
 
 		_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
 		//_camera->setOrthographic(-15, 15, -15, 15);
-		_camera->setPerspective(110.0f, Window.GetAspectRatio());
+		//_camera->setPerspective(110.0f, 1.0f);
+		_camera->setPerspectiveWindowAspectLock(110.0f);
 		_camera->update();
 		_camera->SetMain();
 
@@ -244,7 +246,11 @@ namespace Vxl
 		_octo4->m_transform.setScale(0.5f);
 		_octo4->SetColor(Color3F(0, 0, 1));
 		
-		_light1 = Light::Create("light1");
+		//GameObject::Delete(_entity5);
+		CameraObject* c1 = CameraObject::Create("_camera_special");
+
+		//
+		//_light1 = LightObject::Create("light1");
 
 
 		Debug.Setup();
@@ -427,58 +433,14 @@ namespace Vxl
 	}
 	void Scene_Game::Draw()
 	{
-		Camera::GetMain()->BindUBO();
 		//
 		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE", 0));
 		//
 
 		_fbo->bind();
 
-		RenderManager.RenderScene_ByMaterial();
-		{
-			/*
-			// GBUFFER Instancing
-			_material_gbuffer_instancing->Bind();
-			
-			_entity1->Draw();
-
-			// GBUFFER
-			_material_gbuffer->Bind();
-			
-			_entity2->Draw();
-			_entity3->Draw();
-
-			for (int i = 0; i < _cubes.size(); i++)
-				_cubes[i]->Draw();
-
-			//GBUFFER Color
-				_material_gbuffer_color->Bind();
-				
-				_entity5->m_transform.setScale(0.4f);
-				
-				_shader_gbuffer_color->SetUniform("color", vec3(1, 1, 1));
-				_entity5->m_transform.setPosition(Vector3(0, 0, 0));
-				_entity5->Draw();
-				
-				_shader_gbuffer_color->SetUniform("color", vec3(1, 0, 0));
-				_entity5->m_transform.setPosition(Vector3(1, 0, 0));
-				_entity5->Draw();
-				
-				_shader_gbuffer_color->SetUniform("color", vec3(0, 1, 0));
-				_entity5->m_transform.setPosition(Vector3(0, 1, 0));
-				_entity5->Draw();
-				
-				_shader_gbuffer_color->SetUniform("color", vec3(0, 0, 1));
-				_entity5->m_transform.setPosition(Vector3(0, 0, 1));
-				_entity5->Draw();
-				
-				// Skybox
-				_material_skybox->Bind();
-				
-				_entity4->Draw();
-			
-			*/
-		}
+		Camera::GetMain()->BindUBO();
+		RenderManager.RenderSceneGameObjects();
 
 		//	// GBUFFER No model
 		//	_material_gbuffer_no_model->Bind();
@@ -498,11 +460,7 @@ namespace Vxl
 			(float)Window.GetScreenHeight()
 		));
 
-		//glLineWidth(9.0f);
-		glDepthMask(false);
 		Debug.RenderLines();
-		glDepthMask(true);
-		//glLineWidth(1.0f);
 		// ~~ //
 
 		//for (int i = 0; i < _cubes.size(); i++)

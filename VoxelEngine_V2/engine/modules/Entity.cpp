@@ -20,6 +20,20 @@ namespace Vxl
 		AddComponent(&m_transform, this);
 	}
 
+	Entity::~Entity()
+	{
+		RenderManager.RemoveEntity(this);
+	}
+
+	void Entity::Delete(Entity* _entity)
+	{
+		if (!_entity)
+			return;
+
+		RenderManager.RemoveEntity(_entity);
+		m_database.Delete(_entity);
+	}
+
 	void Entity::SetName(const std::string _name)
 	{
 		if (_name.size() > MAX_ENTITY_NAME_LENGTH)

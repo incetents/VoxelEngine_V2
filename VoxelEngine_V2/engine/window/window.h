@@ -43,8 +43,10 @@ namespace Vxl
 
 		void UpdateSizes(UINT width, UINT height);
 		void UpdateViewport();
-		// Updates Aspect Ratio values for camears
-		void UpdateAspectRatio();
+
+		// Update Cameras locked to the Windows Aspect Ratio
+		void UpdateCameraAspectRatios();
+
 		void Destroy();
 		void Update();
 	public:
