@@ -30,10 +30,6 @@ namespace Vxl
 		}
 	}
 
-	// Databases
-	Database<Texture> Texture::m_database;
-	Database<Cubemap> Cubemap::m_database;
-
 	/* BASE TEXTURE */
 
 	void BaseTexture::updateParameters()
@@ -178,8 +174,8 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Filter_Min		MinFilter,
+		Filter_Mag		MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	)
@@ -219,8 +215,8 @@ namespace Vxl
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Filter_Min		MinFilter,
+		Filter_Mag		MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	) 
@@ -263,29 +259,48 @@ namespace Vxl
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Filter_Min		MinFilter,
+		Filter_Mag		MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	) {
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Texture: " + name);
-			return nullptr;
-		}
+		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, DataType);
 
-		Texture* Tex = new Texture(name, pixels, width, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, DataType);
+		AddToDatabase(name, _texture);
 
-		if (Tex == nullptr)
+		if (_texture == nullptr)
 			return false;
-		else if (!Tex->IsLoaded())
+		else if (!_texture->IsLoaded())
 			return false;
 
-		Logger.log("Loaded Texture: " + name);
-		Texture::m_database.Set(name, Tex);
+		Message_Loaded(name, _texture);
 
-		return Tex;
+		return _texture;
+	}
+
+	Texture* Texture::Load(
+		const std::string& name,
+		const std::string& filePath,
+		bool			InvertY,
+		bool			UseMipMapping,
+		Wrap_Mode		WrapMode,
+		Filter_Min		MinFilter,
+		Filter_Mag		MagFilter,
+		Format_Type		FormatType,
+		Data_Type		DataType
+	) {
+		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, DataType);
+
+		AddToDatabase(name, _texture);
+
+		if (_texture == nullptr)
+			return false;
+		else if (!_texture->IsLoaded())
+			return false;
+
+		Message_Loaded(name, _texture);
+
+		return _texture;
 	}
 
 	Texture::~Texture()
@@ -352,4 +367,28 @@ namespace Vxl
 			delete[] m_image[i];
 	}
 
+	Cubemap* Cubemap::Load(
+		const std::string& name,
+		const std::string& filePath1, const std::string& filePath2, const std::string& filePath3, const std::string& filePath4, const std::string& filePath5, const std::string& filePath6,
+		bool InvertY,
+		bool UseMipMapping,
+		Wrap_Mode WrapMode,
+		Filter_Min MinFilter,
+		Filter_Mag MagFilter,
+		Format_Type	FormatType,
+		Data_Type DataType
+	) {
+		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, DataType);
+
+		AddToDatabase(name, _cubemap);
+
+		if (_cubemap == nullptr)
+			return false;
+		else if (!_cubemap->IsLoaded())
+			return false;
+
+		Message_Loaded(name, _cubemap);
+
+		return _cubemap;
+	}
 }

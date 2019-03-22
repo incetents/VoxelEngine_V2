@@ -4,7 +4,7 @@
 #include "glUtil.h"
 
 #include "../utilities/logger.h"
-#include "../utilities/Database.h"
+#include "../utilities/Asset.h"
 
 #include "../math/Vector2.h"
 #include "../math/Vector3.h"
@@ -223,7 +223,7 @@ namespace Vxl
 		}
 	};
 
-	class Mesh
+	class Mesh : public Asset<Mesh>
 	{
 	private:
 		GLuint  m_VAO;
@@ -246,18 +246,11 @@ namespace Vxl
 
 		void UpdateDrawInfo();
 
-		static Database<Mesh> m_database;
+		Mesh(const std::string& glName = "");
 	public:
 		// Stores Mesh in Database optionally
 		static Mesh* Create(const std::string& name);
-		// Get Mesh from database
-		static Mesh* Get(const std::string& name)
-		{
-			return m_database.Get(name);
-		}
-
-		Mesh(const std::string& glName = "");
-		Mesh(Model* _model);
+		static Mesh* Create(const std::string& name, Model* model);
 		virtual ~Mesh();
 
 		MeshBufferMem<Vector3, 3, BufferType::POSITION> m_positions;

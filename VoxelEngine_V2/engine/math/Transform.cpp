@@ -81,4 +81,19 @@ namespace Vxl
 		m_euler_rotation = euler_rotation;
 		m_scale = scale;
 	}
+	Transform::~Transform()
+	{
+		// Make all children become orphans
+		for (auto child : m_children)
+		{
+			child->simpleRemoveParent();
+			child->m_owner->TransformChanged();
+		}
+		// If it has a parent, break connection
+		if (m_parent)
+		{
+			m_parent->SimpleRemoveChild(this);
+			m_parent->m_owner->TransformChanged();
+		}
+	}
 }

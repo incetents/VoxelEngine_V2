@@ -64,7 +64,7 @@ namespace Vxl
 			if (!m_isSetup)
 				return;
 
-			Destroy();
+			//Destroy();
 			m_isSetup = false;
 			Setup();
 		}

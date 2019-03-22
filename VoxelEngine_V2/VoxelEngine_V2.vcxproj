@@ -38,10 +38,12 @@
     <ClCompile Include="engine\opengl\Texture.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
+    <ClCompile Include="engine\utilities\Time.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
     <ClCompile Include="engine\window\DevConsole.cpp" />
     <ClCompile Include="engine\window\Hierarchy.cpp" />
     <ClCompile Include="engine\window\Inspector.cpp" />
+    <ClCompile Include="engine\window\Performance.cpp" />
     <ClCompile Include="engine\window\ShaderErrors.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
     <ClCompile Include="game\terrain\Block.cpp" />
@@ -124,7 +126,7 @@
     <ClInclude Include="engine\opengl\Texture.h" />
     <ClInclude Include="engine\opengl\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
-    <ClInclude Include="engine\utilities\Database.h" />
+    <ClInclude Include="engine\utilities\Asset.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />
     <ClInclude Include="engine\utilities\GlobalMacros.h" />
     <ClInclude Include="engine\utilities\Loader.h" />
@@ -138,6 +140,7 @@
     <ClInclude Include="engine\opengl\glUtil.h" />
     <ClInclude Include="engine\window\Hierarchy.h" />
     <ClInclude Include="engine\window\Inspector.h" />
+    <ClInclude Include="engine\window\Performance.h" />
     <ClInclude Include="engine\window\ShaderErrors.h" />
     <ClInclude Include="engine\window\window.h" />
     <ClInclude Include="game\Scene_Game.h" />

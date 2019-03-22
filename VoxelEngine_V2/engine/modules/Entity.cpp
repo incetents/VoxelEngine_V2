@@ -11,27 +11,11 @@
 
 namespace Vxl
 {
-	DatabaseSet<Entity> Entity::m_database;
-
 	Entity::Entity(const std::string& name, EntityType type)
 		: m_type(type)
 	{
 		SetName(name);
 		AddComponent(&m_transform, this);
-	}
-
-	Entity::~Entity()
-	{
-		RenderManager.RemoveEntity(this);
-	}
-
-	void Entity::Delete(Entity* _entity)
-	{
-		if (!_entity)
-			return;
-
-		RenderManager.RemoveEntity(_entity);
-		m_database.Delete(_entity);
 	}
 
 	void Entity::SetName(const std::string _name)

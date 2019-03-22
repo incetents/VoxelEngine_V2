@@ -16,6 +16,7 @@ namespace Vxl
 		static const Color3F ORANGE;
 		static const Color3F PURPLE;
 		static const Color3F CYAN;
+		static const Color3F GREY;
 
 		Color3F(float r, float g, float b)
 			: r(r), g(g), b(b)
@@ -74,6 +75,7 @@ namespace Vxl
 		static const Color4F ORANGE;
 		static const Color4F PURPLE;
 		static const Color4F CYAN;
+		static const Color4F GREY;
 
 		Color4F(float r, float g, float b, float a)
 			: r(r), g(g), b(b), a(a)

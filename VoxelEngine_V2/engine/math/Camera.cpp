@@ -11,8 +11,6 @@
 
 namespace Vxl
 {
-	Database<Camera> Camera::m_database;
-
 	Camera* Camera::m_main = nullptr;
 
 	Camera::Camera(const Vector3& _position, const Vector3& _forward, float _znear, float _zfar)
@@ -39,9 +37,12 @@ namespace Vxl
 
 	Camera* Camera::Create(const std::string _name, const Vector3& _position, const Vector3& _forward, float _znear, float _zfar)
 	{
-		Camera* C = new Camera(_position, _forward, _znear, _zfar);
-		m_database.Set(_name, C);
-		return C;
+		Camera* _camera = new Camera(_position, _forward, _znear, _zfar);
+		
+		AddToDatabase(_name, _camera);
+		Message_Created(_name, _camera);
+
+		return _camera;
 	}
 
 	void Camera::update()

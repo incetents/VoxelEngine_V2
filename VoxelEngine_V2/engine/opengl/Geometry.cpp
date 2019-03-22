@@ -193,7 +193,7 @@ namespace Vxl
 			uvs.push_back(UVs[2]);
 		}
 
-		Mesh* NewMesh = new Mesh("Icosahedron" + std::to_string(subdivisions));
+		Mesh* NewMesh = Mesh::Create("Icosahedron" + std::to_string(subdivisions));
 		//
 		NewMesh->m_positions.set(vertices);
 		NewMesh->m_uvs.set(uvs);
@@ -269,7 +269,7 @@ namespace Vxl
 			}
 		}
 
-		Mesh* _mesh = new Mesh("Sphere" + std::to_string(xSlice) + '|' + std::to_string(ySlice));
+		Mesh* _mesh = Mesh::Create("Sphere" + std::to_string(xSlice) + '|' + std::to_string(ySlice));
 		//
 		_mesh->m_positions.set(positions);
 		_mesh->m_uvs.set(uvs);
@@ -301,7 +301,7 @@ namespace Vxl
 		};
 		GLuint indices[] = {0, 1, 2, 0, 2, 3};
 
-		m_fullQuad = new Mesh("FullQuad");
+		m_fullQuad = Mesh::Create("FullQuad");
 		//
 		m_fullQuad->m_positions.set(pos, 4);
 		m_fullQuad->m_uvs.set(uvs, 4);
@@ -329,7 +329,7 @@ namespace Vxl
 		};
 		GLuint indices[] = { 0, 1, 2 };
 
-		m_fullTriangle = new Mesh("FullTriangle");
+		m_fullTriangle = Mesh::Create("FullTriangle");
 		//
 		m_fullTriangle->m_positions.set(pos, 3);
 		m_fullTriangle->m_uvs.set(uvs, 3);
@@ -361,7 +361,7 @@ namespace Vxl
 		};
 		GLuint indices[] = { 0, 1, 2, 0, 2, 3 };
 
-		m_quad = new Mesh("Quad");
+		m_quad = Mesh::Create("Quad");
 		//
 		m_quad->m_positions.set(pos, 4);
 		m_quad->m_uvs.set(uvs, 4);
@@ -478,7 +478,7 @@ namespace Vxl
 			21, 22, 20, 22, 23, 20
 		};
 
-		m_cube = new Mesh("Cube");
+		m_cube = Mesh::Create("Cube");
 		//
 		m_cube->m_positions.set(pos, 24);
 		m_cube->m_uvs.set(uvs, 24);
@@ -596,7 +596,7 @@ namespace Vxl
 			22, 21, 20, 23, 22, 20
 		};
 
-		m_inverseCube = new Mesh("InverseCube");
+		m_inverseCube = Mesh::Create("InverseCube");
 		//
 		m_inverseCube->m_positions.set(pos, 24);
 		m_inverseCube->m_uvs.set(uvs, 24);
@@ -648,7 +648,7 @@ namespace Vxl
 			0, 5, 3
 		};
 
-		m_octahedron = new Mesh("Octahedron");
+		m_octahedron = Mesh::Create("Octahedron");
 		//
 		m_octahedron->m_positions.set(pos, 6);
 		m_octahedron->m_uvs.set(uvs, 6);

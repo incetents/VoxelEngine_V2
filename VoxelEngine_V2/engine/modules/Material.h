@@ -8,7 +8,7 @@
 #include "Component.h"
 #include "../opengl/glUtil.h"
 #include "../opengl/Uniform.h"
-#include "../utilities/Database.h"
+#include "../utilities/Asset.h"
 
 #include "MaterialPackage.h"
 //
@@ -21,7 +21,7 @@ namespace Vxl
 	class Transform;
 	class Texture;
 
-	class Material
+	class Material : public Asset<Material>
 	{
 		friend class MaterialData;
 		friend class RenderManager;
@@ -33,14 +33,11 @@ namespace Vxl
 
 		// Locked Constructor
 		Material(const std::string& _name, ShaderProgram* _shader, UINT _order);
-		// Database
-		static Database<Material> m_database;
 
 	public:
 		// Database Creation
 		static Material* Create(const std::string& _name, ShaderProgram* _shader, UINT _order);
 		
-
 		// Accessors
 		inline std::string GetName(void) const
 		{
@@ -73,11 +70,6 @@ namespace Vxl
 	class MaterialData : public Component
 	{
 	private:
-		enum DataType
-		{
-			Vec3 = 0
-		};
-
 		friend class GameObject;
 		friend class RenderManager;
 	protected:

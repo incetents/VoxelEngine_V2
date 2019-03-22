@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "LightObject.h"
 
+#include "../modules/RenderManager.h"
+
 namespace Vxl
 {
 	LightObject::LightObject(const std::string& name)
@@ -12,15 +14,19 @@ namespace Vxl
 
 	LightObject::~LightObject()
 	{
-	
+		RenderManager.RemoveEntity(this);
 	}
 
 	LightObject* LightObject::Create(const std::string& name)
 	{
+		// Create Unique Name
+		auto UniqueName = FixNameDuplicate(name);
+
 		// Create
-		LightObject* _entity = new LightObject(name);
+		LightObject* _entity = new LightObject(UniqueName);
 		// Store in entity database
-		m_database.Set(_entity);
+		AddToDatabase(UniqueName, _entity);
+		Message_Created(UniqueName, _entity);
 		// Return
 		return _entity;
 	}

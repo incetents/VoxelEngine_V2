@@ -2,13 +2,14 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <Windows.h>
 #include "../utilities/singleton.h"
-#include <GLFW/glfw3.h>
+
+#define HISTOGRAM_SIZE 50
 
 namespace Vxl
 {
-#define HISTOGRAM_SIZE 50
 	// ~~~ //
 	static class Time : public Singleton<class Time>
 	{
@@ -66,59 +67,10 @@ namespace Vxl
 	} SingletonInstance(Time);
 
 	// ~~~ //
-	class Clock
-	{
-	private:
-		double m_startTime;
-		double m_endTime;
-		double m_time;
-	public:
-		Clock(double time)
-			: m_time(time)
-		{
-			Reset();
-		}
-		inline double GetTimeLeft(void) const
-		{
-			return max(m_endTime - glfwGetTime(), 0);
-		}
-		inline bool HasFinished(void) const
-		{
-			return ((m_endTime - glfwGetTime()) <= 0);
-		}
-		inline void AddTime(double MoreTime)
-		{
-			m_endTime += MoreTime;
-		}
-		void Reset(void)
-		{
-			m_startTime = glfwGetTime();
-			m_endTime = m_startTime + m_time;
-		}
-		void Reset(double NewTime)
-		{
-			m_time = NewTime;
-			Reset();
-		}
-		
-	};
-
-	// ~~~ //
 	static class TimeController : public Singleton<class TimeController>
 	{
 	public:
-		void StartFrame()
-		{
-			Time.m_time = glfwGetTime();
-			Time.m_deltaTime = (Time.m_time - Time.m_lastTime) / Time.m_limitFPS;
-			Time.m_totalDeltaTime += Time.m_deltaTime;
-			Time.m_lastTime = Time.m_time;
-			Time.m_currentFPS = (Time.m_deltaTime * Time.m_targetFPS);
-
-			Time.m_histogramFPS[HISTOGRAM_SIZE - 1] = (float)Time.m_currentFPS;
-			memcpy(Time.m_histogramFPS, Time.m_histogramFPS + 1, (HISTOGRAM_SIZE - 1) * sizeof(float));
-
-		}
+		void StartFrame();
 		void EndFrame()
 		{
 			Time.m_frames++;
@@ -133,4 +85,73 @@ namespace Vxl
 		}
 
 	} SingletonInstance(TimeController);
+
+	// ~~~ //
+	class Clock
+	{
+	private:
+		double m_startTime;
+		double m_endTime;
+		double m_time;
+	public:
+		Clock(double time)
+			: m_time(time)
+		{
+			Reset();
+		}
+		double GetTimeLeft(void) const;
+		bool HasFinished(void) const;
+		inline void AddTime(double MoreTime)
+		{
+			m_endTime += MoreTime;
+		}
+		void Reset(void);
+		void Reset(double NewTime)
+		{
+			m_time = NewTime;
+			Reset();
+		}
+
+	};
+
+	// ~~~ //
+	class GPUTimer
+	{
+		friend class RenderManager;
+	private:
+		enum class QueryState
+		{
+			READY,
+			START,
+			END
+		};
+
+		static std::unordered_map<std::string, GPUTimer*> m_timers;
+		static bool	m_TimerBeingUsed;
+		u_int		m_ID;
+		uint64_t	m_elapsedTime = 0;
+		double		m_elapsedTime_MS[10] = { 0 };
+		u_int		m_elapsedTime_MS_index = 0;
+
+		double		m_elapsedTime_MS_average;
+		QueryState	m_queryingState = QueryState::READY;
+
+		GPUTimer();
+		~GPUTimer();
+
+		void Begin();
+		void End();
+		void Update();
+	public:
+
+		inline u_int GetID(void) const
+		{
+			return m_ID;
+		}
+
+		static void		StartTimer(const std::string& name);
+		static void		EndTimer(const std::string& name);
+		static double	GetElapsedTime_MS(const std::string& name);
+
+	};
 }

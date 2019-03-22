@@ -145,7 +145,7 @@ namespace Vxl
 	void Window::UpdateCameraAspectRatios()
 	{
 		// Update aspect ratio for all existing cameras that are locked to this aspect ratio
-		auto Cameras = Camera::m_database.Get();
+		auto Cameras = Camera::GetDatabase();
 		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
 		{
 			auto Cam = it->second;

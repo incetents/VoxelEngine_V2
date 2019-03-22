@@ -10,10 +10,6 @@
 
 namespace Vxl
 {
-	// STATIC //
-	Database<Shader> Shader::m_database;
-	Database<ShaderProgram> ShaderProgram::m_database;
-
 	// SHADER //
 	std::unordered_map<std::string, const Shader*> Shader::ShaderErrorLog;
 	UINT Shader::ShaderErrorLogSize = 0;
@@ -140,6 +136,22 @@ namespace Vxl
 		m_hasCompiled = false;
 	}
 
+	Shader* Shader::Load(const std::string& name, const std::string& filePath, ShaderType type)
+	{
+		Shader* _shader = new Shader(name, filePath, type);
+
+		AddToDatabase(name, _shader);
+
+		if(_shader == nullptr)
+			return false;
+		else if (!_shader->HasLoaded() || !_shader->HasCompiled())
+			return false;
+
+		Message_Created(name, _shader);
+
+		return _shader;
+	}
+
 	// SHADER PROGRAM //
 
 	GLuint ShaderProgram::m_boundID = 0;
@@ -201,6 +213,31 @@ namespace Vxl
 		glDeleteProgram(m_id);
 		m_id = -1;
 		m_linked = false;
+	}
+
+	ShaderProgram* ShaderProgram::Load(const std::string& name, std::vector<std::string> shaders)
+	{
+		ShaderProgram* _program = new ShaderProgram(name);
+
+		AddToDatabase(name, _program);
+
+		int shaderCount = (int)shaders.size();
+		for (int i = 0; i < shaderCount; i++)
+		{
+			Shader* _shader = Shader::Get(shaders[i]);
+			if (_shader != nullptr)
+				_program->AddShader(_shader);
+		}
+		_program->Link();
+
+		if (_program == nullptr)
+			return false;
+		else if (!_program->IsLinked())
+			return false;
+
+		Message_Loaded(name, _program);
+
+		return _program;
 	}
 
 	void ShaderProgram::AddShader(Shader* _shader)

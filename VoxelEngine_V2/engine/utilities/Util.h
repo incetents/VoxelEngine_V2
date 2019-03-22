@@ -33,7 +33,10 @@ namespace Vxl
 		template<typename Type>
 		void RemoveFromVector(std::vector<Type>& vec, Type data)
 		{
-			std::remove(vec.begin(), vec.end(), data);
+			if (data == nullptr || vec.size() == 0)
+				return;
+
+			vec.erase(std::remove(vec.begin(), vec.end(), data));
 		}
 
 		// Aspect Ratio //

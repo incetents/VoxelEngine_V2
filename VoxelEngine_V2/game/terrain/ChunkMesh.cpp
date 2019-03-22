@@ -230,7 +230,7 @@ namespace Vxl
 			}
 		}
 
-		m_mesh = new Mesh();
+		m_mesh = Mesh::Create("CHUNK_TEST");
 		m_mesh->m_positions.set(m_positions);
 		m_mesh->m_uvs.set(m_uvs);
 		m_mesh->m_normals.set(m_normals);

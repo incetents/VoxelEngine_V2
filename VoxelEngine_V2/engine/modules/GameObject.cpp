@@ -16,15 +16,19 @@ namespace Vxl
 
 	GameObject::~GameObject()
 	{
-
+		RenderManager.RemoveEntity(this);
 	}
 
 	GameObject* GameObject::Create(const std::string& name)
 	{
+		// Create Unique Name
+		auto UniqueName = FixNameDuplicate(name);
+
 		// Create
-		GameObject* _entity = new GameObject(name);
+		GameObject* _entity = new GameObject(UniqueName);
 		// Store in entity database
-		m_database.Set(_entity);
+		AddToDatabase(UniqueName, _entity);
+		Message_Created(UniqueName, _entity);
 		// Return
 		return _entity;
 	}
@@ -64,7 +68,8 @@ namespace Vxl
 	{
 		m_material.Bind(!m_isColoredObject);
 
-		m_mesh->Draw();
+		if(m_mesh)
+			m_mesh->Draw();
 	}
 
 	void GameObject::TransformChanged()

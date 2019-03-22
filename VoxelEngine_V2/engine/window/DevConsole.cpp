@@ -49,6 +49,10 @@ namespace Vxl
 
 		ImGui::Separator();
 
+		ImGui::Text("Gbuffer Time: %.4f ms", GPUTimer::GetElapsedTime_MS("Gbuffer"));
+
+		ImGui::Separator();
+
 		if (ImGui::Button("Reload Window"))
 		{
 			RenderManager.ReloadWindow();

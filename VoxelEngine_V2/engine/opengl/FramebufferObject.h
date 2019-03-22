@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include "glUtil.h"
 #include "../math/Color.h"
-#include "../utilities/Database.h"
+#include "../utilities/Asset.h"
 
 //#include "Texture.h"
 #include <vector>
@@ -13,7 +13,7 @@ namespace Vxl
 {
 	class RenderTexture;
 
-	class FramebufferObject
+	class FramebufferObject : public Asset<FramebufferObject>
 	{
 		friend class RenderManager;
 	private:
@@ -39,9 +39,7 @@ namespace Vxl
 		void bindFBO();
 		void clearColor();
 
-		// Database
-		static Database<FramebufferObject> m_database;
-		// Protected Creation
+		// Constructor
 		FramebufferObject(
 			const std::string& name,
 			UINT FBO_width, UINT FBO_height,
@@ -54,11 +52,6 @@ namespace Vxl
 			UINT FBO_width, UINT FBO_height,
 			Color4F ClearColor
 		);
-		// Accessor
-		static FramebufferObject* Get(const std::string& name)
-		{
-			return m_database.Get(name);
-		}
 
 		~FramebufferObject();
 

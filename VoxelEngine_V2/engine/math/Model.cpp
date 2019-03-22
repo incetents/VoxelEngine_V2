@@ -9,11 +9,10 @@
 
 #include "../utilities/stringUtil.h"
 #include "../utilities/Logger.h"
+#include "../opengl/Mesh.h"
 
 namespace Vxl
 {
-	Database<Model> Model::m_database;
-
 	Vector4 InterpretAssimpVec4(aiColor4D vec)
 	{
 		return Vector4(vec.r, vec.g, vec.b, vec.a);
@@ -149,5 +148,32 @@ namespace Vxl
 		// End
 		aiReleaseImport(scene);
 		return _models;
+	}
+
+	std::vector<Mesh*> Model::Load(const std::string& name, const std::string& filePath,
+		bool mergeMeshes, bool normalize, float normalizeScale
+	) {
+		std::vector<Model*> Models = Model::LoadFromAssimp(filePath, mergeMeshes, normalize, normalizeScale);
+		UINT ModelCount = (UINT)Models.size();
+
+		if (ModelCount == 0)
+		{
+			Logger.error("Unable to Load Model: " + name);
+			return std::vector<Mesh*>();
+		}
+
+		std::vector<Mesh*> _meshes;
+		for (UINT i = 0; i < ModelCount; i++)
+		{
+			std::string _name = name;
+			if (ModelCount > 1)
+				_name += " (" + std::to_string(i) + ')';
+
+			
+			Mesh* _mesh = Mesh::Create(_name, Models[i]);
+			_meshes.push_back(_mesh);
+		}
+
+		return _meshes;
 	}
 }

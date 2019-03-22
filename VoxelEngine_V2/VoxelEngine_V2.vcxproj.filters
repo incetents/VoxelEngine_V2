@@ -189,6 +189,12 @@
     <ClCompile Include="engine\modules\LightObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\utilities\Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\window\Performance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\Input.h">
@@ -276,9 +282,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\utilities\Database.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\opengl\Texture.h">
@@ -396,6 +399,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\modules\LightObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\utilities\Asset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\window\Performance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

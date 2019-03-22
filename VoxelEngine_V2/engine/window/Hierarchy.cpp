@@ -6,7 +6,10 @@
 #include "../imgui/imgui_colors.h"
 
 #include "../modules/RenderManager.h"
-#include "../modules/Entity.h"
+#include "../modules/GameObject.h"
+#include "../modules/Material.h"
+
+#include "../opengl/Geometry.h"
 
 #include "../input/Input.h"
 
@@ -99,6 +102,22 @@ namespace Vxl
 
 		if (ImGui::Begin("[F3] Hierarchy", &open, ImVec2(280, 380), 0.9f))
 		{
+			ImGui::Text("Scene Graph:\t");
+			ImGui::SameLine();
+			if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
+			{
+				Entity::Delete(_selectedEntity);
+				_selectedEntity = nullptr;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Add Sphere"))
+			{
+				auto object = GameObject::Create("Generic Object");
+				//object->SetMesh(Geometry.GetSphereUV_Good());
+				object->SetMaterial(Material::Get("gbuffer"));
+				//object->SetColor(Color3F(1, 0, 0));
+			}
+
 			auto AllEntities = RenderManager.m_allEntities;
 			for (auto it = AllEntities.begin(); it != AllEntities.end(); it++)
 			{

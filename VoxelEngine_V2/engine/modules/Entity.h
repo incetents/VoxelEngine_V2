@@ -4,7 +4,7 @@
 #include "Component.h"
 #include "../math/Transform.h"
 #include "../math/Color.h"
-#include "../utilities/Database.h"
+#include "../utilities/Asset.h"
 
 #define MAX_ENTITY_NAME_LENGTH 256
 
@@ -21,7 +21,7 @@ namespace Vxl
 		CAMERA
 	};
 
-	class Entity : public ComponentHandler
+	class Entity : public ComponentHandler, public Asset<Entity>
 	{
 		friend class RenderManager;
 		friend class Transform;
@@ -29,8 +29,6 @@ namespace Vxl
 	protected:
 		// Locked Constructor
 		Entity(const std::string& name, EntityType type);
-		// Database
-		static DatabaseSet<Entity> m_database;
 
 		// Data
 		Mesh*		m_mesh = nullptr;
@@ -43,10 +41,7 @@ namespace Vxl
 
 	public:
 		// Destructor
-		virtual ~Entity();
-
-		// Database Deletion
-		static void Delete(Entity* _entity);
+		virtual ~Entity() {}
 
 		// Data
 		Transform			m_transform;
@@ -108,10 +103,10 @@ namespace Vxl
 		}
 
 		// Color
-		inline void SetColor(Color3F color, bool enableIsColoredObject = true)
+		inline void SetColor(Color3F color, bool colorOverTexture = true)
 		{
 			m_Color = color;
-			m_isColoredObject = enableIsColoredObject;
+			m_isColoredObject = colorOverTexture;
 		}
 		inline Color3F& GetColor(void)
 		{

@@ -2,7 +2,7 @@
 #pragma once
 #include "Enums.h"
 
-#include "../utilities/Database.h"
+#include "../utilities/Asset.h"
 
 #include "Uniform.h"
 
@@ -16,7 +16,7 @@ namespace Vxl
 	typedef std::unordered_map<std::string, glUniformBlock> UniformBlockStorage;
 	typedef std::unordered_map<ShaderType, glSubroutine> SubroutineStorage;
 
-	class Shader
+	class Shader : public Asset<Shader>
 	{
 		friend class Loader;
 		friend class ShaderProgram;
@@ -38,21 +38,20 @@ namespace Vxl
 		bool load();
 		void unload();
 
-		// Locked Constructor
+		// Constructor
 		Shader(const std::string& name, const std::string& filePath, ShaderType type)
 			: m_name(name + '[' + glUtil::shaderTypeToString(type) + ']'), m_filePath(filePath), m_type(type)
 		{
 			m_hasLoaded = load();
 		}
-		// Database
-		static Database<Shader> m_database;
 
 	public:
-		// Database Getter
-		static Shader* Get(const std::string& name)
-		{
-			return m_database.Get(name);
-		}
+		// Load
+		static Shader* Load(
+			const std::string& name,
+			const std::string& filePath,
+			ShaderType type
+		);
 
 		~Shader()
 		{
@@ -103,7 +102,7 @@ namespace Vxl
 		Shader& operator=(const Shader&) = delete;
 	};
 
-	class ShaderProgram
+	class ShaderProgram : public Asset<ShaderProgram>
 	{
 		friend class Loader;
 		friend class RenderManager;
@@ -138,22 +137,19 @@ namespace Vxl
 		bool load();
 		void unload();
 
-		// Locked Constructor
+		// Constructor
 		ShaderProgram(const std::string& name)
 			: m_name(name)
 		{
 			load();
 		}
-		// Database
-		static Database<ShaderProgram> m_database;
 
 	public:
-		
-		// Database Getter
-		static ShaderProgram* Get(const std::string& name)
-		{
-			return m_database.Get(name);
-		}
+		// Load
+		static ShaderProgram* Load(
+			const std::string& name,
+			std::vector<std::string> shaders
+		);
 
 		~ShaderProgram()
 		{

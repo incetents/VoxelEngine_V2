@@ -9,6 +9,7 @@
 #include "Layer.h"
 #include "Material.h"
 #include "../utilities/Util.h"
+#include "../utilities/Time.h"
 #include "../imgui/imgui.h"
 #include "../math/Camera.h"
 #include "../opengl/Texture.h"
@@ -102,14 +103,15 @@ namespace Vxl
 		{
 			case EntityType::GAMEOBJECT:
 			{
-				auto _GameObject = (GameObject*)_entity;
+				auto _GameObject = dynamic_cast<GameObject*>(_entity);
+				assert(_GameObject);
 
 				// Makes sure entity has a material/shader
-				if (!_GameObject->GetMaterial())
-					return;
-
-				// Remove
-				m_gbufferObjects[_GameObject->GetMaterialOrder()].second.erase(_GameObject);
+				if (_GameObject->GetMaterial())
+				{
+					// Remove from Material Render
+					m_gbufferObjects[_GameObject->GetMaterialOrder()].second.erase(_GameObject);
+				}
 
 				// Remove
 				Util::RemoveFromVector(m_allGameObjects, _GameObject);
@@ -119,7 +121,8 @@ namespace Vxl
 			}
 			case EntityType::CAMERA:
 			{
-				auto _Camera = (CameraObject*)_entity;
+				auto _Camera = dynamic_cast<CameraObject*>(_entity);
+				assert(_Camera);
 
 				// Remove
 				Util::RemoveFromVector(m_allCameraObjects, _Camera);
@@ -138,26 +141,26 @@ namespace Vxl
 		ShaderProgram::ProgramsFailed.clear();
 		ShaderProgram::ProgramsFailedSize = 0;
 
-		auto Shaders = Shader::m_database.Get();
+		auto Shaders = Shader::GetDatabase();
 		for (auto Shader : Shaders)
 			Shader.second->reload();
 
-		auto Programs = ShaderProgram::m_database.Get();;
+		auto Programs = ShaderProgram::GetDatabase();
 		for (auto Program : Programs)
 			Program.second->reload();
 
 		// Materials are part of Shaders
-		auto Materials = Material::m_database.Get();
+		auto Materials = Material::GetDatabase();
 		for (auto Material : Materials)
 			Material.second->ReloadPackages();
 
 		// Entity Materials are part of Shaders
-		auto Entities = Entity::m_database.Get();
+		auto Entities = Entity::GetDatabase();
 		for (auto Entity : Entities)
 		{
-			if (Entity->GetType() == EntityType::GAMEOBJECT)
+			if (Entity.second->GetType() == EntityType::GAMEOBJECT)
 			{
-				GameObject* G_Object = dynamic_cast<GameObject*>(Entity);
+				GameObject* G_Object = dynamic_cast<GameObject*>(Entity.second);
 				G_Object->m_material.UpdateMaterialPackages();
 			}
 		}
@@ -167,7 +170,6 @@ namespace Vxl
 		glUtil::initHints(); // important for reset reasons
 
 		Window.Reload();
-		Geometry.Reload();
 
 		ReloadScene();
 
@@ -190,11 +192,11 @@ namespace Vxl
 	void RenderManager::Destroy()
 	{
 		// Delete Cameras
-		Camera::m_database.DeleteAndClear();
+		Camera::DeleteAndClearAll();
 		
 		// Delete Materials and Entities
-		Material::m_database.DeleteAndClear();
-		Entity::m_database.DeleteAndClear();
+		Material::DeleteAndClearAll();
+		Entity::DeleteAndClearAll(); // Since deleting entities changes
 
 		// Clear Shader Error Log
 		Shader::ShaderErrorLog.clear();
@@ -202,15 +204,18 @@ namespace Vxl
 		ShaderProgram::ProgramsFailed.clear();
 		ShaderProgram::ProgramsFailedSize = 0;
 		// Delete Shaders
-		Shader::m_database.DeleteAndClear();
-		ShaderProgram::m_database.DeleteAndClear();
+		Shader::DeleteAndClearAll();
+		ShaderProgram::DeleteAndClearAll();
 
 		// Delete Textures
-		Texture::m_database.DeleteAndClear();
-		Cubemap::m_database.DeleteAndClear();
+		Texture::DeleteAndClearAll();
+		Cubemap::DeleteAndClearAll();
 
 		// Delete Framebuffers
-		FramebufferObject::m_database.DeleteAndClear();
+		FramebufferObject::DeleteAndClearAll();
+
+		// Delete Meshes
+		Mesh::DeleteAndClearAll();
 
 		// Clear Render List
 		m_allEntities.clear();
@@ -220,6 +225,9 @@ namespace Vxl
 		// Remove selected entity
 		Hierarchy._selectedEntity = nullptr;
 
+		// Recreate Geometry Shapes
+		Geometry.Reload();
+
 	}
 	void RenderManager::Update()
 	{
@@ -228,6 +236,10 @@ namespace Vxl
 		// Update all entities
 		for (auto it = m_allEntities.begin(); it != m_allEntities.end(); it++)
 			(*it)->Update();
+
+		// Update all GPU Timers
+		for (auto it = GPUTimer::m_timers.begin(); it != GPUTimer::m_timers.end(); it++)
+			it->second->Update();
 	}
 	void RenderManager::UpdateFixed()
 	{

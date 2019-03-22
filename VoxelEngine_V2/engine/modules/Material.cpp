@@ -16,9 +16,6 @@
 
 namespace Vxl
 {
-	// ~ MATERIAL ~ //
-	Database<Material> Material::m_database;
-
 	Material::Material(
 		const std::string& _name,
 		ShaderProgram* _shader,
@@ -34,9 +31,12 @@ namespace Vxl
 		ShaderProgram* _shader,
 		UINT _order
 	){
-		Material* M = new Material(_name, _shader, _order);
-		m_database.Set(_name, M);
-		return M;
+		Material* _material = new Material(_name, _shader, _order);
+
+		AddToDatabase(_name, _material);
+		Message_Created(_name, _material);
+
+		return _material;
 	}
 
 	void Material::ReloadPackages()
@@ -155,7 +155,7 @@ namespace Vxl
 			Mat_model.m_uniform.Set(m_owner->m_transform.getModel());
 		}
 		// ~ Special Setters ~ //
-		if (Mat_useInstancing.m_exists)
+		if (Mat_useInstancing.m_exists && m_owner->GetMesh())
 		{
 			Mat_useInstancing.m_uniform.Set<bool>(m_owner->GetMesh()->m_instances.GetDrawCount() > 0 ? true : false);
 		}

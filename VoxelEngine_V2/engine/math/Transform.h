@@ -86,6 +86,7 @@ namespace Vxl
 	public:
 		Transform(void);
 		Transform(const Vector3& position, const Vector3& euler_rotation = Vector3(0,0,0), const Vector3& scale = Vector3(1,1,1));
+		~Transform();
 
 		// Dirty Setter
 		void SetDirty()
@@ -174,7 +175,8 @@ namespace Vxl
 			m_parent = parent;
 
 			// Make sure parent has child
-			m_parent->addChild(this);
+			if(m_parent)
+				m_parent->addChild(this);
 
 			// Flag
 			SetDirty();

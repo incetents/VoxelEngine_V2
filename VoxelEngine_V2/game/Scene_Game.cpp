@@ -42,6 +42,7 @@
 #include "../engine/window/DevConsole.h"
 #include "../engine/window/Hierarchy.h"
 #include "../engine/window/Inspector.h"
+#include "../engine/window/Performance.h"
 
 #include "../game/terrain/TerrainManager.h"
 
@@ -99,7 +100,7 @@ namespace Vxl
 		//TerrainManager.Setup(); // keeps track of terrain info
 		//
 
-		_mesh = new Mesh("test1");
+		_mesh = Mesh::Create("test1");
 		
 		Vector3 pos[] = {
 			Vector3(-0.5f, -0.5f, 0.0f),
@@ -142,7 +143,7 @@ namespace Vxl
 		_entity1->m_transform.setScale(+0.5f);
 		
 		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
-		Mesh* jiggyMesh = new Mesh(Model::Get("jiggy"));
+		Mesh* jiggyMesh = Mesh::Get("jiggy");
 		
 		_entity2 = GameObject::Create("_entity2");
 		_entity2->SetMaterial(_material_gbuffer);
@@ -247,8 +248,9 @@ namespace Vxl
 		_octo4->SetColor(Color3F(0, 0, 1));
 		
 		//GameObject::Delete(_entity5);
-		CameraObject* c1 = CameraObject::Create("_camera_special");
+		//CameraObject* c1 = CameraObject::Create("_camera_special");
 
+		GameObject::Delete("_octo3");
 		//
 		//_light1 = LightObject::Create("light1");
 
@@ -257,7 +259,7 @@ namespace Vxl
 	}
 	void Scene_Game::Destroy()
 	{
-		delete _mesh;
+		//delete _mesh;
 
 		TerrainManager.Destroy();
 	}
@@ -357,22 +359,28 @@ namespace Vxl
 			auto Entity = Hierarchy._selectedEntity;
 			static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
 
+			Color4F AABB_Color = Entity->m_isActive ? Color4F::YELLOW : Color4F::GREY;
+			Color4F OBB_Color = Entity->m_isActive ? Color4F::GREEN : Color4F::GREY;
+
 			// Draw Outline around Entity
-			if (Entity->GetMesh()->m_instances.Empty())
+			if (Entity->GetMesh())
 			{
-				Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, Color4F::YELLOW);
-				Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, Color4F::GREEN);
-			}
-			// Draw outline around all instances
-			else
-			{
-				//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
-				auto Instances = Entity->GetMesh()->m_instances.GetVertices();
-				for (Matrix4x4 instanceMatrix : *Instances)
+				if (Entity->GetMesh()->m_instances.Empty())
 				{
-					Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
-					Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, Color4F::YELLOW);
-					Debug.DrawOBB(*Entity, Pos, 5.0f, Color4F::GREEN);
+					Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, AABB_Color);
+					Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
+				}
+				// Draw outline around all instances
+				else
+				{
+					//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
+					auto Instances = Entity->GetMesh()->m_instances.GetVertices();
+					for (Matrix4x4 instanceMatrix : *Instances)
+					{
+						Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
+						Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, AABB_Color);
+						Debug.DrawOBB(*Entity, Pos, 5.0f, OBB_Color);
+					}
 				}
 			}
 		}
@@ -437,10 +445,16 @@ namespace Vxl
 		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE", 0));
 		//
 
+		GPUTimer::StartTimer("Gbuffer");
+
 		_fbo->bind();
+
+		
 
 		Camera::GetMain()->BindUBO();
 		RenderManager.RenderSceneGameObjects();
+
+		GPUTimer::EndTimer("Gbuffer");
 
 		//	// GBUFFER No model
 		//	_material_gbuffer_no_model->Bind();
@@ -521,7 +535,7 @@ namespace Vxl
 				auto Entity = Entities[i];
 
 				// Ignore if not active or not clickable
-				if (!Entity->IsFamilyActive() || !Entity->m_isClickable)
+				if (!Entity->IsFamilyActive() || !Entity->m_isClickable || !Entity->GetMesh())
 					continue;
 
 				_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
@@ -706,6 +720,8 @@ namespace Vxl
 		Inspector.Draw();
 		// Hierarchy
 		Hierarchy.Draw();
+		// Performance
+		Performance.Draw();
 		// Dev Console
 		DevConsole.Draw(this);
 	}

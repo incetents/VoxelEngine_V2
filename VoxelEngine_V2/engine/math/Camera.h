@@ -3,7 +3,7 @@
 
 #include "Transform.h"
 
-#include "../utilities/Database.h"
+#include "../utilities/Asset.h"
 #include <assert.h>
 
 namespace Vxl
@@ -166,7 +166,7 @@ namespace Vxl
 		~CameraProjection_Custom() {}
 	};
 
-	class Camera : public Transform
+	class Camera : public Transform, public Asset<Camera>
 	{
 		friend class CameraProjection;
 		friend class CameraProjection_Perspective;
@@ -197,9 +197,6 @@ namespace Vxl
 
 		// Protected
 		Camera(const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
-	
-		// Database
-		static Database<Camera> m_database;
 	public:
 		~Camera();
 

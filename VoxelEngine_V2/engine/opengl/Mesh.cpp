@@ -7,8 +7,6 @@
 
 namespace Vxl
 {
-	Database<Mesh> Mesh::m_database;
-
 	void Mesh::DrawArray()
 	{
 		glDrawArrays((GLenum)m_type, 0, m_drawCount);
@@ -138,25 +136,26 @@ namespace Vxl
 			glUtil::setGLName(glNameType::VERTEX_ARRAY, m_VAO, "Mesh_" + glName);
 
 	}
-	Mesh::Mesh(Model* _model)
-	{
-		m_VAO = glUtil::generateVAO();
-		Set(_model);
-	}
 
 	Mesh* Mesh::Create(const std::string& name)
 	{
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Mesh: " + name);
-			return nullptr;
-		}
+		Mesh* _mesh = new Mesh(name);
 
-		Mesh* M = new Mesh(name);
+		AddToDatabase(name, _mesh);
+		Message_Created(name, _mesh);
 
-		Logger.log("Created Mesh: " + name);
-		return M;
+		return _mesh;
+	}
+	Mesh* Mesh::Create(const std::string& name, Model* _model)
+	{
+		Mesh* _mesh = new Mesh(name);
+
+		AddToDatabase(name, _mesh);
+		Message_Created(name, _mesh);
+
+		_mesh->Set(_model);
+
+		return _mesh;
 	}
 
 	Mesh::~Mesh()

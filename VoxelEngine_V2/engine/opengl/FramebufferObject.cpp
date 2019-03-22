@@ -10,7 +10,6 @@
 namespace Vxl
 {
 	GLuint FramebufferObject::m_boundID = 0;
-	Database<FramebufferObject> FramebufferObject::m_database;
 
 	FramebufferObject::FramebufferObject(
 		const std::string& name,
@@ -33,19 +32,12 @@ namespace Vxl
 		UINT FBO_width, UINT FBO_height,
 		Color4F ClearColor
 	){
-		// Name Duplication
-		if (m_database.Check(name))
-		{
-			Logger.error("Duplicate Framebuffer: " + name);
-			return nullptr;
-		}
+		FramebufferObject* _FBO = new FramebufferObject(name, FBO_width, FBO_height, ClearColor);
 
-		FramebufferObject* FBO = new FramebufferObject(name, FBO_width, FBO_height, ClearColor);
+		AddToDatabase(name, _FBO);
+		Message_Created(name, _FBO);
 
-		Logger.log("Created FBO: " + name);
-		m_database.Set(name, FBO);
-
-		return FBO;
+		return _FBO;
 	}
 
 	FramebufferObject::~FramebufferObject()
