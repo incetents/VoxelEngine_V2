@@ -165,9 +165,6 @@
     <ClCompile Include="engine\opengl\UBO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\modules\GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui_colors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -183,16 +180,19 @@
     <ClCompile Include="engine\window\DevConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\modules\CameraObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\modules\LightObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\utilities\Time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\window\Performance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\objects\LightObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\objects\GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\objects\CameraObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -374,9 +374,6 @@
     <ClInclude Include="engine\opengl\UBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\modules\GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imgui_colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -392,19 +389,22 @@
     <ClInclude Include="engine\window\DevConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\modules\CameraObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\utilities\GlobalMacros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\modules\LightObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Asset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\window\Performance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\objects\LightObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\objects\GameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\objects\CameraObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

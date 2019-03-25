@@ -36,7 +36,7 @@ namespace Vxl
 	}
 
 	// Static Variables
-	std::unordered_map<std::string, GPUTimer*> GPUTimer::m_timers;
+	std::map<std::string, GPUTimer*> GPUTimer::m_timers;
 	bool GPUTimer::m_TimerBeingUsed = false;
 
 	GPUTimer::GPUTimer()
@@ -87,10 +87,13 @@ namespace Vxl
 		glGetQueryObjectui64v(m_ID, GL_QUERY_RESULT, &m_elapsedTime);
 		m_elapsedTime_MS[m_elapsedTime_MS_index] = (double)m_elapsedTime / 1000000.0;
 
+		m_elapsedTime_MS_index++;
+		m_elapsedTime_MS_index %= GPUTIMER_CAPTURES;
+
 		m_elapsedTime_MS_average = 0;
 		for (auto ms : m_elapsedTime_MS)
 			m_elapsedTime_MS_average += ms;
-		m_elapsedTime_MS_average /= 10.0;
+		m_elapsedTime_MS_average /= (double)GPUTIMER_CAPTURES;
 
 		m_queryingState = QueryState::READY;
 #endif

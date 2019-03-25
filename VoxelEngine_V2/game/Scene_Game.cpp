@@ -30,9 +30,9 @@
 #include "../engine/math/MathCore.h"
 #include "../engine/math/Lerp.h"
 
-#include "../engine/modules/LightObject.h"
-#include "../engine/modules/CameraObject.h"
-#include "../engine/modules/GameObject.h"
+#include "../engine/objects/LightObject.h"
+#include "../engine/objects/CameraObject.h"
+#include "../engine/objects/GameObject.h"
 #include "../engine/modules/Material.h"
 #include "../engine/modules/RenderManager.h"
 
@@ -64,7 +64,7 @@ namespace Vxl
 		_camera->SetMain();
 
 		// FBO
-		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0.1f, 0.1f, 0.3f, 0.0f));
+		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0.1f, 0.1f, 0.3f, 1.0f));
 		_fbo->addTexture("albedo");
 		_fbo->addTexture("normal", Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
 		_fbo->addTexture("test");
@@ -87,6 +87,10 @@ namespace Vxl
 		_material_gbuffer_no_model	= Material::Create("gbuffer_no_model", _shader_gbuffer_no_model, 2);
 		_material_lines				= Material::Create("debug_lines", _shader_lines, 3);
 		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
+
+		_material_gbuffer->m_BlendState = false;
+		_material_gbuffer->m_BlendSource = Blend_Source::ONE;
+		_material_gbuffer->m_BlendDest = Blend_Destination::ZERO;
 
 		_tex = Texture::Get("beato");
 		_tex_crate = Texture::Get("crate_diffuse");
@@ -136,7 +140,7 @@ namespace Vxl
 		
 		
 		// Entities
-		_entity1 = GameObject::Create("_entity1");
+		GameObject* _entity1 = GameObject::Create("_entity1");
 		_entity1->SetMaterial(_material_gbuffer);
 		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity1->SetMesh(_mesh);
@@ -145,25 +149,20 @@ namespace Vxl
 		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
 		Mesh* jiggyMesh = Mesh::Get("jiggy");
 		
-		_entity2 = GameObject::Create("_entity2");
+		GameObject* _entity2 = GameObject::Create("_entity2");
 		_entity2->SetMaterial(_material_gbuffer);
 		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		_entity2->SetColor(Color3F(1, 1, 0));
 		
-		_entity3 = GameObject::Create("_entity3");
+		GameObject* _entity3 = GameObject::Create("_entity3");
 		_entity3->SetMaterial(_material_gbuffer);
 		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity3->SetMesh(Geometry.GetIcosahedron());
 		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
 		
-		_entity4 = GameObject::Create("_entity4");
-		_entity4->SetMaterial(_material_skybox);
-		_entity4->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
-		_entity4->SetMesh(Geometry.GetInverseCube());
-		_entity4->m_isClickable = false;
-		_entity4->m_useTransform = false;
+		
 		
 		GameObject* _entity5 = GameObject::Create("_entity5");
 		_entity5->SetMaterial(_material_gbuffer);
@@ -171,36 +170,17 @@ namespace Vxl
 		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
 		_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		//_entity5->SetColor(Color3F(1, 1, 1));
+		
 
-		for (int x = -1; x <= 1; x++)
-		{
-			for (int y = -1; y <= 1; y++)
-			{
-				for (int z = -1; z <= 1; z++)
-				{
-					if (x == 0 && y == 0 && z == 0)
-						continue;
-					
-					//	Entity* ent = new Entity();
-					//	ent->SetMaterial(_material_gbuffer);
-					//	ent->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-					//	ent->m_mesh = Geometry::GetCube();
-					//	
-					//	ent->m_transform.setPosition(Vector3(x * 4.0f, y * 4.0f, z * 4.0f));
-					//	
-					//	if (x == 1 || y == 1 || z == 1)
-					//	{
-					//		ent->m_transform.setRotationX(45.0f);
-					//		ent->m_transform.setRotationY(45.0f);
-					//	}
-					//	
-					//	_cubes.push_back(ent);
-				}
-			}
-		}
-
+		GameObject* _skybox = GameObject::Create("_skybox");
+		_skybox->SetMaterial(_material_skybox);
+		_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
+		_skybox->SetMesh(Geometry.GetInverseCube());
+		_skybox->m_isClickable = false;
+		_skybox->m_useTransform = false;
+		
 		//
-		_crate1 = GameObject::Create("_crate1");
+		GameObject* _crate1 = GameObject::Create("_crate1");
 		_crate1->SetMaterial(_material_gbuffer);
 		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate1->SetMesh(Geometry.GetCube());
@@ -208,7 +188,7 @@ namespace Vxl
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
-		_crate2 = GameObject::Create("_crate2");
+		GameObject* _crate2 = GameObject::Create("_crate2");
 		_crate2->SetMaterial(_material_gbuffer);
 		_crate2->SetMesh(Geometry.GetCube());
 		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
@@ -219,28 +199,28 @@ namespace Vxl
 		
 		_crate1->m_transform.setWorldPosition(0, 0, 0);
 		
-		_octo1 = GameObject::Create("_octo1");
+		GameObject* _octo1 = GameObject::Create("_octo1");
 		_octo1->SetMaterial(_material_gbuffer);
 		_octo1->SetMesh(Geometry.GetOctahedron());
 		_octo1->m_transform.setPosition(0, 0, 0);
 		_octo1->m_transform.setScale(0.5f);
 		_octo1->SetColor(Color3F(1, 1, 1));
 		
-		_octo2 = GameObject::Create("_octo2");
+		GameObject* _octo2 = GameObject::Create("_octo2");
 		_octo2->SetMaterial(_material_gbuffer);
 		_octo2->SetMesh(Geometry.GetOctahedron());
 		_octo2->m_transform.setPosition(1, 0, 0);
 		_octo2->m_transform.setScale(0.5f);
 		_octo2->SetColor(Color3F(1, 0, 0));
 		
-		_octo3 = GameObject::Create("_octo3");
+		GameObject* _octo3 = GameObject::Create("_octo3");
 		_octo3->SetMaterial(_material_gbuffer);
 		_octo3->SetMesh(Geometry.GetOctahedron());
 		_octo3->m_transform.setPosition(0, 1, 0);
 		_octo3->m_transform.setScale(0.5f);
 		_octo3->SetColor(Color3F(0, 1, 0));
 		
-		_octo4 = GameObject::Create("_octo4");
+		GameObject* _octo4 = GameObject::Create("_octo4");
 		_octo4->SetMaterial(_material_gbuffer);
 		_octo4->SetMesh(Geometry.GetOctahedron());
 		_octo4->m_transform.setPosition(0, 0, 1);
@@ -250,7 +230,7 @@ namespace Vxl
 		//GameObject::Delete(_entity5);
 		//CameraObject* c1 = CameraObject::Create("_camera_special");
 
-		GameObject::Delete("_octo3");
+		//GameObject::Delete("_octo3");
 		//
 		//_light1 = LightObject::Create("light1");
 
@@ -445,11 +425,13 @@ namespace Vxl
 		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE", 0));
 		//
 
-		GPUTimer::StartTimer("Gbuffer");
+		GPUTimer::StartTimer("Fbo1_Bind");
 
 		_fbo->bind();
 
-		
+		GPUTimer::EndTimer("Fbo1_Bind");
+
+		GPUTimer::StartTimer("Gbuffer");
 
 		Camera::GetMain()->BindUBO();
 		RenderManager.RenderSceneGameObjects();
@@ -518,7 +500,7 @@ namespace Vxl
 		if (DevConsole.GetBool("Objects are Clickable", true) && Window.GetCursor() == CursorMode::NORMAL)
 		{
 			_fbo_colorpicker->bind();
-			glUtil::blendDisable();
+			glUtil::blendState(false);
 
 			_shader_colorPicker->Bind();
 
@@ -573,6 +555,7 @@ namespace Vxl
 			mem.f_ID[0] = data[0];
 			mem.f_ID[1] = data[1];
 			mem.f_ID[2] = data[2];
+			mem.f_ID[3] = data[3];
 			mem.ui_ID--;//offset (0 = nothing instead of first value)
 
 			if (Input.getMouseButton(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow())
@@ -592,9 +575,9 @@ namespace Vxl
 
 		// Backbuffer
 		FramebufferObject::unbind();
-		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
-
 		Window.BindWindowViewport();
+
+		glUtil::blendState(false);
 		glUtil::wireframe(false);
 		glUtil::depthTest(Depth_Pass_Rule::ALWAYS);
 

@@ -20,6 +20,8 @@ namespace Vxl
 	class Material;
 	class GameObject;
 	class CameraObject;
+	class LightObject;
+	class SkyboxObject;
 
 	static class RenderManager : public Singleton<class RenderManager>
 	{
@@ -34,10 +36,10 @@ namespace Vxl
 
 		// Masterlist of entities
 		std::vector<Entity*> m_allEntities;
-		// Masterlist of GameObject
-		std::vector<GameObject*> m_allGameObjects;
-		// Masterlist of CameraObjects
-		std::vector<CameraObject*> m_allCameraObjects;
+		// Masterlist of specific entities
+		std::vector<GameObject*>	m_allGameObjects;
+		std::vector<CameraObject*>	m_allCameraObjects;
+		std::vector<LightObject*>	m_allLightObjects;
 
 		// Rendering Gbuffer stuff // UINT = Material Order
 		std::map<UINT, std::pair<Material*, std::set<GameObject*>>> m_gbufferObjects;

@@ -22,11 +22,11 @@
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
-    <ClCompile Include="engine\modules\CameraObject.cpp" />
+    <ClCompile Include="engine\objects\CameraObject.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
-    <ClCompile Include="engine\modules\GameObject.cpp" />
+    <ClCompile Include="engine\objects\GameObject.cpp" />
     <ClCompile Include="engine\modules\Layer.cpp" />
-    <ClCompile Include="engine\modules\LightObject.cpp" />
+    <ClCompile Include="engine\objects\LightObject.cpp" />
     <ClCompile Include="engine\modules\Material.cpp" />
     <ClCompile Include="engine\modules\RenderManager.cpp" />
     <ClCompile Include="engine\modules\Scene.cpp" />
@@ -88,12 +88,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\XGamePad.h" />
-    <ClInclude Include="engine\modules\CameraObject.h" />
-    <ClInclude Include="engine\modules\LightObject.h" />
+    <ClInclude Include="engine\objects\CameraObject.h" />
+    <ClInclude Include="engine\objects\LightObject.h" />
     <ClInclude Include="engine\math\Model.h" />
     <ClInclude Include="engine\modules\Component.h" />
     <ClInclude Include="engine\modules\Entity.h" />
-    <ClInclude Include="engine\modules\GameObject.h" />
+    <ClInclude Include="engine\objects\GameObject.h" />
     <ClInclude Include="engine\modules\Layer.h" />
     <ClInclude Include="engine\modules\Material.h" />
     <ClInclude Include="engine\modules\MaterialPackage.h" />

@@ -1,7 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "Entity.h"
+#include "../modules/Entity.h"
 
 namespace Vxl
 {

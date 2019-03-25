@@ -40,10 +40,12 @@ void main()
 	if(VXL_useColorOverride)
 	{
 		output_albedo = vec4(VXL_color * VXL_tint, 1);
+		//output_albedo.a = 0.0;
 	}
 	else
 	{
 		output_albedo = texture(albedo_handler, f_data.uv) * vec4(VXL_tint, 1);
+		//output_albedo.a = 0.0;
 	}
 		
 	// output UV for testing reasons

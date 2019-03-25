@@ -18,7 +18,8 @@ namespace Vxl
 	{
 		GAMEOBJECT,
 		LIGHT,
-		CAMERA
+		CAMERA,
+		SKYBOX
 	};
 
 	class Entity : public ComponentHandler, public Asset<Entity>
@@ -34,6 +35,7 @@ namespace Vxl
 		Mesh*		m_mesh = nullptr;
 		EntityType  m_type;
 		std::string	m_name;
+		Color3F		m_labelColor = Color3F(1, 1, 1); // Label For editor only
 		Color3F		m_Color = Color3F(1, 1, 1);
 		Color3F		m_Tint	= Color3F(1, 1, 1);
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
@@ -103,6 +105,15 @@ namespace Vxl
 		}
 
 		// Color
+		inline void SetLabelColor(Color3F color)
+		{
+			m_labelColor = color;
+		}
+		inline Color3F& GetLabelColor(void)
+		{
+			return m_labelColor;
+		}
+
 		inline void SetColor(Color3F color, bool colorOverTexture = true)
 		{
 			m_Color = color;

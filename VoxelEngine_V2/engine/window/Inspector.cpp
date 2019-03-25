@@ -32,6 +32,7 @@ namespace Vxl
 			auto Entity = Hierarchy._selectedEntity;
 			if (Entity != nullptr)
 			{
+				// Name
 				static char Name[MAX_ENTITY_NAME_LENGTH];
 				strcpy_s(Name, Entity->GetName().c_str());
 				
@@ -41,12 +42,21 @@ namespace Vxl
 				if (ImGui::InputText("input text", Name, IM_ARRAYSIZE(Name)))
 					Entity->SetName(std::string(Name));
 
+				// Color
+				float EntityColor[3] = { Entity->GetLabelColor().r, Entity->GetLabelColor().g, Entity->GetLabelColor().b };
+				if (ImGui::ColorEdit3("Label Color: ", EntityColor))
+				{
+					Entity->SetLabelColor(Color3F(EntityColor[0], EntityColor[1], EntityColor[2]));
+				}
+
+				// Drag Speed
 				static float DragSpeed = 0.1f;
 				ImGui::Text("DragSpeed: "); ImGui::SameLine(); ImGui::DragFloat("DragSpeed", &DragSpeed, 0.05f, 0.1f, 10.0f);
 				ImGui::PopItemWidth();
 
 				ImGui::Separator();
 
+				// Active
 				ImGui::Checkbox("Active", &Entity->m_isActive);
 
 				// Transform
@@ -57,7 +67,6 @@ namespace Vxl
 					float s[3] = { Entity->m_transform.getScale().x, Entity->m_transform.getScale().y, Entity->m_transform.getScale().z };
 
 					float pw[3] = { Entity->m_transform.getWorldPosition().x, Entity->m_transform.getWorldPosition().y, Entity->m_transform.getWorldPosition().z };
-					//float rw[3] = { Entity->m_transform.getRotationEuler().x, Entity->m_transform.getRotationEuler().y, Entity->m_transform.getRotationEuler().z };
 					float sw[3] = { Entity->m_transform.getWorldScale().x, Entity->m_transform.getWorldScale().y, Entity->m_transform.getWorldScale().z };
 
 

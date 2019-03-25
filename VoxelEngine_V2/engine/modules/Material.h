@@ -53,11 +53,13 @@ namespace Vxl
 
 		// GL States
 		Cull_Type			m_CullType		= Cull_Type::COUNTER_CLOCKWISE;
+		bool				m_BlendState	= true;
 		Blend_Source		m_BlendSource	= Blend_Source::SRC_ALPHA;
 		Blend_Destination	m_BlendDest		= Blend_Destination::ONE_MINUS_SRC_ALPHA;
 		Blend_Equation		m_BlendEq		= Blend_Equation::FUNC_ADD;
 		Depth_Pass_Rule		m_DepthFunc		= Depth_Pass_Rule::LESS_OR_EQUAL;
-		bool				m_DepthMask		= true;
+		bool				m_DepthRead		= true;
+		bool				m_DepthWrite	= true;
 		bool				m_Wireframe		= false;
 		
 		// Reload Packages

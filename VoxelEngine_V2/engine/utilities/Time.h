@@ -4,9 +4,13 @@
 #include <vector>
 #include <string>
 #include <Windows.h>
+#include <unordered_map>
+#include <map>
+#include <assert.h>
 #include "../utilities/singleton.h"
 
 #define HISTOGRAM_SIZE 50
+#define GPUTIMER_CAPTURES 15
 
 namespace Vxl
 {
@@ -117,6 +121,7 @@ namespace Vxl
 	// ~~~ //
 	class GPUTimer
 	{
+		friend class Performance;
 		friend class RenderManager;
 	private:
 		enum class QueryState
@@ -126,12 +131,12 @@ namespace Vxl
 			END
 		};
 
-		static std::unordered_map<std::string, GPUTimer*> m_timers;
+		static std::map<std::string, GPUTimer*> m_timers;
 		static bool	m_TimerBeingUsed;
-		u_int		m_ID;
+		UINT		m_ID;
 		uint64_t	m_elapsedTime = 0;
-		double		m_elapsedTime_MS[10] = { 0 };
-		u_int		m_elapsedTime_MS_index = 0;
+		double		m_elapsedTime_MS[GPUTIMER_CAPTURES] = { 0 };
+		UINT		m_elapsedTime_MS_index = 0;
 
 		double		m_elapsedTime_MS_average;
 		QueryState	m_queryingState = QueryState::READY;
@@ -144,7 +149,7 @@ namespace Vxl
 		void Update();
 	public:
 
-		inline u_int GetID(void) const
+		inline UINT		GetID(void) const
 		{
 			return m_ID;
 		}

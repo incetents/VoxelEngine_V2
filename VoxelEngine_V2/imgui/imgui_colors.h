@@ -9,4 +9,5 @@ struct ImGuiColor
 	static ImVec4 Grey;
 	static ImVec4 Red;
 	static ImVec4 Orange;
+	static ImVec4 Yellow;
 };

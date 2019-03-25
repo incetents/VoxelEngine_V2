@@ -6,7 +6,7 @@
 #include "../imgui/imgui_colors.h"
 
 #include "../modules/RenderManager.h"
-#include "../modules/GameObject.h"
+#include "../objects/GameObject.h"
 #include "../modules/Material.h"
 
 #include "../opengl/Geometry.h"
@@ -33,6 +33,11 @@ namespace Vxl
 			// color start
 			if (!_entity->IsFamilyActive())
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
+			else
+			{
+				Color3F c = _entity->GetLabelColor();
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b,1));
+			}
 
 			// Node + Name
 			std::string Name = _entity->GetName();
@@ -46,8 +51,7 @@ namespace Vxl
 				_selectedEntity = _entity;
 
 			// color end
-			if (!_entity->IsFamilyActive())
-				ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
 		}
 		else
 		{
@@ -59,6 +63,11 @@ namespace Vxl
 			// color start
 			if (!_entity->IsFamilyActive())
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
+			else
+			{
+				Color3F c = _entity->GetLabelColor();
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b, 1));
+			}
 
 			// Node + Name
 			std::string Name = _entity->GetName();
@@ -72,8 +81,7 @@ namespace Vxl
 				_selectedEntity = _entity;
 
 			// color end
-			if (!_entity->IsFamilyActive())
-				ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
 
 			// recursion node
 			if (node_open)

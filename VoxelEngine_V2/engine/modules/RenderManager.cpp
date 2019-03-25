@@ -2,9 +2,6 @@
 #include "Precompiled.h"
 #include "RenderManager.h"
 
-#include "GameObject.h"
-#include "LightObject.h"
-#include "CameraObject.h"
 #include "Scene.h"
 #include "Layer.h"
 #include "Material.h"
@@ -19,6 +16,9 @@
 #include "../opengl/FramebufferObject.h"
 #include "../window/window.h"
 #include "../window/Hierarchy.h"
+#include "../objects/GameObject.h"
+#include "../objects/LightObject.h"
+#include "../objects/CameraObject.h"
 
 #include <algorithm>
 

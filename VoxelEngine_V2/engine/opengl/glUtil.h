@@ -73,13 +73,14 @@ namespace Vxl
 		void cullMode(Cull_Type);
 
 		// Blend Data
+		void blendState(bool state);
 		void blendMode(Blend_Source src, Blend_Destination dst);
 		void blendEquation(Blend_Equation equation);
-		void blendDisable();
 
 		// Depth Rule
-		void depthTest(Depth_Pass_Rule Rule);
+		void depthState(bool state);
 		void depthMask(bool state);
+		void depthTest(Depth_Pass_Rule Rule);
 
 		// Wireframe
 		void wireframe(bool state);

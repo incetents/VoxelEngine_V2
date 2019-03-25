@@ -53,10 +53,12 @@ namespace Vxl
 
 	// Init GL Hints
 	Cull_Type			_cullmode = Cull_Type::NONE;
+	bool				_blendState = false;
 	Blend_Source		_blendsrc = Blend_Source::NONE;
 	Blend_Destination	_blenddest = Blend_Destination::NONE;
 	Blend_Equation		_blendequation = Blend_Equation::NONE;
 	Depth_Pass_Rule		_rule = Depth_Pass_Rule::NONE;
+	bool				_depthState = false;
 	bool				_depthMask = true;
 	bool				_wireframe = false;
 	GLsizei				_viewport[4] = { -1, -1, -1, -1 };
@@ -65,10 +67,12 @@ namespace Vxl
 	{
 		// Reset
 		_cullmode = Cull_Type::NONE;
+		_blendState = false;
 		_blendsrc = Blend_Source::NONE;
 		_blenddest = Blend_Destination::NONE;
 		_blendequation = Blend_Equation::NONE;
 		_rule = Depth_Pass_Rule::NONE;
+		_depthState = false;
 		_depthMask = true;
 		_wireframe = false;
 		for(int i = 0; i < 4; i++)
@@ -77,9 +81,11 @@ namespace Vxl
 		// Set Default Cull Mode
 		cullMode(Cull_Type::COUNTER_CLOCKWISE);
 		// Set Default Blend Mode
+		blendState(true);
 		blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
 		blendEquation(Blend_Equation::FUNC_ADD);
 		// Set Default Depth Test
+		depthState(true);
 		depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
 		// Set Default Wireframe Mode
 		wireframe(false);
@@ -336,15 +342,21 @@ namespace Vxl
 	}
 
 	// Blend Mode (affects rgb of colors based on alpha/rgb of source and destination pixels in shaders)
-	void glUtil::blendDisable()
+	void glUtil::blendState(bool state)
 	{
-		glDisable(GL_BLEND);
+		if (_blendState == state)
+			return;
+
+		if(state)
+			glEnable(GL_BLEND);
+		else
+			glDisable(GL_BLEND);
+
+		_blendState = state;
 	}
 	
 	void glUtil::blendMode(Blend_Source src = Blend_Source::SRC_ALPHA, Blend_Destination dest = Blend_Destination::ONE_MINUS_SRC_ALPHA)
 	{
-		glEnable(GL_BLEND);
-
 		if(_blendsrc != src || _blenddest != dest)
 			glBlendFunc((GLenum)src, (GLenum)dest);
 
@@ -360,11 +372,21 @@ namespace Vxl
 		_blendequation = equation;
 	}
 
+	void glUtil::depthState(bool state)
+	{
+		if (_depthState == state)
+			return;
+
+		if(state)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+
+		_depthState = state;
+	}
 	// Depth Test (What depth value will overwrite the existing one)
 	void glUtil::depthTest(Depth_Pass_Rule Rule = Depth_Pass_Rule::LESS_OR_EQUAL)
 	{
-		glEnable(GL_DEPTH_TEST);
-
 		if (_rule != Rule)
 			glDepthFunc((GLenum)Rule);
 

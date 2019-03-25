@@ -21,6 +21,7 @@ namespace Vxl
 	class GameObject;
 	class LightObject;
 	class CameraObject;
+	class SkyboxObject;
 
 	class Scene_Game : public Scene
 	{
@@ -54,19 +55,6 @@ namespace Vxl
 		Material* _material_passthrough;
 		Material* _material_skybox;
 		Material* _material_lines;
-
-		GameObject* _entity1;
-		GameObject* _entity2;
-		GameObject* _entity3;
-		GameObject* _entity4;
-
-		GameObject* _crate1;
-		GameObject* _crate2;
-
-		GameObject* _octo1;
-		GameObject* _octo2;
-		GameObject* _octo3;
-		GameObject* _octo4;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

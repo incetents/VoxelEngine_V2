@@ -59,10 +59,15 @@ namespace Vxl
 
 		// Bind Modes
 		glUtil::cullMode(m_CullType);
-		glUtil::blendMode(m_BlendSource, m_BlendDest);
-		glUtil::blendEquation(m_BlendEq);
+		glUtil::blendState(m_BlendState);
+		if (m_BlendState)
+		{
+			glUtil::blendMode(m_BlendSource, m_BlendDest);
+			glUtil::blendEquation(m_BlendEq);
+		}
 		glUtil::depthTest(m_DepthFunc);
-		glUtil::depthMask(m_DepthMask);
+		glUtil::depthState(m_DepthRead);
+		glUtil::depthMask(m_DepthWrite);
 		glUtil::wireframe(m_Wireframe);
 	}
 

@@ -5,10 +5,12 @@
 
 namespace Vxl
 {
+	class GPUTimer;
+
 	static class Performance : public Singleton<class Performance>
 	{
 	private:
-
+		GPUTimer* _selected = nullptr;
 	public:
 		// Draw
 		void Draw();
