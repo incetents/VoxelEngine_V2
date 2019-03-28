@@ -19,6 +19,7 @@ namespace Vxl
 {
 	class Transform : public Component
 	{
+		friend class CameraObject;
 	protected:
 		// Model for transformations
 		Matrix4x4	m_ModelMatrix;
@@ -35,6 +36,8 @@ namespace Vxl
 		Vector3		m_forward	= Vector3::FORWARD;
 		Vector3     m_up		= Vector3::UP;
 		Vector3     m_right		= Vector3::RIGHT;
+		// Reversed only forward vector [used for Cameras]
+		bool m_reversedForward = false;
 
 		// Parent/Child relationships
 		Transform*				m_parent = nullptr;
@@ -586,35 +589,47 @@ namespace Vxl
 			updateValues();
 			return m_rotation;
 		}
-		virtual Vector3		getForward(void)
+		const Vector3& getForward(void)
 		{
 			updateValues();
 			return m_forward;
 		}
-		virtual Vector3		getBackwards(void)
-		{
-			updateValues();
-			return -m_forward;
-		}
-		virtual Vector3		getUp(void)
+		const Vector3& getUp(void)
 		{
 			updateValues();
 			return m_up;
 		}
-		virtual Vector3		getDown(void)
+		const Vector3& getRight(void)
+		{
+			updateValues();
+			return m_right;
+		}
+		Vector3 getBackwards(void)
+		{
+			updateValues();
+			return -m_forward;
+		}
+		Vector3 getDown(void)
 		{
 			updateValues();
 			return -m_up;
 		}
-		virtual Vector3		getLeft(void)
+		Vector3 getLeft(void)
 		{
 			updateValues();
 			return -m_right;
 		}
-		virtual Vector3		getRight(void)
+
+		// Since Camera Forward is flipped, this helps with readability
+		Vector3 getCameraForward(void)
 		{
 			updateValues();
-			return m_right;
+			return -m_forward;
+		}
+		const Vector3& getCameraBackwards(void)
+		{
+			updateValues();
+			return m_forward;
 		}
 
 	};

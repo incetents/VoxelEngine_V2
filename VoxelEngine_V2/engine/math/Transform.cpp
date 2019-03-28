@@ -33,7 +33,7 @@ namespace Vxl
 			m_lossyScale.y = Vector3::Length(ParentModel[4], ParentModel[5], ParentModel[6]);
 			m_lossyScale.z = Vector3::Length(ParentModel[8], ParentModel[9], ParentModel[10]);
 
-			// Update directions
+			//
 			m_forward = Vector3::Normalize(m_rotation * Vector3::FORWARD);
 
 			// If forward is pointing directly up, calculate right the expensive way
@@ -43,10 +43,10 @@ namespace Vxl
 			else
 				m_right = -Vector3::Normalize(Vector3::Cross(m_forward, Vector3::UP));
 
-			// Calculate Up
+			//
 			m_up = Vector3::Cross(m_forward, m_right);
 
-			// Set Flag
+			//
 			isDirty = false;
 
 			// Call entity about change in transform class

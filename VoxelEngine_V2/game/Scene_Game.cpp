@@ -21,7 +21,6 @@
 #include "../engine/opengl/Debug.h"
 #include "../engine/opengl/UBO.h"
 
-#include "../engine/math/Camera.h"
 #include "../engine/math/Color.h"
 #include "../engine/math/Transform.h"
 #include "../engine/math/Vector2.h"
@@ -56,12 +55,21 @@ namespace Vxl
 	{
 		Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
 
-		_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
+		//_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
+
+		_cameraObject = CameraObject::Create("_camera_special", 0.01f, 50.0f);
+		_cameraObject->m_transform.setPosition(3.5f, 2.8f, 0.3f);
+		_cameraObject->m_transform.setForward(Vector3(0, 0, 1));
+
+		_cameraObject->SetPerspectiveWindowAspect(110.0f);
+
+		RenderManager.SetMainCamera(_cameraObject);
+
 		//_camera->setOrthographic(-15, 15, -15, 15);
 		//_camera->setPerspective(110.0f, 1.0f);
-		_camera->setPerspectiveWindowAspectLock(110.0f);
-		_camera->update();
-		_camera->SetMain();
+		//_camera->setPerspectiveWindowAspectLock(110.0f);
+		//_camera->update();
+		//_camera->SetMain();
 
 		// FBO
 		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0.1f, 0.1f, 0.3f, 1.0f));
@@ -228,7 +236,7 @@ namespace Vxl
 		_octo4->SetColor(Color3F(0, 0, 1));
 		
 		//GameObject::Delete(_entity5);
-		//CameraObject* c1 = CameraObject::Create("_camera_special");
+		
 
 		//GameObject::Delete("_octo3");
 		//
@@ -257,20 +265,21 @@ namespace Vxl
 		float CamSpeed = 0.1f;
 
 		if (Input.getKey(KeyCode::W))
-			CamMove += _camera->getForward();
+			CamMove += _cameraObject->m_transform.getCameraForward();
 		if (Input.getKey(KeyCode::S))
-			CamMove += _camera->getBackwards();
+			CamMove += _cameraObject->m_transform.getCameraBackwards();
 		if (Input.getKey(KeyCode::A))
-			CamMove += _camera->getLeft();
+			CamMove += _cameraObject->m_transform.getLeft();
 		if (Input.getKey(KeyCode::D))
-			CamMove += _camera->getRight();
+			CamMove += _cameraObject->m_transform.getRight();
 
 		if (Input.getKey(KeyCode::SPACE))
 			CamMove += Vector3::UP;
 		if (Input.getKey(KeyCode::LEFT_CONTROL))
 			CamMove += Vector3::DOWN;
 
-		_camera->increasePosition(CamMove.Normalize() * CamSpeed);
+		_cameraObject->m_transform.increasePosition(CamMove.Normalize() * CamSpeed);
+		//_camera->increasePosition(CamMove.Normalize() * CamSpeed);
 
 		// Camera Rotation
 		Vector3 CamRotation;
@@ -285,7 +294,8 @@ namespace Vxl
 		if (Input.getKey(KeyCode::RIGHT))
 			CamRotation.y -= CamRotationSpeed;
 
-		_camera->increaseRotation(CamRotation);
+		_cameraObject->m_transform.increaseRotation(CamRotation);
+		//_camera->increaseRotation(CamRotation);
 
 		// Camera Lock
 		if (Input.getKeyDown(KeyCode::Z))
@@ -308,16 +318,18 @@ namespace Vxl
 			deltax = MacroClamp(deltax, -100, +100);
 			deltay = MacroClamp(deltay, -100, +100);
 
-			_camera->increaseRotation(-deltay, -deltax, 0);;
+			_cameraObject->m_transform.increaseRotation(-deltay, -deltax, 0);
+			//_camera->increaseRotation(-deltay, -deltax, 0);
 		}
 
 		// Edge case for vertical rotation
-		float Xrot = MacroClamp(_camera->getRotationEuler().x, -89.9f, 89.9f);
-		_camera->setRotationX(Xrot);
+		float Xrot = MacroClamp(_cameraObject->m_transform.getRotationEuler().x, -89.9f, 89.9f);
+		_cameraObject->m_transform.setRotationX(Xrot);
 		//
 
 		// Update Cam
-		_camera->update();
+		_cameraObject->Update();
+		//_camera->update();
 
 		// Debug Lines
 		Debug.DrawLine(
@@ -433,7 +445,8 @@ namespace Vxl
 
 		GPUTimer::StartTimer("Gbuffer");
 
-		Camera::GetMain()->BindUBO();
+		RenderManager.GetMainCamera()->BindUBO();
+		//Camera::GetMain()->BindUBO();
 		RenderManager.RenderSceneGameObjects();
 
 		GPUTimer::EndTimer("Gbuffer");
@@ -619,8 +632,8 @@ namespace Vxl
 			{
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 2);
-				_shader_showRenderTarget->SetUniform("zNear", Camera::GetMain()->getZnear());
-				_shader_showRenderTarget->SetUniform("zFar", Camera::GetMain()->getZfar());
+				_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
+				_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
 
 				_fbo->bindDepth(Active_Texture::LEVEL0);
 				break;

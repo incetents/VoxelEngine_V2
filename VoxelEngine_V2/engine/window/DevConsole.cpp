@@ -15,10 +15,11 @@
 #include "../modules/RenderManager.h"
 #include "../modules/Entity.h"
 
+#include "../objects/CameraObject.h"
+
 #include "../input/Input.h"
 #include "../input/XGamePad.h"
 
-#include "../math/Camera.h"
 #include "../math/Transform.h"
 
 #include "../game/Scene_Game.h"
@@ -73,23 +74,25 @@ namespace Vxl
 
 		if (ImGui::CollapsingHeader("Camera"))
 		{
-			if (Game->_camera)
+			if (Game->_cameraObject)
 			{
-				ImGui::Text("CamPos: %f %f %f", Game->_camera->getPosition().x, Game->_camera->getPosition().y, Game->_camera->getPosition().z);
-				ImGui::Text("CamForward: %f %f %f", Game->_camera->getForward().x, Game->_camera->getForward().y, Game->_camera->getForward().z);
+				Vector3 CamPos = Game->_cameraObject->m_transform.getPosition();
+				Vector3 CamForward = Game->_cameraObject->m_transform.getForward();
+				ImGui::Text("CamPos: %f %f %f", CamPos.x, CamPos.y, CamPos.z);
+				ImGui::Text("CamForward: %f %f %f", CamForward.x, CamForward.y, CamForward.z);
 
-				float cameraFOV = Game->_camera->getFOV();
-				float cameraZNear = Game->_camera->getZnear();
-				float cameraZFar = Game->_camera->getZfar();
+				float cameraFOV = Game->_cameraObject->getFOV();
+				float cameraZNear = Game->_cameraObject->getZnear();
+				float cameraZFar = Game->_cameraObject->getZfar();
 
 				if (ImGui::SliderFloat("FOV", &cameraFOV, 60.0f, 180.0f))
-					Game->_camera->updatePerspective(cameraFOV, Window.GetAspectRatio());
-
+					Game->_cameraObject->SetPerspective(cameraFOV, Game->_cameraObject->getAspect());
+				
 				if (ImGui::SliderFloat("ZNEAR", &cameraZNear, 0.01f, 5.0f))
-					Game->_camera->setZnear(cameraZNear);
-
+					Game->_cameraObject->SetZNear(cameraZNear);
+				
 				if (ImGui::SliderFloat("ZFAR", &cameraZFar, 1.0f, 50.0f))
-					Game->_camera->setZfar(cameraZFar);
+					Game->_cameraObject->SetZFar(cameraZFar);
 
 				ImGui::Separator();
 			}

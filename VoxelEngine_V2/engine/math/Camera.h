@@ -1,322 +1,322 @@
-// Copyright(c) 2019 Emmanuel Lajeunesse
-#pragma once
-
-#include "Transform.h"
-
-#include "../utilities/Asset.h"
-#include <assert.h>
-
-namespace Vxl
-{
-	class Transform;
-	class UniformBufferObject;
-
-	class CameraProjection
-	{
-	protected:
-		// Projection Matrices
-		Matrix4x4 m_projection;
-		Matrix4x4 m_projectionInverse;
-
-	public:
-		CameraProjection(float znear, float zfar)
-			: m_Znear(znear), m_Zfar(zfar) {}
-		virtual ~CameraProjection() {}
-
-		Matrix4x4 & getProjection()
-		{
-			return m_projection;
-		}
-		Matrix4x4 & getProjectionInverse()
-		{
-			return m_projectionInverse;
-		}
-		// Data
-		float m_Znear;
-		float m_Zfar;
-		// Orthographic
-		virtual float getXmin() const { assert(false); return 0.0f; }
-		virtual float getXmax() const { assert(false); return 0.0f; }
-		virtual float getYmin() const { assert(false); return 0.0f; }
-		virtual float getYmax() const { assert(false); return 0.0f; }
-		virtual void Set(float xmin, float xmax, float ymin, float ymax) { assert(false); }
-		// Perspective
-		virtual float getFov() const { assert(false); return 0.0f; }
-		virtual float getAspect() const { assert(false); return 0.0f; }
-		virtual void Set(float _fov, float _aspect) { assert(false); }
-		// Custom
-		virtual void Set(float* _matrix) { assert(false); }
-		virtual bool IsWindowAspectRatio(void) const { return false; }
-
-		// Special Overrides
-		virtual void Update_X(float _xmin, float _xmax) { assert(false); }
-		virtual void Update_Y(float _ymin, float _ymax) { assert(false); }
-		virtual void Update_Z() { assert(false); }
-		virtual void Update_FovAspect(float _fov, float _aspect) { assert(false); }
-	};
-
-	class CameraProjection_Perspective : public CameraProjection
-	{
-	protected:
-		float m_fov;
-		float m_aspect;
-		bool m_windowAspectLock;
-	public:
-		float getFov() const override { return m_fov; }
-		float getAspect() const override { return m_aspect; }
-		bool IsWindowAspectRatio(void) const override { return m_windowAspectLock; }
-
-		void Set(float fov, float aspect) override
-		{
-			m_fov = fov;
-			m_aspect = aspect;
-
-			m_projection = Matrix4x4::Perspective(fov, aspect, m_Znear, m_Zfar);
-			m_projectionInverse = Matrix4x4::PerspectiveInverse(fov, aspect, m_Znear, m_Zfar);
-		}
-		void Update_FovAspect(float _fov, float _aspect) override
-		{
-			m_fov = _fov;
-			m_aspect = _aspect;
-			Matrix4x4::Perspective_UpdateFov(m_projection, _fov, _aspect);
-			Matrix4x4::PerspectiveInverse_UpdateFov(m_projectionInverse, _fov, _aspect);
-		}
-		void Update_Z() override
-		{
-			Matrix4x4::Perspective_UpdateZ(m_projection, m_Znear, m_Zfar);
-			Matrix4x4::PerspectiveInverse_UpdateZ(m_projectionInverse, m_Znear, m_Zfar);
-		}
-
-		CameraProjection_Perspective(bool windowAspectLock, float fov, float aspect, float znear, float zfar)
-			: CameraProjection(znear, zfar), m_windowAspectLock(windowAspectLock)
-		{
-			Set(fov, aspect);
-		}
-		~CameraProjection_Perspective() {}
-	};
-
-	class CameraProjection_Orthographic : public CameraProjection
-	{
-	protected:
-		float m_boundaries[4];
-	public:
-		float getXmin() const override { return m_boundaries[0]; }
-		float getXmax() const override { return m_boundaries[1]; }
-		float getYmin() const override { return m_boundaries[2]; }
-		float getYmax() const override { return m_boundaries[3]; }
-
-		void Set(float xmin, float xmax, float ymin, float ymax) override
-		{
-			m_boundaries[0] = xmin;
-			m_boundaries[1] = xmax;
-			m_boundaries[2] = ymin;
-			m_boundaries[3] = ymax;
-
-			m_projection = Matrix4x4::Orthographic(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
-			m_projectionInverse = Matrix4x4::OrthographicInverse(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
-		}
-		void Update_X(float _xmin, float _xmax) override
-		{
-			m_boundaries[0] = _xmin;
-			m_boundaries[1] = _xmax;
-
-			Matrix4x4::Orthographic_UpdateX(m_projection, _xmin, _xmax);
-			Matrix4x4::OrthographicInverse_UpdateX(m_projection, _xmin, _xmax);
-		}
-		void Update_Y(float _ymin, float _ymax) override
-		{
-			m_boundaries[2] = _ymin;
-			m_boundaries[3] = _ymax;
-
-			Matrix4x4::Orthographic_UpdateY(m_projection, _ymin, _ymax);
-			Matrix4x4::OrthographicInverse_UpdateY(m_projection, _ymin, _ymax);
-		}
-		void Update_Z() override
-		{
-			Matrix4x4::Orthographic_UpdateZ(m_projection, m_Znear, m_Zfar);
-			Matrix4x4::OrthographicInverse_UpdateZ(m_projection, m_Znear, m_Zfar);
-		}
-		CameraProjection_Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
-			: CameraProjection(znear, zfar)
-		{
-			Set(xmin, xmax, ymin, ymax);
-		}
-		~CameraProjection_Orthographic() {}
-	};
-
-	class CameraProjection_Custom : public CameraProjection
-	{
-	public:
-		void Set(float* _matrix) override
-		{
-			m_projection = Matrix4x4(
-				_matrix[0], _matrix[1], _matrix[2], _matrix[3],
-				_matrix[4], _matrix[5], _matrix[6], _matrix[7],
-				_matrix[8], _matrix[9], _matrix[10], _matrix[11],
-				_matrix[12], _matrix[13], _matrix[14], _matrix[15]
-			);
-			m_projectionInverse = m_projection.Inverse();
-		}
-
-		CameraProjection_Custom(float* _matrix)
-			: CameraProjection(0, 0)
-		{
-			Set(_matrix);
-		}
-		~CameraProjection_Custom() {}
-	};
-
-	class Camera : public Transform, public Asset<Camera>
-	{
-		friend class CameraProjection;
-		friend class CameraProjection_Perspective;
-		friend class CameraProjection_Orthographic;
-		friend class RenderManager;
-		friend class Window;
-	protected:
-		enum Type
-		{
-			NONE,
-			ORTHOGRAPHIC,
-			PERSPECTIVE,
-			CUSTOM
-		};
-
-		// Main
-		static Camera* m_main;
-		// VP DATA
-		Type				m_type = Type::NONE;
-		CameraProjection*	m_projection;
-		Matrix4x4			m_view;
-		Matrix4x4			m_viewInverse;
-		Matrix4x4			m_viewProjection;
-		Matrix4x4			m_viewProjectionInverse;
-		// Ubo
-		UniformBufferObject* m_UBO = nullptr;
-		
-
-		// Protected
-		Camera(const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
-	public:
-		~Camera();
-
-		// Database Creation
-		static Camera* Create(const std::string _name, const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
-	
-		void update();
-
-		static Camera* GetMain(void)
-		{
-			return m_main;
-		}
-		inline void SetMain(void)
-		{
-			m_main = this;
-		}
-
-		// Perspective Matrix except the aspect ratio is based on the window
-		Camera& setPerspectiveWindowAspectLock(float _fov);
-		// Perspective Matrix
-		Camera& setPerspective(float _fov, float _aspect);
-		// Orthographic Matrix
-		Camera& setOrthographic(float _xmin, float _xmax, float _ymin, float _ymax);
-		// Set Custom Projection Matrix [16 float array]
-		Camera& setCustomProjection(float* _matrix);
-		
-		Camera& updatePerspective(float _fov, float _aspect);  // If already perspective, this will update its values faster
-		Camera& updatePerspectiveFOV(float _fov);  // If already perspective, this will update its values faster
-		Camera& updatePerspectiveAspectRatio(float _aspect);  // If already perspective, this will update its values faster
-		Camera& updateOrtho_X(float _xmin, float _xmax);  // If already ortho, this will update its values faster
-		Camera& updateOrtho_Y(float _ymin, float _ymax);  // If already ortho, this will update its values faster
-		Camera& setZnear(float _znear);
-		Camera& setZfar(float _zfar);
-
-		void BindUBO();
-
-		// Get Data	
-		inline const Matrix4x4&	getView() const
-		{
-			return m_view;
-		}
-		inline const Matrix4x4&	getViewInverse() const
-		{
-			return m_viewInverse;
-		}
-		inline const Matrix4x4&	getProjection() const
-		{
-			return m_projection->getProjection();
-		}
-		inline const Matrix4x4&	getProjectionInverse() const
-		{
-			return m_projection->getProjectionInverse();
-		}
-		inline const Matrix4x4&	getViewProjection() const
-		{
-			return m_viewProjection;
-		}
-		inline const Matrix4x4&	getViewProjectionInverse() const
-		{
-			return m_viewProjectionInverse;
-		}
-
-		bool isPerspective() const
-		{
-			return m_type == Type::PERSPECTIVE;
-		}
-		bool isOrthographic() const
-		{
-			return m_type == Type::ORTHOGRAPHIC;
-		}
-		bool isCustomProjection() const
-		{
-			return m_type == Type::CUSTOM;
-		}
-
-		inline float getZnear() const
-		{
-			return m_projection->m_Znear;
-		}
-		inline float getZfar() const
-		{
-			return m_projection->m_Zfar;
-		}
-		inline float getFOV() const
-		{
-			return m_projection->getFov();
-		}
-		inline float getAspect() const
-		{
-			return m_projection->getAspect();
-		}
-		inline float getXmin() const
-		{
-			return m_projection->getXmin();
-		}
-		inline float getXmax() const
-		{
-			return m_projection->getXmax();
-		}
-		inline float getYmin() const
-		{
-			return m_projection->getYmin();
-		}
-		inline float getYmax() const
-		{
-			return m_projection->getYmax();
-		}
-
-		// Override for transform class (forward directions are reversed)
-		Vector3 getForward(void) override
-		{
-			updateValues();
-			return -m_forward;
-		}
-		Vector3 getBackwards(void) override
-		{
-			updateValues();
-			return m_forward;
-		}
-
-		Transform& setForward(const Vector3& forward);
-	};
-}
+//// Copyright(c) 2019 Emmanuel Lajeunesse
+//#pragma once
+//
+//#include "Transform.h"
+//
+//#include "../utilities/Asset.h"
+//#include <assert.h>
+//
+//namespace Vxl
+//{
+//	class Transform;
+//	class UniformBufferObject;
+//
+//	class CameraProjection
+//	{
+//	protected:
+//		// Projection Matrices
+//		Matrix4x4 m_projection;
+//		Matrix4x4 m_projectionInverse;
+//
+//	public:
+//		CameraProjection(float znear, float zfar)
+//			: m_Znear(znear), m_Zfar(zfar) {}
+//		virtual ~CameraProjection() {}
+//
+//		Matrix4x4 & getProjection()
+//		{
+//			return m_projection;
+//		}
+//		Matrix4x4 & getProjectionInverse()
+//		{
+//			return m_projectionInverse;
+//		}
+//		// Data
+//		float m_Znear;
+//		float m_Zfar;
+//		// Orthographic
+//		virtual float getXmin() const { assert(false); return 0.0f; }
+//		virtual float getXmax() const { assert(false); return 0.0f; }
+//		virtual float getYmin() const { assert(false); return 0.0f; }
+//		virtual float getYmax() const { assert(false); return 0.0f; }
+//		virtual void Set(float xmin, float xmax, float ymin, float ymax) { assert(false); }
+//		// Perspective
+//		virtual float getFov() const { assert(false); return 0.0f; }
+//		virtual float getAspect() const { assert(false); return 0.0f; }
+//		virtual void Set(float _fov, float _aspect) { assert(false); }
+//		// Custom
+//		virtual void Set(float* _matrix) { assert(false); }
+//		virtual bool IsWindowAspectRatio(void) const { return false; }
+//
+//		// Special Overrides
+//		virtual void Update_X(float _xmin, float _xmax) { assert(false); }
+//		virtual void Update_Y(float _ymin, float _ymax) { assert(false); }
+//		virtual void Update_Z() { assert(false); }
+//		virtual void Update_FovAspect(float _fov, float _aspect) { assert(false); }
+//	};
+//
+//	class CameraProjection_Perspective : public CameraProjection
+//	{
+//	protected:
+//		float m_fov;
+//		float m_aspect;
+//		bool m_windowAspectLock;
+//	public:
+//		float getFov() const override { return m_fov; }
+//		float getAspect() const override { return m_aspect; }
+//		bool IsWindowAspectRatio(void) const override { return m_windowAspectLock; }
+//
+//		void Set(float fov, float aspect) override
+//		{
+//			m_fov = fov;
+//			m_aspect = aspect;
+//
+//			m_projection = Matrix4x4::Perspective(fov, aspect, m_Znear, m_Zfar);
+//			m_projectionInverse = Matrix4x4::PerspectiveInverse(fov, aspect, m_Znear, m_Zfar);
+//		}
+//		void Update_FovAspect(float _fov, float _aspect) override
+//		{
+//			m_fov = _fov;
+//			m_aspect = _aspect;
+//			Matrix4x4::Perspective_UpdateFov(m_projection, _fov, _aspect);
+//			Matrix4x4::PerspectiveInverse_UpdateFov(m_projectionInverse, _fov, _aspect);
+//		}
+//		void Update_Z() override
+//		{
+//			Matrix4x4::Perspective_UpdateZ(m_projection, m_Znear, m_Zfar);
+//			Matrix4x4::PerspectiveInverse_UpdateZ(m_projectionInverse, m_Znear, m_Zfar);
+//		}
+//
+//		CameraProjection_Perspective(bool windowAspectLock, float fov, float aspect, float znear, float zfar)
+//			: CameraProjection(znear, zfar), m_windowAspectLock(windowAspectLock)
+//		{
+//			Set(fov, aspect);
+//		}
+//		~CameraProjection_Perspective() {}
+//	};
+//
+//	class CameraProjection_Orthographic : public CameraProjection
+//	{
+//	protected:
+//		float m_boundaries[4];
+//	public:
+//		float getXmin() const override { return m_boundaries[0]; }
+//		float getXmax() const override { return m_boundaries[1]; }
+//		float getYmin() const override { return m_boundaries[2]; }
+//		float getYmax() const override { return m_boundaries[3]; }
+//
+//		void Set(float xmin, float xmax, float ymin, float ymax) override
+//		{
+//			m_boundaries[0] = xmin;
+//			m_boundaries[1] = xmax;
+//			m_boundaries[2] = ymin;
+//			m_boundaries[3] = ymax;
+//
+//			m_projection = Matrix4x4::Orthographic(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
+//			m_projectionInverse = Matrix4x4::OrthographicInverse(xmin, xmax, ymin, ymax, m_Znear, m_Zfar);
+//		}
+//		void Update_X(float _xmin, float _xmax) override
+//		{
+//			m_boundaries[0] = _xmin;
+//			m_boundaries[1] = _xmax;
+//
+//			Matrix4x4::Orthographic_UpdateX(m_projection, _xmin, _xmax);
+//			Matrix4x4::OrthographicInverse_UpdateX(m_projection, _xmin, _xmax);
+//		}
+//		void Update_Y(float _ymin, float _ymax) override
+//		{
+//			m_boundaries[2] = _ymin;
+//			m_boundaries[3] = _ymax;
+//
+//			Matrix4x4::Orthographic_UpdateY(m_projection, _ymin, _ymax);
+//			Matrix4x4::OrthographicInverse_UpdateY(m_projection, _ymin, _ymax);
+//		}
+//		void Update_Z() override
+//		{
+//			Matrix4x4::Orthographic_UpdateZ(m_projection, m_Znear, m_Zfar);
+//			Matrix4x4::OrthographicInverse_UpdateZ(m_projection, m_Znear, m_Zfar);
+//		}
+//		CameraProjection_Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
+//			: CameraProjection(znear, zfar)
+//		{
+//			Set(xmin, xmax, ymin, ymax);
+//		}
+//		~CameraProjection_Orthographic() {}
+//	};
+//
+//	class CameraProjection_Custom : public CameraProjection
+//	{
+//	public:
+//		void Set(float* _matrix) override
+//		{
+//			m_projection = Matrix4x4(
+//				_matrix[0], _matrix[1], _matrix[2], _matrix[3],
+//				_matrix[4], _matrix[5], _matrix[6], _matrix[7],
+//				_matrix[8], _matrix[9], _matrix[10], _matrix[11],
+//				_matrix[12], _matrix[13], _matrix[14], _matrix[15]
+//			);
+//			m_projectionInverse = m_projection.Inverse();
+//		}
+//
+//		CameraProjection_Custom(float* _matrix)
+//			: CameraProjection(0, 0)
+//		{
+//			Set(_matrix);
+//		}
+//		~CameraProjection_Custom() {}
+//	};
+//
+//	class Camera : public Transform, public Asset<Camera>
+//	{
+//		friend class CameraProjection;
+//		friend class CameraProjection_Perspective;
+//		friend class CameraProjection_Orthographic;
+//		friend class RenderManager;
+//		friend class Window;
+//	protected:
+//		enum Type
+//		{
+//			NONE,
+//			ORTHOGRAPHIC,
+//			PERSPECTIVE,
+//			CUSTOM
+//		};
+//
+//		// Main
+//		static Camera* m_main;
+//		// VP DATA
+//		Type				m_type = Type::NONE;
+//		CameraProjection*	m_projection;
+//		Matrix4x4			m_view;
+//		Matrix4x4			m_viewInverse;
+//		Matrix4x4			m_viewProjection;
+//		Matrix4x4			m_viewProjectionInverse;
+//		// Ubo
+//		UniformBufferObject* m_UBO = nullptr;
+//		
+//
+//		// Protected
+//		Camera(const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
+//	public:
+//		~Camera();
+//
+//		// Database Creation
+//		static Camera* Create(const std::string _name, const Vector3& _position, const Vector3& _forward = Vector3(0, 0, 1), float _znear = -1.0f, float _zfar = 1.0f);
+//	
+//		void update();
+//
+//		static Camera* GetMain(void)
+//		{
+//			return m_main;
+//		}
+//		inline void SetMain(void)
+//		{
+//			m_main = this;
+//		}
+//
+//		// Perspective Matrix except the aspect ratio is based on the window
+//		Camera& setPerspectiveWindowAspectLock(float _fov);
+//		// Perspective Matrix
+//		Camera& setPerspective(float _fov, float _aspect);
+//		// Orthographic Matrix
+//		Camera& setOrthographic(float _xmin, float _xmax, float _ymin, float _ymax);
+//		// Set Custom Projection Matrix [16 float array]
+//		Camera& setCustomProjection(float* _matrix);
+//		
+//		Camera& updatePerspective(float _fov, float _aspect);  // If already perspective, this will update its values faster
+//		Camera& updatePerspectiveFOV(float _fov);  // If already perspective, this will update its values faster
+//		Camera& updatePerspectiveAspectRatio(float _aspect);  // If already perspective, this will update its values faster
+//		Camera& updateOrtho_X(float _xmin, float _xmax);  // If already ortho, this will update its values faster
+//		Camera& updateOrtho_Y(float _ymin, float _ymax);  // If already ortho, this will update its values faster
+//		Camera& setZnear(float _znear);
+//		Camera& setZfar(float _zfar);
+//
+//		void BindUBO();
+//
+//		// Get Data	
+//		inline const Matrix4x4&	getView() const
+//		{
+//			return m_view;
+//		}
+//		inline const Matrix4x4&	getViewInverse() const
+//		{
+//			return m_viewInverse;
+//		}
+//		inline const Matrix4x4&	getProjection() const
+//		{
+//			return m_projection->getProjection();
+//		}
+//		inline const Matrix4x4&	getProjectionInverse() const
+//		{
+//			return m_projection->getProjectionInverse();
+//		}
+//		inline const Matrix4x4&	getViewProjection() const
+//		{
+//			return m_viewProjection;
+//		}
+//		inline const Matrix4x4&	getViewProjectionInverse() const
+//		{
+//			return m_viewProjectionInverse;
+//		}
+//
+//		bool isPerspective() const
+//		{
+//			return m_type == Type::PERSPECTIVE;
+//		}
+//		bool isOrthographic() const
+//		{
+//			return m_type == Type::ORTHOGRAPHIC;
+//		}
+//		bool isCustomProjection() const
+//		{
+//			return m_type == Type::CUSTOM;
+//		}
+//
+//		inline float getZnear() const
+//		{
+//			return m_projection->m_Znear;
+//		}
+//		inline float getZfar() const
+//		{
+//			return m_projection->m_Zfar;
+//		}
+//		inline float getFOV() const
+//		{
+//			return m_projection->getFov();
+//		}
+//		inline float getAspect() const
+//		{
+//			return m_projection->getAspect();
+//		}
+//		inline float getXmin() const
+//		{
+//			return m_projection->getXmin();
+//		}
+//		inline float getXmax() const
+//		{
+//			return m_projection->getXmax();
+//		}
+//		inline float getYmin() const
+//		{
+//			return m_projection->getYmin();
+//		}
+//		inline float getYmax() const
+//		{
+//			return m_projection->getYmax();
+//		}
+//
+//		// Override for transform class (forward directions are reversed)
+//		Vector3 getForward(void) override
+//		{
+//			updateValues();
+//			return -m_forward;
+//		}
+//		Vector3 getBackwards(void) override
+//		{
+//			updateValues();
+//			return m_forward;
+//		}
+//
+//		Transform& setForward(const Vector3& forward);
+//	};
+//}

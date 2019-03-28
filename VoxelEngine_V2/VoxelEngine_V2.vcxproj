@@ -61,7 +61,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="engine\math\Camera.cpp" />
     <ClCompile Include="engine\math\Color.cpp" />
     <ClCompile Include="engine\math\Matrix2x2.cpp" />
     <ClCompile Include="engine\math\Matrix3x3.cpp" />
@@ -106,7 +105,6 @@
     <ClInclude Include="engine\opengl\Geometry.h" />
     <ClInclude Include="engine\opengl\Shader.h" />
     <ClInclude Include="engine\input\Input.h" />
-    <ClInclude Include="engine\math\Camera.h" />
     <ClInclude Include="engine\math\Color.h" />
     <ClInclude Include="engine\math\Lerp.h" />
     <ClInclude Include="engine\math\MathCore.h" />

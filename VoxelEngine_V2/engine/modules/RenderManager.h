@@ -34,6 +34,9 @@ namespace Vxl
 		Layer* m_layers;
 		UINT m_layerToRender = ~0;
 
+		// Main Camera
+		CameraObject* m_mainCamera = nullptr;
+
 		// Masterlist of entities
 		std::vector<Entity*> m_allEntities;
 		// Masterlist of specific entities
@@ -54,6 +57,17 @@ namespace Vxl
 		{
 			return m_allEntities;
 		}
+
+		// Camera
+		void SetMainCamera(CameraObject* _camera)
+		{
+			m_mainCamera = _camera;
+		}
+		CameraObject* GetMainCamera(void) const
+		{
+			return m_mainCamera;
+		}
+		void UpdateAllWindowAspectCameras();
 
 		// Entity
 		void AddEntity(Entity* _entity);

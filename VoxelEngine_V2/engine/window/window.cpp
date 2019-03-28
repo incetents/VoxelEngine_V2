@@ -6,7 +6,7 @@
 #include "../opengl/glUtil.h"
 
 #include "../utilities/logger.h"
-#include "../math/Camera.h"
+#include "../modules/RenderManager.h"
 
 #include <GLFW/glfw3.h>
 
@@ -101,8 +101,8 @@ namespace Vxl
 		m_size[0] = width;
 		m_size[1] = height;
 		m_aspectRatio = (float)width / (float)height;
-		// If using normal aspect ratio, 
-		UpdateCameraAspectRatios();
+		// Update aspect ratios for all related cameras
+		RenderManager.UpdateAllWindowAspectCameras();
 		// Update screen sizes for viewport rendering
 		UpdateViewport();
 	}
@@ -139,19 +139,6 @@ namespace Vxl
 				m_viewportOffset[1] = offsetHeight;
 				m_viewportSize[0] = m_size[0];
 				m_viewportSize[1] = customHeight;
-			}
-		}
-	}
-	void Window::UpdateCameraAspectRatios()
-	{
-		// Update aspect ratio for all existing cameras that are locked to this aspect ratio
-		auto Cameras = Camera::GetDatabase();
-		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
-		{
-			auto Cam = it->second;
-			if (Cam->isPerspective() && Cam->m_projection->IsWindowAspectRatio())
-			{
-				Cam->m_projection->Update_FovAspect(Cam->m_projection->getFov(), GetAspectRatio());
 			}
 		}
 	}
@@ -196,8 +183,8 @@ namespace Vxl
 		// Flags
 		m_useCustomAspectRatio = state;
 		m_customAspectRatio = aspect;
-		// Update Aspect ratios
-		UpdateCameraAspectRatios();
+		// Update aspect ratios for all related cameras
+		RenderManager.UpdateAllWindowAspectCameras();
 		// Update viewport sizes
 		UpdateViewport();
 	}

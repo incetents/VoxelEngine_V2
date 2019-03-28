@@ -10,7 +10,7 @@ namespace Vxl
 {
 	class ShaderProgram;
 	class FramebufferObject;
-	class Camera;
+	//class Camera;
 	class Mesh;
 	class Transform;
 	class XGamePad;
@@ -45,7 +45,8 @@ namespace Vxl
 		Mesh* _mesh;
 
 		// Assets Automated
-		Camera* _camera;
+		//Camera* _camera;
+		CameraObject* _cameraObject;
 
 		FramebufferObject* _fbo;
 		FramebufferObject* _fbo_colorpicker;

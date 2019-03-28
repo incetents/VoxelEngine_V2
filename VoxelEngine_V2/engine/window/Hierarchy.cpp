@@ -114,16 +114,20 @@ namespace Vxl
 			ImGui::SameLine();
 			if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
 			{
-				Entity::Delete(_selectedEntity);
-				_selectedEntity = nullptr;
+				// Don't delete camera
+				if (_selectedEntity && _selectedEntity->GetType() != EntityType::CAMERA)
+				{
+					Entity::Delete(_selectedEntity);
+					_selectedEntity = nullptr;
+				}
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Add Sphere"))
 			{
 				auto object = GameObject::Create("Generic Object");
-				//object->SetMesh(Geometry.GetSphereUV_Good());
+				object->SetMesh(Geometry.GetSphereUV_Good());
 				object->SetMaterial(Material::Get("gbuffer"));
-				//object->SetColor(Color3F(1, 0, 0));
+				object->SetColor(Color3F(1, 0, 0));
 			}
 
 			auto AllEntities = RenderManager.m_allEntities;

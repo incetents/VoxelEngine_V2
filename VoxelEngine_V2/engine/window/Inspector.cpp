@@ -44,9 +44,22 @@ namespace Vxl
 
 				// Color
 				float EntityColor[3] = { Entity->GetLabelColor().r, Entity->GetLabelColor().g, Entity->GetLabelColor().b };
-				if (ImGui::ColorEdit3("Label Color: ", EntityColor))
+				
+				if (ImGui::ColorEdit3("Label Color: ", EntityColor, ImGuiColorEditFlags_NoInputs))
 				{
 					Entity->SetLabelColor(Color3F(EntityColor[0], EntityColor[1], EntityColor[2]));
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Copy Color"))
+				{
+					LabelColorClipboard.r = EntityColor[0];
+					LabelColorClipboard.g = EntityColor[1];
+					LabelColorClipboard.b = EntityColor[2];
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Paste Color"))
+				{
+					Entity->SetLabelColor(LabelColorClipboard);
 				}
 
 				// Drag Speed

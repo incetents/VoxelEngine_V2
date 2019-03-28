@@ -18,9 +18,6 @@
     <ClCompile Include="include\GL\gl3w.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\math\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\math\Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -198,9 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Color.h">

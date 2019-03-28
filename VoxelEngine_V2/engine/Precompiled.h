@@ -24,7 +24,6 @@
 #include "opengl/Shader.h"
 #include "opengl/Texture.h"
 
-#include "math/Camera.h"
 #include "math/Color.h"
 #include "math/Lerp.h"
 #include "math/MathCore.h"

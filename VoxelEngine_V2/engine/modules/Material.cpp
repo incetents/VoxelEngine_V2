@@ -10,7 +10,6 @@
 #include "../modules/Entity.h"
 
 #include "../math/Transform.h"
-#include "../math/Camera.h"
 
 #include "../utilities/logger.h"
 

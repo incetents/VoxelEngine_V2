@@ -8,7 +8,6 @@
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
 #include "../imgui/imgui.h"
-#include "../math/Camera.h"
 #include "../opengl/Texture.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Geometry.h"
@@ -48,6 +47,18 @@ namespace Vxl
 	{
 		assert(index < MAX_LAYERS);
 		return m_layers[index];
+	}
+
+	void RenderManager::UpdateAllWindowAspectCameras()
+	{
+		for (auto Camera : m_allCameraObjects)
+		{
+			if (Camera->isPerspectiveWindowAspect())
+			{
+				Camera->UpdateAspect(Window.GetAspectRatio());
+				Camera->CreatePerspective();
+			}
+		}
 	}
 
 	void RenderManager::AddEntity(Entity* _entity)
@@ -191,9 +202,6 @@ namespace Vxl
 	// Destroy all data for next Window context
 	void RenderManager::Destroy()
 	{
-		// Delete Cameras
-		Camera::DeleteAndClearAll();
-		
 		// Delete Materials and Entities
 		Material::DeleteAndClearAll();
 		Entity::DeleteAndClearAll(); // Since deleting entities changes
