@@ -201,9 +201,19 @@ namespace Vxl
 		_crate2->SetMesh(Geometry.GetCube());
 		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(0, 2, 0);
+		
+
+		GameObject* _crate3 = GameObject::Create("_crate3");
+		_crate3->SetMaterial(_material_gbuffer);
+		_crate3->SetMesh(Geometry.GetCube());
+		_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
+		_crate3->m_transform.setPosition(0, 4, 0);
+
 		// Parent Test
 		//_crate1->m_transform.setParent(&_crate2->m_transform);
+
 		_crate2->m_transform.addChild(&_crate1->m_transform);
+		_crate3->m_transform.addChild(&_crate2->m_transform);
 		
 		_crate1->m_transform.setWorldPosition(0, 0, 0);
 		
@@ -260,76 +270,78 @@ namespace Vxl
 		if (Input.getKeyDown(KeyCode::ESCAPE))
 			Window.Close();
 
-		// Camera Movement
-		Vector3 CamMove;
-		float CamSpeed = 0.1f;
-
-		if (Input.getKey(KeyCode::W))
-			CamMove += _cameraObject->m_transform.getCameraForward();
-		if (Input.getKey(KeyCode::S))
-			CamMove += _cameraObject->m_transform.getCameraBackwards();
-		if (Input.getKey(KeyCode::A))
-			CamMove += _cameraObject->m_transform.getLeft();
-		if (Input.getKey(KeyCode::D))
-			CamMove += _cameraObject->m_transform.getRight();
-
-		if (Input.getKey(KeyCode::SPACE))
-			CamMove += Vector3::UP;
-		if (Input.getKey(KeyCode::LEFT_CONTROL))
-			CamMove += Vector3::DOWN;
-
-		_cameraObject->m_transform.increasePosition(CamMove.Normalize() * CamSpeed);
-		//_camera->increasePosition(CamMove.Normalize() * CamSpeed);
-
-		// Camera Rotation
-		Vector3 CamRotation;
-		float CamRotationSpeed = 2.25f;
-
-		if (Input.getKey(KeyCode::UP))
-			CamRotation.x += CamRotationSpeed;
-		if (Input.getKey(KeyCode::DOWN))
-			CamRotation.x -= CamRotationSpeed;
-		if (Input.getKey(KeyCode::LEFT))
-			CamRotation.y += CamRotationSpeed;
-		if (Input.getKey(KeyCode::RIGHT))
-			CamRotation.y -= CamRotationSpeed;
-
-		_cameraObject->m_transform.increaseRotation(CamRotation);
-		//_camera->increaseRotation(CamRotation);
-
-		// Camera Lock
-		if (Input.getKeyDown(KeyCode::Z))
+		if (DevConsole.GetBool("Camera Keyboard Controls", true))
 		{
+			// Camera Movement
+			Vector3 CamMove;
+			float CamSpeed = 0.1f;
+
+			if (Input.getKey(KeyCode::W))
+				CamMove += _cameraObject->m_transform.getCameraForward();
+			if (Input.getKey(KeyCode::S))
+				CamMove += _cameraObject->m_transform.getCameraBackwards();
+			if (Input.getKey(KeyCode::A))
+				CamMove += _cameraObject->m_transform.getLeft();
+			if (Input.getKey(KeyCode::D))
+				CamMove += _cameraObject->m_transform.getRight();
+
+			if (Input.getKey(KeyCode::SPACE))
+				CamMove += Vector3::UP;
+			if (Input.getKey(KeyCode::LEFT_CONTROL))
+				CamMove += Vector3::DOWN;
+
+			_cameraObject->m_transform.increasePosition(CamMove.Normalize() * CamSpeed);
+			//_camera->increasePosition(CamMove.Normalize() * CamSpeed);
+
+			// Camera Rotation
+			Vector3 CamRotation;
+			float CamRotationSpeed = 2.25f;
+
+			if (Input.getKey(KeyCode::UP))
+				CamRotation.x += CamRotationSpeed;
+			if (Input.getKey(KeyCode::DOWN))
+				CamRotation.x -= CamRotationSpeed;
+			if (Input.getKey(KeyCode::LEFT))
+				CamRotation.y += CamRotationSpeed;
+			if (Input.getKey(KeyCode::RIGHT))
+				CamRotation.y -= CamRotationSpeed;
+
+			_cameraObject->m_transform.increaseRotation(CamRotation);
+			//_camera->increaseRotation(CamRotation);
+
+			// Camera Lock
+			if (Input.getKeyDown(KeyCode::Z))
+			{
+				if (Window.GetCursor() == CursorMode::LOCKED)
+					Window.SetCursor(CursorMode::NORMAL);
+				else
+					Window.SetCursor(CursorMode::LOCKED);
+			}
+
+			float CameraHorizontalRotation = DevConsole.GetFloat("Camera Horizontal Rotation", 0.2f);
+			float CameraVerticalRotation = DevConsole.GetFloat("Camera Vertical Rotation", 0.2f);
+
+			// Lock = mouse rotates camera
 			if (Window.GetCursor() == CursorMode::LOCKED)
-				Window.SetCursor(CursorMode::NORMAL);
-			else
-				Window.SetCursor(CursorMode::LOCKED);
+			{
+				float deltax = Input.getMouseDeltaX() * (float)Time.GetDeltaTime() * CameraVerticalRotation;
+				float deltay = Input.getMouseDeltaY() * (float)Time.GetDeltaTime() * CameraHorizontalRotation;
+				// clamp delta for safety
+				deltax = MacroClamp(deltax, -100, +100);
+				deltay = MacroClamp(deltay, -100, +100);
+
+				_cameraObject->m_transform.increaseRotation(-deltay, -deltax, 0);
+				//_camera->increaseRotation(-deltay, -deltax, 0);
+			}
+
+			// Edge case for vertical rotation
+			float Xrot = MacroClamp(_cameraObject->m_transform.getRotationEuler().x, -89.9f, 89.9f);
+			_cameraObject->m_transform.setRotationX(Xrot);
+			//
+
+			// Update Cam
+			_cameraObject->Update();
 		}
-
-		float CameraHorizontalRotation = DevConsole.GetFloat("Camera Horizontal Rotation", 0.2f);
-		float CameraVerticalRotation = DevConsole.GetFloat("Camera Vertical Rotation", 0.2f);
-
-		// Lock = mouse rotates camera
-		if (Window.GetCursor() == CursorMode::LOCKED)
-		{
-			float deltax = Input.getMouseDeltaX() * (float)Time.GetDeltaTime() * CameraVerticalRotation;
-			float deltay = Input.getMouseDeltaY() * (float)Time.GetDeltaTime() * CameraHorizontalRotation;
-			// clamp delta for safety
-			deltax = MacroClamp(deltax, -100, +100);
-			deltay = MacroClamp(deltay, -100, +100);
-
-			_cameraObject->m_transform.increaseRotation(-deltay, -deltax, 0);
-			//_camera->increaseRotation(-deltay, -deltax, 0);
-		}
-
-		// Edge case for vertical rotation
-		float Xrot = MacroClamp(_cameraObject->m_transform.getRotationEuler().x, -89.9f, 89.9f);
-		_cameraObject->m_transform.setRotationX(Xrot);
-		//
-
-		// Update Cam
-		_cameraObject->Update();
-		//_camera->update();
 
 		// Debug Lines
 		Debug.DrawLine(
@@ -346,36 +358,40 @@ namespace Vxl
 		);
 
 		// Selection
-		if (Hierarchy._selectedEntity != nullptr && Hierarchy._selectedEntity->m_useTransform)
+		for (auto Entity : Hierarchy.GetSelectedEntities())
 		{
-			auto Entity = Hierarchy._selectedEntity;
-			static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
-
-			Color4F AABB_Color = Entity->m_isActive ? Color4F::YELLOW : Color4F::GREY;
-			Color4F OBB_Color = Entity->m_isActive ? Color4F::GREEN : Color4F::GREY;
-
-			// Draw Outline around Entity
-			if (Entity->GetMesh())
+			if (Entity->m_useTransform)
 			{
-				if (Entity->GetMesh()->m_instances.Empty())
+				static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
+
+				Color4F AABB_Color = Entity->m_isActive ? Color4F::YELLOW : Color4F::GREY;
+				Color4F OBB_Color = Entity->m_isActive ? Color4F::GREEN : Color4F::GREY;
+
+				// Draw Outline around Entity
+				if (Entity->GetMesh())
 				{
-					Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, AABB_Color);
-					Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
-				}
-				// Draw outline around all instances
-				else
-				{
-					//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
-					auto Instances = Entity->GetMesh()->m_instances.GetVertices();
-					for (Matrix4x4 instanceMatrix : *Instances)
+					if (Entity->GetMesh()->m_instances.Empty())
 					{
-						Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
-						Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, AABB_Color);
-						Debug.DrawOBB(*Entity, Pos, 5.0f, OBB_Color);
+						Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, AABB_Color);
+						Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
+					}
+					// Draw outline around all instances
+					else
+					{
+						//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
+						auto Instances = Entity->GetMesh()->m_instances.GetVertices();
+						for (Matrix4x4 instanceMatrix : *Instances)
+						{
+							Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
+							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, AABB_Color);
+							Debug.DrawOBB(*Entity, Pos, 5.0f, OBB_Color);
+						}
 					}
 				}
 			}
 		}
+
+		
 
 		//	// Draw OBB for entity 3
 		//	Vector3 p = _entity3->m_transform.getPosition();
@@ -446,7 +462,6 @@ namespace Vxl
 		GPUTimer::StartTimer("Gbuffer");
 
 		RenderManager.GetMainCamera()->BindUBO();
-		//Camera::GetMain()->BindUBO();
 		RenderManager.RenderSceneGameObjects();
 
 		GPUTimer::EndTimer("Gbuffer");
@@ -571,12 +586,27 @@ namespace Vxl
 			mem.f_ID[3] = data[3];
 			mem.ui_ID--;//offset (0 = nothing instead of first value)
 
-			if (Input.getMouseButton(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow())
+			if (Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow())
 			{
 				if (mem.ui_ID < EntityCount)
-					Hierarchy._selectedEntity = Entities[mem.ui_ID];
+				{
+					if (Input.getKey(KeyCode::LEFT_CONTROL))
+					{
+						if (!Entities[mem.ui_ID]->m_isSelected)
+							Hierarchy.AddSelection(Entities[mem.ui_ID]);
+						else
+							Hierarchy.RemoveSelection(Entities[mem.ui_ID]);
+					}
+					else
+					{
+						Hierarchy.ClearSelection();
+						Hierarchy.AddSelection(Entities[mem.ui_ID]);
+					}
+				}
 				else
-					Hierarchy._selectedEntity = nullptr;
+				{
+					Hierarchy.ClearSelection();
+				}
 			}
 
 			//if ()

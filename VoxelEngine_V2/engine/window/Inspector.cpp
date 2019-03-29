@@ -29,9 +29,10 @@ namespace Vxl
 
 		if (ImGui::Begin("[F2] Inspector", &open, ImVec2(380, 280), 0.9f))
 		{
-			auto Entity = Hierarchy._selectedEntity;
-			if (Entity != nullptr)
+			if (Hierarchy.GetSelectedEntities().size() == 1)
 			{
+				auto Entity = Hierarchy.GetSelectedEntities()[0];
+
 				// Name
 				static char Name[MAX_ENTITY_NAME_LENGTH];
 				strcpy_s(Name, Entity->GetName().c_str());

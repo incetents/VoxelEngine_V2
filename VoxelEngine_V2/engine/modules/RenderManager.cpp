@@ -231,7 +231,7 @@ namespace Vxl
 		m_gbufferObjects.clear();
 
 		// Remove selected entity
-		Hierarchy._selectedEntity = nullptr;
+		Hierarchy.m_selectedEntities.clear();
 
 		// Recreate Geometry Shapes
 		Geometry.Reload();

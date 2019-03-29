@@ -50,7 +50,9 @@ namespace Vxl
 		bool				m_useTransform = true;
 		bool				m_isActive = true;
 		bool				m_isColoredObject = false;
+		// Editor Information
 		bool				m_isClickable = true;
+		bool				m_isSelected = false;
 
 		// Type
 		EntityType GetType(void) const

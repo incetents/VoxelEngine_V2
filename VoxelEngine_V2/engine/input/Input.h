@@ -141,6 +141,7 @@ namespace Vxl
 	};
 
 	#define TotalKeys (UINT)KeyCode::TOTAL_KEYS
+	#define TotalMouseButtons 8
 
 	static class Input : public Singleton<class Input>
 	{
@@ -153,7 +154,8 @@ namespace Vxl
 		int		m_MousePrevPos[2] = { 0 };
 		int		m_MousePos[2] = { 0 };
 		int		m_MouseDeltaPos[2] = { 0 };
-		bool	m_MouseButtons[8] = { false };
+		bool	m_MouseButtonsPrev[TotalMouseButtons] = { false };
+		bool	m_MouseButtons[TotalMouseButtons] = { false };
 		double  m_MouseScroll[2] = { 0.0 };
 
 	public:
@@ -168,6 +170,8 @@ namespace Vxl
 		inline int	  getMouseDeltaY() const { return m_MouseDeltaPos[1]; }
 		void		  getMousePos(float& x, float& y)  const { x = static_cast<float>(m_MousePos[0]); y = static_cast<float>(m_MousePos[1]); }
 		bool		  getMouseButton(MouseButton M) const { return m_MouseButtons[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse; }
+		bool		  getMouseButtonDown(MouseButton M) const { return m_MouseButtons[static_cast<int>(M)] && !m_MouseButtonsPrev[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse; }
+		bool		  getMouseButtonUp(MouseButton M) const { return !m_MouseButtons[static_cast<int>(M)] && m_MouseButtonsPrev[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse; }
 		inline double getHorizontalScroll()			const { return m_MouseScroll[0]; }
 		inline double getVerticalScroll()			const { return m_MouseScroll[1]; }
 
@@ -175,6 +179,8 @@ namespace Vxl
 		void Update()
 		{
 			memcpy(m_Key_Previous, m_Key_Current, sizeof(bool) * TotalKeys);
+
+			memcpy(m_MouseButtonsPrev, m_MouseButtons, sizeof(bool) * TotalMouseButtons);
 
 			m_MouseDeltaPos[0] = m_MousePos[0] - m_MousePrevPos[0];
 			m_MouseDeltaPos[1] = m_MousePos[1] - m_MousePrevPos[1];
@@ -204,6 +210,7 @@ namespace Vxl
 		}
 		inline void setMouseButton(int index, bool state)
 		{
+			
 			Input.m_MouseButtons[index] = state;
 		}
 		inline void setScroll(double x, double y)

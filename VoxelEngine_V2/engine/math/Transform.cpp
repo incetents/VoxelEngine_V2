@@ -88,6 +88,16 @@ namespace Vxl
 		{
 			child->simpleRemoveParent();
 			child->m_owner->TransformChanged();
+			// Check for new parent for current children/soon-to-be orphans
+			if (m_parent)
+			{
+				// Preserve World Position
+				Vector3 WorldPosition = child->getWorldPosition();
+				// Current Parent = Grandparent
+				child->setParent(m_parent);
+				// World Position fix
+				child->setWorldPosition(WorldPosition);
+			}
 		}
 		// If it has a parent, break connection
 		if (m_parent)

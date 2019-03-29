@@ -6,12 +6,15 @@
 #include "../imgui/imgui_colors.h"
 
 #include "../modules/RenderManager.h"
-#include "../objects/GameObject.h"
 #include "../modules/Material.h"
+
+#include "../objects/GameObject.h"
 
 #include "../opengl/Geometry.h"
 
 #include "../input/Input.h"
+
+#include "../utilities/Util.h"
 
 #include <iostream>
 
@@ -27,7 +30,7 @@ namespace Vxl
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog;
-			if (_entity == _selectedEntity)
+			if (_entity->m_isSelected)
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
@@ -48,7 +51,20 @@ namespace Vxl
 
 			// selection case
 			if (ImGui::IsItemClicked())
-				_selectedEntity = _entity;
+			{
+				if (Input.getKey(KeyCode::LEFT_CONTROL))
+				{
+					if (!_entity->m_isSelected)
+						AddSelection(_entity);
+					else
+						RemoveSelection(_entity);
+				}
+				else
+				{
+					ClearSelection();
+					AddSelection(_entity);
+				}
+			}
 
 			// color end
 			ImGui::PopStyleColor();
@@ -57,7 +73,7 @@ namespace Vxl
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
-			if (_entity == _selectedEntity)
+			if (_entity->m_isSelected)
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
@@ -78,7 +94,20 @@ namespace Vxl
 
 			// selection
 			if (ImGui::IsItemClicked())
-				_selectedEntity = _entity;
+			{
+				if (Input.getKey(KeyCode::LEFT_CONTROL))
+				{
+					if (!_entity->m_isSelected)
+						AddSelection(_entity);
+					else
+						RemoveSelection(_entity);
+				}
+				else
+				{
+					ClearSelection();
+					AddSelection(_entity);
+				}
+			}
 
 			// color end
 			ImGui::PopStyleColor();
@@ -111,15 +140,18 @@ namespace Vxl
 		if (ImGui::Begin("[F3] Hierarchy", &open, ImVec2(280, 380), 0.9f))
 		{
 			ImGui::Text("Scene Graph:\t");
-			ImGui::SameLine();
+
 			if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
 			{
 				// Don't delete camera
-				if (_selectedEntity && _selectedEntity->GetType() != EntityType::CAMERA)
+				for (auto Entity : m_selectedEntities)
 				{
-					Entity::Delete(_selectedEntity);
-					_selectedEntity = nullptr;
+					if (Entity->GetType() != EntityType::CAMERA)
+					{
+						Entity::Delete(Entity);
+					}
 				}
+				ClearSelection();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Add Sphere"))
@@ -129,15 +161,116 @@ namespace Vxl
 				object->SetMaterial(Material::Get("gbuffer"));
 				object->SetColor(Color3F(1, 0, 0));
 			}
-
-			auto AllEntities = RenderManager.m_allEntities;
-			for (auto it = AllEntities.begin(); it != AllEntities.end(); it++)
+			ImGui::SameLine();
+			if (ImGui::Button("Duplicate Selected GameObject(s)"))
 			{
-				// Only display entities without parents
-				if((*it)->m_transform.getParent() == nullptr)
-					DisplayEntity(*it, 0);
+				for (auto Entity : m_selectedEntities)
+				{
+					if (Entity->GetType() == EntityType::GAMEOBJECT)
+					{
+						auto GEntity = dynamic_cast<GameObject*>(Entity);
+
+						auto object = GameObject::Create(GEntity->GetName());
+						object->SetMesh(GEntity->GetMesh());
+						object->SetMaterial(GEntity->GetMaterial());
+						object->SetColor(GEntity->GetColor());
+						object->m_useTransform = GEntity->m_useTransform;
+						object->m_isActive = GEntity->m_isActive;
+						object->m_isColoredObject = GEntity->m_isColoredObject;
+						object->m_isClickable = GEntity->m_isClickable;
+						object->m_isSelected = false;
+						object->m_transform.setWorldPosition(GEntity->m_transform.getWorldPosition());
+						object->m_transform.setRotation(GEntity->m_transform.getRotationEuler());
+						object->m_transform.setScale(GEntity->m_transform.getScale());
+						object->m_transform.setParent(GEntity->m_transform.getParent());
+					}
+				}
+			}
+
+			// Display Hierarchy with selected entities
+			auto AllEntities = RenderManager.m_allEntities;
+			int EntityCount = (int)AllEntities.size();
+			for (int i = 0; i < EntityCount; i++)
+			{
+				auto Entity = AllEntities[i];
+
+				if (Entity->m_transform.getParent() == nullptr)
+					DisplayEntity(Entity, 0);
+			}
+			//
+
+			// Move Selection
+			if (ImGui::IsWindowFocused())
+			{
+				if (Input.getKeyDown(KeyCode::DOWN))
+				{
+					if (m_selectedEntities.size() == 1)
+					{
+						for (int i = 0; i < EntityCount; i++)
+						{
+							if (AllEntities[i] == m_selectedEntities[0])
+							{
+								ClearSelection();
+								auto Entity = AllEntities[(i + 1) % EntityCount];
+
+								// Check for children
+								if (Entity->m_transform.getChildCount() > 0)
+								{
+
+								}
+								else
+								{
+
+								}
+
+
+								// Get Next Entity
+
+								AddSelection(Entity);
+								break;
+							}
+						}
+					}
+				}
+				else if (Input.getKeyDown(KeyCode::UP))
+				{
+					if (m_selectedEntities.size() == 1)
+					{
+						for (int i = 0; i < EntityCount; i++)
+						{
+							if (AllEntities[i] == m_selectedEntities[0])
+							{
+								ClearSelection();
+								AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i -1]);
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 		ImGui::End();
 	}
+
+	void Hierarchy::RemoveSelection(Entity* _entity)
+	{
+		Util::RemoveFromVector(m_selectedEntities, _entity);
+		_entity->m_isSelected = false;
+	}
+	void Hierarchy::AddSelection(Entity* _entity)
+	{
+		for (auto Entity : m_selectedEntities)
+			if (Entity == _entity)
+				return;
+
+		m_selectedEntities.push_back(_entity);
+		_entity->m_isSelected = true;
+	}
+	void Hierarchy::ClearSelection()
+	{
+		for (auto Entity : m_selectedEntities)
+			Entity->m_isSelected = false;
+		m_selectedEntities.clear();
+	}
 }
+
