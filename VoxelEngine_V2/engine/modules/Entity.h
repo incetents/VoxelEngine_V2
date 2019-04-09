@@ -25,8 +25,9 @@ namespace Vxl
 	class Entity : public ComponentHandler, public Asset<Entity>
 	{
 		friend class RenderManager;
-		friend class Transform;
 		friend class GameObject;
+		friend class Transform;
+		friend class Hierarchy;
 	protected:
 		// Locked Constructor
 		Entity(const std::string& name, EntityType type);
@@ -35,11 +36,14 @@ namespace Vxl
 		Mesh*		m_mesh = nullptr;
 		EntityType  m_type;
 		std::string	m_name;
-		Color3F		m_labelColor = Color3F(1, 1, 1); // Label For editor only
 		Color3F		m_Color = Color3F(1, 1, 1);
 		Color3F		m_Tint	= Color3F(1, 1, 1);
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
 		Vector3		m_AABB[2]; // AABB based on OBB
+		// Editor Information
+		Color3F		m_labelColor = Color3F(1, 1, 1); // Inspector
+		bool		m_isClickable = true; // Click for selection (Color ID system)
+		bool		m_isSelected = false; // Hierarchy
 
 	public:
 		// Destructor
@@ -50,9 +54,20 @@ namespace Vxl
 		bool				m_useTransform = true;
 		bool				m_isActive = true;
 		bool				m_isColoredObject = false;
+		
 		// Editor Information
-		bool				m_isClickable = true;
-		bool				m_isSelected = false;
+		inline void SetClickableState(bool state)
+		{
+			m_isClickable = state;
+		}
+		inline bool IsClickable(void) const
+		{
+			return m_isClickable;
+		}
+		inline bool IsSelected(void) const
+		{
+			return m_isSelected;
+		}
 
 		// Type
 		EntityType GetType(void) const
@@ -62,7 +77,7 @@ namespace Vxl
 		
 		// Name
 		void SetName(const std::string _name);
-		inline std::string	GetName(void) const
+		inline std::string GetName(void) const
 		{
 			return m_name;
 		}
@@ -140,6 +155,9 @@ namespace Vxl
 		{
 			return m_mesh;
 		}
+
+		// Update Bounding Box from Mesh
+		void UpdateBoundingBoxCheap();
 
 		// Behaviour
 		virtual void Update() = 0;

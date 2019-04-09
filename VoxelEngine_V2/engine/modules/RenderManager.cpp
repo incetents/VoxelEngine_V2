@@ -103,6 +103,20 @@ namespace Vxl
 
 				break;
 			}
+			case EntityType::LIGHT:
+			{
+				auto _light = (LightObject*)_entity;
+
+				// Check if entity already exists
+				if (Util::IsInVector(m_allLightObjects, _light))
+					return;
+
+				// Add
+				m_allLightObjects.push_back(_light);
+				m_allEntities.push_back(_entity);
+
+				break;
+			}
 		}
 	}
 
@@ -137,6 +151,17 @@ namespace Vxl
 
 				// Remove
 				Util::RemoveFromVector(m_allCameraObjects, _Camera);
+				Util::RemoveFromVector(m_allEntities, _entity);
+
+				break;
+			}
+			case EntityType::LIGHT:
+			{
+				auto _Light = dynamic_cast<LightObject*>(_entity);
+				assert(_Light);
+
+				// Remove
+				Util::RemoveFromVector(m_allLightObjects, _Light);
 				Util::RemoveFromVector(m_allEntities, _entity);
 
 				break;
@@ -180,11 +205,14 @@ namespace Vxl
 	{
 		glUtil::initHints(); // important for reset reasons
 
+		Destroy();
+
 		Window.Reload();
 
-		ReloadScene();
+		CreateSpecialManagers();
 
-		Debug.CreateDebugTextures();
+		if (m_currentScene)
+			m_currentScene->Reload();
 	}
 	void RenderManager::ReloadFBOS()
 	{
@@ -192,12 +220,11 @@ namespace Vxl
 	}
 
 	// Behaviour
-	void RenderManager::ReloadScene()
+	void RenderManager::CreateSpecialManagers()
 	{
-		Destroy();
-
-		if (m_currentScene)
-			m_currentScene->Reload();
+		UBOManager.Setup();
+		Debug.Setup();
+		Geometry.Setup();
 	}
 	// Destroy all data for next Window context
 	void RenderManager::Destroy()
@@ -232,9 +259,6 @@ namespace Vxl
 
 		// Remove selected entity
 		Hierarchy.m_selectedEntities.clear();
-
-		// Recreate Geometry Shapes
-		Geometry.Reload();
 
 	}
 	void RenderManager::Update()
@@ -276,6 +300,7 @@ namespace Vxl
 
 	void RenderManager::RenderSceneGameObjects()
 	{
+		// render all gameobjects with their corresponding materials
 		for (auto renderList = m_gbufferObjects.begin(); renderList != m_gbufferObjects.end(); renderList++)
 		{
 			Material* _base = renderList->second.first;
@@ -287,6 +312,64 @@ namespace Vxl
 			{
 				if(ent->IsFamilyActive())
 					ent->Draw();
+			}
+		}
+	}
+	void RenderManager::RenderEditorObjects()
+	{
+		// Draw Lights
+		auto billboard = ShaderProgram::Get("billboard");
+		billboard->Bind();
+		
+		Texture* LightTexture = Texture::Get("lightbulb");
+		Texture* LightTextureSelected = Texture::Get("lightbulb_selected");
+		for (auto light : m_allLightObjects)
+		{
+			billboard->SetUniform<Matrix4x4>("VXL_model", light->m_transform.getModel());
+		
+			if (light->IsSelected())
+			{
+				if (LightTextureSelected)
+					LightTextureSelected->Bind(Active_Texture::LEVEL0);
+				else
+					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+			}
+			else
+			{
+				if (LightTexture)
+					LightTexture->Bind(Active_Texture::LEVEL0);
+				else
+					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+			}
+		
+			light->Draw();
+		}
+
+		// Draw Cameras
+		auto gbuffer = ShaderProgram::Get("gbuffer");
+		gbuffer->Bind();
+		
+		gbuffer->SetUniform<bool>("VXL_useInstancing", false);
+		gbuffer->SetUniform<bool>("VXL_useModel", true);
+		gbuffer->SetUniform<bool>("VXL_useColorOverride", false);
+		//gbuffer->SetUniform<Color3F>("VXL_color", Color3F(1, 1, 0));
+		
+		Texture* CameraTexture = Texture::Get("camera");
+		for (auto camera : m_allCameraObjects)
+		{
+			if (camera == GetMainCamera())
+				continue;
+
+			if (camera->IsFamilyActive())
+			{
+				gbuffer->SetUniform<Matrix4x4>("VXL_model", camera->m_transform.getModel());
+
+				if(CameraTexture)
+					CameraTexture->Bind(Active_Texture::LEVEL0);
+				else
+					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+
+				camera->Draw();
 			}
 		}
 	}

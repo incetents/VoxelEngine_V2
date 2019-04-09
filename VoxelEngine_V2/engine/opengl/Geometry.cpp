@@ -11,26 +11,9 @@
 
 namespace Vxl
 {
-	void Geometry::Destroy()
-	{
-		if (!m_isSetup)
-			return;
-
-		delete m_fullQuad;
-		delete m_fullTriangle;
-		delete m_quad;
-		delete m_cube;
-		delete m_inverseCube;
-		delete m_octahedron;
-		delete m_icosahedron;
-		delete m_icoSphere;
-		delete m_sphere;
-		delete m_sphereUV_16;
-		delete m_sphereUV_64;
-	}
 
 	// Generators
-	Mesh* Geometry::GenerateIcosahdron(unsigned int subdivisions)
+	Mesh* Geometry::GenerateIcosahdron(unsigned int subdivisions, float scale)
 	{
 		float t = (1.0f + sqrt(5.0f)) / 2.0f;
 
@@ -184,9 +167,9 @@ namespace Vxl
 
 			}
 
-			vertices.push_back(Tri[0]);
-			vertices.push_back(Tri[1]);
-			vertices.push_back(Tri[2]);
+			vertices.push_back(Tri[0] * scale);
+			vertices.push_back(Tri[1] * scale);
+			vertices.push_back(Tri[2] * scale);
 
 			uvs.push_back(UVs[0]);
 			uvs.push_back(UVs[1]);
@@ -671,6 +654,7 @@ namespace Vxl
 	void Geometry::CreateSphere()
 	{
 		m_sphere = GenerateIcosahdron(2);
+		m_spherehalf = GenerateIcosahdron(2, 0.5f);
 	}
 
 	void Geometry::CreateSphereUV()

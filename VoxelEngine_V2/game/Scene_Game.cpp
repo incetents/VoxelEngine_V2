@@ -53,15 +53,20 @@ namespace Vxl
 {
 	void Scene_Game::Setup()
 	{
-		Loader::LoadScript_ImportFiles("./scripts/ImportFiles.txt");
+		Loader::LoadScript_ImportFiles("./assets/scripts/ImportFiles.txt");
 
 		//_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
 
-		_cameraObject = CameraObject::Create("_camera_special", 0.01f, 50.0f);
+		_cameraObject = CameraObject::Create("_camera_editor", 0.01f, 50.0f);
 		_cameraObject->m_transform.setPosition(3.5f, 2.8f, 0.3f);
 		_cameraObject->m_transform.setForward(Vector3(0, 0, 1));
-
 		_cameraObject->SetPerspectiveWindowAspect(110.0f);
+
+		CameraObject* _c2 = CameraObject::Create("_camera2", 0.5f, 10.0f);
+		_c2->m_transform.setPosition(2.9f, 2.1f, -2.5f);
+		_c2->m_transform.setForward(Vector3(0, 0, 1));
+		_c2->SetPerspectiveWindowAspect(140.0f);
+
 
 		RenderManager.SetMainCamera(_cameraObject);
 
@@ -89,12 +94,14 @@ namespace Vxl
 		_shader_passthrough			= ShaderProgram::Get("passthrough");
 		_shader_colorPicker			= ShaderProgram::Get("colorPicker");
 		_shader_showRenderTarget	= ShaderProgram::Get("showRenderTarget");
+		_shader_billboard			= ShaderProgram::Get("billboard");
 
 		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
 		_material_gbuffer_no_model	= Material::Create("gbuffer_no_model", _shader_gbuffer_no_model, 2);
 		_material_lines				= Material::Create("debug_lines", _shader_lines, 3);
 		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
+		_material_billboard			= Material::Create("billboard", _shader_billboard, 4);
 
 		_material_gbuffer->m_BlendState = false;
 		_material_gbuffer->m_BlendSource = Blend_Source::ONE;
@@ -162,7 +169,7 @@ namespace Vxl
 		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
-		_entity2->SetColor(Color3F(1, 1, 0));
+		//_entity2->SetColor(Color3F(1, 1, 0));
 		
 		GameObject* _entity3 = GameObject::Create("_entity3");
 		_entity3->SetMaterial(_material_gbuffer);
@@ -184,7 +191,7 @@ namespace Vxl
 		_skybox->SetMaterial(_material_skybox);
 		_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_skybox->SetMesh(Geometry.GetInverseCube());
-		_skybox->m_isClickable = false;
+		_skybox->SetClickableState(false);
 		_skybox->m_useTransform = false;
 		
 		//
@@ -210,12 +217,10 @@ namespace Vxl
 		_crate3->m_transform.setPosition(0, 4, 0);
 
 		// Parent Test
-		//_crate1->m_transform.setParent(&_crate2->m_transform);
-
 		_crate2->m_transform.addChild(&_crate1->m_transform);
 		_crate3->m_transform.addChild(&_crate2->m_transform);
-		
-		_crate1->m_transform.setWorldPosition(0, 0, 0);
+		// World Position
+		_crate1->m_transform.setWorldPosition(-5, 0, 0);
 		
 		GameObject* _octo1 = GameObject::Create("_octo1");
 		_octo1->SetMaterial(_material_gbuffer);
@@ -245,6 +250,15 @@ namespace Vxl
 		_octo4->m_transform.setScale(0.5f);
 		_octo4->SetColor(Color3F(0, 0, 1));
 		
+		LightObject* _light1 = LightObject::Create("_light1");
+		_light1->m_transform.setPosition(5, 0, 0);
+
+		//	GameObject* _billboard1 = GameObject::Create("_billboard1");
+		//	_billboard1->SetMaterial(_material_billboard);
+		//	_billboard1->SetMesh(Geometry.GetQuad());
+		//	_billboard1->m_transform.setPosition(0, 0, 0);
+		//	_billboard1->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
+
 		//GameObject::Delete(_entity5);
 		
 
@@ -253,7 +267,7 @@ namespace Vxl
 		//_light1 = LightObject::Create("light1");
 
 
-		Debug.Setup();
+		
 	}
 	void Scene_Game::Destroy()
 	{
@@ -360,32 +374,48 @@ namespace Vxl
 		// Selection
 		for (auto Entity : Hierarchy.GetSelectedEntities())
 		{
-			if (Entity->m_useTransform)
+			// If appears unorthodox, selection might be disabled [ex: skybox cube]
+			if (Entity->IsClickable())
 			{
 				static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
 
-				Color4F AABB_Color = Entity->m_isActive ? Color4F::YELLOW : Color4F::GREY;
-				Color4F OBB_Color = Entity->m_isActive ? Color4F::GREEN : Color4F::GREY;
+				Color4F AABB_Color = Entity->IsFamilyActive() ? Color4F::YELLOW : Color4F::GREY;
+				Color4F OBB_Color = Entity->IsFamilyActive() ? Color4F::GREEN : Color4F::GREY;
 
-				// Draw Outline around Entity
-				if (Entity->GetMesh())
+				// Selection for GameObjects
+				if (Entity->GetType() == EntityType::GAMEOBJECT)
 				{
-					if (Entity->GetMesh()->m_instances.Empty())
+					// Draw Outline around Entity
+					if (Entity->GetMesh())
 					{
-						Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, AABB_Color);
-						Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
-					}
-					// Draw outline around all instances
-					else
-					{
-						//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
-						auto Instances = Entity->GetMesh()->m_instances.GetVertices();
-						for (Matrix4x4 instanceMatrix : *Instances)
+						if (Entity->GetMesh()->m_instances.Empty())
 						{
-							Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
-							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, AABB_Color);
-							Debug.DrawOBB(*Entity, Pos, 5.0f, OBB_Color);
+							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, AABB_Color);
+							Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
 						}
+						// Draw outline around all instances
+						else
+						{
+							//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
+							auto Instances = Entity->GetMesh()->m_instances.GetVertices();
+							for (Matrix4x4 instanceMatrix : *Instances)
+							{
+								Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
+								Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, AABB_Color);
+								Debug.DrawOBB(*Entity, Pos, 5.0f, OBB_Color);
+							}
+						}
+					}
+				}
+				// Selection for Cameras
+				else if (Entity->GetType() == EntityType::CAMERA)
+				{
+					if (Entity->GetMesh())
+					{
+						Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
+
+						CameraObject* C = dynamic_cast<CameraObject*>(Entity);
+						C->DrawFrustum(5.0f, OBB_Color);
 					}
 				}
 			}
@@ -443,28 +473,31 @@ namespace Vxl
 		}
 	}
 
+	// DO NOT DRAW IN HERE //
 	void Scene_Game::UpdateFixed()
 	{
 
 	}
 	void Scene_Game::Draw()
 	{
-		//
-		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE", 0));
-		//
 
-		GPUTimer::StartTimer("Fbo1_Bind");
+		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE", 0));
+
 
 		_fbo->bind();
 
-		GPUTimer::EndTimer("Fbo1_Bind");
-
 		GPUTimer::StartTimer("Gbuffer");
-
-		RenderManager.GetMainCamera()->BindUBO();
+		//
+		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects();
-
+		//
 		GPUTimer::EndTimer("Gbuffer");
+
+		GPUTimer::StartTimer("EditorObjects");
+		//
+		RenderManager.RenderEditorObjects();
+		//
+		GPUTimer::EndTimer("EditorObjects");
 
 		//	// GBUFFER No model
 		//	_material_gbuffer_no_model->Bind();
@@ -545,7 +578,7 @@ namespace Vxl
 				auto Entity = Entities[i];
 
 				// Ignore if not active or not clickable
-				if (!Entity->IsFamilyActive() || !Entity->m_isClickable || !Entity->GetMesh())
+				if (!Entity->IsFamilyActive() || !Entity->IsClickable() || !Entity->GetMesh())
 					continue;
 
 				_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
@@ -560,7 +593,15 @@ namespace Vxl
 				float w = (float)mem.f_ID[3] / 255.0f;
 
 				_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, w));
-				Entity->Draw();
+
+				if (Entity->GetType() == EntityType::LIGHT)
+				{
+					Geometry.GetSphereHalf()->Draw();
+				}
+				else
+				{
+					Entity->Draw();
+				}
 			}
 
 			GLubyte *data = new GLubyte[4];
@@ -592,7 +633,7 @@ namespace Vxl
 				{
 					if (Input.getKey(KeyCode::LEFT_CONTROL))
 					{
-						if (!Entities[mem.ui_ID]->m_isSelected)
+						if (!Entities[mem.ui_ID]->IsSelected())
 							Hierarchy.AddSelection(Entities[mem.ui_ID]);
 						else
 							Hierarchy.RemoveSelection(Entities[mem.ui_ID]);

@@ -37,8 +37,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	//Window.SetCustomAspectRatio(true, 1.0f);
 
 	/* Special */
-	Debug.CreateDebugTextures();
-	Geometry.Setup();
+	RenderManager.CreateSpecialManagers();
 	/* ~ */
 	RenderManager.SetNewScene(_scene);
 	//_scene->setup();

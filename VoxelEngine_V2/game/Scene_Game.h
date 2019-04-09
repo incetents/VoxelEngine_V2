@@ -32,6 +32,7 @@ namespace Vxl
 		ShaderProgram* _shader_passthrough;
 		ShaderProgram* _shader_skybox;
 		ShaderProgram* _shader_lines;
+		ShaderProgram* _shader_billboard;
 		// Non-material Shader
 		ShaderProgram* _shader_colorPicker;
 		ShaderProgram* _shader_showRenderTarget;
@@ -56,6 +57,7 @@ namespace Vxl
 		Material* _material_passthrough;
 		Material* _material_skybox;
 		Material* _material_lines;
+		Material* _material_billboard;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

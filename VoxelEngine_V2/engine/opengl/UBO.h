@@ -1,8 +1,10 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "glUtil.h"
+#include <map>
 
+#include "glUtil.h"
+#include "../utilities/singleton.h"
 
 namespace Vxl
 {
@@ -12,24 +14,30 @@ namespace Vxl
 	class Matrix2x2;
 	class Matrix3x3;
 	class Matrix4x4;
+	class CameraObject;
 
 	class UniformBufferObject
 	{
+		friend class UBOManager;
 	private:
 		GLuint m_id;
+		const unsigned int m_totalBytes;
+		const GLuint m_slot;
+		const std::string m_name;
 
-		void load(unsigned int Bytes, GLuint slot, const std::string& glName);
+		void load();
 		void unload();
 
-	public:
 		UniformBufferObject(unsigned int Bytes, GLuint slot, const std::string& glName)
+			: m_totalBytes(Bytes), m_slot(slot), m_name(glName)
 		{
-			load(Bytes, slot, glName);
+			load();
 		}
 		~UniformBufferObject()
 		{
 			unload();
 		}
+	public:
 
 		void Bind() const;
 		void Unbind() const;
@@ -48,4 +56,31 @@ namespace Vxl
 
 	};
 
+	static class UBOManager : public Singleton<class UBOManager>
+	{
+	private:
+		enum UBOID
+		{
+			CAMERA = 0,
+			FAKE
+		};
+
+		UniformBufferObject** m_ubos;
+
+	public:
+		void Setup()
+		{
+			delete[] m_ubos;
+			m_ubos = new UniformBufferObject*[2];
+			m_ubos[0] = new UniformBufferObject(64 * 3, UBOID::CAMERA, "Camera");
+			m_ubos[1] = new UniformBufferObject(0, UBOID::FAKE, "Empty");
+		}
+		void BindCamera(CameraObject* _camera);
+
+		~UBOManager()
+		{
+			delete[] m_ubos;
+		}
+	
+	} SingletonInstance(UBOManager);
 }

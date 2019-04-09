@@ -17,6 +17,30 @@
 
 namespace Vxl
 {
+	// Imgui Locking Shortcut
+	bool Locked = false;
+	void DisableStart()
+	{
+		if (Locked == true)
+			return;
+
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+
+		Locked = true;
+	}
+	void DisableEnd()
+	{
+		if (Locked == false)
+			return;
+
+		ImGui::PopItemFlag();
+		ImGui::PopStyleVar();
+
+		Locked = false;
+	}
+	//
+
 	void Inspector::Draw()
 	{
 		static bool open = true;
@@ -88,11 +112,9 @@ namespace Vxl
 
 					ImGui::TextColored(ImGuiColor::Orange, Entity->m_useTransform ? "Local:" : "Local: [LOCKED]");
 
+					// Lock if transform is not used
 					if (!Entity->m_useTransform)
-					{
-						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-						ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-					}
+						DisableStart();
 
 					ImGui::Text("Position:"); ImGui::SameLine();
 					if (ImGui::DragFloat3("Position", p, DragSpeed))
@@ -102,28 +124,30 @@ namespace Vxl
 					if (ImGui::DragFloat3("Rotation", r, DragSpeed))
 						Entity->m_transform.setRotation(r[0], r[1], r[2]);
 
+					// Lock Scale for Cameras
+					if(Entity->GetType() == EntityType::CAMERA)
+						DisableStart();
+
 					ImGui::Text("Scale:   "); ImGui::SameLine();
 					if (ImGui::DragFloat3("Scale", s, DragSpeed))
 						Entity->m_transform.setScale(s[0], s[1], s[2]);
 
+					// Lock Scale for Cameras
+					if (Entity->GetType() == EntityType::CAMERA)
+						DisableEnd();
+
+					// Lock if transform is not used
 					if (!Entity->m_useTransform)
-					{
-						ImGui::PopItemFlag();
-						ImGui::PopStyleVar();
-					}
+						DisableEnd();
 
 					ImGui::Separator();
 
 					ImGui::TextColored(ImGuiColor::Orange, "World: [READ ONLY]");
 					
-					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-					
+					DisableStart();
 					ImGui::Text("World Position:"); ImGui::SameLine(); ImGui::DragFloat3("PositionW", pw, DragSpeed);
 					ImGui::Text("World Scale:   "); ImGui::SameLine(); ImGui::DragFloat3("ScaleW", sw, DragSpeed);
-
-					ImGui::PopItemFlag();
-					ImGui::PopStyleVar();
+					DisableEnd();
 
 					ImGui::PopItemWidth();
 				}

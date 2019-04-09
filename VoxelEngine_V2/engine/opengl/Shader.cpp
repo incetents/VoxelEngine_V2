@@ -313,7 +313,7 @@ namespace Vxl
 			}
 
 			// Lock Block Index to Binding Point in shader
-			glUniformBlockBinding(m_id, blockIndex, blockIndex);
+			glUniformBlockBinding(m_id, blockIndex, bindingPoint);
 
 			// Assign
 			m_uniformBlocks[name_str] = glUniformBlock(bindingPoint, blockIndex);

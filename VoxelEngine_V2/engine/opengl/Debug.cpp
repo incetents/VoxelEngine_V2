@@ -94,6 +94,19 @@ namespace Vxl
 		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[6], Width, C, C);
 		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[7], Width, C, C);
 	}
+	void Debug::DrawSquare(
+		const Vector3& position,
+		const Vector3& up,
+		const Vector3& right,
+		float Width,
+		const Color4F& C
+	)
+	{
+		DrawLine(position + up - right, position + up + right, Width, C, C);
+		DrawLine(position + up + right, position - up + right, Width, C, C);
+		DrawLine(position - up + right, position - up - right, Width, C, C);
+		DrawLine(position - up - right, position + up - right, Width, C, C);
+	}
 
 	void Debug::UpdateStart()
 	{

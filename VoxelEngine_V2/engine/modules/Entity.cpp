@@ -3,6 +3,7 @@
 #include "Entity.h"
 
 #include "../opengl/glUtil.h"
+#include "../opengl/Mesh.h"
 #include "../modules/RenderManager.h"
 #include "../utilities/Time.h"
 #include "../utilities/logger.h"
@@ -28,6 +29,42 @@ namespace Vxl
 		}
 		else
 			m_name = _name;
+	}
+
+	// Update Bounding Box from Mesh
+	void Entity::UpdateBoundingBoxCheap()
+	{
+		// Update Bounding Box information
+		if (m_mesh != nullptr)
+		{
+			// Update OBB 
+			Vector4 VMin = Vector4(m_mesh->GetVertexMin(), 1);
+			Vector4 VMax = Vector4(m_mesh->GetVertexMax(), 1);
+			Matrix4x4 Model = m_transform.getModel();
+			Model.TransposeSelf();
+
+			m_OBB[0] = (Model * VMin); // x0 y0 z0
+			m_OBB[1] = (Model * Vector4(VMax.x, VMin.y, VMin.z, 1)); // x1 y0 z0
+			m_OBB[2] = (Model * Vector4(VMin.x, VMax.y, VMin.z, 1)); // x0 y1 z0
+			m_OBB[3] = (Model * Vector4(VMax.x, VMax.y, VMin.z, 1)); // x1 y1 z0
+			m_OBB[4] = (Model * Vector4(VMin.x, VMin.y, VMax.z, 1)); // x0 y0 z1
+			m_OBB[5] = (Model * Vector4(VMax.x, VMin.y, VMax.z, 1)); // x1 y0 z1
+			m_OBB[6] = (Model * Vector4(VMin.x, VMax.y, VMax.z, 1)); // x0 y1 z1
+			m_OBB[7] = (Model * VMax); // x1 y1 z1
+
+#pragma push_macro("MACRONAME")
+#undef max
+#undef min
+			m_AABB[0] = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+			m_AABB[1] = Vector3(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+#pragma pop_macro("MACRONAME")
+
+			for (UINT i = 0; i < 8; i++)
+			{
+				m_AABB[0] = Vector3::Min(m_AABB[0], m_OBB[i]);
+				m_AABB[1] = Vector3::Max(m_AABB[1], m_OBB[i]);
+			}
+		}
 	}
 }
 

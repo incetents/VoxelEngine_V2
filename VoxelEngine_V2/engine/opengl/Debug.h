@@ -24,6 +24,7 @@ namespace Vxl
 		bool				m_lines_resizeDirty = false;
 		static const UINT	m_lines_vertexIncrementAmount;
 		// Debug Textures
+		void CreateDebugTextures();
 		Texture*			m_null_texture;
 
 	public:
@@ -39,6 +40,8 @@ namespace Vxl
 			m_lines->AddStrideHint(BufferType::VERTEX, 3); // loc 0
 			m_lines->AddStrideHint(BufferType::COLOR, 4); // loc 3
 			m_lines->AddStrideHint(BufferType::UV, 1); // loc 1 (WIDTH)
+
+			CreateDebugTextures();
 		}
 		void DrawLine(
 			const Vector3& P1, const Vector3& P2,
@@ -54,13 +57,19 @@ namespace Vxl
 		void DrawOBB(
 			const Entity& entity,
 			const Vector3& OffsetAll,
-			float Width,
+			float Width = 1.0f,
+			const Color4F& C = Color4F(1, 1, 1, 1)
+		);
+		void DrawSquare(
+			const Vector3& position,
+			const Vector3& up,
+			const Vector3& right,
+			float Width = 1.0f,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
 		void UpdateStart();
 		void RenderLines();
-		// Debug Textures
-		void CreateDebugTextures();
+		// Debug Texture
 		Texture* GetNullTexture(void) const
 		{
 			return m_null_texture;

@@ -8,24 +8,38 @@
 #include "../math/Matrix2x2.h"
 #include "../math/Matrix3x3.h"
 #include "../math/Matrix4x4.h"
+#include "../objects/CameraObject.h"
 
 #include <assert.h>
 
 namespace Vxl
 {
-	void UniformBufferObject::load(unsigned int Bytes, GLuint slot, const std::string& glName)
+	// UBOManager //
+	void UBOManager::BindCamera(CameraObject* _camera)
+	{
+		m_ubos[UBOID::CAMERA]->Bind();
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera->getViewProjection(), 0);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera->getView(), 64);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera->getProjection(), 128);
+	}
+
+	// UBO //
+	void UniformBufferObject::load()
 	{
 		glGenBuffers(1, &m_id);
 		glBindBuffer(GL_UNIFORM_BUFFER, m_id);
 		
 		// Allocate size
-		glBufferData(GL_UNIFORM_BUFFER, Bytes, NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, m_totalBytes, NULL, GL_DYNAMIC_DRAW);
 
 		// Set to slot
-		glBindBufferBase(GL_UNIFORM_BUFFER, slot, m_id);
+		glBindBufferBase(GL_UNIFORM_BUFFER, m_slot, m_id);
 
 		// set name
-		glUtil::setGLName(glNameType::BUFFER, m_id, "UBO_" + glName);
+		glUtil::setGLName(glNameType::BUFFER, m_id, "UBO_" + m_name);
+
+		// unbind
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 	void UniformBufferObject::unload()
 	{

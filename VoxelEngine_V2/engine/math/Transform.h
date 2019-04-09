@@ -36,8 +36,6 @@ namespace Vxl
 		Vector3		m_forward	= Vector3::FORWARD;
 		Vector3     m_up		= Vector3::UP;
 		Vector3     m_right		= Vector3::RIGHT;
-		// Reversed only forward vector [used for Cameras]
-		bool m_reversedForward = false;
 
 		// Parent/Child relationships
 		Transform*				m_parent = nullptr;

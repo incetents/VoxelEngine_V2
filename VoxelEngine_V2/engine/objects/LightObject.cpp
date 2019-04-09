@@ -3,13 +3,17 @@
 #include "LightObject.h"
 
 #include "../modules/RenderManager.h"
+#include "../opengl/Mesh.h"
+#include "../opengl/Geometry.h"
 
 namespace Vxl
 {
 	LightObject::LightObject(const std::string& name)
 		: Entity(name, EntityType::LIGHT)
 	{
+		m_mesh = Geometry.GetQuad();
 
+		RenderManager.AddEntity(this);
 	}
 
 	LightObject::~LightObject()
@@ -39,7 +43,7 @@ namespace Vxl
 
 	void LightObject::Draw()
 	{
-
+		m_mesh->Draw();
 	}
 
 	void LightObject::TransformChanged()

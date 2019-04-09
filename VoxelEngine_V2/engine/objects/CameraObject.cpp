@@ -4,16 +4,12 @@
 
 #include "../modules/RenderManager.h"
 #include "../window/window.h"
+#include "../opengl/Mesh.h"
+#include "../opengl/Geometry.h"
+#include "../opengl/Debug.h"
 
 namespace Vxl
 {
-	void CameraObject::BindUBO()
-	{
-		m_UBO.sendMatrix(m_viewProjection, 0);
-		m_UBO.sendMatrix(m_view, 64);
-		m_UBO.sendMatrix(m_projection, 128);
-	}
-
 	// Projection Matrix Creator (based on stored data)
 	void CameraObject::CreatePerspective()
 	{
@@ -51,7 +47,7 @@ namespace Vxl
 	CameraObject::CameraObject(const std::string& name, float _znear, float _zfar)
 		: Entity(name, EntityType::CAMERA), m_znear(_znear), m_zfar(_zfar)
 	{
-		m_transform.m_reversedForward = true;
+		m_mesh = Mesh::Get("camera");
 
 		RenderManager.AddEntity(this);
 	}
@@ -122,12 +118,72 @@ namespace Vxl
 		m_viewProjectionInverse = m_viewProjection.Inverse();
 	}
 
+	// Special
+	void CameraObject::DrawFrustum(float Width, Color4F Color)
+	{
+		// Draw Forward
+		Vector3 Position = m_transform.getWorldPosition();
+		Vector3 Forward = m_transform.getCameraForward();
+		//Debug.DrawLine(Position, Position + Forward * 10.0f, 5.0f);
+
+		// Draw Perspective
+		if (m_type == CameraType::PERSPECTIVE || m_type == CameraType::PERSPECTIVE_WINDOW_ASPECT)
+		{
+			// Get ClosePlane size
+			float Hnear = 2 * tan(m_buffer[0] / 2) * m_znear;
+			float Wnear = Hnear * m_buffer[1];
+			Vector3 ClosePlaneCenter = Position + Forward * m_znear;
+			Vector3 ClosePlaneHalfUp = m_transform.getUp() * Hnear * 0.5f;
+			Vector3 ClosePlaneHalfRight = m_transform.getRight() * Wnear * 0.5f;
+
+			// Get FarPlane size
+			float Hfar = 2 * tan(m_buffer[0] / 2) * m_zfar;
+			float Wfar = Hfar * m_buffer[1];
+			Vector3 FarPlaneCenter = Position + Forward * m_zfar;
+			Vector3 FarPlaneHalfUp = m_transform.getUp() * Hfar * 0.5f;
+			Vector3 FarPlaneHalfRight = m_transform.getRight() * Wfar * 0.5f;
+
+			// Draw ClosePlane
+			Debug.DrawSquare(ClosePlaneCenter, ClosePlaneHalfUp, ClosePlaneHalfRight, Width, Color);
+
+			// Draw FarPlane
+			Debug.DrawSquare(FarPlaneCenter, FarPlaneHalfUp, FarPlaneHalfRight, Width, Color);
+
+			// Connect Planes
+			Debug.DrawLine(
+				ClosePlaneCenter - ClosePlaneHalfUp - ClosePlaneHalfRight,
+				FarPlaneCenter - FarPlaneHalfUp - FarPlaneHalfRight,
+				Width, Color, Color
+			);
+
+			Debug.DrawLine(
+				ClosePlaneCenter - ClosePlaneHalfUp + ClosePlaneHalfRight,
+				FarPlaneCenter - FarPlaneHalfUp + FarPlaneHalfRight,
+				Width, Color, Color
+			);
+
+			Debug.DrawLine(
+				ClosePlaneCenter + ClosePlaneHalfUp - ClosePlaneHalfRight,
+				FarPlaneCenter + FarPlaneHalfUp - FarPlaneHalfRight,
+				Width, Color, Color
+			);
+
+			Debug.DrawLine(
+				ClosePlaneCenter + ClosePlaneHalfUp + ClosePlaneHalfRight,
+				FarPlaneCenter + FarPlaneHalfUp + FarPlaneHalfRight,
+				Width, Color, Color
+			);
+		}
+	}
+
+	// Draw
 	void CameraObject::Draw()
 	{
-
+		m_mesh->Draw();
 	}
 
 	void CameraObject::TransformChanged()
 	{
+		UpdateBoundingBoxCheap();
 	}
 }

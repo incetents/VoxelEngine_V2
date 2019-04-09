@@ -1,0 +1,33 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
+#version 430
+#include "_UBO.glsl"
+
+// Input
+in fragment_data
+{
+	vec2 uv;
+
+} f_data;
+
+// Output
+layout (location = 0) out vec4 output_albedo;
+layout (location = 1) out vec4 output_normal;
+
+// Uniform Textures
+layout (binding = 0) uniform sampler2D albedo_handler;
+
+// Uniforms
+uniform vec3 color = vec3(1,1,1);
+
+// Main
+void main()
+{
+	output_albedo = texture(albedo_handler, f_data.uv);
+	
+	if(output_albedo.a < 0.01)
+		discard;
+		
+	output_albedo.rgb *= color;
+		
+	output_normal = vec4(0.5,0.5,1,1); // serialized normal (0,0,1) * 0.5 + 0.5
+}

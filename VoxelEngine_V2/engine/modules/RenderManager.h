@@ -79,7 +79,7 @@ namespace Vxl
 		void ReloadFBOS();
 
 		// Behaviour
-		void ReloadScene();
+		void CreateSpecialManagers();
 		void Destroy();
 		void Update();
 		void UpdateFixed();
@@ -89,6 +89,7 @@ namespace Vxl
 		// Render
 		void RenderFullScreen();
 		void RenderSceneGameObjects();
+		void RenderEditorObjects();
 
 	} SingletonInstance(RenderManager);
 }

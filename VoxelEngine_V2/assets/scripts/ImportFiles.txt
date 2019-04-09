@@ -2,23 +2,26 @@
 #SHADER
 // order: [Name] [FilePath]
 
-#VERT gbuffer_vert 					./shaders/gbuffer.vert
-#VERT gbuffer_no_model_vert 		./shaders/gbuffer_no_model.vert
-#FRAG gbuffer_frag 					./shaders/gbuffer.frag
+#VERT gbuffer_vert 					./assets/shaders/gbuffer.vert
+#VERT gbuffer_no_model_vert 		./assets/shaders/gbuffer_no_model.vert
+#FRAG gbuffer_frag 					./assets/shaders/gbuffer.frag
 
-#VERT passthrough_vert 				./shaders/passthrough.vert
-#FRAG passthrough_frag 				./shaders/passthrough.frag
+#VERT passthrough_vert 				./assets/shaders/passthrough.vert
+#FRAG passthrough_frag 				./assets/shaders/passthrough.frag
 
-#VERT skybox_vert 	./shaders/skybox.vert
-#FRAG skybox_frag 	./shaders/skybox.frag
+#VERT skybox_vert 	./assets/shaders/skybox.vert
+#FRAG skybox_frag 	./assets/shaders/skybox.frag
 
-#VERT lines_vert 	./shaders/lines.vert
-#GEOM lines_geom 	./shaders/lines.geom
-#FRAG lines_frag 	./shaders/lines.frag
+#VERT lines_vert 	./assets/shaders/lines.vert
+#GEOM lines_geom 	./assets/shaders/lines.geom
+#FRAG lines_frag 	./assets/shaders/lines.frag
 
-#FRAG colorPicker_frag 	./shaders/colorPicker.frag
+#FRAG colorPicker_frag 	./assets/shaders/colorPicker.frag
 
-#FRAG showRenderTarget  ./shaders/showRenderTarget.frag
+#FRAG showRenderTarget  ./assets/shaders/showRenderTarget.frag
+
+#VERT billboard_vert  	./assets/shaders/billboard.vert
+#FRAG billboard_frag 	./assets/shaders/billboard.frag
 
 //----------------------------------------
 #SHADERPROGRAM
@@ -31,6 +34,7 @@ skybox				skybox_vert					skybox_frag
 lines 				lines_vert					lines_geom 				lines_frag
 colorPicker 		gbuffer_vert 				colorPicker_frag
 showRenderTarget 	passthrough_vert 			showRenderTarget
+billboard 			billboard_vert				billboard_frag
 
 //----------------------------------------
 #TEXTURE
@@ -42,10 +46,13 @@ showRenderTarget 	passthrough_vert 			showRenderTarget
 // [FlipY] = YES_FLIP | NO_FLIP
 // [MipMapping] = YES_MIPMAP | NO_MIPMAP
 
-grid_test		./assets/textures/grid_test.png
-beato			./assets/textures/beato.png
-crate_diffuse	./assets/textures/crate_diffuse.png
-TextureAtlas	./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 		NEAREST
+grid_test			./assets/textures/grid_test.png
+beato				./assets/textures/beato.png
+crate_diffuse		./assets/textures/crate_diffuse.png
+TextureAtlas		./assets/textures/TextureAtlas.png 			CLAMP_STRETCH 	NEAREST	 NEAREST
+camera 				./assets/textures/camera.png
+lightbulb 			./assets/textures/lightbulb.png
+lightbulb_selected 	./assets/textures/lightbulb_selected.png	CLAMP_STRETCH
 
 //----------------------------------------
 #CUBEMAP
@@ -62,6 +69,7 @@ craterlake		./assets/cubemaps/craterlake_ft.tga ./assets/cubemaps/craterlake_bk.
 // [SCALE[#]] = "value to scale all vertices, # = decimal number"
 
 jiggy 	./assets/models/jiggy.obj 	NO_MERGE	NORMALIZE 	SCALE[0.2]
+camera 	./assets/models/camera_fixed.obj 	NO_MERGE	NORMALIZE	SCALE[0.25]
 
 
 

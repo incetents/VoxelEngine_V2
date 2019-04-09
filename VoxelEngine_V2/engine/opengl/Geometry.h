@@ -11,7 +11,7 @@ namespace Vxl
 	{
 	private:
 		// Special Utility
-		Mesh* GenerateIcosahdron(unsigned int subdivisions);
+		Mesh* GenerateIcosahdron(unsigned int subdivisions, float scale = 1.0f);
 		Mesh* GenerateSphereUV(unsigned int xSlice, unsigned int ySlice);
 
 	private:
@@ -25,6 +25,7 @@ namespace Vxl
 		Mesh* m_icosahedron = nullptr;
 		Mesh* m_icoSphere = nullptr;
 		Mesh* m_sphere = nullptr; // made from icosahedron subdivded
+		Mesh* m_spherehalf = nullptr;
 		Mesh* m_sphereUV_16 = nullptr;
 		Mesh* m_sphereUV_64 = nullptr;
 
@@ -39,13 +40,9 @@ namespace Vxl
 		void CreateSphere();
 		void CreateSphereUV();
 
-		void Destroy();
 	public:
 		void Setup()
 		{
-			if (m_isSetup)
-				return;
-
 			CreateFullQuad();
 			CreateFullTriangle();
 			CreateQuad();
@@ -56,17 +53,6 @@ namespace Vxl
  			CreateIcosphere();
 			CreateSphere();
 			CreateSphereUV();
-
-			m_isSetup = true;
-		}
-		void Reload()
-		{
-			if (!m_isSetup)
-				return;
-
-			//Destroy();
-			m_isSetup = false;
-			Setup();
 		}
 
 		Mesh* GetFullQuad()
@@ -93,22 +79,32 @@ namespace Vxl
 		{
 			return m_octahedron;
 		}
+		// Vertices are from -1 to +1
 		Mesh* GetIcosahedron()
 		{
 			return m_icosahedron;
 		}
+		// Vertices are from -1 to +1
 		Mesh* GetIcoSphere()
 		{
 			return m_icoSphere;
 		}
+		// Vertices are from -1 to +1
 		Mesh* GetSphere()
 		{
 			return m_sphere;
 		}
+		// Vertices are from -0.5 to +0.5
+		Mesh* GetSphereHalf()
+		{
+			return m_spherehalf;
+		}
+		// Vertices are from -1 to +1
 		Mesh* GetSphereUV_Cheap()
 		{
 			return m_sphereUV_16;
 		}
+		// Vertices are from -1 to +1
 		Mesh* GetSphereUV_Good()
 		{
 			return m_sphereUV_64;

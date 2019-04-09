@@ -36,7 +36,7 @@ namespace Vxl
 		Matrix4x4 m_viewProjection;
 		Matrix4x4 m_viewProjectionInverse;
 		// Ubo
-		UniformBufferObject m_UBO = UniformBufferObject(64 * 3, 0, "Camera");
+		//UniformBufferObject m_UBO = UniformBufferObject(64 * 3, 0, "Camera");
 		
 		// Projection Matrix Creator (based on stored data)
 		void CreatePerspective();
@@ -51,7 +51,7 @@ namespace Vxl
 
 	public:
 
-		void BindUBO();
+		//void BindUBO();
 
 		// Destructor
 		~CameraObject();
@@ -174,6 +174,9 @@ namespace Vxl
 		{
 			return m_viewProjectionInverse;
 		}
+
+		// [ DEBUG ]
+		void DrawFrustum(float Width, Color4F Color);
 
 		// Behaviour
 		virtual void Update() override;
