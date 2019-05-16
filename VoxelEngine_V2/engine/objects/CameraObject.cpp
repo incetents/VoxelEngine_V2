@@ -47,8 +47,6 @@ namespace Vxl
 	CameraObject::CameraObject(const std::string& name, float _znear, float _zfar)
 		: Entity(name, EntityType::CAMERA), m_znear(_znear), m_zfar(_zfar)
 	{
-		m_mesh = Mesh::Get("camera");
-
 		RenderManager.AddEntity(this);
 	}
 
@@ -111,7 +109,7 @@ namespace Vxl
 	void CameraObject::Update()
 	{
 		m_transform.updateValues();
-		m_view = Matrix4x4::LookAt(m_transform.m_position, m_transform.m_position + m_transform.m_forward, Vector3::UP);
+		m_view = Matrix4x4::LookAt(m_transform.m_position, m_transform.m_forward, m_transform.m_right, m_transform.m_up);
 		m_viewInverse = m_view.Inverse();
 
 		m_viewProjection = m_view * m_projection;
@@ -179,11 +177,11 @@ namespace Vxl
 	// Draw
 	void CameraObject::Draw()
 	{
-		m_mesh->Draw();
+
 	}
 
 	void CameraObject::TransformChanged()
 	{
-		UpdateBoundingBoxCheap();
+
 	}
 }

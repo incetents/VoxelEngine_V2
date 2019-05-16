@@ -33,7 +33,6 @@ namespace Vxl
 		Entity(const std::string& name, EntityType type);
 
 		// Data
-		Mesh*		m_mesh = nullptr;
 		EntityType  m_type;
 		std::string	m_name;
 		Color3F		m_Color = Color3F(1, 1, 1);
@@ -42,8 +41,8 @@ namespace Vxl
 		Vector3		m_AABB[2]; // AABB based on OBB
 		// Editor Information
 		Color3F		m_labelColor = Color3F(1, 1, 1); // Inspector
-		bool		m_isClickable = true; // Click for selection (Color ID system)
-		bool		m_isSelected = false; // Hierarchy
+		bool		m_isSelectable = true; //
+		bool		m_isSelected = false; // 
 
 	public:
 		// Destructor
@@ -56,13 +55,13 @@ namespace Vxl
 		bool				m_isColoredObject = false;
 		
 		// Editor Information
-		inline void SetClickableState(bool state)
+		inline void SetSelectable(bool state)
 		{
-			m_isClickable = state;
+			m_isSelectable = state;
 		}
-		inline bool IsClickable(void) const
+		inline bool IsSelectable(void) const
 		{
-			return m_isClickable;
+			return m_isSelectable;
 		}
 		inline bool IsSelected(void) const
 		{
@@ -150,14 +149,8 @@ namespace Vxl
 			return m_Tint;
 		}
 
-		// Mesh
-		inline Mesh* GetMesh(void) const
-		{
-			return m_mesh;
-		}
-
 		// Update Bounding Box from Mesh
-		void UpdateBoundingBoxCheap();
+		void UpdateBoundingBoxCheap(Mesh* _mesh);
 
 		// Behaviour
 		virtual void Update() = 0;

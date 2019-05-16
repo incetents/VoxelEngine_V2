@@ -20,6 +20,7 @@ namespace Vxl
 	class BaseTexture;
 	class Transform;
 	class Texture;
+	class Mesh;
 
 	class Material : public Asset<Material>
 	{
@@ -134,6 +135,6 @@ namespace Vxl
 			return m_base->m_order;
 		}
 
-		virtual void Bind(bool BindTextures);
+		virtual void Bind(bool BindTextures, Mesh* mesh);
 	};
 }

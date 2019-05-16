@@ -120,21 +120,30 @@ namespace Vxl
 					if (ImGui::DragFloat3("Position", p, DragSpeed))
 						Entity->m_transform.setPosition(p[0], p[1], p[2]);
 
+					// NO LOCAL EFFECT
+					if(Entity->GetType() == EntityType::LIGHT)
+						ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
+
 					ImGui::Text("Rotation:"); ImGui::SameLine();
 					if (ImGui::DragFloat3("Rotation", r, DragSpeed))
 						Entity->m_transform.setRotation(r[0], r[1], r[2]);
 
-					// Lock Scale for Cameras
-					if(Entity->GetType() == EntityType::CAMERA)
-						DisableStart();
+					// ~~~
+					if (Entity->GetType() == EntityType::LIGHT)
+						ImGui::PopStyleColor();
+
+
+					// NO LOCAL EFFECT
+					if (Entity->GetType() == EntityType::LIGHT || Entity->GetType() == EntityType::CAMERA)
+						ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
 
 					ImGui::Text("Scale:   "); ImGui::SameLine();
 					if (ImGui::DragFloat3("Scale", s, DragSpeed))
 						Entity->m_transform.setScale(s[0], s[1], s[2]);
 
-					// Lock Scale for Cameras
-					if (Entity->GetType() == EntityType::CAMERA)
-						DisableEnd();
+					// ~~~
+					if (Entity->GetType() == EntityType::LIGHT || Entity->GetType() == EntityType::CAMERA)
+						ImGui::PopStyleColor();
 
 					// Lock if transform is not used
 					if (!Entity->m_useTransform)

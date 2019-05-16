@@ -16,15 +16,19 @@ namespace Vxl
 		if (isDirty)
 		{
 			// Update model matrix
-			m_rotation = Quaternion::GetEuler(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
+			m_rotation = Quaternion::ToQuaternion_ZXY(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
 			Matrix3x3 RotationScale = m_rotation.GetMatrix3x3() * Matrix3x3::GetScale(m_scale);
 			// Result Model
 			m_ModelMatrix = Matrix4x4(RotationScale, m_position);
 
 			// Model affected by Parent
+			Quaternion ParentRotation = m_rotation;
 			Matrix4x4 ParentModel = m_ModelMatrix;
 			if (m_parent != nullptr)
+			{
+				ParentRotation = m_rotation * m_parent->getWorldRotation();
 				ParentModel = m_ModelMatrix * m_parent->getModel();
+			}
 
 			// Update World position
 			m_worldPosition = Vector3(ParentModel[12], ParentModel[13], ParentModel[14]);
@@ -33,19 +37,10 @@ namespace Vxl
 			m_lossyScale.y = Vector3::Length(ParentModel[4], ParentModel[5], ParentModel[6]);
 			m_lossyScale.z = Vector3::Length(ParentModel[8], ParentModel[9], ParentModel[10]);
 
-			//
-			m_forward = Vector3::Normalize(m_rotation * Vector3::FORWARD);
-
-			// If forward is pointing directly up, calculate right the expensive way
-			if (fabs((m_forward - Vector3::UP).Length()) < 0.005f)
-				m_right = Vector3::Normalize(m_rotation * Vector3::RIGHT);
-			// If not, use cheaper method of calculating right
-			else
-				m_right = -Vector3::Normalize(Vector3::Cross(m_forward, Vector3::UP));
-
-			//
-			m_up = Vector3::Cross(m_forward, m_right);
-
+			// Calculate Axis Directions
+			m_forward	= Vector3::Normalize(ParentRotation * Vector3::FORWARD);
+			m_right		= Vector3::Normalize(ParentRotation * Vector3::RIGHT); // Cross of forward and up is not accurate when Roll is taken into account
+			m_up		= Vector3::Cross(m_forward, m_right);
 			//
 			isDirty = false;
 
@@ -61,12 +56,22 @@ namespace Vxl
 
 		// Affected by parent transformations
 		if (m_parent != nullptr)
-		{
 			return m_ModelMatrix * m_parent->getModel();
-		}
 
 		// Orphan
 		return m_ModelMatrix;
+	}
+
+	inline Quaternion Transform::getWorldRotation(void)
+	{
+		updateValues();
+
+		// Affected by parent transformations
+		if (m_parent != nullptr)
+			return m_rotation * m_parent->getWorldRotation();
+
+		// Orphan
+		return m_rotation;
 	}
 
 	Transform::Transform()

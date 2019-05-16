@@ -49,10 +49,9 @@ billboard 			billboard_vert				billboard_frag
 grid_test			./assets/textures/grid_test.png
 beato				./assets/textures/beato.png
 crate_diffuse		./assets/textures/crate_diffuse.png
-TextureAtlas		./assets/textures/TextureAtlas.png 			CLAMP_STRETCH 	NEAREST	 NEAREST
-camera 				./assets/textures/camera.png
-lightbulb 			./assets/textures/lightbulb.png
-lightbulb_selected 	./assets/textures/lightbulb_selected.png	CLAMP_STRETCH
+TextureAtlas		./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 	NEAREST	 NEAREST
+editor_camera 		./assets/textures/editor_camera.png		CLAMP_STRETCH
+editor_lightbulb 	./assets/textures/editor_lightbulb.png	CLAMP_STRETCH
 
 //----------------------------------------
 #CUBEMAP

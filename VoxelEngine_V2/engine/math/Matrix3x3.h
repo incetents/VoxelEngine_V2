@@ -46,23 +46,24 @@ namespace Vxl
 		void BeIdentity();
 
 		// Become Scale Matrix
-		Matrix3x3&   Scale(float size);
-		Matrix3x3&   Scale(float x, float y, float z);
-		Matrix3x3&   Scale(const Vector3& v);
+		Matrix3x3& Scale(float size);
+		Matrix3x3& Scale(float x, float y, float z);
+		Matrix3x3& Scale(const Vector3& v);
+		// Get Scale Matrix
 		static  Matrix3x3 GetScale(float size);
 		static  Matrix3x3 GetScale(float x, float y, float z);
 		static  Matrix3x3 GetScale(const Vector3& v);
 
-		// Become Rotation Matrix (Degrees)
-		static	Matrix3x3 RotationX(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 RotationY(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 RotationZ(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 Rotation(const Degrees&, const Vector3&, RotationDirection = RotationDirection(1));
-		// Become Rotation Matrix (Radians)
-		static	Matrix3x3 RotationX(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 RotationY(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 RotationZ(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 Rotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
+		// Get Rotation Matrix (Degrees)
+		static	Matrix3x3 GetRotationX(const Degrees&, RotationDirection = RotationDirection(1));
+		static	Matrix3x3 GetRotationY(const Degrees&, RotationDirection = RotationDirection(1));
+		static	Matrix3x3 GetRotationZ(const Degrees&, RotationDirection = RotationDirection(1));
+		static	Matrix3x3 GetRotation(const Degrees&, const Vector3&, RotationDirection = RotationDirection(1));
+		// Get Rotation Matrix (Radians)
+		static	Matrix3x3 GetRotationX(const Radians&, RotationDirection = RotationDirection(1));
+		static	Matrix3x3 GetRotationY(const Radians&, RotationDirection = RotationDirection(1));
+		static	Matrix3x3 GetRotationZ(const Radians&, RotationDirection = RotationDirection(1));
+		static	Matrix3x3 GetRotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
 
 		// Set Horizontal Line
 		Matrix3x3& SetRow(int index, const Vector3&);

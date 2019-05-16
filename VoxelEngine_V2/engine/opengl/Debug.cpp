@@ -6,6 +6,8 @@
 #include "../math/Color.h"
 #include "../utilities/Loader.h"
 #include "../modules/Entity.h"
+#include "../opengl/Geometry.h"
+#include "../opengl/Mesh.h"
 
 namespace Vxl
 {
@@ -108,12 +110,40 @@ namespace Vxl
 		DrawLine(position - up - right, position + up - right, Width, C, C);
 	}
 
+	void Debug::DrawWireframeSphere(
+		const Vector3& position,
+		const Vector3& scale,
+		const Color4F& C
+	)
+	{
+		WireframeSphere WS;
+		WS.color = C;
+		WS.calcModel(position, scale);
+
+		m_wireframeSpheres.push_back(WS);
+	}
+	void Debug::DrawWireframeSphere(
+		const Matrix4x4& model,
+		const Color4F& C
+	)
+	{
+		WireframeSphere WS;
+		WS.color = C;
+		WS.model = model;
+
+		m_wireframeSpheres.push_back(WS);
+	}
+
 	void Debug::UpdateStart()
 	{
 		// reset index flag
 		m_lines_vertexIndex = 0;
 		std::fill(m_lines_vertices.begin(), m_lines_vertices.end(), 0);
+
+		// reset wireframe sphere list
+		m_wireframeSpheres.clear();
 	}
+
 	void Debug::RenderLines()
 	{
 		// No VAO allowed

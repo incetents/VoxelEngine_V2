@@ -144,7 +144,7 @@ namespace Vxl
 		m_activeTextureCount = (UINT)m_activeTextures.size();
 	}
 
-	void MaterialData::Bind(bool BindTextures)
+	void MaterialData::Bind(bool BindTextures, Mesh* mesh)
 	{
 		assert(m_base);
 		// Bind Uniforms for this object
@@ -159,9 +159,12 @@ namespace Vxl
 			Mat_model.m_uniform.Set(m_owner->m_transform.getModel());
 		}
 		// ~ Special Setters ~ //
-		if (Mat_useInstancing.m_exists && m_owner->GetMesh())
+		if (Mat_useInstancing.m_exists)
 		{
-			Mat_useInstancing.m_uniform.Set<bool>(m_owner->GetMesh()->m_instances.GetDrawCount() > 0 ? true : false);
+			if (mesh)
+				Mat_useInstancing.m_uniform.Set<bool>(mesh->m_instances.GetDrawCount() > 0 ? true : false);
+			else
+				Mat_useInstancing.m_uniform.Set<bool>(false);
 		}
 		if (Mat_useColorOverride.m_exists)
 		{

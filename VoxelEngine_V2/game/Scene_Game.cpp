@@ -99,7 +99,6 @@ namespace Vxl
 		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
 		_material_gbuffer_no_model	= Material::Create("gbuffer_no_model", _shader_gbuffer_no_model, 2);
-		_material_lines				= Material::Create("debug_lines", _shader_lines, 3);
 		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
 		_material_billboard			= Material::Create("billboard", _shader_billboard, 4);
 
@@ -186,34 +185,36 @@ namespace Vxl
 		_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		//_entity5->SetColor(Color3F(1, 1, 1));
 		
-
+		
 		GameObject* _skybox = GameObject::Create("_skybox");
 		_skybox->SetMaterial(_material_skybox);
 		_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_skybox->SetMesh(Geometry.GetInverseCube());
-		_skybox->SetClickableState(false);
+		_skybox->SetSelectable(false);
 		_skybox->m_useTransform = false;
 		
 		//
 		GameObject* _crate1 = GameObject::Create("_crate1");
 		_crate1->SetMaterial(_material_gbuffer);
 		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_crate1->SetMesh(Geometry.GetCube());
+		_crate1->SetMesh(Geometry.GetCylinderX());
 		_crate1->m_transform.setPosition(0, 2, 0);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
 		GameObject* _crate2 = GameObject::Create("_crate2");
 		_crate2->SetMaterial(_material_gbuffer);
-		_crate2->SetMesh(Geometry.GetCube());
-		_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
+		_crate2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate2->SetMesh(Geometry.GetCylinderZ());
+		//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(0, 2, 0);
 		
 
 		GameObject* _crate3 = GameObject::Create("_crate3");
 		_crate3->SetMaterial(_material_gbuffer);
-		_crate3->SetMesh(Geometry.GetCube());
-		_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
+		_crate3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate3->SetMesh(Geometry.GetCylinderY());
+		//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate3->m_transform.setPosition(0, 4, 0);
 
 		// Parent Test
@@ -250,7 +251,7 @@ namespace Vxl
 		_octo4->m_transform.setScale(0.5f);
 		_octo4->SetColor(Color3F(0, 0, 1));
 		
-		LightObject* _light1 = LightObject::Create("_light1");
+		LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
 		_light1->m_transform.setPosition(5, 0, 0);
 
 		//	GameObject* _billboard1 = GameObject::Create("_billboard1");
@@ -375,7 +376,7 @@ namespace Vxl
 		for (auto Entity : Hierarchy.GetSelectedEntities())
 		{
 			// If appears unorthodox, selection might be disabled [ex: skybox cube]
-			if (Entity->IsClickable())
+			if (Entity->IsSelectable())
 			{
 				static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
 
@@ -385,10 +386,12 @@ namespace Vxl
 				// Selection for GameObjects
 				if (Entity->GetType() == EntityType::GAMEOBJECT)
 				{
+					Mesh* _mesh = dynamic_cast<GameObject*>(Entity)->GetMesh();
+
 					// Draw Outline around Entity
-					if (Entity->GetMesh())
+					if (_mesh)
 					{
-						if (Entity->GetMesh()->m_instances.Empty())
+						if (_mesh->m_instances.Empty())
 						{
 							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, AABB_Color);
 							Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
@@ -397,7 +400,7 @@ namespace Vxl
 						else
 						{
 							//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
-							auto Instances = Entity->GetMesh()->m_instances.GetVertices();
+							auto Instances = _mesh->m_instances.GetVertices();
 							for (Matrix4x4 instanceMatrix : *Instances)
 							{
 								Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
@@ -406,16 +409,36 @@ namespace Vxl
 							}
 						}
 					}
+
+					// Draw Axis Directions
+					Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
+					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 4.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
+					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 4.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
+					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 4.0f, 5.0f, Color4F::RED, Color4F::RED);
 				}
 				// Selection for Cameras
 				else if (Entity->GetType() == EntityType::CAMERA)
 				{
-					if (Entity->GetMesh())
-					{
-						Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
+					//Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
 
-						CameraObject* C = dynamic_cast<CameraObject*>(Entity);
-						C->DrawFrustum(5.0f, OBB_Color);
+					CameraObject* C = dynamic_cast<CameraObject*>(Entity);
+					C->DrawFrustum(5.0f, OBB_Color);
+				}
+				// Selection for Lights
+				else if (Entity->GetType() == EntityType::LIGHT)
+				{
+					LightObject* LObject = dynamic_cast<LightObject*>(Entity);
+					
+					switch (LObject->GetLightType())
+					{
+						case Light::Type::POINT:
+						{
+							Light_Point* LightPoint = dynamic_cast<Light_Point*>(LObject->GetLight());
+							float lightRadius = LightPoint->m_radius;
+
+							Debug.DrawWireframeSphere(LObject->m_transform.getWorldPosition(), Vector3(lightRadius), Color4F(LightPoint->m_color, 0.2f));
+							break;
+						}
 					}
 				}
 			}
@@ -507,18 +530,6 @@ namespace Vxl
 		//	
 		//	TerrainManager.Draw();
 
-		// ~~ //
-		_material_lines->Bind();
-		
-		_shader_lines->SetUniform<Vector4>("_viewport", Vector4(
-			(float)Window.GetScreenOffsetX(),
-			(float)Window.GetScreenOffsetY(),
-			(float)Window.GetScreenWidth(),
-			(float)Window.GetScreenHeight()
-		));
-
-		Debug.RenderLines();
-		// ~~ //
 
 		//for (int i = 0; i < _cubes.size(); i++)
 		//	_cubes[i]->Draw();
@@ -557,103 +568,109 @@ namespace Vxl
 		//	_shader_gbuffer->SetUniform("model", model5.getModel());
 		//	Geometry::GetCube()->Draw();
 
+		// Select Object in scene
 		// ~~ //
-		if (DevConsole.GetBool("Objects are Clickable", true) && Window.GetCursor() == CursorMode::NORMAL)
+		if (Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
 		{
-			_fbo_colorpicker->bind();
-			glUtil::blendState(false);
-
-			_shader_colorPicker->Bind();
-
-			auto Entities = RenderManager.GetAllEntities();
-			unsigned int EntityCount = (unsigned int)Entities.size();
-			union FloatChar
+			if (DevConsole.GetBool("Objects are Clickable", true))
 			{
-				unsigned int ui_ID = 0;
-				unsigned char f_ID[4];
-			};
-			FloatChar mem;
-			for (unsigned int i = 0; i < EntityCount; i++)
-			{
-				auto Entity = Entities[i];
+				_fbo_colorpicker->bind();
+				glUtil::blendState(false);
 
-				// Ignore if not active or not clickable
-				if (!Entity->IsFamilyActive() || !Entity->IsClickable() || !Entity->GetMesh())
-					continue;
+				_shader_colorPicker->Bind();
 
-				_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
-				_shader_colorPicker->SetUniform("VXL_useInstancing", !Entity->GetMesh()->m_instances.Empty());
-				_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
+				auto Entities = RenderManager.GetAllEntities();
+				unsigned int EntityCount = (unsigned int)Entities.size();
 
-				// Convert ID into color
-				mem.ui_ID = i + 1; // offset (0 = nothing instead of first value)
-				float x = (float)mem.f_ID[0] / 255.0f;
-				float y = (float)mem.f_ID[1] / 255.0f;
-				float z = (float)mem.f_ID[2] / 255.0f;
-				float w = (float)mem.f_ID[3] / 255.0f;
-
-				_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, w));
-
-				if (Entity->GetType() == EntityType::LIGHT)
+				for (unsigned int i = 0; i < EntityCount; i++)
 				{
-					Geometry.GetSphereHalf()->Draw();
+					auto Entity = Entities[i];
+
+					// Ignore if not active or not clickable
+					if (!Entity->IsFamilyActive() || !Entity->IsSelectable())
+						continue;
+
+					// Convert ID into color
+					unsigned char cx, cy, cz, cw;
+					Util::DataConversion::uint_to_uchars(i + 1u, cx, cy, cz, cw);
+					float x = cx / 255.0f;
+					float y = cy / 255.0f;
+					float z = cz / 255.0f;
+					float w = cw / 255.0f;
+
+					_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
+					_shader_colorPicker->SetUniform("VXL_useInstancing", false);
+					_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
+					_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, w));
+
+					// Different Effect based on type
+					if (Entity->GetType() == EntityType::GAMEOBJECT)
+					{
+						GameObject* GameObj = dynamic_cast<GameObject*>(Entity);
+
+						_shader_colorPicker->SetUniform("VXL_useInstancing", !GameObj->GetMesh()->m_instances.Empty());
+
+						GameObj->GetMesh()->Draw();
+					}
+					else if (Entity->GetType() == EntityType::CAMERA)
+					{
+						Geometry.GetSphere()->Draw();
+					}
+					else if (Entity->GetType() == EntityType::LIGHT)
+					{
+						Geometry.GetSphere()->Draw();
+					}
+
 				}
-				else
-				{
-					Entity->Draw();
-				}
-			}
 
-			GLubyte *data = new GLubyte[4];
-			glReadPixels(
-				(GLint)Input.getMouseX(),
-				Window.GetResolutionHeight() - (GLint)Input.getMouseY(),
-				1,
-				1,
-				(GLenum)Format_Type::RGBA,
-				(GLenum)Data_Type::UNSIGNED_BYTE,
-				data
-			);
-			//	std::cout <<
-			//		(unsigned int)data[0] << ' ' <<
-			//		(unsigned int)data[1] << ' ' <<
-			//		(unsigned int)data[2] << ' ' <<
-			//		(unsigned int)data[3] << ' ' <<
-			//		std::endl;
+				GLubyte *data = new GLubyte[4];
+				glReadPixels(
+					(GLint)Input.getMouseX(),
+					Window.GetResolutionHeight() - (GLint)Input.getMouseY(),
+					1,
+					1,
+					(GLenum)Format_Type::RGBA,
+					(GLenum)Data_Type::UNSIGNED_BYTE,
+					data
+				);
+				//	std::cout <<
+				//		(unsigned int)data[0] << ' ' <<
+				//		(unsigned int)data[1] << ' ' <<
+				//		(unsigned int)data[2] << ' ' <<
+				//		(unsigned int)data[3] << ' ' <<
+				//		std::endl;
 
-			mem.f_ID[0] = data[0];
-			mem.f_ID[1] = data[1];
-			mem.f_ID[2] = data[2];
-			mem.f_ID[3] = data[3];
-			mem.ui_ID--;//offset (0 = nothing instead of first value)
+				unsigned int EntityIndex;
+				Util::DataConversion::uchars_to_uint(data, EntityIndex);
+				EntityIndex--;
 
-			if (Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow())
-			{
-				if (mem.ui_ID < EntityCount)
+
+				if (EntityIndex < EntityCount)
 				{
 					if (Input.getKey(KeyCode::LEFT_CONTROL))
 					{
-						if (!Entities[mem.ui_ID]->IsSelected())
-							Hierarchy.AddSelection(Entities[mem.ui_ID]);
+						if (!Entities[EntityIndex]->IsSelected())
+							Hierarchy.AddSelection(Entities[EntityIndex]);
 						else
-							Hierarchy.RemoveSelection(Entities[mem.ui_ID]);
+							Hierarchy.RemoveSelection(Entities[EntityIndex]);
 					}
 					else
 					{
 						Hierarchy.ClearSelection();
-						Hierarchy.AddSelection(Entities[mem.ui_ID]);
+						Hierarchy.AddSelection(Entities[EntityIndex]);
 					}
 				}
 				else
 				{
 					Hierarchy.ClearSelection();
 				}
+
+
+				//if ()
+				//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
+
+				delete data;
 			}
-
-			//if ()
-			//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
-
-			delete data;
 		}
 		// ~~ //
 
@@ -676,6 +693,8 @@ namespace Vxl
 			case 0:
 			{
 				_shader_passthrough->Bind();
+				_shader_passthrough->SetUniform<bool>("useTexture", true);
+				_shader_passthrough->SetUniform<bool>("useMVP", false);
 
 				_fbo->bindTexture(0, Active_Texture::LEVEL0);
 				break;

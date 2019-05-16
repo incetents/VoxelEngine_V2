@@ -2,17 +2,20 @@
 #pragma once
 
 #include "../utilities/singleton.h"
+#include <string>
 
 namespace Vxl
 {
 	class Mesh;
+	enum class Axis;
 
 	static class Geometry : public Singleton<class Geometry>
 	{
 	private:
 		// Special Utility
-		Mesh* GenerateIcosahdron(unsigned int subdivisions, float scale = 1.0f);
-		Mesh* GenerateSphereUV(unsigned int xSlice, unsigned int ySlice);
+		Mesh* GenerateIcosahdron(std::string MeshName, unsigned int subdivisions, float scale = 1.0f);
+		Mesh* GenerateSphereUV(std::string MeshName, unsigned int xSlice, unsigned int ySlice);
+		Mesh* GenerateCylinder(std::string MeshName, Axis axis, u_int slices, float height, float radius_top, float radius_bot);
 
 	private:
 		bool m_isSetup = false;
@@ -25,9 +28,14 @@ namespace Vxl
 		Mesh* m_icosahedron = nullptr;
 		Mesh* m_icoSphere = nullptr;
 		Mesh* m_sphere = nullptr; // made from icosahedron subdivded
-		Mesh* m_spherehalf = nullptr;
 		Mesh* m_sphereUV_16 = nullptr;
 		Mesh* m_sphereUV_64 = nullptr;
+		Mesh* m_cylinder_x = nullptr; //
+		Mesh* m_cylinder_y = nullptr; //
+		Mesh* m_cylinder_z = nullptr; //
+		Mesh* m_cone_x = nullptr; //
+		Mesh* m_cone_y = nullptr; //
+		Mesh* m_cone_z = nullptr; //
 
 		void CreateFullQuad();
 		void CreateFullTriangle();
@@ -39,6 +47,8 @@ namespace Vxl
 		void CreateIcosphere();
 		void CreateSphere();
 		void CreateSphereUV();
+		void CreateCylinders();
+		void CreateCones();
 
 	public:
 		void Setup()
@@ -53,6 +63,8 @@ namespace Vxl
  			CreateIcosphere();
 			CreateSphere();
 			CreateSphereUV();
+			CreateCylinders();
+			CreateCones();
 		}
 
 		Mesh* GetFullQuad()
@@ -79,35 +91,54 @@ namespace Vxl
 		{
 			return m_octahedron;
 		}
-		// Vertices are from -1 to +1
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetIcosahedron()
 		{
 			return m_icosahedron;
 		}
-		// Vertices are from -1 to +1
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetIcoSphere()
 		{
 			return m_icoSphere;
 		}
-		// Vertices are from -1 to +1
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetSphere()
 		{
 			return m_sphere;
 		}
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetSphereHalf()
-		{
-			return m_spherehalf;
-		}
-		// Vertices are from -1 to +1
 		Mesh* GetSphereUV_Cheap()
 		{
 			return m_sphereUV_16;
 		}
-		// Vertices are from -1 to +1
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetSphereUV_Good()
 		{
 			return m_sphereUV_64;
+		}
+		Mesh* GetCylinderX()
+		{
+			return m_cylinder_x;
+		}
+		Mesh* GetCylinderY()
+		{
+			return m_cylinder_y;
+		}
+		Mesh* GetCylinderZ()
+		{
+			return m_cylinder_z;
+		}
+		Mesh* GetConeX()
+		{
+			return m_cone_x;
+		}
+		Mesh* GetConeY()
+		{
+			return m_cone_y;
+		}
+		Mesh* GetConeZ()
+		{
+			return m_cone_z;
 		}
 
 	} SingletonInstance(Geometry);

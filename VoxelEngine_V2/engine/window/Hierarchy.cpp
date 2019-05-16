@@ -177,7 +177,7 @@ namespace Vxl
 						object->m_useTransform = GEntity->m_useTransform;
 						object->m_isActive = GEntity->m_isActive;
 						object->m_isColoredObject = GEntity->m_isColoredObject;
-						object->SetClickableState(GEntity->IsClickable());
+						object->SetSelectable(GEntity->IsSelectable());
 						object->m_transform.setWorldPosition(GEntity->m_transform.getWorldPosition());
 						object->m_transform.setRotation(GEntity->m_transform.getRotationEuler());
 						object->m_transform.setScale(GEntity->m_transform.getScale());

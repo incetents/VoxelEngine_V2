@@ -317,60 +317,71 @@ namespace Vxl
 	}
 	void RenderManager::RenderEditorObjects()
 	{
+		glUtil::blendState(true);
+		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
+
+
 		// Draw Lights
 		auto billboard = ShaderProgram::Get("billboard");
 		billboard->Bind();
 		
-		Texture* LightTexture = Texture::Get("lightbulb");
-		Texture* LightTextureSelected = Texture::Get("lightbulb_selected");
+		Texture* LightTexture = Texture::Get("editor_lightbulb");
 		for (auto light : m_allLightObjects)
 		{
 			billboard->SetUniform<Matrix4x4>("VXL_model", light->m_transform.getModel());
 		
-			if (light->IsSelected())
-			{
-				if (LightTextureSelected)
-					LightTextureSelected->Bind(Active_Texture::LEVEL0);
-				else
-					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-			}
+			if (LightTexture)
+				LightTexture->Bind(Active_Texture::LEVEL0);
 			else
-			{
-				if (LightTexture)
-					LightTexture->Bind(Active_Texture::LEVEL0);
-				else
-					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-			}
-		
-			light->Draw();
+				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+
+			Geometry.GetQuad()->Draw();
 		}
 
 		// Draw Cameras
-		auto gbuffer = ShaderProgram::Get("gbuffer");
-		gbuffer->Bind();
-		
-		gbuffer->SetUniform<bool>("VXL_useInstancing", false);
-		gbuffer->SetUniform<bool>("VXL_useModel", true);
-		gbuffer->SetUniform<bool>("VXL_useColorOverride", false);
-		//gbuffer->SetUniform<Color3F>("VXL_color", Color3F(1, 1, 0));
-		
-		Texture* CameraTexture = Texture::Get("camera");
+		Texture* CameraTexture = Texture::Get("editor_camera");
 		for (auto camera : m_allCameraObjects)
 		{
-			if (camera == GetMainCamera())
-				continue;
+			billboard->SetUniform<Matrix4x4>("VXL_model", camera->m_transform.getModel());
 
-			if (camera->IsFamilyActive())
-			{
-				gbuffer->SetUniform<Matrix4x4>("VXL_model", camera->m_transform.getModel());
+			if (LightTexture)
+				CameraTexture->Bind(Active_Texture::LEVEL0);
+			else
+				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
 
-				if(CameraTexture)
-					CameraTexture->Bind(Active_Texture::LEVEL0);
-				else
-					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-
-				camera->Draw();
-			}
+			Geometry.GetQuad()->Draw();
 		}
+
+		// Draw Debug Lines
+		auto lines = ShaderProgram::Get("lines");
+		lines->Bind();
+		lines->SetUniform<Vector4>("_viewport", Vector4(
+			(float)Window.GetScreenOffsetX(),
+			(float)Window.GetScreenOffsetY(),
+			(float)Window.GetScreenWidth(),
+			(float)Window.GetScreenHeight()
+		));
+
+		Debug.RenderLines();
+
+		// Draw Debug Wireframe Sphere
+		auto passthrough = ShaderProgram::Get("passthrough");
+		passthrough->Bind();
+		passthrough->SetUniform<bool>("useTexture", false);
+		passthrough->SetUniform<bool>("useMVP", true);
+		
+
+		glUtil::wireframe(true);
+		glUtil::cullMode(Cull_Type::NO_CULL);
+		glLineWidth(5.0f);
+		for (const auto& sphere : Debug.m_wireframeSpheres)
+		{
+			passthrough->SetUniform<Color4F>("color", sphere.color);
+			passthrough->SetUniform<Matrix4x4>("model", sphere.model);
+			Geometry.GetIcoSphere()->Draw();
+		}
+		glLineWidth(1.0f);
+		glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
+		glUtil::wireframe(false);
 	}
 }

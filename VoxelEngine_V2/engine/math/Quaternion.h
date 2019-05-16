@@ -34,8 +34,11 @@ namespace Vxl
 		void Identity();
 
 		// Create Quaternion from euler angles
-		static Quaternion GetEuler(const Degrees& Deg_X, const Degrees& Deg_Y, const Degrees& Deg_Z);
-		static Quaternion GetEuler(const Radians& Rad_X, const Radians& Rad_Y, const Radians& Rad_Z);
+		static Quaternion ToQuaternion_XYZ(const Degrees& yaw, const Degrees& pitch, const Degrees& roll);
+		static Quaternion ToQuaternion_XYZ(const Radians& yaw, const Radians& pitch, const Radians& roll);
+
+		static Quaternion ToQuaternion_ZXY(const Degrees& yaw, const Degrees& pitch, const Degrees& roll);
+		static Quaternion ToQuaternion_ZXY(const Radians& yaw, const Radians& pitch, const Radians& roll);
 		// Convert Quaternion to euler angles
 		static void ToEuler(const Quaternion& q, Degrees& roll, Degrees& pitch, Degrees& yaw);
 		static void ToEuler(const Quaternion& q, Radians& roll, Radians& pitch, Radians& yaw);

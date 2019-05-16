@@ -173,19 +173,27 @@ namespace Vxl
 	}
 
 	// View Matrix
-	Matrix4x4 Matrix4x4::LookAt(Vector3 Eye, Vector3 Target, Vector3 Up = Vector3(0, 1, 0))
+	Matrix4x4 Matrix4x4::LookAt(Vector3 Eye, Vector3 Forward, Vector3 Right, Vector3 Up)
 	{
-		Vector3 f = Vector3::Normalize(Target - Eye);
-		Vector3 s = Vector3::Normalize(Vector3::Cross(Up, f));
-		Vector3 u = Vector3::Cross(f, s);
-
 		return Matrix4x4
 		(
-			s.x, u.x, f.x, 0,
-			s.y, u.y, f.y, 0,
-			s.z, u.z, f.z, 0,
-			-Vector3::Dot(s, Eye), -Vector3::Dot(u, Eye), -Vector3::Dot(f, Eye), 1.f
+			Right.x, Up.x, Forward.x, 0,
+			Right.y, Up.y, Forward.y, 0,
+			Right.z, Up.z, Forward.z, 0,
+			-Vector3::Dot(Right, Eye), -Vector3::Dot(Up, Eye), -Vector3::Dot(Forward, Eye), 1.f
 		);
+
+		//	Vector3 f = Vector3::Normalize(Forward);
+		//	Vector3 s = Vector3::Normalize(Vector3::Cross(Up, f));
+		//	Vector3 u = Vector3::Cross(f, s);
+		//	
+		//	return Matrix4x4
+		//	(
+		//		s.x, u.x, f.x, 0,
+		//		s.y, u.y, f.y, 0,
+		//		s.z, u.z, f.z, 0,
+		//		-Vector3::Dot(s, Eye), -Vector3::Dot(u, Eye), -Vector3::Dot(f, Eye), 1.f
+		//	);
 	}
 
 	// Perspective Matrix
@@ -305,41 +313,41 @@ namespace Vxl
 
 	
 	// Become Rotation Matrix (Degrees)
-	Matrix4x4 Matrix4x4::RotationX(const Degrees& deg, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationX(const Degrees& deg, RotationDirection rot)
 	{
-		return RotationX(Radians(deg), rot);
+		return GetRotationX(Radians(deg), rot);
 	}
-	Matrix4x4 Matrix4x4::RotationY(const Degrees& deg, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationY(const Degrees& deg, RotationDirection rot)
 	{
-		return RotationY(Radians(deg), rot);
+		return GetRotationY(Radians(deg), rot);
 	}
-	Matrix4x4 Matrix4x4::RotationZ(const Degrees& deg, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationZ(const Degrees& deg, RotationDirection rot)
 	{
-		return RotationZ(Radians(deg), rot);
+		return GetRotationZ(Radians(deg), rot);
 	}
-	Matrix4x4 Matrix4x4::Rotation(const Degrees& deg, const Vector3& direction, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotation(const Degrees& deg, const Vector3& direction, RotationDirection rot)
 	{
-		return Rotation(Radians(deg), direction, rot);
+		return GetRotation(Radians(deg), direction, rot);
 	}
 	// Become Rotation Matrix (Radians)
-	Matrix4x4 Matrix4x4::RotationX(const Radians& rad, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationX(const Radians& rad, RotationDirection rot)
 	{
-		Matrix3x3 m = Matrix3x3::RotationX(rad, rot);
+		Matrix3x3 m = Matrix3x3::GetRotationX(rad, rot);
 		return Matrix4x4(m);
 	}
-	Matrix4x4 Matrix4x4::RotationY(const Radians& rad, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationY(const Radians& rad, RotationDirection rot)
 	{
-		Matrix3x3 m = Matrix3x3::RotationY(rad, rot);
+		Matrix3x3 m = Matrix3x3::GetRotationY(rad, rot);
 		return Matrix4x4(m);
 	}
-	Matrix4x4 Matrix4x4::RotationZ(const Radians& rad, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationZ(const Radians& rad, RotationDirection rot)
 	{
-		Matrix3x3 m = Matrix3x3::RotationZ(rad, rot);
+		Matrix3x3 m = Matrix3x3::GetRotationZ(rad, rot);
 		return Matrix4x4(m);
 	}
-	Matrix4x4 Matrix4x4::Rotation(const Radians& rad, const Vector3& direction, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotation(const Radians& rad, const Vector3& direction, RotationDirection rot)
 	{
-		Matrix3x3 m = Matrix3x3::Rotation(rad, direction, rot);
+		Matrix3x3 m = Matrix3x3::GetRotation(rad, direction, rot);
 		return Matrix4x4(m);
 	}
 
@@ -434,26 +442,32 @@ namespace Vxl
 	}
 
 	// Become Translation Matrix
-	Matrix4x4 Matrix4x4::Translate(const Vector3& center)
-	{
-		return Translate(center.x, center.y, center.z);
-	}
-	Matrix4x4 Matrix4x4::Translate(float x, float y, float z)
+	Matrix4x4 Matrix4x4::GetTranslate(float x, float y, float z)
 	{
 		Matrix4x4 M;
 		M.OverrideCenter(x, y, z);
 		return M;
 	}
-	// Become Scale Matrix
-	Matrix4x4 Matrix4x4::Scale(const Vector3& center)
+	Matrix4x4 Matrix4x4::GetTranslate(const Vector3& center)
 	{
-		return Scale(center.x, center.y, center.z);
+		return GetTranslate(center.x, center.y, center.z);
 	}
-	Matrix4x4 Matrix4x4::Scale(float x, float y, float z)
+	// Become Scale Matrix
+	Matrix4x4 Matrix4x4::GetScale(float all)
+	{
+		Matrix4x4 M;
+		M.OverrideScale(all, all, all);
+		return M;
+	}
+	Matrix4x4 Matrix4x4::GetScale(float x, float y, float z)
 	{
 		Matrix4x4 M;
 		M.OverrideScale(x, y, z);
 		return M;
+	}
+	Matrix4x4 Matrix4x4::GetScale(const Vector3& center)
+	{
+		return GetScale(center.x, center.y, center.z);
 	}
 
 	// Determinant

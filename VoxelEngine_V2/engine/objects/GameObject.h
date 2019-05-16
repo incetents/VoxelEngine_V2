@@ -6,6 +6,7 @@
 
 namespace Vxl
 {
+	class Mesh;
 	class Material;
 
 	class GameObject : public Entity
@@ -21,9 +22,14 @@ namespace Vxl
 		static GameObject* Create(const std::string& name);
 
 		// Data
-		MaterialData		m_material;
+		Mesh*			m_mesh = nullptr;
+		MaterialData	m_material;
 
 		// Mesh
+		inline Mesh* GetMesh(void) const
+		{
+			return m_mesh;
+		}
 		inline void SetMesh(Mesh* _mesh)
 		{
 			m_mesh = _mesh;
@@ -35,6 +41,8 @@ namespace Vxl
 		void			SetMaterial(Material* _base);
 		Material*		GetMaterial(void) const;
 		UINT			GetMaterialOrder(void) const;
+
+
 
 		// Behaviour
 		virtual void Update() override;

@@ -4,6 +4,7 @@
 #include "../utilities/singleton.h"
 
 #include "../math/Vector3.h"
+#include "../math/Matrix4x4.h"
 #include "../math/Color.h"
 #include "VBO.h"
 #include "glUtil.h"
@@ -16,6 +17,7 @@ namespace Vxl
 
 	static class Debug : public Singleton<class Debug>
 	{
+		friend class RenderManager;
 	private:
 		// Debug Lines
 		VBO*				m_lines;
@@ -23,6 +25,20 @@ namespace Vxl
 		UINT				m_lines_vertexIndex = 0;
 		bool				m_lines_resizeDirty = false;
 		static const UINT	m_lines_vertexIncrementAmount;
+		
+		// Debug Wireframe Spheres
+		struct WireframeSphere
+		{
+			Color4F color;
+			Matrix4x4 model;
+			void calcModel(Vector3 center, Vector3 scale)
+			{
+				model = Matrix4x4::GetScale(scale);
+				model.OverrideCenter(center);
+			}
+		};
+		std::vector<WireframeSphere> m_wireframeSpheres;
+		
 		// Debug Textures
 		void CreateDebugTextures();
 		Texture*			m_null_texture;
@@ -67,8 +83,20 @@ namespace Vxl
 			float Width = 1.0f,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
+		void DrawWireframeSphere(
+			const Vector3& position,
+			const Vector3& scale,
+			const Color4F& C = Color4F(1, 1, 1, 1)
+		);
+		void DrawWireframeSphere(
+			const Matrix4x4& model,
+			const Color4F& C = Color4F(1, 1, 1, 1)
+		);
+
 		void UpdateStart();
+
 		void RenderLines();
+
 		// Debug Texture
 		Texture* GetNullTexture(void) const
 		{

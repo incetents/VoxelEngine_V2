@@ -13,7 +13,7 @@ namespace Vxl
 {
 
 	// Generators
-	Mesh* Geometry::GenerateIcosahdron(unsigned int subdivisions, float scale)
+	Mesh* Geometry::GenerateIcosahdron(std::string MeshName, unsigned int subdivisions, float scale)
 	{
 		float t = (1.0f + sqrt(5.0f)) / 2.0f;
 
@@ -176,7 +176,7 @@ namespace Vxl
 			uvs.push_back(UVs[2]);
 		}
 
-		Mesh* NewMesh = Mesh::Create("Icosahedron" + std::to_string(subdivisions));
+		Mesh* NewMesh = Mesh::Create(MeshName);
 		//
 		NewMesh->m_positions.set(vertices);
 		NewMesh->m_uvs.set(uvs);
@@ -184,7 +184,7 @@ namespace Vxl
 		NewMesh->Bind();
 		return NewMesh;
 	}
-	Mesh* Geometry::GenerateSphereUV(unsigned int xSlice, unsigned int ySlice)
+	Mesh* Geometry::GenerateSphereUV(std::string MeshName, unsigned int xSlice, unsigned int ySlice)
 	{
 		std::vector<Vector3> positions;
 		std::vector<Vector2> uvs;
@@ -202,10 +202,10 @@ namespace Vxl
 				float c0 = cosf((2.0f * (j + 0) / y - 1.0f)* HALF_PI + HALF_PI);
 				float c1 = cosf((2.0f * (j + 1) / y - 1.0f)* HALF_PI + HALF_PI);
 
-				vec3 blPos = vec3(s0 * sinf((i + 0) * TWO_PI / x), c0, s0 * cosf((i + 0) * TWO_PI / x));
-				vec3 brPos = vec3(s0 * sinf((i + 1) * TWO_PI / x), c0, s0 * cosf((i + 1) * TWO_PI / x));
-				vec3 tlPos = vec3(s1 * sinf((i + 0) * TWO_PI / x), c1, s1 * cosf((i + 0) * TWO_PI / x));
-				vec3 trPos = vec3(s1 * sinf((i + 1) * TWO_PI / x), c1, s1 * cosf((i + 1) * TWO_PI / x));
+				vec3 blPos = vec3(s0 * sinf((i + 0) * TWO_PI / x), c0, s0 * cosf((i + 0) * TWO_PI / x)) / 2.0f;
+				vec3 brPos = vec3(s0 * sinf((i + 1) * TWO_PI / x), c0, s0 * cosf((i + 1) * TWO_PI / x)) / 2.0f;
+				vec3 tlPos = vec3(s1 * sinf((i + 0) * TWO_PI / x), c1, s1 * cosf((i + 0) * TWO_PI / x)) / 2.0f;
+				vec3 trPos = vec3(s1 * sinf((i + 1) * TWO_PI / x), c1, s1 * cosf((i + 1) * TWO_PI / x)) / 2.0f;
 
 				if (!invert)
 				{
@@ -252,7 +252,99 @@ namespace Vxl
 			}
 		}
 
-		Mesh* _mesh = Mesh::Create("Sphere" + std::to_string(xSlice) + '|' + std::to_string(ySlice));
+		Mesh* _mesh = Mesh::Create(MeshName);
+		//
+		_mesh->m_positions.set(positions);
+		_mesh->m_uvs.set(uvs);
+		//
+		_mesh->Bind();
+		return _mesh;
+	}
+	Mesh* Geometry::GenerateCylinder(std::string MeshName, Axis axis, u_int slices, float height, float radius_top, float radius_bot)
+	{
+		//
+		std::vector<Vector3> positions;
+		std::vector<Vector2> uvs;
+		positions.reserve(12 * slices);
+		uvs.reserve(12 * slices);
+
+		float uv_height_total = height + radius_bot + radius_top;
+		float uv_height_bot = (radius_bot / uv_height_total);
+		float uv_height_top = (height + radius_bot) / uv_height_total;
+
+		float half_height = height / 2;
+
+		for (unsigned int i = 0; i < slices; i++)
+		{
+			float t1 = TWO_PI * ((float)i / (float)slices);
+			float t2 = TWO_PI * ((float)(i+1) / (float)slices);
+
+			float uvx1 = ((float)i / (float)slices);
+			float uvx2 = ((float)(i + 1) / (float)slices);
+
+			Vector2 c1 = Vector2(sinf(t1), cosf(t1));
+			Vector2 c2 = Vector2(sinf(t2), cosf(t2));
+
+			Vector3 p1 = Vector3(c1.x * radius_top, +half_height, c1.y * radius_top);
+			Vector3 p2 = Vector3(c2.x * radius_top, +half_height, c2.y * radius_top);
+			Vector3 p3 = Vector3(c1.x * radius_bot, -half_height, c1.y * radius_bot);
+			Vector3 p4 = Vector3(c2.x * radius_bot, -half_height, c2.y * radius_bot);
+
+			// Circle Top
+			positions.push_back(Vector3(0, half_height, 0));
+			positions.push_back(p1);
+			positions.push_back(p2);
+
+			uvs.push_back(Vector2(0.5f, 0.5f));
+			uvs.push_back(c1 * 0.5f + 0.5f);
+			uvs.push_back(c2 * 0.5f + 0.5f);
+
+			// Circle Bottom
+			positions.push_back(Vector3(0, -half_height, 0));
+			positions.push_back(p4);
+			positions.push_back(p3);
+
+			uvs.push_back(Vector2(0.5f, 0.5f));
+			uvs.push_back(c2 * 0.5f + 0.5f);
+			uvs.push_back(c1 * 0.5f + 0.5f);
+
+			// Side
+			positions.push_back(p1);
+			positions.push_back(p3);
+			positions.push_back(p2);
+
+			uvs.push_back(Vector2(uvx1, uv_height_top));
+			uvs.push_back(Vector2(uvx1, uv_height_bot));
+			uvs.push_back(Vector2(uvx2, uv_height_top));
+			
+			positions.push_back(p2);
+			positions.push_back(p3);
+			positions.push_back(p4);
+
+			uvs.push_back(Vector2(uvx2, uv_height_top));
+			uvs.push_back(Vector2(uvx1, uv_height_bot));
+			uvs.push_back(Vector2(uvx2, uv_height_bot));
+		}
+
+		// Fix Axis
+		if (axis == Axis::X)
+		{
+			for (auto& pos : positions)
+			{
+				pos.SwapXY();
+				pos.x = -pos.x;
+			}
+		}
+		else if (axis == Axis::Z)
+		{
+			for (auto& pos : positions)
+			{
+				pos.SwapYZ();
+				pos.z = -pos.z;
+			}
+		}
+
+		Mesh* _mesh = Mesh::Create(MeshName);
 		//
 		_mesh->m_positions.set(positions);
 		_mesh->m_uvs.set(uvs);
@@ -643,23 +735,40 @@ namespace Vxl
 
 	void Geometry::CreateIcosahedron()
 	{
-		m_icosahedron = GenerateIcosahdron(0);
+		m_icosahedron = GenerateIcosahdron("Icosahedron [Radius=0.5]", 0, 0.5f);
 	}
 
 	void Geometry::CreateIcosphere()
 	{
-		m_icoSphere = GenerateIcosahdron(1);
+		m_icoSphere = GenerateIcosahdron("Icosphere [Radius=0.5]", 1, 0.5f);
 	}
 
 	void Geometry::CreateSphere()
 	{
-		m_sphere = GenerateIcosahdron(2);
-		m_spherehalf = GenerateIcosahdron(2, 0.5f);
+		m_sphere = GenerateIcosahdron("Sphere [Radius=0.5]", 2, 0.5f);
 	}
 
 	void Geometry::CreateSphereUV()
 	{
-		m_sphereUV_16 = GenerateSphereUV(16, 16);
-		m_sphereUV_64 = GenerateSphereUV(64, 64);
+		m_sphereUV_16 = GenerateSphereUV("UVSphere16 [Radius= [Radius=0.5]]", 16, 16);
+		m_sphereUV_64 = GenerateSphereUV("UVSphere64 [Radius= [Radius=0.5]]", 64, 64);
+	}
+
+	void Geometry::CreateCylinders()
+	{
+		//
+		m_cylinder_x = GenerateCylinder("CylinderX [16] [Radius=0.5]", Axis::X, 16, 1.0f, 0.5f, 0.5f);
+		m_cylinder_y = GenerateCylinder("CylinderY [16] [Radius=0.5]", Axis::Y, 16, 1.0f, 0.5f, 0.5f);
+		m_cylinder_z = GenerateCylinder("CylinderZ [16] [Radius=0.5]", Axis::Z, 16, 1.0f, 0.5f, 0.5f);
+		//
+	}
+
+	void Geometry::CreateCones()
+	{
+		//
+		m_cone_x = GenerateCylinder("Cone X-axis [16]", Axis::X, 16, 1.0f, 0.01f, 0.5f);
+		m_cone_y = GenerateCylinder("Cone Y-axis [16]", Axis::Y, 16, 1.0f, 0.01f, 0.5f);
+		m_cone_z = GenerateCylinder("Cone Z-axis [16]", Axis::Z, 16, 1.0f, 0.01f, 0.5f);
+		//
 	}
 }

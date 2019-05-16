@@ -53,7 +53,7 @@ namespace Vxl
 		void BeIdentity();
 
 		// View Matrix
-		static	Matrix4x4  LookAt(Vector3 Eye, Vector3 Target, Vector3 Up);
+		static	Matrix4x4  LookAt(Vector3 Eye, Vector3 Forward, Vector3 Right, Vector3 Up);
 		// Perspective Matrix
 		static	Matrix4x4  Perspective(float fovy, float aspect, float near, float far);
 		static	Matrix4x4  PerspectiveInverse(float fovy, float aspect, float near, float far);
@@ -74,26 +74,27 @@ namespace Vxl
 		// Special Sets
 		Matrix4x4& OverrideCenter(const Vector3& center);
 		Matrix4x4& OverrideCenter(float x, float y, float z);
-		Matrix4x4&  OverrideScale(const Vector3& scale);
-		Matrix4x4&  OverrideScale(float x, float y, float z);
+		Matrix4x4& OverrideScale(const Vector3& scale);
+		Matrix4x4& OverrideScale(float x, float y, float z);
 
 		// Become Translation Matrix
-		static Matrix4x4 Translate(const Vector3& center);
-		static Matrix4x4 Translate(float x, float y, float z);
+		static Matrix4x4 GetTranslate(float x, float y, float z);
+		static Matrix4x4 GetTranslate(const Vector3& center);
 		// Become Scale Matrix
-		static Matrix4x4 Scale(const Vector3& center);
-		static Matrix4x4 Scale(float x, float y, float z);
+		static Matrix4x4 GetScale(float all);
+		static Matrix4x4 GetScale(float x, float y, float z);
+		static Matrix4x4 GetScale(const Vector3& center);
 
 		// Become Rotation Matrix (Degrees)
-		static	Matrix4x4 RotationX(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 RotationY(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 RotationZ(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 Rotation(const Degrees&, const Vector3&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotationX(const Degrees&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotationY(const Degrees&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotationZ(const Degrees&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotation(const Degrees&, const Vector3&, RotationDirection = RotationDirection(1));
 		// Become Rotation Matrix (Radians)
-		static	Matrix4x4 RotationX(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 RotationY(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 RotationZ(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 Rotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotationX(const Radians&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotationY(const Radians&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotationZ(const Radians&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
 
 		// Set Horizontal Line
 				Matrix4x4& SetRow(int index, const Vector4&);

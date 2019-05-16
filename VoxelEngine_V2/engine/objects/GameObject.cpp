@@ -66,7 +66,7 @@ namespace Vxl
 
 	void GameObject::Draw()
 	{
-		m_material.Bind(!m_isColoredObject);
+		m_material.Bind(!m_isColoredObject, m_mesh);
 
 		if(m_mesh)
 			m_mesh->Draw();
@@ -74,6 +74,6 @@ namespace Vxl
 
 	void GameObject::TransformChanged()
 	{
-		UpdateBoundingBoxCheap();
+		UpdateBoundingBoxCheap(m_mesh);
 	}
 }

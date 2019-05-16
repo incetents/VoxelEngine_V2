@@ -39,6 +39,40 @@ namespace Vxl
 			vec.erase(std::remove(vec.begin(), vec.end(), data));
 		}
 
+		// Data Conversion //
+		class DataConversion
+		{
+		public:
+			static void uint_to_uchars(unsigned int input, unsigned char& output1, unsigned char& output2, unsigned char& output3, unsigned char& output4)
+			{
+				union Data
+				{
+					unsigned int _input;
+					unsigned char _outputs[4];
+				} data;
+				// Input
+				data._input = input;
+				// Output
+				output1 = data._outputs[0];
+				output2 = data._outputs[1];
+				output3 = data._outputs[2];
+				output4 = data._outputs[3];
+			}
+			static void uchars_to_uint(unsigned char* inputs, unsigned int& output)
+			{
+				union Data
+				{
+					unsigned int _output;
+					unsigned char _inputs[4];
+				} data;
+				// Input
+				for(int i = 0; i < 4; i++)
+				data._inputs[i] = inputs[i];
+				// Output
+				output = data._output;
+			}
+		};
+
 		// Aspect Ratio //
 		class AspectRatioInfo
 		{

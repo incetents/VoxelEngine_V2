@@ -582,11 +582,12 @@ namespace Vxl
 		{
 			return m_scale;
 		}
-		inline Quaternion	getRotation(void)
+		inline Quaternion	getLocalRotation(void)
 		{
 			updateValues();
 			return m_rotation;
 		}
+		inline Quaternion	getWorldRotation(void);
 		const Vector3& getForward(void)
 		{
 			updateValues();

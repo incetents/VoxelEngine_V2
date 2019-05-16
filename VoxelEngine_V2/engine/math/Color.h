@@ -91,6 +91,13 @@ namespace Vxl
 			: r(_a), g(_a), b(_a), a(_a)
 		{}
 
+		Color4F(const Color3F& c)
+			: r(c.r), g(c.g), b(c.b), a(1)
+		{}
+		Color4F(const Color3F& c, float a)
+			: r(c.r), g(c.g), b(c.b), a(a)
+		{}
+
 		// Data
 		float r, g, b, a;
 

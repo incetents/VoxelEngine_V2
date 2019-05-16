@@ -8,26 +8,48 @@
 
 namespace Vxl
 {
-	LightObject::LightObject(const std::string& name)
+	LightObject::LightObject(const std::string& name, Light::Type type)
 		: Entity(name, EntityType::LIGHT)
 	{
-		m_mesh = Geometry.GetQuad();
-
 		RenderManager.AddEntity(this);
+
+		SetType(type);
 	}
 
 	LightObject::~LightObject()
 	{
 		RenderManager.RemoveEntity(this);
+
+		delete m_data;
 	}
 
-	LightObject* LightObject::Create(const std::string& name)
+	// Utility
+	void LightObject::SetType(Light::Type type)
+	{
+		delete m_data;
+
+		switch (type)
+		{
+		case Light::Type::POINT:
+			m_data = new Light_Point();
+			break;
+		case Light::Type::SPOTLIGHT:
+			m_data = new Light_Spot();
+			break;
+		case Light::Type::DIRLIGHT:
+			m_data = new Light_Directional();
+			break;
+		}
+	}
+
+	LightObject* LightObject::Create(const std::string& name, Light::Type type)
 	{
 		// Create Unique Name
 		auto UniqueName = FixNameDuplicate(name);
 
 		// Create
-		LightObject* _entity = new LightObject(UniqueName);
+		LightObject* _entity = new LightObject(UniqueName, type);
+
 		// Store in entity database
 		AddToDatabase(UniqueName, _entity);
 		Message_Created(UniqueName, _entity);
@@ -43,7 +65,7 @@ namespace Vxl
 
 	void LightObject::Draw()
 	{
-		m_mesh->Draw();
+
 	}
 
 	void LightObject::TransformChanged()

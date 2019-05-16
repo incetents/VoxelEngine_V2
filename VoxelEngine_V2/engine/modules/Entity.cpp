@@ -32,14 +32,16 @@ namespace Vxl
 	}
 
 	// Update Bounding Box from Mesh
-	void Entity::UpdateBoundingBoxCheap()
+	void Entity::UpdateBoundingBoxCheap(Mesh* _mesh)
 	{
+		assert(_mesh);
+
 		// Update Bounding Box information
-		if (m_mesh != nullptr)
+		if (_mesh != nullptr)
 		{
 			// Update OBB 
-			Vector4 VMin = Vector4(m_mesh->GetVertexMin(), 1);
-			Vector4 VMax = Vector4(m_mesh->GetVertexMax(), 1);
+			Vector4 VMin = Vector4(_mesh->GetVertexMin(), 1);
+			Vector4 VMax = Vector4(_mesh->GetVertexMax(), 1);
 			Matrix4x4 Model = m_transform.getModel();
 			Model.TransposeSelf();
 

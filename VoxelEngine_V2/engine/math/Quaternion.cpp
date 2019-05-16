@@ -38,42 +38,54 @@ namespace Vxl
 	}
 
 	// Turn euler rotation into Quaternion
-	Quaternion Quaternion::GetEuler(const Degrees& Deg_X, const Degrees& Deg_Y, const Degrees& Deg_Z)
+	Quaternion Quaternion::ToQuaternion_XYZ(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
 	{
-		return Quaternion::GetEuler(Radians(Deg_X), Radians(Deg_Y), Radians(Deg_Z));
+		return Quaternion::ToQuaternion_XYZ(Radians(yaw), Radians(pitch), Radians(roll));
 	}
-	Quaternion Quaternion::GetEuler(const Radians& Rad_X, const Radians& Rad_Y, const Radians& Rad_Z)
+	Quaternion Quaternion::ToQuaternion_XYZ(const Radians& yaw, const Radians& pitch, const Radians& roll)
 	{
+		// XYZ
 		Quaternion q;
-
+		
 		// EULER
 		float angle;
-
-		angle = Rad_X.Get() * 0.5f;
+		
+		angle = yaw.Get() * 0.5f;
 		const float sr = sinf(angle);
 		const float cr = cosf(angle);
-
-		angle = Rad_Y.Get() * 0.5f;
+		
+		angle = pitch.Get() * 0.5f;
 		const float sp = sinf(angle);
 		const float cp = cosf(angle);
-
-		angle = Rad_Z.Get() * 0.5f;
+		
+		angle = roll.Get() * 0.5f;
 		const float sy = sinf(angle);
 		const float cy = cosf(angle);
-
+		
 		const float cpcy = cp * cy;
 		const float spcy = sp * cy;
 		const float cpsy = cp * sy;
 		const float spsy = sp * sy;
-
+		
+		q.w = (float)(cr * cpcy + sr * spsy);
 		q.x = (float)(sr * cpcy - cr * spsy);
 		q.y = (float)(cr * spcy + sr * cpsy);
 		q.z = (float)(cr * cpsy - sr * spcy);
-		q.w = (float)(cr * cpcy + sr * spsy);
 
-		//std::cout << "TEST Q: " << q.x << " " << q.y << " " << q.z << " " << q.w << std::endl;
+		return q;// .Normalize();
+	}
 
-		return q.Normalize();
+	Quaternion Quaternion::ToQuaternion_ZXY(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
+	{
+		return Quaternion::ToQuaternion_ZXY(Radians(yaw), Radians(pitch), Radians(roll));
+	}
+	Quaternion Quaternion::ToQuaternion_ZXY(const Radians& yaw, const Radians& pitch, const Radians& roll)
+	{
+		auto QX = Quaternion::AngleAxis(yaw, Vector3(1, 0, 0));
+		auto QY = Quaternion::AngleAxis(pitch, Vector3(0, 1, 0));
+		auto QZ = Quaternion::AngleAxis(roll, Vector3(0, 0, 1));
+		
+		return QZ * QX * QY;
 	}
 	// Turn Quaternion into euler rotation
 	void Quaternion::ToEuler(const Quaternion& q, Degrees& roll, Degrees& pitch, Degrees& yaw)

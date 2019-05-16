@@ -68,6 +68,13 @@ namespace Vxl
 {
 	class Vector3;
 
+	enum class Axis
+	{
+		X,
+		Y,
+		Z
+	};
+
 	template<typename T>
 	static bool Compare(T a, T b)
 	{

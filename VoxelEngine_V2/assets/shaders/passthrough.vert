@@ -1,22 +1,37 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
 #version 430
+#include "_UBO.glsl"
 //precision highp float;
 
+// Input
 layout (location = 0) in vec3 m_position;
 layout (location = 1) in vec2 m_uv;
 
-//
+// Output
 out fragment_data
 {
 	vec3 pos;
 	vec2 uv;
 
 } f_data;
-//
+
+
+// Uniforms
+uniform bool useMVP = false;
+uniform mat4 model = mat4(1.0);
 
 void main()
 {
-	f_data.pos = m_position;
+	if(useMVP)
+	{
+		gl_Position = viewProjection * model * vec4(m_position, 1.0);
+	}
+	else
+	{
+		gl_Position = vec4(m_position, 1.0);
+	}
+
+	f_data.pos = gl_Position.xyz;
 	f_data.uv = m_uv;
-	gl_Position = vec4(m_position, 1.0);
+	
 }

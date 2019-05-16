@@ -335,7 +335,11 @@ namespace Vxl
 				glEnable(GL_CULL_FACE);
 				glFrontFace(GL_CW);
 				break;
+			default:
+				assert(FALSE);
+				break;
 			}
+
 		}
 
 		_cullmode = cull;

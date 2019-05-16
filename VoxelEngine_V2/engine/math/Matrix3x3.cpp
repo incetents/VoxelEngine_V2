@@ -123,24 +123,24 @@ namespace Vxl
 	}
 
 	// Become Rotation Matrix (Degrees)
-	Matrix3x3 Matrix3x3::RotationX(const Degrees& deg, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationX(const Degrees& deg, RotationDirection rot)
 	{
-		return RotationX(Radians(deg), rot);
+		return GetRotationX(Radians(deg), rot);
 	}
-	Matrix3x3 Matrix3x3::RotationY(const Degrees& deg, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationY(const Degrees& deg, RotationDirection rot)
 	{
-		return RotationY(Radians(deg), rot);
+		return GetRotationY(Radians(deg), rot);
 	}
-	Matrix3x3 Matrix3x3::RotationZ(const Degrees& deg, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationZ(const Degrees& deg, RotationDirection rot)
 	{
-		return RotationZ(Radians(deg), rot);
+		return GetRotationZ(Radians(deg), rot);
 	}
-	Matrix3x3 Matrix3x3::Rotation(const Degrees& deg, const Vector3& direction, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotation(const Degrees& deg, const Vector3& direction, RotationDirection rot)
 	{
-		return Rotation(Radians(deg), direction, rot);
+		return GetRotation(Radians(deg), direction, rot);
 	}
 	// Become Rotation Matrix (Radians)
-	Matrix3x3 Matrix3x3::RotationX(const Radians& rad, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationX(const Radians& rad, RotationDirection rot)
 	{
 		// Float Radians
 		float Val = rad.Get() * (float)rot;
@@ -152,7 +152,7 @@ namespace Vxl
 			Vector3(0.0f, +sinf(Val), +cosf(Val))
 		);
 	}
-	Matrix3x3 Matrix3x3::RotationY(const Radians& rad, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationY(const Radians& rad, RotationDirection rot)
 	{
 		// Float Radians
 		float Val = rad.Get() * (float)rot;
@@ -164,7 +164,7 @@ namespace Vxl
 			Vector3(-sinf(Val), 0.0f, +cosf(Val))
 		);
 	}
-	Matrix3x3 Matrix3x3::RotationZ(const Radians& rad, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationZ(const Radians& rad, RotationDirection rot)
 	{
 		// Float Radians
 		float Val = rad.Get() * (float)rot;
@@ -176,7 +176,7 @@ namespace Vxl
 			Vector3(0.0f, 0.0f, 1.0f)
 		);
 	}
-	Matrix3x3 Matrix3x3::Rotation(const Radians& rad, const Vector3& direction, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotation(const Radians& rad, const Vector3& direction, RotationDirection rot)
 	{
 		// Get Rotation Amount
 		float R = rad.Get() * (float)rot;
