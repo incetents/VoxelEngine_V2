@@ -53,7 +53,7 @@ namespace Vxl
 		void BeIdentity();
 
 		// View Matrix
-		static	Matrix4x4  LookAt(Vector3 Eye, Vector3 Forward, Vector3 Right, Vector3 Up);
+		static	Matrix4x4  LookAt(const Vector3& Eye, const Vector3& Forward, const Vector3& Right, const Vector3& Up);
 		// Perspective Matrix
 		static	Matrix4x4  Perspective(float fovy, float aspect, float near, float far);
 		static	Matrix4x4  PerspectiveInverse(float fovy, float aspect, float near, float far);

@@ -28,7 +28,8 @@ namespace Vxl
 		Vector3		m_worldPosition;	// World Position
 		Vector3		m_position; // Local Position
 		Vector3		m_euler_rotation; // Local Euler
-		Quaternion	m_rotation; // Local Rotation
+		Quaternion	m_localrotation; // Local Rotation
+		Quaternion	m_worldrotation; // Local Rotation
 		Vector3		m_scale;		// Local Scale
 		Vector3		m_lossyScale;   // World Scale (Not supper accurate)
 
@@ -400,14 +401,14 @@ namespace Vxl
 		{
 			Vector3 Nforward = forward.Normalize();
 
-			if (Nforward == Vector3::UP)
+			if (Nforward.CompareFuzzy(Vector3::UP))
 			{
 				m_euler_rotation.x = 90;
 				m_euler_rotation.y = 0;
 				m_euler_rotation.z = 0; // This should never change
 				return *this;
 			}
-			else if (Nforward == Vector3::DOWN)
+			else if (Nforward.CompareFuzzy(Vector3::DOWN))
 			{
 				m_euler_rotation.x = -90;
 				m_euler_rotation.y = 0;
@@ -415,8 +416,7 @@ namespace Vxl
 				return *this;
 			}
 
-			//Quaternion::ToEuler(Quaternion(forward.x, forward.y, forward.z, 0), roll, pitch, yaw);
-			Degrees yaw = Vector3::GetAngleDegrees(Vector3::FORWARD, Nforward.NormalizeXZ());
+			Degrees yaw = -Vector3::GetAngleDegrees(Vector3::FORWARD, Nforward.NormalizeXZ());
 			if (Nforward.z < 0)
 				yaw = -yaw;
 			Degrees pitch = Vector3::GetAngleDegrees(Vector3::UP, Nforward);
@@ -424,8 +424,6 @@ namespace Vxl
 			m_euler_rotation = Vector3(pitch.Get() - 90.0f, yaw.Get(), 0);
 
 			SetDirty();
-
-			auto test = Transform::getForward();
 
 			return *this;
 		}
@@ -557,7 +555,11 @@ namespace Vxl
 		}
 
 		// Turn object into a 4x4 matrix for math
-		Matrix4x4 getModel(void);
+		const Matrix4x4& getModel(void)
+		{
+			updateValues();
+			return m_ModelMatrix;
+		}
 
 		// Getters
 		inline Vector3		getWorldPosition(void)
@@ -585,9 +587,13 @@ namespace Vxl
 		inline Quaternion	getLocalRotation(void)
 		{
 			updateValues();
-			return m_rotation;
+			return m_localrotation;
 		}
-		inline Quaternion	getWorldRotation(void);
+		inline Quaternion	getWorldRotation(void)
+		{
+			updateValues();
+			return m_worldrotation;
+		}
 		const Vector3& getForward(void)
 		{
 			updateValues();

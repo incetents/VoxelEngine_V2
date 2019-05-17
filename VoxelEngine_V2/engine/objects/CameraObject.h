@@ -181,7 +181,7 @@ namespace Vxl
 		// Behaviour
 		virtual void Update() override;
 		virtual void Draw() override;
-	private:
+	public:
 		virtual void TransformChanged() override;
 	};
 }

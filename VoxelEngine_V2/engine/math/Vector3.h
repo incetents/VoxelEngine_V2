@@ -177,9 +177,13 @@ namespace Vxl
 		Vector3 Inverse() const;
 		static Vector3 Inverse(const Vector3&);
 
-		// Compare
+		// Compare (precise)
 		inline bool Compare(const Vector3&) const;
 		static bool Compare(const Vector3&, const Vector3&);
+
+		// Compare (0.01 precision)
+		inline bool CompareFuzzy(const Vector3&) const;
+		static bool CompareFuzzy(const Vector3&, const Vector3&);
 
 		// Normalize Self
 		Vector3& NormalizeSelf();

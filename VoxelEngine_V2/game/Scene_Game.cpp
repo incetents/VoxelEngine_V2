@@ -59,8 +59,10 @@ namespace Vxl
 
 		_cameraObject = CameraObject::Create("_camera_editor", 0.01f, 50.0f);
 		_cameraObject->m_transform.setPosition(3.5f, 2.8f, 0.3f);
-		_cameraObject->m_transform.setForward(Vector3(0, 0, 1));
+		_cameraObject->m_transform.setForward(Vector3(1, 0, 0));
 		_cameraObject->SetPerspectiveWindowAspect(110.0f);
+
+		//_cameraObject->TransformChanged();
 
 		CameraObject* _c2 = CameraObject::Create("_camera2", 0.5f, 10.0f);
 		_c2->m_transform.setPosition(2.9f, 2.1f, -2.5f);
@@ -185,6 +187,7 @@ namespace Vxl
 		_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		//_entity5->SetColor(Color3F(1, 1, 1));
 		
+		_entity5->m_transform.setForward(vec3(-1, 0, 0));
 		
 		GameObject* _skybox = GameObject::Create("_skybox");
 		_skybox->SetMaterial(_material_skybox);
@@ -305,7 +308,8 @@ namespace Vxl
 			if (Input.getKey(KeyCode::LEFT_CONTROL))
 				CamMove += Vector3::DOWN;
 
-			_cameraObject->m_transform.increasePosition(CamMove.Normalize() * CamSpeed);
+			if(CamMove.LengthSqr() > FLT_EPSILON)
+				_cameraObject->m_transform.increasePosition(CamMove.Normalize() * CamSpeed);
 			//_camera->increasePosition(CamMove.Normalize() * CamSpeed);
 
 			// Camera Rotation
@@ -313,15 +317,16 @@ namespace Vxl
 			float CamRotationSpeed = 2.25f;
 
 			if (Input.getKey(KeyCode::UP))
-				CamRotation.x += CamRotationSpeed;
-			if (Input.getKey(KeyCode::DOWN))
 				CamRotation.x -= CamRotationSpeed;
+			if (Input.getKey(KeyCode::DOWN))
+				CamRotation.x += CamRotationSpeed;
 			if (Input.getKey(KeyCode::LEFT))
-				CamRotation.y += CamRotationSpeed;
-			if (Input.getKey(KeyCode::RIGHT))
 				CamRotation.y -= CamRotationSpeed;
+			if (Input.getKey(KeyCode::RIGHT))
+				CamRotation.y += CamRotationSpeed;
 
-			_cameraObject->m_transform.increaseRotation(CamRotation);
+			if (CamRotation.LengthSqr() > FLT_EPSILON)
+				_cameraObject->m_transform.increaseRotation(CamRotation);
 			//_camera->increaseRotation(CamRotation);
 
 			// Camera Lock
@@ -345,13 +350,16 @@ namespace Vxl
 				deltax = MacroClamp(deltax, -100, +100);
 				deltay = MacroClamp(deltay, -100, +100);
 
-				_cameraObject->m_transform.increaseRotation(-deltay, -deltax, 0);
+				if(fabs(deltax) > FLT_EPSILON && fabs(deltay) > FLT_EPSILON)
+					_cameraObject->m_transform.increaseRotation(-deltay, -deltax, 0);
 				//_camera->increaseRotation(-deltay, -deltax, 0);
 			}
 
 			// Edge case for vertical rotation
+			float OrigXrot = _cameraObject->m_transform.getRotationEuler().x;
 			float Xrot = MacroClamp(_cameraObject->m_transform.getRotationEuler().x, -89.9f, 89.9f);
-			_cameraObject->m_transform.setRotationX(Xrot);
+			if(fabs(OrigXrot - Xrot) > FLT_EPSILON)
+				_cameraObject->m_transform.setRotationX(Xrot);
 			//
 
 			// Update Cam

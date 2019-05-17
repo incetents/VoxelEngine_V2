@@ -109,11 +109,6 @@ namespace Vxl
 	void CameraObject::Update()
 	{
 		m_transform.updateValues();
-		m_view = Matrix4x4::LookAt(m_transform.m_position, m_transform.m_forward, m_transform.m_right, m_transform.m_up);
-		m_viewInverse = m_view.Inverse();
-
-		m_viewProjection = m_view * m_projection;
-		m_viewProjectionInverse = m_viewProjection.Inverse();
 	}
 
 	// Special
@@ -182,6 +177,10 @@ namespace Vxl
 
 	void CameraObject::TransformChanged()
 	{
+		m_view = Matrix4x4::LookAt(m_transform.m_position, m_transform.getForward(), m_transform.getRight(), m_transform.getUp());
+		m_viewInverse = m_view.Inverse();
 
+		m_viewProjection = m_view * m_projection;
+		m_viewProjectionInverse = m_viewProjection.Inverse();
 	}
 }

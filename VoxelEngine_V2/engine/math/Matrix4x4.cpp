@@ -173,7 +173,7 @@ namespace Vxl
 	}
 
 	// View Matrix
-	Matrix4x4 Matrix4x4::LookAt(Vector3 Eye, Vector3 Forward, Vector3 Right, Vector3 Up)
+	Matrix4x4 Matrix4x4::LookAt(const Vector3& Eye, const Vector3& Forward, const Vector3& Right, const Vector3& Up)
 	{
 		return Matrix4x4
 		(
@@ -183,17 +183,10 @@ namespace Vxl
 			-Vector3::Dot(Right, Eye), -Vector3::Dot(Up, Eye), -Vector3::Dot(Forward, Eye), 1.f
 		);
 
+		// Legacy 
 		//	Vector3 f = Vector3::Normalize(Forward);
 		//	Vector3 s = Vector3::Normalize(Vector3::Cross(Up, f));
 		//	Vector3 u = Vector3::Cross(f, s);
-		//	
-		//	return Matrix4x4
-		//	(
-		//		s.x, u.x, f.x, 0,
-		//		s.y, u.y, f.y, 0,
-		//		s.z, u.z, f.z, 0,
-		//		-Vector3::Dot(s, Eye), -Vector3::Dot(u, Eye), -Vector3::Dot(f, Eye), 1.f
-		//	);
 	}
 
 	// Perspective Matrix

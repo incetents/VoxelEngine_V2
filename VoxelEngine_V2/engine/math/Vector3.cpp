@@ -405,13 +405,13 @@ namespace Vxl
 	// Compare
 	bool Vector3::Compare(const Vector3& v) const
 	{
-		if (abs(x - v.x) > FLOAT_EPSILON)
+		if (fabs(x - v.x) > FLOAT_EPSILON)
 			return false;
 
-		if (abs(y - v.y) > FLOAT_EPSILON)
+		else if (fabs(y - v.y) > FLOAT_EPSILON)
 			return false;
 
-		if (abs(z - v.z) > FLOAT_EPSILON)
+		else if (fabs(z - v.z) > FLOAT_EPSILON)
 			return false;
 
 		return true;
@@ -419,6 +419,24 @@ namespace Vxl
 	bool Vector3::Compare(const Vector3& v1, const Vector3& v2)
 	{
 		return v1.Compare(v2);
+	}
+	// Compare Fuzzy
+	bool Vector3::CompareFuzzy(const Vector3& v) const
+	{
+		if (fabs(x - v.x) > 0.01f)
+			return false;
+
+		else if (fabs(y - v.y) > 0.01f)
+			return false;
+
+		else if (fabs(z - v.z) > 0.01f)
+			return false;
+
+		return true;
+	}
+	bool Vector3::CompareFuzzy(const Vector3& v1, const Vector3& v2)
+	{
+		return v1.CompareFuzzy(v2);
 	}
 
 	// Normalize Self (Returns Length)

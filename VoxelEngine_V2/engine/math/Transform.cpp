@@ -15,63 +15,43 @@ namespace Vxl
 		// If dirty is true, update values
 		if (isDirty)
 		{
-			// Update model matrix
-			m_rotation = Quaternion::ToQuaternion_ZXY(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
-			Matrix3x3 RotationScale = m_rotation.GetMatrix3x3() * Matrix3x3::GetScale(m_scale);
-			// Result Model
-			m_ModelMatrix = Matrix4x4(RotationScale, m_position);
-
-			// Model affected by Parent
-			Quaternion ParentRotation = m_rotation;
-			Matrix4x4 ParentModel = m_ModelMatrix;
-			if (m_parent != nullptr)
+			// Acquire Rotation
+			m_localrotation = Quaternion::ToQuaternion_YXZ(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
+			m_worldrotation = m_localrotation;
+			Matrix3x3 RotationMatrix = m_localrotation.GetMatrix3x3();
+			
+			// Base Model Matrix
+			m_ModelMatrix = Matrix4x4(RotationMatrix.Transpose() * Matrix3x3::GetScale(m_scale), m_position);
+			
+			// Add Rotation / Model Matrix from parent
+			Transform* parent = m_parent;
+			while (parent != nullptr)
 			{
-				ParentRotation = m_rotation * m_parent->getWorldRotation();
-				ParentModel = m_ModelMatrix * m_parent->getModel();
+				m_worldrotation = m_worldrotation * parent->getWorldRotation();
+				m_ModelMatrix = m_ModelMatrix * parent->getModel();
+				parent = parent->getParent();
 			}
 
-			// Update World position
-			m_worldPosition = Vector3(ParentModel[12], ParentModel[13], ParentModel[14]);
-			// Update World Scale
-			m_lossyScale.x = Vector3::Length(ParentModel[0], ParentModel[1], ParentModel[2]);
-			m_lossyScale.y = Vector3::Length(ParentModel[4], ParentModel[5], ParentModel[6]);
-			m_lossyScale.z = Vector3::Length(ParentModel[8], ParentModel[9], ParentModel[10]);
-
 			// Calculate Axis Directions
-			m_forward	= Vector3::Normalize(ParentRotation * Vector3::FORWARD);
-			m_right		= Vector3::Normalize(ParentRotation * Vector3::RIGHT); // Cross of forward and up is not accurate when Roll is taken into account
-			m_up		= Vector3::Cross(m_forward, m_right);
-			//
+			Matrix3x3 FinalRotationMatrix = m_worldrotation.GetMatrix3x3();
+			m_right		= FinalRotationMatrix.GetColumn(0);
+			m_up		= FinalRotationMatrix.GetColumn(1);
+			m_forward	= FinalRotationMatrix.GetColumn(2);
+
+			// Update World position
+			m_worldPosition = m_ModelMatrix.GetRow(3);
+			// Update World Scale
+			m_lossyScale.x = Vector3::Length(m_ModelMatrix[0], m_ModelMatrix[1], m_ModelMatrix[2]);
+			m_lossyScale.y = Vector3::Length(m_ModelMatrix[4], m_ModelMatrix[5], m_ModelMatrix[6]);
+			m_lossyScale.z = Vector3::Length(m_ModelMatrix[8], m_ModelMatrix[9], m_ModelMatrix[10]);
+
+
 			isDirty = false;
 
 			// Call entity about change in transform class
 			if (m_owner != nullptr)
 				m_owner->TransformChanged();
 		}
-	}
-
-	Matrix4x4 Transform::getModel()
-	{
-		updateValues();
-
-		// Affected by parent transformations
-		if (m_parent != nullptr)
-			return m_ModelMatrix * m_parent->getModel();
-
-		// Orphan
-		return m_ModelMatrix;
-	}
-
-	inline Quaternion Transform::getWorldRotation(void)
-	{
-		updateValues();
-
-		// Affected by parent transformations
-		if (m_parent != nullptr)
-			return m_rotation * m_parent->getWorldRotation();
-
-		// Orphan
-		return m_rotation;
 	}
 
 	Transform::Transform()

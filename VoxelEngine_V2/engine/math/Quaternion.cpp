@@ -38,11 +38,11 @@ namespace Vxl
 	}
 
 	// Turn euler rotation into Quaternion
-	Quaternion Quaternion::ToQuaternion_XYZ(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
+	Quaternion Quaternion::ToQuaternion_ZYX(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
 	{
-		return Quaternion::ToQuaternion_XYZ(Radians(yaw), Radians(pitch), Radians(roll));
+		return Quaternion::ToQuaternion_ZYX(Radians(yaw), Radians(pitch), Radians(roll));
 	}
-	Quaternion Quaternion::ToQuaternion_XYZ(const Radians& yaw, const Radians& pitch, const Radians& roll)
+	Quaternion Quaternion::ToQuaternion_ZYX(const Radians& yaw, const Radians& pitch, const Radians& roll)
 	{
 		// XYZ
 		Quaternion q;
@@ -75,17 +75,17 @@ namespace Vxl
 		return q;// .Normalize();
 	}
 
-	Quaternion Quaternion::ToQuaternion_ZXY(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
+	Quaternion Quaternion::ToQuaternion_YXZ(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
 	{
-		return Quaternion::ToQuaternion_ZXY(Radians(yaw), Radians(pitch), Radians(roll));
+		return Quaternion::ToQuaternion_YXZ(Radians(yaw), Radians(pitch), Radians(roll));
 	}
-	Quaternion Quaternion::ToQuaternion_ZXY(const Radians& yaw, const Radians& pitch, const Radians& roll)
+	Quaternion Quaternion::ToQuaternion_YXZ(const Radians& yaw, const Radians& pitch, const Radians& roll)
 	{
 		auto QX = Quaternion::AngleAxis(yaw, Vector3(1, 0, 0));
 		auto QY = Quaternion::AngleAxis(pitch, Vector3(0, 1, 0));
 		auto QZ = Quaternion::AngleAxis(roll, Vector3(0, 0, 1));
 		
-		return QZ * QX * QY;
+		return QY * QX * QZ;
 	}
 	// Turn Quaternion into euler rotation
 	void Quaternion::ToEuler(const Quaternion& q, Degrees& roll, Degrees& pitch, Degrees& yaw)
