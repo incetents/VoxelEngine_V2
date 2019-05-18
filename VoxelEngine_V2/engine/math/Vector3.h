@@ -157,21 +157,9 @@ namespace Vxl
 		explicit operator Vector4();
 
 		// Swap Values
-		Vector3& SwapXY()
-		{
-			std::swap(x, y);
-			return *this;
-		}
-		Vector3& SwapXZ()
-		{
-			std::swap(x, z);
-			return *this;
-		}
-		Vector3& SwapYZ()
-		{
-			std::swap(y, z);
-			return *this;
-		}
+		Vector3& SwapXY();
+		Vector3& SwapXZ();
+		Vector3& SwapYZ();
 
 		// Inverse
 		Vector3 Inverse() const;

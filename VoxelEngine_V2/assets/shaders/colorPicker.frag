@@ -14,6 +14,7 @@ in fragment_data
 
 // Output
 layout (location = 0) out vec4 output_color;
+layout (location = 1) out vec4 test;
 
 // Uniforms
 uniform vec4 colorID;
@@ -22,4 +23,5 @@ uniform vec4 colorID;
 void main()
 {
 	output_color = colorID;
+	test = vec4(1,0,0,1);
 }

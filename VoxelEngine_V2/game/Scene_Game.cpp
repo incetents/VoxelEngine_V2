@@ -28,6 +28,7 @@
 #include "../engine/math/Vector4.h"
 #include "../engine/math/MathCore.h"
 #include "../engine/math/Lerp.h"
+#include "../engine/math/Model.h"
 
 #include "../engine/objects/LightObject.h"
 #include "../engine/objects/CameraObject.h"
@@ -37,17 +38,14 @@
 
 #include "../engine/window/window.h"
 
-#include "../engine/window/ShaderErrors.h"
-#include "../engine/window/DevConsole.h"
-#include "../engine/window/Hierarchy.h"
-#include "../engine/window/Inspector.h"
-#include "../engine/window/Performance.h"
+#include "../engine/editor/ShaderErrors.h"
+#include "../engine/editor/DevConsole.h"
+#include "../engine/editor/Hierarchy.h"
+#include "../engine/editor/Inspector.h"
+#include "../engine/editor/Performance.h"
 
 #include "../game/terrain/TerrainManager.h"
 
-#include <iostream>
-
-#include "../engine/math/Model.h"
 
 namespace Vxl
 {
@@ -59,7 +57,7 @@ namespace Vxl
 
 		_cameraObject = CameraObject::Create("_camera_editor", 0.01f, 50.0f);
 		_cameraObject->m_transform.setPosition(3.5f, 2.8f, 0.3f);
-		_cameraObject->m_transform.setForward(Vector3(1, 0, 0));
+		_cameraObject->m_transform.setCameraForward(Vector3(-1, 0, -1));
 		_cameraObject->SetPerspectiveWindowAspect(110.0f);
 
 		//_cameraObject->TransformChanged();
@@ -81,12 +79,12 @@ namespace Vxl
 		// FBO
 		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0.1f, 0.1f, 0.3f, 1.0f));
 		_fbo->addTexture("albedo");
-		_fbo->addTexture("normal", Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
+		_fbo->addTexture("normal", Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
 		_fbo->addTexture("test");
 		_fbo->addDepth();
 
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
-		_fbo_colorpicker->addTexture("color");
+		_fbo_colorpicker->addTexture("color", Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA, Channel_Type::RGBA, Data_Type::FLOAT);
 		_fbo_colorpicker->addDepth();
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
@@ -187,7 +185,7 @@ namespace Vxl
 		_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		//_entity5->SetColor(Color3F(1, 1, 1));
 		
-		_entity5->m_transform.setForward(vec3(-1, 0, 0));
+		
 		
 		GameObject* _skybox = GameObject::Create("_skybox");
 		_skybox->SetMaterial(_material_skybox);
@@ -208,7 +206,7 @@ namespace Vxl
 		GameObject* _crate2 = GameObject::Create("_crate2");
 		_crate2->SetMaterial(_material_gbuffer);
 		_crate2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_crate2->SetMesh(Geometry.GetCylinderZ());
+		_crate2->SetMesh(Geometry.GetCylinderY());
 		//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(0, 2, 0);
 		
@@ -216,7 +214,7 @@ namespace Vxl
 		GameObject* _crate3 = GameObject::Create("_crate3");
 		_crate3->SetMaterial(_material_gbuffer);
 		_crate3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		_crate3->SetMesh(Geometry.GetCylinderY());
+		_crate3->SetMesh(Geometry.GetCylinderZ());
 		//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate3->m_transform.setPosition(0, 4, 0);
 
@@ -226,33 +224,33 @@ namespace Vxl
 		// World Position
 		_crate1->m_transform.setWorldPosition(-5, 0, 0);
 		
-		GameObject* _octo1 = GameObject::Create("_octo1");
-		_octo1->SetMaterial(_material_gbuffer);
-		_octo1->SetMesh(Geometry.GetOctahedron());
-		_octo1->m_transform.setPosition(0, 0, 0);
-		_octo1->m_transform.setScale(0.5f);
-		_octo1->SetColor(Color3F(1, 1, 1));
-		
-		GameObject* _octo2 = GameObject::Create("_octo2");
-		_octo2->SetMaterial(_material_gbuffer);
-		_octo2->SetMesh(Geometry.GetOctahedron());
-		_octo2->m_transform.setPosition(1, 0, 0);
-		_octo2->m_transform.setScale(0.5f);
-		_octo2->SetColor(Color3F(1, 0, 0));
-		
-		GameObject* _octo3 = GameObject::Create("_octo3");
-		_octo3->SetMaterial(_material_gbuffer);
-		_octo3->SetMesh(Geometry.GetOctahedron());
-		_octo3->m_transform.setPosition(0, 1, 0);
-		_octo3->m_transform.setScale(0.5f);
-		_octo3->SetColor(Color3F(0, 1, 0));
-		
-		GameObject* _octo4 = GameObject::Create("_octo4");
-		_octo4->SetMaterial(_material_gbuffer);
-		_octo4->SetMesh(Geometry.GetOctahedron());
-		_octo4->m_transform.setPosition(0, 0, 1);
-		_octo4->m_transform.setScale(0.5f);
-		_octo4->SetColor(Color3F(0, 0, 1));
+		//	GameObject* _octo1 = GameObject::Create("_octo1");
+		//	_octo1->SetMaterial(_material_gbuffer);
+		//	_octo1->SetMesh(Geometry.GetOctahedron());
+		//	_octo1->m_transform.setPosition(0, 0, 0);
+		//	_octo1->m_transform.setScale(0.5f);
+		//	_octo1->SetColor(Color3F(1, 1, 1));
+		//	
+		//	GameObject* _octo2 = GameObject::Create("_octo2");
+		//	_octo2->SetMaterial(_material_gbuffer);
+		//	_octo2->SetMesh(Geometry.GetOctahedron());
+		//	_octo2->m_transform.setPosition(1, 0, 0);
+		//	_octo2->m_transform.setScale(0.5f);
+		//	_octo2->SetColor(Color3F(1, 0, 0));
+		//	
+		//	GameObject* _octo3 = GameObject::Create("_octo3");
+		//	_octo3->SetMaterial(_material_gbuffer);
+		//	_octo3->SetMesh(Geometry.GetOctahedron());
+		//	_octo3->m_transform.setPosition(0, 1, 0);
+		//	_octo3->m_transform.setScale(0.5f);
+		//	_octo3->SetColor(Color3F(0, 1, 0));
+		//	
+		//	GameObject* _octo4 = GameObject::Create("_octo4");
+		//	_octo4->SetMaterial(_material_gbuffer);
+		//	_octo4->SetMesh(Geometry.GetOctahedron());
+		//	_octo4->m_transform.setPosition(0, 0, 1);
+		//	_octo4->m_transform.setScale(0.5f);
+		//	_octo4->SetColor(Color3F(0, 0, 1));
 		
 		LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
 		_light1->m_transform.setPosition(5, 0, 0);
@@ -275,8 +273,6 @@ namespace Vxl
 	}
 	void Scene_Game::Destroy()
 	{
-		//delete _mesh;
-
 		TerrainManager.Destroy();
 	}
 
@@ -350,8 +346,8 @@ namespace Vxl
 				deltax = MacroClamp(deltax, -100, +100);
 				deltay = MacroClamp(deltay, -100, +100);
 
-				if(fabs(deltax) > FLT_EPSILON && fabs(deltay) > FLT_EPSILON)
-					_cameraObject->m_transform.increaseRotation(-deltay, -deltax, 0);
+				if(fabs(deltax) > FLT_EPSILON || fabs(deltay) > FLT_EPSILON)
+					_cameraObject->m_transform.increaseRotation(deltay, deltax, 0);
 				//_camera->increaseRotation(-deltay, -deltax, 0);
 			}
 
@@ -631,28 +627,26 @@ namespace Vxl
 
 				}
 
-				GLubyte *data = new GLubyte[4];
-				glReadPixels(
-					(GLint)Input.getMouseX(),
-					Window.GetResolutionHeight() - (GLint)Input.getMouseY(),
+				GLubyte *data = _fbo_colorpicker->readPixels(
+					0,
+					Input.getMouseX(),
+					Window.GetResolutionHeight() - Input.getMouseY(),
 					1,
-					1,
-					(GLenum)Format_Type::RGBA,
-					(GLenum)Data_Type::UNSIGNED_BYTE,
-					data
+					1
 				);
-				//	std::cout <<
-				//		(unsigned int)data[0] << ' ' <<
-				//		(unsigned int)data[1] << ' ' <<
-				//		(unsigned int)data[2] << ' ' <<
-				//		(unsigned int)data[3] << ' ' <<
-				//		std::endl;
+
+				std::cout <<
+				(unsigned int)data[0] << ' ' <<
+				(unsigned int)data[1] << ' ' <<
+				(unsigned int)data[2] << ' ' <<
+				(unsigned int)data[3] << ' ' <<
+				std::endl;
 
 				unsigned int EntityIndex;
 				Util::DataConversion::uchars_to_uint(data, EntityIndex);
 				EntityIndex--;
 
-
+				// Found an entity
 				if (EntityIndex < EntityCount)
 				{
 					if (Input.getKey(KeyCode::LEFT_CONTROL))
@@ -677,7 +671,7 @@ namespace Vxl
 				//if ()
 				//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
 
-				delete data;
+				delete[] data;
 			}
 		}
 		// ~~ //

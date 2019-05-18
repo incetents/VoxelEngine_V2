@@ -96,6 +96,10 @@ namespace Vxl
 		bool Compare(const Vector2&) const;
 		static bool Compare(const Vector2&, const Vector2&);
 
+		// Compare (0.01 precision)
+		inline bool CompareFuzzy(const Vector2&) const;
+		static bool CompareFuzzy(const Vector2&, const Vector2&);
+
 		// Normalize Self
 		Vector2& NormalizeSelf();
 		// Normalize

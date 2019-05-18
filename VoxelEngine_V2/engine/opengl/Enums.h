@@ -206,7 +206,7 @@ namespace Vxl
 		MIRROR_REPEAT = GL_MIRRORED_REPEAT,
 		MIRROR_CLAMP = GL_MIRROR_CLAMP_TO_EDGE
 	};
-	enum class Filter_Min
+	enum class Min_Filter
 	{
 		NONE = -1, // Error (Used for placeholder)
 
@@ -217,7 +217,7 @@ namespace Vxl
 		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
 		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR
 	};
-	enum class Filter_Mag
+	enum class Mag_Filter
 	{
 		NONE = -1, // Error (Used for placeholder)
 

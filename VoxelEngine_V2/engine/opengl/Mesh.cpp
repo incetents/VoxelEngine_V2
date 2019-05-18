@@ -179,7 +179,8 @@ namespace Vxl
 
 	void Mesh::GenerateNormals(
 		Vector3* _vertices, GLuint _vertCount,
-		GLuint* _indices, GLuint _indexCount
+		GLuint* _indices, GLuint _indexCount,
+		bool smooth
 	){
 		if (_vertices == nullptr || _vertCount == 0)
 		{
@@ -211,10 +212,55 @@ namespace Vxl
 					_vertices[_indices[i + 2]].y,
 					_vertices[_indices[i + 2]].z
 				);
-				Vector3 N = Vector3::Cross((P2 - P1), (P3 - P1));
+				Vector3 N = Vector3::Cross((P2 - P1), (P3 - P1)).Normalize();
 				Normals[_indices[i + 0]] += N;
 				Normals[_indices[i + 1]] += N;
 				Normals[_indices[i + 2]] += N;
+
+			}
+			if (smooth)
+			{
+				for (GLuint i = 0; i < _indexCount; i ++)
+				{
+					std::vector<Vector3> neighbors;
+
+					Vector3 P(
+						_vertices[_indices[i]].x,
+						_vertices[_indices[i]].y,
+						_vertices[_indices[i]].z
+					);
+
+					for (GLuint j = 0; j < _indexCount; j++)
+					{
+						if (i == j)
+							continue;
+
+						Vector3 Q(
+							_vertices[_indices[j]].x,
+							_vertices[_indices[j]].y,
+							_vertices[_indices[j]].z
+						);
+
+						if (Vector3::Distance(P, Q) < 0.01f)
+						{
+							neighbors.push_back(Normals[_indices[j]]);
+						}
+					}
+
+					// No smoothing occurs
+					if (neighbors.size() == 1)
+						continue;
+
+					// Smooth vertices in similar space
+					float neighborCount = (float)neighbors.size();
+
+					Normals[_indices[i]] /= neighborCount;
+					for (auto& n : neighbors)
+						Normals[_indices[i]] += (n / neighborCount);
+
+					if (isinf(Normals[_indices[i]].x))
+						assert(false);
+				}
 			}
 		}
 		// Position Normals
@@ -239,10 +285,74 @@ namespace Vxl
 					_vertices[i + 2].y,
 					_vertices[i + 2].z
 				);
-				Vector3 N = Vector3::Cross((P2 - P1), (P3 - P1));
+				Vector3 N = Vector3::Cross((P2 - P1), (P3 - P1)).Normalize();
 				Normals[i + 0] += N;
 				Normals[i + 1] += N;
 				Normals[i + 2] += N;
+			}
+			if (smooth)
+			{
+				std::vector<Vector3> WNormals;
+				WNormals.reserve(_vertCount);
+				WNormals.resize(_vertCount);
+
+				for (GLuint i = 0; i < _vertCount; i++)
+				{
+					WNormals[i] = Normals[i];
+
+					std::vector<Vector3> neighbors;
+
+					Vector3 P(
+						_vertices[i].x,
+						_vertices[i].y,
+						_vertices[i].z
+					);
+
+					for (GLuint j = 0; j < _vertCount; j++)
+					{
+						if (i == j)
+							continue;
+
+						Vector3 Q(
+							_vertices[j].x,
+							_vertices[j].y,
+							_vertices[j].z
+						);
+
+						if (Vector3::Distance(P, Q) < 0.01f)
+						{
+							WNormals[i] += Normals[j];
+							//neighbors.push_back(Normals[j]);
+						}
+					}
+					//	
+					//	// No smoothing occurs
+					//	if (neighbors.size() == 1)
+					//		continue;
+					//	
+					//	// Smooth vertices in similar space
+					//	float neighborCount = (float)neighbors.size() + 1;
+					//	
+					//	//Normals[i] /= neighborCount;
+					//	for (auto& n : neighbors)
+					//		Normals[i] += n;// / neighborCount;
+					//	
+					//	Normals[i] /= neighborCount;
+					//	
+					//	//Normals[i] /= (neighborCount + 1);
+					//	//Normals[i].NormalizeSelf();
+					//	
+					//	if (isinf(Normals[i].x))
+					//	{
+					//		float a = 10.0f;
+					//	}
+						//assert(false);
+				}
+
+				for (GLuint i = 0; i < _vertCount; i++)
+				{
+					Normals[i] = WNormals[i];
+				}
 			}
 		}
 		// Normalize the normals
@@ -250,6 +360,8 @@ namespace Vxl
 		{
 			Normals[i].NormalizeSelf();
 		}
+
+
 		//
 		m_normals.set(Normals);
 	}
@@ -393,6 +505,32 @@ namespace Vxl
 		m_bitangents.set(Bitangents);
 	}
 
+	void Mesh::GenerateNormals(bool Smooth)
+	{
+		// Generate Missing Normals
+		if (m_normals.Empty() && !m_positions.Empty())
+		{
+			Vector3* test = m_positions.vertices->data();
+			GenerateNormals(
+				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
+				m_indices.indices.data(), (GLuint)m_indices.indices.size(),
+				Smooth
+			);
+		}
+	}
+	void Mesh::GenerateTangents()
+	{
+		// Generate Missing Tangents
+		if ((m_tangents.Empty() || m_bitangents.Empty()) && !m_positions.Empty() && !m_uvs.Empty())
+		{
+			GenerateTangents(
+				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
+				m_uvs.vertices->data(), (GLuint)m_uvs.vertices->size(),
+				m_indices.indices.data(), (GLuint)m_indices.indices.size()
+			);
+		}
+	}
+
 	void Mesh::Bind(Draw_Type type)
 	{
 		m_type = type;
@@ -417,25 +555,6 @@ namespace Vxl
 				assert(posCount % 2 == 0);
 		}
 #endif
-
-		// Generate Missing Normals
-		if (m_normals.Empty() && !m_positions.Empty())
-		{
-			Vector3* test = m_positions.vertices->data();
-			GenerateNormals(
-				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
-				m_indices.indices.data(), (GLuint)m_indices.indices.size()
-			);
-		}
-		// Generate Missing Tangents
-		if ((m_tangents.Empty() || m_bitangents.Empty()) && !m_positions.Empty() && !m_uvs.Empty())
-		{
-			GenerateTangents(
-				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
-				m_uvs.vertices->data(), (GLuint)m_uvs.vertices->size(),
-				m_indices.indices.data(), (GLuint)m_indices.indices.size()
-			);
-		}
 
 		/*	Bind Data	*/
 		glUtil::bindVAO(m_VAO);

@@ -246,6 +246,19 @@ namespace Vxl
 
 		void UpdateDrawInfo();
 
+		// Fills m_normals Based on existing positions and/or indices
+		void GenerateNormals(
+			Vector3* _vertices, GLuint _vertCount,
+			GLuint* _indices = nullptr, GLuint _indexCount = 0,
+			bool smooth = false
+		);
+		// Fills m_tangents and m_bitangents based on existing positions/uvs/indices
+		void GenerateTangents(
+			Vector3* _vertices, GLuint _vertCount,
+			Vector2* _uvs, GLuint _UVCount,
+			GLuint* _indices = nullptr, GLuint _indexCount = 0
+		);
+
 		Mesh(const std::string& glName = "");
 	public:
 		// Stores Mesh in Database optionally
@@ -264,18 +277,6 @@ namespace Vxl
 
 		// Update all data from model
 		void Set(Model* _model);
-
-		// Fills m_normals Based on existing positions and/or indices
-		void GenerateNormals(
-			Vector3* _vertices, GLuint _vertCount,
-			GLuint* _indices = nullptr, GLuint _indexCount = 0
-		);
-		// Fills m_tangents and m_bitangents based on existing positions/uvs/indices
-		void GenerateTangents(
-			Vector3* _vertices, GLuint _vertCount,
-			Vector2* _uvs, GLuint _UVCount,
-			GLuint* _indices = nullptr, GLuint _indexCount = 0
-		);
 
 		inline GLuint		GetDrawCount(void) const
 		{
@@ -298,6 +299,8 @@ namespace Vxl
 			return m_max;
 		}
 
+		void GenerateNormals(bool Smooth);
+		void GenerateTangents();
 		void Bind(Draw_Type type = Draw_Type::TRIANGLES);
 		void RecalculateMinMax();
 

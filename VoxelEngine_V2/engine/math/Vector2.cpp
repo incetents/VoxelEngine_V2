@@ -102,9 +102,7 @@ namespace Vxl
 	// Switch X and Y values
 	Vector2& Vector2::Flip()
 	{
-		float t = x;
-		x = y;
-		y = t;
+		std::swap(x, y);
 		return *this;
 	}
 	Vector2 Vector2::GetFlip()
@@ -143,6 +141,22 @@ namespace Vxl
 	bool Vector2::Compare(const Vector2& v1, const Vector2& v2)
 	{
 		return v1.Compare(v2);
+	}
+
+	// Compare Fuzzy
+	bool Vector2::CompareFuzzy(const Vector2& v) const
+	{
+		if (fabs(x - v.x) > 0.01f)
+			return false;
+
+		else if (fabs(y - v.y) > 0.01f)
+			return false;
+
+		return true;
+	}
+	bool Vector2::CompareFuzzy(const Vector2& v1, const Vector2& v2)
+	{
+		return v1.CompareFuzzy(v2);
 	}
 
 	// Normalize Self (Returns Length)

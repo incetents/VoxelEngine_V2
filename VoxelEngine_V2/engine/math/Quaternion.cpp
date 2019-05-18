@@ -108,19 +108,19 @@ namespace Vxl
 		// x-axis
 		float sinr = +2.0f * (q.w * q.x + q.y * q.z);
 		float cosr = +1.0f - 2.0f * (q.x * q.x + q.y * q.y);
-		roll = atan2f(sinr, cosr);
+		pitch = atan2f(sinr, cosr);
 
 		// y-axis
 		float sinp = +2.0f * (q.w * q.y - q.z * q.x);
 		if (fabs(sinp) >= 1)
-			pitch = copysignf(PI / 2, sinp); // use 90 degrees if out of range
+			yaw = copysignf(PI / 2, sinp); // use 90 degrees if out of range
 		else
-			pitch = asinf(sinp);
+			yaw = asinf(sinp);
 
 		// z-axis
 		float siny = +2.0f * (q.w * q.z + q.x * q.y);
 		float cosy = +1.0f - 2.0f * (q.y * q.y + q.z * q.z);
-		yaw = atan2f(siny, cosy);
+		roll = atan2f(siny, cosy);
 	}
 
 	// Get Matrix

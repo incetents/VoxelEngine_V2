@@ -68,8 +68,8 @@ namespace Vxl
 		void addTexture(
 			const std::string& name,
 			Wrap_Mode WrapMode			= Wrap_Mode::CLAMP_STRETCH,
-			Filter_Min MinFilter		= Filter_Min::NEAREST,
-			Filter_Mag MagFilter		= Filter_Mag::NEAREST,
+			Min_Filter MinFilter		= Min_Filter::NEAREST,
+			Mag_Filter MagFilter		= Mag_Filter::NEAREST,
 			Format_Type FormatType		= Format_Type::RGBA,
 			Channel_Type ChannelType	= Channel_Type::RGBA,
 			Data_Type DataType			= Data_Type::UNSIGNED_BYTE
@@ -82,5 +82,8 @@ namespace Vxl
 
 		void bindTexture(int index, Active_Texture layer);
 		void bindDepth(Active_Texture layer);
+
+		GLubyte* readPixels(u_int textureIndex, int x, int y, int w, int h);
+
 	};
 }

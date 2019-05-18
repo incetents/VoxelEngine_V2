@@ -32,5 +32,5 @@ namespace Vxl
 		// Behaviour
 		void Draw();
 
-	} SingletonInstance(Hierarchy);;
+	} SingletonInstance(Hierarchy);
 }

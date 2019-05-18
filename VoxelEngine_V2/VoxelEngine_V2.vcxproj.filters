@@ -165,22 +165,7 @@
     <ClCompile Include="imgui\imgui_colors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\window\Hierarchy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\window\Inspector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\window\ShaderErrors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\window\DevConsole.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\utilities\Time.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\window\Performance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\objects\LightObject.cpp">
@@ -190,6 +175,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\objects\CameraObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editor\Inspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editor\Performance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editor\ShaderErrors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editor\Hierarchy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editor\DevConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -371,25 +371,10 @@
     <ClInclude Include="imgui\imgui_colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\window\ShaderErrors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\window\Hierarchy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\window\Inspector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\window\DevConsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\utilities\GlobalMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Asset.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\window\Performance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\objects\LightObject.h">
@@ -399,6 +384,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\objects\CameraObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editor\Inspector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editor\Performance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editor\ShaderErrors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editor\Hierarchy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editor\DevConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

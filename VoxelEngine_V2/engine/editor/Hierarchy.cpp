@@ -39,7 +39,7 @@ namespace Vxl
 			else
 			{
 				Color3F c = _entity->GetLabelColor();
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b,1));
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b, 1));
 			}
 
 			// Node + Name
@@ -240,7 +240,7 @@ namespace Vxl
 							if (AllEntities[i] == m_selectedEntities[0])
 							{
 								ClearSelection();
-								AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i -1]);
+								AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i - 1]);
 								break;
 							}
 						}

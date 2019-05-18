@@ -6,6 +6,7 @@ in fragment_data
 {
 	vec3 pos;
 	vec2 uv;
+	vec3 normal;
 	
 } f_data;
 

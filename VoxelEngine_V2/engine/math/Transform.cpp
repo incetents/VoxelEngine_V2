@@ -45,7 +45,7 @@ namespace Vxl
 			m_lossyScale.y = Vector3::Length(m_ModelMatrix[4], m_ModelMatrix[5], m_ModelMatrix[6]);
 			m_lossyScale.z = Vector3::Length(m_ModelMatrix[8], m_ModelMatrix[9], m_ModelMatrix[10]);
 
-
+			// Clean
 			isDirty = false;
 
 			// Call entity about change in transform class
@@ -90,5 +90,50 @@ namespace Vxl
 			m_parent->SimpleRemoveChild(this);
 			m_parent->m_owner->TransformChanged();
 		}
+	}
+
+	Transform& Transform::setForward(const Vector3& forward)
+	{
+		float lengthSqr = forward.LengthSqr();
+		if (lengthSqr < FLT_EPSILON)
+			return *this;
+
+		Vector3 Nforward = forward / sqrt(lengthSqr);
+
+		if (Nforward.CompareFuzzy(Vector3::UP))
+		{
+			m_euler_rotation.x = 90;
+			m_euler_rotation.y = 0;
+			m_euler_rotation.z = 0; // This should never change
+			return *this;
+		}
+		else if (Nforward.CompareFuzzy(Vector3::DOWN))
+		{
+			m_euler_rotation.x = -90;
+			m_euler_rotation.y = 0;
+			m_euler_rotation.z = 0; // This should never change
+			return *this;
+		}
+
+		Degrees yaw = Vector3::GetAngleDegrees(Vector3::FORWARD, Nforward.NormalizeXZ());
+		if (Nforward.x > 0)
+			yaw = -yaw;
+		Degrees pitch = Vector3::GetAngleDegrees(Vector3::UP, Nforward);
+
+		m_euler_rotation = Vector3(-pitch.Get() + 90.0f, yaw.Get(), 0);
+
+		SetDirty();
+		return *this;
+	}
+
+	Transform& Transform::setRotation(const Quaternion& quat)
+	{
+		Degrees pitch, yaw, roll;
+		Quaternion::ToEuler(quat, roll, pitch, yaw);
+
+		m_euler_rotation = Vector3(pitch.Get(), yaw.Get(), roll.Get());
+
+		SetDirty();
+		return *this;
 	}
 }

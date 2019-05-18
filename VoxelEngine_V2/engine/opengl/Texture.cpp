@@ -68,8 +68,8 @@ namespace Vxl
 	BaseTexture::BaseTexture(
 		Texture_Type Type,
 		Wrap_Mode WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Min_Filter MinFilter,
+		Mag_Filter MagFilter,
 		Format_Type FormatType,
 		Channel_Type ChannelType,
 		Data_Type DataType
@@ -83,6 +83,8 @@ namespace Vxl
 		m_dataType(DataType)
 	{
 		glGenTextures(1, &m_id);
+
+		m_channels = (glUtil::getFormatCount(ChannelType));
 
 		updateParameters();
 	}
@@ -133,7 +135,7 @@ namespace Vxl
 
 		updateParameters();
 	}
-	void BaseTexture::setFilterMode(Filter_Min Min, Filter_Mag Mag)
+	void BaseTexture::setFilterMode(Min_Filter Min, Mag_Filter Mag)
 	{
 		m_minFilter = Min;
 		m_magFilter = Mag;
@@ -152,8 +154,8 @@ namespace Vxl
 	RenderTexture::RenderTexture(
 		int Width, int Height,
 		Wrap_Mode WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Min_Filter MinFilter,
+		Mag_Filter MagFilter,
 		Format_Type FormatType,
 		Channel_Type ChannelType,
 		Data_Type DataType
@@ -174,8 +176,8 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min		MinFilter,
-		Filter_Mag		MagFilter,
+		Min_Filter		MinFilter,
+		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	)
@@ -215,8 +217,8 @@ namespace Vxl
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min		MinFilter,
-		Filter_Mag		MagFilter,
+		Min_Filter		MinFilter,
+		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	) 
@@ -259,8 +261,8 @@ namespace Vxl
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min		MinFilter,
-		Filter_Mag		MagFilter,
+		Min_Filter		MinFilter,
+		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	) {
@@ -284,8 +286,8 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min		MinFilter,
-		Filter_Mag		MagFilter,
+		Min_Filter		MinFilter,
+		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	) {
@@ -319,8 +321,8 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Min_Filter MinFilter,
+		Mag_Filter MagFilter,
 		Format_Type		FormatType,
 		Data_Type		DataType
 	) 
@@ -373,8 +375,8 @@ namespace Vxl
 		bool InvertY,
 		bool UseMipMapping,
 		Wrap_Mode WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Min_Filter MinFilter,
+		Mag_Filter MagFilter,
 		Format_Type	FormatType,
 		Data_Type DataType
 	) {

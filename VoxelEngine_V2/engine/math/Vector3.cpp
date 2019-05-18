@@ -388,6 +388,23 @@ namespace Vxl
 		return Vector4(x, y, z, 0);
 	}
 
+	// Swap Values
+	Vector3& Vector3::SwapXY()
+	{
+		std::swap(x, y);
+		return *this;
+	}
+	Vector3& Vector3::SwapXZ()
+	{
+		std::swap(x, z);
+		return *this;
+	}
+	Vector3& Vector3::SwapYZ()
+	{
+		std::swap(y, z);
+		return *this;
+	}
+
 	// Inverse
 	Vector3 Vector3::Inverse() const
 	{
@@ -420,6 +437,7 @@ namespace Vxl
 	{
 		return v1.Compare(v2);
 	}
+
 	// Compare Fuzzy
 	bool Vector3::CompareFuzzy(const Vector3& v) const
 	{
@@ -517,11 +535,11 @@ namespace Vxl
 	// Distance
 	float Vector3::Distance(const Vector3& v)
 	{
-		return Length(*this - v);
+		return Magnitude(*this - v);
 	}
 	float Vector3::Distance(const Vector3& v1, const Vector3& v2)
 	{
-		return Length(v1 - v2);
+		return Magnitude(v1 - v2);
 	}
 
 	// Dot Product

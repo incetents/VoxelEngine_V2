@@ -278,6 +278,30 @@ namespace Vxl
 			return Channel_Type::RGBA;
 		}
 	}
+	unsigned int glUtil::getFormatCount(Channel_Type type)
+	{
+		switch (type)
+		{
+		case Channel_Type::NONE:
+			return 0;
+		case Channel_Type::R:
+		case Channel_Type::DEPTH:
+		case Channel_Type::STENCIL:
+			return 1;
+		case Channel_Type::RG:
+		case Channel_Type::DEPTH_STENCIL:
+			return 2;
+		case Channel_Type::RGB:
+		case Channel_Type::BGR:
+			return 3;
+		case Channel_Type::RGBA:
+		case Channel_Type::BGRA:
+			return 4;
+		}
+
+		assert(false);
+		return 0;
+	}
 
 	void glUtil::clearColor(float r, float g, float b, float a)
 	{

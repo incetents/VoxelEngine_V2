@@ -60,7 +60,7 @@ namespace Vxl
 				// Name
 				static char Name[MAX_ENTITY_NAME_LENGTH];
 				strcpy_s(Name, Entity->GetName().c_str());
-				
+
 				ImGui::Text("Name: "); ImGui::SameLine();
 
 				ImGui::PushItemWidth(-1);
@@ -69,7 +69,7 @@ namespace Vxl
 
 				// Color
 				float EntityColor[3] = { Entity->GetLabelColor().r, Entity->GetLabelColor().g, Entity->GetLabelColor().b };
-				
+
 				if (ImGui::ColorEdit3("Label Color: ", EntityColor, ImGuiColorEditFlags_NoInputs))
 				{
 					Entity->SetLabelColor(Color3F(EntityColor[0], EntityColor[1], EntityColor[2]));
@@ -105,9 +105,10 @@ namespace Vxl
 					float s[3] = { Entity->m_transform.getScale().x, Entity->m_transform.getScale().y, Entity->m_transform.getScale().z };
 
 					float pw[3] = { Entity->m_transform.getWorldPosition().x, Entity->m_transform.getWorldPosition().y, Entity->m_transform.getWorldPosition().z };
+					float rw[3] = { Entity->m_transform.getForward().x, Entity->m_transform.getForward().y, Entity->m_transform.getForward().z };
 					float sw[3] = { Entity->m_transform.getWorldScale().x, Entity->m_transform.getWorldScale().y, Entity->m_transform.getWorldScale().z };
 
-
+					
 					ImGui::PushItemWidth(-1);
 
 					ImGui::TextColored(ImGuiColor::Orange, Entity->m_useTransform ? "Local:" : "Local: [LOCKED]");
@@ -121,7 +122,7 @@ namespace Vxl
 						Entity->m_transform.setPosition(p[0], p[1], p[2]);
 
 					// NO LOCAL EFFECT
-					if(Entity->GetType() == EntityType::LIGHT)
+					if (Entity->GetType() == EntityType::LIGHT)
 						ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
 
 					ImGui::Text("Rotation:"); ImGui::SameLine();
@@ -151,11 +152,13 @@ namespace Vxl
 
 					ImGui::Separator();
 
+					// World Read Only //
 					ImGui::TextColored(ImGuiColor::Orange, "World: [READ ONLY]");
-					
+
 					DisableStart();
-					ImGui::Text("World Position:"); ImGui::SameLine(); ImGui::DragFloat3("PositionW", pw, DragSpeed);
-					ImGui::Text("World Scale:   "); ImGui::SameLine(); ImGui::DragFloat3("ScaleW", sw, DragSpeed);
+					ImGui::Text("Position:"); ImGui::SameLine(); ImGui::DragFloat3("PositionW", pw, DragSpeed);
+					ImGui::Text("Forward: "); ImGui::SameLine(); ImGui::DragFloat3("RotationW", rw, DragSpeed);
+					ImGui::Text("Scale:   "); ImGui::SameLine(); ImGui::DragFloat3("ScaleW", sw, DragSpeed);
 					DisableEnd();
 
 					ImGui::PopItemWidth();

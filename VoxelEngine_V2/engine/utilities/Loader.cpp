@@ -68,31 +68,31 @@ namespace Vxl
 		else
 			return Wrap_Mode::NONE;
 	}
-	Filter_Mag Loader::DecipherFilterModeMag(const std::string& str)
+	Mag_Filter Loader::DecipherFilterModeMag(const std::string& str)
 	{
 		if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
-			return Filter_Mag::NEAREST;
+			return Mag_Filter::NEAREST;
 		else if (str.compare(TAG_FILTERMODE_LINEAR) == 0)
-			return Filter_Mag::LINEAR;
+			return Mag_Filter::LINEAR;
 		else
-			return Filter_Mag::NONE;
+			return Mag_Filter::NONE;
 	}
-	Filter_Min Loader::DecipherFilterModeMin(const std::string& str)
+	Min_Filter Loader::DecipherFilterModeMin(const std::string& str)
 	{
 		if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
-			return Filter_Min::NEAREST;
+			return Min_Filter::NEAREST;
 		else if (str.compare(TAG_FILTERMODE_LINEAR) == 0)
-			return Filter_Min::LINEAR;
+			return Min_Filter::LINEAR;
 		else if (str.compare(TAG_FILTERMODE_NEAREST_NEAREST) == 0)
-			return Filter_Min::NEAREST_MIPMAP_NEAREST;
+			return Min_Filter::NEAREST_MIPMAP_NEAREST;
 		else if (str.compare(TAG_FILTERMODE_LINEAR_NEAREST) == 0)
-			return Filter_Min::LINEAR_MIPMAP_NEAREST;
+			return Min_Filter::LINEAR_MIPMAP_NEAREST;
 		else if (str.compare(TAG_FILTERMODE_NEAREST_LINEAR) == 0)
-			return Filter_Min::NEAREST_MIPMAP_LINEAR;
+			return Min_Filter::NEAREST_MIPMAP_LINEAR;
 		else if (str.compare(TAG_FILTERMODE_LINEAR_LINEAR) == 0)
-			return Filter_Min::LINEAR_MIPMAP_LINEAR;
+			return Min_Filter::LINEAR_MIPMAP_LINEAR;
 		else
-			return Filter_Min::NONE;
+			return Min_Filter::NONE;
 	}
 	ShaderType Loader::DeciperShaderType(const std::string& str)
 	{
@@ -201,8 +201,8 @@ namespace Vxl
 					auto Name = Segments[0];
 					auto filePath = Segments[1];
 					Wrap_Mode WM = Wrap_Mode::REPEAT;
-					Filter_Min FMIN = Filter_Min::LINEAR;
-					Filter_Mag FMAG = Filter_Mag::LINEAR;
+					Min_Filter FMIN = Min_Filter::LINEAR;
+					Mag_Filter FMAG = Mag_Filter::LINEAR;
 					bool FlipY = true;
 					bool MipMap = true;
 

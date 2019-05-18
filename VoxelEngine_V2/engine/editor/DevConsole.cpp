@@ -28,7 +28,6 @@
 
 namespace Vxl
 {
-
 	void DevConsole::Draw_Master(Scene* scene)
 	{
 		Scene_Game* Game = dynamic_cast<Scene_Game*>(scene);
@@ -44,7 +43,7 @@ namespace Vxl
 
 		std::string m1 = "GPU TOTAL: " + std::to_string(glUtil::GetGPUMem_TotalKB() / 1000) + " [MB]";
 		ImGui::Text(m1.c_str());
-		
+
 		std::string m2 = "GPU Current: " + std::to_string(glUtil::GetGPUMem_CurrentKB() / 1000) + " [MB]";
 		ImGui::Text(m2.c_str());
 
@@ -87,10 +86,10 @@ namespace Vxl
 
 				if (ImGui::SliderFloat("FOV", &cameraFOV, 60.0f, 180.0f))
 					Game->_cameraObject->SetPerspective(cameraFOV, Game->_cameraObject->getAspect());
-				
+
 				if (ImGui::SliderFloat("ZNEAR", &cameraZNear, 0.01f, 5.0f))
 					Game->_cameraObject->SetZNear(cameraZNear);
-				
+
 				if (ImGui::SliderFloat("ZFAR", &cameraZFar, 1.0f, 50.0f))
 					Game->_cameraObject->SetZFar(cameraZFar);
 

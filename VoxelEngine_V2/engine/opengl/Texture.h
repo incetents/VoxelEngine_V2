@@ -26,8 +26,8 @@ namespace Vxl
 		int			 m_channels;
 		Texture_Type m_type;
 		Wrap_Mode	 m_wrapMode;
-		Filter_Min  m_minFilter;
-		Filter_Mag  m_magFilter;
+		Min_Filter  m_minFilter;
+		Mag_Filter  m_magFilter;
 		Format_Type  m_formatType;
 		Channel_Type m_channelType;
 		Data_Type	 m_dataType;
@@ -46,8 +46,8 @@ namespace Vxl
 		BaseTexture(
 			Texture_Type Type,
 			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
-			Filter_Min MinFilter = Filter_Min::LINEAR,
-			Filter_Mag MagFilter = Filter_Mag::LINEAR,
+			Min_Filter MinFilter = Min_Filter::LINEAR,
+			Mag_Filter MagFilter = Mag_Filter::LINEAR,
 			Format_Type FormatType = Format_Type::RGBA,
 			Channel_Type ChannelType = Channel_Type::RGBA,
 			Data_Type DataType = Data_Type::UNSIGNED_BYTE
@@ -59,7 +59,7 @@ namespace Vxl
 		void Unbind() const;
 
 		void setWrapMode(Wrap_Mode W);
-		void setFilterMode(Filter_Min Min, Filter_Mag Mag);
+		void setFilterMode(Min_Filter Min, Mag_Filter Mag);
 		// only works if min filter is [clamp to border]
 		void setBorderColor(Color4F color);
 
@@ -91,11 +91,11 @@ namespace Vxl
 		{
 			return m_wrapMode;
 		}
-		inline Filter_Min GetFilterModeMin(void) const
+		inline Min_Filter GetFilterModeMin(void) const
 		{
 			return m_minFilter;
 		}
-		inline Filter_Mag GetFilterModeMag(void) const
+		inline Mag_Filter GetFilterModeMag(void) const
 		{
 			return m_magFilter;
 		}
@@ -129,8 +129,8 @@ namespace Vxl
 		RenderTexture(
 			int Width, int Height,
 			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
-			Filter_Min MinFilter = Filter_Min::LINEAR,
-			Filter_Mag MagFilter = Filter_Mag::LINEAR,
+			Min_Filter MinFilter = Min_Filter::LINEAR,
+			Mag_Filter MagFilter = Mag_Filter::LINEAR,
 			Format_Type FormatType = Format_Type::RGBA,
 			Channel_Type ChannelType = Channel_Type::RGBA,
 			Data_Type DataType = Data_Type::UNSIGNED_BYTE
@@ -150,8 +150,8 @@ namespace Vxl
 			bool			InvertY = true,
 			bool			UseMipMapping = true,
 			Wrap_Mode		WrapMode = Wrap_Mode::REPEAT,
-			Filter_Min		MinFilter = Filter_Min::LINEAR,
-			Filter_Mag		MagFilter = Filter_Mag::LINEAR,
+			Min_Filter		MinFilter = Min_Filter::LINEAR,
+			Mag_Filter		MagFilter = Mag_Filter::LINEAR,
 			Format_Type		FormatType = Format_Type::RGBA,
 			Data_Type		DataType = Data_Type::UNSIGNED_BYTE
 		);
@@ -161,8 +161,8 @@ namespace Vxl
 			std::vector<Color3F> pixels, UINT width,
 			bool			UseMipMapping = true,
 			Wrap_Mode		WrapMode = Wrap_Mode::REPEAT,
-			Filter_Min		MinFilter = Filter_Min::LINEAR,
-			Filter_Mag		MagFilter = Filter_Mag::LINEAR,
+			Min_Filter		MinFilter = Min_Filter::LINEAR,
+			Mag_Filter		MagFilter = Mag_Filter::LINEAR,
 			Format_Type		FormatType = Format_Type::RGBA,
 			Data_Type		DataType = Data_Type::UNSIGNED_BYTE
 		);
@@ -174,8 +174,8 @@ namespace Vxl
 			std::vector<Color3F> pixels, UINT width,
 			bool			UseMipMapping = true,
 			Wrap_Mode		WrapMode = Wrap_Mode::REPEAT,
-			Filter_Min		MinFilter = Filter_Min::LINEAR,
-			Filter_Mag		MagFilter = Filter_Mag::LINEAR,
+			Min_Filter		MinFilter = Min_Filter::LINEAR,
+			Mag_Filter		MagFilter = Mag_Filter::LINEAR,
 			Format_Type		FormatType = Format_Type::RGBA,
 			Data_Type		DataType = Data_Type::UNSIGNED_BYTE
 		);
@@ -186,8 +186,8 @@ namespace Vxl
 			bool			InvertY,
 			bool			UseMipMapping,
 			Wrap_Mode		WrapMode,
-			Filter_Min		MinFilter,
-			Filter_Mag		MagFilter,
+			Min_Filter		MinFilter,
+			Mag_Filter		MagFilter,
 			Format_Type		FormatType,
 			Data_Type		DataType
 		);
@@ -219,8 +219,8 @@ namespace Vxl
 			bool			InvertY = true,
 			bool			UseMipMapping = true,
 			Wrap_Mode		WrapMode = Wrap_Mode::REPEAT,
-			Filter_Min MinFilter = Filter_Min::LINEAR,
-			Filter_Mag MagFilter = Filter_Mag::LINEAR,
+			Min_Filter MinFilter = Min_Filter::LINEAR,
+			Mag_Filter MagFilter = Mag_Filter::LINEAR,
 			Format_Type		FormatType = Format_Type::RGBA,
 			Data_Type		DataType = Data_Type::UNSIGNED_BYTE
 		);
@@ -233,8 +233,8 @@ namespace Vxl
 			bool InvertY = false,
 			bool UseMipMapping = true,
 			Wrap_Mode WrapMode = Wrap_Mode::CLAMP_STRETCH,
-			Filter_Min MinFilter = Filter_Min::LINEAR,
-			Filter_Mag MagFilter = Filter_Mag::LINEAR,
+			Min_Filter MinFilter = Min_Filter::LINEAR,
+			Mag_Filter MagFilter = Mag_Filter::LINEAR,
 			Format_Type		FormatType = Format_Type::RGBA,
 			Data_Type		DataType = Data_Type::UNSIGNED_BYTE
 		);

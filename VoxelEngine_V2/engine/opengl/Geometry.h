@@ -6,16 +6,32 @@
 
 namespace Vxl
 {
+	class Vector2;
+	class Vector3;
 	class Mesh;
 	enum class Axis;
 
 	static class Geometry : public Singleton<class Geometry>
 	{
 	private:
-		// Special Utility
-		Mesh* GenerateIcosahdron(std::string MeshName, unsigned int subdivisions, float scale = 1.0f);
-		Mesh* GenerateSphereUV(std::string MeshName, unsigned int xSlice, unsigned int ySlice);
-		Mesh* GenerateCylinder(std::string MeshName, Axis axis, u_int slices, float height, float radius_top, float radius_bot);
+		// Vertex Creation
+		void CreateCylinder(
+			std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
+			Axis axis, UINT slices, float height, float radius_top, float radius_bot,
+			const Vector3& offset
+		);
+		void CreateCone(
+			std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
+			Axis axis, UINT slices, float height, float radius,
+			const Vector3& offset
+		);
+
+		// Mesh Creation
+		Mesh* GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale = 1.0f);
+		Mesh* GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice);
+		Mesh* GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot);
+		Mesh* GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
+		Mesh* GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
 
 	private:
 		bool m_isSetup = false;
@@ -36,6 +52,9 @@ namespace Vxl
 		Mesh* m_cone_x = nullptr; //
 		Mesh* m_cone_y = nullptr; //
 		Mesh* m_cone_z = nullptr; //
+		Mesh* m_arrow_x = nullptr;
+		Mesh* m_arrow_y = nullptr;
+		Mesh* m_arrow_z = nullptr;
 
 		void CreateFullQuad();
 		void CreateFullTriangle();
@@ -49,6 +68,7 @@ namespace Vxl
 		void CreateSphereUV();
 		void CreateCylinders();
 		void CreateCones();
+		void CreateArrows();
 
 	public:
 		void Setup()
@@ -65,6 +85,7 @@ namespace Vxl
 			CreateSphereUV();
 			CreateCylinders();
 			CreateCones();
+			CreateArrows();
 		}
 
 		Mesh* GetFullQuad()
@@ -139,6 +160,18 @@ namespace Vxl
 		Mesh* GetConeZ()
 		{
 			return m_cone_z;
+		}
+		Mesh* GetArrowX()
+		{
+			return m_arrow_x;
+		}
+		Mesh* GetArrowY()
+		{
+			return m_arrow_y;
+		}
+		Mesh* GetArrowZ()
+		{
+			return m_arrow_z;
 		}
 
 	} SingletonInstance(Geometry);

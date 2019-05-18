@@ -458,9 +458,17 @@ namespace Vxl
 		M.OverrideScale(x, y, z);
 		return M;
 	}
-	Matrix4x4 Matrix4x4::GetScale(const Vector3& center)
+	Matrix4x4 Matrix4x4::GetScale(const Vector3& scale)
 	{
-		return GetScale(center.x, center.y, center.z);
+		return GetScale(scale.x, scale.y, scale.z);
+	}
+	// Become Scale and Translation Matrix
+	Matrix4x4 Matrix4x4::GetTranslateScale(const Vector3& center, const Vector3& scale)
+	{
+		Matrix4x4 M;
+		M.OverrideCenter(center);
+		M.OverrideScale(scale);
+		return M;
 	}
 
 	// Determinant

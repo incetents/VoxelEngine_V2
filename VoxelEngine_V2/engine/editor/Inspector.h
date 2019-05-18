@@ -13,5 +13,5 @@ namespace Vxl
 	public:
 		void Draw();
 
-	} SingletonInstance(Inspector);;
+	} SingletonInstance(Inspector);
 }

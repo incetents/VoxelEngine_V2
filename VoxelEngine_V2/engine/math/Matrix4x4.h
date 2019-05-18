@@ -83,7 +83,9 @@ namespace Vxl
 		// Become Scale Matrix
 		static Matrix4x4 GetScale(float all);
 		static Matrix4x4 GetScale(float x, float y, float z);
-		static Matrix4x4 GetScale(const Vector3& center);
+		static Matrix4x4 GetScale(const Vector3& scale);
+		// Become Scale and Translation Matrix
+		static Matrix4x4 GetTranslateScale(const Vector3& center, const Vector3& scale);
 
 		// Become Rotation Matrix (Degrees)
 		static	Matrix4x4 GetRotationX(const Degrees&, RotationDirection = RotationDirection(1));

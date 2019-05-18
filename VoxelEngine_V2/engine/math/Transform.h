@@ -307,9 +307,9 @@ namespace Vxl
 			SetDirty();
 			return *this;
 		}
-		inline Transform& setRotation(float x, float y, float z)
+		inline Transform& setRotation(float euler_x, float euler_y, float euler_z)
 		{
-			m_euler_rotation = Vector3(x, y, z);
+			m_euler_rotation = Vector3(euler_x, euler_y, euler_z);
 			SetDirty();
 			return *this;
 		}
@@ -397,36 +397,13 @@ namespace Vxl
 		}
 
 		// Special
-		virtual Transform& setForward(const Vector3& forward)
+		inline Transform& setCameraForward(const Vector3& forward)
 		{
-			Vector3 Nforward = forward.Normalize();
-
-			if (Nforward.CompareFuzzy(Vector3::UP))
-			{
-				m_euler_rotation.x = 90;
-				m_euler_rotation.y = 0;
-				m_euler_rotation.z = 0; // This should never change
-				return *this;
-			}
-			else if (Nforward.CompareFuzzy(Vector3::DOWN))
-			{
-				m_euler_rotation.x = -90;
-				m_euler_rotation.y = 0;
-				m_euler_rotation.z = 0; // This should never change
-				return *this;
-			}
-
-			Degrees yaw = -Vector3::GetAngleDegrees(Vector3::FORWARD, Nforward.NormalizeXZ());
-			if (Nforward.z < 0)
-				yaw = -yaw;
-			Degrees pitch = Vector3::GetAngleDegrees(Vector3::UP, Nforward);
-
-			m_euler_rotation = Vector3(pitch.Get() - 90.0f, yaw.Get(), 0);
-
-			SetDirty();
-
-			return *this;
+			return setForward(-forward);
 		}
+		Transform& setForward(const Vector3& forward);
+
+		Transform& setRotation(const Quaternion& quat);
 
 		// Increasers
 		inline Transform& increasePosition(float x, float y, float z)

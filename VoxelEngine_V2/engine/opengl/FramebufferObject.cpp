@@ -117,8 +117,8 @@ namespace Vxl
 	void FramebufferObject::addTexture(
 		const std::string& name,
 		Wrap_Mode WrapMode,
-		Filter_Min MinFilter,
-		Filter_Mag MagFilter,
+		Min_Filter MinFilter,
+		Mag_Filter MagFilter,
 		Format_Type FormatType,
 		Channel_Type ChannelType,
 		Data_Type DataType
@@ -148,7 +148,7 @@ namespace Vxl
 			delete m_depth;
 
 		// Save Texture
-		m_depth = new RenderTexture(m_size[0], m_size[1], Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST, Format_Type::DEPTH, Channel_Type::DEPTH, Data_Type::FLOAT);
+		m_depth = new RenderTexture(m_size[0], m_size[1], Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::DEPTH, Channel_Type::DEPTH, Data_Type::FLOAT);
 
 		// Name
 		glUtil::setGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
@@ -194,5 +194,21 @@ namespace Vxl
 
 		glActiveTexture((GLenum)layer);
 		m_depth->Bind();
+	}
+
+	GLubyte* FramebufferObject::readPixels(u_int textureIndex, int x, int y, int w, int h)
+	{
+		assert(textureIndex < m_textureCount);
+		auto Texture = m_textures[textureIndex];
+		
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + textureIndex);
+		GLubyte* data = new GLubyte[w * h * Texture->GetChannelCount()];
+		glReadPixels(
+			x, y, w, h,
+			(GLenum)Texture->GetFormatType(),
+			(GLenum)Data_Type::UNSIGNED_BYTE,
+			data
+		);
+		return data;
 	}
 }

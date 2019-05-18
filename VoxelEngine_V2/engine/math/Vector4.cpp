@@ -118,6 +118,38 @@ namespace Vxl
 		return Vector3(x, y, z);
 	}
 
+	// Swap Values
+	Vector4& Vector4::SwapXY()
+	{
+		std::swap(x, y);
+		return *this;
+	}
+	Vector4& Vector4::SwapXZ()
+	{
+		std::swap(x, z);
+		return *this;
+	}
+	Vector4& Vector4::SwapXW()
+	{
+		std::swap(x, w);
+		return *this;
+	}
+	Vector4& Vector4::SwapYZ()
+	{
+		std::swap(y, z);
+		return *this;
+	}
+	Vector4& Vector4::SwapYW()
+	{
+		std::swap(y, w);
+		return *this;
+	}
+	Vector4& Vector4::SwapZW()
+	{
+		std::swap(z, w);
+		return *this;
+	}
+
 	// Inverse
 	Vector4 Vector4::Inverse() const
 	{
@@ -153,6 +185,28 @@ namespace Vxl
 	bool Vector4::Compare(const Vector4& v1, const Vector4& v2)
 	{
 		return v1.Compare(v2);
+	}
+
+	// Compare Fuzzy
+	bool Vector4::CompareFuzzy(const Vector4& v) const
+	{
+		if (fabs(x - v.x) > 0.01f)
+			return false;
+
+		else if (fabs(y - v.y) > 0.01f)
+			return false;
+
+		else if (fabs(z - v.z) > 0.01f)
+			return false;
+
+		else if (fabs(w - v.w) > 0.01f)
+			return false;
+
+		return true;
+	}
+	bool Vector4::CompareFuzzy(const Vector4& v1, const Vector4& v2)
+	{
+		return v1.CompareFuzzy(v2);
 	}
 
 	// Normalize Self (Returns Length)

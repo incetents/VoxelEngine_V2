@@ -11,13 +11,184 @@
 
 namespace Vxl
 {
+	// Vertex Maker
+	void Geometry::CreateCylinder(
+		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
+		Axis axis, UINT slices, float height, float radius_top, float radius_bot,
+		const Vector3& offset
+	)
+	{
+		if (axis != Axis::Y)
+			std::swap(radius_top, radius_bot);
+
+		pos.clear();
+		uvs.clear();
+		pos.reserve(12 * slices);
+		uvs.reserve(12 * slices);
+
+		float uv_height_total = height + radius_bot + radius_top;
+		float uv_height_bot = (radius_bot / uv_height_total);
+		float uv_height_top = (height + radius_bot) / uv_height_total;
+
+		float half_height = height / 2;
+
+		for (unsigned int i = 0; i < slices; i++)
+		{
+			float t1 = TWO_PI * ((float)i / (float)slices);
+			float t2 = TWO_PI * ((float)(i + 1) / (float)slices);
+
+			float uvx1 = ((float)i / (float)slices);
+			float uvx2 = ((float)(i + 1) / (float)slices);
+
+			Vector2 c1 = Vector2(sinf(t1), cosf(t1));
+			Vector2 c2 = Vector2(sinf(t2), cosf(t2));
+
+			Vector3 p1 = Vector3(c1.x * radius_top, +half_height, c1.y * radius_top);
+			Vector3 p2 = Vector3(c2.x * radius_top, +half_height, c2.y * radius_top);
+			Vector3 p3 = Vector3(c1.x * radius_bot, -half_height, c1.y * radius_bot);
+			Vector3 p4 = Vector3(c2.x * radius_bot, -half_height, c2.y * radius_bot);
+
+			// Circle Top
+			pos.push_back(Vector3(0, half_height, 0));
+			pos.push_back(p1);
+			pos.push_back(p2);
+
+			uvs.push_back(Vector2(0.5f, 0.5f));
+			uvs.push_back(c1 * 0.5f + 0.5f);
+			uvs.push_back(c2 * 0.5f + 0.5f);
+
+			// Circle Bottom
+			pos.push_back(Vector3(0, -half_height, 0));
+			pos.push_back(p4);
+			pos.push_back(p3);
+
+			uvs.push_back(Vector2(0.5f, 0.5f));
+			uvs.push_back(c2 * 0.5f + 0.5f);
+			uvs.push_back(c1 * 0.5f + 0.5f);
+
+			// Side
+			pos.push_back(p1);
+			pos.push_back(p3);
+			pos.push_back(p2);
+
+			uvs.push_back(Vector2(uvx1, uv_height_top));
+			uvs.push_back(Vector2(uvx1, uv_height_bot));
+			uvs.push_back(Vector2(uvx2, uv_height_top));
+
+			pos.push_back(p2);
+			pos.push_back(p3);
+			pos.push_back(p4);
+
+			uvs.push_back(Vector2(uvx2, uv_height_top));
+			uvs.push_back(Vector2(uvx1, uv_height_bot));
+			uvs.push_back(Vector2(uvx2, uv_height_bot));
+		}
+
+		// Fix Axis
+		if (axis == Axis::X)
+		{
+			for (auto& p : pos)
+			{
+				p.SwapXY();
+				p.x = -p.x;
+				p += offset;
+			}
+		}
+		else if (axis == Axis::Z)
+		{
+			for (auto& p : pos)
+			{
+				p.SwapYZ();
+				p.z = -p.z;
+				p += offset;
+			}
+		}
+		else
+			for (auto& p : pos)
+				p += offset;
+	}
+	void Geometry::CreateCone(
+		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
+		Axis axis, UINT slices, float height, float radius,
+		const Vector3& offset
+	)
+	{
+		pos.clear();
+		uvs.clear();
+		pos.reserve(12 * slices);
+		uvs.reserve(12 * slices);
+
+		float half_height = height / 2;
+
+		for (unsigned int i = 0; i < slices; i++)
+		{
+			float t1 = TWO_PI * ((float)i / (float)slices);
+			float t2 = TWO_PI * ((float)(i + 1) / (float)slices);
+
+			float uvx1 = ((float)i / (float)slices);
+			float uvx2 = ((float)(i + 1) / (float)slices);
+
+			Vector2 c1 = Vector2(sinf(t1), cosf(t1));
+			Vector2 c2 = Vector2(sinf(t2), cosf(t2));
+
+
+			Vector3 p3 = Vector3(c1.x * radius, -half_height, c1.y * radius);
+			Vector3 p4 = Vector3(c2.x * radius, -half_height, c2.y * radius);
+
+			if (axis != Axis::Y)
+			{
+				Vector3 tmp = p3;
+				p3 = p4;
+				p4 = tmp;
+			}
+			// Circle Bottom
+			pos.push_back(Vector3(0, -half_height, 0));
+			pos.push_back(p4);
+			pos.push_back(p3);
+
+			uvs.push_back(Vector2(0.5f, 0.5f));
+			uvs.push_back(c2 * 0.5f + 0.5f);
+			uvs.push_back(c1 * 0.5f + 0.5f);
+
+			// Side
+			pos.push_back(Vector3(0, half_height, 0));
+			pos.push_back(p3);
+			pos.push_back(p4);
+
+			uvs.push_back(Vector2(uvx2, 1.0f));
+			uvs.push_back(Vector2(uvx1, 0.5f));
+			uvs.push_back(Vector2(uvx2, 0.5f));
+		}
+
+		// Fix Axis
+		if (axis == Axis::X)
+		{
+			for (auto& p : pos)
+			{
+				p.SwapXY();
+				p += offset;
+			}
+		}
+		else if (axis == Axis::Z)
+		{
+			for (auto& p : pos)
+			{
+				p.SwapYZ();
+				p += offset;
+			}
+		}
+		else
+			for (auto& p : pos)
+				p += offset;
+	}
 
 	// Generators
-	Mesh* Geometry::GenerateIcosahdron(std::string MeshName, unsigned int subdivisions, float scale)
+	Mesh* Geometry::GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale)
 	{
 		float t = (1.0f + sqrt(5.0f)) / 2.0f;
 
 		std::vector<Vector3> m_points;
+		m_points.reserve(12);
 
 		m_points.push_back(Vector3(-1, +t, 0).NormalizeSelf());
 		m_points.push_back(Vector3(+1, +t, 0).NormalizeSelf());
@@ -35,6 +206,7 @@ namespace Vxl
 		m_points.push_back(Vector3(-t, 0, +1).NormalizeSelf());
 
 		std::vector<Vector3i> m_faces;
+		m_faces.reserve(20);
 
 		m_faces.push_back(Vector3i(0, 11, 5));
 		m_faces.push_back(Vector3i(0, 5, 1));
@@ -113,7 +285,9 @@ namespace Vxl
 		}
 
 		std::vector<Vector3> vertices;
+		vertices.reserve(faceCount * 3);
 		std::vector<Vector2> uvs;
+		uvs.reserve(faceCount * 3);
 		Vec3 Tri[3];
 		Vec3 Normals[3];
 		Vec2 UVs[3];
@@ -180,14 +354,20 @@ namespace Vxl
 		//
 		NewMesh->m_positions.set(vertices);
 		NewMesh->m_uvs.set(uvs);
+		NewMesh->GenerateNormals(true);
+		NewMesh->GenerateTangents();
 		//
 		NewMesh->Bind();
 		return NewMesh;
 	}
-	Mesh* Geometry::GenerateSphereUV(std::string MeshName, unsigned int xSlice, unsigned int ySlice)
+	Mesh* Geometry::GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice)
 	{
 		std::vector<Vector3> positions;
+		positions.reserve(xSlice * ySlice * 6);
 		std::vector<Vector2> uvs;
+		uvs.reserve(xSlice * ySlice * 6);
+		std::vector<Vector3> normals;
+		normals.reserve(xSlice * ySlice * 6);
 		bool invert = false;
 		float x = (float)xSlice;
 		float y = (float)ySlice;
@@ -252,102 +432,77 @@ namespace Vxl
 			}
 		}
 
+		for (const auto& p : positions)
+			normals.push_back(p.Normalize());
+
 		Mesh* _mesh = Mesh::Create(MeshName);
 		//
 		_mesh->m_positions.set(positions);
 		_mesh->m_uvs.set(uvs);
+		_mesh->m_normals.set(normals);
+		_mesh->GenerateTangents();
 		//
 		_mesh->Bind();
 		return _mesh;
 	}
-	Mesh* Geometry::GenerateCylinder(std::string MeshName, Axis axis, u_int slices, float height, float radius_top, float radius_bot)
+	Mesh* Geometry::GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot)
 	{
-		//
 		std::vector<Vector3> positions;
 		std::vector<Vector2> uvs;
-		positions.reserve(12 * slices);
-		uvs.reserve(12 * slices);
 
-		float uv_height_total = height + radius_bot + radius_top;
-		float uv_height_bot = (radius_bot / uv_height_total);
-		float uv_height_top = (height + radius_bot) / uv_height_total;
-
-		float half_height = height / 2;
-
-		for (unsigned int i = 0; i < slices; i++)
-		{
-			float t1 = TWO_PI * ((float)i / (float)slices);
-			float t2 = TWO_PI * ((float)(i+1) / (float)slices);
-
-			float uvx1 = ((float)i / (float)slices);
-			float uvx2 = ((float)(i + 1) / (float)slices);
-
-			Vector2 c1 = Vector2(sinf(t1), cosf(t1));
-			Vector2 c2 = Vector2(sinf(t2), cosf(t2));
-
-			Vector3 p1 = Vector3(c1.x * radius_top, +half_height, c1.y * radius_top);
-			Vector3 p2 = Vector3(c2.x * radius_top, +half_height, c2.y * radius_top);
-			Vector3 p3 = Vector3(c1.x * radius_bot, -half_height, c1.y * radius_bot);
-			Vector3 p4 = Vector3(c2.x * radius_bot, -half_height, c2.y * radius_bot);
-
-			// Circle Top
-			positions.push_back(Vector3(0, half_height, 0));
-			positions.push_back(p1);
-			positions.push_back(p2);
-
-			uvs.push_back(Vector2(0.5f, 0.5f));
-			uvs.push_back(c1 * 0.5f + 0.5f);
-			uvs.push_back(c2 * 0.5f + 0.5f);
-
-			// Circle Bottom
-			positions.push_back(Vector3(0, -half_height, 0));
-			positions.push_back(p4);
-			positions.push_back(p3);
-
-			uvs.push_back(Vector2(0.5f, 0.5f));
-			uvs.push_back(c2 * 0.5f + 0.5f);
-			uvs.push_back(c1 * 0.5f + 0.5f);
-
-			// Side
-			positions.push_back(p1);
-			positions.push_back(p3);
-			positions.push_back(p2);
-
-			uvs.push_back(Vector2(uvx1, uv_height_top));
-			uvs.push_back(Vector2(uvx1, uv_height_bot));
-			uvs.push_back(Vector2(uvx2, uv_height_top));
-			
-			positions.push_back(p2);
-			positions.push_back(p3);
-			positions.push_back(p4);
-
-			uvs.push_back(Vector2(uvx2, uv_height_top));
-			uvs.push_back(Vector2(uvx1, uv_height_bot));
-			uvs.push_back(Vector2(uvx2, uv_height_bot));
-		}
-
-		// Fix Axis
-		if (axis == Axis::X)
-		{
-			for (auto& pos : positions)
-			{
-				pos.SwapXY();
-				pos.x = -pos.x;
-			}
-		}
-		else if (axis == Axis::Z)
-		{
-			for (auto& pos : positions)
-			{
-				pos.SwapYZ();
-				pos.z = -pos.z;
-			}
-		}
+		CreateCylinder(positions, uvs, axis, slices, height, radius_top, radius_bot, Vector3::ZERO);
 
 		Mesh* _mesh = Mesh::Create(MeshName);
 		//
 		_mesh->m_positions.set(positions);
 		_mesh->m_uvs.set(uvs);
+		_mesh->GenerateNormals(true);
+		_mesh->GenerateTangents();
+		//
+		_mesh->Bind();
+		return _mesh;
+	}
+	Mesh* Geometry::GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius)
+	{
+		std::vector<Vector3> positions;
+		std::vector<Vector2> uvs;
+
+		CreateCone(positions, uvs, axis, slices, height, radius, Vector3::ZERO);
+
+		Mesh* _mesh = Mesh::Create(MeshName);
+		//
+		_mesh->m_positions.set(positions);
+		_mesh->m_uvs.set(uvs);
+		_mesh->GenerateNormals(true);
+		_mesh->GenerateTangents();
+		//
+		_mesh->Bind();
+		return _mesh;
+	}
+	Mesh* Geometry::GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset)
+	{
+		std::vector<Vector3> positions;
+		std::vector<Vector3> positions2;
+		std::vector<Vector2> uvs;
+		std::vector<Vector2> uvs2;
+		// RESERVE
+		Vector3 p1Offset;
+		Vector3 p2Offset;
+		p1Offset[(int)axis] = 0.5f;
+		p2Offset[(int)axis] = 1.25f;
+
+		CreateCylinder(positions, uvs, axis, 16, 1.0f, 0.10f, 0.10f, p1Offset);
+		CreateCone(positions2, uvs2, axis, 16, 0.5f, 0.3f, p2Offset);
+
+		positions.insert(positions.end(), positions2.begin(), positions2.end());
+		uvs.insert(uvs.end(), uvs2.begin(), uvs2.end());
+
+		Mesh* _mesh = Mesh::Create(MeshName);
+		//
+		_mesh->m_positions.set(positions);
+		_mesh->m_uvs.set(uvs);
+		_mesh->GenerateNormals(true);
+		_mesh->GenerateTangents();
 		//
 		_mesh->Bind();
 		return _mesh;
@@ -368,19 +523,19 @@ namespace Vxl
 			Vector2(1, 1),
 			Vector2(0, 1)
 		};
-		Vector3 normals[] = {
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1)
-		};
+		//Vector3 normals[] = {
+		//	Vector3(0, 0, +1),
+		//	Vector3(0, 0, +1),
+		//	Vector3(0, 0, +1),
+		//	Vector3(0, 0, +1)
+		//};
 		GLuint indices[] = {0, 1, 2, 0, 2, 3};
 
 		m_fullQuad = Mesh::Create("FullQuad");
 		//
 		m_fullQuad->m_positions.set(pos, 4);
 		m_fullQuad->m_uvs.set(uvs, 4);
-		m_fullQuad->m_normals.set(normals, 4);
+		//m_fullQuad->m_normals.set(normals, 4);
 		m_fullQuad->m_indices.set(indices, 6);
 		//
 		m_fullQuad->Bind();
@@ -397,19 +552,19 @@ namespace Vxl
 			Vector2(2, 0),
 			Vector2(0, 2)
 		};
-		Vector3 normals[] = {
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1)
-		};
+		//Vector3 normals[] = {
+		//	Vector3(0, 0, +1),
+		//	Vector3(0, 0, +1),
+		//	Vector3(0, 0, +1)
+		//};
 		GLuint indices[] = { 0, 1, 2 };
 
 		m_fullTriangle = Mesh::Create("FullTriangle");
 		//
 		m_fullTriangle->m_positions.set(pos, 3);
 		m_fullTriangle->m_uvs.set(uvs, 3);
-		m_fullTriangle->m_normals.set(normals, 3);
-		//m_fullTriangle->m_indices.set(indices, 6);
+		//m_fullTriangle->m_normals.set(normals, 3);
+		m_fullTriangle->m_indices.set(indices, 6);
 		//
 		m_fullTriangle->Bind();
 	}
@@ -442,6 +597,7 @@ namespace Vxl
 		m_quad->m_uvs.set(uvs, 4);
 		m_quad->m_normals.set(normals, 4);
 		m_quad->m_indices.set(indices, 6);
+		m_quad->GenerateTangents();
 		//
 		m_quad->Bind();
 	}
@@ -559,7 +715,7 @@ namespace Vxl
 		m_cube->m_uvs.set(uvs, 24);
 		m_cube->m_normals.set(normals, 24);
 		m_cube->m_indices.set(indices, 36);
-
+		m_cube->GenerateTangents();
 		//
 		m_cube->Bind();
 	}
@@ -677,6 +833,7 @@ namespace Vxl
 		m_inverseCube->m_uvs.set(uvs, 24);
 		m_inverseCube->m_normals.set(normals, 24);
 		m_inverseCube->m_indices.set(indices, 36);
+		m_inverseCube->GenerateTangents();
 		//
 		m_inverseCube->Bind();
 	}
@@ -729,6 +886,7 @@ namespace Vxl
 		m_octahedron->m_uvs.set(uvs, 6);
 		m_octahedron->m_normals.set(normals, 6);
 		m_octahedron->m_indices.set(indices, 24);
+		m_octahedron->GenerateTangents();
 		//
 		m_octahedron->Bind();
 	}
@@ -766,9 +924,16 @@ namespace Vxl
 	void Geometry::CreateCones()
 	{
 		//
-		m_cone_x = GenerateCylinder("Cone X-axis [16]", Axis::X, 16, 1.0f, 0.01f, 0.5f);
-		m_cone_y = GenerateCylinder("Cone Y-axis [16]", Axis::Y, 16, 1.0f, 0.01f, 0.5f);
-		m_cone_z = GenerateCylinder("Cone Z-axis [16]", Axis::Z, 16, 1.0f, 0.01f, 0.5f);
+		m_cone_x = GenerateCone("Cone X-axis [16]", Axis::X, 16, 1.0f, 0.5f);
+		m_cone_y = GenerateCone("Cone Y-axis [16]", Axis::Y, 16, 1.0f, 0.5f);
+		m_cone_z = GenerateCone("Cone Z-axis [16]", Axis::Z, 16, 1.0f, 0.5f);
 		//
+	}
+
+	void Geometry::CreateArrows()
+	{
+		m_arrow_x = GenerateArrow("ArrowX", Axis::X, 1.0f, Vector3::ZERO);
+		m_arrow_y = GenerateArrow("ArrowY", Axis::Y, 1.0f, Vector3::ZERO);
+		m_arrow_z = GenerateArrow("ArrowZ", Axis::Z, 1.0f, Vector3::ZERO);
 	}
 }

@@ -14,7 +14,7 @@
 #include "../opengl/Mesh.h"
 #include "../opengl/FramebufferObject.h"
 #include "../window/window.h"
-#include "../window/Hierarchy.h"
+#include "../editor/Hierarchy.h"
 #include "../objects/GameObject.h"
 #include "../objects/LightObject.h"
 #include "../objects/CameraObject.h"
@@ -231,7 +231,7 @@ namespace Vxl
 	{
 		// Delete Materials and Entities
 		Material::DeleteAndClearAll();
-		Entity::DeleteAndClearAll(); // Since deleting entities changes
+		Entity::DeleteAndClearAll();
 
 		// Clear Shader Error Log
 		Shader::ShaderErrorLog.clear();
@@ -383,5 +383,28 @@ namespace Vxl
 		glLineWidth(1.0f);
 		glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
 		glUtil::wireframe(false);
+
+		// Draw Editor Arrows
+		passthrough->SetUniform<bool>("useTexture", false);
+		passthrough->SetUniform<bool>("useFakeLight", true);
+		passthrough->SetUniform<bool>("useMVP", true);
+
+		passthrough->SetUniform<Color4F>("color", Color4F(1, 0, 0, 1));
+		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslate(Vector3::ZERO));
+		Geometry.GetArrowX()->Draw();
+
+		passthrough->SetUniform<Color4F>("color", Color4F(0, 1, 0, 1));
+		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslate(Vector3::ZERO));
+		Geometry.GetArrowY()->Draw();
+
+		passthrough->SetUniform<Color4F>("color", Color4F(0, 0, 1, 1));
+		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslate(Vector3::ZERO));
+		Geometry.GetArrowZ()->Draw();
+
+		passthrough->SetUniform<Color4F>("color", Color4F(1, 1, 1, 1));
+		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslateScale(Vector3::ZERO, Vector3::QUARTER));
+		Geometry.GetCube()->Draw();
+
+		passthrough->SetUniform<bool>("useFakeLight", false);
 	}
 }

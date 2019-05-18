@@ -47,6 +47,7 @@ namespace Vxl
 	{
 	public:
 		// Constructor
+		Radians() : RotationValue(0) {}
 		explicit Radians(float r) : RotationValue(r) {}
 		explicit Radians(const Degrees& deg);
 
@@ -93,6 +94,7 @@ namespace Vxl
 	{
 	public:
 		// Constructor
+		Degrees() : RotationValue(0) {}
 		explicit Degrees(float d) : RotationValue(d) {}
 		explicit Degrees(const Radians& deg);
 

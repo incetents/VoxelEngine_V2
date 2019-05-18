@@ -194,7 +194,7 @@ namespace Vxl
 		pixels.push_back(Color3F(0, 0, 0));
 		pixels.push_back(Color3F::PURPLE);
 
-		m_null_texture = Texture::CreateCustom("null", pixels, 4, true, Wrap_Mode::CLAMP_STRETCH, Filter_Min::NEAREST, Filter_Mag::NEAREST);
+		m_null_texture = Texture::CreateCustom("null", pixels, 4, true, Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST);
 		assert(m_null_texture);
 	}
 }

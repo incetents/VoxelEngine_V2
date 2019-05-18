@@ -56,6 +56,7 @@ namespace Vxl
 
 		// Get Format Type from channel count
 		Channel_Type getFormat(int ChannelCount);
+		unsigned int getFormatCount(Channel_Type type);
 
 		// Clear Color
 		void clearColor(float r, float g, float b, float a = 1.0f);

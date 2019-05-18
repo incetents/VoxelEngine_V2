@@ -68,6 +68,14 @@ namespace Vxl
 		explicit operator Vector2();
 		explicit operator Vector3();
 
+		// Swap Values
+		Vector4& SwapXY();
+		Vector4& SwapXZ();
+		Vector4& SwapXW();
+		Vector4& SwapYZ();
+		Vector4& SwapYW();
+		Vector4& SwapZW();
+
 		// Inverse
 		Vector4 Inverse() const;
 		static Vector4 Inverse(const Vector4&);
@@ -75,6 +83,10 @@ namespace Vxl
 		// Compare
 		bool Compare(const Vector4&) const;
 		static bool Compare(const Vector4&, const Vector4&);
+
+		// Compare (0.01 precision)
+		inline bool CompareFuzzy(const Vector4&) const;
+		static bool CompareFuzzy(const Vector4&, const Vector4&);
 
 		// Normalize Self
 		Vector4& NormalizeSelf();
