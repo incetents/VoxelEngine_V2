@@ -255,6 +255,8 @@ namespace Vxl
 	{
 		Util::RemoveFromVector(m_selectedEntities, _entity);
 		_entity->m_isSelected = false;
+
+		UpdateAverageSelectionLocation();
 	}
 	void Hierarchy::AddSelection(Entity* _entity)
 	{
@@ -264,12 +266,16 @@ namespace Vxl
 
 		m_selectedEntities.push_back(_entity);
 		_entity->m_isSelected = true;
+
+		UpdateAverageSelectionLocation();
 	}
 	void Hierarchy::ClearSelection()
 	{
 		for (auto Entity : m_selectedEntities)
 			Entity->m_isSelected = false;
 		m_selectedEntities.clear();
+
+		m_averageSelectionLocation = Vector3::ZERO;
 	}
 }
 

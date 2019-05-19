@@ -8,13 +8,13 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
 
 namespace Vxl
 {
-	typedef std::unordered_map<std::string, glUniform> UniformStorage;
-	typedef std::unordered_map<std::string, glUniformBlock> UniformBlockStorage;
-	typedef std::unordered_map<ShaderType, glSubroutine> SubroutineStorage;
+	typedef std::map<std::string, glUniform> UniformStorage;
+	typedef std::map<std::string, glUniformBlock> UniformBlockStorage;
+	typedef std::map<ShaderType, glSubroutine> SubroutineStorage;
 
 	class Shader : public Asset<Shader>
 	{

@@ -20,7 +20,7 @@ namespace Vxl
 	class BaseTexture;
 	class Transform;
 	class Texture;
-	class Mesh;
+	class GameObject;
 
 	class Material : public Asset<Material>
 	{
@@ -28,12 +28,27 @@ namespace Vxl
 		friend class RenderManager;
 	protected:
 		// Data
-		const std::string m_name; // Name
-		ShaderProgram* m_shaderProgram; // Shader
-		UINT m_order = 0; // Render Order
+		const std::string	m_name; // Name
+		ShaderProgram*		m_shaderProgram; // Shader
+		UINT				m_order = 0; // Render Order
 
 		// Locked Constructor
-		Material(const std::string& _name, ShaderProgram* _shader, UINT _order);
+		Material(const std::string& _name, ShaderProgram* _shader, UINT _order)
+			: m_name(_name), m_shaderProgram(_shader), m_order(_order)
+		{
+			UpdateMaterialPackages();
+		}
+
+		// Uniform Packages
+		void UpdateMaterialPackages();
+
+		// Gbuffer-Entity Uniforms
+		MaterialPackage Mat_useModel		= MaterialPackage("VXL_useModel");
+		MaterialPackage Mat_model			= MaterialPackage("VXL_model");
+		MaterialPackage Mat_useInstancing	= MaterialPackage("VXL_useInstancing");
+		MaterialPackage Mat_useColor		= MaterialPackage("VXL_useColor");
+		MaterialPackage Mat_color			= MaterialPackage("VXL_color");
+		MaterialPackage Mat_tint			= MaterialPackage("VXL_tint");
 
 	public:
 		// Database Creation
@@ -49,9 +64,6 @@ namespace Vxl
 			return m_order;
 		}
 
-		// Uniform Packages
-		//MaterialPackage Mat_camPosition		= MaterialPackage("VXL_camPosition");
-
 		// GL States
 		Cull_Type			m_CullType		= Cull_Type::COUNTER_CLOCKWISE;
 		bool				m_BlendState	= true;
@@ -63,10 +75,8 @@ namespace Vxl
 		bool				m_DepthWrite	= true;
 		bool				m_Wireframe		= false;
 		
-		// Reload Packages
-		void ReloadPackages();
 		// Send Uniforms to shader
-		virtual void Bind();
+		void Bind();
 
 	};
 
@@ -77,25 +87,16 @@ namespace Vxl
 		friend class RenderManager;
 	protected:
 		// Material Base
-		Material* m_base;
-		void SetBase(Material* _base);
+		Material* m_material;
+		void SetMaterial(Material* _material);
 
 		// Texture Package
 		BaseTexture* m_textures[32];
 		std::set<Active_Texture> m_activeTextures;
 		UINT m_activeTextureCount = 0;
 
-		// Uniform Packages
-		virtual void UpdateMaterialPackages();
-		// Gbuffer-Entity Uniforms
-		MaterialPackage Mat_useModel			= MaterialPackage("VXL_useModel");
-		MaterialPackage Mat_model				= MaterialPackage("VXL_model");
-		MaterialPackage Mat_useInstancing		= MaterialPackage("VXL_useInstancing");
-		MaterialPackage Mat_useColorOverride	= MaterialPackage("VXL_useColorOverride");
-		MaterialPackage Mat_color				= MaterialPackage("VXL_color");
-		MaterialPackage Mat_tint				= MaterialPackage("VXL_tint");
 		// Custom Packages
-		std::unordered_map<std::string, MaterialPackage*> m_packages;
+		std::map<std::string, MaterialPackage*> m_packages;
 		bool CheckUniform(const std::string& uniformName);
 		
 	public:
@@ -112,7 +113,7 @@ namespace Vxl
 			if (m_packages.find(uniformName) == m_packages.end())
 				m_packages[uniformName] = new MaterialPackageData<Type>(uniformName);
 		
-			if (m_packages[uniformName]->GetUniform(m_base->m_shaderProgram))
+			if (m_packages[uniformName]->GetUniform(m_material->m_shaderProgram))
 			{
 				auto P = dynamic_cast<MaterialPackageData<Type>*>(m_packages[uniformName]);
 				assert(P);
@@ -123,18 +124,18 @@ namespace Vxl
 		void RemoveAllUniforms();
 
 		void SetTexture(BaseTexture* tex, Active_Texture level);
-
 		void ClearTexture(Active_Texture level);
 
 		inline Material* GetBase(void) const
 		{
-			return m_base;
+			return m_material;
 		}
 		inline UINT GetOrder(void) const
 		{
-			return m_base->m_order;
+			return m_material->m_order;
 		}
 
-		virtual void Bind(bool BindTextures, Mesh* mesh);
+		void BindUniforms(GameObject* entity);
+		void BindTextures();
 	};
 }

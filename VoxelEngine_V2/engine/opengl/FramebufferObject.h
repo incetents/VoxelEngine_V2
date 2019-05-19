@@ -38,7 +38,7 @@ namespace Vxl
 		bool checkFBOStatus();
 		void bindFBO();
 		void clearColor();
-
+		
 		// Constructor
 		FramebufferObject(
 			const std::string& name,
@@ -55,6 +55,11 @@ namespace Vxl
 
 		~FramebufferObject();
 
+		inline GLuint GetID(void) const
+		{
+			return m_id;
+		}
+
 		inline void setClearColor(Color4F c)
 		{
 			m_clearColor = c;
@@ -64,6 +69,8 @@ namespace Vxl
 			m_clearBuffers = (GLbitfield)b1 | (GLbitfield)b2 | (GLbitfield)b3 | (GLbitfield)b4;
 		}
 
+		// Clears the color from an entire Texture
+		void clearBuffer(unsigned int index);
 
 		void addTexture(
 			const std::string& name,
@@ -84,6 +91,5 @@ namespace Vxl
 		void bindDepth(Active_Texture layer);
 
 		GLubyte* readPixels(u_int textureIndex, int x, int y, int w, int h);
-
 	};
 }

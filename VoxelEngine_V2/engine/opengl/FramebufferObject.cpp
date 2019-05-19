@@ -103,6 +103,11 @@ namespace Vxl
 		glUtil::clearColor(m_clearColor);
 		glUtil::clearBuffer(m_clearBuffers);
 	}
+	void FramebufferObject::clearBuffer(unsigned int index)
+	{
+		assert(index < m_textureCount);
+		glClearBufferfv(GL_COLOR, index, &m_clearColor[0]);
+	}
 
 	void FramebufferObject::FixCallList()
 	{
@@ -185,22 +190,23 @@ namespace Vxl
 	{
 		assert(index < (int)m_textureCount);
 
-		glActiveTexture((GLenum)layer);
+		glUtil::setActiveTexture(layer);
 		m_textures[index]->Bind();
 	}
 	void FramebufferObject::bindDepth(Active_Texture layer)
 	{
 		assert(m_depth != nullptr);
 
-		glActiveTexture((GLenum)layer);
+		glUtil::setActiveTexture(layer);
 		m_depth->Bind();
 	}
 
+	// Notice, SNORM TEXTURES CANNOT BE READ
 	GLubyte* FramebufferObject::readPixels(u_int textureIndex, int x, int y, int w, int h)
 	{
 		assert(textureIndex < m_textureCount);
 		auto Texture = m_textures[textureIndex];
-		
+
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + textureIndex);
 		GLubyte* data = new GLubyte[w * h * Texture->GetChannelCount()];
 		glReadPixels(

@@ -51,6 +51,8 @@ namespace Vxl
 {
 	void Scene_Game::Setup()
 	{
+		//glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
+
 		Loader::LoadScript_ImportFiles("./assets/scripts/ImportFiles.txt");
 
 		//_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
@@ -77,11 +79,16 @@ namespace Vxl
 		//_camera->SetMain();
 
 		// FBO
-		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0.1f, 0.1f, 0.3f, 1.0f));
+		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0, 0, 0, 1));
 		_fbo->addTexture("albedo");
-		_fbo->addTexture("normal", Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
+		//_fbo->addTexture("normal" , Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
+		_fbo->addTexture("normal" , Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA8, Channel_Type::RGBA, Data_Type::UNSIGNED_BYTE);
 		_fbo->addTexture("test");
 		_fbo->addDepth();
+
+		_fbo_editor = FramebufferObject::Create("EditorPost", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
+		_fbo_editor->addTexture("albedo");
+		_fbo_editor->addDepth();
 
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
 		_fbo_colorpicker->addTexture("color", Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA, Channel_Type::RGBA, Data_Type::FLOAT);
@@ -89,7 +96,6 @@ namespace Vxl
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
 		_shader_gbuffer				= ShaderProgram::Get("gbuffer");
-		_shader_gbuffer_no_model	= ShaderProgram::Get("gbuffer_no_model");
 		_shader_lines				= ShaderProgram::Get("lines");
 		_shader_passthrough			= ShaderProgram::Get("passthrough");
 		_shader_colorPicker			= ShaderProgram::Get("colorPicker");
@@ -98,7 +104,6 @@ namespace Vxl
 
 		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
 		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
-		_material_gbuffer_no_model	= Material::Create("gbuffer_no_model", _shader_gbuffer_no_model, 2);
 		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
 		_material_billboard			= Material::Create("billboard", _shader_billboard, 4);
 
@@ -224,33 +229,33 @@ namespace Vxl
 		// World Position
 		_crate1->m_transform.setWorldPosition(-5, 0, 0);
 		
-		//	GameObject* _octo1 = GameObject::Create("_octo1");
-		//	_octo1->SetMaterial(_material_gbuffer);
-		//	_octo1->SetMesh(Geometry.GetOctahedron());
-		//	_octo1->m_transform.setPosition(0, 0, 0);
-		//	_octo1->m_transform.setScale(0.5f);
-		//	_octo1->SetColor(Color3F(1, 1, 1));
-		//	
-		//	GameObject* _octo2 = GameObject::Create("_octo2");
-		//	_octo2->SetMaterial(_material_gbuffer);
-		//	_octo2->SetMesh(Geometry.GetOctahedron());
-		//	_octo2->m_transform.setPosition(1, 0, 0);
-		//	_octo2->m_transform.setScale(0.5f);
-		//	_octo2->SetColor(Color3F(1, 0, 0));
-		//	
-		//	GameObject* _octo3 = GameObject::Create("_octo3");
-		//	_octo3->SetMaterial(_material_gbuffer);
-		//	_octo3->SetMesh(Geometry.GetOctahedron());
-		//	_octo3->m_transform.setPosition(0, 1, 0);
-		//	_octo3->m_transform.setScale(0.5f);
-		//	_octo3->SetColor(Color3F(0, 1, 0));
-		//	
-		//	GameObject* _octo4 = GameObject::Create("_octo4");
-		//	_octo4->SetMaterial(_material_gbuffer);
-		//	_octo4->SetMesh(Geometry.GetOctahedron());
-		//	_octo4->m_transform.setPosition(0, 0, 1);
-		//	_octo4->m_transform.setScale(0.5f);
-		//	_octo4->SetColor(Color3F(0, 0, 1));
+		GameObject* _octo1 = GameObject::Create("_octo1");
+		_octo1->SetMaterial(_material_gbuffer);
+		_octo1->SetMesh(Geometry.GetOctahedron());
+		_octo1->m_transform.setPosition(0, 0, 0);
+		_octo1->m_transform.setScale(0.5f);
+		_octo1->SetColor(Color3F(1, 1, 1));
+		
+		GameObject* _octo2 = GameObject::Create("_octo2");
+		_octo2->SetMaterial(_material_gbuffer);
+		_octo2->SetMesh(Geometry.GetOctahedron());
+		_octo2->m_transform.setPosition(1, 0, 0);
+		_octo2->m_transform.setScale(0.5f);
+		_octo2->SetColor(Color3F(1, 0, 0));
+		
+		GameObject* _octo3 = GameObject::Create("_octo3");
+		_octo3->SetMaterial(_material_gbuffer);
+		_octo3->SetMesh(Geometry.GetOctahedron());
+		_octo3->m_transform.setPosition(0, 1, 0);
+		_octo3->m_transform.setScale(0.5f);
+		_octo3->SetColor(Color3F(0, 1, 0));
+		
+		GameObject* _octo4 = GameObject::Create("_octo4");
+		_octo4->SetMaterial(_material_gbuffer);
+		_octo4->SetMesh(Geometry.GetOctahedron());
+		_octo4->m_transform.setPosition(0, 0, 1);
+		_octo4->m_transform.setScale(0.5f);
+		_octo4->SetColor(Color3F(0, 0, 1));
 		
 		LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
 		_light1->m_transform.setPosition(5, 0, 0);
@@ -306,7 +311,6 @@ namespace Vxl
 
 			if(CamMove.LengthSqr() > FLT_EPSILON)
 				_cameraObject->m_transform.increasePosition(CamMove.Normalize() * CamSpeed);
-			//_camera->increasePosition(CamMove.Normalize() * CamSpeed);
 
 			// Camera Rotation
 			Vector3 CamRotation;
@@ -323,7 +327,6 @@ namespace Vxl
 
 			if (CamRotation.LengthSqr() > FLT_EPSILON)
 				_cameraObject->m_transform.increaseRotation(CamRotation);
-			//_camera->increaseRotation(CamRotation);
 
 			// Camera Lock
 			if (Input.getKeyDown(KeyCode::Z))
@@ -348,7 +351,6 @@ namespace Vxl
 
 				if(fabs(deltax) > FLT_EPSILON || fabs(deltay) > FLT_EPSILON)
 					_cameraObject->m_transform.increaseRotation(deltay, deltax, 0);
-				//_camera->increaseRotation(-deltay, -deltax, 0);
 			}
 
 			// Edge case for vertical rotation
@@ -415,10 +417,10 @@ namespace Vxl
 					}
 
 					// Draw Axis Directions
-					Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 4.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 4.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 4.0f, 5.0f, Color4F::RED, Color4F::RED);
+					//Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
+					//Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 4.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
+					//Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 4.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
+					//Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 4.0f, 5.0f, Color4F::RED, Color4F::RED);
 				}
 				// Selection for Cameras
 				else if (Entity->GetType() == EntityType::CAMERA)
@@ -448,46 +450,6 @@ namespace Vxl
 			}
 		}
 
-		
-
-		//	// Draw OBB for entity 3
-		//	Vector3 p = _entity3->m_transform.getPosition();
-		//	Vector3 pmin = _entity3->GetAABBMin();
-		//	Vector3 pmax = _entity3->GetAABBMax();
-		//	std::vector<Vector3> OBB = _entity3->GetOBB();
-		//	
-		//	//DebugLines.AddAABB(pmin, pmax, p);
-		//	
-		//	// Bot
-		//	Debug.DrawLine(p + OBB[0], p + OBB[1]);
-		//	Debug.DrawLine(p + OBB[1], p + OBB[5]);
-		//	Debug.DrawLine(p + OBB[5], p + OBB[4]);
-		//	Debug.DrawLine(p + OBB[4], p + OBB[0]);
-		//	
-		//	// Top
-		//	Debug.DrawLine(p + OBB[2], p + OBB[3]);
-		//	Debug.DrawLine(p + OBB[3], p + OBB[7]);
-		//	Debug.DrawLine(p + OBB[7], p + OBB[6]);
-		//	Debug.DrawLine(p + OBB[6], p + OBB[2]);
-		//	
-		//	// Mid
-		//	Debug.DrawLine(p + OBB[0], p + OBB[2]);
-		//	Debug.DrawLine(p + OBB[1], p + OBB[3]);
-		//	Debug.DrawLine(p + OBB[4], p + OBB[6]);
-		//	Debug.DrawLine(p + OBB[5], p + OBB[7]);
-		//	
-		//	// Transforms
-		//	Debug.DrawLine(p, p + _entity3->m_transform.getForward() * 4.0f, Color3F::BLUE, Color3F::BLUE);
-		//	Debug.DrawLine(p, p + _entity3->m_transform.getUp() * 4.0f, Color3F::GREEN, Color3F::GREEN);
-		//	Debug.DrawLine(p, p + _entity3->m_transform.getRight() * 4.0f, Color3F::RED, Color3F::RED);
-		//	
-		//	Debug.DrawAABB(pmin, pmax, p, Color3F::BLACK);
-		//	
-		//	// Rotate Stuff
-		//	//_crate2->m_transform.setRotation(sin(Time.GetTime() / 2) * 90.0, cos(Time.GetTime() / 2) * 90.0, 0);
-		//	//_crate2->m_transform.increaseRotation(1.0f, 0.2f, 0);
-		//	_entity3->m_transform.increaseRotation(0.2f, 1, 0);
-
 		// End Frame Updates
 		XGamePadManager.Update();
 
@@ -512,7 +474,7 @@ namespace Vxl
 
 
 		_fbo->bind();
-
+		//
 		GPUTimer::StartTimer("Gbuffer");
 		//
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
@@ -520,11 +482,38 @@ namespace Vxl
 		//
 		GPUTimer::EndTimer("Gbuffer");
 
+		_fbo_editor->bind();
+		//
 		GPUTimer::StartTimer("EditorObjects");
 		//
 		RenderManager.RenderEditorObjects();
 		//
 		GPUTimer::EndTimer("EditorObjects");
+
+		//	if (Input.getKeyDown(KeyCode::K))
+		//	{
+		//		_fbo->bindTexture(1, Active_Texture::LEVEL0);
+		//		GLubyte* pixels = new GLubyte[Window.GetWindowWidth() * Window.GetScreenHeight() * 4];
+		//		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+		//	
+		//		GLuint r, g, b, a; // or GLbyte r, g, b, a;
+		//	
+		//		size_t x = 1;
+		//		size_t y = 1;
+		//	
+		//		size_t elmes_per_line = 256 * 4; // elements per line = 256 * "RGBA"
+		//	
+		//		size_t row = y * elmes_per_line;
+		//		size_t col = x * 4;
+		//	
+		//		r = pixels[row + col];
+		//		g = pixels[row + col + 1];
+		//		b = pixels[row + col + 2];
+		//		a = pixels[row + col + 3];
+		//	
+		//	
+		//		delete[] pixels;
+		//	}
 
 		//	// GBUFFER No model
 		//	_material_gbuffer_no_model->Bind();
@@ -602,10 +591,12 @@ namespace Vxl
 					float z = cz / 255.0f;
 					float w = cw / 255.0f;
 
+					// Vert
 					_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getModel());
 					_shader_colorPicker->SetUniform("VXL_useInstancing", false);
 					_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
-					_shader_colorPicker->SetUniform<Vector4>("colorID", vec4(x, y, z, w));
+					// Frag
+					_shader_colorPicker->SetUniform<Vector4>("VXL_colorID", vec4(x, y, z, w));
 
 					// Different Effect based on type
 					if (Entity->GetType() == EntityType::GAMEOBJECT)
@@ -635,12 +626,12 @@ namespace Vxl
 					1
 				);
 
-				std::cout <<
-				(unsigned int)data[0] << ' ' <<
-				(unsigned int)data[1] << ' ' <<
-				(unsigned int)data[2] << ' ' <<
-				(unsigned int)data[3] << ' ' <<
-				std::endl;
+				//	std::cout <<
+				//	(unsigned int)data[0] << ' ' <<
+				//	(unsigned int)data[1] << ' ' <<
+				//	(unsigned int)data[2] << ' ' <<
+				//	(unsigned int)data[3] << ' ' <<
+				//	std::endl;
 
 				unsigned int EntityIndex;
 				Util::DataConversion::uchars_to_uint(data, EntityIndex);
@@ -675,9 +666,19 @@ namespace Vxl
 			}
 		}
 		// ~~ //
+		//Input.getMouseButtonDown(MouseButton::LEFT) && 
+
+		// Hover over Editor Axis Objects
+		if (!Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		{
+			
+		}
+		// ~~ //
 
 		// Backbuffer
 		FramebufferObject::unbind();
+		//glDrawBuffer(GL_BACK);
+
 		Window.BindWindowViewport();
 
 		glUtil::blendState(false);
@@ -688,17 +689,18 @@ namespace Vxl
 		glUtil::clearColor(Color4F(0, 0, 0, 0));
 		glUtil::clearBuffer();
 
+		
 		// Final Pass / Back Buffer
 		switch (FBO_OVERRIDE)
 		{
 			// Output Normally
 			case 0:
 			{
-				_shader_passthrough->Bind();
-				_shader_passthrough->SetUniform<bool>("useTexture", true);
-				_shader_passthrough->SetUniform<bool>("useMVP", false);
+				_shader_showRenderTarget->Bind();
+				_shader_showRenderTarget->SetUniform("outputMode", 3);
 
 				_fbo->bindTexture(0, Active_Texture::LEVEL0);
+				_fbo_editor->bindTexture(0, Active_Texture::LEVEL1);
 				break;
 			}
 			// Show Albedo
@@ -730,10 +732,19 @@ namespace Vxl
 				_fbo->bindDepth(Active_Texture::LEVEL0);
 				break;
 			}
+			// Show Editor
+			case 4:
+			{
+				_shader_showRenderTarget->Bind();
+				_shader_showRenderTarget->SetUniform("outputMode", 0);
+
+				_fbo_editor->bindTexture(0, Active_Texture::LEVEL0);
+				break;
+			}
 		}
 		RenderManager.RenderFullScreen();
-		
-		
+		//
+	
 		
 		//	// Normals test
 		//	if (DevConsole.GetBool("Show Normals", false))

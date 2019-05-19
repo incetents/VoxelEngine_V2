@@ -1,5 +1,5 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
-#version 430
+#version 420
 #include "_UBO.glsl"
 
 // Input
@@ -22,9 +22,9 @@ layout (location = 2) out vec4 output_test;
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
 // Uniforms
-uniform bool VXL_useColorOverride 	= false;
-uniform vec3 VXL_color 				= vec3(1,1,1);
-uniform vec3 VXL_tint 				= vec3(1,1,1);
+uniform bool VXL_useColor 	= false;
+uniform vec3 VXL_color 		= vec3(1,1,1);
+uniform vec3 VXL_tint 		= vec3(1,1,1);
 
 uniform int TESTMODE = 0;
 
@@ -37,20 +37,19 @@ void main()
 	//final_color = vec4(f_data.uv.x,f_data.uv.y,1,1);
 	vec2 uv = f_data.uv;
 	
-	if(VXL_useColorOverride)
+	if(VXL_useColor)
 	{
-		output_albedo = vec4(VXL_color * VXL_tint, 1);
-		//output_albedo.a = 0.0;
+		output_albedo.rgb = VXL_color * VXL_tint;
 	}
 	else
 	{
-		output_albedo = texture(albedo_handler, f_data.uv) * vec4(VXL_tint, 1);
-		//output_albedo.a = 0.0;
+		output_albedo.rgb = texture(albedo_handler, f_data.uv).rgb * VXL_tint;
 	}
 		
 	// output UV for testing reasons
 	//output_albedo = vec4(f_data.uv, 0, 1);
 	
+	//output_normal = vec4(-1.0f,-0.5f,-2.0f,1);
 	output_normal = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0); // worldspace Normals
 	//output_normal = vec4(normalize(f_data.normal), 1.0); // screenspace Normals
 	

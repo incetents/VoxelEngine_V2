@@ -1,5 +1,5 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
-#version 430
+#version 420
 #include "_UBO.glsl"
 
 // Input
@@ -46,6 +46,7 @@ void main()
 		f_data.tangent = vec3(model * vec4(m_tangent, 0));
 		f_data.bitangent = vec3(model * vec4(m_bitangent, 0));
 	}
+	// Passthrough
 	else
 	{
 		// Position
@@ -55,7 +56,6 @@ void main()
 		f_data.tangent = m_tangent;
 		f_data.bitangent = m_bitangent;
 	}
-	
 	
 	gl_Position = viewProjection * vec4(f_data.pos, 1); 
 	

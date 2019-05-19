@@ -146,7 +146,8 @@ namespace Vxl
 				"[Default]",
 				"Albedo",
 				"Normal",
-				"Depth"
+				"Depth",
+				"Editor"
 			};
 			static int fbo_override_current = 0;
 			ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);

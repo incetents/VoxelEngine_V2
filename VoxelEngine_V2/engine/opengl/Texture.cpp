@@ -11,7 +11,6 @@
 
 namespace Vxl
 {
-	Active_Texture BaseTexture::m_activeSlot = Active_Texture::LEVEL0;
 	std::unordered_map<Texture_Type, UINT> BaseTexture::m_activeTextures;
 
 	void FlipTextureY(UCHAR* array, GLuint width, GLuint height, GLuint channels)
@@ -96,12 +95,8 @@ namespace Vxl
 
 	void BaseTexture::Bind(Active_Texture layer) const
 	{
-		// Don't set active texture if it hasn't changed
-		if(m_activeSlot != layer)
-			glActiveTexture((GLenum)layer);
-
-		// Update active texture
-		m_activeSlot = layer;
+		// Update active texture slot
+		glUtil::setActiveTexture(layer);
 
 		// Don't bind texture if it hasn't changed
 		if (m_activeTextures[m_type] != m_id)
@@ -275,7 +270,7 @@ namespace Vxl
 		else if (!_texture->IsLoaded())
 			return false;
 
-		Message_Loaded(name, _texture);
+		Message_Created(name, _texture);
 
 		return _texture;
 	}

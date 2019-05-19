@@ -28,12 +28,10 @@ namespace Vxl
 	public:
 		// Assets Loaded
 		ShaderProgram* _shader_gbuffer;
-		ShaderProgram* _shader_gbuffer_no_model;
 		ShaderProgram* _shader_passthrough;
 		ShaderProgram* _shader_skybox;
 		ShaderProgram* _shader_lines;
 		ShaderProgram* _shader_billboard;
-		// Non-material Shader
 		ShaderProgram* _shader_colorPicker;
 		ShaderProgram* _shader_showRenderTarget;
 
@@ -50,10 +48,10 @@ namespace Vxl
 		CameraObject* _cameraObject;
 
 		FramebufferObject* _fbo;
+		FramebufferObject* _fbo_editor;
 		FramebufferObject* _fbo_colorpicker;
 
 		Material* _material_gbuffer;
-		Material* _material_gbuffer_no_model;
 		Material* _material_passthrough;
 		Material* _material_skybox;
 		Material* _material_lines;

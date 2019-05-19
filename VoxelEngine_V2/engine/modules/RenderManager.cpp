@@ -177,29 +177,17 @@ namespace Vxl
 		ShaderProgram::ProgramsFailed.clear();
 		ShaderProgram::ProgramsFailedSize = 0;
 
-		auto Shaders = Shader::GetDatabase();
-		for (auto Shader : Shaders)
-			Shader.second->reload();
-
 		auto Programs = ShaderProgram::GetDatabase();
 		for (auto Program : Programs)
 			Program.second->reload();
 
-		// Materials are part of Shaders
-		auto Materials = Material::GetDatabase();
-		for (auto Material : Materials)
-			Material.second->ReloadPackages();
+		auto Shaders = Shader::GetDatabase();
+		for (auto Shader : Shaders)
+			Shader.second->reload();
 
-		// Entity Materials are part of Shaders
-		auto Entities = Entity::GetDatabase();
-		for (auto Entity : Entities)
-		{
-			if (Entity.second->GetType() == EntityType::GAMEOBJECT)
-			{
-				GameObject* G_Object = dynamic_cast<GameObject*>(Entity.second);
-				G_Object->m_material.UpdateMaterialPackages();
-			}
-		}
+		auto Materials = Material::GetDatabase();
+		for (auto Mat : Materials)
+			Mat.second->UpdateMaterialPackages();
 	}
 	void RenderManager::ReloadWindow()
 	{
@@ -239,8 +227,8 @@ namespace Vxl
 		ShaderProgram::ProgramsFailed.clear();
 		ShaderProgram::ProgramsFailedSize = 0;
 		// Delete Shaders
-		Shader::DeleteAndClearAll();
 		ShaderProgram::DeleteAndClearAll();
+		Shader::DeleteAndClearAll();
 
 		// Delete Textures
 		Texture::DeleteAndClearAll();
@@ -367,44 +355,43 @@ namespace Vxl
 		// Draw Debug Wireframe Sphere
 		auto passthrough = ShaderProgram::Get("passthrough");
 		passthrough->Bind();
-		passthrough->SetUniform<bool>("useTexture", false);
-		passthrough->SetUniform<bool>("useMVP", true);
+		passthrough->SetUniform<bool>("VXL_useTexture", false);
+		passthrough->SetUniform<bool>("VXL_useModel", true);
 		
-
 		glUtil::wireframe(true);
 		glUtil::cullMode(Cull_Type::NO_CULL);
 		glLineWidth(5.0f);
 		for (const auto& sphere : Debug.m_wireframeSpheres)
 		{
-			passthrough->SetUniform<Color4F>("color", sphere.color);
-			passthrough->SetUniform<Matrix4x4>("model", sphere.model);
+			passthrough->SetUniform<Color4F>("VXL_color", sphere.color);
+			passthrough->SetUniform<Matrix4x4>("VXL_model", sphere.model);
 			Geometry.GetIcoSphere()->Draw();
 		}
 		glLineWidth(1.0f);
 		glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
 		glUtil::wireframe(false);
 
-		// Draw Editor Arrows
-		passthrough->SetUniform<bool>("useTexture", false);
-		passthrough->SetUniform<bool>("useFakeLight", true);
-		passthrough->SetUniform<bool>("useMVP", true);
+		// Draw Editor Arrows (if selection applies)
+		if (Hierarchy.CheckSelection())
+		{
+			auto simpleLight = ShaderProgram::Get("simpleLight");
+			simpleLight->Bind();
 
-		passthrough->SetUniform<Color4F>("color", Color4F(1, 0, 0, 1));
-		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslate(Vector3::ZERO));
-		Geometry.GetArrowX()->Draw();
+			simpleLight->SetUniform<bool>("VXL_useModel", true);
+			simpleLight->SetUniform<Matrix4x4>("VXL_model", Matrix4x4::GetTranslate(Hierarchy.GetAverageSelectionLocation()));
 
-		passthrough->SetUniform<Color4F>("color", Color4F(0, 1, 0, 1));
-		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslate(Vector3::ZERO));
-		Geometry.GetArrowY()->Draw();
+			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 1));
+			Geometry.GetArrowX()->Draw();
 
-		passthrough->SetUniform<Color4F>("color", Color4F(0, 0, 1, 1));
-		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslate(Vector3::ZERO));
-		Geometry.GetArrowZ()->Draw();
+			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 1));
+			Geometry.GetArrowY()->Draw();
 
-		passthrough->SetUniform<Color4F>("color", Color4F(1, 1, 1, 1));
-		passthrough->SetUniform<Matrix4x4>("model", Matrix4x4::GetTranslateScale(Vector3::ZERO, Vector3::QUARTER));
-		Geometry.GetCube()->Draw();
+			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 1));
+			Geometry.GetArrowZ()->Draw();
 
-		passthrough->SetUniform<bool>("useFakeLight", false);
+			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 1, 1, 1));
+			Geometry.GetCubeSmall()->Draw();
+
+		}
 	}
 }

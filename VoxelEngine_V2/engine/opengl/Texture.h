@@ -34,7 +34,6 @@ namespace Vxl
 		Color4F		 m_borderColor = Color4F(0, 0, 0, 1);
 
 		// Tracker //
-		static Active_Texture m_activeSlot;
 		static std::unordered_map<Texture_Type, UINT> m_activeTextures;
 
 		void updateParameters();

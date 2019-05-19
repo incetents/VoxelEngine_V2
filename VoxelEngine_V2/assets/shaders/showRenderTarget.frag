@@ -1,5 +1,5 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
-#version 430
+#version 420
 
 // Input
 in fragment_data
@@ -7,6 +7,8 @@ in fragment_data
 	vec3 pos;
 	vec2 uv;
 	vec3 normal;
+	vec3 tangent;
+	vec3 bitangent;
 	
 } f_data;
 
@@ -15,6 +17,7 @@ layout (location = 0) out vec4 output_color;
 
 // Uniform Textures
 layout (binding = 0) uniform sampler2D texture1;
+layout (binding = 1) uniform sampler2D texture2;
 // Uniforms
 uniform int outputMode = 0;
 uniform float zNear = 1;
@@ -30,7 +33,7 @@ float LinearizeDepth(float depth)
 void main()
 {
 	vec4 _texture = texture(texture1, f_data.uv);
-	//Output Mode
+	// Output Mode
 	if(outputMode == 1)
 	{
 		// normal
@@ -45,7 +48,14 @@ void main()
 		float depth = LinearizeDepth(_texture.r);
 		output_color = vec4(depth,depth,depth,1);
 	}
-	else
+	else if(outputMode == 3)
+	{
+		// composite 2 textures
+		vec4 _texture2 = texture(texture2, f_data.uv);
+		output_color = vec4(mix(_texture.rgb, _texture2.rgb, _texture2.a), 1);
+	}
+	else // == 0
+		// normal
 		output_color = _texture;
 }
 

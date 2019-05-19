@@ -34,10 +34,10 @@ namespace Vxl
 	}
 
 	// Material
-	void GameObject::SetMaterial(Material* _base)
+	void GameObject::SetMaterial(Material* _material)
 	{
-		// Do nothing if no change
-		if (_base == m_material.GetBase())
+		// Do nothing if giving same material
+		if (_material == m_material.GetBase())
 			return;
 
 		// Remove material from existing render section
@@ -45,7 +45,7 @@ namespace Vxl
 		if (m_material.GetBase())
 			RenderManager.RemoveEntity(this);
 
-		m_material.SetBase(_base);
+		m_material.SetMaterial(_material);
 
 		RenderManager.AddEntity(this);
 	}
@@ -66,10 +66,18 @@ namespace Vxl
 
 	void GameObject::Draw()
 	{
-		m_material.Bind(!m_isColoredObject, m_mesh);
+		if (m_mesh)
+		{
+			// Send Uniform Data
+			m_material.BindUniforms(this);
 
-		if(m_mesh)
+			// Send Texture Data
+			if (!m_isColoredObject)
+				m_material.BindTextures();
+
+			// Draw Mesh
 			m_mesh->Draw();
+		}
 	}
 
 	void GameObject::TransformChanged()

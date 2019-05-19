@@ -8,6 +8,7 @@
 #include "../opengl/Mesh.h"
 
 #include "../modules/Entity.h"
+#include "../objects/GameObject.h"
 
 #include "../math/Transform.h"
 
@@ -15,16 +16,6 @@
 
 namespace Vxl
 {
-	Material::Material(
-		const std::string& _name,
-		ShaderProgram* _shader,
-		UINT _order
-	)
-		: m_name(_name), m_shaderProgram(_shader), m_order(_order)
-	{
-		ReloadPackages();
-	}
-
 	Material* Material::Create(
 		const std::string& _name,
 		ShaderProgram* _shader,
@@ -38,16 +29,6 @@ namespace Vxl
 		return _material;
 	}
 
-	void Material::ReloadPackages()
-	{
-		if (m_shaderProgram)
-		{
-			//Mat_camPosition.GetUniform(m_shaderProgram);
-		}
-		else
-			Logger.error("Unable to load Material Packages; [Material Name] = " + m_name);
-
-	}
 	void Material::Bind()
 	{
 		if (!m_shaderProgram)
@@ -70,40 +51,38 @@ namespace Vxl
 		glUtil::wireframe(m_Wireframe);
 	}
 
+	void Material::UpdateMaterialPackages()
+	{
+		Mat_useModel.GetUniform(m_shaderProgram);
+		Mat_model.GetUniform(m_shaderProgram);
+		Mat_useInstancing.GetUniform(m_shaderProgram);
+		Mat_useColor.GetUniform(m_shaderProgram);
+		Mat_color.GetUniform(m_shaderProgram);
+		Mat_tint.GetUniform(m_shaderProgram);
+	}
+
 	// ~ Material Data ~ //
 
-	//Texture* MaterialData::NULL_TEXTURE = nullptr;
-
-	void MaterialData::UpdateMaterialPackages()
+	void MaterialData::SetMaterial(Material* _material)
 	{
-		Mat_useModel.GetUniform(m_base->m_shaderProgram);
-		Mat_model.GetUniform(m_base->m_shaderProgram);
-		Mat_useInstancing.GetUniform(m_base->m_shaderProgram);
-		Mat_useColorOverride.GetUniform(m_base->m_shaderProgram);
-		Mat_color.GetUniform(m_base->m_shaderProgram);
-		Mat_tint.GetUniform(m_base->m_shaderProgram);
-	}
-
-	void MaterialData::SetBase(Material* _base)
-	{
-		if (m_base == _base)
+		if (m_material == _material)
 			return;
 
-		m_base = _base;
-		UpdateMaterialPackages();
+		m_material = _material;
 		RemoveAllUniforms();
 	}
+
+	
 
 	MaterialData::~MaterialData()
 	{
-		RemoveAllUniforms();
 		RemoveAllUniforms();
 	}
 
 	bool MaterialData::CheckUniform(const std::string& uniformName)
 	{
 		// Check if shader contains uniform
-		return (m_base->m_shaderProgram->CheckUniform(uniformName));
+		return (m_material->m_shaderProgram->CheckUniform(uniformName));
 	}
 
 	void MaterialData::RemoveUniform(const std::string& uniformName)
@@ -119,9 +98,7 @@ namespace Vxl
 	void MaterialData::RemoveAllUniforms()
 	{
 		for (auto it = m_packages.begin(); it != m_packages.end(); it++)
-		{
 			delete it->second;
-		}
 		
 		m_packages.clear();
 	}
@@ -144,38 +121,38 @@ namespace Vxl
 		m_activeTextureCount = (UINT)m_activeTextures.size();
 	}
 
-	void MaterialData::Bind(bool BindTextures, Mesh* mesh)
+	void MaterialData::BindUniforms(GameObject* entity)
 	{
-		assert(m_base);
+		assert(m_material);
 		// Bind Uniforms for this object
 
 		// ~ Model ~ //
-		if (Mat_useModel.m_exists)
+		if (m_material->Mat_useModel.m_exists)
 		{
-			Mat_useModel.m_uniform.Set<bool>(m_owner->m_useTransform);
+			m_material->Mat_useModel.m_uniform.Set<bool>(m_owner->m_useTransform);
 		}
-		if (m_owner->m_useTransform && Mat_model.m_exists)
+		if (m_owner->m_useTransform && m_material->Mat_model.m_exists)
 		{
-			Mat_model.m_uniform.Set(m_owner->m_transform.getModel());
+			m_material->Mat_model.m_uniform.Set(m_owner->m_transform.getModel());
 		}
 		// ~ Special Setters ~ //
-		if (Mat_useInstancing.m_exists)
+		if (m_material->Mat_useInstancing.m_exists)
 		{
-			if (mesh)
-				Mat_useInstancing.m_uniform.Set<bool>(mesh->m_instances.GetDrawCount() > 0 ? true : false);
+			if (entity->GetMesh())
+				m_material->Mat_useInstancing.m_uniform.Set<bool>(entity->GetMesh()->m_instances.GetDrawCount() > 0 ? true : false);
 			else
-				Mat_useInstancing.m_uniform.Set<bool>(false);
+				m_material->Mat_useInstancing.m_uniform.Set<bool>(false);
 		}
-		if (Mat_useColorOverride.m_exists)
+		if (m_material->Mat_useColor.m_exists)
 		{
 			// Color info or wireframe mode will cause color to be used in shader
-			Mat_useColorOverride.m_uniform.Set<bool>(m_owner->m_isColoredObject || m_base->m_Wireframe);
-			if ((m_owner->m_isColoredObject || m_base->m_Wireframe) && Mat_color.m_exists)
-				Mat_color.m_uniform.Set<Color3F>(m_owner->GetColor());
+			m_material->Mat_useColor.m_uniform.Set<bool>(m_owner->m_isColoredObject || m_material->m_Wireframe);
+			if ((m_owner->m_isColoredObject || m_material->m_Wireframe) && m_material->Mat_color.m_exists)
+				m_material->Mat_color.m_uniform.Set<Color3F>(m_owner->GetColor());
 		}
-		if (Mat_tint.m_exists)
+		if (m_material->Mat_tint.m_exists)
 		{
-			Mat_tint.m_uniform.Set<Color3F>(m_owner->GetTint());
+			m_material->Mat_tint.m_uniform.Set<Color3F>(m_owner->GetTint());
 		}
 
 		// Custom Uniforms //
@@ -183,9 +160,15 @@ namespace Vxl
 		{
 			it->second->SendDataAsUniform();
 		}
-		
+
+	}
+
+	void MaterialData::BindTextures()
+	{
+		assert(m_material);
+
 		// Bind Textures (ignore if parameter is OFF or wireframe mode is ON)
-		if (BindTextures && m_base->m_Wireframe == false)
+		if (m_material->m_Wireframe == false)
 		{
 			// Null Texture if no textures are used
 			if (!m_activeTextureCount)
@@ -213,6 +196,5 @@ namespace Vxl
 				}
 			}
 		}
-
 	}
 }

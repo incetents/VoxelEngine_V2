@@ -3,7 +3,6 @@
 // order: [Name] [FilePath]
 
 #VERT gbuffer_vert 					./assets/shaders/gbuffer.vert
-#VERT gbuffer_no_model_vert 		./assets/shaders/gbuffer_no_model.vert
 #FRAG gbuffer_frag 					./assets/shaders/gbuffer.frag
 
 #VERT passthrough_vert 				./assets/shaders/passthrough.vert
@@ -18,6 +17,8 @@
 
 #FRAG colorPicker_frag 	./assets/shaders/colorPicker.frag
 
+#FRAG simpleLight_frag 	./assets/shaders/simpleLight.frag
+
 #FRAG showRenderTarget  ./assets/shaders/showRenderTarget.frag
 
 #VERT billboard_vert  	./assets/shaders/billboard.vert
@@ -28,8 +29,8 @@
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
 
 gbuffer				gbuffer_vert				gbuffer_frag
-gbuffer_no_model 	gbuffer_no_model_vert 		gbuffer_frag
-passthrough 		passthrough_vert			passthrough_frag
+passthrough 		gbuffer_vert				passthrough_frag
+simpleLight 		gbuffer_vert				simpleLight_frag
 skybox				skybox_vert					skybox_frag
 lines 				lines_vert					lines_geom 				lines_frag
 colorPicker 		gbuffer_vert 				colorPicker_frag

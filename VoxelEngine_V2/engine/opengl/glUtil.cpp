@@ -227,28 +227,31 @@ namespace Vxl
 		}
 		else
 		{
-			Logger.log(message);
+			// For some reason it hates how im storing my VBOs/EBOs
+			//Logger.log(message);
 		}
 	}
 
 	// Gives errors in random locations, cannot use for now
 	void glUtil::initOpenglErrorCallback()
 	{
-		GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-		if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+#if defined(GLOBAL_ERROR_CALLBACK) && !defined(GLOBAL_USE_GLNAMES)
+		//GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		//if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
 		{
 			UsingErrorCallback = true;
-			//	glEnable(GL_DEBUG_OUTPUT);
-			//	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-			//	glDebugMessageCallback(OpenGLDebugCallback, stderr);
+			glEnable(GL_DEBUG_OUTPUT);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			glDebugMessageCallback(OpenGLDebugCallback, stderr);
 			//	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, 0, GL_FALSE);
 		}
+#endif
 	}
 
 	// Set OpenGL Name
 	void glUtil::setGLName(glNameType identifier, GLuint id, const std::string &label)
 	{
-#ifdef GLOBAL_USE_GLNAMES
+#if defined(GLOBAL_USE_GLNAMES) && !defined(GLOBAL_ERROR_CALLBACK)
 		//
 		if(GLNameMaxLength == -1)
 			glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLNameMaxLength);
@@ -309,11 +312,11 @@ namespace Vxl
 	}
 	void glUtil::clearColor(const Color3F& c, float a)
 	{
-		clearColor(c.r, c.g, c.b, 1.0f);
+		glClearColor(c.r, c.g, c.b, 1.0f);
 	}
 	void glUtil::clearColor(const Color4F& c)
 	{
-		clearColor(c.r, c.g, c.b, c.a);
+		glClearColor(c.r, c.g, c.b, c.a);
 	}
 
 	void glUtil::clearBuffer()
@@ -558,13 +561,20 @@ namespace Vxl
 	}
 
 	// TEXTURES //
+	Active_Texture activeSlot = Active_Texture::LEVEL0;
 	void glUtil::setActiveTexture(Active_Texture level)
 	{
+		if (activeSlot == level)
+			return;
+
 		glActiveTexture(GLenum(level));
+
+		activeSlot = level;
 	}
 	void glUtil::setActiveTexture(int level)
 	{
-		glActiveTexture(GL_TEXTURE0 + level);
+		Active_Texture _level = Active_Texture(GL_TEXTURE0 + level);
+		setActiveTexture(_level);
 	}
 	void glUtil::setActiveTexture(unsigned int level)
 	{

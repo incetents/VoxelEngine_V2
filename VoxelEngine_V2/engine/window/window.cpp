@@ -85,6 +85,13 @@ namespace Vxl
 		glUtil::initHints();
 		glUtil::CheckVersion();
 
+		// Create first frame empty
+		// (so it can create all gl assets necesary here without interfering with opengl error callback)
+		StartFrame();
+		ImGui::NewFrame();
+		ImGui::Render();
+		EndFrame();
+
 		// opengl error callback
 		glUtil::initOpenglErrorCallback();
 

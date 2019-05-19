@@ -16,8 +16,7 @@ namespace Vxl
 		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
 		Axis axis, UINT slices, float height, float radius_top, float radius_bot,
 		const Vector3& offset
-	)
-	{
+	){
 		if (axis != Axis::Y)
 			std::swap(radius_top, radius_bot);
 
@@ -111,8 +110,7 @@ namespace Vxl
 		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
 		Axis axis, UINT slices, float height, float radius,
 		const Vector3& offset
-	)
-	{
+	){
 		pos.clear();
 		uvs.clear();
 		pos.reserve(12 * slices);
@@ -507,6 +505,124 @@ namespace Vxl
 		_mesh->Bind();
 		return _mesh;
 	}
+	Mesh* Geometry::GenerateCube(const std::string& MeshName, float unitSize)
+	{
+		Vector3 pos[] = {
+			// Front Face
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			//
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
+			//
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			//
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			//
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			//
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+		};
+		Vector2 uvs[] = {
+			//
+			Vector2(0, 0),
+			Vector2(1, 0),
+			Vector2(1, 1),
+			Vector2(0, 1),
+			//
+			Vector2(1, 0),
+			Vector2(0, 0),
+			Vector2(0, 1),
+			Vector2(1, 1),
+			//
+			Vector2(0, 1),
+			Vector2(1, 1),
+			Vector2(1, 0),
+			Vector2(0, 0),
+			//
+			Vector2(1, 0),
+			Vector2(0, 0),
+			Vector2(0, 1),
+			Vector2(1, 1),
+			//
+			Vector2(0, 0),
+			Vector2(0, 1),
+			Vector2(1, 1),
+			Vector2(1, 0),
+			//
+			Vector2(1, 0),
+			Vector2(1, 1),
+			Vector2(0, 1),
+			Vector2(0, 0),
+		};
+		Vector3 normals[] = {
+			//
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1),
+			Vector3(0, 0, +1),
+			//
+			Vector3(0, 0, -1),
+			Vector3(0, 0, -1),
+			Vector3(0, 0, -1),
+			Vector3(0, 0, -1),
+			//
+			Vector3(0, +1, 0),
+			Vector3(0, +1, 0),
+			Vector3(0, +1, 0),
+			Vector3(0, +1, 0),
+			//
+			Vector3(0, -1, 0),
+			Vector3(0, -1, 0),
+			Vector3(0, -1, 0),
+			Vector3(0, -1, 0),
+			//
+			Vector3(-1, 0, 0),
+			Vector3(-1, 0, 0),
+			Vector3(-1, 0, 0),
+			Vector3(-1, 0, 0),
+			//
+			Vector3(+1, 0, 0),
+			Vector3(+1, 0, 0),
+			Vector3(+1, 0, 0),
+			Vector3(+1, 0, 0),
+		};
+		GLuint indices[] = {
+			0, 1, 2, 0, 2, 3,
+			4, 6, 5, 6, 4, 7,
+			9, 8, 10, 10, 8, 11,
+			12, 13, 14, 12, 14, 15,
+			17, 16, 18, 18, 16, 19,
+			21, 22, 20, 22, 23, 20
+		};
+
+		Mesh* _mesh = Mesh::Create(MeshName);
+		//
+		_mesh->m_positions.set(pos, 24);
+		_mesh->m_uvs.set(uvs, 24);
+		_mesh->m_normals.set(normals, 24);
+		_mesh->m_indices.set(indices, 36);
+		_mesh->GenerateTangents();
+		//
+		_mesh->Bind();
+		return _mesh;
+	}
 
 	// Creators
 	void Geometry::CreateFullQuad()
@@ -604,120 +720,122 @@ namespace Vxl
 
 	void Geometry::CreateCube()
 	{
-		Vector3 pos[] = {
-			// Front Face
-			Vector3(-0.5f, -0.5f, +0.5f),
-			Vector3(+0.5f, -0.5f, +0.5f),
-			Vector3(+0.5f, +0.5f, +0.5f),
-			Vector3(-0.5f, +0.5f, +0.5f),
-			//
-			Vector3(-0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, -0.5f),
-			Vector3(-0.5f, +0.5f, -0.5f),
-			//
-			Vector3(-0.5f, +0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, +0.5f),
-			Vector3(-0.5f, +0.5f, +0.5f),
-			//
-			Vector3(-0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, -0.5f, +0.5f),
-			Vector3(-0.5f, -0.5f, +0.5f),
-			//
-			Vector3(-0.5f, -0.5f, -0.5f),
-			Vector3(-0.5f, +0.5f, -0.5f),
-			Vector3(-0.5f, +0.5f, +0.5f),
-			Vector3(-0.5f, -0.5f, +0.5f),
-			//
-			Vector3(+0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, +0.5f),
-			Vector3(+0.5f, -0.5f, +0.5f),
-		};
-		Vector2 uvs[] = {
-			//
-			Vector2(0, 0),
-			Vector2(1, 0),
-			Vector2(1, 1),
-			Vector2(0, 1),
-			//
-			Vector2(1, 0),
-			Vector2(0, 0),
-			Vector2(0, 1),
-			Vector2(1, 1),
-			//
-			Vector2(0, 1),
-			Vector2(1, 1),
-			Vector2(1, 0),
-			Vector2(0, 0),
-			//
-			Vector2(1, 0),
-			Vector2(0, 0),
-			Vector2(0, 1),
-			Vector2(1, 1),
-			//
-			Vector2(0, 0),
-			Vector2(0, 1),
-			Vector2(1, 1),
-			Vector2(1, 0),
-			//
-			Vector2(1, 0),
-			Vector2(1, 1),
-			Vector2(0, 1),
-			Vector2(0, 0),
-		};
-		Vector3 normals[] = {
-			//
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			//
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			//
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			//
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			//
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-			//
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-		};
-		GLuint indices[] = {
-			0, 1, 2, 0, 2, 3,
-			4, 6, 5, 6, 4, 7,
-			9, 8, 10, 10, 8, 11,
-			12, 13, 14, 12, 14, 15,
-			17, 16, 18, 18, 16, 19,
-			21, 22, 20, 22, 23, 20
-		};
-
-		m_cube = Mesh::Create("Cube");
-		//
-		m_cube->m_positions.set(pos, 24);
-		m_cube->m_uvs.set(uvs, 24);
-		m_cube->m_normals.set(normals, 24);
-		m_cube->m_indices.set(indices, 36);
-		m_cube->GenerateTangents();
-		//
-		m_cube->Bind();
+		m_cube = GenerateCube("Cube", 1.0f);
+		m_cube_small = GenerateCube("Cube_small", 0.25f);
+		//	Vector3 pos[] = {
+		//		// Front Face
+		//		Vector3(-0.5f, -0.5f, +0.5f),
+		//		Vector3(+0.5f, -0.5f, +0.5f),
+		//		Vector3(+0.5f, +0.5f, +0.5f),
+		//		Vector3(-0.5f, +0.5f, +0.5f),
+		//		//
+		//		Vector3(-0.5f, -0.5f, -0.5f),
+		//		Vector3(+0.5f, -0.5f, -0.5f),
+		//		Vector3(+0.5f, +0.5f, -0.5f),
+		//		Vector3(-0.5f, +0.5f, -0.5f),
+		//		//
+		//		Vector3(-0.5f, +0.5f, -0.5f),
+		//		Vector3(+0.5f, +0.5f, -0.5f),
+		//		Vector3(+0.5f, +0.5f, +0.5f),
+		//		Vector3(-0.5f, +0.5f, +0.5f),
+		//		//
+		//		Vector3(-0.5f, -0.5f, -0.5f),
+		//		Vector3(+0.5f, -0.5f, -0.5f),
+		//		Vector3(+0.5f, -0.5f, +0.5f),
+		//		Vector3(-0.5f, -0.5f, +0.5f),
+		//		//
+		//		Vector3(-0.5f, -0.5f, -0.5f),
+		//		Vector3(-0.5f, +0.5f, -0.5f),
+		//		Vector3(-0.5f, +0.5f, +0.5f),
+		//		Vector3(-0.5f, -0.5f, +0.5f),
+		//		//
+		//		Vector3(+0.5f, -0.5f, -0.5f),
+		//		Vector3(+0.5f, +0.5f, -0.5f),
+		//		Vector3(+0.5f, +0.5f, +0.5f),
+		//		Vector3(+0.5f, -0.5f, +0.5f),
+		//	};
+		//	Vector2 uvs[] = {
+		//		//
+		//		Vector2(0, 0),
+		//		Vector2(1, 0),
+		//		Vector2(1, 1),
+		//		Vector2(0, 1),
+		//		//
+		//		Vector2(1, 0),
+		//		Vector2(0, 0),
+		//		Vector2(0, 1),
+		//		Vector2(1, 1),
+		//		//
+		//		Vector2(0, 1),
+		//		Vector2(1, 1),
+		//		Vector2(1, 0),
+		//		Vector2(0, 0),
+		//		//
+		//		Vector2(1, 0),
+		//		Vector2(0, 0),
+		//		Vector2(0, 1),
+		//		Vector2(1, 1),
+		//		//
+		//		Vector2(0, 0),
+		//		Vector2(0, 1),
+		//		Vector2(1, 1),
+		//		Vector2(1, 0),
+		//		//
+		//		Vector2(1, 0),
+		//		Vector2(1, 1),
+		//		Vector2(0, 1),
+		//		Vector2(0, 0),
+		//	};
+		//	Vector3 normals[] = {
+		//		//
+		//		Vector3(0, 0, +1),
+		//		Vector3(0, 0, +1),
+		//		Vector3(0, 0, +1),
+		//		Vector3(0, 0, +1),
+		//		//
+		//		Vector3(0, 0, -1),
+		//		Vector3(0, 0, -1),
+		//		Vector3(0, 0, -1),
+		//		Vector3(0, 0, -1),
+		//		//
+		//		Vector3(0, +1, 0),
+		//		Vector3(0, +1, 0),
+		//		Vector3(0, +1, 0),
+		//		Vector3(0, +1, 0),
+		//		//
+		//		Vector3(0, -1, 0),
+		//		Vector3(0, -1, 0),
+		//		Vector3(0, -1, 0),
+		//		Vector3(0, -1, 0),
+		//		//
+		//		Vector3(-1, 0, 0),
+		//		Vector3(-1, 0, 0),
+		//		Vector3(-1, 0, 0),
+		//		Vector3(-1, 0, 0),
+		//		//
+		//		Vector3(+1, 0, 0),
+		//		Vector3(+1, 0, 0),
+		//		Vector3(+1, 0, 0),
+		//		Vector3(+1, 0, 0),
+		//	};
+		//	GLuint indices[] = {
+		//		0, 1, 2, 0, 2, 3,
+		//		4, 6, 5, 6, 4, 7,
+		//		9, 8, 10, 10, 8, 11,
+		//		12, 13, 14, 12, 14, 15,
+		//		17, 16, 18, 18, 16, 19,
+		//		21, 22, 20, 22, 23, 20
+		//	};
+		//	
+		//	m_cube = Mesh::Create("Cube");
+		//	//
+		//	m_cube->m_positions.set(pos, 24);
+		//	m_cube->m_uvs.set(uvs, 24);
+		//	m_cube->m_normals.set(normals, 24);
+		//	m_cube->m_indices.set(indices, 36);
+		//	m_cube->GenerateTangents();
+		//	//
+		//	m_cube->Bind();
 	}
 
 	void Geometry::CreateInverseCube()

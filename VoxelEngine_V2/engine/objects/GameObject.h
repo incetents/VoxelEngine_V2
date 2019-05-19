@@ -38,7 +38,7 @@ namespace Vxl
 		}
 	
 		// Material
-		void			SetMaterial(Material* _base);
+		void			SetMaterial(Material* _materialBase);
 		Material*		GetMaterial(void) const;
 		UINT			GetMaterialOrder(void) const;
 
