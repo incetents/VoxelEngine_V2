@@ -13,13 +13,6 @@
 #include "Rotation.h"
 #include "Random.h"
 
-enum class Axis
-{
-	X,
-	Y,
-	Z
-};
-
 // Matrix Macros
 #define MATRIX_INVERSE_EPSILON	1e-14f
 #define MATRIX_EPSILON			1e-6f
@@ -70,9 +63,10 @@ namespace Vxl
 
 	enum class Axis
 	{
-		X,
-		Y,
-		Z
+		NONE = -1,
+		X = 0,
+		Y = 1,
+		Z = 2
 	};
 
 	template<typename T>

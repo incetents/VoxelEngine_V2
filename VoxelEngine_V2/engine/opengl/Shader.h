@@ -125,8 +125,14 @@ namespace Vxl
 		// Tracker //
 		static GLuint		m_boundID;
 
+		bool createProgram();
+		void destroyProgram();
+
 		void attachShaders();
 		void detachShaders();
+
+		void AddShader(Shader* _shader);
+		void Link();
 
 		void acquireUniforms();
 		void acquireUniformBlocks();
@@ -134,14 +140,11 @@ namespace Vxl
 
 		bool checkError();
 
-		bool load();
-		void unload();
-
 		// Constructor
 		ShaderProgram(const std::string& name)
 			: m_name(name)
 		{
-			load();
+			createProgram();
 		}
 
 	public:
@@ -153,21 +156,12 @@ namespace Vxl
 
 		~ShaderProgram()
 		{
-			unload();
+			detachShaders();
+			destroyProgram();
 		}
 
 		static std::set<const ShaderProgram*> ProgramsFailed;
 		static UINT ProgramsFailedSize;
-
-		void reload()
-		{
-			unload();
-			load();
-			Link();
-		}
-
-		void AddShader(Shader* _shader);
-		void Link();
 
 		void Bind() const;
 		static void Unbind();

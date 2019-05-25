@@ -21,29 +21,30 @@ namespace Vxl
 			Matrix3x3 RotationMatrix = m_localrotation.GetMatrix3x3();
 			
 			// Base Model Matrix
-			m_ModelMatrix = Matrix4x4(RotationMatrix.Transpose() * Matrix3x3::GetScale(m_scale), m_position);
-			
+			m_local_ModelMatrix = Matrix4x4(RotationMatrix.Transpose() * Matrix3x3::GetScale(m_scale), m_position);
+			m_world_ModelMatrix = m_local_ModelMatrix;
+
 			// Add Rotation / Model Matrix from parent
 			Transform* parent = m_parent;
 			while (parent != nullptr)
 			{
-				m_worldrotation = m_worldrotation * parent->getWorldRotation();
-				m_ModelMatrix = m_ModelMatrix * parent->getModel();
+				m_worldrotation *= parent->getLocalRotation();
+				m_world_ModelMatrix *= parent->getLocalModel();
 				parent = parent->getParent();
 			}
 
 			// Calculate Axis Directions
 			Matrix3x3 FinalRotationMatrix = m_worldrotation.GetMatrix3x3();
-			m_right		= FinalRotationMatrix.GetColumn(0);
-			m_up		= FinalRotationMatrix.GetColumn(1);
-			m_forward	= FinalRotationMatrix.GetColumn(2);
+			m_right		= FinalRotationMatrix.GetColumn(0).Normalize();
+			m_up		= FinalRotationMatrix.GetColumn(1).Normalize();
+			m_forward	= FinalRotationMatrix.GetColumn(2).Normalize();
 
 			// Update World position
-			m_worldPosition = m_ModelMatrix.GetRow(3);
+			m_worldPosition = m_world_ModelMatrix.GetRow(3);
 			// Update World Scale
-			m_lossyScale.x = Vector3::Length(m_ModelMatrix[0], m_ModelMatrix[1], m_ModelMatrix[2]);
-			m_lossyScale.y = Vector3::Length(m_ModelMatrix[4], m_ModelMatrix[5], m_ModelMatrix[6]);
-			m_lossyScale.z = Vector3::Length(m_ModelMatrix[8], m_ModelMatrix[9], m_ModelMatrix[10]);
+			m_lossyScale.x = Vector3::Length(m_world_ModelMatrix[0], m_world_ModelMatrix[1], m_world_ModelMatrix[2]);
+			m_lossyScale.y = Vector3::Length(m_world_ModelMatrix[4], m_world_ModelMatrix[5], m_world_ModelMatrix[6]);
+			m_lossyScale.z = Vector3::Length(m_world_ModelMatrix[8], m_world_ModelMatrix[9], m_world_ModelMatrix[10]);
 
 			// Clean
 			isDirty = false;
@@ -90,6 +91,36 @@ namespace Vxl
 			m_parent->SimpleRemoveChild(this);
 			m_parent->m_owner->TransformChanged();
 		}
+	}
+
+	Transform& Transform::setWorldPosition(const Vector3& position)
+	{
+		// No parent = change local instead
+		if (m_parent == nullptr)
+		{
+			setPosition(position);
+			return *this;
+		}
+
+		// Make sure parent matrices are correct
+		updateValues();
+
+		// Get parent matrix
+		Matrix4x4 Model = m_parent->getLocalModel();
+		Transform* parent = m_parent->getParent();
+
+		// Additional parents need to stack on current parent matrix
+		while (parent != nullptr)
+		{
+			Model = Model * parent->getLocalModel();
+			parent = parent->getParent();
+		}
+
+		// Apply inverse/transpose on model matrix to figure out correct local position
+		m_position = Model.Inverse().Transpose() * position;
+
+		SetDirty();
+		return *this;
 	}
 
 	Transform& Transform::setForward(const Vector3& forward)

@@ -123,7 +123,7 @@ namespace Vxl
 		roll = atan2f(siny, cosy);
 	}
 
-	// Get Matrix
+	// Get Matrix (column major)
 	Matrix3x3 Quaternion::GetMatrix3x3() const
 	{
 		Matrix3x3 matrix;

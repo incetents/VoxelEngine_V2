@@ -22,18 +22,19 @@ namespace Vxl
 		friend class CameraObject;
 	protected:
 		// Model for transformations
-		Matrix4x4	m_ModelMatrix;
+		Matrix4x4	m_local_ModelMatrix;
+		Matrix4x4	m_world_ModelMatrix;
 
 		// Raw Values
 		Vector3		m_worldPosition;	// World Position
 		Vector3		m_position; // Local Position
 		Vector3		m_euler_rotation; // Local Euler
 		Quaternion	m_localrotation; // Local Rotation
-		Quaternion	m_worldrotation; // Local Rotation
+		Quaternion	m_worldrotation; // World Rotation
 		Vector3		m_scale;		// Local Scale
 		Vector3		m_lossyScale;   // World Scale (Not supper accurate)
 
-		// Direction Space
+		// Direction Space [ World Direction ]
 		Vector3		m_forward	= Vector3::FORWARD;
 		Vector3     m_up		= Vector3::UP;
 		Vector3     m_right		= Vector3::RIGHT;
@@ -94,7 +95,7 @@ namespace Vxl
 		void SetDirty()
 		{
 			isDirty = true;
-			for (auto child : m_children)
+			for (Transform* child : m_children)
 				child->SetDirty();
 		}
 
@@ -257,32 +258,18 @@ namespace Vxl
 		// Setters
 		inline Transform& setWorldPosition(float x, float y, float z)
 		{
-			Vector3 Move = Vector3(x, y, z) - getWorldPosition();
-			m_position += Move;
-			SetDirty();
-			return *this;
+			return setWorldPosition(Vector3(x, y, z));
 		}
 		inline Transform& setWorldPosition(const Vector2& position)
 		{
-			Vector3 Move = Vector3(position) - getWorldPosition();
-			m_position += Move;
-			SetDirty();
-			return *this;
+			return setWorldPosition(Vector3(position));
 		}
-		inline Transform& setWorldPosition(const Vector3& position)
-		{
-			Vector3 Move = position - getWorldPosition();
-			m_position += Move;
-			SetDirty();
-			return *this;
-		}
+		Transform& setWorldPosition(const Vector3& position);
 		inline Transform& setWorldPosition(const Vector4& position)
 		{
-			Vector3 Move = Vector3(position) - getWorldPosition();
-			m_position += Move;
-			SetDirty();
-			return *this;
+			return setWorldPosition(Vector3(position));
 		}
+
 		inline Transform& setPosition(float x, float y, float z)
 		{
 			m_position = Vector3(x, y, z);
@@ -406,6 +393,27 @@ namespace Vxl
 		Transform& setRotation(const Quaternion& quat);
 
 		// Increasers
+		inline Transform& increaseWorldPosition(float x, float y, float z)
+		{
+			setWorldPosition(getWorldPosition() + Vector3(x, y, z));
+			return *this;
+		}
+		inline Transform& increaseWorldPosition(const Vector2& translate)
+		{
+			setWorldPosition(getWorldPosition() + Vector3(translate));
+			return *this;
+		}
+		inline Transform& increaseWorldPosition(const Vector3& translate)
+		{
+			setWorldPosition(getWorldPosition() + translate);
+			return *this;
+		}
+		inline Transform& increaseWorldPosition(const Vector4& translate)
+		{
+			setWorldPosition(getWorldPosition() + Vector3(translate));
+			return *this;
+		}
+
 		inline Transform& increasePosition(float x, float y, float z)
 		{
 			m_position += Vector3(x, y, z);
@@ -532,10 +540,15 @@ namespace Vxl
 		}
 
 		// Turn object into a 4x4 matrix for math
-		const Matrix4x4& getModel(void)
+		inline const Matrix4x4& getLocalModel(void)
 		{
 			updateValues();
-			return m_ModelMatrix;
+			return m_local_ModelMatrix;
+		}
+		inline const Matrix4x4& getWorldModel(void)
+		{
+			updateValues();
+			return m_world_ModelMatrix;
 		}
 
 		// Getters

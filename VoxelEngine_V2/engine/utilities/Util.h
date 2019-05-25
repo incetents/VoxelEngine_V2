@@ -8,6 +8,8 @@
 
 namespace Vxl
 {
+	class Vector4;
+
 	namespace Util
 	{
 		// Vector merging
@@ -71,6 +73,9 @@ namespace Vxl
 				// Output
 				output = data._output;
 			}
+
+			// Breaks uint into 4 uchars that are converted into [0,1] floats
+			static Vector4 uint_to_vec4(unsigned int input);
 		};
 
 		// Aspect Ratio //

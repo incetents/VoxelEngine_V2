@@ -14,7 +14,7 @@
 #include "../opengl/Mesh.h"
 #include "../opengl/FramebufferObject.h"
 #include "../window/window.h"
-#include "../editor/Hierarchy.h"
+#include "../editor/Editor.h"
 #include "../objects/GameObject.h"
 #include "../objects/LightObject.h"
 #include "../objects/CameraObject.h"
@@ -178,12 +178,21 @@ namespace Vxl
 		ShaderProgram::ProgramsFailedSize = 0;
 
 		auto Programs = ShaderProgram::GetDatabase();
-		for (auto Program : Programs)
-			Program.second->reload();
-
 		auto Shaders = Shader::GetDatabase();
+
+		for (auto Program : Programs)
+			Program.second->detachShaders();
+
 		for (auto Shader : Shaders)
 			Shader.second->reload();
+
+		for (auto Program : Programs)
+		{
+			Program.second->destroyProgram();
+			Program.second->createProgram();
+			Program.second->attachShaders();
+			Program.second->Link();
+		}
 
 		auto Materials = Material::GetDatabase();
 		for (auto Mat : Materials)
@@ -217,6 +226,12 @@ namespace Vxl
 	// Destroy all data for next Window context
 	void RenderManager::Destroy()
 	{
+		// Remove selected entity
+		Editor.ClearSelection();
+
+		// Delete special
+		GPUTimer::DestroyTimers();
+
 		// Delete Materials and Entities
 		Material::DeleteAndClearAll();
 		Entity::DeleteAndClearAll();
@@ -244,10 +259,6 @@ namespace Vxl
 		m_allEntities.clear();
 		m_allGameObjects.clear();
 		m_gbufferObjects.clear();
-
-		// Remove selected entity
-		Hierarchy.m_selectedEntities.clear();
-
 	}
 	void RenderManager::Update()
 	{
@@ -268,6 +279,7 @@ namespace Vxl
 	void RenderManager::Draw()
 	{
 		m_currentScene->Draw();
+		Debug.End();
 	}
 	void RenderManager::DrawImGui()
 	{
@@ -316,7 +328,7 @@ namespace Vxl
 		Texture* LightTexture = Texture::Get("editor_lightbulb");
 		for (auto light : m_allLightObjects)
 		{
-			billboard->SetUniform<Matrix4x4>("VXL_model", light->m_transform.getModel());
+			billboard->SetUniform<Matrix4x4>("VXL_model", light->m_transform.getWorldModel());
 		
 			if (LightTexture)
 				LightTexture->Bind(Active_Texture::LEVEL0);
@@ -330,7 +342,7 @@ namespace Vxl
 		Texture* CameraTexture = Texture::Get("editor_camera");
 		for (auto camera : m_allCameraObjects)
 		{
-			billboard->SetUniform<Matrix4x4>("VXL_model", camera->m_transform.getModel());
+			billboard->SetUniform<Matrix4x4>("VXL_model", camera->m_transform.getWorldModel());
 
 			if (LightTexture)
 				CameraTexture->Bind(Active_Texture::LEVEL0);
@@ -340,17 +352,7 @@ namespace Vxl
 			Geometry.GetQuad()->Draw();
 		}
 
-		// Draw Debug Lines
-		auto lines = ShaderProgram::Get("lines");
-		lines->Bind();
-		lines->SetUniform<Vector4>("_viewport", Vector4(
-			(float)Window.GetScreenOffsetX(),
-			(float)Window.GetScreenOffsetY(),
-			(float)Window.GetScreenWidth(),
-			(float)Window.GetScreenHeight()
-		));
-
-		Debug.RenderLines();
+	
 
 		// Draw Debug Wireframe Sphere
 		auto passthrough = ShaderProgram::Get("passthrough");
@@ -372,26 +374,68 @@ namespace Vxl
 		glUtil::wireframe(false);
 
 		// Draw Editor Arrows (if selection applies)
-		if (Hierarchy.CheckSelection())
+		if (Editor.HasSelection())
 		{
 			auto simpleLight = ShaderProgram::Get("simpleLight");
 			simpleLight->Bind();
 
 			simpleLight->SetUniform<bool>("VXL_useModel", true);
-			simpleLight->SetUniform<Matrix4x4>("VXL_model", Matrix4x4::GetTranslate(Hierarchy.GetAverageSelectionLocation()));
+			simpleLight->SetUniform<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel());
 
-			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 1));
+			// X Axis //
+			if(Editor.m_controlAxis == Axis::X)
+				if(Editor.m_controlAxisClicked)
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+				else
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+			else
+				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 1));
+
 			Geometry.GetArrowX()->Draw();
 
-			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 1));
+			// Y Axis //
+			if (Editor.m_controlAxis == Axis::Y)
+				if (Editor.m_controlAxisClicked)
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+				else
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+			else
+				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 1));
+
 			Geometry.GetArrowY()->Draw();
 
-			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 1));
+			// Z Axis //
+			if (Editor.m_controlAxis == Axis::Z)
+				if (Editor.m_controlAxisClicked)
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+				else
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+			else
+				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 1));
+
 			Geometry.GetArrowZ()->Draw();
 
 			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 1, 1, 1));
 			Geometry.GetCubeSmall()->Draw();
 
+			// TEST //
+			
+
 		}
+
+		// Draw Debug Lines
+		auto lines = ShaderProgram::Get("lines");
+		lines->Bind();
+		lines->SetUniform<Vector4>("_viewport", Vector4(
+			(float)Window.GetScreenOffsetX(),
+			(float)Window.GetScreenOffsetY(),
+			(float)Window.GetScreenWidth(),
+			(float)Window.GetScreenHeight()
+		));
+
+		lines->SetUniform<bool>("passthrough", false);
+		Debug.RenderWorldLines();
+		lines->SetUniform<bool>("passthrough", true);
+		Debug.RenderScreenLines();
 	}
 }

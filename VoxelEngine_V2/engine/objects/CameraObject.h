@@ -125,6 +125,7 @@ namespace Vxl
 		{
 			return m_zfar;
 		}
+		// [ DEGREES ]
 		inline float getFOV() const
 		{
 			return m_buffer[0];

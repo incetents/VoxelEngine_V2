@@ -10,6 +10,7 @@
 #include "glUtil.h"
 #include <vector>
 #include <assert.h>
+#include "../modules/Entity.h"
 
 namespace Vxl
 {
@@ -18,13 +19,132 @@ namespace Vxl
 	static class Debug : public Singleton<class Debug>
 	{
 		friend class RenderManager;
+
+		static const UINT	VertexIncrementAmount;
+
+		class LineSet
+		{
+		public:
+			enum class PositionType
+			{
+				VEC2,
+				VEC3
+			};
+			PositionType m_type; // Whether position in VBO stride has 2 or 3 values
+
+			VBO*				m_vbo = nullptr;
+			std::vector<float>	m_vertices;  // 16 floats = 2 lines // 800 floats = 100 lines
+			UINT				m_vertexIndex = 0;
+			bool				m_resizeDirty = false;
+
+			void Setup(UINT size, PositionType type)
+			{
+				m_type = type;
+
+				m_vertices.clear();
+				m_vertices.resize(size);
+				m_vertices.shrink_to_fit();
+
+				delete m_vbo;
+				m_vbo = new VBO();
+				m_vbo->SetVertices(m_vertices, BufferBind_Mode::DYNAMIC);
+				if(type == PositionType::VEC3)
+					m_vbo->AddStrideHint(BufferType::VERTEX, 3); // loc 0
+				else
+					m_vbo->AddStrideHint(BufferType::VERTEX, 2); // loc 0
+
+				m_vbo->AddStrideHint(BufferType::COLOR, 4); // loc 3
+				m_vbo->AddStrideHint(BufferType::UV, 1); // loc 1 (WIDTH)
+			}
+			void AddLine(
+				const Vector3& P1, const Vector3& P2,
+				float Width,
+				const Color4F& C1, const Color4F& C2
+			) {
+				assert(m_type == PositionType::VEC3);
+
+				if (m_vertexIndex >= m_vertices.size())
+				{
+					m_vertices.resize(m_vertices.size() + VertexIncrementAmount);
+					m_resizeDirty = true;
+				}
+
+				m_vertices[m_vertexIndex + 0] = P1.x;
+				m_vertices[m_vertexIndex + 1] = P1.y;
+				m_vertices[m_vertexIndex + 2] = P1.z;
+				m_vertices[m_vertexIndex + 3] = C1.r;
+				m_vertices[m_vertexIndex + 4] = C1.g;
+				m_vertices[m_vertexIndex + 5] = C1.b;
+				m_vertices[m_vertexIndex + 6] = C1.a;
+
+				m_vertices[m_vertexIndex + 7] = Width;
+
+				m_vertices[m_vertexIndex + 8] = P2.x;
+				m_vertices[m_vertexIndex + 9] = P2.y;
+				m_vertices[m_vertexIndex + 10] = P2.z;
+				m_vertices[m_vertexIndex + 11] = C2.r;
+				m_vertices[m_vertexIndex + 12] = C2.g;
+				m_vertices[m_vertexIndex + 13] = C2.b;
+				m_vertices[m_vertexIndex + 14] = C2.a;
+
+				m_vertices[m_vertexIndex + 15] = Width;
+
+				// Offset counter
+				m_vertexIndex += 16;
+
+			}
+			void AddLine(
+				const Vector2& P1, const Vector2& P2,
+				float Width,
+				const Color4F& C1, const Color4F& C2
+			) {
+				assert(m_type == PositionType::VEC2);
+
+				if (m_vertexIndex >= m_vertices.size())
+				{
+					m_vertices.resize(m_vertices.size() + VertexIncrementAmount);
+					m_resizeDirty = true;
+				}
+
+				m_vertices[m_vertexIndex + 0] = P1.x;
+				m_vertices[m_vertexIndex + 1] = P1.y;
+				m_vertices[m_vertexIndex + 2] = C1.r;
+				m_vertices[m_vertexIndex + 3] = C1.g;
+				m_vertices[m_vertexIndex + 4] = C1.b;
+				m_vertices[m_vertexIndex + 5] = C1.a;
+
+				m_vertices[m_vertexIndex + 6] = Width;
+
+				m_vertices[m_vertexIndex + 7] = P2.x;
+				m_vertices[m_vertexIndex + 8] = P2.y;
+				m_vertices[m_vertexIndex + 9] = C2.r;
+				m_vertices[m_vertexIndex + 10] = C2.g;
+				m_vertices[m_vertexIndex + 11] = C2.b;
+				m_vertices[m_vertexIndex + 12] = C2.a;
+
+				m_vertices[m_vertexIndex + 13] = Width;
+
+				// Offset counter
+				m_vertexIndex += 14;
+			}
+
+			void UpdateVBO()
+			{
+				// Resize VBO if vector resized
+				if (m_resizeDirty)
+				{
+					// Resize VBO
+					m_vbo->SetVertices(m_vertices, BufferBind_Mode::DYNAMIC);
+					m_resizeDirty = false;
+				}
+			}
+		};
+
 	private:
-		// Debug Lines
-		VBO*				m_lines;
-		std::vector<float>	m_lines_vertices;  // 16 floats = 2 lines // 800 floats = 100 lines
-		UINT				m_lines_vertexIndex = 0;
-		bool				m_lines_resizeDirty = false;
-		static const UINT	m_lines_vertexIncrementAmount;
+		// Debug Lines in world space
+		LineSet m_worldLines;
+		// Debug Lines in screen space
+		LineSet m_screenLines;
 		
 		// Debug Wireframe Spheres
 		struct WireframeSphere
@@ -47,15 +167,8 @@ namespace Vxl
 		// Debug Lines
 		void Setup()
 		{
-			m_lines_vertices.clear();
-			m_lines_vertices.resize(m_lines_vertexIncrementAmount);
-
-			delete m_lines;
-			m_lines = new VBO();
-			m_lines->SetVertices(m_lines_vertices, BufferBind_Mode::DYNAMIC);
-			m_lines->AddStrideHint(BufferType::VERTEX, 3); // loc 0
-			m_lines->AddStrideHint(BufferType::COLOR, 4); // loc 3
-			m_lines->AddStrideHint(BufferType::UV, 1); // loc 1 (WIDTH)
+			m_worldLines.Setup(VertexIncrementAmount, LineSet::PositionType::VEC3);
+			m_screenLines.Setup(VertexIncrementAmount, LineSet::PositionType::VEC2);
 
 			CreateDebugTextures();
 		}
@@ -92,10 +205,16 @@ namespace Vxl
 			const Matrix4x4& model,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
+		
+		void DrawScreenSpaceLine(
+			const Vector2& P1, const Vector2& P2,
+			float Width,
+			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
+		);
 
-		void UpdateStart();
-
-		void RenderLines();
+		void RenderWorldLines();
+		void RenderScreenLines();
+		void End();
 
 		// Debug Texture
 		Texture* GetNullTexture(void) const

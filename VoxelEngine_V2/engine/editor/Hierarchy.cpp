@@ -16,6 +16,8 @@
 
 #include "../utilities/Util.h"
 
+#include "../editor/Editor.h"
+
 #include <iostream>
 
 namespace Vxl
@@ -30,7 +32,7 @@ namespace Vxl
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog;
-			if (_entity->m_isSelected)
+			if (_entity->IsSelected())
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
@@ -54,15 +56,15 @@ namespace Vxl
 			{
 				if (Input.getKey(KeyCode::LEFT_CONTROL))
 				{
-					if (!_entity->m_isSelected)
-						AddSelection(_entity);
+					if (!_entity->IsSelected())
+						Editor.AddSelection(_entity);
 					else
-						RemoveSelection(_entity);
+						Editor.RemoveSelection(_entity);
 				}
 				else
 				{
-					ClearSelection();
-					AddSelection(_entity);
+					Editor.ClearSelection();
+					Editor.AddSelection(_entity);
 				}
 			}
 
@@ -73,7 +75,7 @@ namespace Vxl
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
-			if (_entity->m_isSelected)
+			if (_entity->IsSelected())
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
@@ -97,15 +99,15 @@ namespace Vxl
 			{
 				if (Input.getKey(KeyCode::LEFT_CONTROL))
 				{
-					if (!_entity->m_isSelected)
-						AddSelection(_entity);
+					if (!_entity->IsSelected())
+						Editor.AddSelection(_entity);
 					else
-						RemoveSelection(_entity);
+						Editor.RemoveSelection(_entity);
 				}
 				else
 				{
-					ClearSelection();
-					AddSelection(_entity);
+					Editor.ClearSelection();
+					Editor.AddSelection(_entity);
 				}
 			}
 
@@ -139,19 +141,21 @@ namespace Vxl
 
 		if (ImGui::Begin("[F3] Hierarchy", &open, ImVec2(280, 380), 0.9f))
 		{
+			auto Entities = Editor.GetSelectedEntities();
+
 			ImGui::Text("Scene Graph:\t");
 
 			if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
 			{
 				// Don't delete camera
-				for (auto Entity : m_selectedEntities)
+				for (auto Entity : Entities)
 				{
 					if (Entity->GetType() != EntityType::CAMERA)
 					{
 						Entity::Delete(Entity);
 					}
 				}
-				ClearSelection();
+				Editor.ClearSelection();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Add Sphere"))
@@ -164,7 +168,7 @@ namespace Vxl
 			ImGui::SameLine();
 			if (ImGui::Button("Duplicate Selected GameObject(s)"))
 			{
-				for (auto Entity : m_selectedEntities)
+				for (auto Entity : Entities)
 				{
 					if (Entity->GetType() == EntityType::GAMEOBJECT)
 					{
@@ -203,13 +207,13 @@ namespace Vxl
 			{
 				if (Input.getKeyDown(KeyCode::DOWN))
 				{
-					if (m_selectedEntities.size() == 1)
+					if (Entities.size() == 1)
 					{
 						for (int i = 0; i < EntityCount; i++)
 						{
-							if (AllEntities[i] == m_selectedEntities[0])
+							if (AllEntities[i] == Entities[0])
 							{
-								ClearSelection();
+								Editor.ClearSelection();
 								auto Entity = AllEntities[(i + 1) % EntityCount];
 
 								// Check for children
@@ -225,7 +229,7 @@ namespace Vxl
 
 								// Get Next Entity
 
-								AddSelection(Entity);
+								Editor.AddSelection(Entity);
 								break;
 							}
 						}
@@ -233,14 +237,14 @@ namespace Vxl
 				}
 				else if (Input.getKeyDown(KeyCode::UP))
 				{
-					if (m_selectedEntities.size() == 1)
+					if (Entities.size() == 1)
 					{
 						for (int i = 0; i < EntityCount; i++)
 						{
-							if (AllEntities[i] == m_selectedEntities[0])
+							if (AllEntities[i] == Entities[0])
 							{
-								ClearSelection();
-								AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i - 1]);
+								Editor.ClearSelection();
+								Editor.AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i - 1]);
 								break;
 							}
 						}
@@ -251,31 +255,6 @@ namespace Vxl
 		ImGui::End();
 	}
 
-	void Hierarchy::RemoveSelection(Entity* _entity)
-	{
-		Util::RemoveFromVector(m_selectedEntities, _entity);
-		_entity->m_isSelected = false;
 
-		UpdateAverageSelectionLocation();
-	}
-	void Hierarchy::AddSelection(Entity* _entity)
-	{
-		for (auto Entity : m_selectedEntities)
-			if (Entity == _entity)
-				return;
-
-		m_selectedEntities.push_back(_entity);
-		_entity->m_isSelected = true;
-
-		UpdateAverageSelectionLocation();
-	}
-	void Hierarchy::ClearSelection()
-	{
-		for (auto Entity : m_selectedEntities)
-			Entity->m_isSelected = false;
-		m_selectedEntities.clear();
-
-		m_averageSelectionLocation = Vector3::ZERO;
-	}
 }
 

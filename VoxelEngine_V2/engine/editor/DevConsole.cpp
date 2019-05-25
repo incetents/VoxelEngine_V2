@@ -24,6 +24,8 @@
 
 #include "../game/Scene_Game.h"
 
+#include "../editor/Editor.h"
+
 #include "windows.h"
 
 namespace Vxl
@@ -49,6 +51,9 @@ namespace Vxl
 
 		ImGui::Separator();
 
+		ImGui::Checkbox("ControlAxisLocal", &Editor.m_controlAxisLocal);
+
+		ImGui::Separator();
 
 		if (ImGui::Button("Reload Window"))
 		{

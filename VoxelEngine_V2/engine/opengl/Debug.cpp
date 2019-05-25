@@ -11,7 +11,7 @@
 
 namespace Vxl
 {
-	const UINT Debug::m_lines_vertexIncrementAmount = 800;
+	const UINT Debug::VertexIncrementAmount = 800;
 
 	void Debug::DrawLine(
 		const Vector3& P1, const Vector3& P2,
@@ -19,34 +19,7 @@ namespace Vxl
 		const Color4F& C1, const Color4F& C2
 	)
 	{
-		if (m_lines_vertexIndex >= m_lines_vertices.size())
-		{
-			// Increase vector size
-			m_lines_vertices.resize(m_lines_vertices.size() + m_lines_vertexIncrementAmount);
-			m_lines_resizeDirty = true;
-		}
-
-		m_lines_vertices[m_lines_vertexIndex + 0] = P1.x;
-		m_lines_vertices[m_lines_vertexIndex + 1] = P1.y;
-		m_lines_vertices[m_lines_vertexIndex + 2] = P1.z;
-		m_lines_vertices[m_lines_vertexIndex + 3] = C1.r;
-		m_lines_vertices[m_lines_vertexIndex + 4] = C1.g;
-		m_lines_vertices[m_lines_vertexIndex + 5] = C1.b;
-		m_lines_vertices[m_lines_vertexIndex + 6] = C1.a;
-
-		m_lines_vertices[m_lines_vertexIndex + 7] = Width;
-
-		m_lines_vertices[m_lines_vertexIndex + 8] = P2.x;
-		m_lines_vertices[m_lines_vertexIndex + 9] = P2.y;
-		m_lines_vertices[m_lines_vertexIndex + 10] = P2.z;
-		m_lines_vertices[m_lines_vertexIndex + 11] = C2.r;
-		m_lines_vertices[m_lines_vertexIndex + 12] = C2.g;
-		m_lines_vertices[m_lines_vertexIndex + 13] = C2.b;
-		m_lines_vertices[m_lines_vertexIndex + 14] = C2.a;
-
-		m_lines_vertices[m_lines_vertexIndex + 15] = Width;
-
-		m_lines_vertexIndex += 16;
+		m_worldLines.AddLine(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawAABB(
 		const Vector3& Min, const Vector3& Max,
@@ -134,39 +107,65 @@ namespace Vxl
 		m_wireframeSpheres.push_back(WS);
 	}
 
-	void Debug::UpdateStart()
+	void Debug::DrawScreenSpaceLine(
+		const Vector2& P1, const Vector2& P2,
+		float Width,
+		const Color4F& C1, const Color4F& C2
+	)
 	{
-		// reset index flag
-		m_lines_vertexIndex = 0;
-		std::fill(m_lines_vertices.begin(), m_lines_vertices.end(), 0);
-
-		// reset wireframe sphere list
-		m_wireframeSpheres.clear();
+		m_screenLines.AddLine(P1, P2, Width, C1, C2);
 	}
 
-	void Debug::RenderLines()
+	void Debug::RenderWorldLines()
 	{
 		// No VAO allowed
 		glUtil::unbindVAO();
 
 		// Resize VBO if vector resized
-		if (m_lines_resizeDirty)
-		{
-			// Resize VBO
-			m_lines->SetVertices(m_lines_vertices, BufferBind_Mode::DYNAMIC);
-			m_lines_resizeDirty = false;
-		}
-		// reset index flag
-		m_lines_vertexIndex = 0;
+		m_worldLines.UpdateVBO();
 
 		// Set VBO To lines
-		m_lines->Bind();
+		m_worldLines.m_vbo->Bind();
 		// Update Vertices
-		m_lines->UpdateVertices(&m_lines_vertices[0]);
+		m_worldLines.m_vbo->UpdateVertices(&m_worldLines.m_vertices[0]);
 		// Draw Lines
 		glUtil::depthMask(false);
-		m_lines->Draw(Draw_Type::LINES);
+		m_worldLines.m_vbo->Draw(Draw_Type::LINES);
 		glUtil::depthMask(true);
+
+	}
+
+	void Debug::RenderScreenLines()
+	{
+		// No VAO allowed
+		glUtil::unbindVAO();
+
+		// Resize VBO if vector resized
+		m_screenLines.UpdateVBO();
+
+		// Set VBO To lines
+		m_screenLines.m_vbo->Bind();
+		// Update Vertices
+		m_screenLines.m_vbo->UpdateVertices(&m_screenLines.m_vertices[0]);
+		// Draw Lines
+		glUtil::depthMask(false);
+		m_screenLines.m_vbo->Draw(Draw_Type::LINES);
+		glUtil::depthMask(true);
+
+	}
+
+	void Debug::End()
+	{
+		// reset index flag
+		m_worldLines.m_vertexIndex = 0;
+		std::fill(m_worldLines.m_vertices.begin(), m_worldLines.m_vertices.end(), 0);
+
+		// reset index flag
+		m_screenLines.m_vertexIndex = 0;
+		std::fill(m_screenLines.m_vertices.begin(), m_screenLines.m_vertices.end(), 0);
+
+		// reset wireframe sphere list
+		m_wireframeSpheres.clear();
 	}
 
 	void Debug::CreateDebugTextures()

@@ -56,6 +56,7 @@ namespace Vxl
 	const Vector2 Vector2::DOWN = Vector2(0, -1);
 	const Vector2 Vector2::LEFT = Vector2(-1, 0);
 	const Vector2 Vector2::RIGHT = Vector2(+1, 0);
+	const Vector2 Vector2::HALF = Vector2(+0.5f, +0.5f);
 
 	// Empty Constructor
 	Vector2::Vector2(void) : x(0), y(0) {}

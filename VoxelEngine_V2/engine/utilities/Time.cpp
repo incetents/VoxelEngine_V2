@@ -39,6 +39,15 @@ namespace Vxl
 	std::map<std::string, GPUTimer*> GPUTimer::m_timers;
 	bool GPUTimer::m_TimerBeingUsed = false;
 
+	void GPUTimer::DestroyTimers()
+	{
+#ifdef GLOBAL_GPU_TIMERS
+		for (auto& timer : m_timers)
+			delete timer.second;
+		m_timers.clear();
+#endif
+	}
+
 	GPUTimer::GPUTimer()
 	{
 #ifdef GLOBAL_GPU_TIMERS

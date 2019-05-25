@@ -42,7 +42,7 @@ namespace Vxl
 			// Update OBB 
 			Vector4 VMin = Vector4(_mesh->GetVertexMin(), 1);
 			Vector4 VMax = Vector4(_mesh->GetVertexMax(), 1);
-			Matrix4x4 Model = m_transform.getModel();
+			Matrix4x4 Model = m_transform.getWorldModel();
 			Model.TransposeSelf();
 
 			m_OBB[0] = (Model * VMin); // x0 y0 z0

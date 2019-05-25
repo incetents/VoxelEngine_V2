@@ -6,7 +6,7 @@
 #include "../imgui/imgui_internal.h"
 #include "../imgui/imgui_colors.h"
 
-#include "Hierarchy.h"
+#include "Editor.h"
 #include "../modules/Entity.h"
 
 #include "../math/Vector2.h"
@@ -53,9 +53,9 @@ namespace Vxl
 
 		if (ImGui::Begin("[F2] Inspector", &open, ImVec2(380, 280), 0.9f))
 		{
-			if (Hierarchy.GetSelectedEntities().size() == 1)
+			if (Editor.GetSelectedEntities().size() == 1)
 			{
-				auto Entity = Hierarchy.GetSelectedEntities()[0];
+				auto Entity = Editor.GetSelectedEntities()[0];
 
 				// Name
 				static char Name[MAX_ENTITY_NAME_LENGTH];

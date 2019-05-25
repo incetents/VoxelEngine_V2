@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="engine\editor\Editor.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
@@ -86,6 +87,7 @@
     <ClCompile Include="engine\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\editor\Editor.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
     <ClInclude Include="engine\objects\CameraObject.h" />
     <ClInclude Include="engine\objects\LightObject.h" />

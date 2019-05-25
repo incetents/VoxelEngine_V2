@@ -58,6 +58,7 @@ namespace Vxl
 		static const Vector2 DOWN;
 		static const Vector2 LEFT;
 		static const Vector2 RIGHT;
+		static const Vector2 HALF;
 
 		// Data
 		float x, y;

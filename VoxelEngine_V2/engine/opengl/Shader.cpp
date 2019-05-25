@@ -156,6 +156,24 @@ namespace Vxl
 
 	GLuint ShaderProgram::m_boundID = 0;
 
+	bool ShaderProgram::createProgram()
+	{
+		m_id = glCreateProgram();
+		if (m_id == -1)
+		{
+			Logger.error("Unable to create shader program " + m_name);
+			return false;
+		}
+		return true;
+	}
+
+	void ShaderProgram::destroyProgram()
+	{
+		glDeleteProgram(m_id);
+		m_id = -1;
+		m_linked = false;
+	}
+
 	void ShaderProgram::attachShaders()
 	{
 		for (unsigned int i = 0; i < m_shaderCount; i++)
@@ -194,27 +212,6 @@ namespace Vxl
 		return true;
 	}
 
-	bool ShaderProgram::load()
-	{
-		m_id = glCreateProgram();
-		if (m_id == -1)
-		{
-			Logger.error("Unable to create shader program " + m_name);
-			return false;
-		}
-
-		attachShaders();
-		return true;
-	}
-
-	void ShaderProgram::unload()
-	{
-		detachShaders();
-		glDeleteProgram(m_id);
-		m_id = -1;
-		m_linked = false;
-	}
-
 	ShaderProgram* ShaderProgram::Load(const std::string& name, std::vector<std::string> shaders)
 	{
 		ShaderProgram* _program = new ShaderProgram(name);
@@ -228,6 +225,7 @@ namespace Vxl
 			if (_shader != nullptr)
 				_program->AddShader(_shader);
 		}
+		_program->attachShaders();
 		_program->Link();
 
 		if (_program == nullptr)
@@ -371,8 +369,6 @@ namespace Vxl
 	{
 		if (m_linked)
 			return;
-
-		attachShaders();
 
 		glLinkProgram(m_id);
 		glValidateProgram(m_id);

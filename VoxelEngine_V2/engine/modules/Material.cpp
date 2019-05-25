@@ -133,7 +133,7 @@ namespace Vxl
 		}
 		if (m_owner->m_useTransform && m_material->Mat_model.m_exists)
 		{
-			m_material->Mat_model.m_uniform.Set(m_owner->m_transform.getModel());
+			m_material->Mat_model.m_uniform.Set(m_owner->m_transform.getWorldModel());
 		}
 		// ~ Special Setters ~ //
 		if (m_material->Mat_useInstancing.m_exists)

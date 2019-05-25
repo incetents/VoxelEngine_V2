@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Util.h"
 
+#include "../math/Vector4.h"
+
 namespace Vxl
 {
 	namespace Util
@@ -47,5 +49,17 @@ namespace Vxl
 			ResolutionInfo(2048, 1536)
 		};
 		const unsigned int ResolutionInfo::VariationsCount = 25;
+
+		Vector4 DataConversion::uint_to_vec4(unsigned int input)
+		{
+			unsigned char cx, cy, cz, cw;
+			uint_to_uchars(input, cx, cy, cz, cw);
+			return Vector4(
+				(float)cx / 255.0f,
+				(float)cy / 255.0f,
+				(float)cz / 255.0f,
+				(float)cw / 255.0f
+			);
+		}
 	}
 }

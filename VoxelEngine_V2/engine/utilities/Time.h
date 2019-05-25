@@ -141,6 +141,8 @@ namespace Vxl
 		double		m_elapsedTime_MS_average;
 		QueryState	m_queryingState = QueryState::READY;
 
+		static void DestroyTimers();
+
 		GPUTimer();
 		~GPUTimer();
 

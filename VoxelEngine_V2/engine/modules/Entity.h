@@ -27,7 +27,7 @@ namespace Vxl
 		friend class RenderManager;
 		friend class GameObject;
 		friend class Transform;
-		friend class Hierarchy;
+		friend class Editor;
 	protected:
 		// Locked Constructor
 		Entity(const std::string& name, EntityType type);
