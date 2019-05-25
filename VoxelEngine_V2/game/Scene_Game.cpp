@@ -124,81 +124,81 @@ namespace Vxl
 		//TerrainManager.Setup(); // keeps track of terrain info
 		//
 
-		//	_mesh = Mesh::Create("test1");
-		//	
-		//	Vector3 pos[] = {
-		//		Vector3(-0.5f, -0.5f, 0.0f),
-		//		Vector3(+0.5f, -0.5f, 0.0f),
-		//		Vector3(+0.5f, +0.5f, 0.0f),
-		//		Vector3(-0.5f, +0.5f, 0.0f)
-		//	};
-		//	Vector2 uvs[] = {
-		//		Vector2(0,0),
-		//		Vector2(1,0),
-		//		Vector2(1,1),
-		//		Vector2(0,1)
-		//	};
-		//	GLuint indices[6] = { 0, 1, 2, 0, 2, 3 };
-		//	
-		//	_mesh->m_positions.set(pos, 4);
-		//	_mesh->m_uvs.set(uvs, 4);
-		//	_mesh->m_indices.set(indices, 6);
-		//	
-		//	std::vector<Matrix4x4> m_models;
-		//	for (float x = 0; x < 5.0f; x++)
-		//	{
-		//		for (float y = 0; y < 5.0f; y++)
-		//		{
-		//			Transform t(Vec3(x * 1.2f, y * 1.2f, -4.0f));
-		//			m_models.push_back(t.getLocalModel());
-		//		}
-		//	}
-		//	
-		//	_mesh->m_instances = m_models;
-		//	
-		//	_mesh->Bind();
+		_mesh = Mesh::Create("test1");
+		
+		Vector3 pos[] = {
+			Vector3(-0.5f, -0.5f, 0.0f),
+			Vector3(+0.5f, -0.5f, 0.0f),
+			Vector3(+0.5f, +0.5f, 0.0f),
+			Vector3(-0.5f, +0.5f, 0.0f)
+		};
+		Vector2 uvs[] = {
+			Vector2(0,0),
+			Vector2(1,0),
+			Vector2(1,1),
+			Vector2(0,1)
+		};
+		GLuint indices[6] = { 0, 1, 2, 0, 2, 3 };
+		
+		_mesh->m_positions.set(pos, 4);
+		_mesh->m_uvs.set(uvs, 4);
+		_mesh->m_indices.set(indices, 6);
+		
+		std::vector<Matrix4x4> m_models;
+		for (float x = 0; x < 5.0f; x++)
+		{
+			for (float y = 0; y < 5.0f; y++)
+			{
+				Transform t(Vec3(x * 1.2f, y * 1.2f, -4.0f));
+				m_models.push_back(t.getLocalModel());
+			}
+		}
+		
+		_mesh->m_instances = m_models;
+		
+		_mesh->Bind();
 		
 		
-		//	// Entities
-		//	GameObject* _entity1 = GameObject::Create("_entity1");
-		//	_entity1->SetMaterial(_material_gbuffer);
-		//	_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
-		//	_entity1->SetMesh(_mesh);
-		//	_entity1->m_transform.setScale(+0.5f);
-		//	
-		//	//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
-		//	Mesh* jiggyMesh = Mesh::Get("jiggy");
-		//	
-		//	GameObject* _entity2 = GameObject::Create("_entity2");
-		//	_entity2->SetMaterial(_material_gbuffer);
-		//	//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		//	_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
-		//	_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
-		//	//_entity2->SetColor(Color3F(1, 1, 0));
-		//	
-		//	GameObject* _entity3 = GameObject::Create("_entity3");
-		//	_entity3->SetMaterial(_material_gbuffer);
-		//	_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
-		//	_entity3->SetMesh(Geometry.GetIcosahedron());
-		//	_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
-		//	
-		//	
-		//	
-		//	GameObject* _entity5 = GameObject::Create("_entity5");
-		//	_entity5->SetMaterial(_material_gbuffer);
-		//	_entity5->SetMesh(Geometry.GetSphereUV_Good());
-		//	_entity5->m_transform.setPosition(Vector3(0, -4, 0));
-		//	_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
-		//	//_entity5->SetColor(Color3F(1, 1, 1));
-		//	
-		//	
-		//	
-		//	GameObject* _skybox = GameObject::Create("_skybox");
-		//	_skybox->SetMaterial(_material_skybox);
-		//	_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
-		//	_skybox->SetMesh(Geometry.GetInverseCube());
-		//	_skybox->SetSelectable(false);
-		//	_skybox->m_useTransform = false;
+		// Entities
+		GameObject* _entity1 = GameObject::Create("_entity1");
+		_entity1->SetMaterial(_material_gbuffer);
+		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
+		_entity1->SetMesh(_mesh);
+		_entity1->m_transform.setScale(+0.5f);
+		
+		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
+		Mesh* jiggyMesh = Mesh::Get("jiggy");
+		
+		GameObject* _entity2 = GameObject::Create("_entity2");
+		_entity2->SetMaterial(_material_gbuffer);
+		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
+		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
+		//_entity2->SetColor(Color3F(1, 1, 0));
+		
+		GameObject* _entity3 = GameObject::Create("_entity3");
+		_entity3->SetMaterial(_material_gbuffer);
+		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_entity3->SetMesh(Geometry.GetIcosahedron());
+		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
+		
+		
+		
+		GameObject* _entity5 = GameObject::Create("_entity5");
+		_entity5->SetMaterial(_material_gbuffer);
+		_entity5->SetMesh(Geometry.GetSphereUV_Good());
+		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
+		_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
+		//_entity5->SetColor(Color3F(1, 1, 1));
+		
+		
+		
+		GameObject* _skybox = GameObject::Create("_skybox");
+		_skybox->SetMaterial(_material_skybox);
+		_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
+		_skybox->SetMesh(Geometry.GetInverseCube());
+		_skybox->SetSelectable(false);
+		_skybox->m_useTransform = false;
 		
 		//
 		GameObject* _crate1 = GameObject::Create("_crate1");
@@ -228,47 +228,47 @@ namespace Vxl
 		_crate3->m_transform.addChild(&_crate2->m_transform);
 		_crate2->m_transform.addChild(&_crate1->m_transform);
 
-		//_crate2->m_transform.setRotation(65, 12, 3);
-		//_crate3->m_transform.setRotation(45, 12, 3);
+		_crate2->m_transform.setRotation(65, 12, 3);
+		_crate3->m_transform.setRotation(45, 12, 3);
 		// World Position
-		//_crate1->m_transform.setWorldPosition(-5, 0, 0);
+		_crate1->m_transform.setWorldPosition(-5, 0, 0);
 		
-		//	GameObject* _octo1 = GameObject::Create("_octo1");
-		//	_octo1->SetMaterial(_material_gbuffer);
-		//	_octo1->SetMesh(Geometry.GetOctahedron());
-		//	_octo1->m_transform.setPosition(0, 0, 0);
-		//	_octo1->m_transform.setScale(0.5f);
-		//	_octo1->SetColor(Color3F(1, 1, 1));
-		//	
-		//	GameObject* _octo2 = GameObject::Create("_octo2");
-		//	_octo2->SetMaterial(_material_gbuffer);
-		//	_octo2->SetMesh(Geometry.GetOctahedron());
-		//	_octo2->m_transform.setPosition(1, 0, 0);
-		//	_octo2->m_transform.setScale(0.5f);
-		//	_octo2->SetColor(Color3F(1, 0, 0));
-		//	
-		//	GameObject* _octo3 = GameObject::Create("_octo3");
-		//	_octo3->SetMaterial(_material_gbuffer);
-		//	_octo3->SetMesh(Geometry.GetOctahedron());
-		//	_octo3->m_transform.setPosition(0, 1, 0);
-		//	_octo3->m_transform.setScale(0.5f);
-		//	_octo3->SetColor(Color3F(0, 1, 0));
-		//	
-		//	GameObject* _octo4 = GameObject::Create("_octo4");
-		//	_octo4->SetMaterial(_material_gbuffer);
-		//	_octo4->SetMesh(Geometry.GetOctahedron());
-		//	_octo4->m_transform.setPosition(0, 0, 1);
-		//	_octo4->m_transform.setScale(0.5f);
-		//	_octo4->SetColor(Color3F(0, 0, 1));
-		//	
-		//	LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
-		//	_light1->m_transform.setPosition(5, 0, 0);
+		GameObject* _octo1 = GameObject::Create("_octo1");
+		_octo1->SetMaterial(_material_gbuffer);
+		_octo1->SetMesh(Geometry.GetOctahedron());
+		_octo1->m_transform.setPosition(0, 0, 0);
+		_octo1->m_transform.setScale(0.5f);
+		_octo1->SetColor(Color3F(1, 1, 1));
+		
+		GameObject* _octo2 = GameObject::Create("_octo2");
+		_octo2->SetMaterial(_material_gbuffer);
+		_octo2->SetMesh(Geometry.GetOctahedron());
+		_octo2->m_transform.setPosition(1, 0, 0);
+		_octo2->m_transform.setScale(0.5f);
+		_octo2->SetColor(Color3F(1, 0, 0));
+		
+		GameObject* _octo3 = GameObject::Create("_octo3");
+		_octo3->SetMaterial(_material_gbuffer);
+		_octo3->SetMesh(Geometry.GetOctahedron());
+		_octo3->m_transform.setPosition(0, 1, 0);
+		_octo3->m_transform.setScale(0.5f);
+		_octo3->SetColor(Color3F(0, 1, 0));
+		
+		GameObject* _octo4 = GameObject::Create("_octo4");
+		_octo4->SetMaterial(_material_gbuffer);
+		_octo4->SetMesh(Geometry.GetOctahedron());
+		_octo4->m_transform.setPosition(0, 0, 1);
+		_octo4->m_transform.setScale(0.5f);
+		_octo4->SetColor(Color3F(0, 0, 1));
+		
+		LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
+		_light1->m_transform.setPosition(5, 0, 0);
 
-		//	GameObject* _billboard1 = GameObject::Create("_billboard1");
-		//	_billboard1->SetMaterial(_material_billboard);
-		//	_billboard1->SetMesh(Geometry.GetQuad());
-		//	_billboard1->m_transform.setPosition(0, 0, 0);
-		//	_billboard1->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
+		GameObject* _billboard1 = GameObject::Create("_billboard1");
+		_billboard1->SetMaterial(_material_billboard);
+		_billboard1->SetMesh(Geometry.GetQuad());
+		_billboard1->m_transform.setPosition(8, 3, 2);
+		_billboard1->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
 
 		//GameObject::Delete(_entity5);
 		
@@ -410,8 +410,8 @@ namespace Vxl
 					{
 						if (_mesh->m_instances.Empty())
 						{
-							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 5.0f, AABB_Color);
-							Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
+							Debug.DrawOBB(*Entity, Vector3::ZERO, 3.0f, OBB_Color);
+							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 3.0f, AABB_Color);
 						}
 						// Draw outline around all instances
 						else
@@ -421,17 +421,17 @@ namespace Vxl
 							for (Matrix4x4 instanceMatrix : *Instances)
 							{
 								Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
-								Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 5.0f, AABB_Color);
-								Debug.DrawOBB(*Entity, Pos, 5.0f, OBB_Color);
+								Debug.DrawOBB(*Entity, Pos, 3.0f, OBB_Color);
+								Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 3.0f, AABB_Color);
 							}
 						}
 					}
 
 					// Draw Axis Directions
-					Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 8.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 8.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 8.0f, 5.0f, Color4F::RED, Color4F::RED);
+					//	Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
+					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 8.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
+					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 8.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
+					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 8.0f, 5.0f, Color4F::RED, Color4F::RED);
 				}
 				// Selection for Cameras
 				else if (Entity->GetType() == EntityType::CAMERA)
@@ -634,12 +634,7 @@ namespace Vxl
 				}
 			}
 
-			Debug.DrawScreenSpaceLine(
-				Vector2::ZERO, Vector2::ONE,
-				10.0f,
-				Color4F::RED, Color4F::BLUE
-			);
-
+			
 			// Drag Editor Axis around
 			if (Input.getMouseButton(MouseButton::LEFT) && Editor.m_controlAxis != Axis::NONE && Editor.HasSelection())
 			{
@@ -663,44 +658,28 @@ namespace Vxl
 					ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
 					CenterAxis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
 
-
 					// Calculate Selected Axis in ClipSpace
 					switch (Editor.m_controlAxis)
 					{
 					case Axis::X:
-						if (Editor.m_controlAxisLocal)
-						{
-							ClipSpaceAxis = MVP * Vector4(SelectedEntities[0]->m_transform.getRight(), 1);
-						}
-						else
-							ClipSpaceAxis = MVP * Vector4(1, 0, 0, 1);
+						ClipSpaceAxis = MVP * Vector4(1, 0, 0, 1);
 						break;
 
 					case Axis::Y:
-						if (Editor.m_controlAxisLocal)
-						{
-							ClipSpaceAxis = MVP * Vector4(SelectedEntities[0]->m_transform.getUp(), 1);
-						}
-						else
-							ClipSpaceAxis = MVP * Vector4(0, 1, 0, 1);
+						ClipSpaceAxis = MVP * Vector4(0, 1, 0, 1);
 						break;
 
 					case Axis::Z:
-						if (Editor.m_controlAxisLocal)
-						{
-							ClipSpaceAxis = MVP * Vector4(SelectedEntities[0]->m_transform.getForward(), 1);
-						}
-						else
-							ClipSpaceAxis = MVP * Vector4(0, 0, 1, 1);
+						ClipSpaceAxis = MVP * Vector4(0, 0, 1, 1);
 						break;
 					}
 
 					ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
 					Axis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
 
-					std::cout << Axis_ScreenPos << std::endl;
-					std::cout << CenterAxis_ScreenPos << std::endl;
-					std::cout << "~~~" << std::endl;
+					//std::cout << Axis_ScreenPos << std::endl;
+					//std::cout << CenterAxis_ScreenPos << std::endl;
+					//std::cout << "~~~" << std::endl;
 
 					Axis_ScreenDirection = (Axis_ScreenPos - CenterAxis_ScreenPos).Normalize();
 				}

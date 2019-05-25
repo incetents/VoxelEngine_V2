@@ -130,6 +130,9 @@ namespace Vxl
 				Matrix4x4 Multiply(const Matrix4x4&) const;
 		static	Matrix4x4 Multiply(const Matrix4x4&, const Matrix4x4&);
 
+				Matrix4x4 MultiplyColumnMajor(const Matrix4x4&) const;
+		static	Matrix4x4 MultiplyColumnMajor(const Matrix4x4&, const Matrix4x4&);
+
 		// Compare
 				bool Compare(const Matrix4x4&) const;
 		static	bool Compare(const Matrix4x4&, const Matrix4x4&);

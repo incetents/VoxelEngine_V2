@@ -211,6 +211,11 @@ namespace Vxl
 			float Width,
 			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
 		);
+		void DrawScreenSpaceSquare(
+			const Vector2& P, const Vector2& Size,
+			float LineWidth,
+			const Color4F& Color = Color4F(1, 1, 1, 1)
+		);
 
 		void RenderWorldLines();
 		void RenderScreenLines();

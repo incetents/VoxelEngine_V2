@@ -558,6 +558,24 @@ namespace Vxl
 	{
 		return m1.Multiply(m2);
 	}
+	Matrix4x4 Matrix4x4::MultiplyColumnMajor(const Matrix4x4& m) const
+	{
+		Matrix4x4 Result;
+
+		for (int y = 0; y < Matrix4x4_Length; y++)
+		{
+			for (int x = 0; x < Matrix4x4_Length; x++)
+			{
+				Result[x + y * Matrix4x4_Length] = Vector4::Dot(GetColumn(y), m.GetRow(x));
+			}
+		}
+
+		return Result;
+	}
+	Matrix4x4 Matrix4x4::MultiplyColumnMajor(const Matrix4x4& m1, const Matrix4x4& m2)
+	{
+		return m1.MultiplyColumnMajor(m2);
+	}
 
 	// Compare
 	bool Matrix4x4::Compare(const Matrix4x4& m) const

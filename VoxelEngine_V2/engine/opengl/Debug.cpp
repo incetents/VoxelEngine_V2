@@ -111,9 +111,20 @@ namespace Vxl
 		const Vector2& P1, const Vector2& P2,
 		float Width,
 		const Color4F& C1, const Color4F& C2
-	)
-	{
+	){
 		m_screenLines.AddLine(P1, P2, Width, C1, C2);
+	}
+	void Debug::DrawScreenSpaceSquare(
+		const Vector2& P, const Vector2& Size,
+		float LineWidth,
+		const Color4F& Color
+	){
+		float halfW = Size.x * 0.5f;
+		float halfH = Size.y * 0.5f;
+		m_screenLines.AddLine(P + vec2(+halfW, +halfH), P + vec2(-halfW, +halfH), LineWidth, Color, Color);
+		m_screenLines.AddLine(P + vec2(-halfW, +halfH), P + vec2(-halfW, -halfH), LineWidth, Color, Color);
+		m_screenLines.AddLine(P + vec2(-halfW, -halfH), P + vec2(+halfW, -halfH), LineWidth, Color, Color);
+		m_screenLines.AddLine(P + vec2(+halfW, -halfH), P + vec2(+halfW, +halfH), LineWidth, Color, Color);
 	}
 
 	void Debug::RenderWorldLines()
