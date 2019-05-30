@@ -88,10 +88,20 @@ namespace Vxl
 		{
 			assert(false);
 		}
+		template<typename Type>
+		void SetMatrix(Type data, bool transpose)
+		{
+			assert(false);
+		}
 
 		// [Slower] Set uniform, regardless if shader is bound
 		template<typename Type>
-		void Set(GLuint id, Type data)
+		void Set(GLuint Programid, Type data)
+		{
+			assert(false);
+		}
+		template<typename Type>
+		void SetMatrix(GLuint Programid, Type data, bool transpose)
 		{
 			assert(false);
 		}
@@ -106,6 +116,7 @@ namespace Vxl
 		}
 	};
 
+	//
 	template<>
 	void glUniform::Set<bool>(bool data);
 	template<>
@@ -150,7 +161,20 @@ namespace Vxl
 	void glUniform::Set<Matrix4x4>(Matrix4x4 data);
 
 	//
+	template<>
+	void glUniform::SetMatrix<Matrix2x2&>(Matrix2x2& data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix2x2>(Matrix2x2 data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix3x3&>(Matrix3x3& data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix3x3>(Matrix3x3 data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix4x4&>(Matrix4x4& data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix4x4>(Matrix4x4 data, bool transpose);
 
+	//
 	template<>
 	void glUniform::Set<bool>(GLuint Programid, bool data);
 	template<>
@@ -193,5 +217,19 @@ namespace Vxl
 	void glUniform::Set<Matrix4x4&>(GLuint Programid, Matrix4x4& data);
 	template<>
 	void glUniform::Set<Matrix4x4>(GLuint Programid, Matrix4x4 data);
+	
+	//
+	template<>
+	void glUniform::SetMatrix<Matrix2x2&>(GLuint Programid, Matrix2x2& data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix2x2>(GLuint Programid, Matrix2x2 data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix3x3&>(GLuint Programid, Matrix3x3& data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix3x3>(GLuint Programid, Matrix3x3 data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix4x4&>(GLuint Programid, Matrix4x4& data, bool transpose);
+	template<>
+	void glUniform::SetMatrix<Matrix4x4>(GLuint Programid, Matrix4x4 data, bool transpose);
 
 }

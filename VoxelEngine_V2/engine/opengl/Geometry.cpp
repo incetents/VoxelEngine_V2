@@ -486,11 +486,13 @@ namespace Vxl
 		// RESERVE
 		Vector3 p1Offset;
 		Vector3 p2Offset;
-		p1Offset[(int)axis] = 0.5f;
-		p2Offset[(int)axis] = 1.25f;
+		float stemHeight = 0.66f;
+		float tipHeight = 0.33f;
+		p1Offset[(int)axis] = stemHeight * 0.5f;
+		p2Offset[(int)axis] = stemHeight + tipHeight * 0.5f;;
 
-		CreateCylinder(positions, uvs, axis, 16, 1.0f, 0.10f, 0.10f, p1Offset);
-		CreateCone(positions2, uvs2, axis, 16, 0.5f, 0.3f, p2Offset);
+		CreateCylinder(positions, uvs, axis, 16, stemHeight, 0.08f, 0.08f, p1Offset);
+		CreateCone(positions2, uvs2, axis, 16, tipHeight, 0.2f, p2Offset);
 
 		positions.insert(positions.end(), positions2.begin(), positions2.end());
 		uvs.insert(uvs.end(), uvs2.begin(), uvs2.end());
@@ -623,6 +625,82 @@ namespace Vxl
 		_mesh->Bind();
 		return _mesh;
 	}
+	Mesh* Geometry::GenerateQuad(const std::string& MeshName, Axis axis)
+	{
+		
+		Vector2 uvs[] = {
+			Vector2(0, 0),
+			Vector2(1, 0),
+			Vector2(1, 1),
+			Vector2(0, 1)
+		};
+
+		GLuint indices[] = { 0, 1, 2, 0, 2, 3 };
+
+		Mesh* _mesh = Mesh::Create(MeshName);
+		//
+		if (axis == Axis::X)
+		{
+			Vector3 pos[] = {
+				Vector3(+0.0f, -0.5f, +0.5f),
+				Vector3(+0.0f, -0.5f, -0.5f),
+				Vector3(+0.0f, +0.5f, -0.5f),
+				Vector3(+0.0f, +0.5f, +0.5f)
+			};
+			_mesh->m_positions.set(pos, 4);
+
+			Vector3 normals[] = {
+				Vector3(+1, 0, 0),
+				Vector3(+1, 0, 0),
+				Vector3(+1, 0, 0),
+				Vector3(+1, 0, 0)
+			};
+			_mesh->m_normals.set(normals, 4);
+		}
+		else if (axis == Axis::Y)
+		{
+			Vector3 pos[] = {
+				Vector3(-0.5f, 0, +0.5f),
+				Vector3(+0.5f, 0, +0.5f),
+				Vector3(+0.5f, 0, -0.5f),
+				Vector3(-0.5f, 0, -0.5f)
+			};
+			_mesh->m_positions.set(pos, 4);
+
+			Vector3 normals[] = {
+				Vector3(0, +1, 0),
+				Vector3(0, +1, 0),
+				Vector3(0, +1, 0),
+				Vector3(0, +1, 0)
+			};
+			_mesh->m_normals.set(normals, 4);
+		}
+		else if (axis == Axis::Z)
+		{
+			Vector3 pos[] = {
+				Vector3(-0.5f, -0.5f, +0.0f),
+				Vector3(+0.5f, -0.5f, +0.0f),
+				Vector3(+0.5f, +0.5f, +0.0f),
+				Vector3(-0.5f, +0.5f, +0.0f),
+			};
+			_mesh->m_positions.set(pos, 4);
+
+			Vector3 normals[] = {
+				Vector3(0, 0, +1),
+				Vector3(0, 0, +1),
+				Vector3(0, 0, +1),
+				Vector3(0, 0, +1)
+			};
+			_mesh->m_normals.set(normals, 4);
+		}
+
+		_mesh->m_uvs.set(uvs, 4);
+		_mesh->m_indices.set(indices, 6);
+		_mesh->GenerateTangents();
+		//
+		_mesh->Bind();
+		return _mesh;
+	}
 
 	// Creators
 	void Geometry::CreateFullQuad()
@@ -687,36 +765,39 @@ namespace Vxl
 
 	void Geometry::CreateQuad()
 	{
-		Vector3 pos[] = {
-			Vector3(-0.5f, -0.5f, +0.0f),
-			Vector3(+0.5f, -0.5f, +0.0f),
-			Vector3(+0.5f, +0.5f, +0.0f),
-			Vector3(-0.5f, +0.5f, +0.0f),
-		};
-		Vector2 uvs[] = {
-			Vector2(0, 0),
-			Vector2(1, 0),
-			Vector2(1, 1),
-			Vector2(0, 1)
-		};
-		Vector3 normals[] = {
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1)
-		};
-		GLuint indices[] = { 0, 1, 2, 0, 2, 3 };
-
-		m_quad = Mesh::Create("Quad");
-		//
-		m_quad->m_positions.set(pos, 4);
-		m_quad->m_uvs.set(uvs, 4);
-		m_quad->m_normals.set(normals, 4);
-		m_quad->m_indices.set(indices, 6);
-		m_quad->GenerateTangents();
-		//
-		m_quad->Bind();
-	}
+		m_quad_x = GenerateQuad("Quad_X", Axis::X);
+		m_quad_y = GenerateQuad("Quad_Y", Axis::Y);
+		m_quad_z = GenerateQuad("Quad_Z", Axis::Z);
+		//	Vector3 pos[] = {
+		//		Vector3(-0.5f, -0.5f, +0.0f),
+		//		Vector3(+0.5f, -0.5f, +0.0f),
+		//		Vector3(+0.5f, +0.5f, +0.0f),
+		//		Vector3(-0.5f, +0.5f, +0.0f),
+		//	};
+		//	Vector2 uvs[] = {
+		//		Vector2(0, 0),
+		//		Vector2(1, 0),
+		//		Vector2(1, 1),
+		//		Vector2(0, 1)
+		//	};
+		//	Vector3 normals[] = {
+		//		Vector3(0, 0, +1),
+		//		Vector3(0, 0, +1),
+		//		Vector3(0, 0, +1),
+		//		Vector3(0, 0, +1)
+		//	};
+		//	GLuint indices[] = { 0, 1, 2, 0, 2, 3 };
+		//	
+		//	m_quad = Mesh::Create("Quad");
+		//	//
+		//	m_quad->m_positions.set(pos, 4);
+		//	m_quad->m_uvs.set(uvs, 4);
+		//	m_quad->m_normals.set(normals, 4);
+		//	m_quad->m_indices.set(indices, 6);
+		//	m_quad->GenerateTangents();
+		//	//
+		//	m_quad->Bind();
+	}	
 
 	void Geometry::CreateCube()
 	{

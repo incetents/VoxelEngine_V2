@@ -6,13 +6,16 @@
 #include "../opengl/glUtil.h"
 
 #include "../utilities/logger.h"
+#include "../utilities/GlobalMacros.h"
 #include "../modules/RenderManager.h"
 
 #include <GLFW/glfw3.h>
 
+#ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
+#endif
 
 namespace Vxl
 {
@@ -69,6 +72,7 @@ namespace Vxl
 		glfwSetErrorCallback			(glfwCallbacks::Error);
 		
 
+#ifdef GLOBAL_IMGUI
 		// IMGUI Setup
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -77,6 +81,7 @@ namespace Vxl
 		ImGui_ImplOpenGL3_Init("#version 430");
 
 		ImGui::StyleColorsDark();
+#endif
 
 		// Glew/Opengl Init
 		if (!glUtil::initGlew())
@@ -88,8 +93,10 @@ namespace Vxl
 		// Create first frame empty
 		// (so it can create all gl assets necesary here without interfering with opengl error callback)
 		StartFrame();
+#ifdef GLOBAL_IMGUI
 		ImGui::NewFrame();
 		ImGui::Render();
+#endif
 		EndFrame();
 
 		// opengl error callback
@@ -153,18 +160,24 @@ namespace Vxl
 	{
 		glfwDestroyWindow(m_window);
 
+#ifdef GLOBAL_IMGUI
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
+#endif
 	}
 	void Window::StartFrame()
 	{
+#ifdef GLOBAL_IMGUI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
+#endif
 	}
 	void Window::EndFrame()
 	{
+#ifdef GLOBAL_IMGUI
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
 		Update();
 	}
 
@@ -218,7 +231,11 @@ namespace Vxl
 
 	bool Window::IsCursorOnImguiWindow()
 	{
+#ifdef GLOBAL_IMGUI
 		return ImGui::GetIO().WantCaptureMouse;
+#else
+		return false;
+#endif
 	}
 
 	void Window::BindWindowViewport()
@@ -238,9 +255,11 @@ namespace Vxl
 
 	void Window::Shutdown()
 	{
+#ifdef GLOBAL_IMGUI
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
+#endif
 
 		glfwDestroyWindow(m_window);
 	}

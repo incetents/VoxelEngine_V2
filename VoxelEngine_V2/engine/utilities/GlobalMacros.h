@@ -12,3 +12,6 @@
 
 // [x] whether GPUTimer::StartTimer and GPUTimer::EndTimer actually do anything
 #define GLOBAL_GPU_TIMERS
+
+// [x] whether any of the ImGui libraries are used
+#define GLOBAL_IMGUI

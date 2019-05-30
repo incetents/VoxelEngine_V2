@@ -34,13 +34,12 @@ void main()
 	{
 		mat4 model = VXL_model;
 		
+		// Instance matrix occurs before model matrix (if applicable)
 		if(VXL_useInstancing)
-			model = instanceMatrix * model;
-
-		vec4 object_position = model * vec4(m_position, 1.0);
+			model *= instanceMatrix;
 
 		// Position
-		f_data.pos = vec3(object_position);
+		f_data.pos = vec3(model * vec4(m_position, 1.0));
 		// Normal
 		f_data.normal = vec3(model * vec4(m_normal, 0));
 		f_data.tangent = vec3(model * vec4(m_tangent, 0));

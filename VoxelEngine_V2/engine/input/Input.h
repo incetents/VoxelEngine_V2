@@ -2,9 +2,13 @@
 #pragma once
 
 #include "../utilities/singleton.h"
+#include "../utilities/GlobalMacros.h"
 
 #include <Windows.h>
+
+#ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
+#endif
 
 namespace Vxl
 {
@@ -168,9 +172,30 @@ namespace Vxl
 
 	public:
 		// Keyboard Data
-		inline bool   getKey(KeyCode K)		const { return  m_Key_Current[(int)K] && !ImGui::GetIO().WantCaptureKeyboard; }
-		inline bool   getKeyDown(KeyCode K) const { return  m_Key_Current[(int)K] && !m_Key_Previous[(int)K] && !ImGui::GetIO().WantCaptureKeyboard; }
-		inline bool   getKeyUp(KeyCode K)	const { return !m_Key_Current[(int)K] && m_Key_Previous[(int)K] && !ImGui::GetIO().WantCaptureKeyboard; }
+		inline bool   getKey(KeyCode K)		const
+		{
+#ifdef GLOBAL_IMGUI
+			return  m_Key_Current[(int)K] && !ImGui::GetIO().WantCaptureKeyboard;
+#else
+			return  m_Key_Current[(int)K];
+#endif
+		}
+		inline bool   getKeyDown(KeyCode K) const
+		{
+#ifdef GLOBAL_IMGUI
+			return  m_Key_Current[(int)K] && !m_Key_Previous[(int)K] && !ImGui::GetIO().WantCaptureKeyboard;
+#else
+			return  m_Key_Current[(int)K] && !m_Key_Previous[(int)K];
+#endif
+		}
+		inline bool   getKeyUp(KeyCode K)	const
+		{
+#ifdef GLOBAL_IMGUI
+			return !m_Key_Current[(int)K] && m_Key_Previous[(int)K] && !ImGui::GetIO().WantCaptureKeyboard;
+#else
+			return !m_Key_Current[(int)K] && m_Key_Previous[(int)K];
+#endif
+		}
 		// Mouse Data
 		inline int	  getMouseX() const { return m_MousePos[0]; }
 		inline int	  getMouseY() const { return m_MousePos[1]; }
@@ -179,9 +204,30 @@ namespace Vxl
 		inline int	  getMouseDragDeltaX() const { return m_MouseDragDeltaPos[0]; }
 		inline int	  getMouseDragDeltaY() const { return m_MouseDragDeltaPos[1]; }
 		void		  getMousePos(float& x, float& y)  const { x = static_cast<float>(m_MousePos[0]); y = static_cast<float>(m_MousePos[1]); }
-		bool		  getMouseButton(MouseButton M) const { return m_MouseButtons[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse; }
-		bool		  getMouseButtonDown(MouseButton M) const { return m_MouseButtons[static_cast<int>(M)] && !m_MouseButtonsPrev[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse; }
-		bool		  getMouseButtonUp(MouseButton M) const { return !m_MouseButtons[static_cast<int>(M)] && m_MouseButtonsPrev[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse; }
+		bool		  getMouseButton(MouseButton M) const
+		{
+#ifdef GLOBAL_IMGUI
+			return m_MouseButtons[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse;
+#else
+			return m_MouseButtons[static_cast<int>(M)];
+#endif
+		}
+		bool		  getMouseButtonDown(MouseButton M) const
+		{
+#ifdef GLOBAL_IMGUI
+			return m_MouseButtons[static_cast<int>(M)] && !m_MouseButtonsPrev[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse;
+#else
+			return m_MouseButtons[static_cast<int>(M)] && !m_MouseButtonsPrev[static_cast<int>(M)];
+#endif
+		}
+		bool		  getMouseButtonUp(MouseButton M) const
+		{
+#ifdef GLOBAL_IMGUI
+			return !m_MouseButtons[static_cast<int>(M)] && m_MouseButtonsPrev[static_cast<int>(M)] && !ImGui::GetIO().WantCaptureMouse;
+#else
+			return !m_MouseButtons[static_cast<int>(M)] && m_MouseButtonsPrev[static_cast<int>(M)];
+#endif
+		}
 		inline int	  getMouseLastLeftClickX() const { return m_MouseLastLeftClickPos[0]; }
 		inline int	  getMouseLastLeftClickY() const { return m_MouseLastLeftClickPos[1]; }
 		inline double getHorizontalScroll()			const { return m_MouseScroll[0]; }

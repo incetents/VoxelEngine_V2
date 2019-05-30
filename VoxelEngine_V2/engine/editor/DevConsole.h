@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../utilities/singleton.h"
+#include "../utilities/GlobalMacros.h"
 #include <unordered_map>
 #include <assert.h>
 
@@ -19,6 +20,7 @@ namespace Vxl
 
 	static class DevConsole : public Singleton<class DevConsole>
 	{
+#ifdef GLOBAL_IMGUI
 	private:
 		// custom data
 		std::unordered_map<std::string, bool> m_bools;
@@ -117,8 +119,33 @@ namespace Vxl
 			return DevConsole::instanceRef.m_color4[str];
 		}
 
+#define DEVCONSOLE_GET_BOOL(x, y) DevConsole.GetBool(x, y)
+#define DEVCONSOLE_GET_INT(x, y) DevConsole.GetInt(x, y)
+#define DEVCONSOLE_GET_FLOAT(x, y) DevConsole.GetFloat(x, y)
+#define DEVCONSOLE_GET_DOUBLE(x, y) DevConsole.GetDouble(x, y)
+#define DEVCONSOLE_GET_VEC2(x, y) DevConsole.GetVec2(x, y)
+#define DEVCONSOLE_GET_VEC3(x, y) DevConsole.GetVec3(x, y)
+#define DEVCONSOLE_GET_VEC4(x, y) DevConsole.GetVec4(x, y)
+#define DEVCONSOLE_GET_COLOR3(x, y) DevConsole.GetColor3(x, y)
+#define DEVCONSOLE_GET_COLOR4(x, y) DevConsole.GetColor4(x, y)
+
 		// Draw
 		void Draw(Scene* scene);
+#else
+
+#define DEVCONSOLE_GET_BOOL(x, y) y
+#define DEVCONSOLE_GET_INT(x, y) y
+#define DEVCONSOLE_GET_FLOAT(x, y) y
+#define DEVCONSOLE_GET_DOUBLE(x, y) y
+#define DEVCONSOLE_GET_VEC2(x, y) y
+#define DEVCONSOLE_GET_VEC3(x, y) y
+#define DEVCONSOLE_GET_VEC4(x, y) y
+#define DEVCONSOLE_GET_COLOR3(x, y) y
+#define DEVCONSOLE_GET_COLOR4(x, y) y
+
+	public:
+		void Draw(Scene* scene) {}
+#endif
 
 	} SingletonInstance(DevConsole);
 }

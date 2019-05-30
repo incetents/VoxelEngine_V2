@@ -7,7 +7,7 @@
 #include "Material.h"
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
-#include "../imgui/imgui.h"
+#include "../utilities/GlobalMacros.h"
 #include "../opengl/Texture.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Geometry.h"
@@ -18,6 +18,10 @@
 #include "../objects/GameObject.h"
 #include "../objects/LightObject.h"
 #include "../objects/CameraObject.h"
+
+#ifdef GLOBAL_IMGUI
+#include "../imgui/imgui.h"
+#endif
 
 #include <algorithm>
 
@@ -283,11 +287,13 @@ namespace Vxl
 	}
 	void RenderManager::DrawImGui()
 	{
+#ifdef GLOBAL_IMGUI
 		ImGui::NewFrame();
 
 		m_currentScene->DrawImGui();
 
 		ImGui::Render();
+#endif
 	}
 
 	void RenderManager::RenderFullScreen()
@@ -320,7 +326,6 @@ namespace Vxl
 		glUtil::blendState(true);
 		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
 
-
 		// Draw Lights
 		auto billboard = ShaderProgram::Get("billboard");
 		billboard->Bind();
@@ -328,99 +333,28 @@ namespace Vxl
 		Texture* LightTexture = Texture::Get("editor_lightbulb");
 		for (auto light : m_allLightObjects)
 		{
-			billboard->SetUniform<Matrix4x4>("VXL_model", light->m_transform.getWorldModel());
+			billboard->SetUniformMatrix<Matrix4x4>("VXL_model", light->m_transform.getWorldModel(), true);
 		
 			if (LightTexture)
 				LightTexture->Bind(Active_Texture::LEVEL0);
 			else
 				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
 
-			Geometry.GetQuad()->Draw();
+			Geometry.GetQuadZ()->Draw();
 		}
 
 		// Draw Cameras
 		Texture* CameraTexture = Texture::Get("editor_camera");
 		for (auto camera : m_allCameraObjects)
 		{
-			billboard->SetUniform<Matrix4x4>("VXL_model", camera->m_transform.getWorldModel());
+			billboard->SetUniformMatrix<Matrix4x4>("VXL_model", camera->m_transform.getWorldModel(), true);
 
 			if (LightTexture)
 				CameraTexture->Bind(Active_Texture::LEVEL0);
 			else
 				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
 
-			Geometry.GetQuad()->Draw();
-		}
-
-	
-
-		// Draw Debug Wireframe Sphere
-		auto passthrough = ShaderProgram::Get("passthrough");
-		passthrough->Bind();
-		passthrough->SetUniform<bool>("VXL_useTexture", false);
-		passthrough->SetUniform<bool>("VXL_useModel", true);
-		
-		glUtil::wireframe(true);
-		glUtil::cullMode(Cull_Type::NO_CULL);
-		glLineWidth(5.0f);
-		for (const auto& sphere : Debug.m_wireframeSpheres)
-		{
-			passthrough->SetUniform<Color4F>("VXL_color", sphere.color);
-			passthrough->SetUniform<Matrix4x4>("VXL_model", sphere.model);
-			Geometry.GetIcoSphere()->Draw();
-		}
-		glLineWidth(1.0f);
-		glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
-		glUtil::wireframe(false);
-
-		// Draw Editor Arrows (if selection applies)
-		if (Editor.HasSelection())
-		{
-			auto simpleLight = ShaderProgram::Get("simpleLight");
-			simpleLight->Bind();
-
-			simpleLight->SetUniform<bool>("VXL_useModel", true);
-			simpleLight->SetUniform<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel());
-
-			// X Axis //
-			if(Editor.m_controlAxis == Axis::X)
-				if(Editor.m_controlAxisClicked)
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
-				else
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
-			else
-				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 1));
-
-			Geometry.GetArrowX()->Draw();
-
-			// Y Axis //
-			if (Editor.m_controlAxis == Axis::Y)
-				if (Editor.m_controlAxisClicked)
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
-				else
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
-			else
-				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 1));
-
-			Geometry.GetArrowY()->Draw();
-
-			// Z Axis //
-			if (Editor.m_controlAxis == Axis::Z)
-				if (Editor.m_controlAxisClicked)
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
-				else
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
-			else
-				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 1));
-
-			Geometry.GetArrowZ()->Draw();
-
-			simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 1, 1, 1));
-			Geometry.GetCubeSmall()->Draw();
-
-			// TEST //
-			
-
+			Geometry.GetQuadZ()->Draw();
 		}
 
 		// Draw Debug Lines
@@ -437,5 +371,95 @@ namespace Vxl
 		Debug.RenderWorldLines();
 		lines->SetUniform<bool>("passthrough", true);
 		Debug.RenderScreenLines();
+
+		// Draw Debug Wireframe Sphere
+		auto passthrough = ShaderProgram::Get("passthrough");
+		passthrough->Bind();
+		passthrough->SetUniform<bool>("VXL_useTexture", false);
+		passthrough->SetUniform<bool>("VXL_useModel", true);
+		
+		glUtil::wireframe(true);
+		glUtil::cullMode(Cull_Type::NO_CULL);
+		glLineWidth(5.0f);
+		for (const auto& sphere : Debug.m_wireframeSpheres)
+		{
+			passthrough->SetUniform<Color4F>("VXL_color", sphere.color);
+			passthrough->SetUniformMatrix<Matrix4x4>("VXL_model", sphere.model, true);
+			Geometry.GetIcoSphere()->Draw();
+		}
+		glLineWidth(1.0f);
+		glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
+		glUtil::wireframe(false);
+
+	}
+
+	void RenderManager::RenderEditorObjectsPostDepth()
+	{
+		// Draw Editor Arrows (if selection applies)
+		if (Editor.HasSelection())
+		{
+			auto simpleLight = ShaderProgram::Get("simpleLight");
+			simpleLight->Bind();
+
+			simpleLight->SetUniform<bool>("VXL_useModel", true);
+			simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel(), true);
+
+			// Movement //
+			if (Editor.m_controlMode == Editor.ControlMode::TRANSLATE)
+			{
+				// X Axis //
+				if (Editor.m_controlAxis == Axis::X)
+					if (Editor.m_controlAxisClicked)
+						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+					else
+						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+				else
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 1));
+
+				Geometry.GetArrowX()->Draw();
+
+				// Y Axis //
+				if (Editor.m_controlAxis == Axis::Y)
+					if (Editor.m_controlAxisClicked)
+						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+					else
+						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+				else
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 1));
+
+				Geometry.GetArrowY()->Draw();
+
+				// Z Axis //
+				if (Editor.m_controlAxis == Axis::Z)
+					if (Editor.m_controlAxisClicked)
+						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+					else
+						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+				else
+					simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 1));
+
+				Geometry.GetArrowZ()->Draw();
+
+				// Small cube in the middle //
+				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 1, 1, 0.85f));
+				Geometry.GetCubeSmall()->Draw();
+
+				//	// X Plane
+				//	simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 0.5f));
+				//	Geometry.GetQuadX()->Draw();
+				//	
+				//	// Y Plane
+				//	simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 0.5f));
+				//	Geometry.GetQuadY()->Draw();
+				//	
+				//	// Z Plane
+				//	simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 0.5f));
+				//	Geometry.GetQuadZ()->Draw();
+
+			}
+			// TEST //
+
+
+		}
 	}
 }

@@ -146,6 +146,38 @@ namespace Vxl
 	}
 
 	//
+	template<>
+	void glUniform::SetMatrix<Matrix2x2&>(Matrix2x2& data, bool transpose)
+	{
+		glUniformMatrix2fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix2x2>(Matrix2x2 data, bool transpose)
+	{
+		glUniformMatrix2fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix3x3&>(Matrix3x3& data, bool transpose)
+	{
+		glUniformMatrix3fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix3x3>(Matrix3x3 data, bool transpose)
+	{
+		glUniformMatrix3fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix4x4&>(Matrix4x4& data, bool transpose)
+	{
+		glUniformMatrix4fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix4x4>(Matrix4x4 data, bool transpose)
+	{
+		glUniformMatrix4fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+
+	//
 
 	template<>
 	void glUniform::Set<bool>(GLuint Programid, bool data)
@@ -251,5 +283,37 @@ namespace Vxl
 	void glUniform::Set<Matrix4x4>(GLuint Programid, Matrix4x4 data)
 	{
 		glProgramUniformMatrix4fv(Programid, m_location, 1, GL_FALSE, data.GetStartPointer());
+	}
+
+	//
+	template<>
+	void glUniform::SetMatrix<Matrix2x2&>(GLuint Programid, Matrix2x2& data, bool transpose)
+	{
+		glUniformMatrix2fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix2x2>(GLuint Programid, Matrix2x2 data, bool transpose)
+	{
+		glUniformMatrix2fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix3x3&>(GLuint Programid, Matrix3x3& data, bool transpose)
+	{
+		glUniformMatrix3fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix3x3>(GLuint Programid, Matrix3x3 data, bool transpose)
+	{
+		glUniformMatrix3fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix4x4&>(GLuint Programid, Matrix4x4& data, bool transpose)
+	{
+		glUniformMatrix4fv(m_location, 1, transpose, data.GetStartPointer());
+	}
+	template<>
+	void glUniform::SetMatrix<Matrix4x4>(GLuint Programid, Matrix4x4 data, bool transpose)
+	{
+		glUniformMatrix4fv(m_location, 1, transpose, data.GetStartPointer());
 	}
 }

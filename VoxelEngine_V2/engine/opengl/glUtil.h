@@ -58,17 +58,17 @@ namespace Vxl
 		Channel_Type getFormat(int ChannelCount);
 		unsigned int getFormatCount(Channel_Type type);
 
-		// Clear Color
+		// Clear Setup
 		void clearColor(float r, float g, float b, float a = 1.0f);
 		void clearColor(const Color3F& c, float a = 1.0f);
 		void clearColor(const Color4F& c);
+		void clearDepth(float);
+		void clearStencil(int);
 		// Clear Buffer
 		void clearBuffer();
 		void clearBuffer(UINT bitCode);
 		void clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b = Buffer_Bit_Type::NONE, Buffer_Bit_Type c = Buffer_Bit_Type::NONE, Buffer_Bit_Type d = Buffer_Bit_Type::NONE);
-		// Clear Special
-		void clearDepth(float);
-		void clearStencil(int);
+		
 
 		// Cull Mode
 		void cullMode(Cull_Type);

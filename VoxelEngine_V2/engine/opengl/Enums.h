@@ -80,7 +80,7 @@ namespace Vxl
 	// Buffer Bit Type
 	enum class Buffer_Bit_Type
 	{
-		NONE = -1, // Error (Used for placeholder)
+		NONE = 0, // Error (Used for placeholder) [0 to prevent blit error]
 
 		COLOR = GL_COLOR_BUFFER_BIT,
 		DEPTH = GL_DEPTH_BUFFER_BIT,

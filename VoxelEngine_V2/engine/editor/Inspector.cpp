@@ -2,6 +2,7 @@
 #include "Precompiled.h"
 #include "Inspector.h"
 
+#ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_internal.h"
 #include "../imgui/imgui_colors.h"
@@ -170,3 +171,4 @@ namespace Vxl
 		//ImGui::IsWindowFocused();
 	}
 }
+#endif

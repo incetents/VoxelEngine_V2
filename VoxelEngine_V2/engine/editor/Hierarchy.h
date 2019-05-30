@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../utilities/singleton.h"
+#include "../utilities/GlobalMacros.h"
 
 namespace Vxl
 {
@@ -9,6 +10,7 @@ namespace Vxl
 
 	static class Hierarchy : public Singleton<class Hierarchy>
 	{
+#ifdef GLOBAL_IMGUI
 		friend class RenderManager;
 		friend class Inspector;
 	private:
@@ -18,6 +20,10 @@ namespace Vxl
 
 		// Behaviour
 		void Draw();
+#else
+	public:
+		void Draw() {}
+#endif
 
 	} SingletonInstance(Hierarchy);
 }

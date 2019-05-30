@@ -98,7 +98,7 @@ namespace Vxl
 		// update bound FBO
 		m_boundID = m_id;
 	}
-	void FramebufferObject::clearColor()
+	void FramebufferObject::clearBuffers()
 	{
 		glUtil::clearColor(m_clearColor);
 		glUtil::clearBuffer(m_clearBuffers);
@@ -168,14 +168,12 @@ namespace Vxl
 	void FramebufferObject::bind()
 	{
 		bindFBO();
-		clearColor();
 
 		glUtil::viewport(0, 0, m_size[0], m_size[1]);
 	}
 	void FramebufferObject::bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH)
 	{
 		bindFBO();
-		clearColor();
 
 		glUtil::viewport(viewportX, viewportY, viewportW, viewportH);
 	}

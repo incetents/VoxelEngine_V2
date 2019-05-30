@@ -33,12 +33,15 @@ namespace Vxl
 		Mesh* GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
 		Mesh* GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
 		Mesh* GenerateCube(const std::string& MeshName, float unitSize = 1.0f);
+		Mesh* GenerateQuad(const std::string& MeshName, Axis axis);
 
 	private:
 		bool m_isSetup = false;
 		Mesh* m_fullQuad = nullptr;
 		Mesh* m_fullTriangle = nullptr;
-		Mesh* m_quad = nullptr;
+		Mesh* m_quad_x = nullptr;
+		Mesh* m_quad_y = nullptr;
+		Mesh* m_quad_z = nullptr;
 		Mesh* m_cube = nullptr;
 		Mesh* m_cube_small = nullptr; // (1/4)size
 		Mesh* m_inverseCube = nullptr;
@@ -98,9 +101,17 @@ namespace Vxl
 		{
 			return m_fullTriangle;
 		}
-		Mesh* GetQuad()
+		Mesh* GetQuadX()
 		{
-			return m_quad;
+			return m_quad_x;
+		}
+		Mesh* GetQuadY()
+		{
+			return m_quad_y;
+		}
+		Mesh* GetQuadZ()
+		{
+			return m_quad_z;
 		}
 		Mesh* GetCube()
 		{

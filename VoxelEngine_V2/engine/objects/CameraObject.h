@@ -27,7 +27,8 @@ namespace Vxl
 		CameraType		m_type = CameraType::NONE;
 		float			m_znear;
 		float			m_zfar;
-		float			m_buffer[4] = { 0,0,0,0 }; // Stores [fov,aspect] or [xmin,xmax,ymin,ymax]
+		float			m_buffer[4] = { 0,0,0,0 }; // Stores [fov,aspect,0,0] or [xmin,xmax,ymin,ymax]
+		
 		// Matrix Data
 		Matrix4x4 m_projection;
 		Matrix4x4 m_projectionInverse;
@@ -35,9 +36,13 @@ namespace Vxl
 		Matrix4x4 m_viewInverse;
 		Matrix4x4 m_viewProjection;
 		Matrix4x4 m_viewProjectionInverse;
-		// Ubo
-		//UniformBufferObject m_UBO = UniformBufferObject(64 * 3, 0, "Camera");
-		
+
+		inline void UpdateViewProjection()
+		{
+			m_viewProjection = m_projection * m_view;
+			m_viewProjectionInverse = m_viewProjection.Inverse();
+		}
+
 		// Projection Matrix Creator (based on stored data)
 		void CreatePerspective();
 		// Projection Matrix Creator (based on stored data)

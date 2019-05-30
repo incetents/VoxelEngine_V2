@@ -65,10 +65,10 @@ namespace Vxl
 
 		//_cameraObject->TransformChanged();
 
-		//	CameraObject* _c2 = CameraObject::Create("_camera2", 0.5f, 10.0f);
-		//	_c2->m_transform.setPosition(2.9f, 2.1f, -2.5f);
-		//	_c2->m_transform.setForward(Vector3(0, 0, 1));
-		//	_c2->SetPerspectiveWindowAspect(140.0f);
+		CameraObject* _c2 = CameraObject::Create("_camera2", 0.5f, 10.0f);
+		_c2->m_transform.setPosition(2.9f, 2.1f, -2.5f);
+		_c2->m_transform.setForward(Vector3(0, 0, 1));
+		_c2->SetPerspectiveWindowAspect(140.0f);
 
 
 		RenderManager.SetMainCamera(_cameraObject);
@@ -150,7 +150,7 @@ namespace Vxl
 			for (float y = 0; y < 5.0f; y++)
 			{
 				Transform t(Vec3(x * 1.2f, y * 1.2f, -4.0f));
-				m_models.push_back(t.getLocalModel());
+				m_models.push_back(t.getLocalModel().Transpose());
 			}
 		}
 		
@@ -264,11 +264,23 @@ namespace Vxl
 		LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
 		_light1->m_transform.setPosition(5, 0, 0);
 
-		GameObject* _billboard1 = GameObject::Create("_billboard1");
-		_billboard1->SetMaterial(_material_billboard);
-		_billboard1->SetMesh(Geometry.GetQuad());
-		_billboard1->m_transform.setPosition(8, 3, 2);
+		GameObject* _billboard1 = GameObject::Create("_quad1");
+		_billboard1->SetMaterial(_material_gbuffer);
+		_billboard1->SetMesh(Geometry.GetQuadX());
+		_billboard1->m_transform.setPosition(7, 3, -3);
 		_billboard1->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
+
+		GameObject* _billboard2 = GameObject::Create("_quad2");
+		_billboard2->SetMaterial(_material_gbuffer);
+		_billboard2->SetMesh(Geometry.GetQuadY());
+		_billboard2->m_transform.setPosition(7, 3, -3);
+		_billboard2->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
+
+		GameObject* _billboard3 = GameObject::Create("_quad3");
+		_billboard3->SetMaterial(_material_gbuffer);
+		_billboard3->SetMesh(Geometry.GetQuadZ());
+		_billboard3->m_transform.setPosition(7, 3, -3);
+		_billboard3->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
 
 		//GameObject::Delete(_entity5);
 		
@@ -291,7 +303,7 @@ namespace Vxl
 		if (Input.getKeyDown(KeyCode::ESCAPE))
 			Window.Close();
 
-		if (DevConsole.GetBool("Camera Keyboard Controls", true))
+		if (DEVCONSOLE_GET_BOOL("Camera Keyboard Controls", true))
 		{
 			// Camera Movement
 			Vector3 CamMove;
@@ -339,8 +351,8 @@ namespace Vxl
 					Window.SetCursor(CursorMode::LOCKED);
 			}
 
-			float CameraHorizontalRotation = DevConsole.GetFloat("Camera Horizontal Rotation", 0.2f);
-			float CameraVerticalRotation = DevConsole.GetFloat("Camera Vertical Rotation", 0.2f);
+			float CameraHorizontalRotation = DEVCONSOLE_GET_FLOAT("Camera Horizontal Rotation", 0.2f);
+			float CameraVerticalRotation = DEVCONSOLE_GET_FLOAT("Camera Vertical Rotation", 0.2f);
 
 			// Lock = mouse rotates camera
 			if (Window.GetCursor() == CursorMode::LOCKED)
@@ -404,14 +416,15 @@ namespace Vxl
 				if (Entity->GetType() == EntityType::GAMEOBJECT)
 				{
 					Mesh* _mesh = dynamic_cast<GameObject*>(Entity)->GetMesh();
+					Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
 
 					// Draw Outline around Entity
 					if (_mesh)
 					{
 						if (_mesh->m_instances.Empty())
 						{
-							Debug.DrawOBB(*Entity, Vector3::ZERO, 3.0f, OBB_Color);
-							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Vector3::ZERO, 3.0f, AABB_Color);
+							Debug.DrawOBB(*Entity, EntityWorld, 3.0f, OBB_Color);
+							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, EntityWorld, 3.0f, AABB_Color);
 						}
 						// Draw outline around all instances
 						else
@@ -428,10 +441,10 @@ namespace Vxl
 					}
 
 					// Draw Axis Directions
-					//	Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
-					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 8.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
-					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 8.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
-					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 8.0f, 5.0f, Color4F::RED, Color4F::RED);
+					
+					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 8.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
+					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 8.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
+					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 8.0f, 5.0f, Color4F::RED, Color4F::RED);
 				}
 				// Selection for Cameras
 				else if (Entity->GetType() == EntityType::CAMERA)
@@ -467,7 +480,7 @@ namespace Vxl
 		// Imgui Specials
 		if (_material_gbuffer)
 		{
-			_material_gbuffer->m_Wireframe = DevConsole.GetBool("Gbuffer Wireframe", false);
+			_material_gbuffer->m_Wireframe = DEVCONSOLE_GET_BOOL("Gbuffer Wireframe", false);
 		}
 	}
 
@@ -479,10 +492,11 @@ namespace Vxl
 	void Scene_Game::Draw()
 	{
 
-		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DevConsole.GetInt("TESTMODE", 0));
+		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT("TESTMODE", 0));
 
 
 		_fbo->bind();
+		_fbo->clearBuffers();
 		//
 		GPUTimer::StartTimer("Gbuffer");
 		//
@@ -491,11 +505,27 @@ namespace Vxl
 		//
 		GPUTimer::EndTimer("Gbuffer");
 
+		
+
 		_fbo_editor->bind();
+		_fbo_editor->clearBuffers();
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->GetID());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo_editor->GetID());
+		glBlitFramebuffer(
+			0, 0, _fbo->GetWidth(), _fbo->GetHeight(),
+			0, 0, _fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
+			GL_DEPTH_BUFFER_BIT,
+			GL_NEAREST
+		);
+		glBindFramebuffer(GL_FRAMEBUFFER, _fbo_editor->GetID());
+
 		//
 		GPUTimer::StartTimer("EditorObjects");
 		//
 		RenderManager.RenderEditorObjects();
+		glUtil::clearBuffer(Buffer_Bit_Type::DEPTH);
+		RenderManager.RenderEditorObjectsPostDepth();
 		//
 		GPUTimer::EndTimer("EditorObjects");
 
@@ -570,6 +600,8 @@ namespace Vxl
 		//	_shader_gbuffer->SetUniform("model", model5.getWorldModel());
 		//	Geometry::GetCube()->Draw();
 
+		
+
 		// Editor Axis Objects
 		// ~~ //
 		if (!Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
@@ -580,12 +612,13 @@ namespace Vxl
 			if (!Input.getMouseButton(MouseButton::LEFT) && !Editor.m_controlAxisClicked && Editor.HasSelection())
 			{
 				_fbo_colorpicker->bind();
+				_fbo_colorpicker->clearBuffers();
 				glUtil::blendState(false);
 
 				_shader_colorPicker->Bind();
 
 				_shader_colorPicker->SetUniform<bool>("VXL_useModel", true);
-				_shader_colorPicker->SetUniform<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel());
+				_shader_colorPicker->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel(), true);
 
 				Vector4 color;
 
@@ -647,11 +680,12 @@ namespace Vxl
 				static Vector2 Axis_ScreenDirection;
 				static Vector2 CenterAxis_ScreenPos;
 				static Vector2 Axis_ScreenPos;
+				static float DragSpeed;
 
 				if (Editor.m_controlAxisClicked == false)
 				{
 					// Object MVP
-					Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection().Transpose() * Editor.GetSelectionTransformModel().Transpose();
+					Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * Editor.GetSelectionTransformModel();
 
 					// Calculate Center Axis in ClipSpace
 					Vector4 ClipSpaceAxis = MVP * Vector4(0, 0, 0, 1);
@@ -682,13 +716,17 @@ namespace Vxl
 					//std::cout << "~~~" << std::endl;
 
 					Axis_ScreenDirection = (Axis_ScreenPos - CenterAxis_ScreenPos).Normalize();
+
+					// Update Drag Speed
+					DragSpeed = Editor.GetAverageSelectionDistanceFromEditorCamera() / 3.0f;
 				}
 
 				assert(Axis_ScreenDirection.LengthSqr() != 0.0f);
 
 				// Project Mouse Change onto Xaxis in screenspace, now we'll see how far the mouse drags across the axis
 				static float PreviousDragAmount = 0.0f;
-				float DragAmount = MouseChange.ProjectLength(Axis_ScreenDirection);
+				float DragAmount = MouseChange.ProjectLength(Axis_ScreenDirection) * DragSpeed;
+				// Drag Multiply
 
 				if (Editor.m_controlAxisClicked == false)
 					PreviousDragAmount = DragAmount;
@@ -726,6 +764,7 @@ namespace Vxl
 					}
 				}
 
+				
 				//std::cout << (MouseChange) << std::endl;
 				//std::cout << (Axis_ScreenDirection) << std::endl;
 				//std::cout << (DragAmount) << std::endl;
@@ -740,17 +779,14 @@ namespace Vxl
 				Editor.m_controlAxisClicked = false;
 		}
 
-		if (RenderManager.GetAllEntities().size() > 0)
-			Editor.UpdateSelectionTransformModel();
-
-
 		// Select Object in scene
 		// ~~ //
 		if (!Editor.m_controlAxisClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
 		{
-			if (DevConsole.GetBool("Objects are Clickable", true))
+			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 			{
 				_fbo_colorpicker->bind();
+				_fbo_colorpicker->clearBuffers();
 				glUtil::blendState(false);
 
 				_shader_colorPicker->Bind();
@@ -770,7 +806,7 @@ namespace Vxl
 					Vector4 color = Util::DataConversion::uint_to_vec4(i + 1u);
 
 					// Vert
-					_shader_colorPicker->SetUniform("VXL_model", Entity->m_transform.getWorldModel());
+					_shader_colorPicker->SetUniformMatrix<Matrix4x4>("VXL_model", Entity->m_transform.getWorldModel(), true);
 					_shader_colorPicker->SetUniform("VXL_useInstancing", false);
 					_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
 					// Frag
@@ -843,8 +879,11 @@ namespace Vxl
 
 			}
 		}
+
 		// ~~ //
 
+		if (RenderManager.GetAllEntities().size() > 0)
+			Editor.UpdateSelectionTransformModel();
 		
 		// ~~ //
 
@@ -912,6 +951,17 @@ namespace Vxl
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
 
 				_fbo_editor->bindTexture(0, Active_Texture::LEVEL0);
+				break;
+			}
+			// Show Editor Depth
+			case 5:
+			{
+				_shader_showRenderTarget->Bind();
+				_shader_showRenderTarget->SetUniform("outputMode", 2);
+				_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
+				_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
+
+				_fbo_editor->bindDepth(Active_Texture::LEVEL0);
 				break;
 			}
 		}

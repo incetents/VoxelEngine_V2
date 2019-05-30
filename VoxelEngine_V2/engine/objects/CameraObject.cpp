@@ -15,12 +15,16 @@ namespace Vxl
 	{
 		m_projection = Matrix4x4::Perspective(m_buffer[0], m_buffer[1], m_znear, m_zfar);
 		m_projectionInverse = Matrix4x4::PerspectiveInverse(m_buffer[0], m_buffer[1], m_znear, m_zfar);
+		
+		UpdateViewProjection();
 	}
 	// Projection Matrix Creator (based on stored data)
 	void CameraObject::CreateOrthographic()
 	{
 		m_projection = Matrix4x4::Orthographic(m_buffer[0], m_buffer[1], m_buffer[2], m_buffer[3], m_znear, m_zfar);
 		m_projectionInverse = Matrix4x4::OrthographicInverse(m_buffer[0], m_buffer[1], m_buffer[2], m_buffer[3], m_znear, m_zfar);
+		
+		UpdateViewProjection();
 	}
 
 	void CameraObject::UpdateFOV(float _fov)
@@ -180,7 +184,6 @@ namespace Vxl
 		m_view = Matrix4x4::LookAt(m_transform.m_position, m_transform.getForward(), m_transform.getRight(), m_transform.getUp());
 		m_viewInverse = m_view.Inverse();
 
-		m_viewProjection = m_view * m_projection;
-		m_viewProjectionInverse = m_viewProjection.Inverse();
+		UpdateViewProjection();
 	}
 }

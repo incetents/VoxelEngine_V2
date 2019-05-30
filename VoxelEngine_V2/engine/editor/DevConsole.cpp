@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "DevConsole.h"
 
+#ifdef GLOBAL_IMGUI
+
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
@@ -152,7 +154,8 @@ namespace Vxl
 				"Albedo",
 				"Normal",
 				"Depth",
-				"Editor"
+				"Editor",
+				"EditorDepth"
 			};
 			static int fbo_override_current = 0;
 			ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);
@@ -382,3 +385,4 @@ namespace Vxl
 
 	}
 }
+#endif

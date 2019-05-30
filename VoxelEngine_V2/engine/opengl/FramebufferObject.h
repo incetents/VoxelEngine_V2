@@ -37,7 +37,7 @@ namespace Vxl
 		void FixCallList();
 		bool checkFBOStatus();
 		void bindFBO();
-		void clearColor();
+		
 		
 		// Constructor
 		FramebufferObject(
@@ -59,6 +59,14 @@ namespace Vxl
 		{
 			return m_id;
 		}
+		inline GLuint GetWidth(void) const
+		{
+			return m_size[0];
+		}
+		inline GLuint GetHeight(void) const
+		{
+			return m_size[1];
+		}
 
 		inline void setClearColor(Color4F c)
 		{
@@ -70,6 +78,7 @@ namespace Vxl
 		}
 
 		// Clears the color from an entire Texture
+		void clearBuffers();
 		void clearBuffer(unsigned int index);
 
 		void addTexture(

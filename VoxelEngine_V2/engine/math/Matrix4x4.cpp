@@ -172,53 +172,43 @@ namespace Vxl
 		*this = Matrix4x4::Identity;
 	}
 
-	// View Matrix
+	// View Matrix [ROW MAJOR]
 	Matrix4x4 Matrix4x4::LookAt(const Vector3& Eye, const Vector3& Forward, const Vector3& Right, const Vector3& Up)
 	{
 		return Matrix4x4
 		(
-			Right.x, Up.x, Forward.x, 0,
-			Right.y, Up.y, Forward.y, 0,
-			Right.z, Up.z, Forward.z, 0,
-			-Vector3::Dot(Right, Eye), -Vector3::Dot(Up, Eye), -Vector3::Dot(Forward, Eye), 1.f
+			Right.x,	Right.y,	Right.z,	-Vector3::Dot(Right, Eye),
+			Up.x,		Up.y,		Up.z,		-Vector3::Dot(Up, Eye),
+			Forward.x,	Forward.y,	Forward.z,	-Vector3::Dot(Forward, Eye),
+			0,			0,			0,			1
 		);
-
-		// Legacy 
-		//	Vector3 f = Vector3::Normalize(Forward);
-		//	Vector3 s = Vector3::Normalize(Vector3::Cross(Up, f));
-		//	Vector3 u = Vector3::Cross(f, s);
 	}
 
-	// Perspective Matrix
+	// Perspective Matrix [ROW MAJOR]
 	Matrix4x4 Matrix4x4::Perspective(float fovy, float aspect, float znear, float zfar)
 	{
-		Matrix4x4 M;
-
 		float temp = 1.0f / tanf(Deg_To_Rad(fovy) * 0.5f);
-		
-		M[0x0] = temp / aspect;
-		M[0x5] = temp;
-		M[0xA] = (zfar + znear) / (znear - zfar);
-		M[0xB] = -1.0f;
-		M[0xE] = (2.0f * zfar * znear) / (znear - zfar);
-		M[0xF] = 0.0f;
+		float zdiff = znear - zfar;
 
-		return M;
+		return Matrix4x4
+		(
+			temp / aspect,	0,		0,							0,
+			0,				temp,	0,							0,
+			0,				0,		(zfar + znear) / (zdiff),	(2.0f * zfar * znear) / (zdiff),
+			0,				0,		-1.0f,						0.0f
+		);
 	}
 	Matrix4x4 Matrix4x4::PerspectiveInverse(float fovy, float aspect, float znear, float zfar)
 	{
-		Matrix4x4 M;
+		float inva_temp = tanf(Deg_To_Rad(fovy) * 0.5f);
 
-		float temp = 1.0f / tanf(Deg_To_Rad(fovy) * 0.5f);
-
-		M[0x0] = aspect / temp;
-		M[0x5] = 1.0f / temp;
-		M[0xA] = 1.0f;
-		M[0xB] = (znear - zfar) / (2.0f * zfar * znear);
-		M[0xE] = -1.0f;
-		M[0xF] = +0.5f;
-
-		return M;
+		return Matrix4x4
+		(
+			aspect * inva_temp, 0,			0,										0,
+			0,					inva_temp,	0,										0,
+			0,					0,			1.0f,									-1.0f,
+			0,					0,			(znear - zfar) / (2.0f * zfar * znear), +0.5f
+		);
 	}
 	void Matrix4x4::Perspective_UpdateFov(Matrix4x4& M, float fovy, float aspect)
 	{
@@ -230,18 +220,18 @@ namespace Vxl
 	void Matrix4x4::Perspective_UpdateZ(Matrix4x4& M, float znear, float zfar)
 	{
 		M[0xA] = (zfar + znear) / (znear - zfar);
-		M[0xE] = (2.0f * zfar * znear) / (znear - zfar);
+		M[0xB] = (2.0f * zfar * znear) / (znear - zfar);
 	}
 	void Matrix4x4::PerspectiveInverse_UpdateFov(Matrix4x4& M, float fovy, float aspect)
 	{
-		float temp = 1.0f / tanf(Deg_To_Rad(fovy) * 0.5f);
+		float inva_temp = tanf(Deg_To_Rad(fovy) * 0.5f);
 
-		M[0x0] = aspect / temp;
-		M[0x5] = 1.0f / temp;
+		M[0x0] = aspect * inva_temp;
+		M[0x5] = inva_temp;
 	}
 	void Matrix4x4::PerspectiveInverse_UpdateZ(Matrix4x4& M, float znear, float zfar)
 	{
-		M[0xB] = (znear - zfar) / (2.0f * zfar * znear);
+		M[0xE] = (znear - zfar) / (2.0f * zfar * znear);
 	}
 
 	// Orthographic Matrix
@@ -416,9 +406,14 @@ namespace Vxl
 	}
 	Matrix4x4& Matrix4x4::OverrideCenter(float x, float y, float z)
 	{
-		_Val[0xC] = x;
-		_Val[0xD] = y;
-		_Val[0xE] = z;
+		// ROW MAJOR
+		_Val[0x3] = x;
+		_Val[0x7] = y;
+		_Val[0xB] = z;
+
+		//_Val[0xC] = x;
+		//_Val[0xD] = y;
+		//_Val[0xE] = z;
 		return *this;
 	}
 	Matrix4x4& Matrix4x4::OverrideScale(const Vector3& scale)
@@ -557,24 +552,6 @@ namespace Vxl
 	Matrix4x4 Matrix4x4::Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
 	{
 		return m1.Multiply(m2);
-	}
-	Matrix4x4 Matrix4x4::MultiplyColumnMajor(const Matrix4x4& m) const
-	{
-		Matrix4x4 Result;
-
-		for (int y = 0; y < Matrix4x4_Length; y++)
-		{
-			for (int x = 0; x < Matrix4x4_Length; x++)
-			{
-				Result[x + y * Matrix4x4_Length] = Vector4::Dot(GetColumn(y), m.GetRow(x));
-			}
-		}
-
-		return Result;
-	}
-	Matrix4x4 Matrix4x4::MultiplyColumnMajor(const Matrix4x4& m1, const Matrix4x4& m2)
-	{
-		return m1.MultiplyColumnMajor(m2);
 	}
 
 	// Compare

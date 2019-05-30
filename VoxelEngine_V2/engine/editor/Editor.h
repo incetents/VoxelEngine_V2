@@ -17,6 +17,7 @@ namespace Vxl
 		// Data
 		std::vector<Entity*> m_selectedEntities;
 		Vector3 m_averageSelectionLocation;
+		float m_averageSelectionDistanceFromEditorCamera;
 
 		// For Translate/Rotation/Scale debug object
 		Matrix4x4 m_selectionTransformModel;
@@ -34,6 +35,10 @@ namespace Vxl
 		const Vector3& GetAverageSelectionLocation() const
 		{
 			return m_averageSelectionLocation;
+		}
+		float GetAverageSelectionDistanceFromEditorCamera() const
+		{
+			return m_averageSelectionDistanceFromEditorCamera;
 		}
 		// [true] if at least one object is selected
 		bool HasSelection() const

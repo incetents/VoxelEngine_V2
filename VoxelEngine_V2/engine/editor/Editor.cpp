@@ -58,16 +58,17 @@ namespace Vxl
 		// Only update model if there's an object selected
 		if (m_selectedEntities.size() > 0)
 		{
-			float DistanceToEditorCamera = Vector3::Distance(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), m_averageSelectionLocation);
+			m_averageSelectionDistanceFromEditorCamera = Vector3::Distance(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), m_averageSelectionLocation);
+			float AxisScale = m_averageSelectionDistanceFromEditorCamera / 3.0f;
 
 			if (m_controlAxisLocal)
 			{
 				Matrix3x3 RotationMatrix = m_selectedEntities[0]->m_transform.getWorldRotation().GetMatrix3x3();
-				m_selectionTransformModel = Matrix4x4(RotationMatrix.Transpose() * Matrix3x3::GetScale(DistanceToEditorCamera / 4.0f), m_averageSelectionLocation);
+				m_selectionTransformModel = Matrix4x4(RotationMatrix * Matrix3x3::GetScale(AxisScale), m_averageSelectionLocation);
 			}
 			else
 			{
-				m_selectionTransformModel = Matrix4x4::GetTranslateScale(m_averageSelectionLocation, Vector3(DistanceToEditorCamera / 4.0f));
+				m_selectionTransformModel = Matrix4x4::GetTranslateScale(m_averageSelectionLocation, Vector3(AxisScale));
 			}
 		}
 	}

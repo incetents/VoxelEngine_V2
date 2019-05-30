@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Hierarchy.h"
 
+#ifdef GLOBAL_IMGUI
+
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
@@ -257,4 +259,4 @@ namespace Vxl
 
 
 }
-
+#endif

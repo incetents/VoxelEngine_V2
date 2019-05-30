@@ -179,6 +179,17 @@ namespace Vxl
 #endif
 			m_uniforms[name].Set<Type>(data);
 		}
+		// [Faster] Set uniform (Custom call for matrix)
+		template<typename Type>
+		void					SetUniformMatrix(const std::string& name, Type data, bool transpose)
+		{
+#if _DEBUG
+			// Check if uniform is missing
+			if (m_uniforms.find(name) == m_uniforms.end())
+				return;
+#endif
+			m_uniforms[name].SetMatrix<Type>(data, transpose);
+		}
 		// [Slower] Set uniform, regardless if shader is bound
 		template<typename Type>
 		void					SetProgramUniform(const std::string& name, Type data)
@@ -191,6 +202,18 @@ namespace Vxl
 
 			m_uniforms[name].Set<Type>(m_id, data);
 		}
+		// [Slower] Set uniform, regardless if shader is bound (Custom call for matrix)
+		template<typename Type>
+		void					SetProgramUniformMatrix(const std::string& name, Type data, bool transpose)
+		{
+#if _DEBUG
+			// Check if uniform is missing
+			if (m_uniforms.find(name) == m_uniforms.end())
+				return;
+#endif
+			m_uniforms[name].SetMatrix<Type>(m_id, data, transpose);
+		}
+		
 		inline const glUniform& GetUniform(const std::string& name)
 		{
 #if _DEBUG

@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Performance.h"
 
+#ifdef GLOBAL_IMGUI
+
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
@@ -23,6 +25,7 @@ namespace Vxl
 
 		if (ImGui::Begin("[F4] Performance", &open, ImVec2(280, 680), 0.9f, 0))
 		{
+#ifdef GLOBAL_GPU_TIMERS
 			ImGui::Columns(2, "GPUTimers"); // 4-ways, with border
 			ImGui::Text("Name"); ImGui::NextColumn();
 			ImGui::Text("Miliseconds"); ImGui::NextColumn();
@@ -50,7 +53,11 @@ namespace Vxl
 
 			ImGui::Columns(1);
 			ImGui::Separator();
+#else
+			// No GPU TIMERS
+#endif
 		}
 		ImGui::End();
 	}
 }
+#endif

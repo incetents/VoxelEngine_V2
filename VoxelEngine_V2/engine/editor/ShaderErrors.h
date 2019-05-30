@@ -1,6 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "../utilities/GlobalMacros.h"
 #include "../utilities/singleton.h"
 
 namespace Vxl
@@ -9,7 +10,11 @@ namespace Vxl
 	{
 	public:
 
+#ifdef GLOBAL_IMGUI
 		void Draw();
+#else
+		void Draw() {}
+#endif
 
 	} SingletonInstance(ShaderErrors);
 }

@@ -2,6 +2,7 @@
 #include "Precompiled.h"
 #include "ShaderErrors.h"
 
+#ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
 #include "../engine/opengl/Shader.h"
 
@@ -77,3 +78,4 @@ namespace Vxl
 		}
 	}
 }
+#endif

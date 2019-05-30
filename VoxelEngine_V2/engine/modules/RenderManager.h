@@ -90,6 +90,7 @@ namespace Vxl
 		void RenderFullScreen();
 		void RenderSceneGameObjects();
 		void RenderEditorObjects();
+		void RenderEditorObjectsPostDepth();
 
 	} SingletonInstance(RenderManager);
 }

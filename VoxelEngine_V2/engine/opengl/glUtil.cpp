@@ -318,6 +318,16 @@ namespace Vxl
 	{
 		glClearColor(c.r, c.g, c.b, c.a);
 	}
+	void glUtil::clearDepth(float f)
+	{
+		assert(f >= 0.0f && f <= 1.0f);
+		glClearDepth(f);
+	}
+	void glUtil::clearStencil(int f)
+	{
+		assert(f >= 0.0f && f <= 1.0f);
+		glClearStencil(f);
+	}
 
 	void glUtil::clearBuffer()
 	{
@@ -332,16 +342,7 @@ namespace Vxl
 		glClear(GLbitfield(a) | GLbitfield(b) | GLbitfield(c) | GLbitfield(d));
 	}
 
-	void glUtil::clearDepth(float f)
-	{
-		assert(f >= 0.0f && f <= 1.0f);
-		glClearDepth(f);
-	}
-	void glUtil::clearStencil(int f)
-	{
-		assert(f >= 0.0f && f <= 1.0f);
-		glClearStencil(f);
-	}
+	
 
 	void glUtil::cullMode(Cull_Type cull)
 	{
