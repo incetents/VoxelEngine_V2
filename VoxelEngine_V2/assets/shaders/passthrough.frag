@@ -23,9 +23,6 @@ layout (binding = 0) uniform sampler2D texture1;
 uniform bool VXL_useTexture = true;
 uniform vec4 VXL_color = vec4(1,1,1,1);
 
-uniform bool useFakeLight = false;
-uniform vec3 fakeLightDirection = vec3(0.57735, 0.57735, 0.57735);
-
 //Main
 void main()
 {
@@ -34,19 +31,8 @@ void main()
 		vec4 tex1 = texture(texture1, f_data.uv);
 		output_albedo = tex1;
 	}
-	else if(useFakeLight)
-	{
-		float d = dot(normalize(f_data.normal), normalize(fakeLightDirection)); // -1 to 1 brightness
-		d = d * 0.5 + 0.5; // put into 0-1 range
-		vec4 light = vec4(0.25,0.25,0.25,0);
-		vec4 dark = vec4(0.5,0.5,0.5,0);
-		
-		output_albedo = mix(VXL_color - dark, VXL_color + light, d);
-		//output_albedo = color;
-		//output_albedo = vec4(f_data.normal, 1);
-	}
 	else
 		output_albedo = VXL_color;
 		
-	output_normal = vec4(0.5,0.5,1,1); // serialized normal (0,0,1) * 0.5 + 0.5
+	output_normal = vec4(0,0,1,1);
 }

@@ -32,5 +32,5 @@ void main()
 		
 	output_albedo = mix(VXL_color - dark, VXL_color + light, d);
 
-	output_normal = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0); // worldspace Normals
+	output_normal = vec4(normalize(f_data.normal), 1.0); // worldspace Normals
 }

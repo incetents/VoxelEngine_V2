@@ -21,6 +21,6 @@ void main()
 {
 	//output_color = vec4(f_data.uvw * 0.5 + 0.5, 1);
 	output_color = texture(skybox_handler, f_data.uvw);
-	output_normal = vec4(0.5,0.5,1,1); // serialized normal (0,0,1) * 0.5 + 0.5
+	output_normal = vec4(0,0,1,1); // worldspace Normals
 	output_test = vec4(46.0 / 255.0 , 204.0 / 255.0 , 64.0 / 255.0 , 1);
 }

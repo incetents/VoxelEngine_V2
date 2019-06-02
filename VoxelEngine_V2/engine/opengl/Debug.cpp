@@ -11,7 +11,7 @@
 
 namespace Vxl
 {
-	const UINT Debug::VertexIncrementAmount = 800;
+	const UINT Debug::VertexIncrementAmount = 16;
 
 	void Debug::DrawLine(
 		const Vector3& P1, const Vector3& P2,
@@ -19,7 +19,7 @@ namespace Vxl
 		const Color4F& C1, const Color4F& C2
 	)
 	{
-		m_worldLines.AddLine(P1, P2, Width, C1, C2);
+		m_worldLines.AddLine_Vec3(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawAABB(
 		const Vector3& Min, const Vector3& Max,
@@ -112,7 +112,7 @@ namespace Vxl
 		float Width,
 		const Color4F& C1, const Color4F& C2
 	){
-		m_screenLines.AddLine(P1, P2, Width, C1, C2);
+		m_screenLines.AddLine_Vec2(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawScreenSpaceSquare(
 		const Vector2& P, const Vector2& Size,
@@ -121,59 +121,57 @@ namespace Vxl
 	){
 		float halfW = Size.x * 0.5f;
 		float halfH = Size.y * 0.5f;
-		m_screenLines.AddLine(P + vec2(+halfW, +halfH), P + vec2(-halfW, +halfH), LineWidth, Color, Color);
-		m_screenLines.AddLine(P + vec2(-halfW, +halfH), P + vec2(-halfW, -halfH), LineWidth, Color, Color);
-		m_screenLines.AddLine(P + vec2(-halfW, -halfH), P + vec2(+halfW, -halfH), LineWidth, Color, Color);
-		m_screenLines.AddLine(P + vec2(+halfW, -halfH), P + vec2(+halfW, +halfH), LineWidth, Color, Color);
+		m_screenLines.AddLine_Vec2(P + vec2(+halfW, +halfH), P + vec2(-halfW, +halfH), LineWidth, Color, Color);
+		m_screenLines.AddLine_Vec2(P + vec2(-halfW, +halfH), P + vec2(-halfW, -halfH), LineWidth, Color, Color);
+		m_screenLines.AddLine_Vec2(P + vec2(-halfW, -halfH), P + vec2(+halfW, -halfH), LineWidth, Color, Color);
+		m_screenLines.AddLine_Vec2(P + vec2(+halfW, -halfH), P + vec2(+halfW, +halfH), LineWidth, Color, Color);
 	}
 
 	void Debug::RenderWorldLines()
 	{
-		// No VAO allowed
-		glUtil::unbindVAO();
+		// If vertex index is at start, nothing is being drawn anyways
+		if (m_worldLines.m_mesh->m_vertexIndex > 0)
+		{
+			if (m_worldLines.m_mesh->m_resizeDirty)
+				m_worldLines.m_mesh->SetVertices();
+			else
+				m_worldLines.m_mesh->UpdateVertices();
 
-		// Resize VBO if vector resized
-		m_worldLines.UpdateVBO();
+			m_worldLines.m_mesh->Bind();
 
-		// Set VBO To lines
-		m_worldLines.m_vbo->Bind();
-		// Update Vertices
-		m_worldLines.m_vbo->UpdateVertices(&m_worldLines.m_vertices[0]);
-		// Draw Lines
-		glUtil::depthMask(false);
-		m_worldLines.m_vbo->Draw(Draw_Type::LINES);
-		glUtil::depthMask(true);
-
+			glUtil::depthMask(false);
+			m_worldLines.m_mesh->Draw();
+			glUtil::depthMask(true);
+		}
 	}
 
 	void Debug::RenderScreenLines()
 	{
-		// No VAO allowed
-		glUtil::unbindVAO();
+		// If vertex index is at start, nothing is being drawn anyways
+		if (m_screenLines.m_mesh->m_vertexIndex > 0)
+		{
+			if (m_screenLines.m_mesh->m_resizeDirty)
+				m_screenLines.m_mesh->SetVertices();
+			else
+				m_screenLines.m_mesh->UpdateVertices();
 
-		// Resize VBO if vector resized
-		m_screenLines.UpdateVBO();
+			m_screenLines.m_mesh->Bind();
 
-		// Set VBO To lines
-		m_screenLines.m_vbo->Bind();
-		// Update Vertices
-		m_screenLines.m_vbo->UpdateVertices(&m_screenLines.m_vertices[0]);
-		// Draw Lines
-		glUtil::depthMask(false);
-		m_screenLines.m_vbo->Draw(Draw_Type::LINES);
-		glUtil::depthMask(true);
-
+			glUtil::depthMask(false);
+			m_screenLines.m_mesh->Draw();
+			glUtil::depthMask(true);
+		}
 	}
 
 	void Debug::End()
 	{
 		// reset index flag
-		m_worldLines.m_vertexIndex = 0;
-		std::fill(m_worldLines.m_vertices.begin(), m_worldLines.m_vertices.end(), 0);
+		m_worldLines.m_mesh->m_vertexIndex = 0;
+		std::fill(m_worldLines.m_mesh->m_vertices.begin(), m_worldLines.m_mesh->m_vertices.end(), 0);
 
 		// reset index flag
-		m_screenLines.m_vertexIndex = 0;
-		std::fill(m_screenLines.m_vertices.begin(), m_screenLines.m_vertices.end(), 0);
+		m_screenLines.m_mesh->m_vertexIndex = 0;
+		std::fill(m_screenLines.m_mesh->m_vertices.begin(), m_screenLines.m_mesh->m_vertices.end(), 0);
 
 		// reset wireframe sphere list
 		m_wireframeSpheres.clear();

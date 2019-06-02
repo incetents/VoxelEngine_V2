@@ -69,7 +69,6 @@ namespace Vxl
 		void clearBuffer(UINT bitCode);
 		void clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b = Buffer_Bit_Type::NONE, Buffer_Bit_Type c = Buffer_Bit_Type::NONE, Buffer_Bit_Type d = Buffer_Bit_Type::NONE);
 		
-
 		// Cull Mode
 		void cullMode(Cull_Type);
 
@@ -98,7 +97,7 @@ namespace Vxl
 
 		// VBO
 		void bindVBO(GLuint VBO);
-		void bindVBOSubData(GLsizei Offset, GLsizei Size, GLvoid* Data);
+		void bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data);
 		// VBO - Array
 		void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
 		void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT, GLuint m_strideSize = 0, GLuint m_strideOffset = 0);

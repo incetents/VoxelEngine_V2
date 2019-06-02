@@ -1025,6 +1025,8 @@ typedef unsigned short GLhalf;
 #define GL_MAX_ARRAY_TEXTURE_LAYERS       0x88FF
 #define GL_MIN_PROGRAM_TEXEL_OFFSET       0x8904
 #define GL_MAX_PROGRAM_TEXEL_OFFSET       0x8905
+#define GL_CLAMP_VERTEX_COLOR			  0x891A
+#define GL_CLAMP_FRAGMENT_COLOR			  0x891B
 #define GL_CLAMP_READ_COLOR               0x891C
 #define GL_FIXED_ONLY                     0x891D
 #define GL_MAX_VARYING_COMPONENTS         0x8B4B

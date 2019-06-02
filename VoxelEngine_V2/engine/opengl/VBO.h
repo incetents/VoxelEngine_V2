@@ -3,6 +3,7 @@
 
 #include "glUtil.h"
 
+#include <assert.h>
 #include <vector>
 
 namespace Vxl
@@ -10,15 +11,16 @@ namespace Vxl
 	// List of buffer types (non-custom names reflect built-in attribute locations)
 	enum class BufferType
 	{
+		NONE = -1, // Dev use only
 		POSITION = 0, VERTEX = 0,
-		UV = 1, // CUSTOM
+		UV = 1, LINEWIDTH = 1,
 		NORMAL = 2,
 		COLOR = 3,
 		SECOND_COLOR = 4,
 		FOG = 5,
-		TANGENT = 6, // CUSTOM
-		BITANGENT = 7, // CUSTOM
-		UV1 = 8, InstancingStart = 8, // Custom (instancing)
+		TANGENT = 6,
+		BITANGENT = 7, 
+		UV1 = 8, InstancingStart = 8, // (instancing)
 		UV2 = 9,
 		UV3 = 10,
 		UV4 = 11,
@@ -26,6 +28,36 @@ namespace Vxl
 		UV6 = 13,
 		UV7 = 14,
 		UV8 = 15
+	};
+
+	// Vertex Array Object Wrapper
+	class VAO
+	{
+	private:
+		GLuint m_VAO = -1;
+	public:
+		VAO()
+		{
+			glGenVertexArrays(1, &m_VAO);
+		}
+		~VAO()
+		{
+			glDeleteVertexArrays(1, &m_VAO);
+		}
+
+		inline GLuint GetID(void) const
+		{
+			return m_VAO;
+		}
+
+		void bind(void) const
+		{
+			glBindVertexArray(m_VAO);
+		}
+		void unbind(void) const
+		{
+			glBindVertexArray(0);
+		}
 	};
 
 	// Vertex Buffer Object Wrapper
@@ -96,7 +128,9 @@ namespace Vxl
 		~VBO()
 		{
 			RemoveAllHints();
-			glDeleteBuffers(1, &m_VBO);
+
+			if (m_VBO != -1)
+				glDeleteBuffers(1, &m_VBO);
 		}
 
 		// If Type is not a float, it must be an object containing floats
@@ -106,14 +140,15 @@ namespace Vxl
 			if (_count == 0)
 				return;
 
-			m_empty = false;
-
 			if (m_VBO == -1)
 				glGenBuffers(1, &m_VBO);
 
+			m_empty = false;
 			m_Size = _count * sizeof(Type);
 			m_bindMode = _mode;
-			glUtil::bindArray(m_VBO, m_Size, _arr, (GLenum)_mode);
+
+			glUtil::bindArray(m_VBO, m_Size, (GLvoid*)_arr, (GLenum)_mode);
+
 			UpdateDrawCount();
 		}
 		template<typename Type = GLfloat>
@@ -123,10 +158,16 @@ namespace Vxl
 		}
 
 		template<typename Type = GLfloat>
-		void UpdateVertices(Type* _arr, int offset = 0)
+		void UpdateVertices(Type* _arr, int offset)
 		{
-			glUtil::bindVBO(m_VBO);
-			glUtil::bindVBOSubData(offset, m_Size, _arr);
+			glUtil::bindVBOSubData(m_VBO, offset, m_Size, (GLvoid*)_arr);
+		}
+
+		template<typename Type = GLfloat>
+		void UpdateVertices(Type* _arr, int offset, GLuint size)
+		{
+			assert(size <= m_Size);
+			glUtil::bindVBOSubData(m_VBO, offset, size, (GLvoid*)_arr);
 		}
 
 		void AddStrideHint(BufferType _type, GLuint _valueCount);
@@ -192,8 +233,7 @@ namespace Vxl
 
 		void UpdateIndices(GLuint* _arr, int offset = 0)
 		{
-			glUtil::bindVBO(m_EBO);
-			glUtil::bindVBOSubData(offset, m_Size, _arr);
+			glUtil::bindVBOSubData(m_EBO, offset, m_Size, _arr);
 		}
 
 		inline GLuint GetVBO(void) const

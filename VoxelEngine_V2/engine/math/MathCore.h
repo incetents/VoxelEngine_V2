@@ -25,8 +25,12 @@
 #define Matrix3x3_Size 9
 #define Matrix4x4_Size 16
 
+// Size of an Arrayon the stack
+#define ARRAY_SIZE(_array) (sizeof(_array) / sizeof((_array)[0]))
+
 // Floating point comparisons
 #define FUZZ 1e-12f
+// #define FUZZ 1e-6f
 
 // Math Macros
 #define PI (std::atanf(1.0f) * 4.0f)

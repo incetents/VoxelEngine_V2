@@ -198,6 +198,7 @@ namespace Vxl
 			0,				0,		-1.0f,						0.0f
 		);
 	}
+	// [ROW MAJOR]
 	Matrix4x4 Matrix4x4::PerspectiveInverse(float fovy, float aspect, float znear, float zfar)
 	{
 		float inva_temp = tanf(Deg_To_Rad(fovy) * 0.5f);
@@ -234,34 +235,29 @@ namespace Vxl
 		M[0xE] = (znear - zfar) / (2.0f * zfar * znear);
 	}
 
-	// Orthographic Matrix
+	// Orthographic Matrix [Row Major]
 	Matrix4x4 Matrix4x4::Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
 	{
-		Matrix4x4 M;
+		float xdiff = xmax - xmin;
+		float ydiff = ymax - ymin;
+		float zdiff = zfar - znear;
 
-		M[0x0] = +2.0f / (xmax - xmin);
-		M[0x5] = +2.0f / (ymax - ymin);
-		M[0xA] = -2.0f / (zfar - znear);
-		M[0xC] = -(xmax + xmin) / (xmax - xmin);
-		M[0xD] = -(ymax + ymin) / (ymax - ymin);
-		M[0xE] = -(zfar + znear) / (zfar - znear);
-		M[0xF] = 1.0f;
-
-		return M;
+		return Matrix4x4(
+			2.0f / xdiff, 0, 0, 0,
+			0, 2.0f / ydiff, 0, 0,
+			0, 0, 2.0f / zdiff, 0,
+			-(xmax + xmin) / xdiff, -(ymax + ymin) / ydiff, -(zfar + znear) / zdiff, 1.0f
+		);
 	}
+	// [ROW MAJOR]
 	Matrix4x4 Matrix4x4::OrthographicInverse(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
 	{
-		Matrix4x4 M;
-
-		M[0x0] = (xmax - xmin)  / +2.0f;
-		M[0x5] = (ymax - ymin)  / +2.0f;
-		M[0xA] = (zfar - znear) / -2.0f;
-		M[0xC] = (xmax + xmin)  / +2.0f;
-		M[0xD] = (ymax + ymin)  / +2.0f;
-		M[0xE] = (zfar + znear) / -2.0f;
-		M[0xF] = 1.0f;
-
-		return M;
+		return Matrix4x4(
+			(xmax - xmin) / +2.0f, 0, 0, 0,
+			0, (ymax - ymin) / +2.0f, 0, 0,
+			0, 0, (zfar - znear) / -2.0f, 0,
+			(xmax + xmin) / +2.0f, (ymax + ymin) / +2.0f, (zfar + znear) / -2.0f, 1.0f
+		);
 	}
 	void Matrix4x4::Orthographic_UpdateX(Matrix4x4& M, float xmin, float xmax)
 	{
@@ -411,9 +407,6 @@ namespace Vxl
 		_Val[0x7] = y;
 		_Val[0xB] = z;
 
-		//_Val[0xC] = x;
-		//_Val[0xD] = y;
-		//_Val[0xE] = z;
 		return *this;
 	}
 	Matrix4x4& Matrix4x4::OverrideScale(const Vector3& scale)

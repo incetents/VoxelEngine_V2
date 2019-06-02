@@ -59,7 +59,7 @@ namespace Vxl
 		if (m_selectedEntities.size() > 0)
 		{
 			m_averageSelectionDistanceFromEditorCamera = Vector3::Distance(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), m_averageSelectionLocation);
-			float AxisScale = m_averageSelectionDistanceFromEditorCamera / 3.0f;
+			float AxisScale = 1.0f;// m_averageSelectionDistanceFromEditorCamera / 3.0f;
 
 			if (m_controlAxisLocal)
 			{

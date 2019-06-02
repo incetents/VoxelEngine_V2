@@ -1,235 +1,26 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "MeshBuffer.h"
+#include "VBO.h"
 #include "glUtil.h"
 
-#include "../utilities/logger.h"
 #include "../utilities/Asset.h"
-
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
-#include "../math/Vector4.h"
-#include "../math/Matrix4x4.h"
-#include "../math/Model.h"
-
-#include "VBO.h"
 
 #include <Windows.h>
 #include <vector>
 
 namespace Vxl
 {
-
-	template<typename Type, UINT ValueCount, BufferType Buf>
-	class MeshBuffer
-	{
-		friend class Mesh;
-	private:
-		VBO m_vbo;
-	public:
-		MeshBuffer()
-		{
-			m_vbo.AddStrideHint(Buf, ValueCount);
-		}
-
-		void set(Type* arr, GLuint count)
-		{
-			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
-		}
-		void set(std::vector<Type> vec)
-		{
-			m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), BufferBind_Mode::STATIC);
-		}
-		MeshBuffer& operator=(std::vector<Type> vec)
-		{
-			set(vec);
-			return *this;
-		}
-
-		inline UINT GetDrawCount(void) const
-		{
-			return m_vbo.GetDrawCount();
-		}
-		inline UINT GetSize(void) const
-		{
-			return m_vbo.GetSize();
-		}
-		inline bool Empty()
-		{
-			return m_vbo.GetSize() == 0;
-		}
-	};
-
-	// MeshBuffer except it will remember the array that is passed through
-	template<typename Type, UINT ValueCount, BufferType Buf>
-	class MeshBufferMem
-	{
-		friend class Mesh;
-	private:
-		VBO m_vbo;
-		bool alloc = false;
-		std::vector<Type>* vertices = nullptr;
-	public:
-		MeshBufferMem()
-		{
-			vertices = new std::vector<Type>();
-			m_vbo.AddStrideHint(Buf, ValueCount);
-		}
-
-		void setAlloc(std::vector<Type>* arr)
-		{
-			if (alloc)
-				delete vertices;
-			alloc = false;
-			vertices = arr;
-		}
-		void set(Type* arr, GLuint count)
-		{
-			if (alloc)
-				delete vertices;
-			alloc = true;
-			vertices = new std::vector<Type>(arr, arr + count);
-
-			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
-		}
-		void set(std::vector<Type> vec)
-		{
-			if (alloc)
-				delete vertices;
-			alloc = true;
-			vertices = new std::vector<Type>(vec);
-
-			m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), BufferBind_Mode::STATIC);
-		}
-		MeshBufferMem& operator=(std::vector<Type> vec)
-		{
-			set(vec);
-			return *this;
-		}
-
-		inline UINT GetDrawCount(void) const
-		{
-			return m_vbo.GetDrawCount();
-		}
-		inline UINT GetSize(void) const
-		{
-			return m_vbo.GetSize();
-		}
-		inline bool Empty()
-		{
-			return m_vbo.GetSize() == 0;
-		}
-	};
-
-	class MeshBufferIndices
-	{
-		friend class Mesh;
-	private:
-		EBO m_ebo;
-		std::vector<GLuint> indices;
-	public:
-		void set(GLuint* arr, GLuint count)
-		{
-			m_ebo.SetIndices(arr, count, BufferBind_Mode::STATIC);
-			indices.clear();
-			indices = std::vector<GLuint>(arr, arr + count);
-		}
-		void set(std::vector<GLuint> vec)
-		{
-			m_ebo.SetIndices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
-			indices.clear();
-			indices = vec;
-		}
-		MeshBufferIndices& operator=(std::vector<GLuint> vec)
-		{
-			set(vec);
-			return *this;
-		}
-
-		inline UINT GetDrawCount(void) const
-		{
-			return m_ebo.GetDrawCount();
-		}
-		inline UINT GetSize(void) const
-		{
-			return m_ebo.GetSize();
-		}
-		inline bool Empty()
-		{
-			return m_ebo.GetSize() == 0;
-		}
-	};
-
-	class MeshBufferInstancing
-	{
-		friend class Mesh;
-	private:
-		VBO m_vbo;
-		bool alloc = false;
-		std::vector<Matrix4x4>* vertices = nullptr;
-	public:
-		MeshBufferInstancing()
-		{
-			vertices = new std::vector<Matrix4x4>();
-			m_vbo.AddStrideHint(BufferType::InstancingStart, 0);
-		}
-
-		void setAlloc(std::vector<Matrix4x4>* arr)
-		{
-			if (alloc)
-				delete vertices;
-			alloc = false;
-			vertices = arr;
-		}
-		void set(Matrix4x4* arr, GLuint count)
-		{
-			if (alloc)
-				delete vertices;
-			alloc = true;
-			vertices = new std::vector<Matrix4x4>(arr, arr + count);
-
-			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
-		}
-		void set(std::vector<Matrix4x4> vec)
-		{
-			if (alloc)
-				delete vertices;
-			alloc = true;
-			vertices = new std::vector<Matrix4x4>(vec);
-
-			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
-		}
-		MeshBufferInstancing& operator=(std::vector<Matrix4x4> vec)
-		{
-			set(vec);
-			return *this;
-		}
-
-		inline std::vector<Matrix4x4>* GetVertices(void) const
-		{
-			return vertices;
-		}
-		inline UINT GetDrawCount(void) const
-		{
-			return m_vbo.GetDrawCount();
-		}
-		inline UINT GetSize(void) const
-		{
-			return m_vbo.GetSize();
-		}
-		inline bool Empty()
-		{
-			return m_vbo.GetSize() == 0;
-		}
-	};
+	class Model;
 
 	class Mesh : public Asset<Mesh>
 	{
 	private:
-		GLuint  m_VAO;
+		VAO m_VAO;
 
-		Draw_Type m_type = Draw_Type::TRIANGLES;
-		Draw_Mode m_mode = Draw_Mode::ARRAY;
+		Draw_Type m_type; // Triangles = Default
+		Draw_Mode m_mode; // Array = Default
 		GLuint	  m_drawCount = 0;	// Vertices Drawn
 		GLuint	  m_faces = 0;		// Triangles Drawn
 		GLuint	  m_lines = 0;		// Lines Drawn
@@ -266,14 +57,14 @@ namespace Vxl
 		static Mesh* Create(const std::string& name, Model* model);
 		virtual ~Mesh();
 
-		MeshBufferMem<Vector3, 3, BufferType::POSITION> m_positions;
-		MeshBufferMem<Vector2, 2, BufferType::UV> m_uvs;
-		MeshBuffer<Vector3, 3, BufferType::NORMAL> m_normals;
-		MeshBuffer<Vector3, 3, BufferType::TANGENT> m_tangents;
-		MeshBuffer<Vector3, 3, BufferType::BITANGENT> m_bitangents;
-		MeshBuffer<Vector4, 4, BufferType::COLOR> m_colors;
-		MeshBufferInstancing m_instances;
-		MeshBufferIndices m_indices;
+		MeshBufferMem<Vector3, BufferType::POSITION, 3> m_positions;
+		MeshBufferMem<Vector2, BufferType::UV, 2>		m_uvs;
+		MeshBuffer<Vector3, BufferType::NORMAL, 3>		m_normals;
+		MeshBuffer<Vector3, BufferType::TANGENT, 3>		m_tangents;
+		MeshBuffer<Vector3, BufferType::BITANGENT, 3>	m_bitangents;
+		MeshBuffer<Vector4, BufferType::COLOR, 4>		m_colors;
+		MeshBufferInstancing							m_instances;
+		MeshBufferIndices								m_indices;
 
 		// Update all data from model
 		void Set(Model* _model);
@@ -301,9 +92,9 @@ namespace Vxl
 
 		void GenerateNormals(bool Smooth);
 		void GenerateTangents();
-		void Bind(Draw_Type type = Draw_Type::TRIANGLES);
 		void RecalculateMinMax();
 
+		void Bind(Draw_Type type = Draw_Type::TRIANGLES);
 		void Draw();
 	};
 }

@@ -2,6 +2,10 @@
 #include "Precompiled.h"
 #include "Mesh.h"
 
+#include "../math/Model.h"
+
+#include "../utilities/logger.h"
+
 #include <assert.h>
 #include <iostream>
 
@@ -130,11 +134,8 @@ namespace Vxl
 
 	Mesh::Mesh(const std::string& glName)
 	{
-		m_VAO = glUtil::generateVAO();
-
 		if (!glName.empty())
-			glUtil::setGLName(glNameType::VERTEX_ARRAY, m_VAO, "Mesh_" + glName);
-
+			glUtil::setGLName(glNameType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + glName);
 	}
 
 	Mesh* Mesh::Create(const std::string& name)
@@ -160,7 +161,7 @@ namespace Vxl
 
 	Mesh::~Mesh()
 	{
-		glUtil::deleteVAO(m_VAO);
+		
 	}
 
 	void Mesh::Set(Model* _model)
@@ -510,9 +511,9 @@ namespace Vxl
 		// Generate Missing Normals
 		if (m_normals.Empty() && !m_positions.Empty())
 		{
-			Vector3* test = m_positions.vertices->data();
+			Vector3* test = m_positions.vertices.data();
 			GenerateNormals(
-				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
+				m_positions.vertices.data(), (GLuint)m_positions.vertices.size(),
 				m_indices.indices.data(), (GLuint)m_indices.indices.size(),
 				Smooth
 			);
@@ -524,8 +525,8 @@ namespace Vxl
 		if ((m_tangents.Empty() || m_bitangents.Empty()) && !m_positions.Empty() && !m_uvs.Empty())
 		{
 			GenerateTangents(
-				m_positions.vertices->data(), (GLuint)m_positions.vertices->size(),
-				m_uvs.vertices->data(), (GLuint)m_uvs.vertices->size(),
+				m_positions.vertices.data(), (GLuint)m_positions.vertices.size(),
+				m_uvs.vertices.data(), (GLuint)m_uvs.vertices.size(),
 				m_indices.indices.data(), (GLuint)m_indices.indices.size()
 			);
 		}
@@ -557,7 +558,7 @@ namespace Vxl
 #endif
 
 		/*	Bind Data	*/
-		glUtil::bindVAO(m_VAO);
+		m_VAO.bind();
 
 		m_positions.m_vbo.Bind();
 		m_uvs.m_vbo.Bind();
@@ -579,17 +580,17 @@ namespace Vxl
 		// Min/Max
 		m_min = Vector3::ZERO;
 		m_max = Vector3::ZERO;
-		UINT PosCount = (UINT)m_positions.vertices->size();
+		UINT PosCount = (UINT)m_positions.vertices.size();
 		for (UINT i = 0; i < PosCount; i++)
 		{
-			m_min = Vector3::Min(m_min, m_positions.vertices->at(i));
-			m_max = Vector3::Max(m_max, m_positions.vertices->at(i));
+			m_min = Vector3::Min(m_min, m_positions.vertices[i]);
+			m_max = Vector3::Max(m_max, m_positions.vertices[i]);
 		}
 	}
 
 	void Mesh::Draw()
 	{
-		glUtil::bindVAO(m_VAO);
+		m_VAO.bind();
 		(*this.*Draw_Function)();
 	}
 }

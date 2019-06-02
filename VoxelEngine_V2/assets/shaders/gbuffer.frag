@@ -49,9 +49,7 @@ void main()
 	// output UV for testing reasons
 	//output_albedo = vec4(f_data.uv, 0, 1);
 	
-	//output_normal = vec4(-1.0f,-0.5f,-2.0f,1);
-	output_normal = vec4(normalize(f_data.normal) * 0.5 + 0.5, 1.0); // worldspace Normals
-	//output_normal = vec4(normalize(f_data.normal), 1.0); // screenspace Normals
+	output_normal = vec4(normalize(f_data.normal), 1); // worldspace Normals
 	
 	if(TESTMODE == 1)
 		output_albedo = vec4(normalize(f_data.normal), 1.0);

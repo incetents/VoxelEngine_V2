@@ -28,6 +28,5 @@ void main()
 		discard;
 		
 	output_albedo.rgb *= color;
-		
-	output_normal = vec4(0.5,0.5,1,1); // serialized normal (0,0,1) * 0.5 + 0.5
+	output_normal = vec4(0,0,1,1); // worldspace Normals
 }

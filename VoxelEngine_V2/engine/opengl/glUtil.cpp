@@ -342,8 +342,6 @@ namespace Vxl
 		glClear(GLbitfield(a) | GLbitfield(b) | GLbitfield(c) | GLbitfield(d));
 	}
 
-	
-
 	void glUtil::cullMode(Cull_Type cull)
 	{
 		if (_cullmode != cull)
@@ -482,8 +480,9 @@ namespace Vxl
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	}
-	void glUtil::bindVBOSubData(GLsizei Offset, GLsizei Size, GLvoid* Data)
+	void glUtil::bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data)
 	{
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferSubData(GL_ARRAY_BUFFER, Offset, Size, Data);
 	}
 	void glUtil::bindArray(GLuint VBO, GLsizeiptr length, GLvoid* data, GLenum usage)

@@ -34,6 +34,7 @@
     <ClCompile Include="engine\opengl\Debug.cpp" />
     <ClCompile Include="engine\opengl\FramebufferObject.cpp" />
     <ClCompile Include="engine\opengl\Geometry.cpp" />
+    <ClCompile Include="engine\opengl\LineMesh.cpp" />
     <ClCompile Include="engine\opengl\UBO.cpp" />
     <ClCompile Include="engine\opengl\VBO.cpp" />
     <ClCompile Include="engine\opengl\Texture.cpp" />
@@ -85,6 +86,7 @@
     <ClCompile Include="engine\utilities\stringUtil.cpp" />
     <ClCompile Include="engine\window\glfwCallbacks.cpp" />
     <ClCompile Include="engine\window\window.cpp" />
+    <ClCompile Include="engine\opengl\MeshBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\editor\Editor.h" />
@@ -101,6 +103,7 @@
     <ClInclude Include="engine\modules\RenderManager.h" />
     <ClInclude Include="engine\modules\Scene.h" />
     <ClInclude Include="engine\opengl\Debug.h" />
+    <ClInclude Include="engine\opengl\LineMesh.h" />
     <ClInclude Include="engine\opengl\UBO.h" />
     <ClInclude Include="engine\opengl\VBO.h" />
     <ClInclude Include="engine\opengl\FramebufferObject.h" />
@@ -157,6 +160,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="engine\opengl\MeshBuffer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

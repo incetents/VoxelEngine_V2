@@ -126,6 +126,7 @@ namespace Vxl
 		if (File.empty())
 			return false;
 		
+		Logger.log("~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		Logger.log("Loading Files: " + filePath);
 		Logger.log("~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		

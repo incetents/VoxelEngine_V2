@@ -72,13 +72,15 @@ namespace Vxl
 
 		switch (m_strideCount)
 		{
+		case 0: // Exit if no stride information
+			return;
+
 		case 1:
 			if (m_strideHints[0].m_type == BufferType::InstancingStart)
 				glUtil::setVertexAttribInstancing((int)m_strideHints[0].m_type);
 			else
 				glUtil::setVertexAttrib((int)m_strideHints[0].m_type, m_strideHints[0].m_valueCount, DataType::FLOAT, 0, 0);
-		case 0: // Exit if no stride information
-			return;
+		
 		default:
 			for (auto hint : m_strideHints)
 			{
@@ -118,7 +120,8 @@ namespace Vxl
 	}
 	void EBO::Bind()
 	{
-		glUtil::bindEBO(m_EBO);
+		if (m_EBO != -1)
+			glUtil::bindEBO(m_EBO);
 	}
 	void EBO::Draw(Draw_Type _draw)
 	{

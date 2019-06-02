@@ -48,12 +48,12 @@
 #include "../game/terrain/TerrainManager.h"
 
 
+//#define GL_CLAMP_READ_COLOR 0x891C
+
 namespace Vxl
 {
 	void Scene_Game::Setup()
 	{
-		//glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
-
 		Loader::LoadScript_ImportFiles("./assets/scripts/ImportFiles.txt");
 
 		//_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
@@ -83,7 +83,6 @@ namespace Vxl
 		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(-1, -1, 0, 1));
 		_fbo->addTexture("albedo");
 		_fbo->addTexture("normal" , Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
-		//_fbo->addTexture("normal" , Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA8, Channel_Type::RGBA, Data_Type::UNSIGNED_BYTE);
 		_fbo->addTexture("test");
 		_fbo->addDepth();
 
@@ -149,7 +148,7 @@ namespace Vxl
 		{
 			for (float y = 0; y < 5.0f; y++)
 			{
-				Transform t(Vec3(x * 1.2f, y * 1.2f, -4.0f));
+				Transform t(Vec3(x * 1.2f, y * 1.2f, -7.0f));
 				m_models.push_back(t.getLocalModel().Transpose());
 			}
 		}
@@ -197,7 +196,6 @@ namespace Vxl
 		_skybox->SetMaterial(_material_skybox);
 		_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_skybox->SetMesh(Geometry.GetInverseCube());
-		_skybox->SetSelectable(false);
 		_skybox->m_useTransform = false;
 		
 		//
@@ -382,14 +380,14 @@ namespace Vxl
 		Debug.DrawLine(
 			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
 			10.0f,
-			Color4F(0, 1, 0, 1), Color4F(1, 0, 1, 1)
+			Color4F(0, 1, 0, 0.25f), Color4F(1, 0, 1, 1)
 		);
 		static float time = 0.0f;
 		time += 0.2f;
 		Debug.DrawLine(
 			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
 			10.0f,
-			Color4F(1, 1, 0, 1), Color4F(0, 1, 1, 1)
+			Color4F(1, 1, 0, 0.25f), Color4F(0, 1, 1, 1)
 		);
 
 		// Debug Lines (screen space)
