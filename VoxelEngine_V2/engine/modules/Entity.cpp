@@ -42,17 +42,17 @@ namespace Vxl
 			// Update OBB 
 			Vector4 VMin = Vector4(_mesh->GetVertexMin(), 1);
 			Vector4 VMax = Vector4(_mesh->GetVertexMax(), 1);
-			Matrix4x4 Model = m_transform.getWorldModel();
-			Model.TransposeSelf();
+			Matrix4x4 RotationScaleModel = m_transform.getWorldModel();
+			RotationScaleModel.OverrideCenter(Vector3::ZERO);
 
-			m_OBB[0] = (Model * VMin); // x0 y0 z0
-			m_OBB[1] = (Model * Vector4(VMax.x, VMin.y, VMin.z, 1)); // x1 y0 z0
-			m_OBB[2] = (Model * Vector4(VMin.x, VMax.y, VMin.z, 1)); // x0 y1 z0
-			m_OBB[3] = (Model * Vector4(VMax.x, VMax.y, VMin.z, 1)); // x1 y1 z0
-			m_OBB[4] = (Model * Vector4(VMin.x, VMin.y, VMax.z, 1)); // x0 y0 z1
-			m_OBB[5] = (Model * Vector4(VMax.x, VMin.y, VMax.z, 1)); // x1 y0 z1
-			m_OBB[6] = (Model * Vector4(VMin.x, VMax.y, VMax.z, 1)); // x0 y1 z1
-			m_OBB[7] = (Model * VMax); // x1 y1 z1
+			m_OBB[0] = (RotationScaleModel * VMin); // x0 y0 z0
+			m_OBB[1] = (RotationScaleModel * Vector4(VMax.x, VMin.y, VMin.z, 1)); // x1 y0 z0
+			m_OBB[2] = (RotationScaleModel * Vector4(VMin.x, VMax.y, VMin.z, 1)); // x0 y1 z0
+			m_OBB[3] = (RotationScaleModel * Vector4(VMax.x, VMax.y, VMin.z, 1)); // x1 y1 z0
+			m_OBB[4] = (RotationScaleModel * Vector4(VMin.x, VMin.y, VMax.z, 1)); // x0 y0 z1
+			m_OBB[5] = (RotationScaleModel * Vector4(VMax.x, VMin.y, VMax.z, 1)); // x1 y0 z1
+			m_OBB[6] = (RotationScaleModel * Vector4(VMin.x, VMax.y, VMax.z, 1)); // x0 y1 z1
+			m_OBB[7] = (RotationScaleModel * VMax); // x1 y1 z1
 
 #pragma push_macro("MACRONAME")
 #undef max

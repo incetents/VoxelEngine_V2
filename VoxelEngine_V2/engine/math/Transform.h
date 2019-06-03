@@ -22,8 +22,8 @@ namespace Vxl
 		friend class CameraObject;
 	protected:
 		// Model for transformations
-		Matrix4x4	m_local_ModelMatrix;
-		Matrix4x4	m_world_ModelMatrix;
+		Matrix4x4	m_local_ModelMatrix; // Row Major
+		Matrix4x4	m_world_ModelMatrix; // Row Major
 
 		// Raw Values
 		Vector3		m_worldPosition;	// World Position

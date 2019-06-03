@@ -429,17 +429,21 @@ namespace Vxl
 						{
 							//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
 							auto Instances = _mesh->m_instances.GetVertices();
-							for (Matrix4x4 instanceMatrix : *Instances)
+							auto EModel = Entity->m_transform.getWorldModel();
+							for (Matrix4x4& instanceMatrix : *Instances)
 							{
-								Vector3 Pos = Vector3(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14]);
-								Debug.DrawOBB(*Entity, Pos, 3.0f, OBB_Color);
-								Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, Pos, 3.0f, AABB_Color);
+								//Vector3 Pos = Vector3(instanceMatrix.Transpose() * Vector4(EntityWorld, 1));
+								Vector4 Pos = Vector4(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14], 1);
+
+								Vector3 PosWorld = Vector3(EModel * Pos);
+
+								Debug.DrawOBB(*Entity, PosWorld, 3.0f, OBB_Color);
+								Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, PosWorld, 3.0f, AABB_Color);
 							}
 						}
 					}
 
 					// Draw Axis Directions
-					
 					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 8.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
 					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 8.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
 					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 8.0f, 5.0f, Color4F::RED, Color4F::RED);
