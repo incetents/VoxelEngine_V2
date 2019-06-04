@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Debug.h"
 
-#include "../opengl/Texture.h"
+#include "../textures/Texture.h"
 #include "../math/Color.h"
 #include "../utilities/Loader.h"
 #include "../modules/Entity.h"
@@ -202,7 +202,11 @@ namespace Vxl
 		pixels.push_back(Color3F(0, 0, 0));
 		pixels.push_back(Color3F::PURPLE);
 
-		m_null_texture = Texture::CreateCustom("null", pixels, 4, true, Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST);
+		m_null_texture = Texture::CreateCustom("null", pixels, 4, true,
+			Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST,
+			Format_Type::RGB8, Channel_Type::RGB, Pixel_Type::UNSIGNED_BYTE
+		);
+
 		assert(m_null_texture);
 	}
 }

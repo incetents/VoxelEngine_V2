@@ -37,7 +37,10 @@
     <ClCompile Include="engine\opengl\LineMesh.cpp" />
     <ClCompile Include="engine\opengl\UBO.cpp" />
     <ClCompile Include="engine\opengl\VBO.cpp" />
-    <ClCompile Include="engine\opengl\Texture.cpp" />
+    <ClCompile Include="engine\textures\BaseTexture.cpp" />
+    <ClCompile Include="engine\textures\Cubemap.cpp" />
+    <ClCompile Include="engine\textures\RenderTexture.cpp" />
+    <ClCompile Include="engine\textures\Texture.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Time.cpp" />
@@ -126,7 +129,10 @@
     <ClInclude Include="engine\math\Vector4.h" />
     <ClInclude Include="engine\opengl\Enums.h" />
     <ClInclude Include="engine\opengl\Mesh.h" />
-    <ClInclude Include="engine\opengl\Texture.h" />
+    <ClInclude Include="engine\textures\BaseTexture.h" />
+    <ClInclude Include="engine\textures\Cubemap.h" />
+    <ClInclude Include="engine\textures\RenderTexture.h" />
+    <ClInclude Include="engine\textures\Texture.h" />
     <ClInclude Include="engine\opengl\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\utilities\Asset.h" />

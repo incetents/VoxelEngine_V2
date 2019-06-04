@@ -48,10 +48,13 @@
 #include "opengl/glUtil.h"
 #include "opengl/Mesh.h"
 #include "opengl/Shader.h"
-#include "opengl/Texture.h"
 #include "opengl/UBO.h"
 #include "opengl/Uniform.h"
 #include "opengl/VBO.h"
+
+#include "textures/Texture.h"
+#include "textures/Cubemap.h"
+#include "textures/RenderTexture.h"
 
 #include "utilities/Asset.h"
 #include "utilities/FileIO.h"

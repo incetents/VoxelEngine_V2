@@ -38,7 +38,6 @@ namespace Vxl
 		bool checkFBOStatus();
 		void bindFBO();
 		
-		
 		// Constructor
 		FramebufferObject(
 			const std::string& name,
@@ -83,12 +82,7 @@ namespace Vxl
 
 		void addTexture(
 			const std::string& name,
-			Wrap_Mode WrapMode			= Wrap_Mode::CLAMP_STRETCH,
-			Min_Filter MinFilter		= Min_Filter::NEAREST,
-			Mag_Filter MagFilter		= Mag_Filter::NEAREST,
-			Format_Type FormatType		= Format_Type::RGBA,
-			Channel_Type ChannelType	= Channel_Type::RGBA,
-			Data_Type DataType			= Data_Type::UNSIGNED_BYTE
+			Format_Type FormatType		= Format_Type::RGBA8
 		);
 		void addDepth();
 

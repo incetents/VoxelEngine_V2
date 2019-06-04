@@ -6,7 +6,7 @@
 #include "../utilities/logger.h"
 #include "../Math/Color.h"
 #include "../math/Vector4.h"
-#include "../opengl/Texture.h"
+#include "../textures/Texture.h"
 #include "../utilities/GlobalMacros.h"
 
 #include <algorithm>
@@ -490,7 +490,7 @@ namespace Vxl
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, length, data, usage);
 	}
-	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType, GLuint m_strideSize, GLuint m_strideOffset)
+	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, Data_Type dataType, GLuint m_strideSize, GLuint m_strideOffset)
 	{
 		glEnableVertexAttribArray(bufferIndex);
 		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, GL_FALSE, m_strideSize, BUFFER_OFFSET(m_strideOffset));

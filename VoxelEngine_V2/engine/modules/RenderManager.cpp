@@ -8,7 +8,7 @@
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
 #include "../utilities/GlobalMacros.h"
-#include "../opengl/Texture.h"
+#include "../textures/Texture.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Geometry.h"
 #include "../opengl/Mesh.h"

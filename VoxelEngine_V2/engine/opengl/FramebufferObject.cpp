@@ -2,7 +2,8 @@
 #include "Precompiled.h"
 #include "FramebufferObject.h"
 
-#include "Texture.h"
+#include "../textures/Texture.h"
+#include "../textures/RenderTexture.h"
 #include "../utilities/logger.h"
 
 #include <assert.h>
@@ -121,25 +122,20 @@ namespace Vxl
 
 	void FramebufferObject::addTexture(
 		const std::string& name,
-		Wrap_Mode WrapMode,
-		Min_Filter MinFilter,
-		Mag_Filter MagFilter,
-		Format_Type FormatType,
-		Channel_Type ChannelType,
-		Data_Type DataType
+		Format_Type FormatType
 	)
 	{
 		assert(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments());
+		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 
 		// Create new render texture
-		RenderTexture* _tex = new RenderTexture(m_size[0], m_size[1], WrapMode, MinFilter, MagFilter, FormatType, ChannelType, DataType);
+		RenderTexture* _tex = new RenderTexture(m_size[0], m_size[1], FormatType);
 		m_textures.push_back(_tex);
 
 		// Name
 		glUtil::setGLName(glNameType::TEXTURE, _tex->GetID(), "FBO_" + m_name + "_Tex_" + name);
 
 		// Add to FBO
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, _tex->GetID(), 0);
 		checkFBOStatus();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -153,7 +149,7 @@ namespace Vxl
 			delete m_depth;
 
 		// Save Texture
-		m_depth = new RenderTexture(m_size[0], m_size[1], Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::DEPTH, Channel_Type::DEPTH, Data_Type::FLOAT);
+		m_depth = new RenderTexture(m_size[0], m_size[1], Format_Type::DEPTH16);
 
 		// Name
 		glUtil::setGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
@@ -209,8 +205,8 @@ namespace Vxl
 		GLubyte* data = new GLubyte[w * h * Texture->GetChannelCount()];
 		glReadPixels(
 			x, y, w, h,
-			(GLenum)Texture->GetFormatType(),
-			(GLenum)Data_Type::UNSIGNED_BYTE,
+			GL_RGBA,//(GLenum)Texture->GetFormatType(),
+			(GLenum)Pixel_Type::UNSIGNED_BYTE,
 			data
 		);
 		return data;

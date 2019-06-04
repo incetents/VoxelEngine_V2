@@ -2,7 +2,8 @@
 #include "Precompiled.h"
 #include "Material.h"
 
-#include "../opengl/Texture.h"
+#include "../textures/Texture.h"
+
 #include "../opengl/Shader.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Mesh.h"

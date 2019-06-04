@@ -17,9 +17,12 @@
 #include "../engine/opengl/Geometry.h"
 #include "../engine/opengl/Mesh.h"
 #include "../engine/opengl/Shader.h"
-#include "../engine/opengl/Texture.h"
 #include "../engine/opengl/Debug.h"
 #include "../engine/opengl/UBO.h"
+
+#include "../engine/textures/Texture.h"
+#include "../engine/textures/RenderTexture.h"
+#include "../engine/textures/Cubemap.h"
 
 #include "../engine/math/Color.h"
 #include "../engine/math/Transform.h"
@@ -82,7 +85,7 @@ namespace Vxl
 		// FBO
 		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(-1, -1, 0, 1));
 		_fbo->addTexture("albedo");
-		_fbo->addTexture("normal" , Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA16_SNORM, Channel_Type::RGBA, Data_Type::FLOAT);
+		_fbo->addTexture("normal", Format_Type::RGBA16_SNORM);
 		_fbo->addTexture("test");
 		_fbo->addDepth();
 
@@ -91,7 +94,7 @@ namespace Vxl
 		_fbo_editor->addDepth();
 
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
-		_fbo_colorpicker->addTexture("color", Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, Format_Type::RGBA, Channel_Type::RGBA, Data_Type::FLOAT);
+		_fbo_colorpicker->addTexture("color", Format_Type::RGBA8);
 		_fbo_colorpicker->addDepth();
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
@@ -173,7 +176,15 @@ namespace Vxl
 		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
-		//_entity2->SetColor(Color3F(1, 1, 0));
+		_entity2->SetColor(Color3F(1, 1, 0));
+
+		GameObject* _errorCube = GameObject::Create("_errorCube");
+		_errorCube->SetMaterial(_material_gbuffer);
+		//_errorCube->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
+		_errorCube->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		_errorCube->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
+		//_errorCube->SetColor(Color3F(1, 1, 0));
 		
 		GameObject* _entity3 = GameObject::Create("_entity3");
 		_entity3->SetMaterial(_material_gbuffer);

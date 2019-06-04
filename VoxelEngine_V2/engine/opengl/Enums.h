@@ -28,7 +28,7 @@ namespace Vxl
 		FRAMEBUFFER = GL_FRAMEBUFFER
 	};
 	// Data Types
-	enum class DataType
+	enum class Data_Type
 	{
 		NONE = -1, // Error (Used for placeholder)
 
@@ -229,28 +229,28 @@ namespace Vxl
 		NONE = -1, // Error (Used for placeholder)
 
 		// 1 channel
-		R = GL_RED,
+		//R = GL_RED,
 		R8 = GL_R8,
 		R8_SNORM = GL_R8_SNORM,
 		R16 = GL_R16,
 		R16_SNORM = GL_R16_SNORM,
 		R16F = GL_R16F,
 		// 2 channels
-		RG = GL_RG,
+		//RG = GL_RG,
 		RG8 = GL_RG8,
 		RG8_SNORM = GL_RG8_SNORM,
 		RG16 = GL_RG16,
 		RG16_SNORM = GL_RG16_SNORM,
 		RG16F = GL_RG16F,
 		// 3 channels
-		RGB = GL_RGB,
+		//RGB = GL_RGB,
 		RGB8 = GL_RGB8,
 		RGB8_SNORM = GL_RGB8_SNORM,
 		RGB16 = GL_RGB16,
 		RGB16_SNORM = GL_RGB16_SNORM,
 		RGB16F = GL_RGB16F,
 		// 4 channels
-		RGBA = GL_RGBA,
+		//RGBA = GL_RGBA,
 		RGBA8 = GL_RGBA8,
 		RGBA8_SNORM = GL_RGBA8_SNORM,
 		RGBA16 = GL_RGBA16,
@@ -259,12 +259,12 @@ namespace Vxl
 		R11F_G11F_B10F = GL_R11F_G11F_B10F,// GOOD FOR GBUFFER
 
 		// Special
-		DEPTH = GL_DEPTH_COMPONENT,
+		//DEPTH = GL_DEPTH_COMPONENT,
 		DEPTH16 = GL_DEPTH_COMPONENT16,
 		DEPTH24 = GL_DEPTH_COMPONENT24,
-		DEPTH32 = GL_DEPTH_COMPONENT32,
+		DEPTH32 = GL_DEPTH_COMPONENT32F,
 		DEPTH32F = GL_DEPTH_COMPONENT32F,
-		DEPTH_STENCIL = GL_DEPTH_STENCIL,
+		//DEPTH_STENCIL = GL_DEPTH_STENCIL,
 		DEPTH24_STENCIL8 = GL_DEPTH24_STENCIL8,
 		DEPTH32F_STENCIL8 = GL_DEPTH32F_STENCIL8
 	};
@@ -284,7 +284,7 @@ namespace Vxl
 		DEPTH_STENCIL = GL_DEPTH_STENCIL,
 		STENCIL = GL_STENCIL_INDEX
 	};
-	enum class Data_Type
+	enum class Pixel_Type
 	{
 		NONE = -1, // Error (Used for placeholder)
 

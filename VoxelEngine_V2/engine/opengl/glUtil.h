@@ -100,7 +100,7 @@ namespace Vxl
 		void bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data);
 		// VBO - Array
 		void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
-		void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT, GLuint m_strideSize = 0, GLuint m_strideOffset = 0);
+		void setVertexAttrib(GLuint bufferIndex, int valueCount, Data_Type dataType = Data_Type::FLOAT, GLuint m_strideSize = 0, GLuint m_strideOffset = 0);
 		void setVertexAttribInstancing(GLuint bufferIndex);
 		// EBO - Index
 		void bindEBO(GLuint EBO);

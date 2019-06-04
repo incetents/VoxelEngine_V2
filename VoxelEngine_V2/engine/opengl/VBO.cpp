@@ -79,7 +79,7 @@ namespace Vxl
 			if (m_strideHints[0].m_type == BufferType::InstancingStart)
 				glUtil::setVertexAttribInstancing((int)m_strideHints[0].m_type);
 			else
-				glUtil::setVertexAttrib((int)m_strideHints[0].m_type, m_strideHints[0].m_valueCount, DataType::FLOAT, 0, 0);
+				glUtil::setVertexAttrib((int)m_strideHints[0].m_type, m_strideHints[0].m_valueCount, Data_Type::FLOAT, 0, 0);
 		
 		default:
 			for (auto hint : m_strideHints)
@@ -87,7 +87,7 @@ namespace Vxl
 				if (hint.m_type == BufferType::InstancingStart)
 					glUtil::setVertexAttribInstancing((int)hint.m_type);
 				else
-					glUtil::setVertexAttrib((int)hint.m_type, hint.m_valueCount, DataType::FLOAT, m_Stride, hint.m_strideOffset);
+					glUtil::setVertexAttrib((int)hint.m_type, hint.m_valueCount, Data_Type::FLOAT, m_Stride, hint.m_strideOffset);
 			}
 		}
 	}

@@ -11,8 +11,9 @@
 #include "../math/Vector3.h"
 #include "../math/Model.h"
 
+#include "../textures/Texture.h"
+
 #include "../opengl/Shader.h"
-#include "../opengl/Texture.h"
 #include "../opengl/Enums.h"
 
 #include "logger.h"
@@ -222,7 +223,7 @@ namespace Vxl
 						break;
 					}
 
-					Texture::Load(Name, filePath, FlipY, MipMap, WM, FMIN, FMAG, Format_Type::RGBA, Data_Type::UNSIGNED_BYTE);
+					Texture::Load(Name, filePath, FlipY, MipMap, WM, FMIN, FMAG);
 				}
 				/* CUBEMAP */
 				else if (_state == LoadState::CUBEMAP && SegmentCount == 7)

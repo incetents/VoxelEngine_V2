@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Block.h"
 
-#include "../engine/opengl/Texture.h"
+#include "../engine/textures/Texture.h"
 #include "../engine/utilities/logger.h"
 
 namespace Vxl
