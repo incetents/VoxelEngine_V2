@@ -21,7 +21,7 @@ namespace Vxl
 		bool		 m_useMipMapping = false;
 		int			 m_width;
 		int			 m_height;
-		int			 m_channels;
+		int			 m_channelCount;
 		Texture_Type m_type;
 		Wrap_Mode	 m_wrapMode;
 		Min_Filter   m_minFilter;
@@ -79,7 +79,7 @@ namespace Vxl
 		}
 		inline int GetChannelCount(void) const
 		{
-			return m_channels;
+			return m_channelCount;
 		}
 		inline Texture_Type GetType(void) const
 		{

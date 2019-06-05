@@ -163,8 +163,8 @@ namespace Vxl
 		static std::set<const ShaderProgram*> ProgramsFailed;
 		static UINT ProgramsFailedSize;
 
-		void Bind() const;
-		static void Unbind();
+		void Bind(void) const;
+		static void Unbind(void);
 
 		// Uniform
 

@@ -10,6 +10,27 @@ namespace Vxl
 {
 	class Vector4;
 
+	template<typename Type>
+	class RawArray
+	{
+	public:
+		Type* start;
+		int length;
+		void Allocate(int size)
+		{
+			start = new Type[size];
+			length = size;
+		}
+		void Deallocate()
+		{
+			delete[] start;
+		}
+		Type operator[](int index)
+		{
+			return start[index];
+		}
+	};
+
 	namespace Util
 	{
 		// Vector merging

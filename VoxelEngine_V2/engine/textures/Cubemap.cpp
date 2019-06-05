@@ -28,22 +28,22 @@ namespace Vxl
 	{
 		m_useMipMapping = UseMipMapping;
 
-		m_image[0] = SOIL_load_image(filePath1.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-		m_image[1] = SOIL_load_image(filePath2.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-		m_image[2] = SOIL_load_image(filePath3.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-		m_image[3] = SOIL_load_image(filePath4.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-		m_image[4] = SOIL_load_image(filePath5.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-		m_image[5] = SOIL_load_image(filePath6.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
+		m_image[0] = SOIL_load_image(filePath1.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
+		m_image[1] = SOIL_load_image(filePath2.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
+		m_image[2] = SOIL_load_image(filePath3.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
+		m_image[3] = SOIL_load_image(filePath4.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
+		m_image[4] = SOIL_load_image(filePath5.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
+		m_image[5] = SOIL_load_image(filePath6.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 
 		for (GLuint i = 0; i < 6; i++)
 		{
 			if (!m_image[i])
 				return;
 			else if (InvertY)
-				FlipTextureY(m_image[i], m_width, m_height, m_channels);
+				FlipTextureY(m_image[i], m_width, m_height, m_channelCount);
 		}
 
-		m_channelType = glUtil::getFormat(m_channels);
+		m_channelType = glUtil::getChannelType(m_channelCount);
 
 		for (GLuint i = 0; i < 6; i++)
 		{

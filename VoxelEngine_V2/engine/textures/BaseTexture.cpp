@@ -93,7 +93,7 @@ namespace Vxl
 		glGenTextures(1, &m_id);
 		assert(m_id != -1);
 
-		m_channels = (glUtil::getFormatCount(ChannelType));
+		m_channelCount = (glUtil::getChannelCount(FormatType, ChannelType));
 
 		updateParameters();
 	}

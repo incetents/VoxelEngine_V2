@@ -28,7 +28,7 @@ namespace Vxl
 	{
 		m_useMipMapping = UseMipMapping;
 
-		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
+		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 
 		if (!m_image)
 		{
@@ -38,11 +38,11 @@ namespace Vxl
 		}
 
 		// Get Correct channel data
-		m_channelType = glUtil::getFormat(m_channels);
+		m_channelType = glUtil::getChannelType(m_channelCount);
 
 		// Invert Y
 		if (InvertY)
-			FlipTextureY(m_image, m_width, m_height, m_channels);
+			FlipTextureY(m_image, m_width, m_height, m_channelCount);
 
 		// Storage
 		updateStorage(&m_image[0]);
@@ -74,10 +74,10 @@ namespace Vxl
 		UINT pixelsCount = (UINT)pixels.size();
 		m_width = width;
 		m_height = pixelsCount / width;
-		m_channels = 3;
+		m_channelCount = 3;
 
 		std::vector<UCHAR> fixed_pixels;
-		fixed_pixels.reserve(pixelsCount * m_channels);
+		fixed_pixels.reserve(pixelsCount * m_channelCount);
 
 		for (UINT i = 0; i < pixelsCount; i++)
 		{
@@ -86,7 +86,7 @@ namespace Vxl
 			fixed_pixels.push_back((UCHAR)(pixels[i].b * 255.0f));
 		}
 
-		m_image = new UCHAR[pixelsCount * m_channels];
+		m_image = new UCHAR[pixelsCount * m_channelCount];
 		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
 
 		// Storage

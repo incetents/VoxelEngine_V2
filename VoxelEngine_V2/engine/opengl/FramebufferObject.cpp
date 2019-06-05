@@ -5,12 +5,102 @@
 #include "../textures/Texture.h"
 #include "../textures/RenderTexture.h"
 #include "../utilities/logger.h"
+#include "RenderBuffer.h"
 
 #include <assert.h>
 
 namespace Vxl
 {
 	GLuint FramebufferObject::m_boundID = 0;
+
+	void FramebufferObject::FBOTexture::BecomeRenderTexture(
+		int Width, int Height,
+		Format_Type FormatType,
+		Channel_Type ChannelType,
+		Pixel_Type PixelType
+	)
+	{
+		if (m_type == Type::BUFFER)
+			delete m_buffer;
+		else if (m_type == Type::TEXTURE)
+			delete m_texture;
+
+		m_texture = new RenderTexture(Width, Height, FormatType, ChannelType, PixelType);
+		m_type = Type::TEXTURE;
+	}
+
+	void FramebufferObject::FBOTexture::BecomeRenderBuffer(
+		int Width, int Height,
+		Format_Type FormatType,
+		Channel_Type ChannelType,
+		Pixel_Type PixelType
+	)
+	{
+		if (m_type == Type::BUFFER)
+			delete m_buffer;
+		else if (m_type == Type::TEXTURE)
+			delete m_texture;
+
+		m_buffer = new RenderBuffer(Width, Height, FormatType, ChannelType, PixelType);
+		m_type = Type::BUFFER;
+	}
+
+	GLuint FramebufferObject::FBOTexture::GetID()
+	{
+		assert(m_type != Type::NONE);
+
+		if (m_type == Type::BUFFER)
+			return m_buffer->GetID();
+
+		return m_texture->GetID();
+	}
+	int FramebufferObject::FBOTexture::GetChannelCount()
+	{
+		assert(m_type != Type::NONE);
+
+		if (m_type == Type::BUFFER)
+			return m_buffer->GetChannelCount();
+
+		return m_texture->GetChannelCount();
+
+	}
+	Channel_Type FramebufferObject::FBOTexture::GetChannelType()
+	{
+		assert(m_type != Type::NONE);
+
+		if (m_type == Type::BUFFER)
+			return m_buffer->GetChannelType();
+
+		return m_texture->GetChannelType();
+	}
+	Pixel_Type FramebufferObject::FBOTexture::GetPixelType()
+	{
+		assert(m_type != Type::NONE);
+
+		if (m_type == Type::BUFFER)
+			return m_buffer->GetPixelType();
+
+		return m_texture->GetPixelType();
+	}
+
+	void FramebufferObject::FBOTexture::Bind()
+	{
+		assert(m_type != Type::NONE);
+
+		if (m_type == Type::BUFFER)
+			m_buffer->Bind();
+		else
+			m_texture->Bind();
+	}
+	void FramebufferObject::FBOTexture::Unbind()
+	{
+		assert(m_type != Type::NONE);
+
+		if (m_type == Type::BUFFER)
+			m_buffer->Unbind();
+		else
+			m_texture->Unbind();
+	}
 
 	FramebufferObject::FramebufferObject(
 		const std::string& name,
@@ -129,36 +219,50 @@ namespace Vxl
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 
 		// Create new render texture
-		RenderTexture* _tex = new RenderTexture(m_size[0], m_size[1], FormatType);
-		m_textures.push_back(_tex);
+		m_textures.push_back(FBOTexture());
+		m_textures[m_textureCount].BecomeRenderTexture(m_size[0], m_size[1], FormatType);
+		//RenderTexture* _tex = new RenderTexture(m_size[0], m_size[1], FormatType);
+		//m_textures.push_back(_tex);
 
 		// Name
-		glUtil::setGLName(glNameType::TEXTURE, _tex->GetID(), "FBO_" + m_name + "_Tex_" + name);
+		glUtil::setGLName(glNameType::TEXTURE, m_textures[m_textureCount].GetID(), "FBO_" + m_name + "_Tex_" + name);
 
 		// Add to FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, _tex->GetID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, m_textures[m_textureCount].GetID(), 0);
 		checkFBOStatus();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// fix draw buffer
 		m_dirtyDrawBuffers = true;
 	}
-	void FramebufferObject::addDepth()
+	void FramebufferObject::addDepth(DepthFormat_Type depthFormatType, bool isTexture)
 	{
-		if (m_depth)
-			delete m_depth;
+		// Select Pixel/Channel Type [for glReadPixels]
+		Pixel_Type PixelType;
+		Channel_Type ChannelType;
+		glUtil::getPixelChannelData(depthFormatType, ChannelType, PixelType);
 
-		// Save Texture
-		m_depth = new RenderTexture(m_size[0], m_size[1], Format_Type::DEPTH16);
+		if (isTexture)
+			m_depth.BecomeRenderTexture(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
+		else
+			m_depth.BecomeRenderBuffer(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
 
 		// Name
-		glUtil::setGLName(glNameType::TEXTURE, m_depth->GetID(), "FBO_" + m_name + "_Depth");
+		glUtil::setGLName(glNameType::TEXTURE, m_depth.GetID(), "FBO_" + m_name + "_Depth");
 
 		// Add to FBO
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
+		m_depth.Bind();
+
+		if (isTexture)
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth.GetID(), 0);
+		else
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth.GetID());
+
 		checkFBOStatus();
+		m_depth.Unbind();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	}
 
 	void FramebufferObject::bind()
@@ -185,14 +289,15 @@ namespace Vxl
 		assert(index < (int)m_textureCount);
 
 		glUtil::setActiveTexture(layer);
-		m_textures[index]->Bind();
+
+		m_textures[index].Bind();
 	}
 	void FramebufferObject::bindDepth(Active_Texture layer)
 	{
-		assert(m_depth != nullptr);
+		assert(!m_depth.NotUsed());
 
 		glUtil::setActiveTexture(layer);
-		m_depth->Bind();
+		m_depth.Bind();
 	}
 
 	// Notice, SNORM TEXTURES CANNOT BE READ
@@ -200,15 +305,39 @@ namespace Vxl
 	{
 		assert(textureIndex < m_textureCount);
 		auto Texture = m_textures[textureIndex];
-
+		
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + textureIndex);
-		GLubyte* data = new GLubyte[w * h * Texture->GetChannelCount()];
+		GLubyte* data = new GLubyte[w * h * Texture.GetChannelCount()];
 		glReadPixels(
 			x, y, w, h,
-			GL_RGBA,//(GLenum)Texture->GetFormatType(),
-			(GLenum)Pixel_Type::UNSIGNED_BYTE,
+			(GLenum)Texture.GetChannelType(),
+			(GLenum)Texture.GetPixelType(),
 			data
 		);
 		return data;
+	}
+	GLubyte* FramebufferObject::readDepthPixel(int x, int y, int w, int h)
+	{
+		//RawArray<GLubyte>* data = new RawArray<GLubyte>();
+		//data->Allocate(w * h * m_depth.GetChannelCount());
+
+		//GLubyte* data = new GLubyte[w * h * m_depth.GetChannelCount()];
+
+		RawArray<GLubyte> asd;
+		asd.start = new GLubyte[w * h * m_depth.GetChannelCount()];
+
+		//std::vector<GLubyte> data;
+		//data.reserve(w * h * m_depth.GetChannelCount() * 1);
+		//data.resize(w * h * m_depth.GetChannelCount() * 1);
+		//GLubyte* data = new GLubyte[w * h * m_depth.GetChannelCount()];
+
+		glReadPixels(
+			x, y, w, h,
+			(GLenum)m_depth.GetChannelType(), //GL_DEPTH_COMPONENT,
+			(GLenum)m_depth.GetPixelType(),
+			asd.start
+		);
+		//std::vector<GLubyte> test = std::vector<GLubyte>(data, data + w * h * m_depth.GetChannelCount());
+		return asd.start;
 	}
 }

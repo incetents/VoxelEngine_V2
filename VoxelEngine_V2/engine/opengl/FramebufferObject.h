@@ -5,17 +5,62 @@
 #include "glUtil.h"
 #include "../math/Color.h"
 #include "../utilities/Asset.h"
+#include "../utilities/Util.h"
 
 //#include "Texture.h"
 #include <vector>
 
 namespace Vxl
 {
+	class RenderBuffer;
 	class RenderTexture;
 
 	class FramebufferObject : public Asset<FramebufferObject>
 	{
 		friend class RenderManager;
+	private:
+		class FBOTexture
+		{
+			enum Type
+			{
+				NONE = -1,
+				TEXTURE,
+				BUFFER
+			};
+			Type m_type = Type::NONE;
+		public:
+			union
+			{
+				RenderTexture* m_texture;
+				RenderBuffer* m_buffer;
+			};
+
+			void BecomeRenderTexture(
+				int Width, int Height,
+				Format_Type FormatType,
+				Channel_Type ChannelType = Channel_Type::RGBA,
+				Pixel_Type PixelType = Pixel_Type::UNSIGNED_BYTE
+			);
+			void BecomeRenderBuffer(
+				int Width, int Height,
+				Format_Type FormatType,
+				Channel_Type ChannelType = Channel_Type::RGBA,
+				Pixel_Type PixelType = Pixel_Type::UNSIGNED_BYTE
+			);
+
+			inline bool NotUsed(void) const
+			{
+				return m_type == Type::NONE;
+			}
+			
+			GLuint GetID();
+			int GetChannelCount();
+			Channel_Type GetChannelType();
+			Pixel_Type GetPixelType();
+
+			void Bind();
+			void Unbind();
+		};
 	private:
 		// Fbo
 		const std::string m_name;
@@ -25,11 +70,13 @@ namespace Vxl
 		UINT	m_size[2];
 		bool	m_dirtyDrawBuffers = false;
 		// Textures
-		std::vector<RenderTexture*> m_textures;
+		std::vector<FBOTexture>		m_textures;
+		//std::vector<RenderTexture*> m_textures;
 		GLuint						m_textureCount = 0;
 		GLenum*						m_attachments = nullptr;
 		// Depth
-		RenderTexture*				m_depth = nullptr;
+		FBOTexture m_depth;
+		//RenderTexture*				m_depth = nullptr;
 		// Tracker //
 		static GLuint m_boundID;
 
@@ -84,7 +131,10 @@ namespace Vxl
 			const std::string& name,
 			Format_Type FormatType		= Format_Type::RGBA8
 		);
-		void addDepth();
+		void addDepth(
+			DepthFormat_Type depthFormatType,
+			bool isTexture = true
+		);
 
 		void bind();
 		void bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH);
@@ -94,5 +144,6 @@ namespace Vxl
 		void bindDepth(Active_Texture layer);
 
 		GLubyte* readPixels(u_int textureIndex, int x, int y, int w, int h);
+		GLubyte* readDepthPixel(int x, int y, int w, int h);
 	};
 }

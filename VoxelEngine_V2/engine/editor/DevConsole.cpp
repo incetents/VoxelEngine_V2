@@ -57,14 +57,8 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		if (ImGui::Button("Reload Window"))
-		{
-			RenderManager.ReloadWindow();
-		}
-		if (ImGui::Button("Reload Shaders"))
-		{
-			RenderManager.ReloadShaders();
-		}
+		ImGui::Text("Reload Window = [F5]");
+		ImGui::Text("Reload Shaders = [R]");
 
 		ImGui::Separator();
 
@@ -154,8 +148,7 @@ namespace Vxl
 				"Albedo",
 				"Normal",
 				"Depth",
-				"Editor",
-				"EditorDepth"
+				"Editor"
 			};
 			static int fbo_override_current = 0;
 			ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);

@@ -6,9 +6,11 @@ namespace Vxl
 {
 	RenderTexture::RenderTexture(
 		int Width, int Height,
-		Format_Type FormatType
+		Format_Type FormatType,
+		Channel_Type m_channelType,
+		Pixel_Type PixelType
 	)
-		: BaseTexture(Texture_Type::TEX_2D, Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, FormatType, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE)
+		: BaseTexture(Texture_Type::TEX_2D, Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, FormatType, m_channelType, PixelType)
 	{
 		m_width = Width;
 		m_height = Height;

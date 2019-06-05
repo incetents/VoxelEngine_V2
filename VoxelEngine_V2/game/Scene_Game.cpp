@@ -87,15 +87,15 @@ namespace Vxl
 		_fbo->addTexture("albedo");
 		_fbo->addTexture("normal", Format_Type::RGBA16_SNORM);
 		_fbo->addTexture("test");
-		_fbo->addDepth();
+		_fbo->addDepth(DepthFormat_Type::DEPTH16);
 
 		_fbo_editor = FramebufferObject::Create("EditorPost", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
 		_fbo_editor->addTexture("albedo");
-		_fbo_editor->addDepth();
+		_fbo_editor->addDepth(DepthFormat_Type::DEPTH16, true);
 
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
 		_fbo_colorpicker->addTexture("color", Format_Type::RGBA8);
-		_fbo_colorpicker->addDepth();
+		_fbo_colorpicker->addDepth(DepthFormat_Type::DEPTH16);
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
 		_shader_gbuffer				= ShaderProgram::Get("gbuffer");
@@ -515,6 +515,33 @@ namespace Vxl
 		//
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects();
+
+		GLubyte* test = _fbo->readDepthPixel(
+			Input.getMouseX(),
+			Window.GetResolutionHeight() - Input.getMouseY(),
+			1, 1
+		);
+
+		//	union
+		//	{
+		//		unsigned int a;
+		//		GLubyte b[4];
+		//	};
+		//	b[0] = test[1];
+		//	b[1] = test[0];
+		//	b[2] = 0;
+		//	b[3] = 0;
+
+		//std::cout << a << std::endl;
+		std::cout << (unsigned int)test[0] << std::endl;
+		std::cout << (unsigned int)test[1] << std::endl;
+		std::cout << "~~~" << std::endl;
+
+		//test->Deallocate();
+		//delete test;
+		delete[] test;
+		//delete[] test.start;
+
 		//
 		GPUTimer::EndTimer("Gbuffer");
 
@@ -964,17 +991,6 @@ namespace Vxl
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
 
 				_fbo_editor->bindTexture(0, Active_Texture::LEVEL0);
-				break;
-			}
-			// Show Editor Depth
-			case 5:
-			{
-				_shader_showRenderTarget->Bind();
-				_shader_showRenderTarget->SetUniform("outputMode", 2);
-				_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
-				_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
-
-				_fbo_editor->bindDepth(Active_Texture::LEVEL0);
 				break;
 			}
 		}

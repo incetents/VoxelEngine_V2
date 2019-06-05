@@ -264,7 +264,7 @@ namespace Vxl
 	}
 
 	// Get Format Type from channel count
-	Channel_Type glUtil::getFormat(int ChannelCount)
+	Channel_Type glUtil::getChannelType(int ChannelCount)
 	{
 		switch (ChannelCount)
 		{
@@ -280,16 +280,34 @@ namespace Vxl
 		case 4:
 			return Channel_Type::RGBA;
 		}
+
+		assert(false);
+		return Channel_Type::NONE;
 	}
-	unsigned int glUtil::getFormatCount(Channel_Type type)
+	unsigned int glUtil::getChannelCount(Format_Type format, Channel_Type type)
 	{
+		// Special exceptions
+		switch (format)
+		{
+		case Format_Type::DEPTH16:
+			return 2;
+		case Format_Type::DEPTH24:
+			return 3;
+		case Format_Type::DEPTH32:
+		case Format_Type::DEPTH32F:
+		case Format_Type::DEPTH24_STENCIL8:
+			return 4;
+		case Format_Type::DEPTH32F_STENCIL8:
+			return 8; // 64 bits (24 bits alignment)
+		}
+
+		// Solve channel count based on channel type
 		switch (type)
 		{
 		case Channel_Type::NONE:
 			return 0;
 		case Channel_Type::R:
 		case Channel_Type::DEPTH:
-		case Channel_Type::STENCIL:
 			return 1;
 		case Channel_Type::RG:
 		case Channel_Type::DEPTH_STENCIL:
@@ -301,10 +319,46 @@ namespace Vxl
 		case Channel_Type::BGRA:
 			return 4;
 		}
-
+		
 		assert(false);
 		return 0;
 	}
+
+	// Get Pixel/Channel Data From DepthFormat
+	void glUtil::getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType)
+	{
+		switch (format)
+		{
+		case DepthFormat_Type::STENCIL8:
+			channelType = Channel_Type::STENCIL;
+			pixelType = Pixel_Type::UNSIGNED_BYTE;
+			break;
+		case DepthFormat_Type::DEPTH16:
+			channelType = Channel_Type::DEPTH;
+			pixelType = Pixel_Type::UNSIGNED_SHORT;
+			break;
+		case DepthFormat_Type::DEPTH24:
+			channelType = Channel_Type::DEPTH;
+			pixelType = Pixel_Type::UNSIGNED_INT_24_8;
+			break;
+		case DepthFormat_Type::DEPTH24_STENCIL8:
+			channelType = Channel_Type::DEPTH_STENCIL;
+			pixelType = Pixel_Type::UNSIGNED_INT_24_8;
+			break;
+		case DepthFormat_Type::DEPTH32:
+		case DepthFormat_Type::DEPTH32F:
+			channelType = Channel_Type::DEPTH;
+			pixelType = Pixel_Type::UNSIGNED_INT;
+			break;
+		case DepthFormat_Type::DEPTH32F_STENCIL8:
+			channelType = Channel_Type::DEPTH_STENCIL;
+			pixelType = Pixel_Type::UNSIGNED_INT;
+			break;
+		default:
+			assert(false);
+		}
+	}
+
 
 	void glUtil::clearColor(float r, float g, float b, float a)
 	{

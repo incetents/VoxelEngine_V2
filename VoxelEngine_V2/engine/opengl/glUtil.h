@@ -55,8 +55,11 @@ namespace Vxl
 		void setGLName(glNameType identifier, GLuint name, const std::string &label);
 
 		// Get Format Type from channel count
-		Channel_Type getFormat(int ChannelCount);
-		unsigned int getFormatCount(Channel_Type type);
+		Channel_Type getChannelType(int ChannelCount);
+		unsigned int getChannelCount(Format_Type format, Channel_Type type);
+
+		// Get Pixel/Channel Data From DepthFormat
+		void getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType);
 
 		// Clear Setup
 		void clearColor(float r, float g, float b, float a = 1.0f);
