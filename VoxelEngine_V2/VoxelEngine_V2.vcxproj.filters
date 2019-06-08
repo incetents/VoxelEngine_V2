@@ -443,5 +443,8 @@
     <ClInclude Include="engine\opengl\RenderBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\utilities\Containers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

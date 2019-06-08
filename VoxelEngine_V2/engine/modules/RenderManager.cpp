@@ -9,6 +9,7 @@
 #include "../utilities/Time.h"
 #include "../utilities/GlobalMacros.h"
 #include "../textures/Texture.h"
+#include "../textures/Cubemap.h"
 #include "../opengl/Debug.h"
 #include "../opengl/Geometry.h"
 #include "../opengl/Mesh.h"
@@ -217,7 +218,20 @@ namespace Vxl
 	}
 	void RenderManager::ReloadFBOS()
 	{
-		// ???
+		auto fbos = FramebufferObject::GetDatabase();
+		for (auto& fbo : fbos)
+		{
+			if (fbo.second->m_fullscreen)
+			{
+				fbo.second->unload();
+				// Adjust Size based on current window render size [effectively resizing FBO resolution]
+				fbo.second->m_width = Window.GetScreenWidth();
+				fbo.second->m_height = Window.GetScreenHeight();
+				//
+				fbo.second->load();
+			}
+		}
+		FramebufferObject::unbind();
 	}
 
 	// Behaviour

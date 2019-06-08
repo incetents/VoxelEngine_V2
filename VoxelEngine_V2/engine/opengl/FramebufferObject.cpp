@@ -6,6 +6,7 @@
 #include "../textures/RenderTexture.h"
 #include "../utilities/logger.h"
 #include "RenderBuffer.h"
+#include "../window/window.h"
 
 #include <assert.h>
 
@@ -13,117 +14,99 @@ namespace Vxl
 {
 	GLuint FramebufferObject::m_boundID = 0;
 
-	void FramebufferObject::FBOTexture::BecomeRenderTexture(
-		int Width, int Height,
-		Format_Type FormatType,
-		Channel_Type ChannelType,
-		Pixel_Type PixelType
-	)
+	void FramebufferObject::FBOTexture::load(int Width, int Height)
 	{
-		if (m_type == Type::BUFFER)
-			delete m_buffer;
-		else if (m_type == Type::TEXTURE)
-			delete m_texture;
+		unload();
 
-		m_texture = new RenderTexture(Width, Height, FormatType, ChannelType, PixelType);
-		m_type = Type::TEXTURE;
+		if (m_type == FBORenderType::TEXTURE)
+		{
+			m_texture = new RenderTexture(Width, Height, m_formatType, m_channelType, m_pixelType);
+			glUtil::setGLName(glNameType::TEXTURE, m_texture->GetID(), "FBO_" + m_name + "_Tex_" + m_name);
+		}
+		else
+		{
+			m_buffer = new RenderBuffer(Width, Height, m_formatType, m_channelType, m_pixelType);
+			glUtil::setGLName(glNameType::TEXTURE, m_buffer->GetID(), "FBO_" + m_name + "_RenderBuf_" + m_name);
+		}
+
+
+		m_empty = false;
 	}
 
-	void FramebufferObject::FBOTexture::BecomeRenderBuffer(
-		int Width, int Height,
-		Format_Type FormatType,
-		Channel_Type ChannelType,
-		Pixel_Type PixelType
-	)
+	void FramebufferObject::FBOTexture::unload()
 	{
-		if (m_type == Type::BUFFER)
-			delete m_buffer;
-		else if (m_type == Type::TEXTURE)
-			delete m_texture;
+		if (!m_empty)
+		{
+			if (m_type == FBORenderType::BUFFER)
+				delete m_buffer;
+			else if (m_type == FBORenderType::TEXTURE)
+				delete m_texture;
 
-		m_buffer = new RenderBuffer(Width, Height, FormatType, ChannelType, PixelType);
-		m_type = Type::BUFFER;
+			m_empty = true;
+		}
 	}
 
-	GLuint FramebufferObject::FBOTexture::GetID()
+	GLuint FramebufferObject::FBOTexture::GetID(void) const
 	{
-		assert(m_type != Type::NONE);
-
-		if (m_type == Type::BUFFER)
+		if (m_type == FBORenderType::BUFFER)
 			return m_buffer->GetID();
 
 		return m_texture->GetID();
 	}
-	int FramebufferObject::FBOTexture::GetChannelCount()
+	Format_Type	FramebufferObject::FBOTexture::GetFormatType(void) const
 	{
-		assert(m_type != Type::NONE);
+		if (m_type == FBORenderType::BUFFER)
+			return m_buffer->GetFormatType();
 
-		if (m_type == Type::BUFFER)
-			return m_buffer->GetChannelCount();
-
-		return m_texture->GetChannelCount();
-
+		return m_texture->GetFormatType();
 	}
-	Channel_Type FramebufferObject::FBOTexture::GetChannelType()
+	Channel_Type FramebufferObject::FBOTexture::GetChannelType(void) const
 	{
-		assert(m_type != Type::NONE);
-
-		if (m_type == Type::BUFFER)
+		if (m_type == FBORenderType::BUFFER)
 			return m_buffer->GetChannelType();
 
 		return m_texture->GetChannelType();
 	}
-	Pixel_Type FramebufferObject::FBOTexture::GetPixelType()
+	Pixel_Type FramebufferObject::FBOTexture::GetPixelType(void) const
 	{
-		assert(m_type != Type::NONE);
-
-		if (m_type == Type::BUFFER)
+		if (m_type == FBORenderType::BUFFER)
 			return m_buffer->GetPixelType();
 
 		return m_texture->GetPixelType();
 	}
+	int FramebufferObject::FBOTexture::GetChannelCount(void) const
+	{
+		if (m_type == FBORenderType::BUFFER)
+			return m_buffer->GetChannelCount();
+
+		return m_texture->GetChannelCount();
+	}
 
 	void FramebufferObject::FBOTexture::Bind()
 	{
-		assert(m_type != Type::NONE);
-
-		if (m_type == Type::BUFFER)
+		if (m_type == FBORenderType::BUFFER)
 			m_buffer->Bind();
 		else
 			m_texture->Bind();
 	}
 	void FramebufferObject::FBOTexture::Unbind()
 	{
-		assert(m_type != Type::NONE);
-
-		if (m_type == Type::BUFFER)
+		if (m_type == FBORenderType::BUFFER)
 			m_buffer->Unbind();
 		else
 			m_texture->Unbind();
 	}
 
-	FramebufferObject::FramebufferObject(
-		const std::string& name,
-		UINT FBO_width, UINT FBO_height,
-		Color4F ClearColor
-	)
-		: m_name(name), m_clearColor(ClearColor)
+	FramebufferObject::FramebufferObject(const std::string& name)
+		: m_name(name)
 	{
-		m_size[0] = FBO_width;
-		m_size[1] = FBO_height;
-
-		glGenFramebuffers(1, &m_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-
-		glUtil::setGLName(glNameType::FRAMEBUFFER, m_id, "FBO_" + name);
+		
 	}
 
 	FramebufferObject* FramebufferObject::Create(
-		const std::string& name,
-		UINT FBO_width, UINT FBO_height,
-		Color4F ClearColor
+		const std::string& name
 	){
-		FramebufferObject* _FBO = new FramebufferObject(name, FBO_width, FBO_height, ClearColor);
+		FramebufferObject* _FBO = new FramebufferObject(name);
 
 		AddToDatabase(name, _FBO);
 		Message_Created(name, _FBO);
@@ -133,8 +116,54 @@ namespace Vxl
 
 	FramebufferObject::~FramebufferObject()
 	{
+		unload();
+	}
+
+	void FramebufferObject::load()
+	{
+		// Already init
 		if (m_id != -1)
+			assert(false);
+
+		// Create FBO
+		glGenFramebuffers(1, &m_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+		glUtil::setGLName(glNameType::FRAMEBUFFER, m_id, "FBO_" + m_name);
+
+		// Color attachments
+		for (unsigned int i = 0; i < m_textureCount; i++)
+		{
+			m_textures[i]->load(m_width, m_height);
+
+			if (m_textures[i]->isRenderTexture())
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i]->GetID(), 0);
+			else
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_RENDERBUFFER, m_textures[i]->GetID());
+		}
+
+		// Depth attachment
+		m_depth->load(m_width, m_height);
+		if (m_depth->isRenderTexture())
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
+		else
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth->GetID());
+
+		// Final Check
+		checkFBOStatus();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	void FramebufferObject::unload()
+	{
+		if (m_id != -1)
+		{
 			glDeleteFramebuffers(1, &m_id);
+			m_id = -1;
+
+			// Destroy attached textures and depth/stencil
+			for (auto& tex : m_textures)
+				tex->unload();
+			m_depth->unload();
+		}
 	}
 
 	bool FramebufferObject::checkFBOStatus()
@@ -178,16 +207,16 @@ namespace Vxl
 		if (m_boundID != m_id)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-
-			if (m_dirtyDrawBuffers)
-			{
-				FixCallList();
-				glDrawBuffers(m_textureCount, m_attachments);
-				m_dirtyDrawBuffers = false;
-			}
+			glDrawBuffers(m_textureCount, _Global_Color_Attachment_Calls);
 		}
 		// update bound FBO
 		m_boundID = m_id;
+	}
+	void FramebufferObject::setSizeToWindowSize()
+	{
+		m_width = Window.GetResolutionWidth();
+		m_height = Window.GetResolutionHeight();
+		m_fullscreen = true;
 	}
 	void FramebufferObject::clearBuffers()
 	{
@@ -200,68 +229,67 @@ namespace Vxl
 		glClearBufferfv(GL_COLOR, index, &m_clearColor[0]);
 	}
 
-	void FramebufferObject::FixCallList()
-	{
-		if (m_attachments != nullptr)
-			delete[] m_attachments;
-
-		m_attachments = new GLenum[m_textureCount];
-		for (GLuint i = 0; i < m_textureCount; i++)
-			m_attachments[i] = GL_COLOR_ATTACHMENT0 + i;
-	}
-
 	void FramebufferObject::addTexture(
 		const std::string& name,
-		Format_Type FormatType
+		Format_Type FormatType,
+		FBORenderType fboRenderType
 	)
 	{
 		assert(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments());
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-
+		
 		// Create new render texture
-		m_textures.push_back(FBOTexture());
-		m_textures[m_textureCount].BecomeRenderTexture(m_size[0], m_size[1], FormatType);
-		//RenderTexture* _tex = new RenderTexture(m_size[0], m_size[1], FormatType);
-		//m_textures.push_back(_tex);
+		m_textures.push_back(new FBOTexture(name, fboRenderType, FormatType, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE));
+		m_textureCount++;
 
-		// Name
-		glUtil::setGLName(glNameType::TEXTURE, m_textures[m_textureCount].GetID(), "FBO_" + m_name + "_Tex_" + name);
-
-		// Add to FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, m_textures[m_textureCount].GetID(), 0);
-		checkFBOStatus();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// fix draw buffer
-		m_dirtyDrawBuffers = true;
+		//	if(fboRenderType == FBORenderType::TEXTURE)
+//		m_textures[m_textureCount].BecomeRenderTexture(m_size[0], m_size[1], FormatType);
+//	else
+//		m_textures[m_textureCount].BecomeRenderBuffer(m_size[0], m_size[1], FormatType);
+//	
+//	// Name
+//	m_textures[m_textureCount].m_name = name;
+//	glUtil::setGLName(glNameType::TEXTURE, m_textures[m_textureCount].GetID(), "FBO_" + m_name + "_Tex_" + name);
+//	
+//	// Add to FBO
+//	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+//	
+//	if (fboRenderType == FBORenderType::TEXTURE)
+//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, m_textures[m_textureCount].GetID(), 0);
+//	else
+//		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_RENDERBUFFER, m_textures[m_textureCount].GetID());
+//	
+//	checkFBOStatus();
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-	void FramebufferObject::addDepth(DepthFormat_Type depthFormatType, bool isTexture)
+	void FramebufferObject::addDepth(DepthFormat_Type depthFormatType, FBORenderType fboRenderType)
 	{
+		assert(m_depth == nullptr);
+
 		// Select Pixel/Channel Type [for glReadPixels]
 		Pixel_Type PixelType;
 		Channel_Type ChannelType;
 		glUtil::getPixelChannelData(depthFormatType, ChannelType, PixelType);
 
-		if (isTexture)
-			m_depth.BecomeRenderTexture(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
-		else
-			m_depth.BecomeRenderBuffer(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
+		m_depth = new FBOTexture("depth", fboRenderType, (Format_Type)depthFormatType, ChannelType, PixelType);
 
-		// Name
-		glUtil::setGLName(glNameType::TEXTURE, m_depth.GetID(), "FBO_" + m_name + "_Depth");
-
-		// Add to FBO
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-		m_depth.Bind();
-
-		if (isTexture)
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth.GetID(), 0);
-		else
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth.GetID());
-
-		checkFBOStatus();
-		m_depth.Unbind();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//	if (fboRenderType == FBORenderType::TEXTURE)
+		//		m_depth.BecomeRenderTexture(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
+		//	else
+		//		m_depth.BecomeRenderBuffer(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
+		//	
+		//	// Name
+		//	glUtil::setGLName(glNameType::TEXTURE, m_depth.GetID(), "FBO_" + m_name + "_Depth");
+		//	
+		//	// Add to FBO
+		//	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+		//	
+		//	if (fboRenderType == FBORenderType::TEXTURE)
+		//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth.GetID(), 0);
+		//	else
+		//		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth.GetID());
+		//	
+		//	checkFBOStatus();
+		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	}
 
@@ -269,7 +297,7 @@ namespace Vxl
 	{
 		bindFBO();
 
-		glUtil::viewport(0, 0, m_size[0], m_size[1]);
+		glUtil::viewport(0, 0, m_width, m_height);
 	}
 	void FramebufferObject::bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH)
 	{
@@ -286,58 +314,69 @@ namespace Vxl
 
 	void FramebufferObject::bindTexture(int index, Active_Texture layer)
 	{
-		assert(index < (int)m_textureCount);
+		assert(index < (int)m_textureCount && m_textures[index]->isRenderTexture());
 
 		glUtil::setActiveTexture(layer);
 
-		m_textures[index].Bind();
+		m_textures[index]->Bind();
 	}
 	void FramebufferObject::bindDepth(Active_Texture layer)
 	{
-		assert(!m_depth.NotUsed());
+		assert(m_depth->isRenderTexture());
 
 		glUtil::setActiveTexture(layer);
-		m_depth.Bind();
+		m_depth->Bind();
+	}
+
+	void FramebufferObject::copyDepth(const FramebufferObject& fbo)
+	{
+		// Must have matching formats
+		assert(m_depth->GetFormatType() == fbo.m_depth->GetFormatType());
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_id);
+		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo.m_id);
+
+		glBlitFramebuffer(
+			0, 0, m_width, m_height,
+			0, 0, fbo.m_width, fbo.m_height,
+			GL_DEPTH_BUFFER_BIT,
+			GL_NEAREST
+		);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
 
 	// Notice, SNORM TEXTURES CANNOT BE READ
-	GLubyte* FramebufferObject::readPixels(u_int textureIndex, int x, int y, int w, int h)
+	RawArray<GLubyte> FramebufferObject::readPixels(u_int textureIndex, int x, int y, int w, int h)
 	{
 		assert(textureIndex < m_textureCount);
 		auto Texture = m_textures[textureIndex];
 		
+		RawArray<GLubyte> Array;
+		Array.start = new GLubyte[w * h * Texture->GetChannelCount()];
+
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + textureIndex);
-		GLubyte* data = new GLubyte[w * h * Texture.GetChannelCount()];
 		glReadPixels(
 			x, y, w, h,
-			(GLenum)Texture.GetChannelType(),
-			(GLenum)Texture.GetPixelType(),
-			data
+			(GLenum)Texture->GetChannelType(),
+			(GLenum)Texture->GetPixelType(),
+			Array.start
 		);
-		return data;
+
+		return Array;
 	}
-	GLubyte* FramebufferObject::readDepthPixel(int x, int y, int w, int h)
+	RawArray<GLubyte> FramebufferObject::readDepthPixel(int x, int y, int w, int h)
 	{
-		//RawArray<GLubyte>* data = new RawArray<GLubyte>();
-		//data->Allocate(w * h * m_depth.GetChannelCount());
-
-		//GLubyte* data = new GLubyte[w * h * m_depth.GetChannelCount()];
-
-		RawArray<GLubyte> asd;
-		asd.start = new GLubyte[w * h * m_depth.GetChannelCount()];
-
-		//std::vector<GLubyte> data;
-		//data.reserve(w * h * m_depth.GetChannelCount() * 1);
-		//data.resize(w * h * m_depth.GetChannelCount() * 1);
-		//GLubyte* data = new GLubyte[w * h * m_depth.GetChannelCount()];
+		RawArray<GLubyte> Array;
+		Array.start = new GLubyte[w * h * m_depth->GetChannelCount()];
 
 		glReadPixels(
 			x, y, w, h,
-			(GLenum)m_depth.GetChannelType(), //GL_DEPTH_COMPONENT,
-			(GLenum)m_depth.GetPixelType(),
-			asd.start
+			(GLenum)m_depth->GetChannelType(),
+			(GLenum)m_depth->GetPixelType(),
+			Array.start
 		);
-		//std::vector<GLubyte> test = std::vector<GLubyte>(data, data + w * h * m_depth.GetChannelCount());
-		return asd.start;
+
+		return Array;
 	}
 }

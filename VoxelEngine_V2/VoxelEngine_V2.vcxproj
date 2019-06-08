@@ -138,6 +138,7 @@
     <ClInclude Include="engine\opengl\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\utilities\Asset.h" />
+    <ClInclude Include="engine\utilities\Containers.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />
     <ClInclude Include="engine\utilities\GlobalMacros.h" />
     <ClInclude Include="engine\utilities\Loader.h" />

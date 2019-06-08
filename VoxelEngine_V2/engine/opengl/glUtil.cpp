@@ -339,11 +339,11 @@ namespace Vxl
 			break;
 		case DepthFormat_Type::DEPTH24:
 			channelType = Channel_Type::DEPTH;
-			pixelType = Pixel_Type::UNSIGNED_INT_24_8;
+			pixelType = Pixel_Type::UNSIGNED_INT_8_8_8_8;
 			break;
 		case DepthFormat_Type::DEPTH24_STENCIL8:
 			channelType = Channel_Type::DEPTH_STENCIL;
-			pixelType = Pixel_Type::UNSIGNED_INT_24_8;
+			pixelType = Pixel_Type::UNSIGNED_INT_8_8_8_8;
 			break;
 		case DepthFormat_Type::DEPTH32:
 		case DepthFormat_Type::DEPTH32F:

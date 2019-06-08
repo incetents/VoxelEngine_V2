@@ -83,19 +83,26 @@ namespace Vxl
 		//_camera->SetMain();
 
 		// FBO
-		_fbo = FramebufferObject::Create("Gbuffer", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(-1, -1, 0, 1));
-		_fbo->addTexture("albedo");
+		_fbo = FramebufferObject::Create("Gbuffer");
+		_fbo->setClearColor(Color4F(-1, -1, 0, 1));
+		_fbo->setSizeToWindowSize();
+		_fbo->addTexture("albedo", Format_Type::R11F_G11F_B10F);
 		_fbo->addTexture("normal", Format_Type::RGBA16_SNORM);
 		_fbo->addTexture("test");
-		_fbo->addDepth(DepthFormat_Type::DEPTH16);
+		_fbo->addDepth(DepthFormat_Type::DEPTH16, FBORenderType::TEXTURE);
+		_fbo->init();
 
-		_fbo_editor = FramebufferObject::Create("EditorPost", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
+		_fbo_editor = FramebufferObject::Create("EditorPost");
+		_fbo_editor->setSizeToWindowSize();
 		_fbo_editor->addTexture("albedo");
-		_fbo_editor->addDepth(DepthFormat_Type::DEPTH16, true);
+		_fbo_editor->addDepth(DepthFormat_Type::DEPTH16, FBORenderType::BUFFER);
+		_fbo_editor->init();
 
-		_fbo_colorpicker = FramebufferObject::Create("ColorPicker", Window.GetResolutionWidth(), Window.GetResolutionHeight(), Color4F(0,0,0,0));
+		_fbo_colorpicker = FramebufferObject::Create("ColorPicker");
+		_fbo_colorpicker->setSizeToWindowSize();
 		_fbo_colorpicker->addTexture("color", Format_Type::RGBA8);
-		_fbo_colorpicker->addDepth(DepthFormat_Type::DEPTH16);
+		_fbo_colorpicker->addDepth(DepthFormat_Type::DEPTH16, FBORenderType::BUFFER);
+		_fbo_colorpicker->init();
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
 		_shader_gbuffer				= ShaderProgram::Get("gbuffer");
@@ -516,31 +523,17 @@ namespace Vxl
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects();
 
-		GLubyte* test = _fbo->readDepthPixel(
-			Input.getMouseX(),
-			Window.GetResolutionHeight() - Input.getMouseY(),
-			1, 1
-		);
-
-		//	union
-		//	{
-		//		unsigned int a;
-		//		GLubyte b[4];
-		//	};
-		//	b[0] = test[1];
-		//	b[1] = test[0];
-		//	b[2] = 0;
-		//	b[3] = 0;
-
-		//std::cout << a << std::endl;
-		std::cout << (unsigned int)test[0] << std::endl;
-		std::cout << (unsigned int)test[1] << std::endl;
-		std::cout << "~~~" << std::endl;
-
-		//test->Deallocate();
-		//delete test;
-		delete[] test;
-		//delete[] test.start;
+		//	RawArray<GLubyte> test = _fbo->readDepthPixel(
+		//		Input.getMouseX(),
+		//		Window.GetResolutionHeight() - Input.getMouseY(),
+		//		1, 1
+		//	);
+		//	
+		//	std::cout << (unsigned int)test[0] << std::endl;
+		//	std::cout << (unsigned int)test[1] << std::endl;
+		//	std::cout << "~~~" << std::endl;
+		//	
+		//	test.Deallocate();
 
 		//
 		GPUTimer::EndTimer("Gbuffer");
@@ -550,15 +543,16 @@ namespace Vxl
 		_fbo_editor->bind();
 		_fbo_editor->clearBuffers();
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->GetID());
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo_editor->GetID());
-		glBlitFramebuffer(
-			0, 0, _fbo->GetWidth(), _fbo->GetHeight(),
-			0, 0, _fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
-			GL_DEPTH_BUFFER_BIT,
-			GL_NEAREST
-		);
-		glBindFramebuffer(GL_FRAMEBUFFER, _fbo_editor->GetID());
+		_fbo->copyDepth(*_fbo_editor);
+
+		//	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->GetID());
+		//	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo_editor->GetID());
+		//	glBlitFramebuffer(
+		//		0, 0, _fbo->GetWidth(), _fbo->GetHeight(),
+		//		0, 0, _fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
+		//		GL_DEPTH_BUFFER_BIT,
+		//		GL_NEAREST
+		//	);
 
 		//
 		GPUTimer::StartTimer("EditorObjects");
@@ -679,7 +673,7 @@ namespace Vxl
 				Geometry.GetArrowZ()->Draw();
 
 				// read pixel
-				GLubyte *data = _fbo_colorpicker->readPixels(
+				RawArray<GLubyte> data = _fbo_colorpicker->readPixels(
 					0,
 					Input.getMouseX(),
 					Window.GetResolutionHeight() - Input.getMouseY(),
@@ -688,8 +682,8 @@ namespace Vxl
 				);
 
 				unsigned int EditorIndex;
-				Util::DataConversion::uchars_to_uint(data, EditorIndex);
-				delete[] data;
+				Util::DataConversion::uchars_to_uint(data.start, EditorIndex);
+				data.Deallocate();
 
 				switch (EditorIndex)
 				{
@@ -872,7 +866,7 @@ namespace Vxl
 
 				}
 
-				GLubyte *data = _fbo_colorpicker->readPixels(
+				RawArray<GLubyte> data = _fbo_colorpicker->readPixels(
 					0,
 					Input.getMouseX(),
 					Window.GetResolutionHeight() - Input.getMouseY(),
@@ -888,9 +882,9 @@ namespace Vxl
 				//	std::endl;
 
 				unsigned int EntityIndex;
-				Util::DataConversion::uchars_to_uint(data, EntityIndex);
+				Util::DataConversion::uchars_to_uint(data.start, EntityIndex);
 				EntityIndex--;
-				delete[] data;
+				data.Deallocate();
 
 				// Found an entity
 				if (EntityIndex < EntityCount)

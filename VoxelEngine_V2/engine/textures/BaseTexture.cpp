@@ -57,6 +57,7 @@ namespace Vxl
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, (GLenum)m_channelType, (GLenum)m_pixelType, pixels);
 
+		// Legacy
 		//glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_dataType, pixels);
 		
 		if (m_useMipMapping)

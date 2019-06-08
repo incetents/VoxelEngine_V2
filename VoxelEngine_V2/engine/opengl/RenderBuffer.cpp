@@ -10,7 +10,7 @@ namespace Vxl
 		int Width, int Height,
 		Format_Type FormatType, Channel_Type ChannelType, Pixel_Type PixelType
 	)
-		: m_width(Width), m_height(Height), m_channelType(ChannelType), m_pixelType(PixelType)
+		: m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(ChannelType), m_pixelType(PixelType)
 	{
 		m_channelCount = (glUtil::getChannelCount(FormatType, ChannelType));
 

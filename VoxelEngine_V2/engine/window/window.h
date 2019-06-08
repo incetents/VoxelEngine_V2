@@ -99,6 +99,11 @@ namespace Vxl
 				return m_aspectRatio;
 		}
 
+		// Confusion Awareness:
+		// WindowSize = Resizeable window for context
+		// ScreenSize = Viewport that is being rendered (can change if aspect ratio is locked and blackbars are on the sides)
+		// ResolutionSize = FBO buffer/back buffer render size. If smaller/bigger than screen size, it gets scaled
+
 		// Returns Width of the entire window
 		UINT GetWindowWidth(void) const
 		{
@@ -109,11 +114,18 @@ namespace Vxl
 		{
 			return m_size[1];
 		}
+		
 		// Returns Width of the rendered viewport
 		UINT GetScreenWidth(void) const
 		{
 			return m_viewportSize[0];
 		}
+		// Returns Height of the rendered viewport
+		UINT GetScreenHeight(void) const
+		{
+			return m_viewportSize[1];
+		}
+
 		// Returns X offset of the rendered viewport
 		UINT GetScreenOffsetX(void) const
 		{
@@ -125,11 +137,6 @@ namespace Vxl
 			return m_viewportOffset[1];
 		}
 
-		// Returns Height of the rendered viewport
-		UINT GetScreenHeight(void) const
-		{
-			return m_viewportSize[1];
-		}
 		// Returns Width of backbuffer resolution
 		UINT GetResolutionWidth(void) const
 		{

@@ -125,6 +125,7 @@ namespace Vxl
 		// Tracker //
 		static GLuint		m_boundID;
 
+		// Utility
 		bool createProgram();
 		void destroyProgram();
 

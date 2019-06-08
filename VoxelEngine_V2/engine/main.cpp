@@ -55,6 +55,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		{
 			RenderManager.ReloadShaders();
 		}
+		// FBO Rest
+		if (Input.getKeyDown(KeyCode::F6))
+		{
+			RenderManager.ReloadFBOS();
+		}
 
 		// Before Frame
 		TimeController.StartFrame();

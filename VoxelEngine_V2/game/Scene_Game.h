@@ -3,8 +3,8 @@
 
 #include "../engine/modules/Scene.h"
 
-static int SCREEN_WIDTH = 1600;
-static int SCREEN_HEIGHT = 900;
+static int SCREEN_WIDTH = 160;
+static int SCREEN_HEIGHT = 90;
 
 namespace Vxl
 {
