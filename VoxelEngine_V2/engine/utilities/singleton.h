@@ -2,6 +2,7 @@
 
 // Class has been referenced by Emilian Cioca
 // https://github.com/EmilianC/Jewel3D/blob/master/Engine/Jewel3D/Utilities/Singleton.h
+// [DEAD LINK] Emilian has stated that he doesn't like his Singleton class anymore :_(
 
 /*
 Inherit from this class to create a singleton.

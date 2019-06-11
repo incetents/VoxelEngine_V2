@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Enums.h"
+#include "../utilities/singleton.h"
 
 #include <string>
 
@@ -18,25 +19,38 @@ namespace Vxl
 		UNKNOWN,
 		NVIDIA, 
 		ATI,
+		RADEON,
 		INTEL
 	};
 
+	static class glInfo : public Singleton<class glInfo>
+	{
+	public:
+		void Setup();
+
+		// OpenGL Version
+		int GLVersionMajor = 0;
+		int GLVersionMinor = 0;
+		// Vendor Type
+		VendorType Vendor = VendorType::UNKNOWN;
+		// Graphics Info
+		std::string Gpu_Renderer;
+		std::string Gpu_OpenGLVersion;
+		std::string Gpu_Vendor;
+
+		// Variables
+		float MAX_ANISOTROPY = -1;
+
+	} SingletonInstance(glInfo);
+
 	namespace glUtil
 	{
-		// OpenGL Version
-		static int GLVersionMajor = 0;
-		static int GLVersionMinor = 0;
-		// Vendor Information
-		static VendorType Vendor = VendorType::UNKNOWN;
-
 		// Setup Glew for OpenGL
 		bool initGlew();
 
 		// Init hints
 		void initHints();
 
-		// Check Version Wrapped
-		void CheckVersion();
 		// Get Version Data
 		const char* getRendererVersion();
 		const char* getOpenGLVersion();

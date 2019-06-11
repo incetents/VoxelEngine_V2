@@ -328,13 +328,15 @@ namespace Vxl
 		m_depth->Bind();
 	}
 
-	void FramebufferObject::copyDepth(const FramebufferObject& fbo)
+	void FramebufferObject::blitDepth(const FramebufferObject& fbo)
 	{
 		// Must have matching formats
 		assert(m_depth->GetFormatType() == fbo.m_depth->GetFormatType());
+		// Must have matching sizes
+		assert(m_width == fbo.m_width && m_height == fbo.m_height);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_id);
-		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo.m_id);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo.m_id);
 
 		glBlitFramebuffer(
 			0, 0, m_width, m_height,
@@ -344,6 +346,14 @@ namespace Vxl
 		);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	}
+
+	// Generates mipmap of current texture
+	void FramebufferObject::generateMipmaps(unsigned int textureIndex)
+	{
+		assert(m_id == m_boundID && textureIndex < m_textureCount && m_textures[textureIndex]->isRenderTexture());
+		m_textures[textureIndex]->Bind();
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
 	// Notice, SNORM TEXTURES CANNOT BE READ

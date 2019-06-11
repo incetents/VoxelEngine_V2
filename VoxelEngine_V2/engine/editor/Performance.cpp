@@ -25,37 +25,83 @@ namespace Vxl
 
 		if (ImGui::Begin("[F4] Performance", &open, ImVec2(280, 680), 0.9f, 0))
 		{
-#ifdef GLOBAL_GPU_TIMERS
-			ImGui::Columns(2, "GPUTimers"); // 4-ways, with border
-			ImGui::Text("Name"); ImGui::NextColumn();
-			ImGui::Text("Miliseconds"); ImGui::NextColumn();
-			ImGui::Separator();
+			if(m_mode == Mode::GPU)
+				ImGui::TextColored(ImGuiColor::Orange, "[GPU]");
+			else if (m_mode == Mode::CPU)
+				ImGui::TextColored(ImGuiColor::Orange, "[CPU]");
 
-			double MS_TOTAL = 0.0f;
+			ImGui::SameLine();
 
-			for (auto _gputimer : GPUTimer::m_timers)
+			if (ImGui::SmallButton("GPU"))
+				m_mode = Mode::GPU;
+			ImGui::SameLine();
+			if (ImGui::SmallButton("CPU"))
+				m_mode = Mode::CPU;
+
+			if (m_mode == Mode::GPU)
 			{
-				MS_TOTAL += _gputimer.second->m_elapsedTime_MS_average;
+#ifdef GLOBAL_GPU_TIMERS
+				ImGui::Columns(2, "GPUTimers"); // 4-ways, with border
+				ImGui::Text("Name"); ImGui::NextColumn();
+				ImGui::Text("Miliseconds"); ImGui::NextColumn();
+				ImGui::Separator();
 
-				if (ImGui::Selectable(_gputimer.first.c_str(), _selected == _gputimer.second, ImGuiSelectableFlags_SpanAllColumns))
-					_selected = _gputimer.second;
-				//bool hovered = ImGui::IsItemHovered();
+				double MS_TOTAL = 0.0f;
 
-				ImGui::NextColumn();
-				ImGui::Text("%.4f", _gputimer.second->m_elapsedTime_MS_average);
-				ImGui::NextColumn();
-			}
+				for (auto _gputimer : GPUTimer::m_timers)
+				{
+					MS_TOTAL += _gputimer.second->m_elapsedTime_MS_average;
 
-			ImGui::Separator();
+					if (ImGui::Selectable(_gputimer.first.c_str(), m_GPUTimerselected == _gputimer.second, ImGuiSelectableFlags_SpanAllColumns))
+						m_GPUTimerselected = _gputimer.second;
+					//bool hovered = ImGui::IsItemHovered();
 
-			ImGui::TextColored(ImGuiColor::Yellow, "TOTAL"); ImGui::NextColumn();
-			ImGui::TextColored(ImGuiColor::Yellow, "%.4f", MS_TOTAL); ImGui::NextColumn();
+					ImGui::NextColumn();
+					ImGui::Text("%.4f", _gputimer.second->m_elapsedTime_MS_average);
+					ImGui::NextColumn();
+				}
 
-			ImGui::Columns(1);
-			ImGui::Separator();
+				ImGui::Separator();
+
+				ImGui::TextColored(ImGuiColor::Yellow, "TOTAL"); ImGui::NextColumn();
+				ImGui::TextColored(ImGuiColor::Yellow, "%.4f", MS_TOTAL); ImGui::NextColumn();
+
+				ImGui::Columns(1);
+				ImGui::Separator();
 #else
-			// No GPU TIMERS
+				ImGui::TextColored(ImGuiColor::Orange, "[Disabled]");
 #endif
+			}
+			else if (m_mode == Mode::CPU)
+			{
+				ImGui::Columns(2, "CPUTimers"); // 4-ways, with border
+				ImGui::Text("Name"); ImGui::NextColumn();
+				ImGui::Text("Miliseconds"); ImGui::NextColumn();
+				ImGui::Separator();
+
+				double MS_TOTAL = 0.0f;
+
+				for (auto _gputimer : CPUTimer::m_timers)
+				{
+					MS_TOTAL += _gputimer.second->m_elapsedTime_MS_average;
+
+					if (ImGui::Selectable(_gputimer.first.c_str(), m_CPUTimerselected == _gputimer.second, ImGuiSelectableFlags_SpanAllColumns))
+						m_CPUTimerselected = _gputimer.second;
+					//bool hovered = ImGui::IsItemHovered();
+
+					ImGui::NextColumn();
+					ImGui::Text("%.4f", _gputimer.second->m_elapsedTime_MS_average);
+					ImGui::NextColumn();
+				}
+
+				ImGui::Separator();
+
+				ImGui::TextColored(ImGuiColor::Yellow, "TOTAL"); ImGui::NextColumn();
+				ImGui::TextColored(ImGuiColor::Yellow, "%.4f", MS_TOTAL); ImGui::NextColumn();
+
+				ImGui::Columns(1);
+				ImGui::Separator();
+			}
 		}
 		ImGui::End();
 	}

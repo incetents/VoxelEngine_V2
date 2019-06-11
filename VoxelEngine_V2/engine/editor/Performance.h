@@ -12,7 +12,15 @@ namespace Vxl
 	{
 #ifdef GLOBAL_IMGUI
 	private:
-		GPUTimer* _selected = nullptr;
+		enum Mode
+		{
+			GPU,
+			CPU
+		};
+		Mode m_mode = Mode::GPU;
+
+		GPUTimer* m_GPUTimerselected = nullptr;
+		CPUTimer* m_CPUTimerselected = nullptr;
 	public:
 		// Draw
 		void Draw();

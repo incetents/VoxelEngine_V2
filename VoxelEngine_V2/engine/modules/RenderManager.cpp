@@ -286,6 +286,10 @@ namespace Vxl
 		for (auto it = m_allEntities.begin(); it != m_allEntities.end(); it++)
 			(*it)->Update();
 
+		// Update all CPU Timers
+		for (auto it = CPUTimer::m_timers.begin(); it != CPUTimer::m_timers.end(); it++)
+			it->second->Update();
+
 		// Update all GPU Timers
 		for (auto it = GPUTimer::m_timers.begin(); it != GPUTimer::m_timers.end(); it++)
 			it->second->Update();

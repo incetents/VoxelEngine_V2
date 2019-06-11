@@ -7,10 +7,13 @@
 #include <unordered_map>
 #include <map>
 #include <assert.h>
+#include <chrono>
+
 #include "../utilities/singleton.h"
 
 #define HISTOGRAM_SIZE 50
 #define GPUTIMER_CAPTURES 15
+#define CPUTIMER_CAPTURES 15
 
 namespace Vxl
 {
@@ -119,27 +122,48 @@ namespace Vxl
 	};
 
 	// ~~~ //
+	class CPUTimer
+	{
+		friend class Performance;
+		friend class RenderManager;
+	private:
+
+		static std::map<std::string, CPUTimer*> m_timers;
+
+		bool m_inUse = false;
+		long long	m_elapsedTime;
+		double		m_elapsedTime_MS[GPUTIMER_CAPTURES] = { 0 };
+		UINT		m_elapsedTime_MS_index = 0;
+		double		m_elapsedTime_MS_average;
+		std::chrono::steady_clock::time_point m_start;
+
+		void Begin();
+		void End();
+
+		void Update();
+
+	public:
+		static void	StartTimer(const std::string& name);
+		static void	EndTimer(const std::string& name);
+
+		static double GetElapsedTime_MS(const std::string& name);
+	};
+
+	// ~~~ //
 	class GPUTimer
 	{
 		friend class Performance;
 		friend class RenderManager;
 	private:
-		enum class QueryState
-		{
-			READY,
-			START,
-			END
-		};
 
 		static std::map<std::string, GPUTimer*> m_timers;
 		static bool	m_TimerBeingUsed;
+
 		UINT		m_ID;
 		uint64_t	m_elapsedTime = 0;
 		double		m_elapsedTime_MS[GPUTIMER_CAPTURES] = { 0 };
 		UINT		m_elapsedTime_MS_index = 0;
-
 		double		m_elapsedTime_MS_average;
-		QueryState	m_queryingState = QueryState::READY;
 
 		static void DestroyTimers();
 
@@ -147,8 +171,10 @@ namespace Vxl
 		~GPUTimer();
 
 		void Begin();
-		void End();
+		static void End();
+
 		void Update();
+
 	public:
 
 		inline UINT		GetID(void) const
@@ -157,7 +183,7 @@ namespace Vxl
 		}
 
 		static void		StartTimer(const std::string& name);
-		static void		EndTimer(const std::string& name);
+		static void		EndTimer();
 		static double	GetElapsedTime_MS(const std::string& name);
 
 	};

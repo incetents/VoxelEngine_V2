@@ -35,7 +35,67 @@ namespace Vxl
 		m_endTime = m_startTime + m_time;
 	}
 
-	// Static Variables
+	// CPU TIMERS //
+	std::map<std::string, CPUTimer*> CPUTimer::m_timers;
+
+	void CPUTimer::Begin()
+	{
+		assert(!m_inUse);
+
+		m_start = std::chrono::steady_clock::now();
+		m_inUse = true;
+	}
+	void CPUTimer::End()
+	{
+		assert(m_inUse);
+
+		auto elapsedTime = std::chrono::steady_clock::now() - m_start;
+		// Convert elapsed time into long long
+		m_elapsedTime = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedTime).count();
+		m_inUse = false;
+	}
+
+	void CPUTimer::Update()
+	{
+		m_elapsedTime_MS[m_elapsedTime_MS_index] = (double)m_elapsedTime / 1000000.0;
+		m_elapsedTime_MS_index++;
+		m_elapsedTime_MS_index %= CPUTIMER_CAPTURES;
+
+		m_elapsedTime_MS_average = 0;
+		for (auto ms : m_elapsedTime_MS)
+			m_elapsedTime_MS_average += ms;
+		m_elapsedTime_MS_average /= (double)CPUTIMER_CAPTURES;
+	}
+
+	void CPUTimer::StartTimer(const std::string& name)
+	{
+		// Create timer if doesn't exist
+		if (m_timers.find(name) == m_timers.end())
+			m_timers[name] = new CPUTimer();
+
+		m_timers[name]->Begin();
+	}
+	void CPUTimer::EndTimer(const std::string& name)
+	{
+		// Error if timer doesn't exist
+		if (m_timers.find(name) == m_timers.end())
+			assert(false);
+
+		m_timers[name]->End();
+	}
+
+	double CPUTimer::GetElapsedTime_MS(const std::string& name)
+	{
+		// Error if timer doesn't exist
+		if (m_timers.find(name) == m_timers.end())
+			assert(false);
+
+		// return time
+		return m_timers[name]->m_elapsedTime_MS_average;
+	}
+
+
+	// GPU TIMERS //
 	std::map<std::string, GPUTimer*> GPUTimer::m_timers;
 	bool GPUTimer::m_TimerBeingUsed = false;
 
@@ -63,73 +123,60 @@ namespace Vxl
 
 	void GPUTimer::Begin()
 	{
-#ifdef GLOBAL_GPU_TIMERS
-		if (m_queryingState == QueryState::READY)
-		{
-			m_queryingState = QueryState::START;
-
-			glBeginQuery(GL_TIME_ELAPSED, m_ID);
-			m_TimerBeingUsed = true;
-		}
-#endif
+		glBeginQuery(GL_TIME_ELAPSED, m_ID);
 	}
-
 	void GPUTimer::End()
 	{
-#ifdef GLOBAL_GPU_TIMERS
-		if (m_queryingState == QueryState::START)
-		{
-			m_queryingState = QueryState::END;
-
-			glEndQuery(GL_TIME_ELAPSED);
-			m_TimerBeingUsed = false;
-		}
-#endif
+		glEndQuery(GL_TIME_ELAPSED);
 	}
 
 	void GPUTimer::Update()
 	{
 #ifdef GLOBAL_GPU_TIMERS
-		if (m_queryingState != QueryState::END)
-			return;
+		int ready = false;
+		glGetQueryObjectiv(m_ID, GL_QUERY_RESULT_AVAILABLE, &ready);
 
-		glGetQueryObjectui64v(m_ID, GL_QUERY_RESULT, &m_elapsedTime);
-		m_elapsedTime_MS[m_elapsedTime_MS_index] = (double)m_elapsedTime / 1000000.0;
+		if (ready != 0)
+		{
+			glGetQueryObjectui64v(m_ID, GL_QUERY_RESULT, &m_elapsedTime);
 
-		m_elapsedTime_MS_index++;
-		m_elapsedTime_MS_index %= GPUTIMER_CAPTURES;
+			m_elapsedTime_MS[m_elapsedTime_MS_index] = (double)m_elapsedTime / 1000000.0;
+			m_elapsedTime_MS_index++;
+			m_elapsedTime_MS_index %= GPUTIMER_CAPTURES;
 
-		m_elapsedTime_MS_average = 0;
-		for (auto ms : m_elapsedTime_MS)
-			m_elapsedTime_MS_average += ms;
-		m_elapsedTime_MS_average /= (double)GPUTIMER_CAPTURES;
-
-		m_queryingState = QueryState::READY;
+			m_elapsedTime_MS_average = 0;
+			for (auto ms : m_elapsedTime_MS)
+				m_elapsedTime_MS_average += ms;
+			m_elapsedTime_MS_average /= (double)GPUTIMER_CAPTURES;
+		}
 #endif
 	}
 
 	void GPUTimer::StartTimer(const std::string& name)
 	{
 #ifdef GLOBAL_GPU_TIMERS
+		// Must be open for usage
+		if (m_TimerBeingUsed)
+			assert(false);
+
 		// Create timer if doesn't exist
 		if (m_timers.find(name) == m_timers.end())
 			m_timers[name] = new GPUTimer();
 
-		if (m_TimerBeingUsed)
-			EndTimer(name);
-
 		m_timers[name]->Begin();
+		m_TimerBeingUsed = true;
 #endif
 	}
 
-	void GPUTimer::EndTimer(const std::string& name)
+	void GPUTimer::EndTimer()
 	{
 #ifdef GLOBAL_GPU_TIMERS
-		// Create timer if doesn't exist
-		if (m_timers.find(name) == m_timers.end())
-			m_timers[name] = new GPUTimer();
+		// Must be open for usage
+		if (!m_TimerBeingUsed)
+			assert(false);
 
-		m_timers[name]->End();
+		GPUTimer::End();
+		m_TimerBeingUsed = false;
 #endif
 	}
 
@@ -140,7 +187,7 @@ namespace Vxl
 			return m_timers[name]->m_elapsedTime_MS_average;
 		else
 #endif
-			return 0;
+			return 0.0;
 	}
 
 	

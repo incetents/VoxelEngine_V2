@@ -164,7 +164,9 @@ namespace Vxl
 		void bindTexture(int index, Active_Texture layer);
 		void bindDepth(Active_Texture layer);
 
-		void copyDepth(const FramebufferObject& fbo);
+		void blitDepth(const FramebufferObject& fbo);
+
+		void generateMipmaps(unsigned int textureIndex);
 
 		RawArray<GLubyte> readPixels(u_int textureIndex, int x, int y, int w, int h);
 		RawArray<GLubyte> readDepthPixel(int x, int y, int w, int h);

@@ -23,10 +23,15 @@ uniform int outputMode = 0;
 uniform float zNear = 1;
 uniform float zFar = 1;
 
-// function
+// Puts depth into linear space
 float LinearizeDepth(float depth)
 {
-    return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
+    return (2.0 * zNear * zFar) / (zFar + zNear - (2.0 * depth - 1.0) * (zFar - zNear));
+}
+// Makes depth value easier to notice visually
+float VisualizeDepth(float depth)
+{
+	return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
 }
 
 //Main
@@ -44,7 +49,7 @@ void main()
 	else if(outputMode == 2)
 	{
 		// depth
-		float depth = LinearizeDepth(_texture.r);
+		float depth = VisualizeDepth(_texture.r);
 		output_color = vec4(depth,depth,depth,1);
 	}
 	else if(outputMode == 3)

@@ -19,6 +19,33 @@
 
 namespace Vxl
 {
+	void glInfo::Setup()
+	{
+		// Acquire openglversion
+		glGetIntegerv(GL_MAJOR_VERSION, &GLVersionMajor);
+		glGetIntegerv(GL_MINOR_VERSION, &GLVersionMinor);
+
+		// Acquire Vendor
+		std::string VendorStr = glUtil::getVendor();
+		std::transform(VendorStr.begin(), VendorStr.end(), VendorStr.begin(), ::tolower);
+		if (VendorStr.find("nvidia") != -1)
+			Vendor = VendorType::NVIDIA;
+		else if (VendorStr.find("ati") != -1)
+			Vendor = VendorType::ATI;
+		else if (VendorStr.find("radeon") != -1)
+			Vendor = VendorType::RADEON;
+		else if (VendorStr.find("intel") != -1)
+			Vendor = VendorType::INTEL;
+
+		// Acquire GPU info
+		Gpu_Renderer = std::string(glUtil::getRendererVersion());
+		Gpu_OpenGLVersion =  std::string(glUtil::getOpenGLVersion());
+		Gpu_Vendor = std::string(glUtil::getVendor());
+
+		// Acquire Restrictions
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &MAX_ANISOTROPY);
+	}
+
 	bool glUtil::initGlew()
 	{
 		if (gl3wInit())
@@ -28,25 +55,15 @@ namespace Vxl
 			return false;
 		}
 
-		// Acquire openglversion
-		glGetIntegerv(GL_MAJOR_VERSION, &GLVersionMajor);
-		glGetIntegerv(GL_MINOR_VERSION, &GLVersionMinor);
+		// Setup opengl info about context
+		glInfo.Setup();
 
-		if (!gl3wIsSupported(GLVersionMajor, GLVersionMinor))
+		if (!gl3wIsSupported(glInfo.GLVersionMajor, glInfo.GLVersionMinor))
 		{
-			Logger.error("OpenGL " + std::to_string(GLVersionMajor) + '.' + std::to_string(GLVersionMinor) + " not supported");
+			Logger.error("OpenGL " + std::to_string(glInfo.GLVersionMajor) + '.' + std::to_string(glInfo.GLVersionMinor) + " not supported");
 			std::system("pause");
 			return false;
 		}
-
-		std::string VendorStr = getVendor();
-		std::transform(VendorStr.begin(), VendorStr.end(), VendorStr.begin(), ::tolower);
-		if (VendorStr.find("nvidia") != -1)
-			Vendor = VendorType::NVIDIA;
-		else if (VendorStr.find("ati") != -1)
-			Vendor = VendorType::ATI;
-		else if (VendorStr.find("intel") != -1)
-			Vendor = VendorType::INTEL;
 
 		return true;
 	}
@@ -94,17 +111,6 @@ namespace Vxl
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
-	// Check Version Wrapped
-	void glUtil::CheckVersion()
-	{
-		// Get version info
-		Logger.log("~~~~~~~~~~~~~~~~~~");
-		Logger.log("Renderer: " + std::string(glUtil::getRendererVersion()));
-		Logger.log("OpenGL version supported: " + std::string(glUtil::getOpenGLVersion()));
-		Logger.log("Vendor: " + std::string(glUtil::getVendor()));
-		Logger.log("~~~~~~~~~~~~~~~~~~");
-	}
-
 	// Get Version Data
 	const char* glUtil::getRendererVersion()
 	{
@@ -122,7 +128,7 @@ namespace Vxl
 	// Get Memory
 	int glUtil::GetGPUMem_TotalKB()
 	{
-		if (Vendor == VendorType::NVIDIA)
+		if (glInfo.Vendor == VendorType::NVIDIA)
 		{
 			GLint total_mem_kb = 0;
 			glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
@@ -133,7 +139,7 @@ namespace Vxl
 	}
 	int glUtil::GetGPUMem_CurrentKB()
 	{
-		if (Vendor == VendorType::NVIDIA)
+		if (glInfo.Vendor == VendorType::NVIDIA)
 		{
 			GLint cur_avail_mem_kb = 0;
 			glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);

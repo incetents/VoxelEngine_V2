@@ -209,13 +209,13 @@ namespace Vxl
 		//_entity5->SetColor(Color3F(1, 1, 1));
 		
 		
-		
 		GameObject* _skybox = GameObject::Create("_skybox");
 		_skybox->SetMaterial(_material_skybox);
 		_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_skybox->SetMesh(Geometry.GetInverseCube());
 		_skybox->m_useTransform = false;
 		
+
 		//
 		GameObject* _crate1 = GameObject::Create("_crate1");
 		_crate1->SetMaterial(_material_gbuffer);
@@ -315,6 +315,8 @@ namespace Vxl
 
 	void Scene_Game::Update()
 	{
+
+		CPUTimer::StartTimer("UPDATE");
 
 		if (Input.getKeyDown(KeyCode::ESCAPE))
 			Window.Close();
@@ -502,6 +504,8 @@ namespace Vxl
 		{
 			_material_gbuffer->m_Wireframe = DEVCONSOLE_GET_BOOL("Gbuffer Wireframe", false);
 		}
+
+		CPUTimer::EndTimer("UPDATE");
 	}
 
 	// DO NOT DRAW IN HERE //
@@ -519,6 +523,7 @@ namespace Vxl
 		_fbo->clearBuffers();
 		//
 		GPUTimer::StartTimer("Gbuffer");
+		CPUTimer::StartTimer("Gbuffer");
 		//
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects();
@@ -536,32 +541,23 @@ namespace Vxl
 		//	test.Deallocate();
 
 		//
-		GPUTimer::EndTimer("Gbuffer");
-
-		
+		CPUTimer::EndTimer("Gbuffer");
+		GPUTimer::EndTimer();
 
 		_fbo_editor->bind();
 		_fbo_editor->clearBuffers();
 
-		_fbo->copyDepth(*_fbo_editor);
-
-		//	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->GetID());
-		//	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo_editor->GetID());
-		//	glBlitFramebuffer(
-		//		0, 0, _fbo->GetWidth(), _fbo->GetHeight(),
-		//		0, 0, _fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
-		//		GL_DEPTH_BUFFER_BIT,
-		//		GL_NEAREST
-		//	);
 
 		//
 		GPUTimer::StartTimer("EditorObjects");
 		//
+		_fbo->blitDepth(*_fbo_editor);
 		RenderManager.RenderEditorObjects();
+
 		glUtil::clearBuffer(Buffer_Bit_Type::DEPTH);
 		RenderManager.RenderEditorObjectsPostDepth();
 		//
-		GPUTimer::EndTimer("EditorObjects");
+		GPUTimer::EndTimer();
 
 		//	if (Input.getKeyDown(KeyCode::K))
 		//	{

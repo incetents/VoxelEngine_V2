@@ -94,7 +94,13 @@ namespace Vxl
 			assert(false);
 
 		glUtil::initHints();
-		glUtil::CheckVersion();
+
+		// Get version info
+		Logger.log("~~~~~~~~~~~~~~~~~~");
+		Logger.log("Renderer: " + glInfo.Gpu_Renderer);
+		Logger.log("OpenGL version supported: " + glInfo.Gpu_OpenGLVersion);
+		Logger.log("Vendor: " + glInfo.Gpu_Vendor);
+		Logger.log("~~~~~~~~~~~~~~~~~~");
 
 		// Create first frame empty
 		// (so it can create all gl assets necesary here without interfering with opengl error callback)
