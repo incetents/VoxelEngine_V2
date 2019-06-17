@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "XGamePad.h"
 
-#include <assert.h>
+#include "../utilities/Util.h"
 
 #pragma comment(lib, "Xinput9_1_0.lib")
 
@@ -13,7 +13,7 @@ namespace Vxl
 	XGamePad::XGamePad(UINT ID)
 		: m_id(ID)
 	{
-		assert(ID <= 4);
+		VXL_ASSERT(ID < 4, "GamePad ID is too large, only supports IDs 0 to 3");
 		memset(&m_state, 0, sizeof(XINPUT_STATE));
 	}
 

@@ -7,7 +7,7 @@
 #include "../Math/Color.h"
 #include "../math/Vector4.h"
 #include "../textures/Texture.h"
-#include "../utilities/GlobalMacros.h"
+#include "../utilities/Macros.h"
 
 #include <algorithm>
 #include <iostream>
@@ -263,7 +263,7 @@ namespace Vxl
 			glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLNameMaxLength);
 
 		std::string labelEdit = label + " (" + std::to_string(id) + ")";
-		assert(labelEdit.size() < GLNameMaxLength);
+		VXL_ASSERT(labelEdit.size() < GLNameMaxLength, "GLName is too big");
 		glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
 		//
 #endif
@@ -287,36 +287,19 @@ namespace Vxl
 			return Channel_Type::RGBA;
 		}
 
-		assert(false);
+		VXL_ASSERT(false, "Invalid Channel Count");
 		return Channel_Type::NONE;
 	}
-	unsigned int glUtil::getChannelCount(Format_Type format, Channel_Type type)
+	unsigned int glUtil::getChannelCount(Channel_Type type)
 	{
-		// Special exceptions
-		switch (format)
-		{
-		case Format_Type::DEPTH16:
-			return 2;
-		case Format_Type::DEPTH24:
-			return 3;
-		case Format_Type::DEPTH32:
-		case Format_Type::DEPTH32F:
-		case Format_Type::DEPTH24_STENCIL8:
-			return 4;
-		case Format_Type::DEPTH32F_STENCIL8:
-			return 8; // 64 bits (24 bits alignment)
-		}
-
 		// Solve channel count based on channel type
 		switch (type)
 		{
 		case Channel_Type::NONE:
 			return 0;
 		case Channel_Type::R:
-		case Channel_Type::DEPTH:
 			return 1;
 		case Channel_Type::RG:
-		case Channel_Type::DEPTH_STENCIL:
 			return 2;
 		case Channel_Type::RGB:
 		case Channel_Type::BGR:
@@ -324,9 +307,62 @@ namespace Vxl
 		case Channel_Type::RGBA:
 		case Channel_Type::BGRA:
 			return 4;
+			// Special Case [Cannot figure out channel count based on this information alone]
+		case Channel_Type::DEPTH:
+		case Channel_Type::DEPTH_STENCIL:
+			return -1;
 		}
 		
-		assert(false);
+		VXL_ASSERT(false, "Invalid Channel Type");
+		return 0;
+	}
+
+	unsigned int glUtil::getChannelCount(Format_Type format)
+	{
+		// Special exceptions
+		switch (format)
+		{
+			// 1 Channel
+		case Format_Type::R8:
+		case Format_Type::R8_SNORM:
+		case Format_Type::R16:
+		case Format_Type::R16_SNORM:
+		case Format_Type::R16F:
+			return 1;
+			// 2 Channels
+		case Format_Type::RG8:
+		case Format_Type::RG8_SNORM:
+		case Format_Type::RG16:
+		case Format_Type::RG16_SNORM:
+		case Format_Type::RG16F:
+		case Format_Type::DEPTH16:// Special
+			return 2;
+			// 3 Channels
+		case Format_Type::RGB8:
+		case Format_Type::RGB8_SNORM:
+		case Format_Type::RGB16:
+		case Format_Type::RGB16_SNORM:
+		case Format_Type::RGB16F:
+		case Format_Type::R11F_G11F_B10F:// Special
+		case Format_Type::SRGB8:// Special
+		case Format_Type::DEPTH24:// Special
+			return 3;
+			// 4 ChannelS
+		case Format_Type::RGBA8:
+		case Format_Type::RGBA8_SNORM:
+		case Format_Type::RGBA16:
+		case Format_Type::RGBA16_SNORM:
+		case Format_Type::RGBA16F:
+		case Format_Type::SRGBA8:// Special
+		case Format_Type::DEPTH32:// Special
+		case Format_Type::DEPTH32F:// Special
+		case Format_Type::DEPTH24_STENCIL8:// Special
+			return 4;
+		case Format_Type::DEPTH32F_STENCIL8:
+			return 8; // 64 bits total (24 bits padding for alignment)
+		}
+
+		VXL_ASSERT(false, "Invalid Format Type");
 		return 0;
 	}
 
@@ -338,31 +374,31 @@ namespace Vxl
 		case DepthFormat_Type::STENCIL8:
 			channelType = Channel_Type::STENCIL;
 			pixelType = Pixel_Type::UNSIGNED_BYTE;
-			break;
+			return;
 		case DepthFormat_Type::DEPTH16:
 			channelType = Channel_Type::DEPTH;
 			pixelType = Pixel_Type::UNSIGNED_SHORT;
-			break;
+			return;
 		case DepthFormat_Type::DEPTH24:
 			channelType = Channel_Type::DEPTH;
 			pixelType = Pixel_Type::UNSIGNED_INT_8_8_8_8;
-			break;
+			return;
 		case DepthFormat_Type::DEPTH24_STENCIL8:
 			channelType = Channel_Type::DEPTH_STENCIL;
 			pixelType = Pixel_Type::UNSIGNED_INT_8_8_8_8;
-			break;
+			return;
 		case DepthFormat_Type::DEPTH32:
 		case DepthFormat_Type::DEPTH32F:
 			channelType = Channel_Type::DEPTH;
 			pixelType = Pixel_Type::UNSIGNED_INT;
-			break;
+			return;
 		case DepthFormat_Type::DEPTH32F_STENCIL8:
 			channelType = Channel_Type::DEPTH_STENCIL;
 			pixelType = Pixel_Type::UNSIGNED_INT;
-			break;
-		default:
-			assert(false);
+			return;
 		}
+
+		VXL_ASSERT(false, "Invalid DepthFormat Type");
 	}
 
 
@@ -380,12 +416,12 @@ namespace Vxl
 	}
 	void glUtil::clearDepth(float f)
 	{
-		assert(f >= 0.0f && f <= 1.0f);
+		VXL_ASSERT(f >= 0.0f && f <= 1.0f, "Depth Value must be between 0 and 1 inclusif");
 		glClearDepth(f);
 	}
 	void glUtil::clearStencil(int f)
 	{
-		assert(f >= 0.0f && f <= 1.0f);
+		VXL_ASSERT(f >= 0.0f && f <= 1.0f, "Stencil Value must be between 0 and 1 inclusif");
 		glClearStencil(f);
 	}
 
@@ -422,7 +458,7 @@ namespace Vxl
 				glFrontFace(GL_CW);
 				break;
 			default:
-				assert(FALSE);
+				VXL_ASSERT(FALSE, "Invalud CullType Mode");
 				break;
 			}
 

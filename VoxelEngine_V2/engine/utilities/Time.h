@@ -10,6 +10,7 @@
 #include <chrono>
 
 #include "../utilities/singleton.h"
+#include "../utilities/Macros.h"
 
 #define HISTOGRAM_SIZE 50
 #define GPUTIMER_CAPTURES 15
@@ -40,7 +41,7 @@ namespace Vxl
 
 		inline void SetTargetFPS(double FPS)
 		{
-			assert(FPS > 0.0); // FPS cannot be zero or smaller
+			VXL_ASSERT(FPS > 0.0, "Cannot set FPS to a number lower or equal to 0"); // FPS cannot be zero or smaller
 
 			m_targetFPS = FPS;
 			m_limitFPS = 1.0 / FPS;

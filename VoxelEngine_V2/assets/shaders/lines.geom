@@ -1,5 +1,5 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
-#version 420
+#version 420 core
 
 #define SHOW_DEBUG_LINES        0
 #define PASSTHROUGH_BASIC_LINES 0

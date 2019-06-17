@@ -12,7 +12,11 @@ namespace Vxl
 	)
 		: m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(ChannelType), m_pixelType(PixelType)
 	{
-		m_channelCount = (glUtil::getChannelCount(FormatType, ChannelType));
+		//m_channelCount = (glUtil::getChannelCount(FormatType, ChannelType));
+		m_channelCount = glUtil::getChannelCount(ChannelType);
+		if (m_channelCount == -1)
+			m_channelCount = glUtil::getChannelCount(FormatType);
+
 
 		glGenRenderbuffers(1, &m_id);
 

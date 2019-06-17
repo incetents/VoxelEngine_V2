@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Color.h"
 
-#include <assert.h>
+#include "../utilities/Util.h"
 
 namespace Vxl
 {
@@ -149,12 +149,12 @@ namespace Vxl
 
 	float Color3F::operator[](const int index) const
 	{
-		assert((index >= 0) && (index < 3));
+		VXL_ASSERT((index >= 0) && (index < 3), "Color3F operator[] index out of range");
 		return (&r)[index];
 	}
 	float& Color3F::operator[](const int index)
 	{
-		assert((index >= 0) && (index < 3));
+		VXL_ASSERT((index >= 0) && (index < 3), "Color3F operator[] index out of range");
 		return (&r)[index];
 	}
 
@@ -326,12 +326,12 @@ namespace Vxl
 
 	float Color4F::operator[](const int index) const
 	{
-		assert((index >= 0) && (index < 3));
+		VXL_ASSERT((index >= 0) && (index <= 3), "Color4F operator[] index out of range");
 		return (&r)[index];
 	}
 	float& Color4F::operator[](const int index)
 	{
-		assert((index >= 0) && (index < 3));
+		VXL_ASSERT((index >= 0) && (index <= 3), "Color4F operator[] index out of range");
 		return (&r)[index];
 	}
 }

@@ -7,6 +7,8 @@
 #include "../math/Vector4.h"
 #include "../math/Color.h"
 
+#include "../utilities/Macros.h"
+
 namespace Vxl
 {
 	
@@ -88,7 +90,7 @@ namespace Vxl
 		}
 		Light* GetLight(void) const
 		{
-			assert(m_data != nullptr);
+			VXL_ASSERT(m_data != nullptr, "LightObject missing data");
 			return m_data;
 		}
 

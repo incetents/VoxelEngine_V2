@@ -1,5 +1,5 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
-#version 420
+#version 420 core
 
 // Input
 in vec4 v_color;

@@ -5,6 +5,16 @@
 #include "MathCore.h"
 #include "Lerp.h"
 
+#include "../utilities/Macros.h"
+
+#ifdef _DEBUG
+#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) VXL_ASSERT(index < Matrix2x2_Length, "Matrix2x2 index out of range")
+#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) VXL_ASSERT(index < Matrix2x2_Size, "Matrix2x2 index out of range")
+#else
+#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) __noop
+#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) __noop
+#endif
+
 namespace Vxl
 {
 	// Identity Matrix
@@ -71,53 +81,53 @@ namespace Vxl
 	}
 
 	// Set Horizontal Line
-	Matrix2x2& Matrix2x2::SetRow(int index, const Vector2& r)
+	Matrix2x2& Matrix2x2::SetRow(unsigned int index, const Vector2& r)
 	{
-		assert((index >= 0) && (index < Matrix2x2_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index)
 		_Val[index * Matrix2x2_Length + 0] = r.x;
 		_Val[index * Matrix2x2_Length + 1] = r.y;
 		return *this;
 	}
-	Matrix2x2& Matrix2x2::SetRow(Matrix2x2& m, int index, const Vector2& r)
+	Matrix2x2& Matrix2x2::SetRow(Matrix2x2& m, unsigned int index, const Vector2& r)
 	{
 		return m.SetRow(index, r);
 	}
 	// Set Vertical Line
-	Matrix2x2& Matrix2x2::SetColumn(int index, const Vector2& c)
+	Matrix2x2& Matrix2x2::SetColumn(unsigned int index, const Vector2& c)
 	{
-		assert((index >= 0) && (index < Matrix2x2_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index)
 		_Val[(index + 0)] = c.x;
 		_Val[(index + 2)] = c.y;
 		return *this;
 	}
-	Matrix2x2& Matrix2x2::SetColumn(Matrix2x2& m, int index, const Vector2& c)
+	Matrix2x2& Matrix2x2::SetColumn(Matrix2x2& m, unsigned int index, const Vector2& c)
 	{
 		return m.SetColumn(index, c);
 	}
 
 	// Get Horizontal Line
-	Vector2 Matrix2x2::GetRow(int index) const
+	Vector2 Matrix2x2::GetRow(unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix2x2_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index)
 		return Vector2(
 			_Val[0 + (index * Matrix2x2_Length)],
 			_Val[1 + (index * Matrix2x2_Length)]
 		);
 	}
-	Vector2 Matrix2x2::GetRow(const Matrix2x2& m, int index)
+	Vector2 Matrix2x2::GetRow(const Matrix2x2& m, unsigned int index)
 	{
 		return m.GetRow(index);
 	}
 	// Get Vertical Line
-	Vector2 Matrix2x2::GetColumn(int index) const
+	Vector2 Matrix2x2::GetColumn(unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix2x2_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index)
 		return Vector2(
 			_Val[(index + 0)],
 			_Val[(index + 2)]
 		);
 	}
-	Vector2 Matrix2x2::GetColumn(const Matrix2x2& m, int index)
+	Vector2 Matrix2x2::GetColumn(const Matrix2x2& m, unsigned int index)
 	{
 		return m.GetColumn(index);
 	}
@@ -276,14 +286,14 @@ namespace Vxl
 	}
 
 	// Operator Overloads
-	float& Matrix2x2::operator[](int index)
+	float& Matrix2x2::operator[](unsigned int index)
 	{
-		assert((index >= 0) && (index < Matrix2x2_Size));
+		OUT_OF_RANGE_INDEX_CHECK_SIZE(index)
 		return _Val[index];
 	}
-	float Matrix2x2::operator[](int index) const
+	float Matrix2x2::operator[](unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix2x2_Size));
+		OUT_OF_RANGE_INDEX_CHECK_SIZE(index)
 		return _Val[index];
 	}
 
@@ -408,7 +418,7 @@ namespace Vxl
 
 	Matrix2x2& Matrix2x2::operator/=(const float f)
 	{
-		assert(f != 0.f);
+		VXL_ASSERT(f != 0.f, "Matrix2x2 division by 0")
 		float inva = 1.0f / f;
 
 		_Val[0] *= inva;

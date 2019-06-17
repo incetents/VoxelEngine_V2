@@ -63,8 +63,6 @@
 
 namespace Vxl
 {
-	class Vector3;
-
 	enum class Axis
 	{
 		NONE = -1,
@@ -72,6 +70,17 @@ namespace Vxl
 		Y = 1,
 		Z = 2
 	};
+
+	template<typename T>
+	static T RoundToMultiple(T val, T multiple)
+	{
+		T remainder = val % multiple;
+		if (remainder != 0)
+		{
+			val += multiple - remainder;
+		}
+		return val;
+	}
 
 	template<typename T>
 	static bool Compare(T a, T b)
@@ -131,6 +140,4 @@ namespace Vxl
 	{
 		return Rad_To_Deg(value);
 	}
-
-	void CalculateNormals(Vector3* arr, unsigned int length, Vector3* normals);
 }

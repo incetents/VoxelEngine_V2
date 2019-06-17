@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "glUtil.h"
+#include "../utilities/Macros.h"
 
 namespace Vxl
 {
@@ -86,24 +87,24 @@ namespace Vxl
 		template<typename Type>
 		void Set(Type data)
 		{
-			assert(false);
+			VXL_ASSERT(false, "Uniform type does not exist");
 		}
 		template<typename Type>
 		void SetMatrix(Type data, bool transpose)
 		{
-			assert(false);
+			VXL_ASSERT(false, "Uniform type does not exist");
 		}
 
 		// [Slower] Set uniform, regardless if shader is bound
 		template<typename Type>
 		void Set(GLuint Programid, Type data)
 		{
-			assert(false);
+			VXL_ASSERT(false, "Uniform type does not exist");
 		}
 		template<typename Type>
 		void SetMatrix(GLuint Programid, Type data, bool transpose)
 		{
-			assert(false);
+			VXL_ASSERT(false, "Uniform type does not exist");
 		}
 
 		inline GLenum GetLocation(void) const

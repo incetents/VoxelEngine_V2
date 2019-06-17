@@ -116,7 +116,7 @@ namespace Vxl
 			if (m_packages[uniformName]->GetUniform(m_material->m_shaderProgram))
 			{
 				auto P = dynamic_cast<MaterialPackageData<Type>*>(m_packages[uniformName]);
-				assert(P);
+				VXL_ASSERT(P, "Material Uniform, missing package");
 				P->m_data = data;
 			}
 		}

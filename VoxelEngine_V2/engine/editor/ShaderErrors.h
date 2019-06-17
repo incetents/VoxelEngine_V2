@@ -1,8 +1,8 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../utilities/GlobalMacros.h"
 #include "../utilities/singleton.h"
+#include "../utilities/Macros.h"
 
 namespace Vxl
 {

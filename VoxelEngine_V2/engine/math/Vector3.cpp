@@ -9,6 +9,14 @@
 #include "MathCore.h"
 #include "Lerp.h"
 
+#include "../utilities/Macros.h"
+
+#ifdef _DEBUG
+#define OUT_OF_RANGE_INDEX_CHECK(index) VXL_ASSERT(index < 3, "Vector3 index out of range")
+#else
+#define OUT_OF_RANGE_INDEX_CHECK(index) __noop
+#endif
+
 namespace Vxl
 {
 	const Vector3i Vector3i::ZERO = Vector3i(0, 0, 0);
@@ -76,14 +84,14 @@ namespace Vxl
 	}
 
 	// Special Operator Overloads
-	int Vector3i::operator[](const int index) const
+	int Vector3i::operator[](const unsigned int index) const
 	{
-		assert((index >= 0) && (index < 3));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
-	int& Vector3i::operator[](const int index)
+	int& Vector3i::operator[](const unsigned int index)
 	{
-		assert((index >= 0) && (index < 3));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
 	Vector3i Vector3i::operator-() const
@@ -282,7 +290,7 @@ namespace Vxl
 	}
 	Vector3i& Vector3i::operator/= (int f)
 	{
-		assert(f);
+		VXL_ASSERT(f, "Vector3i dividing by 0");
 		x /= f;
 		y /= f;
 		z /= f;
@@ -866,14 +874,14 @@ namespace Vxl
 
 
 	// Special Operator Overloads
-	float Vector3::operator[](const int index) const
+	float Vector3::operator[](const unsigned int index) const
 	{
-		assert((index >= 0) && (index < 3));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
-	float& Vector3::operator[](const int index)
+	float& Vector3::operator[](const unsigned int index)
 	{
-		assert((index >= 0) && (index < 3));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
 	Vector3 Vector3::operator-() const
@@ -1073,6 +1081,7 @@ namespace Vxl
 	}
 	Vector3& Vector3::operator/= (float f)
 	{
+		VXL_ASSERT(f != 0.f, "Vector3 dividing by 0");
 		float inva = 1.0f / f;
 		x *= inva;
 		y *= inva;

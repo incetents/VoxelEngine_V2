@@ -14,6 +14,7 @@
 #include "../math/Transform.h"
 
 #include "../utilities/logger.h"
+#include "../utilities/Macros.h"
 
 namespace Vxl
 {
@@ -106,7 +107,7 @@ namespace Vxl
 
 	void MaterialData::SetTexture(BaseTexture* tex, Active_Texture level)
 	{
-		assert((int)level - GL_TEXTURE0 < MAX_MATERIAL_TEXTURES);
+		VXL_ASSERT((int)level - GL_TEXTURE0 < MAX_MATERIAL_TEXTURES, "Active Texture level higher than allowed maximum");
 		m_textures[(UINT)level - GL_TEXTURE0] = tex;
 		if (tex)
 			m_activeTextures.insert(level);
@@ -124,7 +125,7 @@ namespace Vxl
 
 	void MaterialData::BindUniforms(GameObject* entity)
 	{
-		assert(m_material);
+		VXL_ASSERT(m_material, "Missing Material");
 		// Bind Uniforms for this object
 
 		// ~ Model ~ //
@@ -166,7 +167,7 @@ namespace Vxl
 
 	void MaterialData::BindTextures()
 	{
-		assert(m_material);
+		VXL_ASSERT(m_material, "Missing Material");
 
 		// Bind Textures (ignore if parameter is OFF or wireframe mode is ON)
 		if (m_material->m_Wireframe == false)

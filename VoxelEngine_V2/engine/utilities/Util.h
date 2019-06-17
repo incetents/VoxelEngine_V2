@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iterator>
 
+
 namespace Vxl
 {
 	class Vector4;

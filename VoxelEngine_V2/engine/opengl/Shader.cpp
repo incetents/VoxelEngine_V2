@@ -5,7 +5,6 @@
 #include <GL/gl3w.h>
 
 #include "../utilities/logger.h"
-//#include "../utilities/stringUtil.h"
 #include "../utilities/FileIO.h"
 
 namespace Vxl
@@ -291,8 +290,7 @@ namespace Vxl
 
 			if (blockIndex == -1)
 			{
-				assert(false); // Could not figure out block index from name
-				continue;
+				VXL_ASSERT(false, "Unable to get blockIndex from name");
 			}
 
 			// Get Binding point from name (ex: "ColorBlock_17" => Binding Point is 17)
@@ -306,7 +304,7 @@ namespace Vxl
 			
 			if (bindingPoint == -1)
 			{
-				assert(false); // Could not figure out binding point from name
+				VXL_ASSERT(false, "Could not figure out binding point from name, ex: MyBuffer_1 == bindingPoint of 1");
 				continue;
 			}
 

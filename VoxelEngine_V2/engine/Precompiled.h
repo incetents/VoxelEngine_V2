@@ -58,7 +58,7 @@
 
 #include "utilities/Asset.h"
 #include "utilities/FileIO.h"
-#include "utilities/GlobalMacros.h"
+#include "utilities/Macros.h"
 #include "utilities/Loader.h"
 #include "utilities/logger.h"
 #include "utilities/singleton.h"

@@ -41,18 +41,18 @@ namespace Vxl
 		static	Matrix2x2 Rotation(const Radians& Deg, RotationDirection Rot = RotationDirection(1));
 
 		// Set Horizontal Line
-		Matrix2x2& SetRow(int index, const Vector2&);
-		static	Matrix2x2& SetRow(Matrix2x2&, int index, const Vector2&);
+		Matrix2x2& SetRow(unsigned int index, const Vector2&);
+		static	Matrix2x2& SetRow(Matrix2x2&, unsigned int index, const Vector2&);
 		// Set Vertical Line
-		Matrix2x2& SetColumn(int index, const Vector2&);
-		static	Matrix2x2& SetColumn(Matrix2x2&, int index, const Vector2&);
+		Matrix2x2& SetColumn(unsigned int index, const Vector2&);
+		static	Matrix2x2& SetColumn(Matrix2x2&, unsigned int index, const Vector2&);
 
 		// Get Horizontal Line
-		Vector2 GetRow(int index) const;
-		static	Vector2 GetRow(const Matrix2x2&, int index);
+		Vector2 GetRow(unsigned int index) const;
+		static	Vector2 GetRow(const Matrix2x2&, unsigned int index);
 		// Get Vertical Line
-		Vector2 GetColumn(int index) const;
-		static	Vector2 GetColumn(const Matrix2x2&, int index);
+		Vector2 GetColumn(unsigned int index) const;
+		static	Vector2 GetColumn(const Matrix2x2&, unsigned int index);
 
 		// Determinant
 		float Determinant() const;
@@ -97,8 +97,8 @@ namespace Vxl
 		static	Matrix2x2 Lerp(const Matrix2x2&, const Matrix2x2&, float t);
 
 		// Special Operator Overloads
-		float& operator[](int);
-		float operator[](int) const;
+		float& operator[](unsigned int);
+		float operator[](unsigned int) const;
 		Matrix2x2 operator-() const;
 
 		// Matrix -- Vector Multiplication

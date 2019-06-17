@@ -3,7 +3,7 @@
 
 #include "../utilities/singleton.h"
 #include "../math/Color.h"
-#include "../utilities/GlobalMacros.h"
+#include "../utilities/Macros.h"
 
 namespace Vxl
 {

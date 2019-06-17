@@ -31,7 +31,7 @@ namespace Vxl
 			m_locations[index] = functionIndex;
 			return;
 		}
-		assert(FALSE);
+		VXL_ASSERT(FALSE, "Subroutine Name or Function not found");
 	}
 
 	void glSubroutine::Bind()

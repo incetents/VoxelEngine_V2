@@ -10,6 +10,8 @@
 #include "../opengl/Shader.h"
 #include "../opengl/Uniform.h"
 
+#include "../utilities/Macros.h"
+
 namespace Vxl
 {
 	class ShaderProgram;
@@ -30,7 +32,6 @@ namespace Vxl
 			if (!shader)
 				return false;
 
-			//assert(shader != nullptr);
 			if (shader->CheckUniform(m_uniformName))
 			{
 				m_uniform = shader->GetUniform(m_uniformName);
@@ -43,7 +44,7 @@ namespace Vxl
 		virtual void SendDataAsUniform()
 		{
 			// Should only be called from derived class
-			assert(false);
+			VXL_ASSERT(false, "Invalid Material Package Type for Uniform");
 		}
 	};
 

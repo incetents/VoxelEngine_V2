@@ -19,7 +19,7 @@ namespace Vxl
 	}
 	void Editor::AddSelection(Entity* _entity)
 	{
-		assert(_entity);
+		VXL_ASSERT(_entity, "Adding nullptr in Editor::AddSelection");
 		if (_entity->m_isSelectable == false)
 			return;
 

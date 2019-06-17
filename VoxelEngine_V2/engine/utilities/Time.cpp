@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Time.h"
 
-#include "../utilities/GlobalMacros.h"
+#include "../utilities/Macros.h"
 #include "../opengl/glUtil.h"
 #include <assert.h>
 #include <GLFW/glfw3.h>
@@ -40,14 +40,14 @@ namespace Vxl
 
 	void CPUTimer::Begin()
 	{
-		assert(!m_inUse);
+		VXL_ASSERT(!m_inUse, "Cannot start CPUTimer while in use");
 
 		m_start = std::chrono::steady_clock::now();
 		m_inUse = true;
 	}
 	void CPUTimer::End()
 	{
-		assert(m_inUse);
+		VXL_ASSERT(m_inUse, "Cannot stop CPUTimer while not in use");
 
 		auto elapsedTime = std::chrono::steady_clock::now() - m_start;
 		// Convert elapsed time into long long
@@ -79,7 +79,7 @@ namespace Vxl
 	{
 		// Error if timer doesn't exist
 		if (m_timers.find(name) == m_timers.end())
-			assert(false);
+			VXL_ASSERT(false, "CPUTimer, Cannot End Timer if it does not exist");
 
 		m_timers[name]->End();
 	}
@@ -88,7 +88,7 @@ namespace Vxl
 	{
 		// Error if timer doesn't exist
 		if (m_timers.find(name) == m_timers.end())
-			assert(false);
+			VXL_ASSERT(false, "CPUTimer, does not exist");
 
 		// return time
 		return m_timers[name]->m_elapsedTime_MS_average;
@@ -157,7 +157,7 @@ namespace Vxl
 #ifdef GLOBAL_GPU_TIMERS
 		// Must be open for usage
 		if (m_TimerBeingUsed)
-			assert(false);
+			VXL_ASSERT(false, "GPUTimer, Cannot Start Timer if one is already being used");
 
 		// Create timer if doesn't exist
 		if (m_timers.find(name) == m_timers.end())
@@ -173,7 +173,7 @@ namespace Vxl
 #ifdef GLOBAL_GPU_TIMERS
 		// Must be open for usage
 		if (!m_TimerBeingUsed)
-			assert(false);
+			VXL_ASSERT(false, "GPUTimer, Cannot End Timer if not being used");
 
 		GPUTimer::End();
 		m_TimerBeingUsed = false;

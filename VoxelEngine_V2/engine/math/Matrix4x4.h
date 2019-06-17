@@ -99,18 +99,18 @@ namespace Vxl
 		static	Matrix4x4 GetRotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
 
 		// Set Horizontal Line
-				Matrix4x4& SetRow(int index, const Vector4&);
-		static	Matrix4x4& SetRow(Matrix4x4&, int index, const Vector4&);
+				Matrix4x4& SetRow(unsigned int index, const Vector4&);
+		static	Matrix4x4& SetRow(Matrix4x4&, unsigned int index, const Vector4&);
 		// Set Vertical Line
-				Matrix4x4& SetColumn(int index, const Vector4&);
-		static	Matrix4x4& SetColumn(Matrix4x4&, int index, const Vector4&);
+				Matrix4x4& SetColumn(unsigned int index, const Vector4&);
+		static	Matrix4x4& SetColumn(Matrix4x4&, unsigned int index, const Vector4&);
 
 		// Get Horizontal Line
-				Vector4 GetRow(int index) const;
-		static	Vector4 GetRow(const Matrix4x4&, int index);
+				Vector4 GetRow(unsigned int index) const;
+		static	Vector4 GetRow(const Matrix4x4&, unsigned int index);
 		// Get Vertical Line
-				Vector4 GetColumn(int index) const;
-		static	Vector4 GetColumn(const Matrix4x4&, int index);
+				Vector4 GetColumn(unsigned int index) const;
+		static	Vector4 GetColumn(const Matrix4x4&, unsigned int index);
 
 		// Determinant
 				float Determinant() const;
@@ -153,8 +153,8 @@ namespace Vxl
 		static	Matrix4x4 Lerp(const Matrix4x4&, const Matrix4x4&, float t);
 
 		// Special Operator Overloads
-		float& operator[](int);
-		float operator[](int) const;
+		float& operator[](unsigned int);
+		float operator[](unsigned int) const;
 		Matrix4x4 operator-(void) const;
 
 		// Matrix -- Vector Multiplication

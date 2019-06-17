@@ -3,6 +3,7 @@
 #include "Enums.h"
 
 #include "../utilities/Asset.h"
+#include "../utilities/Macros.h"
 
 #include "Uniform.h"
 
@@ -218,7 +219,7 @@ namespace Vxl
 		inline const glUniform& GetUniform(const std::string& name)
 		{
 #if _DEBUG
-			assert(CheckUniform(name));
+			VXL_ASSERT(CheckUniform(name), "Uniform does not exist for this shader");
 #endif
 			return m_uniforms[name];
 		}
@@ -240,7 +241,7 @@ namespace Vxl
 		inline glUniformBlock   GetUniformBlock(const std::string& name)
 		{
 #if _DEBUG
-			assert(m_uniformBlocks.find(name) != m_uniformBlocks.end());
+			VXL_ASSERT(m_uniformBlocks.find(name) != m_uniformBlocks.end(), "Uniform block does not exist");
 #endif
 			return m_uniformBlocks[name];
 		}
@@ -253,7 +254,7 @@ namespace Vxl
 		inline glSubroutine*	GetSubroutine(ShaderType type)
 		{
 #if _DEBUG
-			assert(m_subroutines.find(type) != m_subroutines.end());
+			VXL_ASSERT(m_subroutines.find(type) != m_subroutines.end(), "Uniform subroutine does not exist");
 #endif
 			return &m_subroutines[type];
 		}

@@ -207,6 +207,6 @@ namespace Vxl
 			Format_Type::RGB8, Channel_Type::RGB, Pixel_Type::UNSIGNED_BYTE
 		);
 
-		assert(m_null_texture);
+		VXL_ASSERT(m_null_texture, "Failed to create null texture");
 	}
 }

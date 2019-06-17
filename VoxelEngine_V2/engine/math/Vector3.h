@@ -56,8 +56,8 @@ namespace Vxl
 		static bool Compare(const Vector3i&, const Vector3i&);
 
 		// Special Operator Overloads
-		int operator[](const int) const;
-		int& operator[](const int);
+		int operator[](const unsigned int) const;
+		int& operator[](const unsigned int);
 		Vector3i operator-() const;
 
 		// Basic Operator Overloading
@@ -285,8 +285,8 @@ namespace Vxl
 		static Vector3 Nlerp(const Vector3&, const Vector3&, float t);
 
 		// Special Operator Overloads
-		float operator[](const int) const;
-		float& operator[](const int);
+		float operator[](const unsigned int) const;
+		float& operator[](const unsigned int);
 		Vector3 operator-() const;
 
 		// Basic Operator Overloading

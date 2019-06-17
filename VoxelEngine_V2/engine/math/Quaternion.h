@@ -72,8 +72,8 @@ namespace Vxl
 		static float Dot(const Quaternion&, const Quaternion&);
 
 		// Special Operator Overloads
-		float				operator[](const int) const;
-		float&				operator[](const int);
+		float				operator[](const unsigned int) const;
+		float&				operator[](const unsigned int);
 		Quaternion			operator-();
 		// Operator Overload (Math)
 		Quaternion			operator+(const Quaternion&) const;

@@ -6,7 +6,7 @@
 #include "../opengl/glUtil.h"
 
 #include "../utilities/logger.h"
-#include "../utilities/GlobalMacros.h"
+#include "../utilities/Macros.h"
 #include "../modules/RenderManager.h"
 
 #include <GLFW/glfw3.h>
@@ -36,14 +36,14 @@ namespace Vxl
 		m_resolution[0] = width;
 		m_resolution[1] = height;
 
+		// ???
 		//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
+		// Set OpenGL Version for Context
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-
-		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT);
+		// Set OpenGL to Core Mode
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		m_window = glfwCreateWindow(m_size[0], m_size[1], m_name.c_str(), NULL, NULL);
 		if (!m_window)
@@ -91,7 +91,7 @@ namespace Vxl
 
 		// Glew/Opengl Init
 		if (!glUtil::initGlew())
-			assert(false);
+			VXL_ASSERT(false, "Glew failed to initialized");
 
 		glUtil::initHints();
 

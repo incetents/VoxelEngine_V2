@@ -9,8 +9,19 @@
 #include "MathCore.h"
 #include "Lerp.h"
 
+#include "../utilities/Macros.h"
+
+#ifdef _DEBUG
+#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) VXL_ASSERT(index < Matrix4x4_Length, "Matrix4x4 index out of range")
+#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) VXL_ASSERT(index < Matrix4x4_Size, "Matrix4x4 index out of range")
+#else
+#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) __noop
+#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) __noop
+#endif
+
 namespace Vxl
 {
+
 	// Identity Matrix
 	const Matrix4x4 Matrix4x4::Identity = Matrix4x4(
 		1, 0, 0, 0,
@@ -331,40 +342,38 @@ namespace Vxl
 	}
 
 	// Set Horizontal Line
-	Matrix4x4& Matrix4x4::SetRow(int index, const Vector4& r)
+	Matrix4x4& Matrix4x4::SetRow(unsigned int index, const Vector4& r)
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		_Val[index * Matrix4x4_Length + 0] = r.x;
 		_Val[index * Matrix4x4_Length + 1] = r.y;
 		_Val[index * Matrix4x4_Length + 2] = r.z;
 		_Val[index * Matrix4x4_Length + 3] = r.w;
 		return *this;
 	}
-	Matrix4x4& Matrix4x4::SetRow(Matrix4x4& m, int index, const Vector4& r)
+	Matrix4x4& Matrix4x4::SetRow(Matrix4x4& m, unsigned int index, const Vector4& r)
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
 		return m.SetRow(index, r);
 	}
 	// Set Vertical Line
-	Matrix4x4& Matrix4x4::SetColumn(int index, const Vector4& c)
+	Matrix4x4& Matrix4x4::SetColumn(unsigned int index, const Vector4& c)
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		_Val[(index + 0x0)] = c.x;
 		_Val[(index + 0x4)] = c.y;
 		_Val[(index + 0x8)] = c.z;
 		_Val[(index + 0xC)] = c.w;
 		return *this;
 	}
-	Matrix4x4& Matrix4x4::SetColumn(Matrix4x4& m, int index, const Vector4& c)
+	Matrix4x4& Matrix4x4::SetColumn(Matrix4x4& m, unsigned int index, const Vector4& c)
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
 		return m.SetColumn(index, c);
 	}
 
 	// Get Horizontal Line
-	Vector4 Matrix4x4::GetRow(int index) const
+	Vector4 Matrix4x4::GetRow(unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		return Vector4(
 			_Val[0 + (index * Matrix4x4_Length)],
 			_Val[1 + (index * Matrix4x4_Length)],
@@ -372,15 +381,14 @@ namespace Vxl
 			_Val[3 + (index * Matrix4x4_Length)]
 		);
 	}
-	Vector4 Matrix4x4::GetRow(const Matrix4x4& m, int index)
+	Vector4 Matrix4x4::GetRow(const Matrix4x4& m, unsigned int index)
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
 		return m.GetRow(index);
 	}
 	// Get Vertical Line
-	Vector4 Matrix4x4::GetColumn(int index) const
+	Vector4 Matrix4x4::GetColumn(unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		return Vector4(
 			_Val[(index + 0x0)],
 			_Val[(index + 0x4)],
@@ -388,9 +396,8 @@ namespace Vxl
 			_Val[(index + 0xC)]
 		);
 	}
-	Vector4 Matrix4x4::GetColumn(const Matrix4x4& m, int index)
+	Vector4 Matrix4x4::GetColumn(const Matrix4x4& m, unsigned int index)
 	{
-		assert((index >= 0) && (index < Matrix4x4_Length));
 		return m.GetColumn(index);
 	}
 
@@ -604,14 +611,14 @@ namespace Vxl
 	}
 
 	// Operator Overloads
-	float& Matrix4x4::operator[](int index)
+	float& Matrix4x4::operator[](unsigned int index)
 	{
-		assert((index >= 0) && (index < Matrix4x4_Size));
+		OUT_OF_RANGE_INDEX_CHECK_SIZE(index);
 		return _Val[index];
 	}
-	float Matrix4x4::operator[](int index) const
+	float Matrix4x4::operator[](unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix4x4_Size));
+		OUT_OF_RANGE_INDEX_CHECK_SIZE(index);
 		return _Val[index];
 	}
 	Matrix4x4 Matrix4x4::operator-() const
@@ -889,6 +896,7 @@ namespace Vxl
 
 	Matrix4x4& Matrix4x4::operator/=(const float f)
 	{
+		VXL_ASSERT(f != 0.f, "Matrix4x4 division by 0")
 		float inva = 1.0f / f;
 
 		for (int i = 0; i < Matrix4x4_Size; i++)

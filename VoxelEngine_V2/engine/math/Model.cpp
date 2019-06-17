@@ -107,7 +107,7 @@ namespace Vxl
 			_model->indices.reserve(mesh->mNumFaces * 3u);
 			for (std::uint32_t faceIndex = 0u; faceIndex < mesh->mNumFaces; faceIndex++)
 			{
-				assert(mesh->mFaces[faceIndex].mNumIndices == 3u);
+				VXL_ASSERT(mesh->mFaces[faceIndex].mNumIndices == 3u, "Model Loader, indices are not in a multiples of 3");
 				_model->indices.push_back(mesh->mFaces[faceIndex].mIndices[0u]);
 				_model->indices.push_back(mesh->mFaces[faceIndex].mIndices[1u]);
 				_model->indices.push_back(mesh->mFaces[faceIndex].mIndices[2u]);

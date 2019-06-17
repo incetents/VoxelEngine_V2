@@ -29,12 +29,12 @@ namespace Vxl
 
 	void CameraObject::UpdateFOV(float _fov)
 	{
-		assert(m_type == CameraType::PERSPECTIVE || m_type == CameraType::PERSPECTIVE_WINDOW_ASPECT);
+		VXL_ASSERT(m_type == CameraType::PERSPECTIVE || m_type == CameraType::PERSPECTIVE_WINDOW_ASPECT, "Invalid Type for CameraObject");
 		m_buffer[0] = _fov;
 	}
 	void CameraObject::UpdateAspect(float _aspect)
 	{
-		assert(m_type == CameraType::PERSPECTIVE || m_type == CameraType::PERSPECTIVE_WINDOW_ASPECT);
+		VXL_ASSERT(m_type == CameraType::PERSPECTIVE || m_type == CameraType::PERSPECTIVE_WINDOW_ASPECT, "Invalid Type for CameraObject");
 		m_buffer[1] = _aspect;
 	}
 	void CameraObject::UpdateOrthoX(float _xmin, float _xmax)

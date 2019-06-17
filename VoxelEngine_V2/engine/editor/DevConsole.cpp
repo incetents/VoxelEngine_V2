@@ -58,6 +58,7 @@ namespace Vxl
 		ImGui::Separator();
 
 		ImGui::Text("Reload Window = [F5]");
+		ImGui::Text("Reload Fullscreen FBOs = [F6]");
 		ImGui::Text("Reload Shaders = [R]");
 
 		ImGui::Separator();

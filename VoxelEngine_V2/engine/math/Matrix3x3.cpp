@@ -8,6 +8,16 @@
 #include "MathCore.h"
 #include "Lerp.h"
 
+#include "../utilities/Macros.h"
+
+#ifdef _DEBUG
+#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) VXL_ASSERT(index < Matrix3x3_Length, "Matrix3x3 index out of range")
+#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) VXL_ASSERT(index < Matrix3x3_Size, "Matrix3x3 index out of range")
+#else
+#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) __noop
+#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) __noop
+#endif
+
 namespace Vxl
 {
 	// Identity Matrix
@@ -205,62 +215,58 @@ namespace Vxl
 	}
 
 	// Set Horizontal Line
-	Matrix3x3& Matrix3x3::SetRow(int index, const Vector3& r)
+	Matrix3x3& Matrix3x3::SetRow(unsigned int index, const Vector3& r)
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		_Val[index * Matrix3x3_Length + 0] = r.x;
 		_Val[index * Matrix3x3_Length + 1] = r.y;
 		_Val[index * Matrix3x3_Length + 2] = r.z;
 		return *this;
 	}
-	Matrix3x3& Matrix3x3::SetRow(Matrix3x3& m, int index, const Vector3& r)
+	Matrix3x3& Matrix3x3::SetRow(Matrix3x3& m, unsigned int index, const Vector3& r)
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
 		return m.SetRow(index, r);
 	}
 	// Set Vertical Line
-	Matrix3x3& Matrix3x3::SetColumn(int index, const Vector3& c)
+	Matrix3x3& Matrix3x3::SetColumn(unsigned int index, const Vector3& c)
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		_Val[(index + 0)] = c.x;
 		_Val[(index + 3)] = c.y;
 		_Val[(index + 6)] = c.z;
 		return *this;
 	}
-	Matrix3x3& Matrix3x3::SetColumn(Matrix3x3& m, int index, const Vector3& c)
+	Matrix3x3& Matrix3x3::SetColumn(Matrix3x3& m, unsigned int index, const Vector3& c)
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
 		return m.SetColumn(index, c);
 	}
 
 	// Get Horizontal Line
-	Vector3 Matrix3x3::GetRow(int index) const
+	Vector3 Matrix3x3::GetRow(unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		return Vector3(
 			_Val[0 + (index * Matrix3x3_Length)],
 			_Val[1 + (index * Matrix3x3_Length)],
 			_Val[2 + (index * Matrix3x3_Length)]
 		);
 	}
-	Vector3 Matrix3x3::GetRow(const Matrix3x3& m, int index)
+	Vector3 Matrix3x3::GetRow(const Matrix3x3& m, unsigned int index)
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
 		return m.GetRow(index);
 	}
 	// Get Vertical Line
-	Vector3 Matrix3x3::GetColumn(int index) const
+	Vector3 Matrix3x3::GetColumn(unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
 		return Vector3(
 			_Val[(index + 0)],
 			_Val[(index + 3)],
 			_Val[(index + 6)]
 		);
 	}
-	Vector3 Matrix3x3::GetColumn(const Matrix3x3& m, int index)
+	Vector3 Matrix3x3::GetColumn(const Matrix3x3& m, unsigned int index)
 	{
-		assert((index >= 0) && (index < Matrix3x3_Length));
 		return m.GetColumn(index);
 	}
 
@@ -411,14 +417,14 @@ namespace Vxl
 	}
 
 	// Operator Overloads
-	float& Matrix3x3::operator[](int index)
+	float& Matrix3x3::operator[](unsigned int index)
 	{
-		assert((index >= 0) && (index < Matrix3x3_Size));
+		OUT_OF_RANGE_INDEX_CHECK_SIZE(index);
 		return _Val[index];
 	}
-	float Matrix3x3::operator[](int index) const
+	float Matrix3x3::operator[](unsigned int index) const
 	{
-		assert((index >= 0) && (index < Matrix3x3_Size));
+		OUT_OF_RANGE_INDEX_CHECK_SIZE(index);
 		return _Val[index];
 	}
 
@@ -612,6 +618,7 @@ namespace Vxl
 
 	Matrix3x3& Matrix3x3::operator/=(const float f)
 	{
+		VXL_ASSERT(f != 0.f, "Matrix3x3 division by 0")
 		float inva = 1.0f / f;
 
 		for (int i = 0; i < Matrix3x3_Size; i++)

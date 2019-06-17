@@ -5,6 +5,7 @@
 #include "../math/Model.h"
 
 #include "../utilities/logger.h"
+#include "../utilities/Macros.h"
 
 #include <assert.h>
 #include <iostream>
@@ -73,7 +74,7 @@ namespace Vxl
 			m_lines = 0;
 			break;
 		case Draw_Type::LINES:
-			assert(m_drawCount % 2 == 0);
+			VXL_ASSERT(m_drawCount % 2 == 0, "Mesh DrawCount is not multiple of 2 for LINES");
 			m_faces = 0;
 			m_lines = m_drawCount / 2;
 			break;
@@ -86,29 +87,29 @@ namespace Vxl
 			m_lines = m_drawCount;
 			break;
 		case Draw_Type::LINES_ADJACENCY:
-			assert(m_drawCount % 4 == 0);
+			VXL_ASSERT(m_drawCount % 4 == 0, "Mesh DrawCount is not multiple of 4 for LINES_ADJACENCY");
 			m_faces = 0;
 			m_lines = m_drawCount / 4;
 			break;
 		case Draw_Type::LINE_STRIP_ADJACENCY:
-			assert(m_drawCount > 1);
+			VXL_ASSERT(m_drawCount > 1, "Mesh DrawCount is not larger than 1 for LINE_STRIP_ADJACENCY");
 			m_faces = 0;
 			m_lines = m_drawCount - 2;
 			break;
 
 		case Draw_Type::TRIANGLES:
-			assert(m_drawCount % 3 == 0);
+			VXL_ASSERT(m_drawCount % 3 == 0, "Mesh DrawCount is not multiple of 3 for TRIANGLES");
 			m_faces = m_drawCount / 3;
 			m_lines = m_drawCount;
 			break;
 		case Draw_Type::TRIANGLE_STRIP:
 		case Draw_Type::TRIANGLE_FAN:
-			assert(m_drawCount > 2);
+			VXL_ASSERT(m_drawCount > 2, "Mesh DrawCount is not larger than 2 for TRIANGLE_STRIP/TRIANGLE_FAN");
 			m_faces = m_drawCount - 2;
 			m_lines = ((m_drawCount - 3) * 2) + 3;
 			break;
 		case Draw_Type::TRIANGLES_ADJACENCY:
-			assert(m_drawCount % 6 == 0);
+			VXL_ASSERT(m_drawCount % 6 == 0, "Mesh DrawCount is not multiple of 6 for TRIANGLES_ADJACENCY");
 			m_faces = m_drawCount / 6;
 			m_lines = m_drawCount / 3;
 			break;
@@ -118,14 +119,14 @@ namespace Vxl
 			// Not understood
 			m_faces = 0;
 			m_lines = 0;
-			assert(false);
+			VXL_ASSERT(false, "DrawType Not implemented properly");
 			break;
 
 		case Draw_Type::PATCHES:
 			// Not implemented
 			m_faces = 0;
 			m_lines = 0;
-			assert(false);
+			VXL_ASSERT(false, "DrawType Not implemented properly");
 			break;
 			
 		}
@@ -166,7 +167,7 @@ namespace Vxl
 
 	void Mesh::Set(Model* _model)
 	{
-		assert(_model);
+		VXL_ASSERT(_model, "Model is nullptr");
 		m_positions.set(_model->positions);
 		m_uvs.set(_model->uvs);
 		m_normals.set(_model->normals);
@@ -185,7 +186,7 @@ namespace Vxl
 	){
 		if (_vertices == nullptr || _vertCount == 0)
 		{
-			assert(false);
+			VXL_ASSERT(false, "Vertices missing");
 			return;
 		}
 		//
@@ -194,7 +195,7 @@ namespace Vxl
 		// Indexed Normals
 		if (_indices)
 		{
-			assert(_indexCount % 3 == 0 && _indexCount > 0);
+			VXL_ASSERT(_indexCount % 3 == 0 && _indexCount > 0, "Index needs to be a multiple of 3 and not empty");
 			
 			for (GLuint i = 0; i < _indexCount; i+= 3)
 			{
@@ -260,14 +261,14 @@ namespace Vxl
 						Normals[_indices[i]] += (n / neighborCount);
 
 					if (isinf(Normals[_indices[i]].x))
-						assert(false);
+						VXL_ASSERT(false, "Normal has invalid value");
 				}
 			}
 		}
 		// Position Normals
 		else
 		{
-			assert(_vertCount % 3 == 0);
+			VXL_ASSERT(_vertCount % 3 == 0, "Vertices is not a multiple of 3");
 
 			for (GLuint i = 0; i < _vertCount; i += 3)
 			{
@@ -375,7 +376,7 @@ namespace Vxl
 	{
 		if (_vertices == nullptr || _vertCount == 0)
 		{
-			assert(false);
+			VXL_ASSERT(false, "Vertices are missing");
 			return;
 		}
 		//
@@ -386,7 +387,7 @@ namespace Vxl
 		// Indexed Normals
 		if (_indices)
 		{
-			assert(_indexCount % 3 == 0 && _indexCount > 0);
+			VXL_ASSERT(_indexCount % 3 == 0 && _indexCount > 0, "Indices are not multiple of 3 or are empty");
 
 			for (GLuint i = 0; i < _indexCount; i += 3)
 			{
@@ -442,7 +443,7 @@ namespace Vxl
 		// Position Normals
 		else
 		{
-			assert(_vertCount % 3 == 0);
+			VXL_ASSERT(_vertCount % 3 == 0, "Vertices are not multiple of 3");
 
 			for (GLuint i = 0; i < _vertCount; i += 3)
 			{
@@ -543,17 +544,25 @@ namespace Vxl
 		if (indicesCount)
 		{
 			if (glUtil::isDrawTypeTriangles(m_type))
-				assert(indicesCount % 3 == 0);
+			{
+				VXL_ASSERT(indicesCount % 3 == 0, "Indices are not multiple of 3");
+			}
 			else if (glUtil::isDrawTypeLines(m_type))
-				assert(indicesCount % 2 == 0);
+			{
+				VXL_ASSERT(indicesCount % 2 == 0, "Indices are not multiple of 2");
+			}
 		}
 		else
 		{
 			GLuint posCount = m_positions.GetDrawCount();
 			if (glUtil::isDrawTypeTriangles(m_type))
-				assert(posCount % 3 == 0);
+			{
+				VXL_ASSERT(posCount % 3 == 0, "Vertices are not multiple of 3");
+			}
 			else if (glUtil::isDrawTypeLines(m_type))
-				assert(posCount % 2 == 0);
+			{
+				VXL_ASSERT(posCount % 2 == 0, "Vertices are not multiple of 2");
+			}
 		}
 #endif
 

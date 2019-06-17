@@ -6,6 +6,8 @@
 #include "glUtil.h"
 #include "../utilities/singleton.h"
 
+#include <assert.h>
+
 namespace Vxl
 {
 	class Vector2;
@@ -20,10 +22,12 @@ namespace Vxl
 	{
 		friend class UBOManager;
 	private:
-		GLuint m_id;
-		const unsigned int m_totalBytes;
-		const GLuint m_slot;
-		const std::string m_name;
+		GLuint				m_id;
+		const unsigned int	m_totalBytes;
+		const GLuint		m_slot;
+		const std::string	m_name;
+		void*				m_buffer = nullptr;
+		bool				m_bufferDirty = false;
 
 		void load();
 		void unload();
@@ -37,23 +41,29 @@ namespace Vxl
 		{
 			unload();
 		}
-	public:
 
-		void Bind() const;
+		void Bind();
 		void Unbind() const;
 
-		void sendMatrix(const Matrix2x2& matrix, int offset) const;
-		void sendMatrix(const Matrix3x3& matrix, int offset) const;
-		void sendMatrix(const Matrix4x4& matrix, int offset) const;
-		void sendVector(const Vector2& vector, int offset) const;
-		void sendVector(const Vector3& vector, int offset) const;
-		void sendVector(const Vector4& vector, int offset) const;
-		void sendFloat(float scalar, int offset) const;
-		void sendInt(int scalar, int offset) const;
-		void sendUInt(unsigned int scalar, int offset) const;
-		void sendBool(bool boolean, int offset) const;
-		void sendData(void* data, int size, int offset = 0) const;
+		void* GetBufferLocation(unsigned int byteOffset) const;
 
+		void sendMatrix(const Matrix2x2& matrix, unsigned int byteOffset);
+		void sendMatrix(const Matrix3x3& matrix, unsigned int byteOffset);
+		void sendMatrix(const Matrix4x4& matrix, unsigned int byteOffset);
+		void sendVector(const Vector2& vector, unsigned int byteOffset);
+		void sendVector(const Vector3& vector, unsigned int byteOffset);
+		void sendVector(const Vector4& vector, unsigned int byteOffset);
+
+		template<typename Type>
+		void sendData(Type data, unsigned int byteOffset)
+		{
+			// Must be multiple of [4 bytes]
+			assert(byteOffset % 4 == 0);
+
+			reinterpret_cast<Type*>(GetBufferLocation(byteOffset))[0] = data;
+		
+			m_bufferDirty = true;
+		}
 	};
 
 	static class UBOManager : public Singleton<class UBOManager>
@@ -65,12 +75,14 @@ namespace Vxl
 			FAKE
 		};
 
-		UniformBufferObject** m_ubos;
+		UniformBufferObject** m_ubos = nullptr;
 
 	public:
 		void Setup()
 		{
-			delete[] m_ubos;
+			if(m_ubos != nullptr)
+				delete[] m_ubos;
+
 			m_ubos = new UniformBufferObject*[2];
 			m_ubos[0] = new UniformBufferObject(64 * 3, UBOID::CAMERA, "Camera");
 			m_ubos[1] = new UniformBufferObject(0, UBOID::FAKE, "Empty");

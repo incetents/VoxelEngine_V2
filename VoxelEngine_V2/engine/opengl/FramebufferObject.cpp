@@ -1,14 +1,12 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "FramebufferObject.h"
+#include "RenderBuffer.h"
 
 #include "../textures/Texture.h"
 #include "../textures/RenderTexture.h"
 #include "../utilities/logger.h"
-#include "RenderBuffer.h"
 #include "../window/window.h"
-
-#include <assert.h>
 
 namespace Vxl
 {
@@ -123,7 +121,10 @@ namespace Vxl
 	{
 		// Already init
 		if (m_id != -1)
-			assert(false);
+		{
+			VXL_ASSERT(false, "FBO already init");
+			return;
+		}
 
 		// Create FBO
 		glGenFramebuffers(1, &m_id);
@@ -225,7 +226,7 @@ namespace Vxl
 	}
 	void FramebufferObject::clearBuffer(unsigned int index)
 	{
-		assert(index < m_textureCount);
+		VXL_ASSERT(index < m_textureCount, "FBO, Index out of bounds");
 		glClearBufferfv(GL_COLOR, index, &m_clearColor[0]);
 	}
 
@@ -235,35 +236,15 @@ namespace Vxl
 		FBORenderType fboRenderType
 	)
 	{
-		assert(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments());
+		VXL_ASSERT(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments(), "FBO, too many color attachments");
 		
 		// Create new render texture
 		m_textures.push_back(new FBOTexture(name, fboRenderType, FormatType, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE));
 		m_textureCount++;
-
-		//	if(fboRenderType == FBORenderType::TEXTURE)
-//		m_textures[m_textureCount].BecomeRenderTexture(m_size[0], m_size[1], FormatType);
-//	else
-//		m_textures[m_textureCount].BecomeRenderBuffer(m_size[0], m_size[1], FormatType);
-//	
-//	// Name
-//	m_textures[m_textureCount].m_name = name;
-//	glUtil::setGLName(glNameType::TEXTURE, m_textures[m_textureCount].GetID(), "FBO_" + m_name + "_Tex_" + name);
-//	
-//	// Add to FBO
-//	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-//	
-//	if (fboRenderType == FBORenderType::TEXTURE)
-//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_TEXTURE_2D, m_textures[m_textureCount].GetID(), 0);
-//	else
-//		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (m_textureCount++), GL_RENDERBUFFER, m_textures[m_textureCount].GetID());
-//	
-//	checkFBOStatus();
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 	void FramebufferObject::addDepth(DepthFormat_Type depthFormatType, FBORenderType fboRenderType)
 	{
-		assert(m_depth == nullptr);
+		VXL_ASSERT(m_depth == nullptr, "FBO, cannot add multiple depth/stencil attachments");
 
 		// Select Pixel/Channel Type [for glReadPixels]
 		Pixel_Type PixelType;
@@ -271,26 +252,6 @@ namespace Vxl
 		glUtil::getPixelChannelData(depthFormatType, ChannelType, PixelType);
 
 		m_depth = new FBOTexture("depth", fboRenderType, (Format_Type)depthFormatType, ChannelType, PixelType);
-
-		//	if (fboRenderType == FBORenderType::TEXTURE)
-		//		m_depth.BecomeRenderTexture(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
-		//	else
-		//		m_depth.BecomeRenderBuffer(m_size[0], m_size[1], (Format_Type)depthFormatType, ChannelType, PixelType);
-		//	
-		//	// Name
-		//	glUtil::setGLName(glNameType::TEXTURE, m_depth.GetID(), "FBO_" + m_name + "_Depth");
-		//	
-		//	// Add to FBO
-		//	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-		//	
-		//	if (fboRenderType == FBORenderType::TEXTURE)
-		//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth.GetID(), 0);
-		//	else
-		//		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth.GetID());
-		//	
-		//	checkFBOStatus();
-		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	}
 
 	void FramebufferObject::bind()
@@ -312,9 +273,10 @@ namespace Vxl
 		m_boundID = 0;
 	}
 
-	void FramebufferObject::bindTexture(int index, Active_Texture layer)
+	void FramebufferObject::bindTexture(unsigned int index, Active_Texture layer)
 	{
-		assert(index < (int)m_textureCount && m_textures[index]->isRenderTexture());
+		VXL_ASSERT(index < m_textureCount, "FBO, bindTexture index out of bounds");
+		VXL_ASSERT(m_textures[index]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		glUtil::setActiveTexture(layer);
 
@@ -322,7 +284,7 @@ namespace Vxl
 	}
 	void FramebufferObject::bindDepth(Active_Texture layer)
 	{
-		assert(m_depth->isRenderTexture());
+		VXL_ASSERT(m_depth->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		glUtil::setActiveTexture(layer);
 		m_depth->Bind();
@@ -331,9 +293,9 @@ namespace Vxl
 	void FramebufferObject::blitDepth(const FramebufferObject& fbo)
 	{
 		// Must have matching formats
-		assert(m_depth->GetFormatType() == fbo.m_depth->GetFormatType());
+		VXL_ASSERT(m_depth->GetFormatType() == fbo.m_depth->GetFormatType(), "FBO, blitDepth doesn't have matching depth formats");
 		// Must have matching sizes
-		assert(m_width == fbo.m_width && m_height == fbo.m_height);
+		VXL_ASSERT(m_width == fbo.m_width && m_height == fbo.m_height, "FBO, blitDepth doesn't have matching sizes");
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_id);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo.m_id);
@@ -351,7 +313,10 @@ namespace Vxl
 	// Generates mipmap of current texture
 	void FramebufferObject::generateMipmaps(unsigned int textureIndex)
 	{
-		assert(m_id == m_boundID && textureIndex < m_textureCount && m_textures[textureIndex]->isRenderTexture());
+		VXL_ASSERT(textureIndex < m_textureCount, "FBO, index out of bounds");
+		VXL_ASSERT(m_id == m_boundID, "FBO" + m_name + "must be bound before generating mipmaps for its color attachments");
+		VXL_ASSERT(m_textures[textureIndex]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
+		
 		m_textures[textureIndex]->Bind();
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
@@ -359,7 +324,8 @@ namespace Vxl
 	// Notice, SNORM TEXTURES CANNOT BE READ
 	RawArray<GLubyte> FramebufferObject::readPixels(u_int textureIndex, int x, int y, int w, int h)
 	{
-		assert(textureIndex < m_textureCount);
+		VXL_ASSERT(textureIndex < m_textureCount, "FBO, index out of bounds");
+
 		auto Texture = m_textures[textureIndex];
 		
 		RawArray<GLubyte> Array;

@@ -3,6 +3,8 @@
 
 #include "glUtil.h"
 
+#include "../utilities/Macros.h"
+
 #include <assert.h>
 #include <vector>
 
@@ -166,7 +168,7 @@ namespace Vxl
 		template<typename Type = GLfloat>
 		void UpdateVertices(Type* _arr, int offset, GLuint size)
 		{
-			assert(size <= m_Size);
+			VXL_ASSERT(size + offset <= m_Size, "VBO: Size + Offset too large for updating vertices");
 			glUtil::bindVBOSubData(m_VBO, offset, size, (GLvoid*)_arr);
 		}
 

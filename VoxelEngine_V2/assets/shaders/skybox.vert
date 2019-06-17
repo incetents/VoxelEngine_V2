@@ -1,5 +1,5 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
-#version 420
+#version 420 core
 #include "_UBO.glsl"
 
 // Input

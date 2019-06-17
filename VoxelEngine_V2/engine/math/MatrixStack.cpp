@@ -6,7 +6,7 @@ namespace Vxl
 {
 	//	_MatrixStack& _MatrixStack::pushMatrix(const Matrix4x4& matrix)
 	//	{
-	//		assert(m_size < 255);
+	//		VXL_ASSERT(m_size < 255);
 	//	
 	//		if (m_size == 0)
 	//			m_stack.push(matrix);

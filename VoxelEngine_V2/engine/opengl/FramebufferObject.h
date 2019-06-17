@@ -7,6 +7,7 @@
 #include "../utilities/Asset.h"
 #include "../utilities/Util.h"
 #include "../utilities/Containers.h"
+#include "../utilities/Macros.h"
 
 //#include "Texture.h"
 #include <vector>
@@ -110,7 +111,7 @@ namespace Vxl
 
 		inline void init()
 		{
-			assert(m_width > 0 && m_width > 0);
+			VXL_ASSERT(m_width > 0 && m_width > 0, "Invalid FBO Init Size");
 			load();
 		}
 		inline void setClearColor(Color4F c)
@@ -161,7 +162,7 @@ namespace Vxl
 		void bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH);
 		static void unbind();
 
-		void bindTexture(int index, Active_Texture layer);
+		void bindTexture(unsigned int index, Active_Texture layer);
 		void bindDepth(Active_Texture layer);
 
 		void blitDepth(const FramebufferObject& fbo);

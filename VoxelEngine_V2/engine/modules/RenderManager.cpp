@@ -7,7 +7,7 @@
 #include "Material.h"
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
-#include "../utilities/GlobalMacros.h"
+#include "../utilities/Macros.h"
 #include "../textures/Texture.h"
 #include "../textures/Cubemap.h"
 #include "../opengl/Debug.h"
@@ -50,7 +50,7 @@ namespace Vxl
 	}
 	const Layer& RenderManager::GetLayer(UINT index)
 	{
-		assert(index < MAX_LAYERS);
+		VXL_ASSERT(index < MAX_LAYERS, "Layer index out of bounds");
 		return m_layers[index];
 	}
 
@@ -68,7 +68,7 @@ namespace Vxl
 
 	void RenderManager::AddEntity(Entity* _entity)
 	{
-		assert(_entity);
+		VXL_ASSERT(_entity, "RenderManager cannot add nullptr");
 
 		switch (_entity->GetType())
 		{
@@ -127,14 +127,14 @@ namespace Vxl
 
 	void RenderManager::RemoveEntity(Entity* _entity)
 	{
-		assert(_entity);
+		VXL_ASSERT(_entity, "RenderManager cannot remove nullptr");
 
 		switch (_entity->GetType())
 		{
 			case EntityType::GAMEOBJECT:
 			{
 				auto _GameObject = dynamic_cast<GameObject*>(_entity);
-				assert(_GameObject);
+				VXL_ASSERT(_GameObject, "GameObject cast failed");
 
 				// Makes sure entity has a material/shader
 				if (_GameObject->GetMaterial())
@@ -152,7 +152,7 @@ namespace Vxl
 			case EntityType::CAMERA:
 			{
 				auto _Camera = dynamic_cast<CameraObject*>(_entity);
-				assert(_Camera);
+				VXL_ASSERT(_Camera, "CameraObject cast failed");
 
 				// Remove
 				Util::RemoveFromVector(m_allCameraObjects, _Camera);
@@ -163,7 +163,7 @@ namespace Vxl
 			case EntityType::LIGHT:
 			{
 				auto _Light = dynamic_cast<LightObject*>(_entity);
-				assert(_Light);
+				VXL_ASSERT(_Light, "LightObject cast failed");
 
 				// Remove
 				Util::RemoveFromVector(m_allLightObjects, _Light);

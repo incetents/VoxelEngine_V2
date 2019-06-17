@@ -197,8 +197,8 @@ namespace Vxl
 		static Vector2 Nlerp(const Vector2&, const Vector2&, float t);
 
 		// Special Operator Overloading
-		float operator[](const int) const;
-		float& operator[](const int);
+		float operator[](const unsigned int) const;
+		float& operator[](const unsigned int);
 		Vector2 operator-() const;
 
 		// Basic Operator Overloading

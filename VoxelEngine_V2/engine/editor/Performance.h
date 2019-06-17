@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../utilities/singleton.h"
-#include "../utilities/GlobalMacros.h"
+#include "../utilities/Macros.h"
 
 namespace Vxl
 {

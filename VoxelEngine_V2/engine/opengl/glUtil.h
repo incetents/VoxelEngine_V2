@@ -70,7 +70,8 @@ namespace Vxl
 
 		// Get Format Type from channel count
 		Channel_Type getChannelType(int ChannelCount);
-		unsigned int getChannelCount(Format_Type format, Channel_Type type);
+		unsigned int getChannelCount(Channel_Type type);
+		unsigned int getChannelCount(Format_Type format);
 
 		// Get Pixel/Channel Data From DepthFormat
 		void getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType);

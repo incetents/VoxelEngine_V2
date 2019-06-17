@@ -37,7 +37,7 @@ namespace Vxl
 		void updateParameters();
 		void updateStorage();
 		void updateStorage(const GLvoid* pixels);
-		void updateTexImageCubemap(int side = 0, const GLvoid* pixels = nullptr);
+		void updateTexImageCubemap(unsigned int side = 0, const GLvoid* pixels = nullptr);
 
 	public:
 		BaseTexture(const BaseTexture&) = delete;

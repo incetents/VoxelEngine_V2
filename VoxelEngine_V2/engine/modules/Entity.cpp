@@ -34,7 +34,7 @@ namespace Vxl
 	// Update Bounding Box from Mesh
 	void Entity::UpdateBoundingBoxCheap(Mesh* _mesh)
 	{
-		assert(_mesh);
+		VXL_ASSERT(_mesh, "Cannot update bounding box without mesh");
 
 		// Update Bounding Box information
 		if (_mesh != nullptr)

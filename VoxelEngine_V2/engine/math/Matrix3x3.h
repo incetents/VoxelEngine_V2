@@ -66,18 +66,18 @@ namespace Vxl
 		static	Matrix3x3 GetRotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
 
 		// Set Horizontal Line
-		Matrix3x3& SetRow(int index, const Vector3&);
-		static  Matrix3x3& SetRow(Matrix3x3&, int index, const Vector3&);
+		Matrix3x3& SetRow(unsigned int index, const Vector3&);
+		static  Matrix3x3& SetRow(Matrix3x3&, unsigned int index, const Vector3&);
 		// Set Vertical Line
-		Matrix3x3& SetColumn(int index, const Vector3&);
-		static	Matrix3x3& SetColumn(Matrix3x3&, int index, const Vector3&);
+		Matrix3x3& SetColumn(unsigned int index, const Vector3&);
+		static	Matrix3x3& SetColumn(Matrix3x3&, unsigned int index, const Vector3&);
 
 		// Get Horizontal Line
-		Vector3 GetRow(int index) const;
-		static  Vector3 GetRow(const Matrix3x3&, int index);
+		Vector3 GetRow(unsigned int index) const;
+		static  Vector3 GetRow(const Matrix3x3&, unsigned int index);
 		// Get Vertical Line
-		Vector3 GetColumn(int index) const;
-		static  Vector3 GetColumn(const Matrix3x3&, int index);
+		Vector3 GetColumn(unsigned int index) const;
+		static  Vector3 GetColumn(const Matrix3x3&, unsigned int index);
 
 		// Determinant
 		float Determinant() const;
@@ -122,8 +122,8 @@ namespace Vxl
 		static	Matrix3x3 Lerp(const Matrix3x3&, const Matrix3x3&, float t);
 
 		// Special Operator Overloads
-		float& operator[](int);
-		float operator[](int) const;
+		float& operator[](unsigned int);
+		float operator[](unsigned int) const;
 		Matrix3x3 operator-() const;
 
 		// Matrix -- Vector Multiplication

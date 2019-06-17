@@ -63,7 +63,7 @@ namespace Vxl
 				float Width,
 				const Color4F& C1, const Color4F& C2
 			) {
-				assert(m_type == PositionType::VEC3);
+				VXL_ASSERT(m_type == PositionType::VEC3, "Invalid LineSet Type for this function");
 
 				if (m_mesh->m_vertexIndex >= m_mesh->m_vertices.size())
 				{
@@ -100,7 +100,7 @@ namespace Vxl
 				float Width,
 				const Color4F& C1, const Color4F& C2
 			) {
-				assert(m_type == PositionType::VEC2);
+				VXL_ASSERT(m_type == PositionType::VEC2, "Invalid LineSet Type for this function");
 
 				if (m_mesh->m_vertexIndex >= m_mesh->m_vertices.size())
 				{

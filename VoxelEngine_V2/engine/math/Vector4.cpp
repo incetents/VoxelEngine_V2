@@ -9,6 +9,14 @@
 #include "MathCore.h"
 #include "Lerp.h"
 
+#include "../utilities/Macros.h"
+
+#ifdef _DEBUG
+#define OUT_OF_RANGE_INDEX_CHECK(index) VXL_ASSERT(index < 4, "Vector4 index out of range")
+#else
+#define OUT_OF_RANGE_INDEX_CHECK(index) __noop
+#endif
+
 namespace Vxl
 {
 	// Constructors
@@ -551,14 +559,14 @@ namespace Vxl
 
 
 	// Special Operator Overloads
-	float Vector4::operator[](int index) const
+	float Vector4::operator[](unsigned int index) const
 	{
-		assert((index >= 0) && (index < 4));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
-	float& Vector4::operator[](int index)
+	float& Vector4::operator[](unsigned int index)
 	{
-		assert((index >= 0) && (index < 4));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
 	Vector4 Vector4::operator-() const
@@ -765,6 +773,7 @@ namespace Vxl
 	}
 	Vector4& Vector4::operator/= (float f)
 	{
+		VXL_ASSERT(f, "Vector3i dividing by 0");
 		float inva = 1.0f / f;
 		x *= inva;
 		y *= inva;

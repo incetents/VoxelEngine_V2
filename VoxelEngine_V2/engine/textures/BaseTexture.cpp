@@ -3,6 +3,7 @@
 #include "BaseTexture.h"
 
 #include "../opengl/glUtil.h"
+#include "../utilities/Macros.h"
 
 #include <assert.h>
 
@@ -63,9 +64,9 @@ namespace Vxl
 		if (m_useMipMapping)
 			glGenerateMipmap(GL_TEXTURE_2D);
 	}
-	void BaseTexture::updateTexImageCubemap(int side, const GLvoid* pixels)
+	void BaseTexture::updateTexImageCubemap(unsigned int side, const GLvoid* pixels)
 	{
-		assert(side < 6);
+		VXL_ASSERT(side < 6, "Side index too large for cubemap");
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
 			0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_pixelType, pixels
 		);
@@ -92,9 +93,11 @@ namespace Vxl
 		m_pixelType(PixelType)
 	{
 		glGenTextures(1, &m_id);
-		assert(m_id != -1);
+		VXL_ASSERT(m_id != -1, "Base Texture index is -1");
 
-		m_channelCount = (glUtil::getChannelCount(FormatType, ChannelType));
+		m_channelCount = glUtil::getChannelCount(ChannelType);
+		if (m_channelCount == -1)
+			m_channelCount = glUtil::getChannelCount(FormatType);
 
 		updateParameters();
 	}

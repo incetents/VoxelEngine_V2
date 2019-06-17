@@ -11,6 +11,12 @@
 #include <iostream>
 #include <assert.h>
 
+#ifdef _DEBUG
+#define OUT_OF_RANGE_INDEX_CHECK(index) VXL_ASSERT(index < Matrix4x4_Length, "Quaternion index out of range")
+#else
+#define OUT_OF_RANGE_INDEX_CHECK(index) __noop
+#endif
+
 namespace Vxl
 {
 	// Identity Matrix
@@ -248,14 +254,14 @@ namespace Vxl
 	}
 
 	// Operator Overloads
-	float Quaternion::operator[](const int index) const
+	float Quaternion::operator[](const unsigned int index) const
 	{
-		assert((index >= 0) && (index < 4));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
-	float& Quaternion::operator[](const int index)
+	float& Quaternion::operator[](const unsigned int index)
 	{
-		assert((index >= 0) && (index < 4));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
 	Quaternion Quaternion::operator-()

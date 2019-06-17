@@ -9,6 +9,14 @@
 #include "MathCore.h"
 #include "Lerp.h"
 
+#include "../utilities/Macros.h"
+
+#ifdef _DEBUG
+#define OUT_OF_RANGE_INDEX_CHECK(index) VXL_ASSERT(index < 2, "Vector2 index out of range")
+#else
+#define OUT_OF_RANGE_INDEX_CHECK(index) __noop
+#endif
+
 namespace Vxl
 {
 	const Vector2i Vector2i::ZERO = Vector2i(0, 0);
@@ -490,14 +498,14 @@ namespace Vxl
 
 
 	// Special Operator Overloading
-	float Vector2::operator[](const int index) const
+	float Vector2::operator[](const unsigned int index) const
 	{
-		assert((index >= 0) && (index < 2));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
-	float& Vector2::operator[](const int index)
+	float& Vector2::operator[](const unsigned int index)
 	{
-		assert((index >= 0) && (index < 2));
+		OUT_OF_RANGE_INDEX_CHECK(index);
 		return (&x)[index];
 	}
 	Vector2 Vector2::operator-() const

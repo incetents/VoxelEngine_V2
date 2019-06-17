@@ -15,6 +15,8 @@
 #include <assert.h>
 #include <vector>
 
+#include "../utilities/Macros.h"
+
 namespace Vxl
 {
 	class Transform : public Component
@@ -125,8 +127,7 @@ namespace Vxl
 		}
 		Transform*				getChild(u_int index)
 		{
-			assert(index >= 0 && index < m_totalChildren);
-
+			VXL_ASSERT(index < m_totalChildren, "Transform index out of range");
 			return m_children[index];
 		}
 		int						getChildIndex(Transform* c)

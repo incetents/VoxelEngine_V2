@@ -23,7 +23,7 @@ namespace Vxl
 		}
 		inline Type operator[](unsigned int index) const
 		{
-			assert(index < length);
+			VXL_ASSERT(index < length, "index out of bounds");
 			return start[index];
 		}
 	};

@@ -44,6 +44,7 @@
     <ClCompile Include="engine\textures\Texture.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
+    <ClCompile Include="engine\utilities\Macros.cpp" />
     <ClCompile Include="engine\utilities\Time.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
     <ClCompile Include="engine\editor\DevConsole.cpp" />
@@ -140,9 +141,9 @@
     <ClInclude Include="engine\utilities\Asset.h" />
     <ClInclude Include="engine\utilities\Containers.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />
-    <ClInclude Include="engine\utilities\GlobalMacros.h" />
     <ClInclude Include="engine\utilities\Loader.h" />
     <ClInclude Include="engine\utilities\logger.h" />
+    <ClInclude Include="engine\utilities\Macros.h" />
     <ClInclude Include="engine\utilities\singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\utilities\Time.h" />

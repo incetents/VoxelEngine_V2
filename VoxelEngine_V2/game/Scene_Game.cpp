@@ -751,7 +751,7 @@ namespace Vxl
 					DragSpeed = Editor.GetAverageSelectionDistanceFromEditorCamera() / 3.0f;
 				}
 
-				assert(Axis_ScreenDirection.LengthSqr() != 0.0f);
+				VXL_ASSERT(Axis_ScreenDirection.LengthSqr() != 0.0f, "Axis_ScreenDirection is zero");
 
 				// Project Mouse Change onto Xaxis in screenspace, now we'll see how far the mouse drags across the axis
 				static float PreviousDragAmount = 0.0f;
