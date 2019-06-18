@@ -316,9 +316,9 @@ namespace Vxl
 		VXL_ASSERT(textureIndex < m_textureCount, "FBO, index out of bounds");
 		VXL_ASSERT(m_id == m_boundID, "FBO" + m_name + "must be bound before generating mipmaps for its color attachments");
 		VXL_ASSERT(m_textures[textureIndex]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
-		
-		m_textures[textureIndex]->Bind();
-		glGenerateMipmap(GL_TEXTURE_2D);
+
+		// Create mipmapping for Fbo Texture
+		m_textures[textureIndex]->m_texture->updateMipmapping();
 	}
 
 	// Notice, SNORM TEXTURES CANNOT BE READ

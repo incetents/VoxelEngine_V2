@@ -17,5 +17,8 @@ namespace Vxl
 			Channel_Type m_channelType = Channel_Type::RGBA,
 			Pixel_Type PixelType = Pixel_Type::UNSIGNED_BYTE
 		);
+
+		// Update mipmaps
+		void updateMipmapping();
 	};
 }

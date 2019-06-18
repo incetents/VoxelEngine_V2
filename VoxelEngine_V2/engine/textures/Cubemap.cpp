@@ -19,15 +19,14 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Min_Filter MinFilter,
-		Mag_Filter MagFilter,
+		Min_Filter		MinFilter,
+		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
-		Pixel_Type		PixelType
+		Pixel_Type		PixelType,
+		Anisotropic_Mode AnisotropicMode
 	)
-		: BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, MinFilter, MagFilter, FormatType, Channel_Type::NONE, PixelType)
+		: BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, MinFilter, MagFilter, FormatType, Channel_Type::NONE, PixelType, AnisotropicMode, UseMipMapping)
 	{
-		m_useMipMapping = UseMipMapping;
-
 		m_image[0] = SOIL_load_image(filePath1.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 		m_image[1] = SOIL_load_image(filePath2.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 		m_image[2] = SOIL_load_image(filePath3.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
@@ -45,13 +44,12 @@ namespace Vxl
 
 		m_channelType = glUtil::getChannelType(m_channelCount);
 
+		// Storage
 		for (GLuint i = 0; i < 6; i++)
 		{
 			updateTexImageCubemap(i, m_image[i]);
 		}
-
-		if (m_useMipMapping)
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		updateMipmapping();
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath1);
@@ -76,7 +74,8 @@ namespace Vxl
 		Min_Filter MinFilter,
 		Mag_Filter MagFilter,
 		Format_Type	FormatType,
-		Pixel_Type PixelType
+		Pixel_Type PixelType,
+		Anisotropic_Mode AnisotropicMode
 	) {
 		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, PixelType);
 

@@ -22,12 +22,11 @@ namespace Vxl
 		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
-		Pixel_Type		PixelType
+		Pixel_Type		PixelType,
+		Anisotropic_Mode  AnisotropicMode
 	)
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
 	{
-		m_useMipMapping = UseMipMapping;
-
 		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 
 		if (!m_image)
@@ -46,6 +45,7 @@ namespace Vxl
 
 		// Storage
 		updateStorage(&m_image[0]);
+		updateMipmapping();
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath);
@@ -65,11 +65,11 @@ namespace Vxl
 		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
-		Pixel_Type		PixelType
+		Pixel_Type		PixelType,
+		Anisotropic_Mode  AnisotropicMode
 	) 
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
 	{
-		m_useMipMapping = UseMipMapping;
 
 		UINT pixelsCount = (UINT)pixels.size();
 		m_width = width;
@@ -92,6 +92,7 @@ namespace Vxl
 		// Storage
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // helps prevent textures smaller than 4x4 not get corrupted
 		updateStorage(&m_image[0]);
+		updateMipmapping();
 
 		// glName
 		glUtil::setGLName(glNameType::TEXTURE, m_id, "Tex_" + name);
@@ -111,9 +112,10 @@ namespace Vxl
 		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
-		Pixel_Type		PixelType
+		Pixel_Type		PixelType,
+		Anisotropic_Mode  AnisotropicMode
 	) {
-		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType);
+		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode);
 
 		AddToDatabase(name, _texture);
 
@@ -136,9 +138,10 @@ namespace Vxl
 		Mag_Filter		MagFilter,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
-		Pixel_Type		PixelType
+		Pixel_Type		PixelType,
+		Anisotropic_Mode  AnisotropicMode
 	) {
-		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType);
+		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode);
 
 		AddToDatabase(name, _texture);
 

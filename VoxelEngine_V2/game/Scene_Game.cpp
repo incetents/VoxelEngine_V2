@@ -207,6 +207,15 @@ namespace Vxl
 		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
 		_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		//_entity5->SetColor(Color3F(1, 1, 1));
+
+
+		GameObject* _entity6 = GameObject::Create("_entity6");
+		_entity6->SetMaterial(_material_gbuffer);
+		_entity6->SetMesh(Geometry.GetQuadY());
+		_entity6->m_transform.setPosition(Vector3(0, -10, 0));
+		_entity6->m_transform.setScale(Vector3(20, 1, 20));
+		_entity6->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
+		//_entity5->SetColor(Color3F(1, 1, 1));
 		
 		
 		GameObject* _skybox = GameObject::Create("_skybox");
@@ -315,7 +324,6 @@ namespace Vxl
 
 	void Scene_Game::Update()
 	{
-
 		CPUTimer::StartTimer("UPDATE");
 
 		if (Input.getKeyDown(KeyCode::ESCAPE))

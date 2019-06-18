@@ -12,6 +12,7 @@
 #include "../math/Model.h"
 
 #include "../textures/Texture.h"
+#include "../textures/Cubemap.h"
 
 #include "../opengl/Shader.h"
 #include "../opengl/Enums.h"
@@ -21,6 +22,8 @@
 
 namespace Vxl
 {
+	const std::string Loader::TAG_DEFAULT = "DEFAULT";
+
 	const std::string Loader::TAG_LOAD_SHADER = "#SHADER";
 	const std::string Loader::TAG_LOAD_SHADERPROGRAM = "#SHADERPROGRAM";
 	const std::string Loader::TAG_LOAD_TEXTURE = "#TEXTURE";
@@ -54,9 +57,13 @@ namespace Vxl
 	const std::string Loader::TAG_NORMALIZE = "NORMALIZE";
 	const std::string Loader::TAG_NORMALIZE_SCALE = "SCALE";
 
+	const std::string Loader::TAG_LOW = "LOW";
+	const std::string Loader::TAG_MEDIUM = "MEDIUM";
+	const std::string Loader::TAG_HIGH = "HIGH";
+
 	Wrap_Mode Loader::DecipherWrapMode(const std::string& str)
 	{
-		if (str.compare(TAG_WRAPMODE_REPEAT) == 0)
+		if (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_WRAPMODE_REPEAT) == 0)
 			return Wrap_Mode::REPEAT;
 		else if (str.compare(TAG_WRAPMODE_CLAMP_BORDER) == 0)
 			return Wrap_Mode::CLAMP_BORDER;
@@ -71,19 +78,19 @@ namespace Vxl
 	}
 	Mag_Filter Loader::DecipherFilterModeMag(const std::string& str)
 	{
-		if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
-			return Mag_Filter::NEAREST;
-		else if (str.compare(TAG_FILTERMODE_LINEAR) == 0)
+		if (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_FILTERMODE_LINEAR) == 0)
 			return Mag_Filter::LINEAR;
+		else if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
+			return Mag_Filter::NEAREST;
 		else
 			return Mag_Filter::NONE;
 	}
 	Min_Filter Loader::DecipherFilterModeMin(const std::string& str)
 	{
-		if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
-			return Min_Filter::NEAREST;
-		else if (str.compare(TAG_FILTERMODE_LINEAR) == 0)
+		if (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_FILTERMODE_LINEAR) == 0)
 			return Min_Filter::LINEAR;
+		else if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
+			return Min_Filter::NEAREST;
 		else if (str.compare(TAG_FILTERMODE_NEAREST_NEAREST) == 0)
 			return Min_Filter::NEAREST_MIPMAP_NEAREST;
 		else if (str.compare(TAG_FILTERMODE_LINEAR_NEAREST) == 0)
@@ -114,11 +121,22 @@ namespace Vxl
 	}
 	bool Loader::DecipherFlipType(const std::string& str)
 	{
-		return (str.compare(TAG_FLIP_TRUE) == 0);
+		return (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_FLIP_TRUE) == 0);
 	}
 	bool Loader::DecipherMipMapType(const std::string& str)
 	{
-		return (str.compare(TAG_MIPMAP_TRUE) == 0);
+		return (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_MIPMAP_TRUE) == 0);
+	}
+	Anisotropic_Mode Loader::DecipherAnisotropicMode(const std::string& str)
+	{
+		if(str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_HIGH) == 0)
+			return Anisotropic_Mode::HIGH;
+		else if (str.compare(TAG_MEDIUM) == 0)
+			return Anisotropic_Mode::MEDIUM;
+		else if (str.compare(TAG_LOW) == 0)
+			return Anisotropic_Mode::LOW;
+		else
+			return Anisotropic_Mode::NONE;
 	}
 
 	bool Loader::LoadScript_ImportFiles(const std::string& filePath)
@@ -205,11 +223,14 @@ namespace Vxl
 					Wrap_Mode WM = Wrap_Mode::REPEAT;
 					Min_Filter FMIN = Min_Filter::LINEAR;
 					Mag_Filter FMAG = Mag_Filter::LINEAR;
+					Anisotropic_Mode ANSO = Anisotropic_Mode::HIGH;
 					bool FlipY = true;
 					bool MipMap = true;
 
 					switch (SegmentCount)
 					{
+					case 8:
+						ANSO = DecipherAnisotropicMode(Segments[7]);
 					case 7:
 						MipMap = DecipherMipMapType(Segments[6]); // 7
 					case 6:
@@ -223,7 +244,7 @@ namespace Vxl
 						break;
 					}
 
-					Texture::Load(Name, filePath, FlipY, MipMap, WM, FMIN, FMAG);
+					Texture::Load(Name, filePath, FlipY, MipMap, WM, FMIN, FMAG, Format_Type::RGBA8, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE, ANSO);
 				}
 				/* CUBEMAP */
 				else if (_state == LoadState::CUBEMAP && SegmentCount == 7)

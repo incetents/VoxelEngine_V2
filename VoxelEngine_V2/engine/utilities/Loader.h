@@ -10,6 +10,7 @@ namespace Vxl
 	enum class Min_Filter;
 	enum class Mag_Filter;
 	enum class ShaderType;
+	enum class Anisotropic_Mode : GLubyte;
 
 	class Loader
 	{
@@ -23,6 +24,8 @@ namespace Vxl
 			CUBEMAP,
 			MODEL
 		};
+
+		static const std::string TAG_DEFAULT;
 
 		static const std::string TAG_LOAD_SHADER;
 		static const std::string TAG_LOAD_SHADERPROGRAM;
@@ -57,12 +60,17 @@ namespace Vxl
 		static const std::string TAG_NORMALIZE;
 		static const std::string TAG_NORMALIZE_SCALE;
 
+		static const std::string TAG_LOW;
+		static const std::string TAG_MEDIUM;
+		static const std::string TAG_HIGH;
+
 		static Wrap_Mode DecipherWrapMode(const std::string& str);
 		static Min_Filter DecipherFilterModeMin(const std::string& str);
 		static Mag_Filter DecipherFilterModeMag(const std::string& str);
 		static ShaderType DeciperShaderType(const std::string& str);
 		static bool DecipherFlipType(const std::string& str);
 		static bool DecipherMipMapType(const std::string& str);
+		static Anisotropic_Mode DecipherAnisotropicMode(const std::string& str);
 	public:
 
 		static bool LoadScript_ImportFiles(const std::string& filePath);

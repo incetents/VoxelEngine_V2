@@ -12,13 +12,21 @@ namespace Vxl
 {
 	void FlipTextureY(UCHAR* array, GLuint width, GLuint height, GLuint channels);
 
+	enum class Anisotropic_Mode : GLubyte
+	{
+		NONE = 1,
+		LOW = 4,
+		MEDIUM = 8,
+		HIGH = 16
+	};
+
 	class BaseTexture
 	{
 	protected:
 		// Data //
 		GLuint		 m_id = -1;
 		bool		 m_loaded = false;
-		bool		 m_useMipMapping = false;
+		bool		 m_mipMapping = false;
 		int			 m_width;
 		int			 m_height;
 		int			 m_channelCount;
@@ -29,15 +37,18 @@ namespace Vxl
 		Format_Type  m_formatType;
 		Channel_Type m_channelType;
 		Pixel_Type	 m_pixelType;
+		Anisotropic_Mode m_anisotropicMode;
 		Color4F		 m_borderColor = Color4F(0, 0, 0, 1);
 
 		// Tracker //
 		static std::map<Texture_Type, UINT> m_activeTextures;
 
+	public:
 		void updateParameters();
 		void updateStorage();
 		void updateStorage(const GLvoid* pixels);
 		void updateTexImageCubemap(unsigned int side = 0, const GLvoid* pixels = nullptr);
+		void updateMipmapping();
 
 	public:
 		BaseTexture(const BaseTexture&) = delete;
@@ -48,7 +59,9 @@ namespace Vxl
 			Mag_Filter MagFilter = Mag_Filter::LINEAR,
 			Format_Type FormatType = Format_Type::RGBA8,
 			Channel_Type ChannelType = Channel_Type::RGBA,
-			Pixel_Type PixelType = Pixel_Type::UNSIGNED_BYTE
+			Pixel_Type PixelType = Pixel_Type::UNSIGNED_BYTE,
+			Anisotropic_Mode AnisotropicMode = Anisotropic_Mode::NONE,
+			bool MipMapping = false
 		);
 		virtual ~BaseTexture();
 
@@ -58,6 +71,7 @@ namespace Vxl
 
 		void setWrapMode(Wrap_Mode W);
 		void setFilterMode(Min_Filter Min, Mag_Filter Mag);
+		void setAnistropicMode(Anisotropic_Mode Anso);
 		// only works if min filter is [clamp to border]
 		void setBorderColor(Color4F color);
 
@@ -67,7 +81,7 @@ namespace Vxl
 		}
 		inline bool IsMipMapping(void) const
 		{
-			return m_useMipMapping;
+			return m_mipMapping;
 		}
 		inline int GetWidth(void) const
 		{

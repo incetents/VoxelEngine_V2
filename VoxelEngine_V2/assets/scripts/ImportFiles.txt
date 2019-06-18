@@ -2,11 +2,11 @@
 #SHADER
 // order: [Name] [FilePath]
 
-#VERT gbuffer_vert 					./assets/shaders/gbuffer.vert
-#FRAG gbuffer_frag 					./assets/shaders/gbuffer.frag
+#VERT gbuffer_vert 		./assets/shaders/gbuffer.vert
+#FRAG gbuffer_frag 		./assets/shaders/gbuffer.frag
 
-#VERT passthrough_vert 				./assets/shaders/passthrough.vert
-#FRAG passthrough_frag 				./assets/shaders/passthrough.frag
+#VERT passthrough_vert 	./assets/shaders/passthrough.vert
+#FRAG passthrough_frag 	./assets/shaders/passthrough.frag
 
 #VERT skybox_vert 	./assets/shaders/skybox.vert
 #FRAG skybox_frag 	./assets/shaders/skybox.frag
@@ -39,15 +39,16 @@ billboard 			billboard_vert				billboard_frag
 
 //----------------------------------------
 #TEXTURE
-// order: [Name] [FilePath] [WrapMode =repeat] [FilterModeMin =linear] [FilterModeMag =linear] [FlipY =true] [MipMapping =true]
+// order: [Name] [FilePath] [WrapMode =repeat] [FilterModeMin =linear] [FilterModeMag =linear] [FlipY =true] [MipMapping =true] [Anisotropic =HIGH]
 //
 // [WrapMode] = REPEAT | CLAMP_BORDER | CLAMP_STRETCH | MIRROR_REPEAT |
 // [FilterModeMin] = NEAREST | LINEAR
 // [FilterModeMag] = NEAREST | LINEAR | NEAREST_NEAREST | LINEAR_NEAREST | NEAREST_LINEAR | LINEAR_LINEAR
 // [FlipY] = YES_FLIP | NO_FLIP
 // [MipMapping] = YES_MIPMAP | NO_MIPMAP
+// [Anisotropic] = NONE | LOW | MEDIUM | HIGH
 
-grid_test			./assets/textures/grid_test.png
+grid_test			./assets/textures/grid_test.png 		DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT
 beato				./assets/textures/beato.png
 crate_diffuse		./assets/textures/crate_diffuse.png
 TextureAtlas		./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 	NEAREST	 NEAREST

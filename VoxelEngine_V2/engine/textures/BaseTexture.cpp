@@ -44,13 +44,13 @@ namespace Vxl
 
 		if (m_wrapMode == Wrap_Mode::CLAMP_BORDER)
 			glTexParameterfv(Target, GL_TEXTURE_BORDER_COLOR, &(m_borderColor[0]));
+
+		// Anistropic Mode cnanot be larger than Maximum given size
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, min(glInfo.MAX_ANISOTROPY, (float)m_anisotropicMode));
 	}
 	void BaseTexture::updateStorage()
 	{
 		glTexStorage2D(GL_TEXTURE_2D, 1, (GLenum)m_formatType, m_width, m_height);
-
-		if (m_useMipMapping)
-			glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	void BaseTexture::updateStorage(const GLvoid* pixels)
 	{
@@ -60,9 +60,6 @@ namespace Vxl
 
 		// Legacy
 		//glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_dataType, pixels);
-		
-		if (m_useMipMapping)
-			glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	void BaseTexture::updateTexImageCubemap(unsigned int side, const GLvoid* pixels)
 	{
@@ -70,9 +67,11 @@ namespace Vxl
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
 			0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_pixelType, pixels
 		);
-
-		if (m_useMipMapping)
-			glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	void BaseTexture::updateMipmapping()
+	{
+		if (m_mipMapping)
+			glGenerateMipmap((GLenum)m_type);
 	}
 
 	BaseTexture::BaseTexture(
@@ -82,7 +81,9 @@ namespace Vxl
 		Mag_Filter MagFilter,
 		Format_Type FormatType,
 		Channel_Type ChannelType,
-		Pixel_Type PixelType
+		Pixel_Type PixelType,
+		Anisotropic_Mode AnisotropicMode,
+		bool MipMapping
 	)
 		: m_type(Type),
 		m_wrapMode(WrapMode),
@@ -90,7 +91,9 @@ namespace Vxl
 		m_magFilter(MagFilter),
 		m_formatType(FormatType),
 		m_channelType(ChannelType),
-		m_pixelType(PixelType)
+		m_pixelType(PixelType),
+		m_anisotropicMode(AnisotropicMode),
+		m_mipMapping(MipMapping)
 	{
 		glGenTextures(1, &m_id);
 		VXL_ASSERT(m_id != -1, "Base Texture index is -1");
@@ -147,6 +150,12 @@ namespace Vxl
 	{
 		m_minFilter = Min;
 		m_magFilter = Mag;
+
+		updateParameters();
+	}
+	void BaseTexture::setAnistropicMode(Anisotropic_Mode Anso)
+	{
+		m_anisotropicMode = Anso;
 
 		updateParameters();
 	}
