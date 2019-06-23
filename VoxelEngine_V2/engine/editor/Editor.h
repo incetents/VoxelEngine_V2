@@ -16,11 +16,14 @@ namespace Vxl
 	private:
 		// Data
 		std::vector<Entity*> m_selectedEntities;
-		Vector3 m_averageSelectionLocation;
-		float m_averageSelectionDistanceFromEditorCamera;
+		float	m_averageSelectionDistanceFromEditorCamera;
 
 		// For Translate/Rotation/Scale debug object
-		Matrix4x4 m_selectionTransformModel;
+		Matrix4x4	m_selectionTransform_Model;
+		Vector3		m_selectionTransform_WorldPosition;
+		Vector3		m_selectionTransform_Forward;
+		Vector3		m_selectionTransform_Up;
+		Vector3		m_selectionTransform_Right;
 
 		// Update info
 		void UpdateSelectionAverage();
@@ -32,10 +35,7 @@ namespace Vxl
 		{
 			return m_selectedEntities;
 		}
-		const Vector3& GetAverageSelectionLocation() const
-		{
-			return m_averageSelectionLocation;
-		}
+		
 		float GetAverageSelectionDistanceFromEditorCamera() const
 		{
 			return m_averageSelectionDistanceFromEditorCamera;
@@ -49,10 +49,27 @@ namespace Vxl
 		void AddSelection(Entity* _entity);
 		void ClearSelection();
 
-		const Matrix4x4& GetSelectionTransformModel(void) const
+		inline const Matrix4x4& GetSelectionTransformModel(void) const
 		{
-			return m_selectionTransformModel;
+			return m_selectionTransform_Model;
 		}
+		inline const Vector3& GetSelectionTransformWorldPosition() const
+		{
+			return m_selectionTransform_WorldPosition;
+		}
+		inline const Vector3& GetSelectionTransformForward(void) const
+		{
+			return m_selectionTransform_Forward;
+		}
+		inline const Vector3& GetSelectionTransformUp(void) const
+		{
+			return m_selectionTransform_Up;
+		}
+		inline const Vector3& GetSelectionTransformRight(void) const
+		{
+			return m_selectionTransform_Right;
+		}
+
 
 		/* Editor Controls */
 		enum ControlMode

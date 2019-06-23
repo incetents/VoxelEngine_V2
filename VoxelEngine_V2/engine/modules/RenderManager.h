@@ -44,9 +44,11 @@ namespace Vxl
 		std::vector<CameraObject*>	m_allCameraObjects;
 		std::vector<LightObject*>	m_allLightObjects;
 
-		// Rendering Gbuffer stuff // UINT = Material Order
-		std::map<UINT, std::pair<Material*, std::set<GameObject*>>> m_gbufferObjects;
-		
+		// GameObjects per Material
+		std::map<Material*, std::set<GameObject*>> m_gameObjectsPerMaterial;
+		// All Materials with their gameobjects, sorted by their OrderID
+		std::map<UINT, std::pair<Material*, std::set<GameObject*>>> m_gameObjectsSorted;
+
 	public:
 		RenderManager();
 

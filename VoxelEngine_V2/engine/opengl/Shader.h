@@ -167,6 +167,7 @@ namespace Vxl
 
 		void Bind(void) const;
 		static void Unbind(void);
+		static UINT GetBoundProgram(void);
 
 		// Uniform
 
@@ -216,14 +217,12 @@ namespace Vxl
 			m_uniforms[name].SetMatrix<Type>(m_id, data, transpose);
 		}
 		
-		inline const glUniform& GetUniform(const std::string& name)
+		inline const glUniform& GetUniform(const std::string& name) const
 		{
-#if _DEBUG
 			VXL_ASSERT(CheckUniform(name), "Uniform does not exist for this shader");
-#endif
-			return m_uniforms[name];
+			return m_uniforms.at(name);
 		}
-		inline bool				CheckUniform(const std::string& name)
+		inline bool				CheckUniform(const std::string& name) const
 		{
 			return (m_uniforms.find(name) != m_uniforms.end());
 		}
@@ -238,12 +237,10 @@ namespace Vxl
 
 
 		// Uniform Blocks
-		inline glUniformBlock   GetUniformBlock(const std::string& name)
+		inline const glUniformBlock& GetUniformBlock(const std::string& name) const
 		{
-#if _DEBUG
 			VXL_ASSERT(m_uniformBlocks.find(name) != m_uniformBlocks.end(), "Uniform block does not exist");
-#endif
-			return m_uniformBlocks[name];
+			return m_uniformBlocks.at(name);
 		}
 		inline GLuint			GetUniformBlockCount(void) const
 		{

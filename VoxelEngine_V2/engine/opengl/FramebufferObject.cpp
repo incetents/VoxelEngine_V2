@@ -12,11 +12,11 @@ namespace Vxl
 {
 	GLuint FramebufferObject::m_boundID = 0;
 
-	void FramebufferObject::FBOTexture::load(int Width, int Height)
+	void FramebufferObject::Attachment::load(int Width, int Height)
 	{
 		unload();
 
-		if (m_type == FBORenderType::TEXTURE)
+		if (m_type == Attachment_Type::TEXTURE)
 		{
 			m_texture = new RenderTexture(Width, Height, m_formatType, m_channelType, m_pixelType);
 			glUtil::setGLName(glNameType::TEXTURE, m_texture->GetID(), "FBO_" + m_name + "_Tex_" + m_name);
@@ -31,65 +31,65 @@ namespace Vxl
 		m_empty = false;
 	}
 
-	void FramebufferObject::FBOTexture::unload()
+	void FramebufferObject::Attachment::unload()
 	{
 		if (!m_empty)
 		{
-			if (m_type == FBORenderType::BUFFER)
+			if (m_type == Attachment_Type::BUFFER)
 				delete m_buffer;
-			else if (m_type == FBORenderType::TEXTURE)
+			else if (m_type == Attachment_Type::TEXTURE)
 				delete m_texture;
 
 			m_empty = true;
 		}
 	}
 
-	GLuint FramebufferObject::FBOTexture::GetID(void) const
+	GLuint FramebufferObject::Attachment::GetID(void) const
 	{
-		if (m_type == FBORenderType::BUFFER)
+		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetID();
 
 		return m_texture->GetID();
 	}
-	Format_Type	FramebufferObject::FBOTexture::GetFormatType(void) const
+	Format_Type	FramebufferObject::Attachment::GetFormatType(void) const
 	{
-		if (m_type == FBORenderType::BUFFER)
+		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetFormatType();
 
 		return m_texture->GetFormatType();
 	}
-	Channel_Type FramebufferObject::FBOTexture::GetChannelType(void) const
+	Channel_Type FramebufferObject::Attachment::GetChannelType(void) const
 	{
-		if (m_type == FBORenderType::BUFFER)
+		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetChannelType();
 
 		return m_texture->GetChannelType();
 	}
-	Pixel_Type FramebufferObject::FBOTexture::GetPixelType(void) const
+	Pixel_Type FramebufferObject::Attachment::GetPixelType(void) const
 	{
-		if (m_type == FBORenderType::BUFFER)
+		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetPixelType();
 
 		return m_texture->GetPixelType();
 	}
-	int FramebufferObject::FBOTexture::GetChannelCount(void) const
+	int FramebufferObject::Attachment::GetChannelCount(void) const
 	{
-		if (m_type == FBORenderType::BUFFER)
+		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetChannelCount();
 
 		return m_texture->GetChannelCount();
 	}
 
-	void FramebufferObject::FBOTexture::Bind()
+	void FramebufferObject::Attachment::Bind()
 	{
-		if (m_type == FBORenderType::BUFFER)
+		if (m_type == Attachment_Type::BUFFER)
 			m_buffer->Bind();
 		else
 			m_texture->Bind();
 	}
-	void FramebufferObject::FBOTexture::Unbind()
+	void FramebufferObject::Attachment::Unbind()
 	{
-		if (m_type == FBORenderType::BUFFER)
+		if (m_type == Attachment_Type::BUFFER)
 			m_buffer->Unbind();
 		else
 			m_texture->Unbind();
@@ -233,16 +233,16 @@ namespace Vxl
 	void FramebufferObject::addTexture(
 		const std::string& name,
 		Format_Type FormatType,
-		FBORenderType fboRenderType
+		Attachment_Type fboRenderType
 	)
 	{
 		VXL_ASSERT(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments(), "FBO, too many color attachments");
 		
 		// Create new render texture
-		m_textures.push_back(new FBOTexture(name, fboRenderType, FormatType, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE));
+		m_textures.push_back(new Attachment(name, fboRenderType, FormatType, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE));
 		m_textureCount++;
 	}
-	void FramebufferObject::addDepth(DepthFormat_Type depthFormatType, FBORenderType fboRenderType)
+	void FramebufferObject::addDepth(DepthFormat_Type depthFormatType, Attachment_Type fboRenderType)
 	{
 		VXL_ASSERT(m_depth == nullptr, "FBO, cannot add multiple depth/stencil attachments");
 
@@ -251,7 +251,7 @@ namespace Vxl
 		Channel_Type ChannelType;
 		glUtil::getPixelChannelData(depthFormatType, ChannelType, PixelType);
 
-		m_depth = new FBOTexture("depth", fboRenderType, (Format_Type)depthFormatType, ChannelType, PixelType);
+		m_depth = new Attachment("depth", fboRenderType, (Format_Type)depthFormatType, ChannelType, PixelType);
 	}
 
 	void FramebufferObject::bind()

@@ -32,8 +32,7 @@ namespace Vxl
 		int			 m_channelCount;
 		Texture_Type m_type;
 		Wrap_Mode	 m_wrapMode;
-		Min_Filter   m_minFilter;
-		Mag_Filter   m_magFilter;
+		Filter_Mode  m_filterMode;
 		Format_Type  m_formatType;
 		Channel_Type m_channelType;
 		Pixel_Type	 m_pixelType;
@@ -55,8 +54,7 @@ namespace Vxl
 		BaseTexture(
 			Texture_Type Type,
 			Wrap_Mode WrapMode = Wrap_Mode::REPEAT,
-			Min_Filter MinFilter = Min_Filter::LINEAR,
-			Mag_Filter MagFilter = Mag_Filter::LINEAR,
+			Filter_Mode FilterMode = Filter_Mode::LINEAR,
 			Format_Type FormatType = Format_Type::RGBA8,
 			Channel_Type ChannelType = Channel_Type::RGBA,
 			Pixel_Type PixelType = Pixel_Type::UNSIGNED_BYTE,
@@ -70,7 +68,7 @@ namespace Vxl
 		void Unbind() const;
 
 		void setWrapMode(Wrap_Mode W);
-		void setFilterMode(Min_Filter Min, Mag_Filter Mag);
+		void setFilterMode(Filter_Mode filter);
 		void setAnistropicMode(Anisotropic_Mode Anso);
 		// only works if min filter is [clamp to border]
 		void setBorderColor(Color4F color);
@@ -103,13 +101,9 @@ namespace Vxl
 		{
 			return m_wrapMode;
 		}
-		inline Min_Filter GetFilterModeMin(void) const
+		inline Filter_Mode GetFilterMode(void) const
 		{
-			return m_minFilter;
-		}
-		inline Mag_Filter GetFilterModeMag(void) const
-		{
-			return m_magFilter;
+			return m_filterMode;
 		}
 		inline Format_Type GetFormatType(void) const
 		{

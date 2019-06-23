@@ -408,4 +408,9 @@ namespace Vxl
 		// update bound program
 		ShaderProgram::m_boundID = 0;
 	}
+
+	UINT ShaderProgram::GetBoundProgram(void)
+	{
+		return m_boundID;
+	}
 }

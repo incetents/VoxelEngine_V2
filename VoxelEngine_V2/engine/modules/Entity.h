@@ -11,7 +11,6 @@
 namespace Vxl
 {
 	class Mesh;
-	class Material;
 	class ShaderProgram;
 
 	enum class EntityType

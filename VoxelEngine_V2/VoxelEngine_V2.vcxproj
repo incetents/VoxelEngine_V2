@@ -104,7 +104,6 @@
     <ClInclude Include="engine\objects\GameObject.h" />
     <ClInclude Include="engine\modules\Layer.h" />
     <ClInclude Include="engine\modules\Material.h" />
-    <ClInclude Include="engine\modules\MaterialPackage.h" />
     <ClInclude Include="engine\modules\RenderManager.h" />
     <ClInclude Include="engine\modules\Scene.h" />
     <ClInclude Include="engine\opengl\Debug.h" />

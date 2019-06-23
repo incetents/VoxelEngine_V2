@@ -254,6 +254,38 @@ namespace Vxl
 #endif
 	}
 
+	// Check if string name matches GL type
+	bool glUtil::VeryifyDataType(const std::string& name, GLenum type)
+	{
+		// Bool
+		if (name.compare("bool") == 0 && type == GL_BOOL)
+			return true;
+		// Float
+		if (name.compare("float") == 0 && type == GL_FLOAT)
+			return true;
+		// Vec2
+		if (name.compare("class Vxl::Vector2") == 0 && type == GL_FLOAT_VEC2)
+			return true;
+		// Vec3 - Color3F
+		if ((name.compare("class Vxl::Vector3") == 0 || name.compare("class Vxl::Color3F") == 0) && type == GL_FLOAT_VEC3)
+			return true;
+		// Vec4
+		if ((name.compare("class Vxl::Vector4") == 0 || name.compare("class Vxl::Color4F") == 0) && type == GL_FLOAT_VEC4)
+			return true;
+		// Mat2
+		if (name.compare("class Vxl::Matrix2x2") == 0 && type == GL_FLOAT_MAT2)
+			return true;
+		// Mat3
+		if (name.compare("class Vxl::Matrix3x3") == 0 && type == GL_FLOAT_MAT3)
+			return true;
+		// Mat4
+		if (name.compare("class Vxl::Matrix4x4") == 0 && type == GL_FLOAT_MAT4)
+			return true;
+
+		VXL_ASSERT(false, "Could not verify GLSL Data Type");
+		return false;
+	}
+
 	// Set OpenGL Name
 	void glUtil::setGLName(glNameType identifier, GLuint id, const std::string &label)
 	{

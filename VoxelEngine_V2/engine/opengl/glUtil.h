@@ -64,6 +64,9 @@ namespace Vxl
 		static bool UsingErrorCallback = false;
 		void initOpenglErrorCallback();
 
+		// Check if string name matches GL type
+		bool VeryifyDataType(const std::string& name, GLenum type);
+
 		// Set OpenGL Name
 		static int GLNameMaxLength = -1;
 		void setGLName(glNameType identifier, GLuint name, const std::string &label);

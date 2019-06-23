@@ -32,9 +32,11 @@ void AssertFail(const std::string& message, const std::string& title);
 // ~~~ //
 #define VXL_ASSERT(expression, message) if(!(expression)) { Logger.error(message);\
 AssertFail(#message ## "\n\nFunction: " + std::string(__FUNCSIG__) + "\nLine: " + std::to_string(__LINE__) + "\n\nFile:\n" + std::string(__FILE__), "Assert Failed"); }
+#define VXL_RETURN_ON_FAIL(expression) if(!(expression)) { return; }
 //
 #else
 // ~~~ //
 #define VXL_ASSERT(expression, message) __noop
+#define VXL_RETURN_ON_FAIL(expression) __noop
 //
 #endif

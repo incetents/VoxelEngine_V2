@@ -81,7 +81,9 @@ namespace Vxl
 		inline const HANDLE getHandle() const { return m_ConsoleHandle;}
 
 		void log	(const std::string& msg) { AddMessage(msg); }
-		void error	(const std::string& msg) { AddMessage(msg, LogType::Error, ConsoleColor::DARK_RED); }
+		void error	(const std::string& msg) {
+			AddMessage(msg, LogType::Error, ConsoleColor::DARK_RED);
+		}
 
 	} SingletonInstance(Logger);
 

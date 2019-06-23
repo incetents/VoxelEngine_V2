@@ -39,19 +39,19 @@ billboard 			billboard_vert				billboard_frag
 
 //----------------------------------------
 #TEXTURE
-// order: [Name] [FilePath] [WrapMode =repeat] [FilterModeMin =linear] [FilterModeMag =linear] [FlipY =true] [MipMapping =true] [Anisotropic =HIGH]
+// order: [Name] [FilePath] [WrapMode =repeat] [FilterMode =linear] [FlipY =true] [MipMapping =true] [Anisotropic =HIGH]
 //
 // [WrapMode] = REPEAT | CLAMP_BORDER | CLAMP_STRETCH | MIRROR_REPEAT |
-// [FilterModeMin] = NEAREST | LINEAR
-// [FilterModeMag] = NEAREST | LINEAR | NEAREST_NEAREST | LINEAR_NEAREST | NEAREST_LINEAR | LINEAR_LINEAR
+// [FilterMode] = NEAREST | LINEAR
 // [FlipY] = YES_FLIP | NO_FLIP
 // [MipMapping] = YES_MIPMAP | NO_MIPMAP
 // [Anisotropic] = NONE | LOW | MEDIUM | HIGH
 
-grid_test			./assets/textures/grid_test.png 		DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT
+grid_test			./assets/textures/grid_test.png 
+checkerboard 		./assets/textures/checkerboard.jpg 
 beato				./assets/textures/beato.png
 crate_diffuse		./assets/textures/crate_diffuse.png
-TextureAtlas		./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 	NEAREST	 NEAREST
+TextureAtlas		./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 	NEAREST
 editor_camera 		./assets/textures/editor_camera.png		CLAMP_STRETCH
 editor_lightbulb 	./assets/textures/editor_lightbulb.png	CLAMP_STRETCH
 

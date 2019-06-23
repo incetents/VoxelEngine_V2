@@ -3,12 +3,14 @@
 
 #include "../utilities/singleton.h"
 #include "../utilities/Macros.h"
-#include <unordered_map>
 
 #include "../math/Vector2.h"
 #include "../math/Vector3.h"
 #include "../math/Vector4.h"
 #include "../math/Color.h"
+
+#include <map>
+#include <utility>
 
 namespace Vxl
 {
@@ -22,100 +24,110 @@ namespace Vxl
 #ifdef GLOBAL_IMGUI
 	private:
 		// custom data
-		std::unordered_map<std::string, bool> m_bools;
-		std::unordered_map<std::string, int> m_integers;
-		std::unordered_map<std::string, float> m_floats;
-		std::unordered_map<std::string, double> m_doubles;
-		std::unordered_map<std::string, Vector2> m_vec2;
-		std::unordered_map<std::string, Vector3> m_vec3;
-		std::unordered_map<std::string, Vector4> m_vec4;
-		std::unordered_map<std::string, Color3F> m_color3;
-		std::unordered_map<std::string, Color4F> m_color4;
+		std::map<std::string, bool> m_bools;
+		std::map<std::string, int> m_integers;
+		std::map<std::string, float> m_floats;
+		std::map<std::string, double> m_doubles;
+		std::map<std::string, Vector2> m_vec2;
+		std::map<std::string, Vector3> m_vec3;
+		std::map<std::string, Vector4> m_vec4;
+		std::map<std::string, Color3F> m_color3;
+		std::map<std::string, Color4F> m_color4;
+
+		std::map<std::string, std::pair<bool, std::string>> m_display_values;
 
 		// Menu Mode
 		enum class MenuState
 		{
 			MASTER,
-			CUSTOM_VALUES
+			CUSTOM_VALUES,
+			STATISTICS
 		};
 		MenuState m_State = MenuState::MASTER;
 		// Draw Menu Section
 		void Draw_Master(Scene* scene);
 		void Draw_CustomValues();
+		void Draw_Statistics();
 	public:
 
 		// custom data
 		bool	GetBool(const std::string& str, bool _default)
 		{
-			if (DevConsole::instanceRef.m_bools.find(str) == DevConsole::instanceRef.m_bools.end())
-				DevConsole::instanceRef.m_bools[str] = _default;
+			if (m_bools.find(str) == m_bools.end())
+				m_bools[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_bools.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many bools in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_bools[str];
+			VXL_ASSERT(m_bools.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many bools in Custom Data"); // in case something went wrong
+			return m_bools[str];
 		}
 		int		GetInt(const std::string& str, int _default)
 		{
-			if (DevConsole::instanceRef.m_integers.find(str) == DevConsole::instanceRef.m_integers.end())
-				DevConsole::instanceRef.m_integers[str] = _default;
+			if (m_integers.find(str) == m_integers.end())
+				m_integers[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_integers.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many integers in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_integers[str];
+			VXL_ASSERT(m_integers.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many integers in Custom Data"); // in case something went wrong
+			return m_integers[str];
 		}
 		float	GetFloat(const std::string& str, float _default)
 		{
-			if (DevConsole::instanceRef.m_floats.find(str) == DevConsole::instanceRef.m_floats.end())
-				DevConsole::instanceRef.m_floats[str] = _default;
+			if (m_floats.find(str) == m_floats.end())
+				m_floats[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_floats.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many floats in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_floats[str];
+			VXL_ASSERT(m_floats.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many floats in Custom Data"); // in case something went wrong
+			return m_floats[str];
 		}
 		double	GetDouble(const std::string& str, double _default)
 		{
-			if (DevConsole::instanceRef.m_doubles.find(str) == DevConsole::instanceRef.m_doubles.end())
-				DevConsole::instanceRef.m_doubles[str] = _default;
+			if (m_doubles.find(str) == m_doubles.end())
+				m_doubles[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_doubles.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many doubles in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_doubles[str];
+			VXL_ASSERT(m_doubles.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many doubles in Custom Data"); // in case something went wrong
+			return m_doubles[str];
 		}
 		Vector2 GetVec2(const std::string& str, Vector2 _default)
 		{
-			if (DevConsole::instanceRef.m_vec2.find(str) == DevConsole::instanceRef.m_vec2.end())
-				DevConsole::instanceRef.m_vec2[str] = _default;
+			if (m_vec2.find(str) == m_vec2.end())
+				m_vec2[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_vec2.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec2s in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_vec2[str];
+			VXL_ASSERT(m_vec2.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec2s in Custom Data"); // in case something went wrong
+			return m_vec2[str];
 		}
 		Vector3 GetVec3(const std::string& str, Vector3 _default)
 		{
-			if (DevConsole::instanceRef.m_vec3.find(str) == DevConsole::instanceRef.m_vec3.end())
-				DevConsole::instanceRef.m_vec3[str] = _default;
+			if (m_vec3.find(str) == m_vec3.end())
+				m_vec3[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_vec3.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec3s in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_vec3[str];
+			VXL_ASSERT(m_vec3.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec3s in Custom Data"); // in case something went wrong
+			return m_vec3[str];
 		}
 		Vector4 GetVec4(const std::string& str, Vector4 _default)
 		{
-			if (DevConsole::instanceRef.m_vec4.find(str) == DevConsole::instanceRef.m_vec4.end())
-				DevConsole::instanceRef.m_vec4[str] = _default;
+			if (m_vec4.find(str) == m_vec4.end())
+				m_vec4[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_vec4.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec4s in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_vec4[str];
+			VXL_ASSERT(m_vec4.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec4s in Custom Data"); // in case something went wrong
+			return m_vec4[str];
 		}
 		Color3F GetColor3(const std::string& str, Color3F _default)
 		{
-			if (DevConsole::instanceRef.m_color3.find(str) == DevConsole::instanceRef.m_color3.end())
-				DevConsole::instanceRef.m_color3[str] = _default;
+			if (m_color3.find(str) == m_color3.end())
+				m_color3[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_color3.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many Color3s in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_color3[str];
+			VXL_ASSERT(m_color3.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many Color3s in Custom Data"); // in case something went wrong
+			return m_color3[str];
 		}
 		Color4F GetColor4(const std::string& str, Color4F _default)
 		{
-			if (DevConsole::instanceRef.m_color4.find(str) == DevConsole::instanceRef.m_color4.end())
-				DevConsole::instanceRef.m_color4[str] = _default;
+			if (m_color4.find(str) == m_color4.end())
+				m_color4[str] = _default;
 
-			VXL_ASSERT(DevConsole::instanceRef.m_color4.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many Color4s in Custom Data"); // in case something went wrong
-			return DevConsole::instanceRef.m_color4[str];
+			VXL_ASSERT(m_color4.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many Color4s in Custom Data"); // in case something went wrong
+			return m_color4[str];
+		}
+
+		// display data
+		inline void ShowFloat(const std::string& name, float _value)
+		{
+			m_display_values[name] = std::pair<bool, std::string>(true, std::to_string(_value));
 		}
 
 #define DEVCONSOLE_GET_BOOL(x, y) DevConsole.GetBool(x, y)

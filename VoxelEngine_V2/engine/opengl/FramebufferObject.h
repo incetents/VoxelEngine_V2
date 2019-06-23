@@ -17,7 +17,7 @@ namespace Vxl
 	class RenderBuffer;
 	class RenderTexture;
 
-	enum class FBORenderType
+	enum class Attachment_Type
 	{
 		BUFFER,
 		TEXTURE
@@ -27,21 +27,21 @@ namespace Vxl
 	{
 		friend class RenderManager;
 	private:
-		class FBOTexture
+		class Attachment
 		{
-			FBORenderType	m_type;
+			Attachment_Type	m_type;
 			bool			m_empty = true;
 		public:
-			FBOTexture(
+			Attachment(
 				const std::string& name,
-				FBORenderType type,
+				Attachment_Type type,
 				Format_Type formatType,
 				Channel_Type channelType,
 				Pixel_Type pixelType
 			)
 				: m_name(name), m_type(type), m_formatType(formatType), m_channelType(channelType), m_pixelType(pixelType)
 			{}
-			~FBOTexture()
+			~Attachment()
 			{
 				unload();
 			}
@@ -51,6 +51,7 @@ namespace Vxl
 			const Channel_Type	m_channelType;
 			const Pixel_Type	m_pixelType;
 
+			// Attachment can only be one type
 			union
 			{
 				RenderTexture* m_texture;
@@ -62,11 +63,11 @@ namespace Vxl
 
 			inline bool isRenderTexture(void) const
 			{
-				return m_type == FBORenderType::TEXTURE;
+				return m_type == Attachment_Type::TEXTURE;
 			}
 			inline bool isRenderBuffer(void) const
 			{
-				return m_type == FBORenderType::BUFFER;
+				return m_type == Attachment_Type::BUFFER;
 			}
 
 			GLuint			GetID(void) const;
@@ -88,9 +89,9 @@ namespace Vxl
 		UINT	m_height = 0;
 		bool	m_fullscreen = false; // Width/Height will attempt to match screen's resolution
 		// Attachments
-		std::vector<FBOTexture*>	m_textures;
+		std::vector<Attachment*>	m_textures;
 		GLuint						m_textureCount = 0;
-		FBOTexture*					m_depth = nullptr;
+		Attachment*					m_depth = nullptr;
 		// Tracker //
 		static GLuint m_boundID;
 
@@ -151,11 +152,11 @@ namespace Vxl
 		void addTexture(
 			const std::string& name,
 			Format_Type FormatType		= Format_Type::RGBA8,
-			FBORenderType fboRenderType = FBORenderType::TEXTURE
+			Attachment_Type fboRenderType = Attachment_Type::TEXTURE
 		);
 		void addDepth(
 			DepthFormat_Type depthFormatType,
-			FBORenderType fboRenderType
+			Attachment_Type fboRenderType
 		);
 
 		void bind();

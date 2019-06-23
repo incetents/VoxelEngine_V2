@@ -10,7 +10,7 @@ namespace Vxl
 		Channel_Type m_channelType,
 		Pixel_Type PixelType
 	)
-		: BaseTexture(Texture_Type::TEX_2D, Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST, FormatType, m_channelType, PixelType, Anisotropic_Mode::NONE, false)
+		: BaseTexture(Texture_Type::TEX_2D, Wrap_Mode::CLAMP_STRETCH, Filter_Mode::NEAREST, FormatType, m_channelType, PixelType, Anisotropic_Mode::NONE, false)
 	{
 		m_width = Width;
 		m_height = Height;

@@ -23,8 +23,7 @@ namespace Vxl
 			bool			InvertY = true,
 			bool			UseMipMapping = true,
 			Wrap_Mode		WrapMode = Wrap_Mode::REPEAT,
-			Min_Filter		MinFilter = Min_Filter::LINEAR_MIPMAP_LINEAR,
-			Mag_Filter		MagFilter = Mag_Filter::LINEAR,
+			Filter_Mode		FilterMode = Filter_Mode::LINEAR,
 			Format_Type		FormatType = Format_Type::RGBA8,
 			Pixel_Type		PixelType = Pixel_Type::UNSIGNED_BYTE,
 			Anisotropic_Mode AnisotropicMode = Anisotropic_Mode::NONE
@@ -38,8 +37,7 @@ namespace Vxl
 			bool InvertY = false,
 			bool UseMipMapping = true,
 			Wrap_Mode WrapMode = Wrap_Mode::CLAMP_STRETCH,
-			Min_Filter MinFilter = Min_Filter::LINEAR,
-			Mag_Filter MagFilter = Mag_Filter::LINEAR,
+			Filter_Mode		FilterMode = Filter_Mode::LINEAR,
 			Format_Type		FormatType = Format_Type::RGBA8,
 			Pixel_Type		PixelType = Pixel_Type::UNSIGNED_BYTE,
 			Anisotropic_Mode AnisotropicMode = Anisotropic_Mode::NONE

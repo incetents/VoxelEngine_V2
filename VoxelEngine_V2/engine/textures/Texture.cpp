@@ -18,14 +18,13 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Min_Filter		MinFilter,
-		Mag_Filter		MagFilter,
+		Filter_Mode		FilterMode,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
 		Pixel_Type		PixelType,
 		Anisotropic_Mode  AnisotropicMode
 	)
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
 	{
 		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 
@@ -61,14 +60,13 @@ namespace Vxl
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Min_Filter		MinFilter,
-		Mag_Filter		MagFilter,
+		Filter_Mode		FilterMode,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
 		Pixel_Type		PixelType,
 		Anisotropic_Mode  AnisotropicMode
 	) 
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
+		: BaseTexture(Texture_Type::TEX_2D, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
 	{
 
 		UINT pixelsCount = (UINT)pixels.size();
@@ -108,14 +106,13 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Min_Filter		MinFilter,
-		Mag_Filter		MagFilter,
+		Filter_Mode		FilterMode,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
 		Pixel_Type		PixelType,
 		Anisotropic_Mode  AnisotropicMode
 	) {
-		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode);
+		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
 		AddToDatabase(name, _texture);
 
@@ -134,14 +131,13 @@ namespace Vxl
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Min_Filter		MinFilter,
-		Mag_Filter		MagFilter,
+		Filter_Mode		FilterMode,
 		Format_Type		FormatType,
 		Channel_Type	ChannelType,
 		Pixel_Type		PixelType,
 		Anisotropic_Mode  AnisotropicMode
 	) {
-		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, ChannelType, PixelType, AnisotropicMode);
+		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
 		AddToDatabase(name, _texture);
 

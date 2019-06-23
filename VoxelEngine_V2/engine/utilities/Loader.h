@@ -7,8 +7,7 @@
 namespace Vxl
 {
 	enum class Wrap_Mode;
-	enum class Min_Filter;
-	enum class Mag_Filter;
+	enum class Filter_Mode;
 	enum class ShaderType;
 	enum class Anisotropic_Mode : GLubyte;
 
@@ -48,10 +47,6 @@ namespace Vxl
 
 		static const std::string TAG_FILTERMODE_NEAREST;
 		static const std::string TAG_FILTERMODE_LINEAR;
-		static const std::string TAG_FILTERMODE_NEAREST_NEAREST;
-		static const std::string TAG_FILTERMODE_LINEAR_NEAREST;
-		static const std::string TAG_FILTERMODE_NEAREST_LINEAR;
-		static const std::string TAG_FILTERMODE_LINEAR_LINEAR;
 
 		static const std::string TAG_FLIP_TRUE;
 		static const std::string TAG_MIPMAP_TRUE;
@@ -65,8 +60,7 @@ namespace Vxl
 		static const std::string TAG_HIGH;
 
 		static Wrap_Mode DecipherWrapMode(const std::string& str);
-		static Min_Filter DecipherFilterModeMin(const std::string& str);
-		static Mag_Filter DecipherFilterModeMag(const std::string& str);
+		static Filter_Mode DecipherFilterMode(const std::string& str);
 		static ShaderType DeciperShaderType(const std::string& str);
 		static bool DecipherFlipType(const std::string& str);
 		static bool DecipherMipMapType(const std::string& str);

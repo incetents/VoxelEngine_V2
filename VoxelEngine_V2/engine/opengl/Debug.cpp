@@ -203,7 +203,7 @@ namespace Vxl
 		pixels.push_back(Color3F::PURPLE);
 
 		m_null_texture = Texture::CreateCustom("null", pixels, 4, true,
-			Wrap_Mode::CLAMP_STRETCH, Min_Filter::NEAREST, Mag_Filter::NEAREST,
+			Wrap_Mode::CLAMP_STRETCH, Filter_Mode::NEAREST,
 			Format_Type::RGB8, Channel_Type::RGB, Pixel_Type::UNSIGNED_BYTE
 		);
 

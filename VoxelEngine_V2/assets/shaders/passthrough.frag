@@ -21,7 +21,7 @@ layout (binding = 0) uniform sampler2D texture1;
 
 // Uniforms
 uniform bool VXL_useTexture = true;
-uniform vec4 VXL_color = vec4(1,1,1,1);
+uniform vec3 VXL_color = vec3(1,1,1);
 
 //Main
 void main()
@@ -32,7 +32,7 @@ void main()
 		output_albedo = tex1;
 	}
 	else
-		output_albedo = VXL_color;
+		output_albedo = vec4(VXL_color, 1);
 		
 	output_normal = vec4(0,0,1,1);
 }

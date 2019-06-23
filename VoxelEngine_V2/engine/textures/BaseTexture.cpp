@@ -36,25 +36,41 @@ namespace Vxl
 
 		glBindTexture(Target, m_id);
 
+		// Wrapping
 		glTexParameteri(Target, GL_TEXTURE_WRAP_S, (GLenum)m_wrapMode);
 		glTexParameteri(Target, GL_TEXTURE_WRAP_T, (GLenum)m_wrapMode);
 
-		glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, (GLenum)m_minFilter);
-		glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, (GLenum)m_magFilter);
-
 		if (m_wrapMode == Wrap_Mode::CLAMP_BORDER)
 			glTexParameterfv(Target, GL_TEXTURE_BORDER_COLOR, &(m_borderColor[0]));
+
+		// Mag Filter
+		glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, (GLenum)m_filterMode);
+
+		// Min Filter
+		if (m_mipMapping)
+		{
+			if(m_filterMode == Filter_Mode::LINEAR)
+				glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			else
+				glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+			// Unused Options
+			// GL_LINEAR_MIPMAP_NEAREST
+			// GL_NEAREST_MIPMAP_LINEAR
+		}
+		else
+			glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, (GLenum)m_filterMode);
 
 		// Anistropic Mode cnanot be larger than Maximum given size
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, min(glInfo.MAX_ANISOTROPY, (float)m_anisotropicMode));
 	}
 	void BaseTexture::updateStorage()
 	{
-		glTexStorage2D(GL_TEXTURE_2D, 1, (GLenum)m_formatType, m_width, m_height);
+		glTexStorage2D(GL_TEXTURE_2D, m_mipMapping ? 3 : 1, (GLenum)m_formatType, m_width, m_height);
 	}
 	void BaseTexture::updateStorage(const GLvoid* pixels)
 	{
-		glTexStorage2D(GL_TEXTURE_2D, 1, (GLenum)m_formatType, m_width, m_height);
+		glTexStorage2D(GL_TEXTURE_2D, m_mipMapping ? 3 : 1, (GLenum)m_formatType, m_width, m_height);
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, (GLenum)m_channelType, (GLenum)m_pixelType, pixels);
 
@@ -77,8 +93,7 @@ namespace Vxl
 	BaseTexture::BaseTexture(
 		Texture_Type Type,
 		Wrap_Mode WrapMode,
-		Min_Filter MinFilter,
-		Mag_Filter MagFilter,
+		Filter_Mode FilterMode,
 		Format_Type FormatType,
 		Channel_Type ChannelType,
 		Pixel_Type PixelType,
@@ -87,8 +102,7 @@ namespace Vxl
 	)
 		: m_type(Type),
 		m_wrapMode(WrapMode),
-		m_minFilter(MinFilter),
-		m_magFilter(MagFilter),
+		m_filterMode(FilterMode),
 		m_formatType(FormatType),
 		m_channelType(ChannelType),
 		m_pixelType(PixelType),
@@ -146,10 +160,9 @@ namespace Vxl
 
 		updateParameters();
 	}
-	void BaseTexture::setFilterMode(Min_Filter Min, Mag_Filter Mag)
+	void BaseTexture::setFilterMode(Filter_Mode filter)
 	{
-		m_minFilter = Min;
-		m_magFilter = Mag;
+		m_filterMode = filter;
 
 		updateParameters();
 	}

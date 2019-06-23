@@ -20,6 +20,8 @@
 #include "../objects/LightObject.h"
 #include "../objects/CameraObject.h"
 
+#include "../editor/DevConsole.h"
+
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
 #endif
@@ -80,15 +82,13 @@ namespace Vxl
 				if (Util::IsInVector(m_allGameObjects, _GameObject))
 					return;
 
-				// Key
-				auto Key = _GameObject->GetMaterialOrder();
+				if (_GameObject->GetMaterial() != nullptr)
+				{
+					auto key = _GameObject->GetMaterial();
 
-				// New Material = New Set
-				if (m_gbufferObjects.find(Key) == m_gbufferObjects.end())
-					m_gbufferObjects[Key] = std::make_pair(_GameObject->GetMaterial(), std::set<GameObject*>());
+					m_gameObjectsPerMaterial[key].insert(_GameObject);
+				}
 
-				// Add
-				m_gbufferObjects[Key].second.insert(_GameObject);
 				m_allGameObjects.push_back(_GameObject);
 				m_allEntities.push_back(_entity);
 
@@ -139,8 +139,9 @@ namespace Vxl
 				// Makes sure entity has a material/shader
 				if (_GameObject->GetMaterial())
 				{
-					// Remove from Material Render
-					m_gbufferObjects[_GameObject->GetMaterialOrder()].second.erase(_GameObject);
+					auto key = _GameObject->GetMaterial();
+
+					m_gameObjectsPerMaterial[key].erase(_GameObject);
 				}
 
 				// Remove
@@ -201,7 +202,7 @@ namespace Vxl
 
 		auto Materials = Material::GetDatabase();
 		for (auto Mat : Materials)
-			Mat.second->UpdateMaterialPackages();
+			Mat.second->UpdateProperties();
 	}
 	void RenderManager::ReloadWindow()
 	{
@@ -254,6 +255,17 @@ namespace Vxl
 		Material::DeleteAndClearAll();
 		Entity::DeleteAndClearAll();
 
+		Material::m_masterOrder.clear();
+		Material::m_masterOrderDirty = true;
+
+		// Clear Render List
+		m_allEntities.clear();
+		m_allGameObjects.clear();
+		m_allLightObjects.clear();
+
+		m_gameObjectsPerMaterial.clear();
+		m_gameObjectsSorted.clear();
+
 		// Clear Shader Error Log
 		Shader::ShaderErrorLog.clear();
 		Shader::ShaderErrorLogSize = 0;
@@ -272,11 +284,6 @@ namespace Vxl
 
 		// Delete Meshes
 		Mesh::DeleteAndClearAll();
-
-		// Clear Render List
-		m_allEntities.clear();
-		m_allGameObjects.clear();
-		m_gbufferObjects.clear();
 	}
 	void RenderManager::Update()
 	{
@@ -322,21 +329,54 @@ namespace Vxl
 			Geometry.GetFullTriangle()->Draw();
 	}
 
+	// render all gameobjects with their corresponding materials
 	void RenderManager::RenderSceneGameObjects()
 	{
-		// render all gameobjects with their corresponding materials
-		for (auto renderList = m_gbufferObjects.begin(); renderList != m_gbufferObjects.end(); renderList++)
+		// If material order has been changed, resort them all
+		if (Material::m_masterOrderDirty)
 		{
-			Material* _base = renderList->second.first;
-			_base->Bind();
+			m_gameObjectsSorted.clear();
 
-			std::set<GameObject*> _entites = renderList->second.second;
-
-			for (auto ent : _entites)
+			for (auto renderSet = m_gameObjectsPerMaterial.begin(); renderSet != m_gameObjectsPerMaterial.end(); renderSet++)
 			{
-				if(ent->IsFamilyActive())
+				m_gameObjectsSorted[renderSet->first->GetOrder()] = std::pair<Material*, std::set<GameObject*>>(renderSet->first, renderSet->second);
+			}
+
+			Material::m_masterOrderDirty = false;
+		}
+
+
+		// Map that contains all sets of material/gameobjects in order
+		for (auto renderOrder = m_gameObjectsSorted.begin(); renderOrder != m_gameObjectsSorted.end(); renderOrder++)
+		{
+			// Set of material/gameobjects
+			auto materialSet = renderOrder->second;
+
+			// Get Material for binding
+			Material* material = materialSet.first;
+			VXL_ASSERT(material, "Storing nullptr in renderSet");
+			material->Bind();
+
+			// Get GameObject for rendering
+			std::set<GameObject*> entites = materialSet.second;
+
+			for (auto& ent : entites)
+			{
+				if (ent->IsFamilyActive())
 					ent->Draw();
 			}
+
+
+			//	Material* _base = renderList->second.first;
+			//	_base->Bind();
+			//	
+			//	std::set<GameObject*> _entites = renderList->second.second;
+			//	
+			//	for (auto ent : _entites)
+			//	{
+			//		if(ent->IsFamilyActive())
+			//			ent->Draw();
+			//	}
 		}
 	}
 	void RenderManager::RenderEditorObjects()
@@ -386,7 +426,13 @@ namespace Vxl
 		));
 
 		lines->SetUniform<bool>("passthrough", false);
+
+		glUtil::depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
 		Debug.RenderWorldLines();
+
+		//glUtil::depthTest(Depth_Pass_Rule::GREATER);
+		// ???
+
 		lines->SetUniform<bool>("passthrough", true);
 		Debug.RenderScreenLines();
 
@@ -462,17 +508,36 @@ namespace Vxl
 				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 1, 1, 0.85f));
 				Geometry.GetCubeSmall()->Draw();
 
-				//	// X Plane
-				//	simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 0.5f));
-				//	Geometry.GetQuadX()->Draw();
-				//	
-				//	// Y Plane
-				//	simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 0.5f));
-				//	Geometry.GetQuadY()->Draw();
-				//	
-				//	// Z Plane
-				//	simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 0.5f));
-				//	Geometry.GetQuadZ()->Draw();
+				glUtil::cullMode(Cull_Type::NO_CULL);
+
+				Vector3 SelectionTransformToCamera = (m_mainCamera->m_transform.getWorldPosition() - Editor.GetSelectionTransformWorldPosition());
+
+				bool CamOnXAxis = SelectionTransformToCamera.Dot(Editor.GetSelectionTransformRight()) > 0.0f;
+				bool CamOnYAxis = SelectionTransformToCamera.Dot(Editor.GetSelectionTransformUp()) > 0.0f;
+				bool CamOnZAxis = SelectionTransformToCamera.Dot(Editor.GetSelectionTransformForward()) > 0.0f;
+
+				// X Plane Position
+				Matrix4x4 Offset = Matrix4x4::GetTranslate(Vector3(0, CamOnYAxis ? 0.25f : -0.25f, CamOnZAxis ? 0.25f : -0.25f));
+				simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel() * Offset, true);
+				// X Plane
+				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 0.85f));
+				Geometry.GetHalfQuadX()->Draw();
+				
+				// Y Plane Position
+				Offset = Matrix4x4::GetTranslate(Vector3(CamOnXAxis ? 0.25f : -0.25f, 0, CamOnZAxis ? 0.25f : -0.25f));
+				simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel() * Offset, true);
+				// Y Plane
+				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 0.85f));
+				Geometry.GetHalfQuadY()->Draw();
+				
+				// Z Plane Position
+				Offset = Matrix4x4::GetTranslate(Vector3(CamOnXAxis ? 0.25f : -0.25f, CamOnYAxis ? 0.25f : -0.25f, 0));
+				simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel() * Offset, true);
+				// Z Plane
+				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 0.85f));
+				Geometry.GetHalfQuadZ()->Draw();
+
+				glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
 
 			}
 			// TEST //

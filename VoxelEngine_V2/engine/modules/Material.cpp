@@ -18,12 +18,14 @@
 
 namespace Vxl
 {
-	Material* Material::Create(
-		const std::string& _name,
-		ShaderProgram* _shader,
-		UINT _order
-	){
-		Material* _material = new Material(_name, _shader, _order);
+	// Static
+	std::map<UINT, Material*> Material::m_masterOrder;
+	bool Material::m_masterOrderDirty = false;
+
+	// Database Creation
+	Material* Material::Create(const std::string& _name, UINT _order)
+	{
+		Material* _material = new Material(_name, _order);
 
 		AddToDatabase(_name, _material);
 		Message_Created(_name, _material);
@@ -31,10 +33,30 @@ namespace Vxl
 		return _material;
 	}
 
+	void Material::UpdateProperties()
+	{
+		VXL_ASSERT(m_shaderProgram, "Material has no Program");
+
+		m_property_useModel.AcquireUniform(*m_shaderProgram);
+		m_property_model.AcquireUniform(*m_shaderProgram);
+		m_property_useInstancing.AcquireUniform(*m_shaderProgram);
+		m_property_useColor.AcquireUniform(*m_shaderProgram);
+		m_property_color.AcquireUniform(*m_shaderProgram);
+		m_property_tint.AcquireUniform(*m_shaderProgram);
+	}
+
+	// Setters
+	void Material::SetProgram(const ShaderProgram& _program)
+	{
+		m_shaderProgram = &_program;
+
+		UpdateProperties();
+	}
+
+	// Bind
 	void Material::Bind()
 	{
-		if (!m_shaderProgram)
-			return;
+		VXL_ASSERT(m_shaderProgram, "Material missing Shader Program");
 
 		// Bind Shader
 		m_shaderProgram->Bind();
@@ -51,152 +73,36 @@ namespace Vxl
 		glUtil::depthState(m_DepthRead);
 		glUtil::depthMask(m_DepthWrite);
 		glUtil::wireframe(m_Wireframe);
+
+		//	// Bind Textures (ignore if wireframe mode is ON)
+		//	if (m_Wireframe == false)
+		//	{
+		//		// Null Texture if no textures are used
+		//		if (m_textureCount == 0)
+		//		{
+		//			// Bind null texture on first active layer
+		//			Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+		//		}
+		//		else
+		//		{
+		//			for (auto it = m_textures.begin(); it != m_textures.end(); it++)
+		//			{
+		//				// Get Current texture
+		//				BaseTexture* _tex = m_textures[it->first];
+		//	
+		//				// Bind Null texture if texture isn't loaded
+		//				if (_tex == nullptr || !_tex->IsLoaded())
+		//				{
+		//					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+		//				}
+		//				// Bind texture normally
+		//				else
+		//				{
+		//					_tex->Bind(it->first);
+		//				}
+		//			}
+		//		}
+		//	}
 	}
 
-	void Material::UpdateMaterialPackages()
-	{
-		Mat_useModel.GetUniform(m_shaderProgram);
-		Mat_model.GetUniform(m_shaderProgram);
-		Mat_useInstancing.GetUniform(m_shaderProgram);
-		Mat_useColor.GetUniform(m_shaderProgram);
-		Mat_color.GetUniform(m_shaderProgram);
-		Mat_tint.GetUniform(m_shaderProgram);
-	}
-
-	// ~ Material Data ~ //
-
-	void MaterialData::SetMaterial(Material* _material)
-	{
-		if (m_material == _material)
-			return;
-
-		m_material = _material;
-		RemoveAllUniforms();
-	}
-
-	
-
-	MaterialData::~MaterialData()
-	{
-		RemoveAllUniforms();
-	}
-
-	bool MaterialData::CheckUniform(const std::string& uniformName)
-	{
-		// Check if shader contains uniform
-		return (m_material->m_shaderProgram->CheckUniform(uniformName));
-	}
-
-	void MaterialData::RemoveUniform(const std::string& uniformName)
-	{
-		// Check if name exists
-		if (m_packages.find(uniformName) != m_packages.end())
-		{
-			delete m_packages[uniformName];
-			m_packages.erase(uniformName);
-		}
-	}
-
-	void MaterialData::RemoveAllUniforms()
-	{
-		for (auto it = m_packages.begin(); it != m_packages.end(); it++)
-			delete it->second;
-		
-		m_packages.clear();
-	}
-
-	void MaterialData::SetTexture(BaseTexture* tex, Active_Texture level)
-	{
-		VXL_ASSERT((int)level - GL_TEXTURE0 < MAX_MATERIAL_TEXTURES, "Active Texture level higher than allowed maximum");
-		m_textures[(UINT)level - GL_TEXTURE0] = tex;
-		if (tex)
-			m_activeTextures.insert(level);
-		else
-			m_activeTextures.erase(level);
-
-		m_activeTextureCount = (UINT)m_activeTextures.size();
-	}
-
-	void MaterialData::ClearTexture(Active_Texture level)
-	{
-		m_activeTextures.erase(level);
-		m_activeTextureCount = (UINT)m_activeTextures.size();
-	}
-
-	void MaterialData::BindUniforms(GameObject* entity)
-	{
-		VXL_ASSERT(m_material, "Missing Material");
-		// Bind Uniforms for this object
-
-		// ~ Model ~ //
-		if (m_material->Mat_useModel.m_exists)
-		{
-			m_material->Mat_useModel.m_uniform.Set<bool>(m_owner->m_useTransform);
-		}
-		if (m_owner->m_useTransform && m_material->Mat_model.m_exists)
-		{
-			m_material->Mat_model.m_uniform.SetMatrix(m_owner->m_transform.getWorldModel(), true);
-		}
-		// ~ Special Setters ~ //
-		if (m_material->Mat_useInstancing.m_exists)
-		{
-			if (entity->GetMesh())
-				m_material->Mat_useInstancing.m_uniform.Set<bool>(entity->GetMesh()->m_instances.GetDrawCount() > 0 ? true : false);
-			else
-				m_material->Mat_useInstancing.m_uniform.Set<bool>(false);
-		}
-		if (m_material->Mat_useColor.m_exists)
-		{
-			// Color info or wireframe mode will cause color to be used in shader
-			m_material->Mat_useColor.m_uniform.Set<bool>(m_owner->m_isColoredObject || m_material->m_Wireframe);
-			if ((m_owner->m_isColoredObject || m_material->m_Wireframe) && m_material->Mat_color.m_exists)
-				m_material->Mat_color.m_uniform.Set<Color3F>(m_owner->GetColor());
-		}
-		if (m_material->Mat_tint.m_exists)
-		{
-			m_material->Mat_tint.m_uniform.Set<Color3F>(m_owner->GetTint());
-		}
-
-		// Custom Uniforms //
-		for (auto it = m_packages.begin(); it != m_packages.end(); it++)
-		{
-			it->second->SendDataAsUniform();
-		}
-
-	}
-
-	void MaterialData::BindTextures()
-	{
-		VXL_ASSERT(m_material, "Missing Material");
-
-		// Bind Textures (ignore if parameter is OFF or wireframe mode is ON)
-		if (m_material->m_Wireframe == false)
-		{
-			// Null Texture if no textures are used
-			if (!m_activeTextureCount)
-			{
-				// Bind null texture on first active layer
-				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-			}
-			else
-			{
-				for (Active_Texture id : m_activeTextures)
-				{
-					// Get Current texture
-					BaseTexture* _tex = m_textures[(UINT)id - GL_TEXTURE0];
-
-					// Bind Null texture if texture isn't loaded
-					if (_tex == nullptr || !_tex->IsLoaded())
-					{
-						Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-					}
-					// Bind texture normally
-					else
-					{
-						_tex->Bind(id);
-					}
-				}
-			}
-		}
-	}
 }

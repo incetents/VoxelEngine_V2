@@ -336,6 +336,34 @@ namespace Vxl
 
 		ImGui::PopItemWidth();
 	}
+	void DevConsole::Draw_Statistics()
+	{
+		//
+		ImGui::PushItemWidth(-1);
+
+		// Floats
+		ImGui::Text("Statistics:");
+		if (m_display_values.size() > 0)
+		{
+			for (auto it = m_display_values.begin(); it != m_display_values.end(); it++)
+			{
+				ImGui::TextColored(ImGuiColor::Orange, it->first.c_str());	ImGui::SameLine();
+				
+				ImGui::Text(": ");				ImGui::SameLine();
+
+				if (it->second.first)
+					ImGui::Text(it->second.second.c_str());
+				else
+					ImGui::TextColored(ImGuiColor::Grey, it->second.second.c_str());
+			}
+		}
+		else
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
+		ImGui::Separator();
+
+		//
+		ImGui::PopItemWidth();
+	}
 
 	void DevConsole::Draw(Scene* scene)
 	{
@@ -358,6 +386,8 @@ namespace Vxl
 						m_State = MenuState::MASTER;
 					if (ImGui::MenuItem("Custom Values", NULL, m_State == MenuState::CUSTOM_VALUES, m_State != MenuState::CUSTOM_VALUES))
 						m_State = MenuState::CUSTOM_VALUES;
+					if (ImGui::MenuItem("Statistics", NULL, m_State == MenuState::STATISTICS, m_State != MenuState::STATISTICS))
+						m_State = MenuState::STATISTICS;
 
 					ImGui::EndMenu();
 				}
@@ -371,6 +401,9 @@ namespace Vxl
 				break;
 			case MenuState::CUSTOM_VALUES:
 				Draw_CustomValues();
+				break;
+			case MenuState::STATISTICS:
+				Draw_Statistics();
 				break;
 			}
 

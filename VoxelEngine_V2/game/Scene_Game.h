@@ -51,11 +51,10 @@ namespace Vxl
 		FramebufferObject* _fbo_editor;
 		FramebufferObject* _fbo_colorpicker;
 
-		Material* _material_gbuffer;
-		Material* _material_passthrough;
-		Material* _material_skybox;
-		Material* _material_lines;
-		Material* _material_billboard;
+		Material* material_skybox;
+		Material* material_gbuffer;
+		Material* material_passthrough;
+		Material* material_billboard;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

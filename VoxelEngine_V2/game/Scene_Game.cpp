@@ -61,7 +61,7 @@ namespace Vxl
 
 		//_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
 
-		_cameraObject = CameraObject::Create("_camera_editor", 0.01f, 50.0f);
+		_cameraObject = CameraObject::Create("_camera_editor", 0.01f, 5000.0f);
 		_cameraObject->m_transform.setPosition(3.5f, 2.8f, 0.3f);
 		_cameraObject->m_transform.setCameraForward(Vector3(-1, 0, -1));
 		_cameraObject->SetPerspectiveWindowAspect(110.0f);
@@ -89,19 +89,19 @@ namespace Vxl
 		_fbo->addTexture("albedo", Format_Type::R11F_G11F_B10F);
 		_fbo->addTexture("normal", Format_Type::RGBA16_SNORM);
 		_fbo->addTexture("test");
-		_fbo->addDepth(DepthFormat_Type::DEPTH16, FBORenderType::TEXTURE);
+		_fbo->addDepth(DepthFormat_Type::DEPTH16, Attachment_Type::TEXTURE);
 		_fbo->init();
 
 		_fbo_editor = FramebufferObject::Create("EditorPost");
 		_fbo_editor->setSizeToWindowSize();
 		_fbo_editor->addTexture("albedo");
-		_fbo_editor->addDepth(DepthFormat_Type::DEPTH16, FBORenderType::BUFFER);
+		_fbo_editor->addDepth(DepthFormat_Type::DEPTH16, Attachment_Type::BUFFER);
 		_fbo_editor->init();
 
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker");
 		_fbo_colorpicker->setSizeToWindowSize();
 		_fbo_colorpicker->addTexture("color", Format_Type::RGBA8);
-		_fbo_colorpicker->addDepth(DepthFormat_Type::DEPTH16, FBORenderType::BUFFER);
+		_fbo_colorpicker->addDepth(DepthFormat_Type::DEPTH16, Attachment_Type::BUFFER);
 		_fbo_colorpicker->init();
 
 		_shader_skybox				= ShaderProgram::Get("skybox");
@@ -112,14 +112,22 @@ namespace Vxl
 		_shader_showRenderTarget	= ShaderProgram::Get("showRenderTarget");
 		_shader_billboard			= ShaderProgram::Get("billboard");
 
-		_material_skybox			= Material::Create("skybox", _shader_skybox, 0);
-		_material_gbuffer			= Material::Create("gbuffer", _shader_gbuffer, 1);
-		_material_passthrough		= Material::Create("passthrough", _shader_passthrough, 999);
-		_material_billboard			= Material::Create("billboard", _shader_billboard, 4);
 
-		_material_gbuffer->m_BlendState = false;
-		_material_gbuffer->m_BlendSource = Blend_Source::ONE;
-		_material_gbuffer->m_BlendDest = Blend_Destination::ZERO;
+		material_skybox = Material::Create("skybox", 0);
+		material_skybox->SetProgram(*_shader_skybox);
+
+		material_gbuffer = Material::Create("gbuffer", 1);
+		material_gbuffer->SetProgram(*_shader_gbuffer);
+
+		material_gbuffer->m_BlendState = false;
+		material_gbuffer->m_BlendSource = Blend_Source::ONE;
+		material_gbuffer->m_BlendDest = Blend_Destination::ZERO;
+
+		material_passthrough = Material::Create("passthrough", 2);
+		material_passthrough->SetProgram(*_shader_passthrough);
+
+		material_billboard = Material::Create("billboard", 3);
+		material_billboard->SetProgram(*_shader_billboard);
 
 		_tex = Texture::Get("beato");
 		_tex_crate = Texture::Get("crate_diffuse");
@@ -170,8 +178,8 @@ namespace Vxl
 		
 		// Entities
 		GameObject* _entity1 = GameObject::Create("_entity1");
-		_entity1->SetMaterial(_material_gbuffer);
-		_entity1->m_material.SetTexture(_tex, Active_Texture::LEVEL0);
+		_entity1->SetMaterial(material_gbuffer);
+		_entity1->SetTexture(_tex, Active_Texture::LEVEL0);
 		_entity1->SetMesh(_mesh);
 		_entity1->m_transform.setScale(+0.5f);
 		
@@ -179,14 +187,14 @@ namespace Vxl
 		Mesh* jiggyMesh = Mesh::Get("jiggy");
 		
 		GameObject* _entity2 = GameObject::Create("_entity2");
-		_entity2->SetMaterial(_material_gbuffer);
+		_entity2->SetMaterial(material_gbuffer);
 		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		_entity2->SetColor(Color3F(1, 1, 0));
 
 		GameObject* _errorCube = GameObject::Create("_errorCube");
-		_errorCube->SetMaterial(_material_gbuffer);
+		_errorCube->SetMaterial(material_gbuffer);
 		//_errorCube->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_errorCube->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
@@ -194,57 +202,59 @@ namespace Vxl
 		//_errorCube->SetColor(Color3F(1, 1, 0));
 		
 		GameObject* _entity3 = GameObject::Create("_entity3");
-		_entity3->SetMaterial(_material_gbuffer);
-		_entity3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_entity3->SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_entity3->SetMaterial(material_gbuffer);
 		_entity3->SetMesh(Geometry.GetIcosahedron());
 		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
 		
 		
 		
 		GameObject* _entity5 = GameObject::Create("_entity5");
-		_entity5->SetMaterial(_material_gbuffer);
+		_entity5->SetMaterial(material_gbuffer);
+		_entity5->SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		_entity5->SetMesh(Geometry.GetSphereUV_Good());
 		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
-		_entity5->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		//_entity5->SetColor(Color3F(1, 1, 1));
 
 
 		GameObject* _entity6 = GameObject::Create("_entity6");
-		_entity6->SetMaterial(_material_gbuffer);
+		_entity6->SetMaterial(material_gbuffer);
+		_entity6->SetTexture(Texture::Get("grid_test"), Active_Texture::LEVEL0);
 		_entity6->SetMesh(Geometry.GetQuadY());
 		_entity6->m_transform.setPosition(Vector3(0, -10, 0));
 		_entity6->m_transform.setScale(Vector3(20, 1, 20));
-		_entity6->m_material.SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
 		//_entity5->SetColor(Color3F(1, 1, 1));
 		
 		
 		GameObject* _skybox = GameObject::Create("_skybox");
-		_skybox->SetMaterial(_material_skybox);
-		_skybox->m_material.SetTexture(_cubemap1, Active_Texture::LEVEL0);
+		_skybox->SetMaterial(material_skybox);
+		_skybox->SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_skybox->SetMesh(Geometry.GetInverseCube());
 		_skybox->m_useTransform = false;
 		
 
+		//_skybox->SetMaterial(material_gbuffer);
+
 		//
 		GameObject* _crate1 = GameObject::Create("_crate1");
-		_crate1->SetMaterial(_material_gbuffer);
-		_crate1->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate1->SetMaterial(material_gbuffer);
+		_crate1->SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate1->SetMesh(Geometry.GetCylinderX());
 		_crate1->m_transform.setPosition(1, 0, 0);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
 		GameObject* _crate2 = GameObject::Create("_crate2");
-		_crate2->SetMaterial(_material_gbuffer);
-		_crate2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate2->SetMaterial(material_gbuffer);
+		_crate2->SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate2->SetMesh(Geometry.GetCylinderY());
 		//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(0, 2, 0);
 		
 
 		GameObject* _crate3 = GameObject::Create("_crate3");
-		_crate3->SetMaterial(_material_gbuffer);
-		_crate3->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate3->SetMaterial(material_gbuffer);
+		_crate3->SetTexture(_tex_crate, Active_Texture::LEVEL0);
 		_crate3->SetMesh(Geometry.GetCylinderZ());
 		//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate3->m_transform.setPosition(1, 2, 0);
@@ -259,28 +269,28 @@ namespace Vxl
 		_crate1->m_transform.setWorldPosition(-5, 0, 0);
 		
 		GameObject* _octo1 = GameObject::Create("_octo1");
-		_octo1->SetMaterial(_material_gbuffer);
+		_octo1->SetMaterial(material_gbuffer);
 		_octo1->SetMesh(Geometry.GetOctahedron());
 		_octo1->m_transform.setPosition(0, 0, 0);
 		_octo1->m_transform.setScale(0.5f);
 		_octo1->SetColor(Color3F(1, 1, 1));
 		
 		GameObject* _octo2 = GameObject::Create("_octo2");
-		_octo2->SetMaterial(_material_gbuffer);
+		_octo2->SetMaterial(material_gbuffer);
 		_octo2->SetMesh(Geometry.GetOctahedron());
 		_octo2->m_transform.setPosition(1, 0, 0);
 		_octo2->m_transform.setScale(0.5f);
 		_octo2->SetColor(Color3F(1, 0, 0));
 		
 		GameObject* _octo3 = GameObject::Create("_octo3");
-		_octo3->SetMaterial(_material_gbuffer);
+		_octo3->SetMaterial(material_gbuffer);
 		_octo3->SetMesh(Geometry.GetOctahedron());
 		_octo3->m_transform.setPosition(0, 1, 0);
 		_octo3->m_transform.setScale(0.5f);
 		_octo3->SetColor(Color3F(0, 1, 0));
 		
 		GameObject* _octo4 = GameObject::Create("_octo4");
-		_octo4->SetMaterial(_material_gbuffer);
+		_octo4->SetMaterial(material_gbuffer);
 		_octo4->SetMesh(Geometry.GetOctahedron());
 		_octo4->m_transform.setPosition(0, 0, 1);
 		_octo4->m_transform.setScale(0.5f);
@@ -290,28 +300,14 @@ namespace Vxl
 		_light1->m_transform.setPosition(5, 0, 0);
 
 		GameObject* _billboard1 = GameObject::Create("_quad1");
-		_billboard1->SetMaterial(_material_gbuffer);
-		_billboard1->SetMesh(Geometry.GetQuadX());
+		_billboard1->SetMaterial(material_billboard);
+		_billboard1->SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
+		_billboard1->SetMesh(Geometry.GetQuadZ());
 		_billboard1->m_transform.setPosition(7, 3, -3);
-		_billboard1->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
-
-		GameObject* _billboard2 = GameObject::Create("_quad2");
-		_billboard2->SetMaterial(_material_gbuffer);
-		_billboard2->SetMesh(Geometry.GetQuadY());
-		_billboard2->m_transform.setPosition(7, 3, -3);
-		_billboard2->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
-
-		GameObject* _billboard3 = GameObject::Create("_quad3");
-		_billboard3->SetMaterial(_material_gbuffer);
-		_billboard3->SetMesh(Geometry.GetQuadZ());
-		_billboard3->m_transform.setPosition(7, 3, -3);
-		_billboard3->m_material.SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
 
 		//GameObject::Delete(_entity5);
-		
-
 		//GameObject::Delete("_octo3");
-		//
+		
 		//_light1 = LightObject::Create("light1");
 
 
@@ -508,9 +504,9 @@ namespace Vxl
 		XGamePadManager.Update();
 
 		// Imgui Specials
-		if (_material_gbuffer)
+		if (material_gbuffer)
 		{
-			_material_gbuffer->m_Wireframe = DEVCONSOLE_GET_BOOL("Gbuffer Wireframe", false);
+			material_gbuffer->m_Wireframe = DEVCONSOLE_GET_BOOL("Gbuffer Wireframe", false);
 		}
 
 		CPUTimer::EndTimer("UPDATE");
@@ -736,11 +732,9 @@ namespace Vxl
 					case Axis::X:
 						ClipSpaceAxis = MVP * Vector4(1, 0, 0, 1);
 						break;
-
 					case Axis::Y:
 						ClipSpaceAxis = MVP * Vector4(0, 1, 0, 1);
 						break;
-
 					case Axis::Z:
 						ClipSpaceAxis = MVP * Vector4(0, 0, 1, 1);
 						break;
@@ -777,22 +771,13 @@ namespace Vxl
 					switch (Editor.m_controlAxis)
 					{
 					case Axis::X:
-						if (Editor.m_controlAxisLocal)
-							MoveDirection = SelectedEntities[0]->m_transform.getRight();
-						else
-							MoveDirection = Vector3::RIGHT;
+						MoveDirection = Editor.GetSelectionTransformRight();
 						break;
 					case Axis::Y:
-						if (Editor.m_controlAxisLocal)
-							MoveDirection = SelectedEntities[0]->m_transform.getUp();
-						else
-							MoveDirection = Vector3::UP;
+						MoveDirection = Editor.GetSelectionTransformUp();
 						break;
 					case Axis::Z:
-						if (Editor.m_controlAxisLocal)
-							MoveDirection = SelectedEntities[0]->m_transform.getForward();
-						else
-							MoveDirection = Vector3::FORWARD;
+						MoveDirection = Editor.GetSelectionTransformForward();
 						break;
 					}
 

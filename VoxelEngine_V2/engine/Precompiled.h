@@ -37,7 +37,6 @@
 #include "modules/Entity.h"
 #include "modules/Layer.h"
 #include "modules/Material.h"
-#include "modules/MaterialPackage.h"
 #include "modules/RenderManager.h"
 #include "modules/Scene.h"
 

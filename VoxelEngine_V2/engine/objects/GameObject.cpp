@@ -6,12 +6,15 @@
 #include "../modules/Material.h"
 #include "../modules/RenderManager.h"
 
+#include "../opengl/Debug.h"
+#include "../textures/Texture.h"
+
 namespace Vxl
 {
 	GameObject::GameObject(const std::string& name)
 		: Entity(name, EntityType::GAMEOBJECT)
 	{
-		AddComponent(&m_material, this);
+		//AddComponent(&m_material, this);
 	}
 
 	GameObject::~GameObject()
@@ -36,26 +39,16 @@ namespace Vxl
 	// Material
 	void GameObject::SetMaterial(Material* _material)
 	{
-		// Do nothing if giving same material
-		if (_material == m_material.GetBase())
-			return;
-
-		// Remove material from existing render section
-		// Doesn't get called if it originally had no material base
-		if (m_material.GetBase())
+		VXL_ASSERT(_material, "Cannot Set Empty Material to GameObject");
+		
+		// Remove entity from existing Set
+		if(m_material != nullptr)
 			RenderManager.RemoveEntity(this);
+		
+		m_material = _material;
 
-		m_material.SetMaterial(_material);
-
+		// Add Entity
 		RenderManager.AddEntity(this);
-	}
-	Material* GameObject::GetMaterial(void) const
-	{
-		return m_material.GetBase();
-	}
-	UINT GameObject::GetMaterialOrder(void) const
-	{
-		return m_material.GetOrder();
 	}
 
 	// Behaviour
@@ -68,12 +61,67 @@ namespace Vxl
 	{
 		if (m_mesh)
 		{
-			// Send Uniform Data
-			m_material.BindUniforms(this);
+			// Bind Textures (ignore if wireframe mode is ON)
+			if (m_material->m_Wireframe == false)
+			{
+				// Null Texture if no textures are used
+				if (m_textureCount == 0)
+				{
+					// Bind null texture on first active layer
+					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+				}
+				else
+				{
+					for (auto it = m_textures.begin(); it != m_textures.end(); it++)
+					{
+						// Get Current texture
+						BaseTexture* _tex = m_textures[it->first];
 
-			// Send Texture Data
-			if (!m_isColoredObject)
-				m_material.BindTextures();
+						// Bind Null texture if texture isn't loaded
+						if (_tex == nullptr || !_tex->IsLoaded())
+						{
+							Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+						}
+						// Bind texture normally
+						else
+						{
+							_tex->Bind(it->first);
+						}
+					}
+				}
+			}
+
+			// Set Material Properties
+			auto p = ShaderProgram::GetBoundProgram();
+
+			// ~ Model ~ //
+			if(m_material->m_property_useModel.IsUsed())
+				m_material->m_property_useModel.SetProperty(m_useTransform);
+
+			if (m_useTransform && m_material->m_property_model.IsUsed())
+			{
+				m_material->m_property_model.SetProperty(m_transform.getWorldModel().Transpose());
+			}
+			// ~ Instancing ~ //
+			if (m_material->m_property_useInstancing.IsUsed())
+			{
+				m_material->m_property_useInstancing.SetProperty(m_mesh && m_mesh->m_instances.GetDrawCount());
+			}
+
+			// ~ Colors ~ //
+			if (m_material->m_property_color.IsUsed() && m_material->m_property_color.IsUsed())
+			{
+				// Color info or wireframe mode will cause color to be used in shader
+				m_material->m_property_useColor.SetProperty(m_isColoredObject || m_material->m_Wireframe);
+
+				if ((m_isColoredObject || m_material->m_Wireframe))
+					m_material->m_property_color.SetProperty(m_Color);
+			}
+			// ~ Tint ~ //
+			if (m_material->m_property_tint.IsUsed())
+			{
+				m_material->m_property_tint.SetProperty(m_Tint);
+			}
 
 			// Draw Mesh
 			m_mesh->Draw();

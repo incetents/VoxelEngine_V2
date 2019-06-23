@@ -625,9 +625,8 @@ namespace Vxl
 		_mesh->Bind();
 		return _mesh;
 	}
-	Mesh* Geometry::GenerateQuad(const std::string& MeshName, Axis axis)
+	Mesh* Geometry::GenerateQuad(const std::string& MeshName, Axis axis, float unitSize)
 	{
-		
 		Vector2 uvs[] = {
 			Vector2(0, 0),
 			Vector2(1, 0),
@@ -642,10 +641,10 @@ namespace Vxl
 		if (axis == Axis::X)
 		{
 			Vector3 pos[] = {
-				Vector3(+0.0f, -0.5f, +0.5f),
-				Vector3(+0.0f, -0.5f, -0.5f),
-				Vector3(+0.0f, +0.5f, -0.5f),
-				Vector3(+0.0f, +0.5f, +0.5f)
+				Vector3(+0.0f, -0.5f * unitSize, +0.5f * unitSize),
+				Vector3(+0.0f, -0.5f * unitSize, -0.5f * unitSize),
+				Vector3(+0.0f, +0.5f * unitSize, -0.5f * unitSize),
+				Vector3(+0.0f, +0.5f * unitSize, +0.5f * unitSize)
 			};
 			_mesh->m_positions.set(pos, 4);
 
@@ -660,10 +659,10 @@ namespace Vxl
 		else if (axis == Axis::Y)
 		{
 			Vector3 pos[] = {
-				Vector3(-0.5f, 0, +0.5f),
-				Vector3(+0.5f, 0, +0.5f),
-				Vector3(+0.5f, 0, -0.5f),
-				Vector3(-0.5f, 0, -0.5f)
+				Vector3(-0.5f * unitSize, 0, +0.5f * unitSize),
+				Vector3(+0.5f * unitSize, 0, +0.5f * unitSize),
+				Vector3(+0.5f * unitSize, 0, -0.5f * unitSize),
+				Vector3(-0.5f * unitSize, 0, -0.5f * unitSize)
 			};
 			_mesh->m_positions.set(pos, 4);
 
@@ -678,10 +677,10 @@ namespace Vxl
 		else if (axis == Axis::Z)
 		{
 			Vector3 pos[] = {
-				Vector3(-0.5f, -0.5f, +0.0f),
-				Vector3(+0.5f, -0.5f, +0.0f),
-				Vector3(+0.5f, +0.5f, +0.0f),
-				Vector3(-0.5f, +0.5f, +0.0f),
+				Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.0f),
+				Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.0f),
+				Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.0f),
+				Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.0f),
 			};
 			_mesh->m_positions.set(pos, 4);
 
@@ -765,38 +764,13 @@ namespace Vxl
 
 	void Geometry::CreateQuad()
 	{
-		m_quad_x = GenerateQuad("Quad_X", Axis::X);
-		m_quad_y = GenerateQuad("Quad_Y", Axis::Y);
-		m_quad_z = GenerateQuad("Quad_Z", Axis::Z);
-		//	Vector3 pos[] = {
-		//		Vector3(-0.5f, -0.5f, +0.0f),
-		//		Vector3(+0.5f, -0.5f, +0.0f),
-		//		Vector3(+0.5f, +0.5f, +0.0f),
-		//		Vector3(-0.5f, +0.5f, +0.0f),
-		//	};
-		//	Vector2 uvs[] = {
-		//		Vector2(0, 0),
-		//		Vector2(1, 0),
-		//		Vector2(1, 1),
-		//		Vector2(0, 1)
-		//	};
-		//	Vector3 normals[] = {
-		//		Vector3(0, 0, +1),
-		//		Vector3(0, 0, +1),
-		//		Vector3(0, 0, +1),
-		//		Vector3(0, 0, +1)
-		//	};
-		//	GLuint indices[] = { 0, 1, 2, 0, 2, 3 };
-		//	
-		//	m_quad = Mesh::Create("Quad");
-		//	//
-		//	m_quad->m_positions.set(pos, 4);
-		//	m_quad->m_uvs.set(uvs, 4);
-		//	m_quad->m_normals.set(normals, 4);
-		//	m_quad->m_indices.set(indices, 6);
-		//	m_quad->GenerateTangents();
-		//	//
-		//	m_quad->Bind();
+		m_quad_x = GenerateQuad("Quad_X", Axis::X, 1.0f);
+		m_quad_y = GenerateQuad("Quad_Y", Axis::Y, 1.0f);
+		m_quad_z = GenerateQuad("Quad_Z", Axis::Z, 1.0f);
+
+		m_halfquad_x = GenerateQuad("HalfQuad_X", Axis::X, 0.5f);
+		m_halfquad_y = GenerateQuad("HalfQuad_Y", Axis::Y, 0.5f);
+		m_halfquad_z = GenerateQuad("HalfQuad_Z", Axis::Z, 0.5f);
 	}	
 
 	void Geometry::CreateCube()

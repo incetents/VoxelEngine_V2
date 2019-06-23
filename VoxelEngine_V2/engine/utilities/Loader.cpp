@@ -45,10 +45,6 @@ namespace Vxl
 
 	const std::string Loader::TAG_FILTERMODE_NEAREST = "NEAREST";
 	const std::string Loader::TAG_FILTERMODE_LINEAR = "LINEAR";
-	const std::string Loader::TAG_FILTERMODE_NEAREST_NEAREST = "NEAREST_NEAREST";
-	const std::string Loader::TAG_FILTERMODE_LINEAR_NEAREST = "LINEAR_NEAREST";
-	const std::string Loader::TAG_FILTERMODE_NEAREST_LINEAR = "NEAREST_LINEAR";
-	const std::string Loader::TAG_FILTERMODE_LINEAR_LINEAR = "LINEAR_LINEAR";
 
 	const std::string Loader::TAG_FLIP_TRUE = "YES_FLIP";
 	const std::string Loader::TAG_MIPMAP_TRUE = "YES_MIPMAP";
@@ -76,31 +72,14 @@ namespace Vxl
 		else
 			return Wrap_Mode::NONE;
 	}
-	Mag_Filter Loader::DecipherFilterModeMag(const std::string& str)
+	Filter_Mode Loader::DecipherFilterMode(const std::string& str)
 	{
 		if (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_FILTERMODE_LINEAR) == 0)
-			return Mag_Filter::LINEAR;
+			return Filter_Mode::LINEAR;
 		else if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
-			return Mag_Filter::NEAREST;
+			return Filter_Mode::NEAREST;
 		else
-			return Mag_Filter::NONE;
-	}
-	Min_Filter Loader::DecipherFilterModeMin(const std::string& str)
-	{
-		if (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_FILTERMODE_LINEAR) == 0)
-			return Min_Filter::LINEAR;
-		else if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
-			return Min_Filter::NEAREST;
-		else if (str.compare(TAG_FILTERMODE_NEAREST_NEAREST) == 0)
-			return Min_Filter::NEAREST_MIPMAP_NEAREST;
-		else if (str.compare(TAG_FILTERMODE_LINEAR_NEAREST) == 0)
-			return Min_Filter::LINEAR_MIPMAP_NEAREST;
-		else if (str.compare(TAG_FILTERMODE_NEAREST_LINEAR) == 0)
-			return Min_Filter::NEAREST_MIPMAP_LINEAR;
-		else if (str.compare(TAG_FILTERMODE_LINEAR_LINEAR) == 0)
-			return Min_Filter::LINEAR_MIPMAP_LINEAR;
-		else
-			return Min_Filter::NONE;
+			return Filter_Mode::NONE;
 	}
 	ShaderType Loader::DeciperShaderType(const std::string& str)
 	{
@@ -221,30 +200,27 @@ namespace Vxl
 					auto Name = Segments[0];
 					auto filePath = Segments[1];
 					Wrap_Mode WM = Wrap_Mode::REPEAT;
-					Min_Filter FMIN = Min_Filter::LINEAR;
-					Mag_Filter FMAG = Mag_Filter::LINEAR;
+					Filter_Mode Filter = Filter_Mode::LINEAR;
 					Anisotropic_Mode ANSO = Anisotropic_Mode::HIGH;
 					bool FlipY = true;
 					bool MipMap = true;
 
 					switch (SegmentCount)
 					{
-					case 8:
-						ANSO = DecipherAnisotropicMode(Segments[7]);
 					case 7:
-						MipMap = DecipherMipMapType(Segments[6]); // 7
+						ANSO = DecipherAnisotropicMode(Segments[6]);
 					case 6:
-						FlipY = DecipherFlipType(Segments[5]); // 6
+						MipMap = DecipherMipMapType(Segments[5]);
 					case 5:
-						FMAG = DecipherFilterModeMag(Segments[4]); // 5
+						FlipY = DecipherFlipType(Segments[4]);
 					case 4:
-						FMIN = DecipherFilterModeMin(Segments[3]); // 4
+						Filter = DecipherFilterMode(Segments[3]);
 					case 3:
-						WM = DecipherWrapMode(Segments[2]); // 3
+						WM = DecipherWrapMode(Segments[2]);
 						break;
 					}
 
-					Texture::Load(Name, filePath, FlipY, MipMap, WM, FMIN, FMAG, Format_Type::RGBA8, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE, ANSO);
+					Texture::Load(Name, filePath, FlipY, MipMap, WM, Filter, Format_Type::RGBA8, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE, ANSO);
 				}
 				/* CUBEMAP */
 				else if (_state == LoadState::CUBEMAP && SegmentCount == 7)

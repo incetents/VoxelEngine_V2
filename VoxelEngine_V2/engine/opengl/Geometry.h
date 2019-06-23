@@ -33,7 +33,7 @@ namespace Vxl
 		Mesh* GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
 		Mesh* GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
 		Mesh* GenerateCube(const std::string& MeshName, float unitSize = 1.0f);
-		Mesh* GenerateQuad(const std::string& MeshName, Axis axis);
+		Mesh* GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f);
 
 	private:
 		bool m_isSetup = false;
@@ -42,6 +42,9 @@ namespace Vxl
 		Mesh* m_quad_x = nullptr;
 		Mesh* m_quad_y = nullptr;
 		Mesh* m_quad_z = nullptr;
+		Mesh* m_halfquad_x = nullptr;
+		Mesh* m_halfquad_y = nullptr;
+		Mesh* m_halfquad_z = nullptr;
 		Mesh* m_cube = nullptr;
 		Mesh* m_cube_small = nullptr; // (1/4)size
 		Mesh* m_inverseCube = nullptr;
@@ -93,6 +96,7 @@ namespace Vxl
 			CreateArrows();
 		}
 
+		// Vertices are from -1 to +1
 		Mesh* GetFullQuad()
 		{
 			return m_fullQuad;
@@ -101,18 +105,37 @@ namespace Vxl
 		{
 			return m_fullTriangle;
 		}
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetQuadX()
 		{
 			return m_quad_x;
 		}
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetQuadY()
 		{
 			return m_quad_y;
 		}
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetQuadZ()
 		{
 			return m_quad_z;
 		}
+		// Vertices are from -0.25 to +0.25
+		Mesh* GetHalfQuadX()
+		{
+			return m_halfquad_x;
+		}
+		// Vertices are from -0.25 to +0.25
+		Mesh* GetHalfQuadY()
+		{
+			return m_halfquad_y;
+		}
+		// Vertices are from -0.25 to +0.25
+		Mesh* GetHalfQuadZ()
+		{
+			return m_halfquad_z;
+		}
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetCube()
 		{
 			return m_cube;
@@ -121,6 +144,7 @@ namespace Vxl
 		{
 			return m_cube_small;
 		}
+		// Vertices are from -0.5 to +0.5
 		Mesh* GetInverseCube()
 		{
 			return m_inverseCube;

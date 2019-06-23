@@ -19,13 +19,12 @@ namespace Vxl
 		bool			InvertY,
 		bool			UseMipMapping,
 		Wrap_Mode		WrapMode,
-		Min_Filter		MinFilter,
-		Mag_Filter		MagFilter,
+		Filter_Mode		FilterMode,
 		Format_Type		FormatType,
 		Pixel_Type		PixelType,
 		Anisotropic_Mode AnisotropicMode
 	)
-		: BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, MinFilter, MagFilter, FormatType, Channel_Type::NONE, PixelType, AnisotropicMode, UseMipMapping)
+		: BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, FilterMode, FormatType, Channel_Type::NONE, PixelType, AnisotropicMode, UseMipMapping)
 	{
 		m_image[0] = SOIL_load_image(filePath1.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 		m_image[1] = SOIL_load_image(filePath2.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
@@ -71,13 +70,12 @@ namespace Vxl
 		bool InvertY,
 		bool UseMipMapping,
 		Wrap_Mode WrapMode,
-		Min_Filter MinFilter,
-		Mag_Filter MagFilter,
+		Filter_Mode FilterMode,
 		Format_Type	FormatType,
 		Pixel_Type PixelType,
 		Anisotropic_Mode AnisotropicMode
 	) {
-		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, MinFilter, MagFilter, FormatType, PixelType);
+		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType);
 
 		AddToDatabase(name, _cubemap);
 

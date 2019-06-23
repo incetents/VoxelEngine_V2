@@ -365,9 +365,6 @@
     <ClInclude Include="engine\modules\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\modules\MaterialPackage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\opengl\VBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
