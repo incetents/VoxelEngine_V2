@@ -11,6 +11,8 @@
 #include "../modules/Material.h"
 
 #include "../objects/GameObject.h"
+#include "../objects/CameraObject.h"
+#include "../objects/LightObject.h"
 
 #include "../opengl/Geometry.h"
 
@@ -149,12 +151,15 @@ namespace Vxl
 
 			if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
 			{
-				// Don't delete camera
 				for (auto Entity : Entities)
 				{
-					if (Entity->GetType() != EntityType::CAMERA)
+					if (Entity->GetType() == EntityType::GAMEOBJECT)
 					{
-						Entity::Delete(Entity);
+						GameObject::Delete((GameObject*)Entity);
+					}
+					else if (Entity->GetType() == EntityType::CAMERA)
+					{
+						CameraObject::Delete((CameraObject*)Entity);
 					}
 				}
 				Editor.ClearSelection();

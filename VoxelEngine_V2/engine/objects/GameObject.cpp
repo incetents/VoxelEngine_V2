@@ -26,7 +26,7 @@ namespace Vxl
 	{
 		// Create Unique Name
 		auto UniqueName = FixNameDuplicate(name);
-
+		
 		// Create
 		GameObject* _entity = new GameObject(UniqueName);
 		// Store in entity database
@@ -62,33 +62,9 @@ namespace Vxl
 		if (m_mesh)
 		{
 			// Bind Textures (ignore if wireframe mode is ON)
-			if (m_material->m_Wireframe == false)
+			if (m_material->m_Wireframe == false && !m_material->HasSharedTextures())
 			{
-				// Null Texture if no textures are used
-				if (m_textureCount == 0)
-				{
-					// Bind null texture on first active layer
-					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-				}
-				else
-				{
-					for (auto it = m_textures.begin(); it != m_textures.end(); it++)
-					{
-						// Get Current texture
-						BaseTexture* _tex = m_textures[it->first];
-
-						// Bind Null texture if texture isn't loaded
-						if (_tex == nullptr || !_tex->IsLoaded())
-						{
-							Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-						}
-						// Bind texture normally
-						else
-						{
-							_tex->Bind(it->first);
-						}
-					}
-				}
+				TextureBinder::BindTextures();
 			}
 
 			// Set Material Properties

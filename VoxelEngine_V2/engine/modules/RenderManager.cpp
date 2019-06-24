@@ -58,12 +58,13 @@ namespace Vxl
 
 	void RenderManager::UpdateAllWindowAspectCameras()
 	{
-		for (auto Camera : m_allCameraObjects)
+		auto AllCameras = CameraObject::GetDatabase();
+		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 		{
-			if (Camera->isPerspectiveWindowAspect())
+			if (camera->second->isPerspectiveWindowAspect())
 			{
-				Camera->UpdateAspect(Window.GetAspectRatio());
-				Camera->CreatePerspective();
+				camera->second->UpdateAspect(Window.GetAspectRatio());
+				camera->second->CreatePerspective();
 			}
 		}
 	}
@@ -77,19 +78,22 @@ namespace Vxl
 			case EntityType::GAMEOBJECT:
 			{
 				auto _GameObject = (GameObject*)_entity;
+				VXL_ASSERT(_GameObject->GetMaterial() != nullptr, "GameObject has no material");
 
 				// Check if entity already exists
-				if (Util::IsInVector(m_allGameObjects, _GameObject))
-					return;
+				//if (Util::IsInVector(m_allGameObjects, _GameObject))
+				//	return;
 
-				if (_GameObject->GetMaterial() != nullptr)
-				{
-					auto key = _GameObject->GetMaterial();
+				// Material/GameObjects set
+				auto key = _GameObject->GetMaterial();
 
-					m_gameObjectsPerMaterial[key].insert(_GameObject);
-				}
+				// Empty Check
+				if (m_gameObjectsPerMaterial[key] == nullptr)
+					m_gameObjectsPerMaterial[key] = new std::set<GameObject*>();
 
-				m_allGameObjects.push_back(_GameObject);
+				m_gameObjectsPerMaterial[key]->insert(_GameObject);
+
+				//m_allGameObjects.push_back(_GameObject);
 				m_allEntities.push_back(_entity);
 
 				break;
@@ -99,11 +103,11 @@ namespace Vxl
 				auto _Camera = (CameraObject*)_entity;
 
 				// Check if entity already exists
-				if (Util::IsInVector(m_allCameraObjects, _Camera))
-					return;
+				//if (Util::IsInVector(m_allCameraObjects, _Camera))
+				//	return;
 
 				// Add
-				m_allCameraObjects.push_back(_Camera);
+				//m_allCameraObjects.push_back(_Camera);
 				m_allEntities.push_back(_entity);
 
 				break;
@@ -113,11 +117,11 @@ namespace Vxl
 				auto _light = (LightObject*)_entity;
 
 				// Check if entity already exists
-				if (Util::IsInVector(m_allLightObjects, _light))
-					return;
+				//if (Util::IsInVector(m_allLightObjects, _light))
+				//	return;
 
 				// Add
-				m_allLightObjects.push_back(_light);
+				//m_allLightObjects.push_back(_light);
 				m_allEntities.push_back(_entity);
 
 				break;
@@ -133,41 +137,39 @@ namespace Vxl
 		{
 			case EntityType::GAMEOBJECT:
 			{
-				auto _GameObject = dynamic_cast<GameObject*>(_entity);
-				VXL_ASSERT(_GameObject, "GameObject cast failed");
+				auto _GameObject = (GameObject*)_entity;
+				VXL_ASSERT(_GameObject->GetMaterial() != nullptr, "GameObject has no material");
 
-				// Makes sure entity has a material/shader
-				if (_GameObject->GetMaterial())
-				{
-					auto key = _GameObject->GetMaterial();
+				// Material/GameObjects set
+				auto key = _GameObject->GetMaterial();
 
-					m_gameObjectsPerMaterial[key].erase(_GameObject);
-				}
+				// Empty or Missing Check
+				if (m_gameObjectsPerMaterial[key] == nullptr || m_gameObjectsPerMaterial[key]->find(_GameObject) == m_gameObjectsPerMaterial[key]->end())
+					return;
+
+				m_gameObjectsPerMaterial[key]->erase(_GameObject);
 
 				// Remove
-				Util::RemoveFromVector(m_allGameObjects, _GameObject);
 				Util::RemoveFromVector(m_allEntities, _entity);
 
 				break;
 			}
 			case EntityType::CAMERA:
 			{
-				auto _Camera = dynamic_cast<CameraObject*>(_entity);
+				auto _Camera = (CameraObject*)_entity;
 				VXL_ASSERT(_Camera, "CameraObject cast failed");
 
 				// Remove
-				Util::RemoveFromVector(m_allCameraObjects, _Camera);
 				Util::RemoveFromVector(m_allEntities, _entity);
 
 				break;
 			}
 			case EntityType::LIGHT:
 			{
-				auto _Light = dynamic_cast<LightObject*>(_entity);
+				auto _Light = (LightObject*)_entity;
 				VXL_ASSERT(_Light, "LightObject cast failed");
 
 				// Remove
-				Util::RemoveFromVector(m_allLightObjects, _Light);
 				Util::RemoveFromVector(m_allEntities, _entity);
 
 				break;
@@ -226,8 +228,8 @@ namespace Vxl
 			{
 				fbo.second->unload();
 				// Adjust Size based on current window render size [effectively resizing FBO resolution]
-				fbo.second->m_width = Window.GetScreenWidth();
-				fbo.second->m_height = Window.GetScreenHeight();
+				fbo.second->m_width = Window.GetViewportWidth();
+				fbo.second->m_height = Window.GetViewportHeight();
 				//
 				fbo.second->load();
 			}
@@ -251,17 +253,19 @@ namespace Vxl
 		// Delete special
 		GPUTimer::DestroyTimers();
 
-		// Delete Materials and Entities
+		// Destroy all Entities
+		GameObject::DeleteAndClearAll();
+		LightObject::DeleteAndClearAll();
+		CameraObject::DeleteAndClearAll();
+
+		// Delete Materials
 		Material::DeleteAndClearAll();
-		Entity::DeleteAndClearAll();
 
 		Material::m_masterOrder.clear();
 		Material::m_masterOrderDirty = true;
 
 		// Clear Render List
 		m_allEntities.clear();
-		m_allGameObjects.clear();
-		m_allLightObjects.clear();
 
 		m_gameObjectsPerMaterial.clear();
 		m_gameObjectsSorted.clear();
@@ -339,7 +343,7 @@ namespace Vxl
 
 			for (auto renderSet = m_gameObjectsPerMaterial.begin(); renderSet != m_gameObjectsPerMaterial.end(); renderSet++)
 			{
-				m_gameObjectsSorted[renderSet->first->GetOrder()] = std::pair<Material*, std::set<GameObject*>>(renderSet->first, renderSet->second);
+				m_gameObjectsSorted[renderSet->first->GetOrder()] = std::pair<Material*, std::set<GameObject*>*>(renderSet->first, renderSet->second);
 			}
 
 			Material::m_masterOrderDirty = false;
@@ -355,28 +359,19 @@ namespace Vxl
 			// Get Material for binding
 			Material* material = materialSet.first;
 			VXL_ASSERT(material, "Storing nullptr in renderSet");
-			material->Bind();
+			material->BindProgram();
+			material->BindStates();
+			material->BindTextures(); // Only occurs if shared textures is true
 
 			// Get GameObject for rendering
-			std::set<GameObject*> entites = materialSet.second;
+			std::set<GameObject*>* entities = materialSet.second;
+			std::set<GameObject*> BENT = *entities;
 
-			for (auto& ent : entites)
+			for (auto& ent : *entities)
 			{
 				if (ent->IsFamilyActive())
 					ent->Draw();
 			}
-
-
-			//	Material* _base = renderList->second.first;
-			//	_base->Bind();
-			//	
-			//	std::set<GameObject*> _entites = renderList->second.second;
-			//	
-			//	for (auto ent : _entites)
-			//	{
-			//		if(ent->IsFamilyActive())
-			//			ent->Draw();
-			//	}
 		}
 	}
 	void RenderManager::RenderEditorObjects()
@@ -385,13 +380,14 @@ namespace Vxl
 		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
 
 		// Draw Lights
-		auto billboard = ShaderProgram::Get("billboard");
-		billboard->Bind();
+		auto billboard = Material::Get("billboard");
+		billboard->BindProgram();
 		
 		Texture* LightTexture = Texture::Get("editor_lightbulb");
-		for (auto light : m_allLightObjects)
+		auto AllLights = LightObject::GetDatabase();
+		for (auto light = AllLights.begin(); light != AllLights.end(); light++)
 		{
-			billboard->SetUniformMatrix<Matrix4x4>("VXL_model", light->m_transform.getWorldModel(), true);
+			billboard->m_property_model.SetPropertyTranspose(light->second->m_transform.getWorldModel(), true);
 		
 			if (LightTexture)
 				LightTexture->Bind(Active_Texture::LEVEL0);
@@ -403,9 +399,10 @@ namespace Vxl
 
 		// Draw Cameras
 		Texture* CameraTexture = Texture::Get("editor_camera");
-		for (auto camera : m_allCameraObjects)
+		auto AllCameras = CameraObject::GetDatabase();
+		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 		{
-			billboard->SetUniformMatrix<Matrix4x4>("VXL_model", camera->m_transform.getWorldModel(), true);
+			billboard->m_property_model.SetPropertyTranspose(camera->second->m_transform.getWorldModel(), true);
 
 			if (LightTexture)
 				CameraTexture->Bind(Active_Texture::LEVEL0);
@@ -416,16 +413,11 @@ namespace Vxl
 		}
 
 		// Draw Debug Lines
-		auto lines = ShaderProgram::Get("lines");
-		lines->Bind();
-		lines->SetUniform<Vector4>("_viewport", Vector4(
-			(float)Window.GetScreenOffsetX(),
-			(float)Window.GetScreenOffsetY(),
-			(float)Window.GetScreenWidth(),
-			(float)Window.GetScreenHeight()
-		));
+		auto lines = Material::Get("lines");
+		lines->BindProgram();
+		lines->m_property_viewport.SetProperty(Window.GetViewport());
 
-		lines->SetUniform<bool>("passthrough", false);
+		lines->SetProperty<bool>("passthrough", false);
 
 		glUtil::depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
 		Debug.RenderWorldLines();
@@ -433,7 +425,8 @@ namespace Vxl
 		//glUtil::depthTest(Depth_Pass_Rule::GREATER);
 		// ???
 
-		lines->SetUniform<bool>("passthrough", true);
+		lines->SetProperty<bool>("passthrough", true);
+
 		Debug.RenderScreenLines();
 
 		// Draw Debug Wireframe Sphere
@@ -447,7 +440,7 @@ namespace Vxl
 		glLineWidth(5.0f);
 		for (const auto& sphere : Debug.m_wireframeSpheres)
 		{
-			passthrough->SetUniform<Color4F>("VXL_color", sphere.color);
+			passthrough->SetUniform<Color3F>("VXL_color", sphere.color.getRGB());
 			passthrough->SetUniformMatrix<Matrix4x4>("VXL_model", sphere.model, true);
 			Geometry.GetIcoSphere()->Draw();
 		}

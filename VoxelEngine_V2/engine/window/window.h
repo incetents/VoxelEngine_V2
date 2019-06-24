@@ -116,25 +116,29 @@ namespace Vxl
 		}
 		
 		// Returns Width of the rendered viewport
-		UINT GetScreenWidth(void) const
+		UINT GetViewportWidth(void) const
 		{
 			return m_viewportSize[0];
 		}
 		// Returns Height of the rendered viewport
-		UINT GetScreenHeight(void) const
+		UINT GetViewportHeight(void) const
 		{
 			return m_viewportSize[1];
 		}
-
 		// Returns X offset of the rendered viewport
-		UINT GetScreenOffsetX(void) const
+		UINT GetViewportOffsetX(void) const
 		{
 			return m_viewportOffset[0];
 		}
 		// Returns Y offset of the rendered viewport
-		UINT GetScreenOffsetY(void) const
+		UINT GetViewportOffsetY(void) const
 		{
 			return m_viewportOffset[1];
+		}
+		// Returns Viewport [Screen Offset and Screen Size]
+		Vector4 GetViewport(void) const
+		{
+			return Vector4((float)m_viewportOffset[0], (float)m_viewportOffset[1], (float)m_viewportSize[0], (float)m_viewportSize[1]);
 		}
 
 		// Returns Width of backbuffer resolution

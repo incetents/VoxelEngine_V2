@@ -21,7 +21,7 @@ namespace Vxl
 		SKYBOX
 	};
 
-	class Entity : public ComponentHandler, public Asset<Entity>
+	class Entity : public ComponentHandler
 	{
 		friend class RenderManager;
 		friend class GameObject;

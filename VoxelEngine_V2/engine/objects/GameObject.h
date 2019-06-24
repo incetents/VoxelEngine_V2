@@ -8,7 +8,7 @@ namespace Vxl
 {
 	class Mesh;
 
-	class GameObject : public Entity
+	class GameObject : public Entity, public Asset<GameObject>, public TextureBinder
 	{
 	private:
 		GameObject(const std::string& name);
@@ -17,16 +17,12 @@ namespace Vxl
 		Mesh*			m_mesh = nullptr;
 		Material*		m_material = nullptr;
 
-		std::map<Active_Texture, BaseTexture*>	m_textures;
-		UINT									m_textureCount = 0;
-
 	public:
 		// Destructor
 		~GameObject();
 
 		// Database Creation
 		static GameObject* Create(const std::string& name);
-
 
 		// Mesh
 		inline void SetMesh(Mesh* _mesh)
@@ -47,22 +43,6 @@ namespace Vxl
 			return m_material;
 		}
 
-		// Texture
-		inline void SetTexture(BaseTexture* texture, Active_Texture layer)
-		{
-			m_textures[layer] = texture;
-			m_textureCount = (UINT)m_textures.size();
-		}
-		inline void RemoveTexture(Active_Texture layer)
-		{
-			m_textures.erase(layer);
-			m_textureCount = (UINT)m_textures.size();
-		}
-		inline void ClearTextures(void)
-		{
-			m_textures.clear();
-			m_textureCount = 0;
-		}
 
 		// Behaviour
 		virtual void Update() override;

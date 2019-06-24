@@ -65,7 +65,7 @@ namespace Vxl
 
 	};
 
-	class LightObject : public Entity
+	class LightObject : public Entity, public Asset<LightObject>
 	{
 	private:
 		LightObject(const std::string& name, Light::Type type);

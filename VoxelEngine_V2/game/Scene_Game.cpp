@@ -129,6 +129,9 @@ namespace Vxl
 		material_billboard = Material::Create("billboard", 3);
 		material_billboard->SetProgram(*_shader_billboard);
 
+		material_lines = Material::Create("lines", 4);
+		material_lines->SetProgram(*_shader_lines);
+
 		_tex = Texture::Get("beato");
 		_tex_crate = Texture::Get("crate_diffuse");
 		_tex_gridtest = Texture::Get("grid_test");
@@ -305,6 +308,9 @@ namespace Vxl
 		_billboard1->SetMesh(Geometry.GetQuadZ());
 		_billboard1->m_transform.setPosition(7, 3, -3);
 
+		//material_gbuffer
+		//material_billboard
+
 		//GameObject::Delete(_entity5);
 		//GameObject::Delete("_octo3");
 		
@@ -320,6 +326,7 @@ namespace Vxl
 
 	void Scene_Game::Update()
 	{
+
 		CPUTimer::StartTimer("UPDATE");
 
 		if (Input.getKeyDown(KeyCode::ESCAPE))
@@ -672,13 +679,17 @@ namespace Vxl
 				_shader_colorPicker->SetUniform<Vector4>("VXL_colorID", color);
 				Geometry.GetArrowZ()->Draw();
 
+				float px = Input.getMousePosViewportX(); // [0 -> 1] horizontally across viewport
+				px *= (float)_fbo_colorpicker->GetWidth();
+
+				float py = Input.getMousePosViewportY(true); // [0 -> 1] vertically across viewport
+				py *= (float)_fbo_colorpicker->GetHeight();
+
 				// read pixel
 				RawArray<GLubyte> data = _fbo_colorpicker->readPixels(
 					0,
-					Input.getMouseX(),
-					Window.GetResolutionHeight() - Input.getMouseY(),
-					1,
-					1
+					px, py,
+					1, 1
 				);
 
 				unsigned int EditorIndex;
@@ -855,12 +866,16 @@ namespace Vxl
 
 				}
 
+				float px = Input.getMousePosViewportX(); // [0 -> 1] horizontally across viewport
+				px *= (float)_fbo_colorpicker->GetWidth();
+
+				float py = Input.getMousePosViewportY(true); // [0 -> 1] vertically across viewport
+				py *= (float)_fbo_colorpicker->GetHeight();
+
 				RawArray<GLubyte> data = _fbo_colorpicker->readPixels(
 					0,
-					Input.getMouseX(),
-					Window.GetResolutionHeight() - Input.getMouseY(),
-					1,
-					1
+					px, py,
+					1, 1
 				);
 
 				//	std::cout <<

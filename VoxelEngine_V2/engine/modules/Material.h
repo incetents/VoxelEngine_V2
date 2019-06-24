@@ -1,17 +1,21 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "../opengl/glUtil.h"
+#include "../opengl/Uniform.h"
+#include "../opengl/Shader.h"
+
+#include "../utilities/Asset.h"
+
+#include "../textures/TextureBinder.h"
+
+#include "Component.h"
+
 #include <unordered_map>
 #include <vector>
 #include <set>
 #include <map>
 #include <string>
-#include "Component.h"
-#include "../opengl/glUtil.h"
-#include "../opengl/Uniform.h"
-#include "../utilities/Asset.h"
-
-#include "../opengl/Shader.h"
 //
 
 #define MAX_MATERIAL_TEXTURES 8
@@ -57,13 +61,20 @@ namespace Vxl
 			VXL_ASSERT(m_uniform.GetLocation() != -1, "Property has no attached Uniform");
 			m_uniform.Set<Type>(_data);
 		}
+		// Only works for matrices
+		void SetPropertyTranspose(Type _data, bool _transpose)
+		{
+			VXL_ASSERT(m_uniform.GetLocation() != -1, "Property has no attached Uniform");
+			m_uniform.SetMatrix<Type>(_data, _transpose);
+		}
+
 		inline bool IsUsed(void) const
 		{
 			return m_isUsed;
 		}
 	};
 
-	class Material : public Asset<Material>
+	class Material : public Asset<Material>, public TextureBinder
 	{
 		friend class RenderManager;
 	private:
@@ -73,9 +84,7 @@ namespace Vxl
 		static std::map<UINT, Material*> m_masterOrder; // List of all used Orders and whether they are dirty
 		static bool				m_masterOrderDirty; // Whether or not the master order has changed
 		UINT					m_order = -1; // Render Order
-
-		std::map<Active_Texture, BaseTexture*> m_textures;
-		UINT					m_textureCount = 0;
+		bool					m_sharedTextures = false; // [true] = binds materials textures
 
 		// Locked Constructor
 		Material(const std::string& _name, UINT _order)
@@ -92,7 +101,7 @@ namespace Vxl
 		static Material* Create(const std::string& _name, UINT _order);
 
 		// Setters
-		void SetProgram(const ShaderProgram& _program);
+		void		SetProgram(const ShaderProgram& _program);
 		inline void SetOrder(UINT _order)
 		{
 			VXL_ASSERT(m_order != _order, "Cannot set order as its own value");
@@ -125,20 +134,9 @@ namespace Vxl
 
 			m_masterOrderDirty = true;
 		}
-		inline void SetTexture(BaseTexture* texture, Active_Texture layer)
+		inline void	SetSharedTextures(bool state)
 		{
-			m_textures[layer] = texture;
-			m_textureCount = (UINT)m_textures.size();
-		}
-		inline void RemoveTexture(Active_Texture layer)
-		{
-			m_textures.erase(layer);
-			m_textureCount = (UINT)m_textures.size();
-		}
-		inline void ClearTextures(void)
-		{
-			m_textures.clear();
-			m_textureCount = 0;
+			m_sharedTextures = state;
 		}
 
 		// Getters
@@ -149,6 +147,10 @@ namespace Vxl
 		inline UINT					GetOrder(void) const
 		{
 			return m_order;
+		}
+		inline bool					HasSharedTextures(void) const
+		{
+			return m_sharedTextures;
 		}
 
 		// GL States
@@ -169,9 +171,21 @@ namespace Vxl
 		MaterialProperty<bool>			m_property_useColor		 = MaterialProperty<bool>("VXL_useColor");
 		MaterialProperty<Color3F>		m_property_color		 = MaterialProperty<Color3F>("VXL_color");
 		MaterialProperty<Color3F>		m_property_tint			 = MaterialProperty<Color3F>("VXL_tint");
+		MaterialProperty<Vector4>		m_property_viewport		 = MaterialProperty<Vector4>("VXL_viewport");
+
+		template<typename Type>
+		void SetProperty(const std::string& _uniformName, Type _data)
+		{
+			VXL_ASSERT(m_shaderProgram, "Missing ShaderProgram for Material");
+			VXL_ASSERT(m_shaderProgram->CheckUniform(_uniformName), "Shader Program doesn't contain Uniform: " + _uniformName);
+			glUniform uniform = m_shaderProgram->GetUniform(_uniformName);
+			uniform.Set<Type>(_data);
+		}
 
 		// Bind Program, GL States, and Textures
-		void Bind();
+		void BindProgram();
+		void BindStates();
+		void BindTextures();
 	};
 
 }

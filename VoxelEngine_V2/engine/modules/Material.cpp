@@ -43,6 +43,7 @@ namespace Vxl
 		m_property_useColor.AcquireUniform(*m_shaderProgram);
 		m_property_color.AcquireUniform(*m_shaderProgram);
 		m_property_tint.AcquireUniform(*m_shaderProgram);
+		m_property_viewport.AcquireUniform(*m_shaderProgram);
 	}
 
 	// Setters
@@ -54,13 +55,15 @@ namespace Vxl
 	}
 
 	// Bind
-	void Material::Bind()
+	void Material::BindProgram()
 	{
 		VXL_ASSERT(m_shaderProgram, "Material missing Shader Program");
 
 		// Bind Shader
 		m_shaderProgram->Bind();
-
+	}
+	void Material::BindStates()
+	{
 		// Bind Modes
 		glUtil::cullMode(m_CullType);
 		glUtil::blendState(m_BlendState);
@@ -73,36 +76,14 @@ namespace Vxl
 		glUtil::depthState(m_DepthRead);
 		glUtil::depthMask(m_DepthWrite);
 		glUtil::wireframe(m_Wireframe);
-
-		//	// Bind Textures (ignore if wireframe mode is ON)
-		//	if (m_Wireframe == false)
-		//	{
-		//		// Null Texture if no textures are used
-		//		if (m_textureCount == 0)
-		//		{
-		//			// Bind null texture on first active layer
-		//			Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-		//		}
-		//		else
-		//		{
-		//			for (auto it = m_textures.begin(); it != m_textures.end(); it++)
-		//			{
-		//				// Get Current texture
-		//				BaseTexture* _tex = m_textures[it->first];
-		//	
-		//				// Bind Null texture if texture isn't loaded
-		//				if (_tex == nullptr || !_tex->IsLoaded())
-		//				{
-		//					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
-		//				}
-		//				// Bind texture normally
-		//				else
-		//				{
-		//					_tex->Bind(it->first);
-		//				}
-		//			}
-		//		}
-		//	}
+	}
+	void Material::BindTextures()
+	{
+		// Bind Textures (ignore if wireframe mode is ON)
+		if (m_Wireframe == false && m_sharedTextures)
+		{
+			TextureBinder::BindTextures();
+		}
 	}
 
 }

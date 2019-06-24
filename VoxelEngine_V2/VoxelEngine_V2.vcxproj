@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="engine\editor\Editor.cpp" />
+    <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="engine\textures\Cubemap.cpp" />
     <ClCompile Include="engine\textures\RenderTexture.cpp" />
     <ClCompile Include="engine\textures\Texture.cpp" />
+    <ClCompile Include="engine\textures\TextureBinder.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Macros.cpp" />
@@ -137,6 +139,7 @@
     <ClInclude Include="engine\textures\Texture.h" />
     <ClInclude Include="engine\opengl\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
+    <ClInclude Include="engine\textures\TextureBinder.h" />
     <ClInclude Include="engine\utilities\Asset.h" />
     <ClInclude Include="engine\utilities\Containers.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />

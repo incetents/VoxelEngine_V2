@@ -3,15 +3,15 @@
 
 #include "../utilities/singleton.h"
 
-#include "VBO.h"
-#include "glUtil.h"
-
 #include "../math/Vector3.h"
 #include "../math/Matrix4x4.h"
 #include "../math/Color.h"
 
 #include "../modules/Entity.h"
 #include "../opengl/LineMesh.h"
+
+#include "VBO.h"
+#include "glUtil.h"
 
 #include <vector>
 #include <assert.h>

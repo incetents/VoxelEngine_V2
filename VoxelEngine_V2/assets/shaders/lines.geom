@@ -13,7 +13,7 @@ layout(line_strip, max_vertices = 10) out;
 layout(triangle_strip, max_vertices = 6) out;
 #endif
 
-uniform vec4 _viewport;
+uniform vec4 VXL_viewport;
 
 in vec3 _position[];
 in vec4 vs_color[];
@@ -62,14 +62,14 @@ void main(void)
         end = mix(start, end, (0 - t0) / (t1 - t0));
     }
 
-    vec2 vpSize         = _viewport.zw;
+    vec2 vpSize         = VXL_viewport.zw;
 
     //  Compute line axis and side vector in screen space
     vec2 startInNDC     = start.xy / start.w;       //  clip to NDC: homogenize and drop z
     vec2 endInNDC       = end.xy / end.w;
     vec2 lineInNDC      = endInNDC - startInNDC;
-    vec2 startInScreen  = (0.5 * startInNDC + vec2(0.5)) * vpSize + _viewport.xy;
-    vec2 endInScreen    = (0.5 * endInNDC   + vec2(0.5)) * vpSize + _viewport.xy;
+    vec2 startInScreen  = (0.5 * startInNDC + vec2(0.5)) * vpSize + VXL_viewport.xy;
+    vec2 endInScreen    = (0.5 * endInNDC   + vec2(0.5)) * vpSize + VXL_viewport.xy;
     vec2 lineInScreen   = lineInNDC * vpSize;       //  ndc to screen (direction vector)
     vec2 axisInScreen   = normalize(lineInScreen);
     vec2 sideInScreen   = vec2(-axisInScreen.y, axisInScreen.x);    // rotate

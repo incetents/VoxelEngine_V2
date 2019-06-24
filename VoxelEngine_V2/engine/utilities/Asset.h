@@ -10,6 +10,8 @@
 
 namespace Vxl
 {
+	// Used as a means of inheriting a unique map of objects
+
 	template<class Type>
 	class Asset
 	{

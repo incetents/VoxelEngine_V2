@@ -216,6 +216,12 @@
     <ClCompile Include="engine\utilities\Macros.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\textures\TextureBinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\input\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\Input.h">
@@ -444,6 +450,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\textures\TextureBinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

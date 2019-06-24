@@ -55,6 +55,7 @@ namespace Vxl
 		Material* material_gbuffer;
 		Material* material_passthrough;
 		Material* material_billboard;
+		Material* material_lines;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

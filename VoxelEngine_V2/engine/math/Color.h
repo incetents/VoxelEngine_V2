@@ -107,6 +107,12 @@ namespace Vxl
 			return (start * (1.0f - t) + end * t);
 		}
 
+		// Utility
+		Color3F getRGB(void) const
+		{
+			return Color3F(r, g, b);
+		}
+
 		// Overloads
 		Color4F operator+(const Color4F& c) const;
 		Color4F operator-(const Color4F& c) const;

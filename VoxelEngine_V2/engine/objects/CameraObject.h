@@ -17,7 +17,7 @@ namespace Vxl
 		CUSTOM
 	};
 
-	class CameraObject : public Entity
+	class CameraObject : public Entity, public Asset<CameraObject>
 	{
 		friend class RenderManager;
 	private:

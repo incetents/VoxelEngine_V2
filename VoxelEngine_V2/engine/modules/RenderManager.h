@@ -39,15 +39,11 @@ namespace Vxl
 
 		// Masterlist of entities
 		std::vector<Entity*> m_allEntities;
-		// Masterlist of specific entities
-		std::vector<GameObject*>	m_allGameObjects;
-		std::vector<CameraObject*>	m_allCameraObjects;
-		std::vector<LightObject*>	m_allLightObjects;
 
 		// GameObjects per Material
-		std::map<Material*, std::set<GameObject*>> m_gameObjectsPerMaterial;
+		std::map<Material*, std::set<GameObject*>*> m_gameObjectsPerMaterial;
 		// All Materials with their gameobjects, sorted by their OrderID
-		std::map<UINT, std::pair<Material*, std::set<GameObject*>>> m_gameObjectsSorted;
+		std::map<UINT, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted;
 
 	public:
 		RenderManager();

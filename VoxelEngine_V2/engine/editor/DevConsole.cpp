@@ -66,7 +66,7 @@ namespace Vxl
 		if (ImGui::CollapsingHeader("Window"))
 		{
 			ImGui::Text("Window Size: %d %d", Window.GetWindowWidth(), Window.GetWindowHeight());
-			ImGui::Text("Window Viewport: %d %d", Window.GetScreenWidth(), Window.GetScreenHeight());
+			ImGui::Text("Window Viewport: %d %d", Window.GetViewportWidth(), Window.GetViewportHeight());
 			ImGui::Text("Window Resolution: %d %d", Window.GetResolutionWidth(), Window.GetResolutionHeight());
 			ImGui::Text("Window Aspect: %f", Window.GetAspectRatio());
 		}
