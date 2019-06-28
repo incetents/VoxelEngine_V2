@@ -20,17 +20,19 @@ layout (location = 1) out vec4 output_normal;
 layout (binding = 0) uniform sampler2D texture1;
 
 // Uniforms
-uniform vec4 VXL_color = vec4(1,1,1,1);
+uniform vec3 VXL_color = vec3(1,1,1);
+uniform float VXL_alpha = 1.0;
 
 //Main
 void main()
 {
 	float d = dot(normalize(f_data.normal), vec3(0.57735, 0.57735, 0.57735)); // -1 to 1 brightness
 	d = d * 0.5 + 0.5; // put into 0-1 range
-	vec4 light = vec4(0.25,0.25,0.25,0);
-	vec4 dark = vec4(0.5,0.5,0.5,0);
+	vec3 light = vec3(0.25,0.25,0.25);
+	vec3 dark = vec3(0.5,0.5,0.5);
 		
-	output_albedo = mix(VXL_color - dark, VXL_color + light, d);
+	output_albedo.rgb = mix(VXL_color - dark, VXL_color + light, d);
+	output_albedo.a = VXL_alpha;
 
 	output_normal = vec4(normalize(f_data.normal), 1.0); // worldspace Normals
 }

@@ -109,6 +109,13 @@ namespace Vxl
 					float rw[3] = { Entity->m_transform.getForward().x, Entity->m_transform.getForward().y, Entity->m_transform.getForward().z };
 					float sw[3] = { Entity->m_transform.getWorldScale().x, Entity->m_transform.getWorldScale().y, Entity->m_transform.getWorldScale().z };
 
+					// Camera has reversed forward
+					if (Entity->GetType() == EntityType::CAMERA)
+					{
+						rw[0] = -rw[0];
+						rw[1] = -rw[1];
+						rw[2] = -rw[2];
+					}
 					
 					ImGui::PushItemWidth(-1);
 

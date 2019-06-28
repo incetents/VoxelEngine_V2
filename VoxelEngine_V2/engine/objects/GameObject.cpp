@@ -84,13 +84,19 @@ namespace Vxl
 				m_material->m_property_useInstancing.SetProperty(m_mesh && m_mesh->m_instances.GetDrawCount());
 			}
 
-			// ~ Colors ~ //
-			if (m_material->m_property_color.IsUsed() && m_material->m_property_color.IsUsed())
-			{
-				// Color info or wireframe mode will cause color to be used in shader
-				m_material->m_property_useColor.SetProperty(m_isColoredObject || m_material->m_Wireframe);
+			// Use texture if no color and no wireframe
+			bool UseTexture = !m_isColoredObject && !m_material->m_Wireframe;
 
-				if ((m_isColoredObject || m_material->m_Wireframe))
+			// ~ Texture ~ //
+			if (m_material->m_property_useTexture.IsUsed())
+			{
+				m_material->m_property_useTexture.SetProperty(UseTexture);
+			}
+
+			// ~ Colors ~ //
+			if (m_material->m_property_color.IsUsed())
+			{
+				if (!UseTexture)
 					m_material->m_property_color.SetProperty(m_Color);
 			}
 			// ~ Tint ~ //

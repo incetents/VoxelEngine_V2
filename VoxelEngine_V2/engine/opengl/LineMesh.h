@@ -26,10 +26,19 @@ namespace Vxl
 		UINT				m_vertexIndex = 0;
 		bool				m_resizeDirty = false;
 
-		void AddStrideHint(BufferType type, int valueCount)
+		void AddStrideHint(BufferType type, GLuint valueCount, GLuint strideByteOffset)
 		{
-			m_vertexBuffer.addStrideHint(type, valueCount);
+			m_vertexBuffer.addStrideHint(type, valueCount, strideByteOffset);
 		}
+		void RemoveStrideHint(BufferType type)
+		{
+			m_vertexBuffer.removeStrideHint(type);
+		}
+		void ClearStrideHints(void)
+		{
+			m_vertexBuffer.removeAllStrideHints();
+		}
+
 		// Expensive but can resize buffer
 		void SetVertices()
 		{

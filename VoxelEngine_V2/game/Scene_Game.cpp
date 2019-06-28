@@ -104,13 +104,14 @@ namespace Vxl
 		_fbo_colorpicker->addDepth(DepthFormat_Type::DEPTH16, Attachment_Type::BUFFER);
 		_fbo_colorpicker->init();
 
-		_shader_skybox				= ShaderProgram::Get("skybox");
-		_shader_gbuffer				= ShaderProgram::Get("gbuffer");
-		_shader_lines				= ShaderProgram::Get("lines");
-		_shader_passthrough			= ShaderProgram::Get("passthrough");
-		_shader_colorPicker			= ShaderProgram::Get("colorPicker");
-		_shader_showRenderTarget	= ShaderProgram::Get("showRenderTarget");
-		_shader_billboard			= ShaderProgram::Get("billboard");
+		ShaderProgram* _shader_skybox			= ShaderProgram::Get("skybox");
+		ShaderProgram* _shader_gbuffer			= ShaderProgram::Get("gbuffer");
+		ShaderProgram* _shader_lines			= ShaderProgram::Get("lines");
+		ShaderProgram* _shader_passthrough		= ShaderProgram::Get("passthrough");
+		ShaderProgram* _shader_colorPicker		= ShaderProgram::Get("colorPicker");
+		ShaderProgram* _shader_showRenderTarget = ShaderProgram::Get("showRenderTarget");
+		ShaderProgram* _shader_billboard		= ShaderProgram::Get("billboard");
+		ShaderProgram* _shader_simpleLight		= ShaderProgram::Get("simpleLight");
 
 
 		material_skybox = Material::Create("skybox", 0);
@@ -119,9 +120,8 @@ namespace Vxl
 		material_gbuffer = Material::Create("gbuffer", 1);
 		material_gbuffer->SetProgram(*_shader_gbuffer);
 
+		// Gbuffer has no blending whatsoever
 		material_gbuffer->m_BlendState = false;
-		material_gbuffer->m_BlendSource = Blend_Source::ONE;
-		material_gbuffer->m_BlendDest = Blend_Destination::ZERO;
 
 		material_passthrough = Material::Create("passthrough", 2);
 		material_passthrough->SetProgram(*_shader_passthrough);
@@ -131,6 +131,12 @@ namespace Vxl
 
 		material_lines = Material::Create("lines", 4);
 		material_lines->SetProgram(*_shader_lines);
+
+		material_simpleLight = Material::Create("simpleLight", 5);
+		material_simpleLight->SetProgram(*_shader_simpleLight);
+
+		material_colorPicker = Material::Create("colorPicker", 6);
+		material_colorPicker->SetProgram(*_shader_colorPicker);
 
 		_tex = Texture::Get("beato");
 		_tex_crate = Texture::Get("crate_diffuse");
@@ -234,7 +240,7 @@ namespace Vxl
 		_skybox->SetTexture(_cubemap1, Active_Texture::LEVEL0);
 		_skybox->SetMesh(Geometry.GetInverseCube());
 		_skybox->m_useTransform = false;
-		
+		_skybox->SetSelectable(false);
 
 		//_skybox->SetMaterial(material_gbuffer);
 
@@ -526,7 +532,7 @@ namespace Vxl
 	}
 	void Scene_Game::Draw()
 	{
-
+		ShaderProgram* _shader_gbuffer = ShaderProgram::Get("gbuffer");
 		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT("TESTMODE", 0));
 
 
@@ -656,41 +662,56 @@ namespace Vxl
 				_fbo_colorpicker->clearBuffers();
 				glUtil::blendState(false);
 
-				_shader_colorPicker->Bind();
+				material_colorPicker->BindProgram();
 
-				_shader_colorPicker->SetUniform<bool>("VXL_useModel", true);
-				_shader_colorPicker->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel(), true);
+				material_colorPicker->m_property_useModel.SetProperty(true);
+				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
 
 				Vector4 color;
 
 				// Cube (ignored)
-				_shader_colorPicker->SetUniform<Vector4>("VXL_colorID", Vector4(0, 0, 0, 0));
+				material_colorPicker->m_property_output.SetProperty(Vector4(0, 0, 0, 0));
 				Geometry.GetCubeSmall()->Draw();
 
+				// X-arrow
 				color = Util::DataConversion::uint_to_vec4(1u);
-				_shader_colorPicker->SetUniform<Vector4>("VXL_colorID", color);
+				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetArrowX()->Draw();
 
+				// Y-arrow
 				color = Util::DataConversion::uint_to_vec4(2u);
-				_shader_colorPicker->SetUniform<Vector4>("VXL_colorID", color);
+				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetArrowY()->Draw();
 
+				// Z-arrow
 				color = Util::DataConversion::uint_to_vec4(3u);
-				_shader_colorPicker->SetUniform<Vector4>("VXL_colorID", color);
+				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetArrowZ()->Draw();
 
-				float px = Input.getMousePosViewportX(); // [0 -> 1] horizontally across viewport
-				px *= (float)_fbo_colorpicker->GetWidth();
+				glUtil::cullMode(Cull_Type::NO_CULL);
 
-				float py = Input.getMousePosViewportY(true); // [0 -> 1] vertically across viewport
-				py *= (float)_fbo_colorpicker->GetHeight();
+				// X Plane
+				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
+				color = Util::DataConversion::uint_to_vec4(4u);
+				material_colorPicker->m_property_output.SetProperty(color);
+				Geometry.GetHalfQuadX()->Draw();
 
-				// read pixel
-				RawArray<GLubyte> data = _fbo_colorpicker->readPixels(
-					0,
-					px, py,
-					1, 1
-				);
+				// Y Plane
+				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
+				color = Util::DataConversion::uint_to_vec4(5u);
+				material_colorPicker->m_property_output.SetProperty(color);
+				Geometry.GetHalfQuadY()->Draw();
+
+				// Z Plane
+				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
+				color = Util::DataConversion::uint_to_vec4(6u);
+				material_colorPicker->m_property_output.SetProperty(color);
+				Geometry.GetHalfQuadZ()->Draw();
+
+				glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
+
+
+				RawArray<GLubyte> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
 
 				unsigned int EditorIndex;
 				Util::DataConversion::uchars_to_uint(data.start, EditorIndex);
@@ -700,21 +721,37 @@ namespace Vxl
 				{
 				case 1u:
 					Editor.m_controlAxis = Axis::X;
+					Editor.m_controlPlane = Axis::NONE;
 					break;
 				case 2u:
 					Editor.m_controlAxis = Axis::Y;
+					Editor.m_controlPlane = Axis::NONE;
 					break;
 				case 3u:
 					Editor.m_controlAxis = Axis::Z;
+					Editor.m_controlPlane = Axis::NONE;
+					break;
+				case 4u:
+					Editor.m_controlAxis = Axis::NONE;
+					Editor.m_controlPlane = Axis::X;
+					break;
+				case 5u:
+					Editor.m_controlAxis = Axis::NONE;
+					Editor.m_controlPlane = Axis::Y;
+					break;
+				case 6u:
+					Editor.m_controlAxis = Axis::NONE;
+					Editor.m_controlPlane = Axis::Z;
 					break;
 				default:
 					Editor.m_controlAxis = Axis::NONE;
+					Editor.m_controlPlane = Axis::NONE;
 				}
 			}
 
 			
 			// Drag Editor Axis around
-			if (Input.getMouseButton(MouseButton::LEFT) && Editor.m_controlAxis != Axis::NONE && Editor.HasSelection())
+			if (Input.getMouseButton(MouseButton::LEFT) && (Editor.m_controlAxis != Axis::NONE || Editor.m_controlPlane != Axis::NONE) && Editor.HasSelection())
 			{
 				Vector2 MouseChange = Vector2(
 					(float)+Input.getMouseDragDeltaX(),
@@ -730,7 +767,7 @@ namespace Vxl
 				if (Editor.m_controlAxisClicked == false)
 				{
 					// Object MVP
-					Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * Editor.GetSelectionTransformModel();
+					Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * Editor.GetSelectionTransform().Model;
 
 					// Calculate Center Axis in ClipSpace
 					Vector4 ClipSpaceAxis = MVP * Vector4(0, 0, 0, 1);
@@ -749,6 +786,21 @@ namespace Vxl
 					case Axis::Z:
 						ClipSpaceAxis = MVP * Vector4(0, 0, 1, 1);
 						break;
+					case Axis::NONE:
+					{
+						switch (Editor.m_controlPlane)
+						{
+						case Axis::X:
+							ClipSpaceAxis = MVP * Vector4(0, 0.577f, 0.577f, 1);
+							break;
+						case Axis::Y:
+							ClipSpaceAxis = MVP * Vector4(0.577f, 0, 0.577f, 1);
+							break;
+						case Axis::Z:
+							ClipSpaceAxis = MVP * Vector4(0.577f, 0.577f, 0, 1);
+							break;
+						}
+					}
 					}
 
 					ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
@@ -761,8 +813,10 @@ namespace Vxl
 					Axis_ScreenDirection = (Axis_ScreenPos - CenterAxis_ScreenPos).Normalize();
 
 					// Update Drag Speed
-					DragSpeed = Editor.GetAverageSelectionDistanceFromEditorCamera() / 3.0f;
+					DragSpeed = Editor.GetSelectionTransform().CameraDistance / 3.0f;
 				}
+
+				std::cout << DragSpeed << std::endl;
 
 				VXL_ASSERT(Axis_ScreenDirection.LengthSqr() != 0.0f, "Axis_ScreenDirection is zero");
 
@@ -782,14 +836,29 @@ namespace Vxl
 					switch (Editor.m_controlAxis)
 					{
 					case Axis::X:
-						MoveDirection = Editor.GetSelectionTransformRight();
+						MoveDirection = Editor.GetSelectionTransform().Right;
 						break;
 					case Axis::Y:
-						MoveDirection = Editor.GetSelectionTransformUp();
+						MoveDirection = Editor.GetSelectionTransform().Up;
 						break;
 					case Axis::Z:
-						MoveDirection = Editor.GetSelectionTransformForward();
+						MoveDirection = Editor.GetSelectionTransform().Forward;
 						break;
+					case Axis::NONE:
+					{
+						switch (Editor.m_controlPlane)
+						{
+						case Axis::X:
+							MoveDirection = Editor.GetSelectionTransform().Up + Editor.GetSelectionTransform().Forward;
+							break;
+						case Axis::Y:
+							MoveDirection = Editor.GetSelectionTransform().Right + Editor.GetSelectionTransform().Forward;
+							break;
+						case Axis::Z:
+							MoveDirection = Editor.GetSelectionTransform().Right + Editor.GetSelectionTransform().Up;
+							break;
+						}
+					}
 					}
 
 					for (auto& Entity : SelectedEntities)
@@ -823,7 +892,7 @@ namespace Vxl
 				_fbo_colorpicker->clearBuffers();
 				glUtil::blendState(false);
 
-				_shader_colorPicker->Bind();
+				material_colorPicker->BindProgram();
 
 				auto Entities = RenderManager.GetAllEntities();
 				unsigned int EntityCount = (unsigned int)Entities.size();
@@ -840,18 +909,21 @@ namespace Vxl
 					Vector4 color = Util::DataConversion::uint_to_vec4(i + 1u);
 
 					// Vert
-					_shader_colorPicker->SetUniformMatrix<Matrix4x4>("VXL_model", Entity->m_transform.getWorldModel(), true);
-					_shader_colorPicker->SetUniform("VXL_useInstancing", false);
-					_shader_colorPicker->SetUniform("VXL_useModel", Entity->m_useTransform);
+					material_colorPicker->m_property_useModel.SetProperty(Entity->m_useTransform);
+					if (Entity->m_useTransform)
+						material_colorPicker->m_property_model.SetPropertyMatrix(Entity->m_transform.getWorldModel(), true);
+
+					material_colorPicker->m_property_useInstancing.SetProperty(false);
+
 					// Frag
-					_shader_colorPicker->SetUniform<Vector4>("VXL_colorID", color);
+					material_colorPicker->m_property_output.SetProperty(color);
 
 					// Different Effect based on type
 					if (Entity->GetType() == EntityType::GAMEOBJECT)
 					{
 						GameObject* GameObj = dynamic_cast<GameObject*>(Entity);
 
-						_shader_colorPicker->SetUniform("VXL_useInstancing", !GameObj->GetMesh()->m_instances.Empty());
+						material_colorPicker->m_property_useInstancing.SetProperty(!GameObj->GetMesh()->m_instances.Empty());
 
 						GameObj->GetMesh()->Draw();
 					}
@@ -866,17 +938,8 @@ namespace Vxl
 
 				}
 
-				float px = Input.getMousePosViewportX(); // [0 -> 1] horizontally across viewport
-				px *= (float)_fbo_colorpicker->GetWidth();
 
-				float py = Input.getMousePosViewportY(true); // [0 -> 1] vertically across viewport
-				py *= (float)_fbo_colorpicker->GetHeight();
-
-				RawArray<GLubyte> data = _fbo_colorpicker->readPixels(
-					0,
-					px, py,
-					1, 1
-				);
+				RawArray<GLubyte> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
 
 				//	std::cout <<
 				//	(unsigned int)data[0] << ' ' <<
@@ -940,6 +1003,8 @@ namespace Vxl
 		glUtil::clearBuffer();
 
 		
+		ShaderProgram* _shader_showRenderTarget = ShaderProgram::Get("showRenderTarget");
+
 		// Final Pass / Back Buffer
 		switch (FBO_OVERRIDE)
 		{

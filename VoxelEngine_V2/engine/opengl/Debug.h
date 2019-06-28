@@ -47,13 +47,22 @@ namespace Vxl
 				delete m_mesh;
 				m_mesh = new LineMesh();
 
-				if (type == PositionType::VEC3)
-					m_mesh->AddStrideHint(BufferType::VERTEX, 3); // loc 0
-				else
-					m_mesh->AddStrideHint(BufferType::VERTEX, 2); // loc 0
+				int offset = 0;
 
-				m_mesh->AddStrideHint(BufferType::COLOR, 4);  // loc 3
-				m_mesh->AddStrideHint(BufferType::LINEWIDTH, 1); // loc 1
+				if (type == PositionType::VEC3)
+				{
+					m_mesh->AddStrideHint(BufferType::VERTEX, 3, 0); // loc 0
+					offset += 3;
+				}
+				else
+				{
+					m_mesh->AddStrideHint(BufferType::VERTEX, 2, 0); // loc 0
+					offset += 2;
+				}
+
+				m_mesh->AddStrideHint(BufferType::COLOR, 4, offset);  // loc 3
+				offset += 4;
+				m_mesh->AddStrideHint(BufferType::LINEWIDTH, 1, offset); // loc 1
 
 				m_mesh->SetVertices();
 				m_mesh->Bind();

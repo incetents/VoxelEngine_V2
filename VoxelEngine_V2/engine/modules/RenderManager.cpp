@@ -387,7 +387,7 @@ namespace Vxl
 		auto AllLights = LightObject::GetDatabase();
 		for (auto light = AllLights.begin(); light != AllLights.end(); light++)
 		{
-			billboard->m_property_model.SetPropertyTranspose(light->second->m_transform.getWorldModel(), true);
+			billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getWorldModel(), true);
 		
 			if (LightTexture)
 				LightTexture->Bind(Active_Texture::LEVEL0);
@@ -402,7 +402,7 @@ namespace Vxl
 		auto AllCameras = CameraObject::GetDatabase();
 		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 		{
-			billboard->m_property_model.SetPropertyTranspose(camera->second->m_transform.getWorldModel(), true);
+			billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getWorldModel(), true);
 
 			if (LightTexture)
 				CameraTexture->Bind(Active_Texture::LEVEL0);
@@ -419,29 +419,34 @@ namespace Vxl
 
 		lines->SetProperty<bool>("passthrough", false);
 
+		glUtil::depthMask(false);
 		glUtil::depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
 		Debug.RenderWorldLines();
 
-		//glUtil::depthTest(Depth_Pass_Rule::GREATER);
+		glUtil::depthTest(Depth_Pass_Rule::GREATER);
 		// ???
+
+		glUtil::depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
 
 		lines->SetProperty<bool>("passthrough", true);
 
 		Debug.RenderScreenLines();
 
+		glUtil::depthMask(true);
+
 		// Draw Debug Wireframe Sphere
-		auto passthrough = ShaderProgram::Get("passthrough");
-		passthrough->Bind();
-		passthrough->SetUniform<bool>("VXL_useTexture", false);
-		passthrough->SetUniform<bool>("VXL_useModel", true);
+		auto passthrough = Material::Get("passthrough");
+		passthrough->BindProgram();
+		passthrough->m_property_useTexture.SetProperty(false);
+		passthrough->m_property_useModel.SetProperty(true);
 		
 		glUtil::wireframe(true);
 		glUtil::cullMode(Cull_Type::NO_CULL);
 		glLineWidth(5.0f);
 		for (const auto& sphere : Debug.m_wireframeSpheres)
 		{
-			passthrough->SetUniform<Color3F>("VXL_color", sphere.color.getRGB());
-			passthrough->SetUniformMatrix<Matrix4x4>("VXL_model", sphere.model, true);
+			passthrough->m_property_color.SetProperty(sphere.color.getRGB());
+			passthrough->m_property_model.SetPropertyMatrix(sphere.model, true);
 			Geometry.GetIcoSphere()->Draw();
 		}
 		glLineWidth(1.0f);
@@ -455,11 +460,11 @@ namespace Vxl
 		// Draw Editor Arrows (if selection applies)
 		if (Editor.HasSelection())
 		{
-			auto simpleLight = ShaderProgram::Get("simpleLight");
-			simpleLight->Bind();
+			auto simpleLight = Material::Get("simpleLight");
+			simpleLight->BindProgram();
 
-			simpleLight->SetUniform<bool>("VXL_useModel", true);
-			simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel(), true);
+			simpleLight->m_property_useModel.SetProperty(true);
+			simpleLight->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
 
 			// Movement //
 			if (Editor.m_controlMode == Editor.ControlMode::TRANSLATE)
@@ -467,71 +472,80 @@ namespace Vxl
 				// X Axis //
 				if (Editor.m_controlAxis == Axis::X)
 					if (Editor.m_controlAxisClicked)
-						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 					else
-						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 				else
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 1));
+					simpleLight->m_property_color.SetProperty(Color3F::RED);
 
 				Geometry.GetArrowX()->Draw();
 
 				// Y Axis //
 				if (Editor.m_controlAxis == Axis::Y)
 					if (Editor.m_controlAxisClicked)
-						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 					else
-						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 				else
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 1));
+					simpleLight->m_property_color.SetProperty(Color3F::GREEN);
 
 				Geometry.GetArrowY()->Draw();
 
 				// Z Axis //
 				if (Editor.m_controlAxis == Axis::Z)
 					if (Editor.m_controlAxisClicked)
-						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::WHITE);
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 					else
-						simpleLight->SetUniform<Color4F>("VXL_color", Color4F::YELLOW);
+						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 				else
-					simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 1));
+					simpleLight->m_property_color.SetProperty(Color3F::BLUE);
 
 				Geometry.GetArrowZ()->Draw();
 
 				// Small cube in the middle //
-				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 1, 1, 0.85f));
+				simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+				simpleLight->m_property_alpha.SetProperty(0.85f);
 				Geometry.GetCubeSmall()->Draw();
 
 				glUtil::cullMode(Cull_Type::NO_CULL);
 
-				Vector3 SelectionTransformToCamera = (m_mainCamera->m_transform.getWorldPosition() - Editor.GetSelectionTransformWorldPosition());
-
-				bool CamOnXAxis = SelectionTransformToCamera.Dot(Editor.GetSelectionTransformRight()) > 0.0f;
-				bool CamOnYAxis = SelectionTransformToCamera.Dot(Editor.GetSelectionTransformUp()) > 0.0f;
-				bool CamOnZAxis = SelectionTransformToCamera.Dot(Editor.GetSelectionTransformForward()) > 0.0f;
-
-				// X Plane Position
-				Matrix4x4 Offset = Matrix4x4::GetTranslate(Vector3(0, CamOnYAxis ? 0.25f : -0.25f, CamOnZAxis ? 0.25f : -0.25f));
-				simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel() * Offset, true);
 				// X Plane
-				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(1, 0, 0, 0.85f));
+				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
+				if (Editor.m_controlPlane == Axis::X)
+					if (Editor.m_controlAxisClicked)
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+				else
+					simpleLight->m_property_color.SetProperty(Color3F::RED);
 				Geometry.GetHalfQuadX()->Draw();
 				
-				// Y Plane Position
-				Offset = Matrix4x4::GetTranslate(Vector3(CamOnXAxis ? 0.25f : -0.25f, 0, CamOnZAxis ? 0.25f : -0.25f));
-				simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel() * Offset, true);
 				// Y Plane
-				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 1, 0, 0.85f));
+				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
+				if (Editor.m_controlPlane == Axis::Y)
+					if (Editor.m_controlAxisClicked)
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+				else
+					simpleLight->m_property_color.SetProperty(Color3F::GREEN);
 				Geometry.GetHalfQuadY()->Draw();
-				
-				// Z Plane Position
-				Offset = Matrix4x4::GetTranslate(Vector3(CamOnXAxis ? 0.25f : -0.25f, CamOnYAxis ? 0.25f : -0.25f, 0));
-				simpleLight->SetUniformMatrix<Matrix4x4>("VXL_model", Editor.GetSelectionTransformModel() * Offset, true);
+
 				// Z Plane
-				simpleLight->SetUniform<Color4F>("VXL_color", Color4F(0, 0, 1, 0.85f));
+				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
+				if (Editor.m_controlPlane == Axis::Z)
+					if (Editor.m_controlAxisClicked)
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+				else
+					simpleLight->m_property_color.SetProperty(Color3F::BLUE);
 				Geometry.GetHalfQuadZ()->Draw();
 
 				glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
 
+				// revert
+				simpleLight->m_property_alpha.SetProperty(1.0f);
 			}
 			// TEST //
 

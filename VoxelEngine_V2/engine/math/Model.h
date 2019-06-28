@@ -34,7 +34,7 @@ namespace Vxl
 		std::vector<Vector3> normals;
 		std::vector<Vector3> tangents;
 		std::vector<Vector3> bitangents;
-		std::vector<Vector4> colors;
+		//std::vector<Vector4> colors;
 		unsigned int vertexCount = 0;
 
 		std::vector<unsigned int> indices;
@@ -58,7 +58,7 @@ namespace Vxl
 			Util::MergeVectors(normals, other.normals);
 			Util::MergeVectors(tangents, other.tangents);
 			Util::MergeVectors(bitangents, other.bitangents);
-			Util::MergeVectors(colors, other.colors);
+			//Util::MergeVectors(colors, other.colors);
 			Util::MergeVectors(indices, other.indices);
 
 			vertexCount += other.vertexCount;

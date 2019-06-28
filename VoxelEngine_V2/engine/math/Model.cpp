@@ -76,8 +76,8 @@ namespace Vxl
 				_model->bitangents.reserve(mesh->mNumVertices);
 			}
 			// colors
-			if (mesh->HasVertexColors(0))
-				_model->colors.reserve(mesh->mNumVertices);
+			//	if (mesh->HasVertexColors(0))
+			//		_model->colors.reserve(mesh->mNumVertices);
 
 			// add all data
 			for (std::uint32_t vertIndex = 0u; vertIndex < mesh->mNumVertices; vertIndex++)
@@ -97,10 +97,10 @@ namespace Vxl
 					_model->tangents.push_back(InterpretAssimpVec3(mesh->mTangents[vertIndex]));
 					_model->bitangents.push_back(InterpretAssimpVec3(mesh->mBitangents[vertIndex]));
 				}
-				if (mesh->HasVertexColors(0))
-				{
-					_model->colors.push_back(InterpretAssimpVec4(mesh->mColors[0][vertIndex]));
-				}
+				//if (mesh->HasVertexColors(0))
+				//{
+				//	_model->colors.push_back(InterpretAssimpVec4(mesh->mColors[0][vertIndex]));
+				//}
 			}
 
 			// index

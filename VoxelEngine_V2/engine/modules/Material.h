@@ -32,12 +32,19 @@ namespace Vxl
 	{
 		friend class Material;
 	private:
+#ifdef _DEBUG
+		const ShaderProgram* m_program = nullptr;
+#endif
 		const std::string	m_propertyName;
 		glUniform			m_uniform;
 		bool				m_isUsed = true;
 
 		void AcquireUniform(const ShaderProgram& program)
 		{
+#ifdef _DEBUG
+			m_program = &program;
+#endif
+
 			if (program.CheckUniform(m_propertyName))
 			{
 				m_uniform = program.GetUniform(m_propertyName);
@@ -58,12 +65,14 @@ namespace Vxl
 		{}
 		void SetProperty(Type _data)
 		{
+			VXL_ASSERT(ShaderProgram::GetBoundProgram() == m_program->GetID(), "Cannot change property without binding associated program first");
 			VXL_ASSERT(m_uniform.GetLocation() != -1, "Property has no attached Uniform");
 			m_uniform.Set<Type>(_data);
 		}
 		// Only works for matrices
-		void SetPropertyTranspose(Type _data, bool _transpose)
+		void SetPropertyMatrix(Type _data, bool _transpose)
 		{
+			VXL_ASSERT(ShaderProgram::GetBoundProgram() == m_program->GetID(), "Cannot change property without binding associated program first");
 			VXL_ASSERT(m_uniform.GetLocation() != -1, "Property has no attached Uniform");
 			m_uniform.SetMatrix<Type>(_data, _transpose);
 		}
@@ -168,10 +177,12 @@ namespace Vxl
 		MaterialProperty<bool>			m_property_useModel		 = MaterialProperty<bool>("VXL_useModel");
 		MaterialProperty<Matrix4x4>		m_property_model		 = MaterialProperty<Matrix4x4>("VXL_model");
 		MaterialProperty<bool>			m_property_useInstancing = MaterialProperty<bool>("VXL_useInstancing");
-		MaterialProperty<bool>			m_property_useColor		 = MaterialProperty<bool>("VXL_useColor");
+		MaterialProperty<bool>			m_property_useTexture	 = MaterialProperty<bool>("VXL_useTexture");
 		MaterialProperty<Color3F>		m_property_color		 = MaterialProperty<Color3F>("VXL_color");
 		MaterialProperty<Color3F>		m_property_tint			 = MaterialProperty<Color3F>("VXL_tint");
 		MaterialProperty<Vector4>		m_property_viewport		 = MaterialProperty<Vector4>("VXL_viewport");
+		MaterialProperty<float>			m_property_alpha		 = MaterialProperty<float>("VXL_alpha");
+		MaterialProperty<Vector4>		m_property_output		 = MaterialProperty<Vector4>("VXL_output");
 
 		template<typename Type>
 		void SetProperty(const std::string& _uniformName, Type _data)

@@ -40,10 +40,12 @@ namespace Vxl
 		m_property_useModel.AcquireUniform(*m_shaderProgram);
 		m_property_model.AcquireUniform(*m_shaderProgram);
 		m_property_useInstancing.AcquireUniform(*m_shaderProgram);
-		m_property_useColor.AcquireUniform(*m_shaderProgram);
+		m_property_useTexture.AcquireUniform(*m_shaderProgram);
 		m_property_color.AcquireUniform(*m_shaderProgram);
 		m_property_tint.AcquireUniform(*m_shaderProgram);
 		m_property_viewport.AcquireUniform(*m_shaderProgram);
+		m_property_alpha.AcquireUniform(*m_shaderProgram);
+		m_property_output.AcquireUniform(*m_shaderProgram);
 	}
 
 	// Setters

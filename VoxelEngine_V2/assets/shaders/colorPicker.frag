@@ -16,10 +16,10 @@ in fragment_data
 layout (location = 0) out vec4 output_color;
 
 // Uniforms
-uniform vec4 VXL_colorID;
+uniform vec4 VXL_output;
 
 //Main
 void main()
 {
-	output_color = VXL_colorID;
+	output_color = VXL_output;
 }

@@ -14,32 +14,39 @@ namespace Vxl
 	static class Editor : public Singleton<class Editor>
 	{
 	private:
-		// Data
+		// Selected Entities
 		std::vector<Entity*> m_selectedEntities;
-		float	m_averageSelectionDistanceFromEditorCamera;
 
-		// For Translate/Rotation/Scale debug object
-		Matrix4x4	m_selectionTransform_Model;
-		Vector3		m_selectionTransform_WorldPosition;
-		Vector3		m_selectionTransform_Forward;
-		Vector3		m_selectionTransform_Up;
-		Vector3		m_selectionTransform_Right;
+		// Transform Selection
+		struct SelectionTransform
+		{
+			Matrix4x4	Model;
+			Vector3		WorldPosition;
+			Vector3		Forward;
+			Vector3		Up;
+			Vector3		Right;
+			float		CameraDistance;
 
-		// Update info
-		void UpdateSelectionAverage();
+		} m_SelectionTransform;
+		void UpdateSelectionTransformPosition();
+
+		// Axis Selection
+		struct AxisSelectionTransform
+		{
+			Matrix4x4 X_Model;
+			Matrix4x4 Y_Model;
+			Matrix4x4 Z_Model;
+
+		} m_AxisSelectionTransform;
 
 	public:
 
-		/* Selection */
-		const std::vector<Entity*>& GetSelectedEntities(void) const
+		// Selected Entities
+		inline const std::vector<Entity*>& GetSelectedEntities(void) const
 		{
 			return m_selectedEntities;
 		}
 		
-		float GetAverageSelectionDistanceFromEditorCamera() const
-		{
-			return m_averageSelectionDistanceFromEditorCamera;
-		}
 		// [true] if at least one object is selected
 		bool HasSelection() const
 		{
@@ -49,27 +56,15 @@ namespace Vxl
 		void AddSelection(Entity* _entity);
 		void ClearSelection();
 
-		inline const Matrix4x4& GetSelectionTransformModel(void) const
+		// Transform Selection
+		inline const SelectionTransform& GetSelectionTransform(void) const
 		{
-			return m_selectionTransform_Model;
+			return m_SelectionTransform;
 		}
-		inline const Vector3& GetSelectionTransformWorldPosition() const
+		inline const AxisSelectionTransform& GetAxisSelectionTransform(void) const
 		{
-			return m_selectionTransform_WorldPosition;
+			return m_AxisSelectionTransform;
 		}
-		inline const Vector3& GetSelectionTransformForward(void) const
-		{
-			return m_selectionTransform_Forward;
-		}
-		inline const Vector3& GetSelectionTransformUp(void) const
-		{
-			return m_selectionTransform_Up;
-		}
-		inline const Vector3& GetSelectionTransformRight(void) const
-		{
-			return m_selectionTransform_Right;
-		}
-
 
 		/* Editor Controls */
 		enum ControlMode
@@ -80,6 +75,7 @@ namespace Vxl
 		};
 		ControlMode m_controlMode = ControlMode::TRANSLATE;
 		Axis m_controlAxis = Axis::NONE;
+		Axis m_controlPlane = Axis::NONE;
 		bool m_controlAxisClicked = false;
 		bool m_controlAxisLocal = true; // Whether Editor axis rotates based on local rotation
 

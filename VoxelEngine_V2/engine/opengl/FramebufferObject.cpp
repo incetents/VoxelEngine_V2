@@ -7,6 +7,7 @@
 #include "../textures/RenderTexture.h"
 #include "../utilities/logger.h"
 #include "../window/window.h"
+#include "../input/Input.h"
 
 namespace Vxl
 {
@@ -324,7 +325,11 @@ namespace Vxl
 	// Notice, SNORM TEXTURES CANNOT BE READ
 	RawArray<GLubyte> FramebufferObject::readPixels(u_int textureIndex, int x, int y, int w, int h)
 	{
-		VXL_ASSERT(textureIndex < m_textureCount, "FBO, index out of bounds");
+		VXL_ASSERT(textureIndex < m_textureCount, "FBO readpixels: index out of bounds");
+		
+		// Ignore if x,y coordinates are outside FBO range
+		if (x < 0 || y < 0)
+			return RawArray<GLubyte>();
 
 		auto Texture = m_textures[textureIndex];
 		
@@ -341,7 +346,20 @@ namespace Vxl
 
 		return Array;
 	}
-	RawArray<GLubyte> FramebufferObject::readDepthPixel(int x, int y, int w, int h)
+	RawArray<GLubyte> FramebufferObject::readPixelsFromMouse(u_int textureIndex, int w, int h)
+	{
+		float px, py;
+		px = Input.getMousePosViewportX();  // [0 -> 1] horizontally across viewport
+		py = Input.getMousePosViewportY(true);  // [0 -> 1] vertically across viewport
+
+		// Move position from [0->1] into [0->width] and [0->height]
+		px *= m_width;
+		py *= m_height;
+
+		return readPixels(textureIndex, (int)px, (int)py, w, h);
+	}
+
+	RawArray<GLubyte> FramebufferObject::readDepthPixels(int x, int y, int w, int h)
 	{
 		RawArray<GLubyte> Array;
 		Array.start = new GLubyte[w * h * m_depth->GetChannelCount()];
@@ -354,5 +372,17 @@ namespace Vxl
 		);
 
 		return Array;
+	}
+	RawArray<GLubyte> FramebufferObject::readDepthPixelsFromMouse(int w, int h)
+	{
+		float px, py;
+		px = Input.getMousePosViewportX();  // [0 -> 1] horizontally across viewport
+		py = Input.getMousePosViewportY(true);  // [0 -> 1] vertically across viewport
+
+		// Move position from [0->1] into [0->width] and [0->height]
+		px *= m_width;
+		py *= m_height;
+
+		return readDepthPixels((int)px, (int)py, w, h);
 	}
 }

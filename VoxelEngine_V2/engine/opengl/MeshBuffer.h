@@ -21,13 +21,22 @@ namespace Vxl
 		MeshBuffer()
 		{
 			if (Buf != BufferType::NONE)
-				addStrideHint(Buf, ValCount);
+				addStrideHint(Buf, ValCount, 0);
 		}
 
-		void addStrideHint(BufferType type, GLuint valueCount)
+		void addStrideHint(BufferType type, GLuint valueCount, GLuint strideByteOffset)
 		{
-			m_vbo.AddStrideHint(type, valueCount);
+			m_vbo.AddStrideHint(type, valueCount, strideByteOffset);
 		}
+		void removeStrideHint(BufferType type)
+		{
+			m_vbo.RemoveStrideHint(type);
+		}
+		void removeAllStrideHints()
+		{
+			m_vbo.RemoveAllStrideHints();
+		}
+
 
 		virtual void set(Type* arr, GLuint size, BufferBind_Mode mode = BufferBind_Mode::STATIC)
 		{
@@ -216,7 +225,7 @@ namespace Vxl
 		MeshBufferInstancing()
 		{
 			vertices = new std::vector<Matrix4x4>();
-			m_vbo.AddStrideHint(BufferType::InstancingStart, 0);
+			m_vbo.AddStrideHint(BufferType::InstancingStart, 0, 0);
 		}
 
 		void setAlloc(std::vector<Matrix4x4>* arr)

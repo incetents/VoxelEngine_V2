@@ -171,6 +171,9 @@ namespace Vxl
 		void generateMipmaps(unsigned int textureIndex);
 
 		RawArray<GLubyte> readPixels(u_int textureIndex, int x, int y, int w, int h);
-		RawArray<GLubyte> readDepthPixel(int x, int y, int w, int h);
+		RawArray<GLubyte> readPixelsFromMouse(u_int textureIndex, int w, int h);
+
+		RawArray<GLubyte> readDepthPixels(int x, int y, int w, int h);
+		RawArray<GLubyte> readDepthPixelsFromMouse(int w, int h);
 	};
 }

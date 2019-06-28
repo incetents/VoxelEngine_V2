@@ -173,7 +173,7 @@ namespace Vxl
 		m_normals.set(_model->normals);
 		m_tangents.set(_model->tangents);
 		m_bitangents.set(_model->bitangents);
-		m_colors.set(_model->colors);
+		//m_colors.set(_model->colors);
 		m_indices.set(_model->indices);
 
 		Bind();
@@ -574,7 +574,7 @@ namespace Vxl
 		m_normals.m_vbo.Bind();
 		m_tangents.m_vbo.Bind();
 		m_bitangents.m_vbo.Bind();
-		m_colors.m_vbo.Bind();
+		//m_colors.m_vbo.Bind();
 		m_instances.m_vbo.Bind();
 		m_indices.m_ebo.Bind();
 

@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <vector>
+#include <map>
 
 namespace Vxl
 {
@@ -68,9 +69,9 @@ namespace Vxl
 	private:
 		GLuint m_VBO = -1;
 		GLuint m_TypeSize = 0; // ex: Float = 4
-		GLuint m_Size = 0;
-		GLuint m_DrawCount = 0;
-		GLsizei m_Stride = 0;
+		GLuint m_DrawCount = 0; // Values to be read for drawing
+		GLuint m_Size = 0; // Bytes of space used
+		GLsizei m_StrideSize = 0; // Bytes of space for Stride
 		bool m_empty = true;
 		
 		BufferBind_Mode m_bindMode;
@@ -78,33 +79,16 @@ namespace Vxl
 		// Stride Information Here
 		struct StrideHint
 		{
-			BufferType	m_type = BufferType::VERTEX;
-			GLuint		m_valueCount = 0;
-			GLuint		m_strideOffset = 0;
+			GLuint		m_valueCount; // Value
+			GLuint		m_strideOffset; // Bytes
+			bool		m_instancing = false;
+
+			StrideHint() {}
+			StrideHint(GLuint valueCount, GLuint strideOffset)
+				: m_valueCount(valueCount), m_strideOffset(strideOffset)
+			{}
 		};
-		std::vector<StrideHint> m_strideHints;
-		UINT m_strideCount = 0;
-		inline StrideHint* GetHint(BufferType type)
-		{
-			for (UINT i = 0; i < m_strideCount; i++)
-			{
-				if (type == m_strideHints[i].m_type)
-					return &m_strideHints[i];
-			}
-			return nullptr;
-		}
-		inline void RemoveHint(BufferType type)
-		{
-			UINT Count = (UINT)m_strideHints.size();
-			for (UINT i = 0; i < Count; i++)
-			{
-				if (m_strideHints[i].m_type == type)
-				{
-					m_strideHints.erase(m_strideHints.begin() + i);
-					return;
-				}
-			}
-		}
+		std::map<UINT, StrideHint> m_strideHints;
 		
 		void UpdateDrawCount();
 
@@ -129,7 +113,7 @@ namespace Vxl
 
 		~VBO()
 		{
-			RemoveAllHints();
+			RemoveAllStrideHints();
 
 			if (m_VBO != -1)
 				glDeleteBuffers(1, &m_VBO);
@@ -172,9 +156,9 @@ namespace Vxl
 			glUtil::bindVBOSubData(m_VBO, offset, size, (GLvoid*)_arr);
 		}
 
-		void AddStrideHint(BufferType _type, GLuint _valueCount);
+		void AddStrideHint(BufferType _type, GLuint _valueCount, GLuint _strideOffset);
 		void RemoveStrideHint(BufferType _type);
-		inline void RemoveAllHints()
+		inline void RemoveAllStrideHints()
 		{
 			m_strideHints.clear();
 		}
@@ -183,17 +167,17 @@ namespace Vxl
 		{
 			return m_VBO;
 		}
-		inline GLuint GetSize(void) const
-		{
-			return m_Size;
-		}
 		inline GLuint GetDrawCount(void) const
 		{
 			return m_DrawCount;
 		}
-		inline GLsizei GetStride(void) const
+		inline GLuint GetSize(void) const
 		{
-			return m_Stride;
+			return m_Size;
+		}
+		inline GLsizei GetStrideSize(void) const
+		{
+			return m_StrideSize;
 		}
 		inline bool IsEmpty(void) const
 		{

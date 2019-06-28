@@ -22,7 +22,7 @@ layout (location = 2) out vec4 output_test;
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
 // Uniforms
-uniform bool VXL_useColor 	= false;
+uniform bool VXL_useTexture = false;
 uniform vec3 VXL_color 		= vec3(1,1,1);
 uniform vec3 VXL_tint 		= vec3(1,1,1);
 
@@ -37,13 +37,13 @@ void main()
 	//final_color = vec4(f_data.uv.x,f_data.uv.y,1,1);
 	vec2 uv = f_data.uv;
 	
-	if(VXL_useColor)
+	if(VXL_useTexture)
 	{
-		output_albedo.rgb = VXL_color * VXL_tint;
+		output_albedo.rgb = texture(albedo_handler, f_data.uv).rgb * VXL_tint;
 	}
 	else
 	{
-		output_albedo.rgb = texture(albedo_handler, f_data.uv).rgb * VXL_tint;
+		output_albedo.rgb = VXL_color * VXL_tint;
 	}
 		
 	// output UV for testing reasons

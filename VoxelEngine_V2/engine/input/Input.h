@@ -206,7 +206,7 @@ namespace Vxl
 		inline int	  getMouseDragDeltaY(void) const { return m_MouseDragDeltaPos[1]; }
 		inline void	  getMousePos(float& x, float& y)  const { x = static_cast<float>(m_MousePos[0]); y = static_cast<float>(m_MousePos[1]); }
 		inline float  getMousePosViewportX(void) const { return m_MousePosViewport[0]; }
-		inline float  getMousePosViewportY(bool flip) const { return flip ? -m_MousePosViewport[1] : m_MousePosViewport[1]; }
+		inline float  getMousePosViewportY(bool flip) const { return flip ? 1.0f-m_MousePosViewport[1] : m_MousePosViewport[1]; }
 		inline void   getMousePosViewport(float& x, float& y) const { x = m_MousePosViewport[0]; y = m_MousePosViewport[1];  }
 		bool		  getMouseButton(MouseButton M) const
 		{

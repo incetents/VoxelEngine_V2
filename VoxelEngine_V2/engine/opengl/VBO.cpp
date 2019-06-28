@@ -7,60 +7,33 @@ namespace Vxl
 	// VBO //
 	void VBO::UpdateDrawCount()
 	{
-		if (m_Stride == 0)
+		m_StrideSize = 0;
+		for (auto& hint : m_strideHints)
+		{
+			m_StrideSize += hint.second.m_valueCount * 4; // Total bytes
+		}
+
+		if (m_StrideSize == 0)
 			m_DrawCount = m_Size / m_TypeSize;
 		else
-			m_DrawCount = m_Size / m_Stride;
-
-		UINT Offset = 0;
-		UINT Count = (UINT)m_strideHints.size();
-		for (UINT i = 0; i < Count; i++)
-		{
-			m_strideHints[i].m_strideOffset = Offset;
-			Offset += m_strideHints[i].m_valueCount * sizeof(GLfloat);
-		}
+			m_DrawCount = m_Size / m_StrideSize;
 	}
 
-	void VBO::AddStrideHint(BufferType _type, GLuint _valueCount)
+	void VBO::AddStrideHint(BufferType _type, GLuint _valueCount, GLuint _strideOffset)
 	{
-		StrideHint* hint = GetHint(_type);
+		m_strideHints[(UINT)_type] = StrideHint(_valueCount, _strideOffset * 4);
 
-		// Check if hint already exists
-		if (hint)
-		{
-			m_Stride -= hint->m_valueCount * m_TypeSize;
-			hint->m_valueCount = _valueCount;
-		}
-		// New
-		else
-		{
-			StrideHint hint;
-			hint.m_type = _type;
-			hint.m_valueCount = _valueCount;
-			m_strideHints.push_back(hint);
-			m_strideCount++;
-		}
+		if (_type == BufferType::InstancingStart)
+			m_strideHints[(UINT)_type].m_instancing = true;
 
-		// Update Stride
-		m_Stride += _valueCount * m_TypeSize;
-
-		// Update Data
 		UpdateDrawCount();
 	}
 
 	void VBO::RemoveStrideHint(BufferType _type)
 	{
-		StrideHint* hint = GetHint(_type);
-
-		// Check if hint already exists
-		if (hint)
-		{
-			m_Stride -= hint->m_valueCount * sizeof(GLfloat);
-			RemoveHint(_type);
-			delete hint;
-			UpdateDrawCount();
-			m_strideCount--;
-		}
+		m_strideHints.erase((UINT)_type);
+		
+		UpdateDrawCount();
 	}
 
 	void VBO::Bind()
@@ -70,24 +43,29 @@ namespace Vxl
 
 		glUtil::bindVBO(m_VBO);
 
-		switch (m_strideCount)
+		UINT strideCount = m_strideHints.size();
+
+		switch (strideCount)
 		{
 		case 0: // Exit if no stride information
 			return;
 
 		case 1:
-			if (m_strideHints[0].m_type == BufferType::InstancingStart)
-				glUtil::setVertexAttribInstancing((int)m_strideHints[0].m_type);
+			for (auto hint : m_strideHints)
+			{
+			if (hint.second.m_instancing)
+				glUtil::setVertexAttribInstancing((UINT)hint.first);
 			else
-				glUtil::setVertexAttrib((int)m_strideHints[0].m_type, m_strideHints[0].m_valueCount, Data_Type::FLOAT, 0, 0);
+				glUtil::setVertexAttrib((UINT)hint.first, hint.second.m_valueCount, Data_Type::FLOAT, 0, 0);
+			}
 		
 		default:
 			for (auto hint : m_strideHints)
 			{
-				if (hint.m_type == BufferType::InstancingStart)
-					glUtil::setVertexAttribInstancing((int)hint.m_type);
+				if (hint.second.m_instancing)
+					glUtil::setVertexAttribInstancing((UINT)hint.first);
 				else
-					glUtil::setVertexAttrib((int)hint.m_type, hint.m_valueCount, Data_Type::FLOAT, m_Stride, hint.m_strideOffset);
+					glUtil::setVertexAttrib((UINT)hint.first, hint.second.m_valueCount, Data_Type::FLOAT, m_StrideSize, hint.second.m_strideOffset);
 			}
 		}
 	}

@@ -62,7 +62,7 @@ namespace Vxl
 		MeshBuffer<Vector3, BufferType::NORMAL, 3>		m_normals;
 		MeshBuffer<Vector3, BufferType::TANGENT, 3>		m_tangents;
 		MeshBuffer<Vector3, BufferType::BITANGENT, 3>	m_bitangents;
-		MeshBuffer<Vector4, BufferType::COLOR, 4>		m_colors;
+		//MeshBuffer<Vector4, BufferType::COLOR, 4>		m_colors;
 		MeshBufferInstancing							m_instances;
 		MeshBufferIndices								m_indices;
 

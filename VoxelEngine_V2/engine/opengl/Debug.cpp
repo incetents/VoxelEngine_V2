@@ -133,15 +133,17 @@ namespace Vxl
 		if (m_worldLines.m_mesh->m_vertexIndex > 0)
 		{
 			if (m_worldLines.m_mesh->m_resizeDirty)
+			{
 				m_worldLines.m_mesh->SetVertices();
+				m_worldLines.m_mesh->Bind();
+			}
 			else
+			{
 				m_worldLines.m_mesh->UpdateVertices();
+				m_worldLines.m_mesh->Bind();
+			}
 
-			m_worldLines.m_mesh->Bind();
-
-			glUtil::depthMask(false);
 			m_worldLines.m_mesh->Draw();
-			glUtil::depthMask(true);
 		}
 	}
 
@@ -151,15 +153,17 @@ namespace Vxl
 		if (m_screenLines.m_mesh->m_vertexIndex > 0)
 		{
 			if (m_screenLines.m_mesh->m_resizeDirty)
+			{
 				m_screenLines.m_mesh->SetVertices();
+				m_screenLines.m_mesh->Bind();
+			}
 			else
+			{
 				m_screenLines.m_mesh->UpdateVertices();
+				m_screenLines.m_mesh->Bind();
+			}
 
-			m_screenLines.m_mesh->Bind();
-
-			glUtil::depthMask(false);
 			m_screenLines.m_mesh->Draw();
-			glUtil::depthMask(true);
 		}
 	}
 

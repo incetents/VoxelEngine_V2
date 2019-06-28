@@ -27,14 +27,6 @@ namespace Vxl
 	{
 	public:
 		// Assets Loaded
-		ShaderProgram* _shader_gbuffer;
-		ShaderProgram* _shader_passthrough;
-		ShaderProgram* _shader_skybox;
-		ShaderProgram* _shader_lines;
-		ShaderProgram* _shader_billboard;
-		ShaderProgram* _shader_colorPicker;
-		ShaderProgram* _shader_showRenderTarget;
-
 		Texture* _tex;
 		Texture* _tex_crate;
 		Texture* _tex_gridtest;
@@ -56,6 +48,8 @@ namespace Vxl
 		Material* material_passthrough;
 		Material* material_billboard;
 		Material* material_lines;
+		Material* material_simpleLight;
+		Material* material_colorPicker;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;
