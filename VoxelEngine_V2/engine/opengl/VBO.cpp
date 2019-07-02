@@ -20,12 +20,26 @@ namespace Vxl
 		uint32_t elementCount = (uint32_t)m_layout.m_elements.size();
 		VXL_ASSERT(elementCount > 0, "Layout requires at least one Element");
 
-		for (const auto& element : m_layout.m_elements)
+		// If only 1 element, stride and offset can be set to zero for efficient packing
+		if (elementCount == 1)
 		{
-			glUtil::setVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, Data_Type::FLOAT, m_layout.m_stride, element.m_offset, element.m_normalized);
+			const auto& element = m_layout.m_elements[0];
+
+			glUtil::setVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, 0, 0, element.m_normalized);
 
 			if (element.m_divisor > 0)
 				glUtil::setVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
+		}
+		// Normal layout
+		else
+		{
+			for (const auto& element : m_layout.m_elements)
+			{
+				glUtil::setVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, m_layout.m_stride, element.m_offset, element.m_normalized);
+
+				if (element.m_divisor > 0)
+					glUtil::setVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
+			}
 		}
 	}
 

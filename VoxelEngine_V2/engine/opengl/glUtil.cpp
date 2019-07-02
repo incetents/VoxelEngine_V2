@@ -30,10 +30,8 @@ namespace Vxl
 		std::transform(VendorStr.begin(), VendorStr.end(), VendorStr.begin(), ::tolower);
 		if (VendorStr.find("nvidia") != -1)
 			Vendor = VendorType::NVIDIA;
-		else if (VendorStr.find("ati") != -1)
-			Vendor = VendorType::ATI;
-		else if (VendorStr.find("radeon") != -1)
-			Vendor = VendorType::RADEON;
+		else if (VendorStr.find("ati") != -1 || VendorStr.find("radeon") != -1)
+			Vendor = VendorType::AMD;
 		else if (VendorStr.find("intel") != -1)
 			Vendor = VendorType::INTEL;
 
@@ -399,7 +397,7 @@ namespace Vxl
 	}
 
 	//
-	uint32_t glUtil::getShaderDataTypeValueCount(ShaderDataType data)
+	uint32_t glUtil::getValueCount(ShaderDataType data)
 	{
 		switch (data)
 		{
@@ -425,7 +423,7 @@ namespace Vxl
 			return 0;
 		}
 	}
-	uint32_t glUtil::getShaderDataTypeSize(ShaderDataType data)
+	uint32_t glUtil::getSize(ShaderDataType data)
 	{
 		switch (data)
 		{
@@ -449,6 +447,34 @@ namespace Vxl
 		default:
 			VXL_ASSERT(false, "Invalid ShaderDataType");
 			return 0;
+		}
+	}
+	DataType glUtil::getDataType(ShaderDataType data)
+	{
+		switch (data)
+		{
+		case ShaderDataType::BOOL: // Treat bool as an Integer
+		case ShaderDataType::INT:
+			return DataType::INT;
+
+		case ShaderDataType::UNSIGNED_INT:
+			return DataType::UNSIGNED_INT;
+
+		case ShaderDataType::FLOAT:
+		case ShaderDataType::VEC2:
+		case ShaderDataType::VEC3:
+		case ShaderDataType::VEC4:
+		case ShaderDataType::MAT2:
+		case ShaderDataType::MAT3:
+		case ShaderDataType::MAT4:
+			return DataType::FLOAT;
+
+		case ShaderDataType::DOUBLE:
+			return DataType::DOUBLE;
+
+		default:
+			VXL_ASSERT(false, "Invalid ShaderDataType");
+			return DataType::NONE;
 		}
 	}
 
@@ -672,7 +698,7 @@ namespace Vxl
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, length, data, usage);
 	}
-	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, Data_Type dataType, GLuint strideSize, GLuint strideOffset, bool normalized)
+	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType, GLuint strideSize, GLuint strideOffset, bool normalized)
 	{
 		glEnableVertexAttribArray(bufferIndex);
 		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, normalized, strideSize, BUFFER_OFFSET(strideOffset));

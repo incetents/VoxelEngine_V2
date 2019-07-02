@@ -28,7 +28,7 @@ namespace Vxl
 		FRAMEBUFFER = GL_FRAMEBUFFER
 	};
 	// Data Types
-	enum class Data_Type
+	enum class DataType
 	{
 		NONE = -1, // Error (Used for placeholder)
 

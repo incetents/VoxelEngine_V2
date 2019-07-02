@@ -36,8 +36,9 @@ namespace Vxl
 		friend class BufferLayout;
 		friend class VBO;
 	private:
-		BufferType		m_bufferType;
-		ShaderDataType	m_dataType;
+		BufferType		m_bufferType;	// For vertex attrib slot
+		DataType		m_dataType;	
+		ShaderDataType	m_shaderDataType;
 		bool			m_normalized;
 		uint32_t		m_valueCount;	// Values [Ex: float = 1, double = 1, vec4 = 4]
 		uint32_t		m_size;			// Bytes  [Ex: float = 4, double = 8, vec4 = 16]
@@ -45,11 +46,12 @@ namespace Vxl
 		uint32_t		m_divisor = 0;
 
 	public:
-		BufferElement(BufferType bufferType, ShaderDataType dataType, bool normalized, uint32_t divisor = 0)
-			: m_bufferType(bufferType),  m_dataType(dataType), m_normalized(normalized), m_divisor(divisor)
+		BufferElement(BufferType bufferType, ShaderDataType shaderDataType, bool normalized, uint32_t divisor = 0)
+			: m_bufferType(bufferType), m_shaderDataType(shaderDataType), m_normalized(normalized), m_divisor(divisor)
 		{
-			m_valueCount = glUtil::getShaderDataTypeValueCount(dataType);
-			m_size = glUtil::getShaderDataTypeSize(dataType);
+			m_valueCount	= glUtil::getValueCount(shaderDataType);
+			m_size			= glUtil::getSize(shaderDataType);
+			m_dataType		= glUtil::getDataType(shaderDataType);
 		}
 	};
 	// Vertex Buffer Layout
