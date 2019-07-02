@@ -7,33 +7,7 @@ namespace Vxl
 	// VBO //
 	void VBO::UpdateDrawCount()
 	{
-		m_StrideSize = 0;
-		for (auto& hint : m_strideHints)
-		{
-			m_StrideSize += hint.second.m_valueCount * 4; // Total bytes
-		}
-
-		if (m_StrideSize == 0)
-			m_DrawCount = m_Size / m_TypeSize;
-		else
-			m_DrawCount = m_Size / m_StrideSize;
-	}
-
-	void VBO::AddStrideHint(BufferType _type, GLuint _valueCount, GLuint _strideOffset)
-	{
-		m_strideHints[(UINT)_type] = StrideHint(_valueCount, _strideOffset * 4);
-
-		if (_type == BufferType::InstancingStart)
-			m_strideHints[(UINT)_type].m_instancing = true;
-
-		UpdateDrawCount();
-	}
-
-	void VBO::RemoveStrideHint(BufferType _type)
-	{
-		m_strideHints.erase((UINT)_type);
-		
-		UpdateDrawCount();
+		m_DrawCount = m_Size / m_layout.m_stride;
 	}
 
 	void VBO::Bind()
@@ -43,30 +17,15 @@ namespace Vxl
 
 		glUtil::bindVBO(m_VBO);
 
-		UINT strideCount = m_strideHints.size();
+		uint32_t elementCount = (uint32_t)m_layout.m_elements.size();
+		VXL_ASSERT(elementCount > 0, "Layout requires at least one Element");
 
-		switch (strideCount)
+		for (const auto& element : m_layout.m_elements)
 		{
-		case 0: // Exit if no stride information
-			return;
+			glUtil::setVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, Data_Type::FLOAT, m_layout.m_stride, element.m_offset, element.m_normalized);
 
-		case 1:
-			for (auto hint : m_strideHints)
-			{
-			if (hint.second.m_instancing)
-				glUtil::setVertexAttribInstancing((UINT)hint.first);
-			else
-				glUtil::setVertexAttrib((UINT)hint.first, hint.second.m_valueCount, Data_Type::FLOAT, 0, 0);
-			}
-		
-		default:
-			for (auto hint : m_strideHints)
-			{
-				if (hint.second.m_instancing)
-					glUtil::setVertexAttribInstancing((UINT)hint.first);
-				else
-					glUtil::setVertexAttrib((UINT)hint.first, hint.second.m_valueCount, Data_Type::FLOAT, m_StrideSize, hint.second.m_strideOffset);
-			}
+			if (element.m_divisor > 0)
+				glUtil::setVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
 		}
 	}
 

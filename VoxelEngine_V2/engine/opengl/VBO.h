@@ -1,7 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "glUtil.h"
+#include "VBOLayout.h"
 
 #include "../utilities/Macros.h"
 
@@ -11,28 +11,6 @@
 
 namespace Vxl
 {
-	// List of buffer types (non-custom names reflect built-in attribute locations)
-	enum class BufferType
-	{
-		NONE = -1, // Dev use only
-		POSITION = 0, VERTEX = 0,
-		UV = 1, LINEWIDTH = 1,
-		NORMAL = 2,
-		COLOR = 3,
-		SECOND_COLOR = 4,
-		FOG = 5,
-		TANGENT = 6,
-		BITANGENT = 7, 
-		UV1 = 8, InstancingStart = 8, // (instancing)
-		UV2 = 9,
-		UV3 = 10,
-		UV4 = 11,
-		UV5 = 12,
-		UV6 = 13,
-		UV7 = 14,
-		UV8 = 15
-	};
-
 	// Vertex Array Object Wrapper
 	class VAO
 	{
@@ -67,28 +45,13 @@ namespace Vxl
 	class VBO
 	{
 	private:
-		GLuint m_VBO = -1;
-		GLuint m_TypeSize = 0; // ex: Float = 4
-		GLuint m_DrawCount = 0; // Values to be read for drawing
-		GLuint m_Size = 0; // Bytes of space used
-		GLsizei m_StrideSize = 0; // Bytes of space for Stride
-		bool m_empty = true;
-		
+		GLuint			m_VBO = -1;
+		GLuint			m_TypeSize = 0; // ex: Float = 4
+		GLuint			m_DrawCount = 0; // Values to be read for drawing
+		GLuint			m_Size = 0; // Bytes of space used
+		bool			m_empty = true;
+		BufferLayout	m_layout;
 		BufferBind_Mode m_bindMode;
-
-		// Stride Information Here
-		struct StrideHint
-		{
-			GLuint		m_valueCount; // Value
-			GLuint		m_strideOffset; // Bytes
-			bool		m_instancing = false;
-
-			StrideHint() {}
-			StrideHint(GLuint valueCount, GLuint strideOffset)
-				: m_valueCount(valueCount), m_strideOffset(strideOffset)
-			{}
-		};
-		std::map<UINT, StrideHint> m_strideHints;
 		
 		void UpdateDrawCount();
 
@@ -113,8 +76,6 @@ namespace Vxl
 
 		~VBO()
 		{
-			RemoveAllStrideHints();
-
 			if (m_VBO != -1)
 				glDeleteBuffers(1, &m_VBO);
 		}
@@ -156,11 +117,9 @@ namespace Vxl
 			glUtil::bindVBOSubData(m_VBO, offset, size, (GLvoid*)_arr);
 		}
 
-		void AddStrideHint(BufferType _type, GLuint _valueCount, GLuint _strideOffset);
-		void RemoveStrideHint(BufferType _type);
-		inline void RemoveAllStrideHints()
+		inline void SetLayout(const BufferLayout& layout)
 		{
-			m_strideHints.clear();
+			m_layout = layout;
 		}
 
 		inline GLuint GetVBO(void) const
@@ -174,10 +133,6 @@ namespace Vxl
 		inline GLuint GetSize(void) const
 		{
 			return m_Size;
-		}
-		inline GLsizei GetStrideSize(void) const
-		{
-			return m_StrideSize;
 		}
 		inline bool IsEmpty(void) const
 		{

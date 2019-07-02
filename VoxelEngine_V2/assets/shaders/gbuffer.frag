@@ -58,9 +58,11 @@ void main()
 	if(TESTMODE == 3)
 		output_albedo = vec4(normalize(f_data.bitangent), 1.0);
 	
-	float d = dot(-getCameraForwad(), normalize(f_data.normal));
-	
+	output_albedo.a = 1.0;
+
+	float d = dot(-getCameraForwad(), normalize(f_data.normal));	
 	output_test = vec4(d, 0, 0.2, 1);
+	
 	
 	//if(TESTMODE == 1)
 	//output_albedo = vec4(d, 0, 0.2, 1);

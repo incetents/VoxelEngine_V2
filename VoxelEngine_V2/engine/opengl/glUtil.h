@@ -76,6 +76,10 @@ namespace Vxl
 		unsigned int getChannelCount(Channel_Type type);
 		unsigned int getChannelCount(Format_Type format);
 
+		// Get info from ShaderDataType
+		uint32_t getShaderDataTypeValueCount(ShaderDataType data);
+		uint32_t getShaderDataTypeSize(ShaderDataType data);
+
 		// Get Pixel/Channel Data From DepthFormat
 		void getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType);
 
@@ -121,8 +125,9 @@ namespace Vxl
 		void bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data);
 		// VBO - Array
 		void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
-		void setVertexAttrib(GLuint bufferIndex, int valueCount, Data_Type dataType = Data_Type::FLOAT, GLuint m_strideSize = 0, GLuint m_strideOffset = 0);
-		void setVertexAttribInstancing(GLuint bufferIndex);
+		void setVertexAttrib(GLuint bufferIndex, int valueCount, Data_Type dataType = Data_Type::FLOAT, GLuint strideSize = 0, GLuint strideOffset = 0, bool normalized = false);
+		void setVertexAttribDivisor(GLuint bufferIndex, GLuint divisor);
+		//void setVertexAttribInstancing(GLuint bufferIndex);
 		// EBO - Index
 		void bindEBO(GLuint EBO);
 		void bindIndices(GLuint EBO, GLsizeiptr length, GLvoid * data, GLenum usage);

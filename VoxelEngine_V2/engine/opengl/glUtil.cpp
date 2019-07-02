@@ -398,6 +398,60 @@ namespace Vxl
 		return 0;
 	}
 
+	//
+	uint32_t glUtil::getShaderDataTypeValueCount(ShaderDataType data)
+	{
+		switch (data)
+		{
+		case ShaderDataType::BOOL:
+		case ShaderDataType::INT:
+		case ShaderDataType::UNSIGNED_INT:
+		case ShaderDataType::FLOAT:
+		case ShaderDataType::DOUBLE:
+			return 1;
+		case ShaderDataType::VEC2:
+			return 2;
+		case ShaderDataType::VEC3:
+			return 3;
+		case ShaderDataType::VEC4:
+		case ShaderDataType::MAT2:
+			return 4;
+		case ShaderDataType::MAT3:
+			return 9;
+		case ShaderDataType::MAT4:
+			return 16;
+		default:
+			VXL_ASSERT(false, "Invalid ShaderDataType");
+			return 0;
+		}
+	}
+	uint32_t glUtil::getShaderDataTypeSize(ShaderDataType data)
+	{
+		switch (data)
+		{
+		case ShaderDataType::BOOL:
+		case ShaderDataType::INT:
+		case ShaderDataType::UNSIGNED_INT:
+		case ShaderDataType::FLOAT:
+			return 4;
+		case ShaderDataType::DOUBLE:
+		case ShaderDataType::VEC2:
+			return 8;
+		case ShaderDataType::VEC3:
+			return 12;
+		case ShaderDataType::VEC4:
+		case ShaderDataType::MAT2:
+			return 16;
+		case ShaderDataType::MAT3:
+			return 36;
+		case ShaderDataType::MAT4:
+			return 64;
+		default:
+			VXL_ASSERT(false, "Invalid ShaderDataType");
+			return 0;
+		}
+	}
+
 	// Get Pixel/Channel Data From DepthFormat
 	void glUtil::getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType)
 	{
@@ -618,28 +672,32 @@ namespace Vxl
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, length, data, usage);
 	}
-	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, Data_Type dataType, GLuint m_strideSize, GLuint m_strideOffset)
+	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, Data_Type dataType, GLuint strideSize, GLuint strideOffset, bool normalized)
 	{
 		glEnableVertexAttribArray(bufferIndex);
-		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, GL_FALSE, m_strideSize, BUFFER_OFFSET(m_strideOffset));
+		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, normalized, strideSize, BUFFER_OFFSET(strideOffset));
 	}
-	// notice takes 4 attribute array slots (starting from given index)
-	void glUtil::setVertexAttribInstancing(GLuint bufferIndex)
+	void glUtil::setVertexAttribDivisor(GLuint bufferIndex, GLuint divisor)
 	{
-		glEnableVertexAttribArray(bufferIndex + 0);
-		glVertexAttribPointer(bufferIndex + 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)0);
-		glEnableVertexAttribArray(bufferIndex + 1);
-		glVertexAttribPointer(bufferIndex + 1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(sizeof(Vector4)));
-		glEnableVertexAttribArray(bufferIndex + 2);
-		glVertexAttribPointer(bufferIndex + 2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(2 * sizeof(Vector4)));
-		glEnableVertexAttribArray(bufferIndex + 3);
-		glVertexAttribPointer(bufferIndex + 3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(3 * sizeof(Vector4)));
-
-		glVertexAttribDivisor(bufferIndex + 0, 1);
-		glVertexAttribDivisor(bufferIndex + 1, 1);
-		glVertexAttribDivisor(bufferIndex + 2, 1);
-		glVertexAttribDivisor(bufferIndex + 3, 1);
+		glVertexAttribDivisor(bufferIndex, divisor);
 	}
+	//	// notice takes 4 attribute array slots (starting from given index)
+	//	void glUtil::setVertexAttribInstancing(GLuint bufferIndex)
+	//	{
+	//		glEnableVertexAttribArray(bufferIndex + 0);
+	//		glVertexAttribPointer(bufferIndex + 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)0);
+	//		glEnableVertexAttribArray(bufferIndex + 1);
+	//		glVertexAttribPointer(bufferIndex + 1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(sizeof(Vector4)));
+	//		glEnableVertexAttribArray(bufferIndex + 2);
+	//		glVertexAttribPointer(bufferIndex + 2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(2 * sizeof(Vector4)));
+	//		glEnableVertexAttribArray(bufferIndex + 3);
+	//		glVertexAttribPointer(bufferIndex + 3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(Vector4), (void*)(3 * sizeof(Vector4)));
+	//	
+	//		glVertexAttribDivisor(bufferIndex + 0, 1);
+	//		glVertexAttribDivisor(bufferIndex + 1, 1);
+	//		glVertexAttribDivisor(bufferIndex + 2, 1);
+	//		glVertexAttribDivisor(bufferIndex + 3, 1);
+	//	}
 
 	void glUtil::bindEBO(GLuint EBO)
 	{

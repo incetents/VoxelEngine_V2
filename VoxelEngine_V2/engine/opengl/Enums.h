@@ -60,7 +60,7 @@ namespace Vxl
 	};
 
 	// Uniform Types
-	enum class UniformType
+	enum class ShaderDataType
 	{
 		NONE = -1, // Error (Used for placeholder)
 

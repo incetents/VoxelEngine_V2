@@ -57,11 +57,11 @@ namespace Vxl
 		static Mesh* Create(const std::string& name, Model* model);
 		virtual ~Mesh();
 
-		MeshBufferMem<Vector3, BufferType::POSITION, 3> m_positions;
-		MeshBufferMem<Vector2, BufferType::UV, 2>		m_uvs;
-		MeshBuffer<Vector3, BufferType::NORMAL, 3>		m_normals;
-		MeshBuffer<Vector3, BufferType::TANGENT, 3>		m_tangents;
-		MeshBuffer<Vector3, BufferType::BITANGENT, 3>	m_bitangents;
+		MeshBufferMem<Vector3, BufferType::POSITION, ShaderDataType::VEC3> m_positions;
+		MeshBufferMem<Vector2, BufferType::UV, ShaderDataType::VEC2>		m_uvs;
+		MeshBuffer<Vector3, BufferType::NORMAL, ShaderDataType::VEC3>		m_normals;
+		MeshBuffer<Vector3, BufferType::TANGENT, ShaderDataType::VEC3>		m_tangents;
+		MeshBuffer<Vector3, BufferType::BITANGENT, ShaderDataType::VEC3>	m_bitangents;
 		//MeshBuffer<Vector4, BufferType::COLOR, 4>		m_colors;
 		MeshBufferInstancing							m_instances;
 		MeshBufferIndices								m_indices;

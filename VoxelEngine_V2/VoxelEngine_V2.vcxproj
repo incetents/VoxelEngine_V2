@@ -133,6 +133,7 @@
     <ClInclude Include="engine\math\Vector4.h" />
     <ClInclude Include="engine\opengl\Enums.h" />
     <ClInclude Include="engine\opengl\Mesh.h" />
+    <ClInclude Include="engine\opengl\VBOLayout.h" />
     <ClInclude Include="engine\textures\BaseTexture.h" />
     <ClInclude Include="engine\textures\Cubemap.h" />
     <ClInclude Include="engine\textures\RenderTexture.h" />

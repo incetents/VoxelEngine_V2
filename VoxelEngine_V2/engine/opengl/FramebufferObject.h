@@ -19,7 +19,9 @@ namespace Vxl
 
 	enum class Attachment_Type
 	{
+		// Render Buffer [Cannot bind like a texture]
 		BUFFER,
+		// Render Texture
 		TEXTURE
 	};
 
