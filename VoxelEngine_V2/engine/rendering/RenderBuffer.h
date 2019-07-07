@@ -1,7 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../opengl/Enums.h"
+#include "../rendering/Enums.h"
 
 namespace Vxl
 {

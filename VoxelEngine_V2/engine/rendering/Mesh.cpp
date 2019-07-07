@@ -512,7 +512,6 @@ namespace Vxl
 		// Generate Missing Normals
 		if (m_normals.Empty() && !m_positions.Empty())
 		{
-			Vector3* test = m_positions.vertices.data();
 			GenerateNormals(
 				m_positions.vertices.data(), (GLuint)m_positions.vertices.size(),
 				m_indices.indices.data(), (GLuint)m_indices.indices.size(),

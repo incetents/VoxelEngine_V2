@@ -14,8 +14,10 @@
 #include "../textures/Texture.h"
 #include "../textures/Cubemap.h"
 
-#include "../opengl/Shader.h"
-#include "../opengl/Enums.h"
+#include "../rendering/Shader.h"
+#include "../rendering/Enums.h"
+
+#include "../rendering/Graphics.h"
 
 #include "logger.h"
 #include "FileIO.h"
@@ -187,10 +189,15 @@ namespace Vxl
 				else if (_state == LoadState::SHADER_PROGRAM && SegmentCount >= 3)
 				{
 					auto Name = Segments[0];
-					std::vector<std::string> Shaders;
+					std::vector<Shader*> Shaders;
 					
 					for (unsigned int i = 1; i < SegmentCount; i++)
-						Shaders.push_back(Segments[i]);
+					{
+						if (Shader::CheckIfExists(Segments[i]))
+							Shaders.push_back(Shader::Get(Segments[i]));
+						else
+							Logger.error("Attempting to load non-existing Shader: " + Segments[i]);
+					}
 					
 					ShaderProgram::Load(Name, Shaders);
 				}

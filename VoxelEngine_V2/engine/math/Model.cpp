@@ -9,7 +9,7 @@
 
 #include "../utilities/stringUtil.h"
 #include "../utilities/Logger.h"
-#include "../opengl/Mesh.h"
+#include "../rendering/Mesh.h"
 
 namespace Vxl
 {

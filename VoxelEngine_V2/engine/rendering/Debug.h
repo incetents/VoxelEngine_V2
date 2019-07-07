@@ -8,7 +8,7 @@
 #include "../math/Color.h"
 
 #include "../modules/Entity.h"
-#include "../opengl/LineMesh.h"
+#include "../rendering/LineMesh.h"
 
 #include "VBO.h"
 #include "glUtil.h"

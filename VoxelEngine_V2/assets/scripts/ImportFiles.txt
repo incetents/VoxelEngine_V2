@@ -24,6 +24,8 @@
 #VERT billboard_vert  	./assets/shaders/billboard.vert
 #FRAG billboard_frag 	./assets/shaders/billboard.frag
 
+//#VERT broken ./assets/shaders/broken.txt
+
 //----------------------------------------
 #SHADERPROGRAM
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders

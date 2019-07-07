@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Cubemap.h"
 
-#include "../opengl/glUtil.h"
+#include "../rendering/glUtil.h"
 #include "../utilities/stringUtil.h"
 
 #include <SOIL/SOIL.h>

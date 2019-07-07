@@ -56,28 +56,30 @@ subroutine vec4 color_t(); // prototype
 
 // Subroutines
 subroutine(color_t)
-vec4 ColorRed()
+vec4 ColorRed() // Function Name
 {
 	return vec4(1, 0, 0, 1);
 }
 
 subroutine(color_t)
-vec4 ColorGreen()
+vec4 ColorGreen() // Function Name
 {
 	return vec4(0, 1, 0, 1);
 }
 
 subroutine(color_t)
-vec4 ColorBlue()
+vec4 ColorBlue() // Function Name
 {
 	return vec4(0, 0, 1, 1);
 }
 
+// Colour1 = UniformName
 layout(location = 0) subroutine uniform color_t Colour1; // pointer to subroutine
 layout(location = 1) subroutine uniform color_t Colour2; // pointer to subroutine
 
 // test
 subroutine float test_t();
+
 subroutine(test_t)
 float t1()
 {

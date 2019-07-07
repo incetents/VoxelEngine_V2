@@ -62,7 +62,7 @@ void main()
 
 	float d = dot(-getCameraForwad(), normalize(f_data.normal));	
 	output_test = vec4(d, 0, 0.2, 1);
-	
+
 	
 	//if(TESTMODE == 1)
 	//output_albedo = vec4(d, 0, 0.2, 1);

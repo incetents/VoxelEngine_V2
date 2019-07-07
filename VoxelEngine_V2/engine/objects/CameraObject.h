@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../modules/Entity.h"
-#include "../opengl/UBO.h"
+#include "../rendering/UBO.h"
 
 namespace Vxl
 {

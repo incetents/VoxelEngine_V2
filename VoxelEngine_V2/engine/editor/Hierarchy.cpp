@@ -14,7 +14,7 @@
 #include "../objects/CameraObject.h"
 #include "../objects/LightObject.h"
 
-#include "../opengl/Geometry.h"
+#include "../rendering/Geometry.h"
 
 #include "../input/Input.h"
 

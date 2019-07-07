@@ -4,7 +4,7 @@
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
-#include "../engine/opengl/Shader.h"
+#include "../engine/rendering/Shader.h"
 
 namespace Vxl
 {

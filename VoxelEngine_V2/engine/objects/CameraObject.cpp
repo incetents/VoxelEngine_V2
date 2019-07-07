@@ -4,9 +4,9 @@
 
 #include "../modules/RenderManager.h"
 #include "../window/window.h"
-#include "../opengl/Mesh.h"
-#include "../opengl/Geometry.h"
-#include "../opengl/Debug.h"
+#include "../rendering/Mesh.h"
+#include "../rendering/Geometry.h"
+#include "../rendering/Debug.h"
 
 namespace Vxl
 {

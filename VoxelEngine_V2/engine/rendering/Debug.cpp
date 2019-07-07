@@ -6,8 +6,8 @@
 #include "../math/Color.h"
 #include "../utilities/Loader.h"
 #include "../modules/Entity.h"
-#include "../opengl/Geometry.h"
-#include "../opengl/Mesh.h"
+#include "../rendering/Geometry.h"
+#include "../rendering/Mesh.h"
 
 namespace Vxl
 {

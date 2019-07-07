@@ -1,9 +1,9 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../opengl/glUtil.h"
-#include "../opengl/Uniform.h"
-#include "../opengl/Shader.h"
+#include "../rendering/glUtil.h"
+#include "../rendering/Uniform.h"
+#include "../rendering/Shader.h"
 
 #include "../utilities/Asset.h"
 
@@ -36,7 +36,7 @@ namespace Vxl
 		const ShaderProgram* m_program = nullptr;
 #endif
 		const std::string	m_propertyName;
-		glUniform			m_uniform;
+		Graphics::Uniform	m_uniform;
 		bool				m_isUsed = true;
 
 		void AcquireUniform(const ShaderProgram& program)
@@ -49,7 +49,7 @@ namespace Vxl
 			{
 				m_uniform = program.GetUniform(m_propertyName);
 
-				GLenum UniformType = m_uniform.GetType();
+				uint32_t UniformType = m_uniform.type;
 				std::string TypeName = typeid(Type).name();
 				
 				glUtil::VeryifyDataType(TypeName, UniformType);
@@ -66,15 +66,15 @@ namespace Vxl
 		void SetProperty(Type _data)
 		{
 			VXL_ASSERT(ShaderProgram::GetBoundProgram() == m_program->GetID(), "Cannot change property without binding associated program first");
-			VXL_ASSERT(m_uniform.GetLocation() != -1, "Property has no attached Uniform");
-			m_uniform.Set<Type>(_data);
+			VXL_ASSERT(m_uniform.location != -1, "Property has no attached Uniform");
+			m_uniform.Send<Type>(_data);
 		}
 		// Only works for matrices
 		void SetPropertyMatrix(Type _data, bool _transpose)
 		{
 			VXL_ASSERT(ShaderProgram::GetBoundProgram() == m_program->GetID(), "Cannot change property without binding associated program first");
-			VXL_ASSERT(m_uniform.GetLocation() != -1, "Property has no attached Uniform");
-			m_uniform.SetMatrix<Type>(_data, _transpose);
+			VXL_ASSERT(m_uniform.location != -1, "Property has no attached Uniform");
+			m_uniform.SendMatrix<Type>(_data, _transpose);
 		}
 
 		inline bool IsUsed(void) const
@@ -189,8 +189,8 @@ namespace Vxl
 		{
 			VXL_ASSERT(m_shaderProgram, "Missing ShaderProgram for Material");
 			VXL_ASSERT(m_shaderProgram->CheckUniform(_uniformName), "Shader Program doesn't contain Uniform: " + _uniformName);
-			glUniform uniform = m_shaderProgram->GetUniform(_uniformName);
-			uniform.Set<Type>(_data);
+			Graphics::Uniform uniform = m_shaderProgram->GetUniform(_uniformName);
+			uniform.Send<Type>(_data);
 		}
 
 		// Bind Program, GL States, and Textures

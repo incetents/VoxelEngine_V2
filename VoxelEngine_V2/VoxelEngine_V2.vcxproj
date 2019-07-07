@@ -32,13 +32,14 @@
     <ClCompile Include="engine\modules\Material.cpp" />
     <ClCompile Include="engine\modules\RenderManager.cpp" />
     <ClCompile Include="engine\modules\Scene.cpp" />
-    <ClCompile Include="engine\opengl\Debug.cpp" />
-    <ClCompile Include="engine\opengl\FramebufferObject.cpp" />
-    <ClCompile Include="engine\opengl\Geometry.cpp" />
-    <ClCompile Include="engine\opengl\LineMesh.cpp" />
-    <ClCompile Include="engine\opengl\RenderBuffer.cpp" />
-    <ClCompile Include="engine\opengl\UBO.cpp" />
-    <ClCompile Include="engine\opengl\VBO.cpp" />
+    <ClCompile Include="engine\rendering\Debug.cpp" />
+    <ClCompile Include="engine\rendering\FramebufferObject.cpp" />
+    <ClCompile Include="engine\rendering\Geometry.cpp" />
+    <ClCompile Include="engine\rendering\Graphics.cpp" />
+    <ClCompile Include="engine\rendering\LineMesh.cpp" />
+    <ClCompile Include="engine\rendering\RenderBuffer.cpp" />
+    <ClCompile Include="engine\rendering\UBO.cpp" />
+    <ClCompile Include="engine\rendering\VBO.cpp" />
     <ClCompile Include="engine\textures\BaseTexture.cpp" />
     <ClCompile Include="engine\textures\Cubemap.cpp" />
     <ClCompile Include="engine\textures\RenderTexture.cpp" />
@@ -81,11 +82,11 @@
     <ClCompile Include="engine\math\Vector2.cpp" />
     <ClCompile Include="engine\math\Vector3.cpp" />
     <ClCompile Include="engine\math\Vector4.cpp" />
-    <ClCompile Include="engine\opengl\glUtil.cpp" />
+    <ClCompile Include="engine\rendering\glUtil.cpp" />
     <ClCompile Include="engine\main.cpp" />
-    <ClCompile Include="engine\opengl\Mesh.cpp" />
-    <ClCompile Include="engine\opengl\Shader.cpp" />
-    <ClCompile Include="engine\opengl\Uniform.cpp" />
+    <ClCompile Include="engine\rendering\Mesh.cpp" />
+    <ClCompile Include="engine\rendering\Shader.cpp" />
+    <ClCompile Include="engine\rendering\Uniform.cpp" />
     <ClCompile Include="engine\Precompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -93,7 +94,7 @@
     <ClCompile Include="engine\utilities\stringUtil.cpp" />
     <ClCompile Include="engine\window\glfwCallbacks.cpp" />
     <ClCompile Include="engine\window\window.cpp" />
-    <ClCompile Include="engine\opengl\MeshBuffer.cpp" />
+    <ClCompile Include="engine\rendering\MeshBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\editor\Editor.h" />
@@ -108,14 +109,15 @@
     <ClInclude Include="engine\modules\Material.h" />
     <ClInclude Include="engine\modules\RenderManager.h" />
     <ClInclude Include="engine\modules\Scene.h" />
-    <ClInclude Include="engine\opengl\Debug.h" />
-    <ClInclude Include="engine\opengl\LineMesh.h" />
-    <ClInclude Include="engine\opengl\RenderBuffer.h" />
-    <ClInclude Include="engine\opengl\UBO.h" />
-    <ClInclude Include="engine\opengl\VBO.h" />
-    <ClInclude Include="engine\opengl\FramebufferObject.h" />
-    <ClInclude Include="engine\opengl\Geometry.h" />
-    <ClInclude Include="engine\opengl\Shader.h" />
+    <ClInclude Include="engine\rendering\Debug.h" />
+    <ClInclude Include="engine\rendering\Graphics.h" />
+    <ClInclude Include="engine\rendering\LineMesh.h" />
+    <ClInclude Include="engine\rendering\RenderBuffer.h" />
+    <ClInclude Include="engine\rendering\UBO.h" />
+    <ClInclude Include="engine\rendering\VBO.h" />
+    <ClInclude Include="engine\rendering\FramebufferObject.h" />
+    <ClInclude Include="engine\rendering\Geometry.h" />
+    <ClInclude Include="engine\rendering\Shader.h" />
     <ClInclude Include="engine\input\Input.h" />
     <ClInclude Include="engine\math\Color.h" />
     <ClInclude Include="engine\math\Lerp.h" />
@@ -131,14 +133,14 @@
     <ClInclude Include="engine\math\Vector2.h" />
     <ClInclude Include="engine\math\Vector3.h" />
     <ClInclude Include="engine\math\Vector4.h" />
-    <ClInclude Include="engine\opengl\Enums.h" />
-    <ClInclude Include="engine\opengl\Mesh.h" />
-    <ClInclude Include="engine\opengl\VBOLayout.h" />
+    <ClInclude Include="engine\rendering\Enums.h" />
+    <ClInclude Include="engine\rendering\Mesh.h" />
+    <ClInclude Include="engine\rendering\VBOLayout.h" />
     <ClInclude Include="engine\textures\BaseTexture.h" />
     <ClInclude Include="engine\textures\Cubemap.h" />
     <ClInclude Include="engine\textures\RenderTexture.h" />
     <ClInclude Include="engine\textures\Texture.h" />
-    <ClInclude Include="engine\opengl\Uniform.h" />
+    <ClInclude Include="engine\rendering\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\textures\TextureBinder.h" />
     <ClInclude Include="engine\utilities\Asset.h" />
@@ -153,7 +155,7 @@
     <ClInclude Include="engine\utilities\Util.h" />
     <ClInclude Include="engine\editor\DevConsole.h" />
     <ClInclude Include="engine\window\glfwCallbacks.h" />
-    <ClInclude Include="engine\opengl\glUtil.h" />
+    <ClInclude Include="engine\rendering\glUtil.h" />
     <ClInclude Include="engine\editor\Hierarchy.h" />
     <ClInclude Include="engine\editor\Inspector.h" />
     <ClInclude Include="engine\editor\Performance.h" />
@@ -173,7 +175,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="engine\opengl\MeshBuffer.h" />
+    <ClInclude Include="engine\rendering\MeshBuffer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

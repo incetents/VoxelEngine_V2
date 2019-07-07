@@ -3,13 +3,15 @@
 #include "window.h"
 
 #include "glfwCallbacks.h"
-#include "../opengl/glUtil.h"
+#include "../rendering/glUtil.h"
 
 #include "../utilities/logger.h"
 #include "../utilities/Macros.h"
 #include "../modules/RenderManager.h"
 
 #include <GLFW/glfw3.h>
+
+#include "../rendering/Graphics.h"
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
@@ -91,6 +93,10 @@ namespace Vxl
 
 		// Glew/Opengl Init
 		if (!glUtil::initGlew())
+			VXL_ASSERT(false, "Glew failed to initialized");
+
+		// Graphics [newer]
+		if(!Graphics::Setup())
 			VXL_ASSERT(false, "Glew failed to initialized");
 
 		glUtil::initHints();

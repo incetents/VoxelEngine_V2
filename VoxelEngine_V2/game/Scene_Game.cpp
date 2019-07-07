@@ -13,12 +13,12 @@
 #include "../engine/utilities/stringUtil.h"
 #include "../engine/utilities/Time.h"
 
-#include "../engine/opengl/FramebufferObject.h"
-#include "../engine/opengl/Geometry.h"
-#include "../engine/opengl/Mesh.h"
-#include "../engine/opengl/Shader.h"
-#include "../engine/opengl/Debug.h"
-#include "../engine/opengl/UBO.h"
+#include "../engine/rendering/FramebufferObject.h"
+#include "../engine/rendering/Geometry.h"
+#include "../engine/rendering/Mesh.h"
+#include "../engine/rendering/Shader.h"
+#include "../engine/rendering/Debug.h"
+#include "../engine/rendering/UBO.h"
 
 #include "../engine/textures/Texture.h"
 #include "../engine/textures/RenderTexture.h"
@@ -169,6 +169,8 @@ namespace Vxl
 		_mesh->m_positions.set(pos, 4);
 		_mesh->m_uvs.set(uvs, 4);
 		_mesh->m_indices.set(indices, 6);
+		_mesh->GenerateNormals(false);
+		_mesh->GenerateTangents(=);
 		
 		std::vector<Matrix4x4> m_models;
 		for (float x = 0; x < 5.0f; x++)
@@ -533,8 +535,15 @@ namespace Vxl
 	void Scene_Game::Draw()
 	{
 		ShaderProgram* _shader_gbuffer = ShaderProgram::Get("gbuffer");
-		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT("TESTMODE", 0));
+		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
+		//	
+		//	if(Time.GetFrameCount() % 100 < 50)
+		//		sub.Connect("Colour1", "ColorRed");
+		//	else
+		//		sub.Connect("Colour1", "ColorGreen");
+		//	
 
+		//_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT("TESTMODE", 0));
 
 		_fbo->bind();
 		_fbo->clearBuffers();
@@ -1092,11 +1101,14 @@ namespace Vxl
 
 		
 		//	// SUBROUTINES
-		//	glSubroutine Sub = *_shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
-		//	Sub.Set("Colour1", "ColorRed");
-		//	Sub.Set("Colour2", "ColorGreen");
-		//	Sub.Set("myNum", "t2");
-		//	Sub.Bind();
+		//	ShaderProgram* _shader_gbuffer = ShaderProgram::Get("gbuffer");
+		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
+		//	
+		//	if(Time.GetFrameCount() % 100 < 50)
+		//		sub.Connect("Colour1", "ColorRed");
+		//	else
+		//		sub.Connect("Colour1", "ColorGreen");
+		//	
 		//	
 		//	// UNIFORM BLOCKS
 		//	auto block = _shader_gbuffer->GetUniformBlock("ColorBlock_0");
@@ -1107,23 +1119,6 @@ namespace Vxl
 		//	float b = 0.0f;
 		//	block->Set(&r, 1, 0);
 		//	block->Set(&g, 1, 1);
-
-		//	// UNIFORMS
-		//	_shader_gbuffer->SetUniform("value1", 0.1f);
-		//	_shader_gbuffer->SetUniform("value2", 0.1f);
-		//	_shader_gbuffer->SetUniform("value3", 0.1f);
-		//	
-		//	// Uniform a = Sp->GetUniform("value1");
-		//	a.set<float>(1.0f);
-		//	Uniform b = Sp->GetUniform("value2");
-		//	b.set<float>(0.0f);
-		//	Uniform c = Sp->GetUniform("value3");
-		//	c.set<float>(0.5f);
-		//	
-		//	Shader_Gbuffer->SetUniform("model", model.getModel());
-		//	
-		//	Shader_Gbuffer->SetUniform("view", cam.getView());
-		//	Shader_Gbuffer->SetUniform("projection", cam.getProjection());
 
 	}
 	void Scene_Game::DrawImGui()

@@ -804,26 +804,26 @@ namespace Vxl
 	}
 
 	// MISC //
-	std::string glUtil::shaderTypeToString(const ShaderType& type)
-	{
-		switch (type)
-		{
-		case ShaderType::VERTEX:
-			return "VERTEX";
-		case ShaderType::FRAGMENT:
-			return "FRAGMENT";
-		case ShaderType::GEOMETRY:
-			return "GEOMETRY";
-		case ShaderType::TESSELATION_CONTROL:
-			return "TESSELATION_CONTROL";
-		case ShaderType::TESSELATION_EVALUATION:
-			return "TESSELATION_EVALUATION";
-		case ShaderType::COMPUTE:
-			return "COMPUTE";
-		default:
-			return "ERROR";
-		}
-	}
+	//	std::string glUtil::shaderTypeToString(const ShaderType& type)
+	//	{
+	//		switch (type)
+	//		{
+	//		case ShaderType::VERTEX:
+	//			return "VERTEX";
+	//		case ShaderType::FRAGMENT:
+	//			return "FRAGMENT";
+	//		case ShaderType::GEOMETRY:
+	//			return "GEOMETRY";
+	//		case ShaderType::TESSELATION_CONTROL:
+	//			return "TESSELATION_CONTROL";
+	//		case ShaderType::TESSELATION_EVALUATION:
+	//			return "TESSELATION_EVALUATION";
+	//		case ShaderType::COMPUTE:
+	//			return "COMPUTE";
+	//		default:
+	//			return "ERROR";
+	//		}
+	//	}
 
 	// GET OPENGL INFO //
 	GLint glUtil::GetMaxUniformBufferBindings()

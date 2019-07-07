@@ -7,7 +7,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
-#include "../opengl/glUtil.h"
+#include "../rendering/glUtil.h"
 
 #include "../utilities/Time.h"
 #include "../utilities/Util.h"

@@ -3,8 +3,8 @@
 #include "LightObject.h"
 
 #include "../modules/RenderManager.h"
-#include "../opengl/Mesh.h"
-#include "../opengl/Geometry.h"
+#include "../rendering/Mesh.h"
+#include "../rendering/Geometry.h"
 
 namespace Vxl
 {

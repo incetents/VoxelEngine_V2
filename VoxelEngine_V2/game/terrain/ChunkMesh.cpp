@@ -4,7 +4,7 @@
 
 
 #include "Chunk.h"
-#include "../engine/opengl/Mesh.h"
+#include "../engine/rendering/Mesh.h"
 
 namespace Vxl
 {

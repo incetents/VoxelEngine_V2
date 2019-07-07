@@ -1,9 +1,11 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
-#include "Enums.h"
+//#include "Enums.h"
 
 #include "../utilities/Asset.h"
 #include "../utilities/Macros.h"
+
+//#include <GL/gl3w.h>
 
 #include "Uniform.h"
 
@@ -13,19 +15,18 @@
 
 namespace Vxl
 {
-	typedef std::map<std::string, glUniform> UniformStorage;
-	typedef std::map<std::string, glUniformBlock> UniformBlockStorage;
-	typedef std::map<ShaderType, glSubroutine> SubroutineStorage;
+	typedef std::map<std::string, Graphics::Uniform> UniformStorage;
+	typedef std::map<std::string, Graphics::UniformBlock> UniformBlockStorage;
+	typedef std::map<ShaderType, Graphics::UniformSubroutine> SubroutineStorage;
 
 	class Shader : public Asset<Shader>
 	{
-		friend class Loader;
 		friend class ShaderProgram;
 		friend class RenderManager;
 	private:
 		bool				m_hasLoaded = false;
 		bool				m_hasCompiled = false;
-		GLuint				m_id = -1;
+		ShaderID			m_id = -1;
 		const std::string   m_name;
 		const std::string	m_filePath;
 		std::string			m_sourceBackup; // has line numbers appended
@@ -33,15 +34,14 @@ namespace Vxl
 		const ShaderType	m_type;
 		
 		bool compile(const std::string& source);
-		bool checkError() const;
-		void readError();
+		void updateErrorMessage();
 
 		bool load();
 		void unload();
 
 		// Constructor
 		Shader(const std::string& name, const std::string& filePath, ShaderType type)
-			: m_name(name + '[' + glUtil::shaderTypeToString(type) + ']'), m_filePath(filePath), m_type(type)
+			: m_name(name + '[' + Graphics::Shader::GetName(type) + ']'), m_filePath(filePath), m_type(type)
 		{
 			m_hasLoaded = load();
 		}
@@ -77,7 +77,7 @@ namespace Vxl
 		{
 			return m_hasCompiled;
 		}
-		inline GLuint				GetID(void) const
+		inline uint32_t				GetID(void) const
 		{
 			return m_id;
 		}
@@ -105,26 +105,23 @@ namespace Vxl
 
 	class ShaderProgram : public Asset<ShaderProgram>
 	{
-		friend class Loader;
 		friend class RenderManager;
 	private:
 		// Program //
-		const std::string   m_name;
-		GLuint				m_id = -1;
-		bool				m_linked = false;
-		BYTE				m_shaderCount : 3; // 3 bits, val is 8 max
+		const std::string    m_name;
+		ShaderProgramID		 m_id = -1;
+		bool				 m_linked = false;
+		BYTE				 m_shaderCount : 3; // 3 bits, val is 8 max
 		std::vector<Shader*> m_shaders;
-		// Uniform //
-		UniformStorage		m_uniforms;
-		GLint				m_uniformCount = 0;
-		UniformBlockStorage m_uniformBlocks;
-		GLint				m_uniformBlockCount = 0;
-		SubroutineStorage   m_subroutines;
-		GLint				m_subroutineCount = 0;
-		// Error //
-		std::string			m_errorMessage;
-		// Tracker //
-		static GLuint		m_boundID;
+		// Uniforms //
+		UniformStorage		 m_uniforms;
+		UniformBlockStorage  m_uniformBlocks;
+		SubroutineStorage    m_subroutines;
+		bool				 m_usingSubroutines;
+		// Error //			 
+		std::string			 m_errorMessage;
+		// Tracker //		 
+		static uint32_t		 m_boundID;
 
 		// Utility
 		bool createProgram();
@@ -133,14 +130,7 @@ namespace Vxl
 		void attachShaders();
 		void detachShaders();
 
-		void AddShader(Shader* _shader);
 		void Link();
-
-		void acquireUniforms();
-		void acquireUniformBlocks();
-		void acquireSubroutines();
-
-		bool checkError();
 
 		// Constructor
 		ShaderProgram(const std::string& name)
@@ -153,7 +143,7 @@ namespace Vxl
 		// Load
 		static ShaderProgram* Load(
 			const std::string& name,
-			std::vector<std::string> shaders
+			const std::vector<Shader*>& shaders
 		);
 
 		~ShaderProgram()
@@ -175,49 +165,32 @@ namespace Vxl
 		template<typename Type>
 		void					SetUniform(const std::string& name, Type data)
 		{
-#if _DEBUG
-			// Check if uniform is missing
-			if (m_uniforms.find(name) == m_uniforms.end())
-				return;
-#endif
-			m_uniforms[name].Set<Type>(data);
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end());
+			m_uniforms[name].Send<Type>(data);
 		}
 		// [Faster] Set uniform (Custom call for matrix)
 		template<typename Type>
 		void					SetUniformMatrix(const std::string& name, Type data, bool transpose)
 		{
-#if _DEBUG
-			// Check if uniform is missing
-			if (m_uniforms.find(name) == m_uniforms.end())
-				return;
-#endif
-			m_uniforms[name].SetMatrix<Type>(data, transpose);
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end());
+			m_uniforms[name].SendMatrix<Type>(data, transpose);
 		}
 		// [Slower] Set uniform, regardless if shader is bound
 		template<typename Type>
 		void					SetProgramUniform(const std::string& name, Type data)
 		{
-#if _DEBUG
-			// Check if uniform is missing
-			if (m_uniforms.find(name) == m_uniforms.end())
-				return;
-#endif
-
-			m_uniforms[name].Set<Type>(m_id, data);
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end());
+			m_uniforms[name].Send<Type>(m_id, data);
 		}
 		// [Slower] Set uniform, regardless if shader is bound (Custom call for matrix)
 		template<typename Type>
 		void					SetProgramUniformMatrix(const std::string& name, Type data, bool transpose)
 		{
-#if _DEBUG
-			// Check if uniform is missing
-			if (m_uniforms.find(name) == m_uniforms.end())
-				return;
-#endif
-			m_uniforms[name].SetMatrix<Type>(m_id, data, transpose);
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end());
+			m_uniforms[name].SendMatrix<Type>(m_id, data, transpose);
 		}
 		
-		inline const glUniform& GetUniform(const std::string& name) const
+		inline const Graphics::Uniform& GetUniform(const std::string& name) const
 		{
 			VXL_ASSERT(CheckUniform(name), "Uniform does not exist for this shader");
 			return m_uniforms.at(name);
@@ -226,9 +199,9 @@ namespace Vxl
 		{
 			return (m_uniforms.find(name) != m_uniforms.end());
 		}
-		inline GLuint			GetUniformCount(void) const
+		inline uint32_t			GetUniformCount(void) const
 		{
-			return m_uniformCount;
+			return (uint32_t)m_uniforms.size();
 		}
 		const UniformStorage	GetAllUniforms(void) const
 		{
@@ -237,27 +210,25 @@ namespace Vxl
 
 
 		// Uniform Blocks
-		inline const glUniformBlock& GetUniformBlock(const std::string& name) const
+		inline const Graphics::UniformBlock& GetUniformBlock(const std::string& name) const
 		{
 			VXL_ASSERT(m_uniformBlocks.find(name) != m_uniformBlocks.end(), "Uniform block does not exist");
 			return m_uniformBlocks.at(name);
 		}
-		inline GLuint			GetUniformBlockCount(void) const
+		inline uint32_t			GetUniformBlockCount(void) const
 		{
-			return m_uniformBlockCount;
+			return (uint32_t)m_uniformBlocks.size();
 		}
 
 		// Subroutines
-		inline glSubroutine*	GetSubroutine(ShaderType type)
+		inline Graphics::UniformSubroutine&	GetSubroutine(ShaderType type)
 		{
-#if _DEBUG
 			VXL_ASSERT(m_subroutines.find(type) != m_subroutines.end(), "Uniform subroutine does not exist");
-#endif
-			return &m_subroutines[type];
+			return m_subroutines[type];
 		}
-		inline GLuint			GetSubroutineCount(void) const
+		inline uint32_t			GetSubroutineCount(void) const
 		{
-			return m_subroutineCount;
+			return (uint32_t)m_subroutines.size();
 		}
 
 		// Misc
@@ -265,7 +236,7 @@ namespace Vxl
 		{
 			return m_linked;
 		}
-		inline GLuint	GetID(void) const
+		inline uint32_t	GetID(void) const
 		{
 			return m_id;
 		}

@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "TextureBinder.h"
 
-#include "../opengl/Debug.h"
+#include "../rendering/Debug.h"
 
 #include "Texture.h"
 

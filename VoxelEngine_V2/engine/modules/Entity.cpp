@@ -2,8 +2,8 @@
 #include "Precompiled.h"
 #include "Entity.h"
 
-#include "../opengl/glUtil.h"
-#include "../opengl/Mesh.h"
+#include "../rendering/glUtil.h"
+#include "../rendering/Mesh.h"
 #include "../modules/RenderManager.h"
 #include "../utilities/Time.h"
 #include "../utilities/logger.h"

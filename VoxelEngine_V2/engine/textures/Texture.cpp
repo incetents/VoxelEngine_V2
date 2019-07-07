@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Texture.h"
 
-#include "../opengl/glUtil.h"
+#include "../rendering/glUtil.h"
 #include "../utilities/logger.h"
 #include "../utilities/stringUtil.h"
 #include "../math/Color.h"

@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "BaseTexture.h"
 
-#include "../opengl/glUtil.h"
+#include "../rendering/glUtil.h"
 #include "../utilities/Macros.h"
 
 #include <assert.h>

@@ -4,9 +4,9 @@
 
 #include "../textures/Texture.h"
 
-#include "../opengl/Shader.h"
-#include "../opengl/Debug.h"
-#include "../opengl/Mesh.h"
+#include "../rendering/Shader.h"
+#include "../rendering/Debug.h"
+#include "../rendering/Mesh.h"
 
 #include "../modules/Entity.h"
 #include "../objects/GameObject.h"

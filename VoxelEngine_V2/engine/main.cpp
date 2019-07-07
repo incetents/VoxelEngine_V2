@@ -12,8 +12,6 @@
 #include "../game/Scene_Game.h"
 #include "modules/RenderManager.h"
 
-#include "opengl/Debug.h"
-
 /**/
 using namespace Vxl;
 using namespace std;

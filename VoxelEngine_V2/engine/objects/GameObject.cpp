@@ -2,11 +2,11 @@
 #include "Precompiled.h"
 #include "GameObject.h"
 
-#include "../opengl/Mesh.h"
+#include "../rendering/Mesh.h"
 #include "../modules/Material.h"
 #include "../modules/RenderManager.h"
 
-#include "../opengl/Debug.h"
+#include "../rendering/Debug.h"
 #include "../textures/Texture.h"
 
 namespace Vxl
@@ -76,7 +76,7 @@ namespace Vxl
 
 			if (m_useTransform && m_material->m_property_model.IsUsed())
 			{
-				m_material->m_property_model.SetProperty(m_transform.getWorldModel().Transpose());
+				m_material->m_property_model.SetPropertyMatrix(m_transform.getWorldModel(), true);
 			}
 			// ~ Instancing ~ //
 			if (m_material->m_property_useInstancing.IsUsed())

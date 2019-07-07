@@ -15,8 +15,8 @@
 #define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) VXL_ASSERT(index < Matrix4x4_Length, "Matrix4x4 index out of range")
 #define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) VXL_ASSERT(index < Matrix4x4_Size, "Matrix4x4 index out of range")
 #else
-#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) __noop
-#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) __noop
+#define OUT_OF_RANGE_INDEX_CHECK_LENGTH(index) __noop;
+#define OUT_OF_RANGE_INDEX_CHECK_SIZE(index) __noop;
 #endif
 
 namespace Vxl

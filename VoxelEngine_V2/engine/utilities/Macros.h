@@ -6,10 +6,14 @@
 
 
 // [x] whether or not glUtil::setGLName should actually call glObjectLabel(...)
+#ifdef _DEBUG
 //#define GLOBAL_USE_GLNAMES // conflicts with GLOBAL_ERROR_CALLBACK
+#endif
 
 // [x] whether glUtil.cpp OpenglErrorCallback is used
+#ifdef _DEBUG
 #define GLOBAL_ERROR_CALLBACK // conflicts with GLOBAL_USE_GLNAMES
+#endif
 
 // [x] whether GPUTimer::StartTimer and GPUTimer::EndTimer actually do anything
 #define GLOBAL_GPU_TIMERS
@@ -36,7 +40,7 @@ AssertFail(#message ## "\n\nFunction: " + std::string(__FUNCSIG__) + "\nLine: " 
 //
 #else
 // ~~~ //
-#define VXL_ASSERT(expression, message) __noop
-#define VXL_RETURN_ON_FAIL(expression) __noop
+#define VXL_ASSERT(expression, message) __noop;
+#define VXL_RETURN_ON_FAIL(expression) __noop;
 //
 #endif

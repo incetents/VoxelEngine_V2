@@ -10,10 +10,10 @@
 #include "../utilities/Macros.h"
 #include "../textures/Texture.h"
 #include "../textures/Cubemap.h"
-#include "../opengl/Debug.h"
-#include "../opengl/Geometry.h"
-#include "../opengl/Mesh.h"
-#include "../opengl/FramebufferObject.h"
+#include "../rendering/Debug.h"
+#include "../rendering/Geometry.h"
+#include "../rendering/Mesh.h"
+#include "../rendering/FramebufferObject.h"
 #include "../window/window.h"
 #include "../editor/Editor.h"
 #include "../objects/GameObject.h"
@@ -336,7 +336,7 @@ namespace Vxl
 	// render all gameobjects with their corresponding materials
 	void RenderManager::RenderSceneGameObjects()
 	{
-		// If material order has been changed, resort them all
+		// If material order has been changed, re-sort them all
 		if (Material::m_masterOrderDirty)
 		{
 			m_gameObjectsSorted.clear();

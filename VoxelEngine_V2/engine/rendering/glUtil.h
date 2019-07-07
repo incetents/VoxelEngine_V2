@@ -150,7 +150,7 @@ namespace Vxl
 		void unbindTexture(Texture_Type type);
 
 		// MISC //
-		std::string shaderTypeToString(const ShaderType& type);
+		//std::string shaderTypeToString(const ShaderType& type);
 
 		// GET OPENGL INFO //
 		GLint GetMaxUniformBufferBindings();

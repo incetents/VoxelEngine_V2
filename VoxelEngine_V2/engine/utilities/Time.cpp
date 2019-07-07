@@ -3,7 +3,7 @@
 #include "Time.h"
 
 #include "../utilities/Macros.h"
-#include "../opengl/glUtil.h"
+#include "../rendering/glUtil.h"
 #include <assert.h>
 #include <GLFW/glfw3.h>
 
