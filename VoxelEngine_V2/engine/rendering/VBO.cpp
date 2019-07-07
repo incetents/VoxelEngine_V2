@@ -15,7 +15,7 @@ namespace Vxl
 		if (m_empty)
 			return;
 
-		glUtil::bindVBO(m_VBO);
+		Graphics::VBO::Bind(m_VBO);
 
 		uint32_t elementCount = (uint32_t)m_layout.m_elements.size();
 		VXL_ASSERT(elementCount > 0, "Layout requires at least one Element");
@@ -25,32 +25,35 @@ namespace Vxl
 		{
 			const auto& element = m_layout.m_elements[0];
 
-			glUtil::setVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, 0, 0, element.m_normalized);
+			Graphics::VBO::SetVertexAttribState((UINT)element.m_bufferType, true);
+			Graphics::VBO::SetVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, 0, 0, element.m_normalized);
 
 			if (element.m_divisor > 0)
-				glUtil::setVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
+				Graphics::VBO::SetVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
 		}
 		// Normal layout
 		else
 		{
 			for (const auto& element : m_layout.m_elements)
 			{
-				glUtil::setVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, m_layout.m_stride, element.m_offset, element.m_normalized);
+				Graphics::VBO::SetVertexAttribState((UINT)element.m_bufferType, true);
+				Graphics::VBO::SetVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, m_layout.m_stride, element.m_offset, element.m_normalized);
 
 				if (element.m_divisor > 0)
-					glUtil::setVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
+					Graphics::VBO::SetVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
 			}
 		}
 	}
 
-	void VBO::Draw(Draw_Type _draw)
+	void VBO::Draw(DrawType _draw)
 	{
-		glDrawArrays((GLenum)_draw, 0, m_DrawCount);
+		Logger.error("plz no");
+		//glDrawArrays((GLenum)_draw, 0, m_DrawCount);
 	}
 
 	// EBO //
 
-	void EBO::SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode)
+	void EBO::SetIndices(uint32_t* _arr, uint32_t _count, BufferUsage _mode)
 	{
 		if (_count == 0)
 			return;
@@ -58,25 +61,27 @@ namespace Vxl
 		m_empty = false;
 
 		if (m_EBO == -1)
-			glGenBuffers(1, &m_EBO);
+			m_EBO = Graphics::EBO::Create();
 
-		m_Size = _count * sizeof(GLuint);
+		m_Size = _count * sizeof(uint32_t);
 		m_DrawCount = _count;
 		m_bindMode = _mode;
-		glUtil::bindIndices(m_EBO, m_Size, _arr, (GLenum)_mode);
+		Graphics::EBO::Bind(m_EBO);
+		Graphics::EBO::BindData(m_Size, _arr, _mode);
 	}
-	void EBO::SetIndices(std::vector<GLuint> _arr, BufferBind_Mode _mode)
+	void EBO::SetIndices(std::vector<uint32_t> _arr, BufferUsage _mode)
 	{
-		SetIndices(&_arr[0], (GLuint)_arr.size(), _mode);
+		SetIndices(&_arr[0], (uint32_t)_arr.size(), _mode);
 	}
 	void EBO::Bind()
 	{
 		if (m_EBO != -1)
-			glUtil::bindEBO(m_EBO);
+			Graphics::EBO::Bind(m_EBO);
 	}
-	void EBO::Draw(Draw_Type _draw)
+	void EBO::Draw(DrawType _draw)
 	{
-		glDrawElements((GLenum)_draw, m_DrawCount, GL_UNSIGNED_INT, 0);
+		Logger.error("plz no");
+		//glDrawElements((GLenum)_draw, m_DrawCount, GL_UNSIGNED_INT, 0);
 	}
 }
 

@@ -10,7 +10,7 @@
 
 namespace Vxl
 {
-	template<typename Type, BufferType Buf, ShaderDataType SDT>
+	template<typename Type, BufferType Buf, AttributeType Atr>
 	class MeshBuffer
 	{
 		friend class Mesh;
@@ -20,22 +20,22 @@ namespace Vxl
 	public:
 		MeshBuffer()
 		{
-			if (Buf == BufferType::NONE || SDT == ShaderDataType::NONE)
+			if (Buf == BufferType::NONE || Atr == AttributeType::NONE)
 				VXL_ASSERT(false, "MeshBuffer Layout cannot be None");
 
 			BufferLayout layout =
 			{
-				{Buf, SDT, false}
+				{Buf, Atr, false}
 			};
 			m_vbo.SetLayout(layout);
 		}
 
 
-		virtual void set(Type* arr, GLuint size, BufferBind_Mode mode = BufferBind_Mode::STATIC)
+		virtual void set(Type* arr, GLuint size, BufferUsage mode = BufferUsage::STATIC_DRAW)
 		{
 			m_vbo.SetVertices(arr, size, mode);
 		}
-		virtual void set(const std::vector<Type>& vec, BufferBind_Mode mode = BufferBind_Mode::STATIC)
+		virtual void set(const std::vector<Type>& vec, BufferUsage mode = BufferUsage::STATIC_DRAW)
 		{
 			m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), mode);
 		}
@@ -72,8 +72,8 @@ namespace Vxl
 		}
 	};
 
-	template<typename Type, BufferType Buf, ShaderDataType SDT>
-	class MeshBufferMem : public MeshBuffer<Type, Buf, SDT>
+	template<typename Type, BufferType Buf, AttributeType Atr>
+	class MeshBufferMem : public MeshBuffer<Type, Buf, Atr>
 	{
 		friend class Mesh;
 	private:
@@ -81,19 +81,19 @@ namespace Vxl
 	public:
 		MeshBufferMem(){}
 		 
-		void set(Type* arr, GLuint size, BufferBind_Mode mode = BufferBind_Mode::STATIC) override
+		void set(Type* arr, GLuint size, BufferUsage mode = BufferUsage::STATIC_DRAW) override
 		{
 			vertices = std::vector<Type>(arr, arr + size);
 			vertices.shrink_to_fit();
 
-			MeshBuffer<Type, Buf, SDT>::m_vbo.SetVertices(arr, size, mode);
+			MeshBuffer<Type, Buf, Atr>::m_vbo.SetVertices(arr, size, mode);
 		}
-		void set(const std::vector<Type>& vec, BufferBind_Mode mode = BufferBind_Mode::STATIC) override
+		void set(const std::vector<Type>& vec, BufferUsage mode = BufferUsage::STATIC_DRAW) override
 		{
 			vertices = vec;
 			vertices.shrink_to_fit();
 
-			MeshBuffer<Type, Buf, SDT>::m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), mode);
+			MeshBuffer<Type, Buf, Atr>::m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), mode);
 		}
 
 		void update(Type* arr, int offset, int size) override
@@ -101,14 +101,14 @@ namespace Vxl
 			vertices = std::vector<Type>(arr, arr + size);
 			vertices.shrink_to_fit();
 
-			MeshBuffer<Type, Buf, SDT>::m_vbo.UpdateVertices(arr, offset, size);
+			MeshBuffer<Type, Buf, Atr>::m_vbo.UpdateVertices(arr, offset, size);
 		}
 		void update(const std::vector<Type>& vec, int offset, int size) override
 		{
 			vertices = vec;
 			vertices.shrink_to_fit();
 
-			MeshBuffer<Type, Buf, SDT>::m_vbo.UpdateVertices(&vec[0], offset, size);
+			MeshBuffer<Type, Buf, Atr>::m_vbo.UpdateVertices(&vec[0], offset, size);
 		}
 
 		void update(Type* arr) override
@@ -116,14 +116,14 @@ namespace Vxl
 			vertices = std::vector<Type>(arr, arr + vertices.size());
 			vertices.shrink_to_fit();
 		
-			MeshBuffer<Type, Buf, SDT>::m_vbo.UpdateVertices(arr, 0);
+			MeshBuffer<Type, Buf, Atr>::m_vbo.UpdateVertices(arr, 0);
 		}
 		void update(const std::vector<Type>& vec) override
 		{
 			vertices = vec;
 			vertices.shrink_to_fit();
 		
-			MeshBuffer<Type, Buf, SDT>::m_vbo.UpdateVertices(&vec[0], 0);
+			MeshBuffer<Type, Buf, Atr>::m_vbo.UpdateVertices(&vec[0], 0);
 		}
 
 	};
@@ -133,23 +133,23 @@ namespace Vxl
 		friend class Mesh;
 	private:
 		EBO m_ebo;
-		std::vector<GLuint> indices;
+		std::vector<uint32_t> indices;
 	public:
-		void set(GLuint* arr, GLuint size)
+		void set(uint32_t* arr, uint32_t size)
 		{
-			indices = std::vector<GLuint>(arr, arr + size);
+			indices = std::vector<uint32_t>(arr, arr + size);
 			indices.shrink_to_fit();
 
-			m_ebo.SetIndices(arr, size, BufferBind_Mode::STATIC);
+			m_ebo.SetIndices(arr, size, BufferUsage::STATIC_DRAW);
 		}
-		void set(std::vector<GLuint> vec)
+		void set(std::vector<uint32_t> vec)
 		{
 			indices = vec;
 			indices.shrink_to_fit();
 
-			m_ebo.SetIndices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+			m_ebo.SetIndices(&vec[0], (uint32_t)vec.size(), BufferUsage::STATIC_DRAW);
 		}
-		MeshBufferIndices& operator=(std::vector<GLuint> vec)
+		MeshBufferIndices& operator=(std::vector<uint32_t> vec)
 		{
 			set(vec);
 			return *this;
@@ -184,10 +184,10 @@ namespace Vxl
 			// Instancing must be seperated into 4 vec4s
 			BufferLayout layout =
 			{
-				{BufferType::INSTANCING_1, ShaderDataType::VEC4, false, 1},
-				{BufferType::INSTANCING_2, ShaderDataType::VEC4, false, 1},
-				{BufferType::INSTANCING_3, ShaderDataType::VEC4, false, 1},
-				{BufferType::INSTANCING_4, ShaderDataType::VEC4, false, 1}
+				{BufferType::INSTANCING_1, AttributeType::VEC4, false, 1},
+				{BufferType::INSTANCING_2, AttributeType::VEC4, false, 1},
+				{BufferType::INSTANCING_3, AttributeType::VEC4, false, 1},
+				{BufferType::INSTANCING_4, AttributeType::VEC4, false, 1}
 			};
 			m_vbo.SetLayout(layout);
 		}
@@ -199,14 +199,14 @@ namespace Vxl
 			alloc = false;
 			vertices = arr;
 		}
-		void set(Matrix4x4* arr, GLuint count)
+		void set(Matrix4x4* arr, uint32_t count)
 		{
 			if (alloc)
 				delete vertices;
 			alloc = true;
 			vertices = new std::vector<Matrix4x4>(arr, arr + count);
 
-			m_vbo.SetVertices(arr, count, BufferBind_Mode::STATIC);
+			m_vbo.SetVertices(arr, count, BufferUsage::STATIC_DRAW);
 		}
 		void set(std::vector<Matrix4x4> vec)
 		{
@@ -215,7 +215,7 @@ namespace Vxl
 			alloc = true;
 			vertices = new std::vector<Matrix4x4>(vec);
 
-			m_vbo.SetVertices(&vec[0], (GLuint)vec.size(), BufferBind_Mode::STATIC);
+			m_vbo.SetVertices(&vec[0], (uint32_t)vec.size(), BufferUsage::STATIC_DRAW);
 		}
 		MeshBufferInstancing& operator=(std::vector<Matrix4x4> vec)
 		{

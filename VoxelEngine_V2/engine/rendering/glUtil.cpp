@@ -397,86 +397,86 @@ namespace Vxl
 	}
 
 	//
-	uint32_t glUtil::getValueCount(ShaderDataType data)
-	{
-		switch (data)
-		{
-		case ShaderDataType::BOOL:
-		case ShaderDataType::INT:
-		case ShaderDataType::UNSIGNED_INT:
-		case ShaderDataType::FLOAT:
-		case ShaderDataType::DOUBLE:
-			return 1;
-		case ShaderDataType::VEC2:
-			return 2;
-		case ShaderDataType::VEC3:
-			return 3;
-		case ShaderDataType::VEC4:
-		case ShaderDataType::MAT2:
-			return 4;
-		case ShaderDataType::MAT3:
-			return 9;
-		case ShaderDataType::MAT4:
-			return 16;
-		default:
-			VXL_ASSERT(false, "Invalid ShaderDataType");
-			return 0;
-		}
-	}
-	uint32_t glUtil::getSize(ShaderDataType data)
-	{
-		switch (data)
-		{
-		case ShaderDataType::BOOL:
-		case ShaderDataType::INT:
-		case ShaderDataType::UNSIGNED_INT:
-		case ShaderDataType::FLOAT:
-			return 4;
-		case ShaderDataType::DOUBLE:
-		case ShaderDataType::VEC2:
-			return 8;
-		case ShaderDataType::VEC3:
-			return 12;
-		case ShaderDataType::VEC4:
-		case ShaderDataType::MAT2:
-			return 16;
-		case ShaderDataType::MAT3:
-			return 36;
-		case ShaderDataType::MAT4:
-			return 64;
-		default:
-			VXL_ASSERT(false, "Invalid ShaderDataType");
-			return 0;
-		}
-	}
-	DataType glUtil::getDataType(ShaderDataType data)
-	{
-		switch (data)
-		{
-		case ShaderDataType::BOOL: // Treat bool as an Integer
-		case ShaderDataType::INT:
-			return DataType::INT;
-
-		case ShaderDataType::UNSIGNED_INT:
-			return DataType::UNSIGNED_INT;
-
-		case ShaderDataType::FLOAT:
-		case ShaderDataType::VEC2:
-		case ShaderDataType::VEC3:
-		case ShaderDataType::VEC4:
-		case ShaderDataType::MAT2:
-		case ShaderDataType::MAT3:
-		case ShaderDataType::MAT4:
-			return DataType::FLOAT;
-
-		case ShaderDataType::DOUBLE:
-			return DataType::DOUBLE;
-
-		default:
-			VXL_ASSERT(false, "Invalid ShaderDataType");
-			return DataType::NONE;
-		}
-	}
+	//	uint32_t glUtil::getValueCount(ShaderDataType data)
+	//	{
+	//		switch (data)
+	//		{
+	//		case ShaderDataType::BOOL:
+	//		case ShaderDataType::INT:
+	//		case ShaderDataType::UNSIGNED_INT:
+	//		case ShaderDataType::FLOAT:
+	//		case ShaderDataType::DOUBLE:
+	//			return 1;
+	//		case ShaderDataType::VEC2:
+	//			return 2;
+	//		case ShaderDataType::VEC3:
+	//			return 3;
+	//		case ShaderDataType::VEC4:
+	//		case ShaderDataType::MAT2:
+	//			return 4;
+	//		case ShaderDataType::MAT3:
+	//			return 9;
+	//		case ShaderDataType::MAT4:
+	//			return 16;
+	//		default:
+	//			VXL_ASSERT(false, "Invalid ShaderDataType");
+	//			return 0;
+	//		}
+	//	}
+	//	uint32_t glUtil::getSize(ShaderDataType data)
+	//	{
+	//		switch (data)
+	//		{
+	//		case ShaderDataType::BOOL:
+	//		case ShaderDataType::INT:
+	//		case ShaderDataType::UNSIGNED_INT:
+	//		case ShaderDataType::FLOAT:
+	//			return 4;
+	//		case ShaderDataType::DOUBLE:
+	//		case ShaderDataType::VEC2:
+	//			return 8;
+	//		case ShaderDataType::VEC3:
+	//			return 12;
+	//		case ShaderDataType::VEC4:
+	//		case ShaderDataType::MAT2:
+	//			return 16;
+	//		case ShaderDataType::MAT3:
+	//			return 36;
+	//		case ShaderDataType::MAT4:
+	//			return 64;
+	//		default:
+	//			VXL_ASSERT(false, "Invalid ShaderDataType");
+	//			return 0;
+	//		}
+	//	}
+	//	DataType glUtil::getDataType(ShaderDataType data)
+	//	{
+	//		switch (data)
+	//		{
+	//		case ShaderDataType::BOOL: // Treat bool as an Integer
+	//		case ShaderDataType::INT:
+	//			return DataType::INT;
+	//	
+	//		case ShaderDataType::UNSIGNED_INT:
+	//			return DataType::UNSIGNED_INT;
+	//	
+	//		case ShaderDataType::FLOAT:
+	//		case ShaderDataType::VEC2:
+	//		case ShaderDataType::VEC3:
+	//		case ShaderDataType::VEC4:
+	//		case ShaderDataType::MAT2:
+	//		case ShaderDataType::MAT3:
+	//		case ShaderDataType::MAT4:
+	//			return DataType::FLOAT;
+	//	
+	//		case ShaderDataType::DOUBLE:
+	//			return DataType::DOUBLE;
+	//	
+	//		default:
+	//			VXL_ASSERT(false, "Invalid ShaderDataType");
+	//			return DataType::NONE;
+	//		}
+	//	}
 
 	// Get Pixel/Channel Data From DepthFormat
 	void glUtil::getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType)
@@ -664,49 +664,49 @@ namespace Vxl
 	//		_viewport[3] = h;
 	//	}
 
-	// BUFFERS //
-	GLuint glUtil::generateVAO()
-	{
-		GLuint VAO = 0;
-		glGenVertexArrays(1, &VAO);
-		return VAO;
-	}
-	void glUtil::deleteVAO(GLuint& VAO)
-	{
-		glDeleteVertexArrays(1, &VAO);
-	}
-	void glUtil::bindVAO(GLuint VAO)
-	{
-		glBindVertexArray(VAO);
-	}
-	void glUtil::unbindVAO()
-	{
-		glBindVertexArray(0);
-	}
-
-	void glUtil::bindVBO(GLuint VBO)
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	}
-	void glUtil::bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data)
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferSubData(GL_ARRAY_BUFFER, Offset, Size, Data);
-	}
-	void glUtil::bindArray(GLuint VBO, GLsizeiptr length, GLvoid* data, GLenum usage)
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, length, data, usage);
-	}
-	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType, GLuint strideSize, GLuint strideOffset, bool normalized)
-	{
-		glEnableVertexAttribArray(bufferIndex);
-		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, normalized, strideSize, BUFFER_OFFSET(strideOffset));
-	}
-	void glUtil::setVertexAttribDivisor(GLuint bufferIndex, GLuint divisor)
-	{
-		glVertexAttribDivisor(bufferIndex, divisor);
-	}
+	//	// BUFFERS //
+	//	GLuint glUtil::generateVAO()
+	//	{
+	//		GLuint VAO = 0;
+	//		glGenVertexArrays(1, &VAO);
+	//		return VAO;
+	//	}
+	//	void glUtil::deleteVAO(GLuint& VAO)
+	//	{
+	//		glDeleteVertexArrays(1, &VAO);
+	//	}
+	//	void glUtil::bindVAO(GLuint VAO)
+	//	{
+	//		glBindVertexArray(VAO);
+	//	}
+	//	void glUtil::unbindVAO()
+	//	{
+	//		glBindVertexArray(0);
+	//	}
+	//	
+	//	void glUtil::bindVBO(GLuint VBO)
+	//	{
+	//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//	}
+	//	void glUtil::bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data)
+	//	{
+	//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//		glBufferSubData(GL_ARRAY_BUFFER, Offset, Size, Data);
+	//	}
+	//	void glUtil::bindArray(GLuint VBO, GLsizeiptr length, GLvoid* data, GLenum usage)
+	//	{
+	//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//		glBufferData(GL_ARRAY_BUFFER, length, data, usage);
+	//	}
+	//	void glUtil::setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType, GLuint strideSize, GLuint strideOffset, bool normalized)
+	//	{
+	//		glEnableVertexAttribArray(bufferIndex);
+	//		glVertexAttribPointer(bufferIndex, valueCount, (GLenum)dataType, normalized, strideSize, BUFFER_OFFSET(strideOffset));
+	//	}
+	//	void glUtil::setVertexAttribDivisor(GLuint bufferIndex, GLuint divisor)
+	//	{
+	//		glVertexAttribDivisor(bufferIndex, divisor);
+	//	}
 	//	// notice takes 4 attribute array slots (starting from given index)
 	//	void glUtil::setVertexAttribInstancing(GLuint bufferIndex)
 	//	{
@@ -725,52 +725,52 @@ namespace Vxl
 	//		glVertexAttribDivisor(bufferIndex + 3, 1);
 	//	}
 
-	void glUtil::bindEBO(GLuint EBO)
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	}
-	void glUtil::bindIndices(GLuint EBO, GLsizeiptr length, GLvoid* data, GLenum usage)
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, length, data, usage);
-	}
+	//	void glUtil::bindEBO(GLuint EBO)
+	//	{
+	//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//	}
+	//	void glUtil::bindIndices(GLuint EBO, GLsizeiptr length, GLvoid* data, GLenum usage)
+	//	{
+	//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//		glBufferData(GL_ELEMENT_ARRAY_BUFFER, length, data, usage);
+	//	}
 
-	void glUtil::drawArray(Draw_Type type, GLuint count)
-	{
-		glDrawArrays((GLenum)type, 0, count);
-	}
-	void glUtil::drawArrayIndexed(Draw_Type type, GLuint count)
-	{
-		glDrawElements((GLenum)type, count, GL_UNSIGNED_INT, 0);
-	}
+	//	void glUtil::drawArray(Draw_Type type, GLuint count)
+	//	{
+	//		glDrawArrays((GLenum)type, 0, count);
+	//	}
+	//	void glUtil::drawArrayIndexed(Draw_Type type, GLuint count)
+	//	{
+	//		glDrawElements((GLenum)type, count, GL_UNSIGNED_INT, 0);
+	//	}
 
-	// Draw Type
-	bool glUtil::isDrawTypeTriangles(Draw_Type type)
-	{
-		return (
-			type == Draw_Type::TRIANGLES ||
-			type == Draw_Type::TRIANGLES_ADJACENCY ||
-			type == Draw_Type::TRIANGLE_FAN ||
-			type == Draw_Type::TRIANGLE_STRIP ||
-			type == Draw_Type::TRIANGLE_STRIP_ADJACENCY
-			);
-	}
-	bool glUtil::isDrawTypeLines(Draw_Type type)
-	{
-		return (
-			type == Draw_Type::LINES ||
-			type == Draw_Type::LINES_ADJACENCY ||
-			type == Draw_Type::LINE_LOOP ||
-			type == Draw_Type::LINE_STRIP ||
-			type == Draw_Type::LINE_STRIP_ADJACENCY
-			);
-	}
-	bool glUtil::isDrawTypePoints(Draw_Type type)
-	{
-		return (
-			type == Draw_Type::POINTS
-			);
-	}
+	//	// Draw Type
+	//	bool glUtil::isDrawTypeTriangles(Draw_Type type)
+	//	{
+	//		return (
+	//			type == Draw_Type::TRIANGLES ||
+	//			type == Draw_Type::TRIANGLES_ADJACENCY ||
+	//			type == Draw_Type::TRIANGLE_FAN ||
+	//			type == Draw_Type::TRIANGLE_STRIP ||
+	//			type == Draw_Type::TRIANGLE_STRIP_ADJACENCY
+	//			);
+	//	}
+	//	bool glUtil::isDrawTypeLines(Draw_Type type)
+	//	{
+	//		return (
+	//			type == Draw_Type::LINES ||
+	//			type == Draw_Type::LINES_ADJACENCY ||
+	//			type == Draw_Type::LINE_LOOP ||
+	//			type == Draw_Type::LINE_STRIP ||
+	//			type == Draw_Type::LINE_STRIP_ADJACENCY
+	//			);
+	//	}
+	//	bool glUtil::isDrawTypePoints(Draw_Type type)
+	//	{
+	//		return (
+	//			type == Draw_Type::POINTS
+	//			);
+	//	}
 
 	// TEXTURES //
 	Active_Texture activeSlot = Active_Texture::LEVEL0;

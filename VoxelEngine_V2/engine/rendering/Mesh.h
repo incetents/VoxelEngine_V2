@@ -3,7 +3,8 @@
 
 #include "MeshBuffer.h"
 #include "VBO.h"
-#include "glUtil.h"
+//#include "glUtil.h"
+#include "Graphics.h"
 
 #include "../utilities/Asset.h"
 
@@ -19,11 +20,12 @@ namespace Vxl
 	private:
 		VAO m_VAO;
 
-		Draw_Type m_type; // Triangles = Default
-		Draw_Mode m_mode; // Array = Default
-		GLuint	  m_drawCount = 0;	// Vertices Drawn
-		GLuint	  m_faces = 0;		// Triangles Drawn
-		GLuint	  m_lines = 0;		// Lines Drawn
+		DrawType m_type; // Triangles = Default
+		DrawSubType m_subtype; //
+		DrawMode m_mode; // Array = Default
+		uint32_t m_drawCount = 0;	// Vertices Drawn
+		uint32_t m_faces = 0;		// Triangles Drawn
+		uint32_t m_lines = 0;		// Lines Drawn
 
 		Vector3 m_min; // smallest vertices of mesh
 		Vector3 m_max; // largest vertices of mesh
@@ -39,15 +41,15 @@ namespace Vxl
 
 		// Fills m_normals Based on existing positions and/or indices
 		void GenerateNormals(
-			Vector3* _vertices, GLuint _vertCount,
-			GLuint* _indices = nullptr, GLuint _indexCount = 0,
+			Vector3* _vertices, uint32_t _vertCount,
+			uint32_t* _indices = nullptr, uint32_t _indexCount = 0,
 			bool smooth = false
 		);
 		// Fills m_tangents and m_bitangents based on existing positions/uvs/indices
 		void GenerateTangents(
-			Vector3* _vertices, GLuint _vertCount,
-			Vector2* _uvs, GLuint _UVCount,
-			GLuint* _indices = nullptr, GLuint _indexCount = 0
+			Vector3* _vertices, uint32_t _vertCount,
+			Vector2* _uvs, uint32_t _UVCount,
+			uint32_t* _indices = nullptr, uint32_t _indexCount = 0
 		);
 
 		Mesh(const std::string& glName = "");
@@ -57,11 +59,11 @@ namespace Vxl
 		static Mesh* Create(const std::string& name, Model* model);
 		virtual ~Mesh();
 
-		MeshBufferMem<Vector3, BufferType::POSITION, ShaderDataType::VEC3> m_positions;
-		MeshBufferMem<Vector2, BufferType::UV, ShaderDataType::VEC2>		m_uvs;
-		MeshBuffer<Vector3, BufferType::NORMAL, ShaderDataType::VEC3>		m_normals;
-		MeshBuffer<Vector3, BufferType::TANGENT, ShaderDataType::VEC3>		m_tangents;
-		MeshBuffer<Vector3, BufferType::BITANGENT, ShaderDataType::VEC3>	m_bitangents;
+		MeshBufferMem<Vector3, BufferType::POSITION, AttributeType::VEC3> m_positions;
+		MeshBufferMem<Vector2, BufferType::UV, AttributeType::VEC2>		m_uvs;
+		MeshBuffer<Vector3, BufferType::NORMAL, AttributeType::VEC3>		m_normals;
+		MeshBuffer<Vector3, BufferType::TANGENT, AttributeType::VEC3>		m_tangents;
+		MeshBuffer<Vector3, BufferType::BITANGENT, AttributeType::VEC3>	m_bitangents;
 		//MeshBuffer<Vector4, BufferType::COLOR, 4>		m_colors;
 		MeshBufferInstancing							m_instances;
 		MeshBufferIndices								m_indices;
@@ -69,23 +71,27 @@ namespace Vxl
 		// Update all data from model
 		void Set(Model* _model);
 
-		inline GLuint		GetDrawCount(void) const
+		inline uint32_t		GetDrawCount(void)	 const
 		{
 			return m_drawCount;
 		}
-		inline Draw_Type	GetDrawType(void) const
+		inline DrawType		GetDrawType(void)	 const
 		{
 			return m_type;
 		}
-		inline Draw_Mode	GetDrawMode(void) const
+		inline DrawSubType	GetDrawSubType(void) const
+		{
+			return m_subtype;
+		}
+		inline DrawMode		GetDrawMode(void)	 const
 		{
 			return m_mode;
 		}
-		inline Vector3		GetVertexMin(void) const
+		inline Vector3		GetVertexMin(void)	 const
 		{
 			return m_min;
 		}
-		inline Vector3		GetVertexMax(void) const
+		inline Vector3		GetVertexMax(void)	 const
 		{
 			return m_max;
 		}
@@ -94,7 +100,7 @@ namespace Vxl
 		void GenerateTangents();
 		void RecalculateMinMax();
 
-		void Bind(Draw_Type type = Draw_Type::TRIANGLES);
+		void Bind(DrawType type = DrawType::TRIANGLES);
 		void Draw();
 	};
 }

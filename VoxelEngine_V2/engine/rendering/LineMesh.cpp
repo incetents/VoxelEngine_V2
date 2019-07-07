@@ -4,7 +4,7 @@
 
 namespace Vxl
 {
-	void LineMesh::Bind(Draw_Type type)
+	void LineMesh::Bind(DrawType type)
 	{
 		m_type = type;
 		m_drawCount = m_VBO.GetDrawCount();
@@ -19,6 +19,7 @@ namespace Vxl
 	void LineMesh::Draw()
 	{
 		m_VAO.bind();
-		glDrawArrays((GLenum)m_type, 0, m_drawCount);
+		Graphics::Draw::Array(m_type, m_drawCount);
+		//glDrawArrays((GLenum)m_type, 0, m_drawCount);
 	}
 }

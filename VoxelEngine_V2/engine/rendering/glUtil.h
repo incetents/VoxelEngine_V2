@@ -75,10 +75,10 @@ namespace Vxl
 		unsigned int getChannelCount(Channel_Type type);
 		unsigned int getChannelCount(Format_Type format);
 
-		// Get info from ShaderDataType
-		uint32_t getValueCount(ShaderDataType data);
-		uint32_t getSize(ShaderDataType data);
-		DataType getDataType(ShaderDataType data);
+		//	// Get info from ShaderDataType
+		//	uint32_t getValueCount(ShaderDataType data);
+		//	uint32_t getSize(ShaderDataType data);
+		//	DataType getDataType(ShaderDataType data);
 
 		// Get Pixel/Channel Data From DepthFormat
 		void getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType);
@@ -113,33 +113,33 @@ namespace Vxl
 		//	// viewport
 		//	void viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h);
 
-		// BUFFERS //
-		// VAO
-		GLuint generateVAO();
-		void deleteVAO(GLuint& VAO);
-		void bindVAO(GLuint VAO);
-		void unbindVAO();
-
-		// VBO
-		void bindVBO(GLuint VBO);
-		void bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data);
-		// VBO - Array
-		void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
-		void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT, GLuint strideSize = 0, GLuint strideOffset = 0, bool normalized = false);
-		void setVertexAttribDivisor(GLuint bufferIndex, GLuint divisor);
-		//void setVertexAttribInstancing(GLuint bufferIndex);
-		// EBO - Index
-		void bindEBO(GLuint EBO);
-		void bindIndices(GLuint EBO, GLsizeiptr length, GLvoid * data, GLenum usage);
-
-		// Draw Buffer (VAO needs to be bound before this call)
-		void drawArray(Draw_Type type, GLuint count);
-		void drawArrayIndexed(Draw_Type type, GLuint count);
-
-		// Draw Type
-		bool isDrawTypeTriangles(Draw_Type type);
-		bool isDrawTypeLines(Draw_Type type);
-		bool isDrawTypePoints(Draw_Type type);
+		//	// BUFFERS //
+		//	// VAO
+		//	GLuint generateVAO();
+		//	void deleteVAO(GLuint& VAO);
+		//	void bindVAO(GLuint VAO);
+		//	void unbindVAO();
+		//	
+		//	// VBO
+		//	void bindVBO(GLuint VBO);
+		//	void bindVBOSubData(GLuint VBO, GLsizei Offset, GLsizei Size, GLvoid* Data);
+		//	// VBO - Array
+		//	void bindArray(GLuint VBO, GLsizeiptr length, GLvoid * data, GLenum usage);
+		//	void setVertexAttrib(GLuint bufferIndex, int valueCount, DataType dataType = DataType::FLOAT, GLuint strideSize = 0, GLuint strideOffset = 0, bool normalized = false);
+		//	void setVertexAttribDivisor(GLuint bufferIndex, GLuint divisor);
+		//	//void setVertexAttribInstancing(GLuint bufferIndex);
+		//	// EBO - Index
+		//	void bindEBO(GLuint EBO);
+		//	void bindIndices(GLuint EBO, GLsizeiptr length, GLvoid * data, GLenum usage);
+		//	
+		//	// Draw Buffer (VAO needs to be bound before this call)
+		//	void drawArray(Draw_Type type, GLuint count);
+		//	void drawArrayIndexed(Draw_Type type, GLuint count);
+		//	
+		//	// Draw Type
+		//	bool isDrawTypeTriangles(Draw_Type type);
+		//	bool isDrawTypeLines(Draw_Type type);
+		//	bool isDrawTypePoints(Draw_Type type);
 
 		// TEXTURES //
 		void setActiveTexture(Active_Texture level);

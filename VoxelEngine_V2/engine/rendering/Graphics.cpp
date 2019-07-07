@@ -140,6 +140,55 @@ namespace Vxl
 		GL_NOTEQUAL,
 		GL_ALWAYS
 	};
+	int GL_DataType[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_BYTE,
+		GL_UNSIGNED_BYTE,
+		GL_SHORT,
+		GL_UNSIGNED_SHORT,
+		GL_INT,
+		GL_UNSIGNED_INT,
+		GL_HALF_FLOAT,
+		GL_FLOAT,
+		GL_DOUBLE,
+		GL_FIXED,
+		GL_INT_2_10_10_10_REV,
+		GL_UNSIGNED_INT_2_10_10_10_REV,
+		GL_UNSIGNED_INT_10F_11F_11F_REV
+	};
+	int GL_BufferUsage[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_STREAM_DRAW, // The data store contents will be modified once and used at most a few times.
+		GL_STREAM_READ,
+		GL_STREAM_COPY,
+		GL_STATIC_DRAW, // The data store contents will be modified once and used many times.
+		GL_STATIC_READ,
+		GL_STATIC_COPY,
+		GL_DYNAMIC_DRAW, // The data store contents will be modified repeatedly and used many times.
+		GL_DYNAMIC_READ,
+		GL_DYNAMIC_COPY
+	};
+	int GL_DrawType[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_POINTS,						// Geom / Frag	(points)
+		GL_LINES,						// Geom / Frag	(lines)
+		GL_LINE_STRIP,					// Geom / Frag	(lines)
+		GL_LINE_LOOP,					// Geom / Frag	(lines)
+		GL_LINES_ADJACENCY,				// Geom			(lines adjacency)
+		GL_LINE_STRIP_ADJACENCY,		// Geom			(lines adjacency)
+		GL_TRIANGLES,					// Geom / Frag	(triangles)
+		GL_TRIANGLE_STRIP,				// Geom / Frag	(triangles)
+		GL_TRIANGLE_FAN,				// Geom / Frag	(triangles)
+		GL_TRIANGLES_ADJACENCY,			// Geom			(triangles adjacency)
+		GL_TRIANGLE_STRIP_ADJACENCY,	// Geom (triangles adjacency)
+		GL_PATCHES						// Tesselation Control
+	};
 
 	// ~ Setup ~ //
 	bool Graphics::Setup()
@@ -396,6 +445,111 @@ namespace Vxl
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
+	// ~ Conversion ~ //
+	uint32_t Graphics::GetValueCount(AttributeType type)
+	{
+		switch (type)
+		{
+		case AttributeType::INT:
+		case AttributeType::UINT:
+		case AttributeType::FLOAT:
+		case AttributeType::DOUBLE:
+			return 1;
+		case AttributeType::VEC2:
+			return 2;
+		case AttributeType::VEC3:
+			return 3;
+		case AttributeType::VEC4:
+		case AttributeType::MAT2:
+			return 4;
+		case AttributeType::MAT3:
+			return 9;
+		case AttributeType::MAT4:
+			return 16;
+		default:
+			VXL_ASSERT(false, "Invalid AttributeType");
+			return 0;
+		}
+	}
+	uint32_t Graphics::GetSize(AttributeType type)
+	{
+		switch (type)
+		{
+		case AttributeType::INT:
+		case AttributeType::UINT:
+		case AttributeType::FLOAT:
+			return 4;
+		case AttributeType::DOUBLE:
+		case AttributeType::VEC2:
+			return 8;
+		case AttributeType::VEC3:
+			return 12;
+		case AttributeType::VEC4:
+		case AttributeType::MAT2:
+			return 16;
+		case AttributeType::MAT3:
+			return 36;
+		case AttributeType::MAT4:
+			return 64;
+		default:
+			VXL_ASSERT(false, "Invalid AttributeType");
+			return 0;
+		}
+	}
+	DataType Graphics::GetDataType(AttributeType type)
+	{
+		switch (type)
+		{
+		case AttributeType::INT:
+			return DataType::INT;
+
+		case AttributeType::UINT:
+			return DataType::UNSIGNED_INT;
+
+		case AttributeType::FLOAT:
+		case AttributeType::VEC2:
+		case AttributeType::VEC3:
+		case AttributeType::VEC4:
+		case AttributeType::MAT2:
+		case AttributeType::MAT3:
+		case AttributeType::MAT4:
+			return DataType::FLOAT;
+
+		case AttributeType::DOUBLE:
+			return DataType::DOUBLE;
+
+		default:
+			VXL_ASSERT(false, "Invalid ShaderDataType");
+			return DataType::NONE;
+		}
+	}
+	DrawSubType Graphics::GetDrawSubType(DrawType type)
+	{
+		switch (type)
+		{
+		case DrawType::TRIANGLES:
+		case DrawType::TRIANGLES_ADJACENCY:
+		case DrawType::TRIANGLE_FAN:
+		case DrawType::TRIANGLE_STRIP:
+		case DrawType::TRIANGLE_STRIP_ADJACENCY:
+			return DrawSubType::TRIANGLES;
+
+		case DrawType::LINES:
+		case DrawType::LINES_ADJACENCY:
+		case DrawType::LINE_LOOP:
+		case DrawType::LINE_STRIP:
+		case DrawType::LINE_STRIP_ADJACENCY:
+			return DrawSubType::LINES;
+
+		case DrawType::POINTS:
+			return DrawSubType::POINTS;
+
+		default:
+			VXL_ASSERT(false, "Unknown DrawType for GetDrawSubType()");
+			return DrawSubType::TRIANGLES;
+		}
+	}
+
 	// ~ Sends Uniforms to Shader ~ //
 	template<>
 	void Graphics::Uniform::Send<bool>(bool data)
@@ -630,17 +784,15 @@ namespace Vxl
 	{
 		ShaderID id = glCreateShader(GL_ShaderType[(int)shaderType]);
 
-		if (id == -1)
-			Logger.error("GL ERROR: -1 glCreateShader()");
+		VXL_ASSERT(id != -1, "GL ERROR: glCreateShader()");
 
 		return id;
 	}
 	void Graphics::Shader::Delete(ShaderID id)
 	{
-		if (id == -1)
-			Logger.error("GL ERROR: -1 glDeleteShader()");
-		else
-			glDeleteShader(id);
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteShader()");
+
+		glDeleteShader(id);
 	}
 	bool Graphics::Shader::Compile(ShaderID id, ShaderType shaderType, const char* source)
 	{
@@ -688,17 +840,15 @@ namespace Vxl
 	{
 		ShaderProgramID program = glCreateProgram();
 
-		if (program == -1)
-			Logger.error("GL ERROR: -1 glCreateProgram()");
+		VXL_ASSERT(program != -1, "GL ERROR: glCreateProgram()");
 
 		return program;
 	}
 	void Graphics::ShaderProgram::Delete(ShaderProgramID program)
 	{
-		if (program == -1)
-			Logger.error("GL ERROR: -1 glDeleteShader()");
-		else
-			glDeleteProgram(program);
+		VXL_ASSERT(program != -1, "GL ERROR: glDeleteProgram()");
+
+		glDeleteProgram(program);
 	}
 	void Graphics::ShaderProgram::AttachShader(ShaderProgramID program, ShaderID id)
 	{
@@ -902,5 +1052,131 @@ namespace Vxl
 		}
 
 		return subroutines;
+	}
+
+	// ~ Buffers ~ //
+
+	// ~ VAO ~ //
+	VAOID Graphics::VAO::Create(void)
+	{
+		VAOID id;
+		glGenVertexArrays(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenVertexArrays()");
+
+		return id;
+	}
+	void Graphics::VAO::Delete(VAOID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteVertexArrays()");
+
+		glDeleteVertexArrays(1, &id);
+	}
+	void Graphics::VAO::Bind(VAOID id)
+	{
+		glBindVertexArray(id);
+	}
+	void Graphics::VAO::Unbind(void)
+	{
+		glBindVertexArray(0);
+	}
+
+	// ~ VBO ~ //
+	VBOID Graphics::VBO::Create(void)
+	{
+		VAOID id;
+		glGenBuffers(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenBuffers()");
+
+		return id;
+	}
+	void Graphics::VBO::Delete(VBOID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteBuffers()");
+
+		glDeleteBuffers(1, &id);
+	}
+	void Graphics::VBO::Bind(VBOID id)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+	}
+	void Graphics::VBO::Unbind(void)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+	void Graphics::VBO::BindData(__int64 length, void* data, BufferUsage usage)
+	{
+		glBufferData(GL_ARRAY_BUFFER, length, data, GL_BufferUsage[(int)usage]);
+	}
+	void Graphics::VBO::BindSubData(int OffsetBytes, int SizeBytes, void* data)
+	{
+		glBufferSubData(GL_ARRAY_BUFFER, OffsetBytes, SizeBytes, data);
+	}
+
+	void Graphics::VBO::SetVertexAttribState(uint32_t bufferIndex, bool state)
+	{
+		if(state)
+			glEnableVertexAttribArray(bufferIndex);
+		else
+			glDisableVertexAttribArray(bufferIndex);
+	}
+	void Graphics::VBO::SetVertexAttrib(uint32_t bufferIndex, int valueCount, DataType datatype, uint32_t strideSize, uint32_t strideOffset, bool normalized)
+	{
+		glVertexAttribPointer(bufferIndex, valueCount, GL_DataType[(int)datatype], normalized, strideSize, BUFFER_OFFSET(strideOffset));
+	}
+	void Graphics::VBO::SetVertexAttribDivisor(uint32_t bufferIndex, uint32_t divisor)
+	{
+		glVertexAttribDivisor(bufferIndex, divisor);
+	}
+
+	// ~ EBO ~ //
+	EBOID Graphics::EBO::Create(void)
+	{
+		VAOID id;
+		glGenBuffers(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenBuffers()");
+
+		return id;
+	}
+	void Graphics::EBO::Delete(EBOID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteBuffers()");
+
+		glDeleteBuffers(1, &id);
+	}
+	void Graphics::EBO::Bind(EBOID id)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+	}
+	void Graphics::EBO::Unbind(void)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+	void Graphics::EBO::BindData(__int64 length, void* data, BufferUsage usage)
+	{
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, length, data, GL_BufferUsage[(int)usage]);
+	}
+	void Graphics::EBO::BindSubData(int OffsetBytes, int SizeBytes, void* data)
+	{
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, OffsetBytes, SizeBytes, data);
+	}
+
+	void Graphics::Draw::Array(DrawType type, uint32_t count)
+	{
+		glDrawArrays(GL_DrawType[(int)type], 0, count);
+	}
+	void Graphics::Draw::Indexed(DrawType type, uint32_t count)
+	{
+		glDrawElements(GL_DrawType[(int)type], count, GL_UNSIGNED_INT, 0);
+	}
+	void Graphics::Draw::ArrayInstanced(DrawType type, uint32_t count, uint32_t instanceCount)
+	{
+		glDrawArraysInstanced(GL_DrawType[(int)type], 0, count, instanceCount);
+	}
+	void Graphics::Draw::IndexedInstanced(DrawType type, uint32_t count, uint32_t instanceCount)
+	{
+		glDrawElementsInstanced(GL_DrawType[(int)type], count, GL_UNSIGNED_INT, 0, instanceCount);
 	}
 }

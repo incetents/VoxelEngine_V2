@@ -6,6 +6,8 @@
 #include <string>
 #include <map>
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i)) 
+
 namespace Vxl
 {
 	// Forward Declare
@@ -55,6 +57,22 @@ namespace Vxl
 		TESSELATION_CONTROL,
 		TESSELATION_EVALUATION ,
 		COMPUTE,
+	};
+	// ~ Attribute Type ~ //
+	enum class AttributeType
+	{
+		NONE = -1, // Error (Used for placeholder)
+
+		INT,
+		UINT,
+		FLOAT,
+		DOUBLE,
+		VEC2,
+		VEC3,
+		VEC4,
+		MAT2,
+		MAT3,
+		MAT4
 	};
 	// ~ Buffer Bit Type ~ //
 	enum class BufferBit
@@ -122,10 +140,84 @@ namespace Vxl
 		NOT_EQUAL,
 		ALWAYS
 	};
+	// ~ Data Types ~ //
+	enum class DataType
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		BYTE,
+		UNSIGNED_BYTE,
+		SHORT,
+		UNSIGNED_SHORT,
+		INT,
+		UNSIGNED_INT,
+		HALF_FLOAT,
+		FLOAT,
+		DOUBLE,
+		FIXED,
+		INT_2_10_10_10_REV,
+		UNSIGNED_INT_2_10_10_10_REV,
+		UNSIGNED_INT_10F_11F_11F_REV
+	};
+	// ~ Buffer Usage ~ //
+	enum class BufferUsage
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		STREAM_DRAW, // The data store contents will be modified once and used at most a few times.
+		STREAM_READ,
+		STREAM_COPY,
+		STATIC_DRAW, // The data store contents will be modified once and used many times.
+		STATIC_READ,
+		STATIC_COPY,
+		DYNAMIC_DRAW, // The data store contents will be modified repeatedly and used many times.
+		DYNAMIC_READ,
+		DYNAMIC_COPY
+	};
+	// ~ Draw Type ~ //
+	enum class DrawType
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		POINTS,						// Geom / Frag	(points)
+		LINES,						// Geom / Frag	(lines)
+		LINE_STRIP,					// Geom / Frag	(lines)
+		LINE_LOOP,					// Geom / Frag	(lines)
+		LINES_ADJACENCY,			// Geom			(lines adjacency)
+		LINE_STRIP_ADJACENCY,		// Geom			(lines adjacency)
+		TRIANGLES,					// Geom / Frag	(triangles)
+		TRIANGLE_STRIP,				// Geom / Frag	(triangles)
+		TRIANGLE_FAN,				// Geom / Frag	(triangles)
+		TRIANGLES_ADJACENCY,		// Geom			(triangles adjacency)
+		TRIANGLE_STRIP_ADJACENCY,	// Geom (triangles adjacency)
+		PATCHES						// Tesselation Control
+	};
+	// ~ Draw SubType ~ //
+	enum class DrawSubType
+	{
+		NONE = -1,
+			
+		POINTS,
+		LINES,
+		TRIANGLES
+	};
+	// ~ Draw Mode ~ //
+	enum class DrawMode
+	{
+		NONE = -1, // Error (Used for placeholder)
+
+		ARRAY,
+		ARRAY_INSTANCED,
+		INDEXED,
+		INDEXED_INSTANCED
+	};
 
 	// ~ Object Typedefs ~ //
 	typedef uint32_t ShaderID;
 	typedef uint32_t ShaderProgramID;
+	typedef uint32_t VAOID;
+	typedef uint32_t VBOID;
+	typedef uint32_t EBOID;
 
 	// Graphics Caller
 	namespace Graphics
@@ -176,6 +268,12 @@ namespace Vxl
 		void ClearBuffer(BufferBit clearBit);
 		void ClearBuffer(BufferBit clearBit, BufferBit clearBit2);
 		void ClearAllBuffers();
+
+		// ~ Conversion ~ //
+		uint32_t GetValueCount(AttributeType type);
+		uint32_t GetSize(AttributeType type);
+		DataType GetDataType(AttributeType type);
+		DrawSubType GetDrawSubType(DrawType type);
 
 		// ~ Uniforms ~ //
 		struct Uniform
@@ -308,6 +406,46 @@ namespace Vxl
 			std::map<ShaderType, UniformSubroutine> AcquireUniformSubroutines(ShaderProgramID id, std::vector<Vxl::Shader*> shaders);
 		}
 
+		// ~ Buffers ~ //
+		namespace VAO
+		{
+			VAOID	Create(void);
+			void	Delete(VAOID id);
+			void	Bind(VAOID id);
+			void	Unbind();
+		}
+		namespace VBO
+		{
+			VBOID	Create(void);
+			void	Delete(VBOID id);
+			void	Bind(VBOID id);
+			void	Unbind(void);
+			void	BindData(__int64 length, void* data, BufferUsage usage);
+			void	BindSubData(int OffsetBytes, int SizeBytes, void* data);
+
+			void	SetVertexAttribState(uint32_t bufferIndex, bool state);
+			void	SetVertexAttrib(uint32_t bufferIndex, int valueCount, DataType datatype, uint32_t strideSize, uint32_t strideOffset, bool normalized);
+			void	SetVertexAttribDivisor(uint32_t bufferIndex, uint32_t divisor);
+		}
+
+		namespace EBO
+		{
+			EBOID	Create(void);
+			void	Delete(EBOID id);
+			void	Bind(EBOID id);
+			void	Unbind(void);
+			void	BindData(__int64 length, void* data, BufferUsage usage);
+			void	BindSubData(int OffsetBytes, int SizeBytes, void* data);
+		}
+
+		// ~ Drawing ~ //
+		namespace Draw
+		{
+			void Array(DrawType type, uint32_t count);
+			void Indexed(DrawType type, uint32_t count);
+			void ArrayInstanced(DrawType type, uint32_t count, uint32_t instanceCount);
+			void IndexedInstanced(DrawType type, uint32_t count, uint32_t instanceCount);
+		}
 	};
 
 }

@@ -28,24 +28,24 @@ namespace Vxl
 	//		FRAMEBUFFER = GL_FRAMEBUFFER
 	//	};
 	// Data Types
-	enum class DataType
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		BYTE = GL_BYTE,
-		UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
-		SHORT = GL_SHORT,
-		UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
-		INT = GL_INT,
-		UNSIGNED_INT = GL_UNSIGNED_INT,
-		HALF_FLOAT = GL_HALF_FLOAT,
-		FLOAT = GL_FLOAT,
-		DOUBLE = GL_DOUBLE,
-		FIXED = GL_FIXED,
-		INT_2_10_10_10_REV = GL_INT_2_10_10_10_REV,
-		UNSIGNED_INT_2_10_10_10_REV = GL_UNSIGNED_INT_2_10_10_10_REV,
-		UNSIGNED_INT_10F_11F_11F_REV = GL_UNSIGNED_INT_10F_11F_11F_REV
-	};
+	//	enum class DataType
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		BYTE = GL_BYTE,
+	//		UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
+	//		SHORT = GL_SHORT,
+	//		UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
+	//		INT = GL_INT,
+	//		UNSIGNED_INT = GL_UNSIGNED_INT,
+	//		HALF_FLOAT = GL_HALF_FLOAT,
+	//		FLOAT = GL_FLOAT,
+	//		DOUBLE = GL_DOUBLE,
+	//		FIXED = GL_FIXED,
+	//		INT_2_10_10_10_REV = GL_INT_2_10_10_10_REV,
+	//		UNSIGNED_INT_2_10_10_10_REV = GL_UNSIGNED_INT_2_10_10_10_REV,
+	//		UNSIGNED_INT_10F_11F_11F_REV = GL_UNSIGNED_INT_10F_11F_11F_REV
+	//	};
 	// Shader Types
 	//	enum class ShaderType
 	//	{
@@ -59,23 +59,23 @@ namespace Vxl
 	//		COMPUTE = GL_COMPUTE_SHADER
 	//	};
 
-	// Uniform Types
-	enum class ShaderDataType
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		BOOL = GL_BOOL,
-		INT = GL_INT,
-		UNSIGNED_INT = GL_UNSIGNED_INT,
-		FLOAT = GL_FLOAT,
-		DOUBLE = GL_DOUBLE,
-		VEC2 = GL_FLOAT_VEC2,
-		VEC3 = GL_FLOAT_VEC3,
-		VEC4 = GL_FLOAT_VEC4,
-		MAT2 = GL_FLOAT_MAT2,
-		MAT3 = GL_FLOAT_MAT3,
-		MAT4 = GL_FLOAT_MAT4
-	};
+	//	// Uniform Types
+	//	enum class ShaderDataType
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		BOOL = GL_BOOL,
+	//		INT = GL_INT,
+	//		UNSIGNED_INT = GL_UNSIGNED_INT,
+	//		FLOAT = GL_FLOAT,
+	//		DOUBLE = GL_DOUBLE,
+	//		VEC2 = GL_FLOAT_VEC2,
+	//		VEC3 = GL_FLOAT_VEC3,
+	//		VEC4 = GL_FLOAT_VEC4,
+	//		MAT2 = GL_FLOAT_MAT2,
+	//		MAT3 = GL_FLOAT_MAT3,
+	//		MAT4 = GL_FLOAT_MAT4
+	//	};
 
 	// Buffer Bit Type
 	//	enum class Buffer_Bit_Type
@@ -143,42 +143,42 @@ namespace Vxl
 	//		ALWAYS = GL_ALWAYS
 	//	};
 	// Draw Type
-	enum class Draw_Type
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		POINTS = GL_POINTS,								// Geom / Frag	(points)
-		LINES = GL_LINES,								// Geom / Frag	(lines)
-		LINE_STRIP = GL_LINE_STRIP,						// Geom / Frag	(lines)
-		LINE_LOOP = GL_LINE_LOOP,						// Geom / Frag	(lines)
-		LINES_ADJACENCY = GL_LINES_ADJACENCY,			// Geom			(lines adjacency)
-		LINE_STRIP_ADJACENCY = GL_LINE_STRIP_ADJACENCY, // Geom			(lines adjacency)
-		TRIANGLES = GL_TRIANGLES,						// Geom / Frag	(triangles)
-		TRIANGLE_STRIP = GL_TRIANGLE_STRIP,				// Geom / Frag	(triangles)
-		TRIANGLE_FAN = GL_TRIANGLE_FAN,					// Geom / Frag	(triangles)
-		TRIANGLES_ADJACENCY = GL_TRIANGLES_ADJACENCY,	// Geom			(triangles adjacency)
-		TRIANGLE_STRIP_ADJACENCY = GL_TRIANGLE_STRIP_ADJACENCY, // Geom (triangles adjacency)
-		PATCHES = GL_PATCHES							// Tesselation Control
-	};
-	// Draw Mode
-	enum class Draw_Mode
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		ARRAY,
-		ARRAY_INSTANCED,
-		INDEXED,
-		INDEXED_INSTANCED
-	};
+	//	enum class Draw_Type
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		POINTS = GL_POINTS,								// Geom / Frag	(points)
+	//		LINES = GL_LINES,								// Geom / Frag	(lines)
+	//		LINE_STRIP = GL_LINE_STRIP,						// Geom / Frag	(lines)
+	//		LINE_LOOP = GL_LINE_LOOP,						// Geom / Frag	(lines)
+	//		LINES_ADJACENCY = GL_LINES_ADJACENCY,			// Geom			(lines adjacency)
+	//		LINE_STRIP_ADJACENCY = GL_LINE_STRIP_ADJACENCY, // Geom			(lines adjacency)
+	//		TRIANGLES = GL_TRIANGLES,						// Geom / Frag	(triangles)
+	//		TRIANGLE_STRIP = GL_TRIANGLE_STRIP,				// Geom / Frag	(triangles)
+	//		TRIANGLE_FAN = GL_TRIANGLE_FAN,					// Geom / Frag	(triangles)
+	//		TRIANGLES_ADJACENCY = GL_TRIANGLES_ADJACENCY,	// Geom			(triangles adjacency)
+	//		TRIANGLE_STRIP_ADJACENCY = GL_TRIANGLE_STRIP_ADJACENCY, // Geom (triangles adjacency)
+	//		PATCHES = GL_PATCHES							// Tesselation Control
+	//	};
+	//	// Draw Mode
+	//	enum class Draw_Mode
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		ARRAY,
+	//		ARRAY_INSTANCED,
+	//		INDEXED,
+	//		INDEXED_INSTANCED
+	//	};
 	// Buffer Bind Type
-	enum class BufferBind_Mode
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		STREAM = GL_STREAM_DRAW, // The data store contents will be modified once and used at most a few times.
-		STATIC = GL_STATIC_DRAW, // The data store contents will be modified once and used many times.
-		DYNAMIC = GL_DYNAMIC_DRAW // The data store contents will be modified repeatedly and used many times.
-	};
+	//	enum class BufferBind_Mode
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		STREAM = GL_STREAM_DRAW, // The data store contents will be modified once and used at most a few times.
+	//		STATIC = GL_STATIC_DRAW, // The data store contents will be modified once and used many times.
+	//		DYNAMIC = GL_DYNAMIC_DRAW // The data store contents will be modified repeatedly and used many times.
+	//	};
 	// Texture Data
 	enum class Texture_Type
 	{

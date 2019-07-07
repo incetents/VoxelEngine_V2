@@ -15,29 +15,29 @@ namespace Vxl
 	class VAO
 	{
 	private:
-		GLuint m_VAO = -1;
+		VAOID m_VAO = -1;
 	public:
 		VAO()
 		{
-			glGenVertexArrays(1, &m_VAO);
+			m_VAO = Graphics::VAO::Create();
 		}
 		~VAO()
 		{
-			glDeleteVertexArrays(1, &m_VAO);
+			Graphics::VAO::Delete(m_VAO);
 		}
 
-		inline GLuint GetID(void) const
+		inline uint32_t GetID(void) const
 		{
 			return m_VAO;
 		}
 
 		void bind(void) const
 		{
-			glBindVertexArray(m_VAO);
+			Graphics::VAO::Bind(m_VAO);
 		}
 		void unbind(void) const
 		{
-			glBindVertexArray(0);
+			Graphics::VAO::Unbind();
 		}
 	};
 
@@ -45,30 +45,30 @@ namespace Vxl
 	class VBO
 	{
 	private:
-		GLuint			m_VBO = -1;
-		GLuint			m_TypeSize = 0; // ex: Float = 4
-		GLuint			m_DrawCount = 0; // Values to be read for drawing
-		GLuint			m_Size = 0; // Bytes of space used
+		VBOID			m_VBO = -1;
+		uint32_t			m_TypeSize = 0; // ex: Float = 4
+		uint32_t			m_DrawCount = 0; // Values to be read for drawing
+		uint32_t			m_Size = 0; // Bytes of space used
 		bool			m_empty = true;
 		BufferLayout	m_layout;
-		BufferBind_Mode m_bindMode;
+		BufferUsage m_bindMode;
 		
 		void UpdateDrawCount();
 
 	public:	
-		template<typename Type = GLfloat>
+		template<typename Type = float>
 		VBO()
 		{
 			m_TypeSize = sizeof(Type);
 		}
-		template<typename Type = GLfloat>
-		VBO(Type* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
+		template<typename Type = float>
+		VBO(Type* _arr, uint32_t _count, BufferUsage _mode = BufferUsage::STATIC_DRAW)
 		{
 			m_TypeSize = sizeof(Type);
 			SetVertices<Type>(_arr, _count, _mode);
 		}
-		template<typename Type = GLfloat>
-		VBO(std::vector<Type> _arr, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
+		template<typename Type = float>
+		VBO(std::vector<Type> _arr, BufferUsage _mode = BufferUsage::STATIC_DRAW)
 		{
 			m_TypeSize = sizeof(Type);
 			SetVertices<Type>(_arr, _mode);
@@ -77,12 +77,12 @@ namespace Vxl
 		~VBO()
 		{
 			if (m_VBO != -1)
-				glDeleteBuffers(1, &m_VBO);
+				Graphics::VBO::Delete(m_VBO);
 		}
 
 		// If Type is not a float, it must be an object containing floats
-		template<typename Type = GLfloat>
-		void SetVertices(Type* _arr, GLuint _count, BufferBind_Mode _mode)
+		template<typename Type = float>
+		void SetVertices(Type* _arr, uint32_t _count, BufferUsage _mode)
 		{
 			if (_count == 0)
 				return;
@@ -94,27 +94,37 @@ namespace Vxl
 			m_Size = _count * sizeof(Type);
 			m_bindMode = _mode;
 
-			glUtil::bindArray(m_VBO, m_Size, (GLvoid*)_arr, (GLenum)_mode);
+			Graphics::VBO::Bind(m_VBO);
+			Graphics::VBO::BindData(m_Size, (void*)_arr, _mode);
+
+			//glUtil::bindArray(m_VBO, m_Size, (GLvoid*)_arr, (GLenum)_mode);
 
 			UpdateDrawCount();
 		}
-		template<typename Type = GLfloat>
-		void SetVertices(std::vector<Type> _arr, BufferBind_Mode _mode)
+		template<typename Type = float>
+		void SetVertices(std::vector<Type> _arr, BufferUsage _mode)
 		{
 			SetVertices(&_arr[0], (GLuint)_arr.size(), _mode);
 		}
 
-		template<typename Type = GLfloat>
+		template<typename Type = float>
 		void UpdateVertices(Type* _arr, int offset)
 		{
-			glUtil::bindVBOSubData(m_VBO, offset, m_Size, (GLvoid*)_arr);
+			Graphics::VBO::Bind(m_VBO);
+			Graphics::VBO::BindSubData(offset, m_Size, (void*)_arr);
+
+			//glUtil::bindVBOSubData(m_VBO, offset, m_Size, (GLvoid*)_arr);
 		}
 
-		template<typename Type = GLfloat>
-		void UpdateVertices(Type* _arr, int offset, GLuint size)
+		template<typename Type = float>
+		void UpdateVertices(Type* _arr, int offset, uint32_t size)
 		{
 			VXL_ASSERT(size + offset <= m_Size, "VBO: Size + Offset too large for updating vertices");
-			glUtil::bindVBOSubData(m_VBO, offset, size, (GLvoid*)_arr);
+
+			Graphics::VBO::Bind(m_VBO);
+			Graphics::VBO::BindSubData(offset, size, (void*)_arr);
+
+			//glUtil::bindVBOSubData(m_VBO, offset, size, (GLvoid*)_arr);
 		}
 
 		inline void SetLayout(const BufferLayout& layout)
@@ -122,15 +132,15 @@ namespace Vxl
 			m_layout = layout;
 		}
 
-		inline GLuint GetVBO(void) const
+		inline uint32_t GetVBO(void) const
 		{
 			return m_VBO;
 		}
-		inline GLuint GetDrawCount(void) const
+		inline uint32_t GetDrawCount(void) const
 		{
 			return m_DrawCount;
 		}
-		inline GLuint GetSize(void) const
+		inline uint32_t GetSize(void) const
 		{
 			return m_Size;
 		}
@@ -139,53 +149,55 @@ namespace Vxl
 			return m_empty;
 		}
 		
-		inline BufferBind_Mode GetBindMode(void) const
+		inline BufferUsage GetBindMode(void) const
 		{
 			return m_bindMode;
 		}
 
 		void Bind();
-		void Draw(Draw_Type _draw);
+		void Draw(DrawType _draw);
 	};
 
 	// Element Buffer Object
 	class EBO
 	{
 	private:
-		GLuint m_EBO = -1;
-		GLuint m_Size = 0;
-		GLuint m_DrawCount = 0;
+		EBOID m_EBO = -1;
+		uint32_t m_Size = 0;
+		uint32_t m_DrawCount = 0;
 		bool m_empty = true;
 
-		BufferBind_Mode m_bindMode;
+		BufferUsage m_bindMode;
 	public:
 		EBO() {}
-		EBO(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC)
+		EBO(uint32_t* _arr, uint32_t _count, BufferUsage _mode = BufferUsage::STATIC_DRAW)
 		{
 			SetIndices(_arr, _count, _mode);
 		}
 		~EBO()
 		{
-			glDeleteBuffers(1, &m_EBO);
+			if(m_EBO != -1)
+				Graphics::EBO::Delete(m_EBO);
 		}
 
-		void SetIndices(GLuint* _arr, GLuint _count, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
-		void SetIndices(std::vector<GLuint> _arr, BufferBind_Mode _mode = BufferBind_Mode::STATIC);
+		void SetIndices(uint32_t* _arr, uint32_t _count, BufferUsage _mode = BufferUsage::STATIC_DRAW);
+		void SetIndices(std::vector<uint32_t> _arr, BufferUsage _mode = BufferUsage::STATIC_DRAW);
 
-		void UpdateIndices(GLuint* _arr, int offset = 0)
+		void UpdateIndices(uint32_t* _arr, int offset = 0)
 		{
-			glUtil::bindVBOSubData(m_EBO, offset, m_Size, _arr);
+			Graphics::EBO::Bind(m_EBO);
+			Graphics::EBO::BindSubData(offset, m_Size, _arr);
 		}
 
-		inline GLuint GetVBO(void) const
+		inline uint32_t GetVBO(void) const
 		{
 			return m_EBO;
 		}
-		inline GLuint GetSize(void) const
+		inline uint32_t GetSize(void) const
 		{
 			return m_Size;
 		}
-		inline GLuint GetDrawCount(void) const
+		inline uint32_t GetDrawCount(void) const
 		{
 			return m_DrawCount;
 		}
@@ -194,13 +206,13 @@ namespace Vxl
 			return m_empty;
 		}
 
-		inline BufferBind_Mode GetBindMode(void) const
+		inline BufferUsage GetBindMode(void) const
 		{
 			return m_bindMode;
 		}
 
 		void Bind();
-		void Draw(Draw_Type _draw);
+		void Draw(DrawType _draw);
 	};
 }
 
