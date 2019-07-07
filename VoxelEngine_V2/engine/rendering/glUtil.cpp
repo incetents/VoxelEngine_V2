@@ -67,47 +67,47 @@ namespace Vxl
 	}
 
 	// Init GL Hints
-	Cull_Type			_cullmode = Cull_Type::NONE;
-	bool				_blendState = false;
-	Blend_Source		_blendsrc = Blend_Source::NONE;
-	Blend_Destination	_blenddest = Blend_Destination::NONE;
-	Blend_Equation		_blendequation = Blend_Equation::NONE;
-	Depth_Pass_Rule		_rule = Depth_Pass_Rule::NONE;
-	bool				_depthState = false;
-	bool				_depthMask = true;
-	bool				_wireframe = false;
-	GLsizei				_viewport[4] = { -1, -1, -1, -1 };
+	//	Cull_Type			_cullmode = Cull_Type::NONE;
+	//	bool				_blendState = false;
+	//	Blend_Source		_blendsrc = Blend_Source::NONE;
+	//	Blend_Destination	_blenddest = Blend_Destination::NONE;
+	//	Blend_Equation		_blendequation = Blend_Equation::NONE;
+	//	Depth_Pass_Rule		_rule = Depth_Pass_Rule::NONE;
+	//	bool				_depthState = false;
+	//	bool				_depthMask = true;
+	//	bool				_wireframe = false;
+	//	GLsizei				_viewport[4] = { -1, -1, -1, -1 };
 
-	void glUtil::initHints()
-	{
-		// Reset
-		_cullmode = Cull_Type::NONE;
-		_blendState = false;
-		_blendsrc = Blend_Source::NONE;
-		_blenddest = Blend_Destination::NONE;
-		_blendequation = Blend_Equation::NONE;
-		_rule = Depth_Pass_Rule::NONE;
-		_depthState = false;
-		_depthMask = true;
-		_wireframe = false;
-		for(int i = 0; i < 4; i++)
-			_viewport[i] = -1;
-
-		// Set Default Cull Mode
-		cullMode(Cull_Type::COUNTER_CLOCKWISE);
-		// Set Default Blend Mode
-		blendState(true);
-		blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
-		blendEquation(Blend_Equation::FUNC_ADD);
-		// Set Default Depth Test
-		depthState(true);
-		depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
-		// Set Default Wireframe Mode
-		wireframe(false);
-
-		// Cubemap edges are hidden
-		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-	}
+	//	void glUtil::initHints()
+	//	{
+	//		// Reset
+	//		_cullmode = Cull_Type::NONE;
+	//		_blendState = false;
+	//		_blendsrc = Blend_Source::NONE;
+	//		_blenddest = Blend_Destination::NONE;
+	//		_blendequation = Blend_Equation::NONE;
+	//		_rule = Depth_Pass_Rule::NONE;
+	//		_depthState = false;
+	//		_depthMask = true;
+	//		_wireframe = false;
+	//		for(int i = 0; i < 4; i++)
+	//			_viewport[i] = -1;
+	//	
+	//		// Set Default Cull Mode
+	//		cullMode(Cull_Type::COUNTER_CLOCKWISE);
+	//		// Set Default Blend Mode
+	//		blendState(true);
+	//		blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
+	//		blendEquation(Blend_Equation::FUNC_ADD);
+	//		// Set Default Depth Test
+	//		depthState(true);
+	//		depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
+	//		// Set Default Wireframe Mode
+	//		wireframe(false);
+	//	
+	//		// Cubemap edges are hidden
+	//		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	//	}
 
 	// Get Version Data
 	const char* glUtil::getRendererVersion()
@@ -285,19 +285,19 @@ namespace Vxl
 	}
 
 	// Set OpenGL Name
-	void glUtil::setGLName(glNameType identifier, GLuint id, const std::string &label)
-	{
-#if defined(GLOBAL_USE_GLNAMES) && !defined(GLOBAL_ERROR_CALLBACK)
-		//
-		if(GLNameMaxLength == -1)
-			glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLNameMaxLength);
-
-		std::string labelEdit = label + " (" + std::to_string(id) + ")";
-		VXL_ASSERT(labelEdit.size() < GLNameMaxLength, "GLName is too big");
-		glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
-		//
-#endif
-	}
+//		void glUtil::setGLName(glNameType identifier, GLuint id, const std::string &label)
+//		{
+//	#if defined(GLOBAL_USE_GLNAMES) && !defined(GLOBAL_ERROR_CALLBACK)
+//			//
+//			if(GLNameMaxLength == -1)
+//				glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLNameMaxLength);
+//	
+//			std::string labelEdit = label + " (" + std::to_string(id) + ")";
+//			VXL_ASSERT(labelEdit.size() < GLNameMaxLength, "GLName is too big");
+//			glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
+//			//
+//	#endif
+//		}
 
 	// Get Format Type from channel count
 	Channel_Type glUtil::getChannelType(int ChannelCount)
@@ -514,155 +514,155 @@ namespace Vxl
 	}
 
 
-	void glUtil::clearColor(float r, float g, float b, float a)
-	{
-		glClearColor(r, g, b, a);
-	}
-	void glUtil::clearColor(const Color3F& c, float a)
-	{
-		glClearColor(c.r, c.g, c.b, 1.0f);
-	}
-	void glUtil::clearColor(const Color4F& c)
-	{
-		glClearColor(c.r, c.g, c.b, c.a);
-	}
-	void glUtil::clearDepth(float f)
-	{
-		VXL_ASSERT(f >= 0.0f && f <= 1.0f, "Depth Value must be between 0 and 1 inclusif");
-		glClearDepth(f);
-	}
-	void glUtil::clearStencil(int f)
-	{
-		VXL_ASSERT(f >= 0.0f && f <= 1.0f, "Stencil Value must be between 0 and 1 inclusif");
-		glClearStencil(f);
-	}
+	//	void glUtil::clearColor(float r, float g, float b, float a)
+	//	{
+	//		glClearColor(r, g, b, a);
+	//	}
+	//	void glUtil::clearColor(const Color3F& c, float a)
+	//	{
+	//		glClearColor(c.r, c.g, c.b, 1.0f);
+	//	}
+	//	void glUtil::clearColor(const Color4F& c)
+	//	{
+	//		glClearColor(c.r, c.g, c.b, c.a);
+	//	}
+	//	void glUtil::clearDepth(float f)
+	//	{
+	//		VXL_ASSERT(f >= 0.0f && f <= 1.0f, "Depth Value must be between 0 and 1 inclusif");
+	//		glClearDepth(f);
+	//	}
+	//	void glUtil::clearStencil(int f)
+	//	{
+	//		VXL_ASSERT(f >= 0.0f && f <= 1.0f, "Stencil Value must be between 0 and 1 inclusif");
+	//		glClearStencil(f);
+	//	}
+	//	
+	//	void glUtil::clearBuffer()
+	//	{
+	//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//	}
+	//	void glUtil::clearBuffer(UINT bitCode)
+	//	{
+	//		glClear(bitCode);
+	//	}
+	//	void glUtil::clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b, Buffer_Bit_Type c, Buffer_Bit_Type d)
+	//	{
+	//		glClear(GLbitfield(a) | GLbitfield(b) | GLbitfield(c) | GLbitfield(d));
+	//	}
+	//	
+	//	void glUtil::cullMode(Cull_Type cull)
+	//	{
+	//		if (_cullmode != cull)
+	//		{
+	//			switch (cull)
+	//			{
+	//			case Cull_Type::NO_CULL:
+	//				glDisable(GL_CULL_FACE);
+	//				break;
+	//	
+	//			case Cull_Type::COUNTER_CLOCKWISE:
+	//				glEnable(GL_CULL_FACE);
+	//				glFrontFace(GL_CCW);
+	//				break;
+	//	
+	//			case Cull_Type::CLOCKWISE:
+	//				glEnable(GL_CULL_FACE);
+	//				glFrontFace(GL_CW);
+	//				break;
+	//			default:
+	//				VXL_ASSERT(FALSE, "Invalud CullType Mode");
+	//				break;
+	//			}
+	//	
+	//		}
+	//	
+	//		_cullmode = cull;
+	//	}
 
-	void glUtil::clearBuffer()
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-	void glUtil::clearBuffer(UINT bitCode)
-	{
-		glClear(bitCode);
-	}
-	void glUtil::clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b, Buffer_Bit_Type c, Buffer_Bit_Type d)
-	{
-		glClear(GLbitfield(a) | GLbitfield(b) | GLbitfield(c) | GLbitfield(d));
-	}
-
-	void glUtil::cullMode(Cull_Type cull)
-	{
-		if (_cullmode != cull)
-		{
-			switch (cull)
-			{
-			case Cull_Type::NO_CULL:
-				glDisable(GL_CULL_FACE);
-				break;
-
-			case Cull_Type::COUNTER_CLOCKWISE:
-				glEnable(GL_CULL_FACE);
-				glFrontFace(GL_CCW);
-				break;
-
-			case Cull_Type::CLOCKWISE:
-				glEnable(GL_CULL_FACE);
-				glFrontFace(GL_CW);
-				break;
-			default:
-				VXL_ASSERT(FALSE, "Invalud CullType Mode");
-				break;
-			}
-
-		}
-
-		_cullmode = cull;
-	}
-
-	// Blend Mode (affects rgb of colors based on alpha/rgb of source and destination pixels in shaders)
-	void glUtil::blendState(bool state)
-	{
-		if (_blendState == state)
-			return;
-
-		if(state)
-			glEnable(GL_BLEND);
-		else
-			glDisable(GL_BLEND);
-
-		_blendState = state;
-	}
-	
-	void glUtil::blendMode(Blend_Source src = Blend_Source::SRC_ALPHA, Blend_Destination dest = Blend_Destination::ONE_MINUS_SRC_ALPHA)
-	{
-		if(_blendsrc != src || _blenddest != dest)
-			glBlendFunc((GLenum)src, (GLenum)dest);
-
-		_blendsrc = src;
-		_blenddest = dest;
-	}
-	
-	void glUtil::blendEquation(Blend_Equation equation)
-	{
-		if(_blendequation != equation)
-			glBlendEquation((GLenum)equation);
-
-		_blendequation = equation;
-	}
-
-	void glUtil::depthState(bool state)
-	{
-		if (_depthState == state)
-			return;
-
-		if(state)
-			glEnable(GL_DEPTH_TEST);
-		else
-			glDisable(GL_DEPTH_TEST);
-
-		_depthState = state;
-	}
-	// Depth Test (What depth value will overwrite the existing one)
-	void glUtil::depthTest(Depth_Pass_Rule Rule = Depth_Pass_Rule::LESS_OR_EQUAL)
-	{
-		if (_rule != Rule)
-			glDepthFunc((GLenum)Rule);
-
-		_rule = Rule;
-	}
-	void glUtil::depthMask(bool state)
-	{
-		if(_depthMask != state)
-			glDepthMask(state);
-
-		_depthMask = state;
-	}
-
-	// Wireframe Mode
-	void glUtil::wireframe(bool state)
-	{
-		if (_wireframe != state)
-		{
-			if (state)
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-
-		_wireframe = state;
-	}
-
-	// viewport
-	void glUtil::viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h)
-	{
-		if(_viewport[0] != x || _viewport[1] != y || _viewport[2] != w || _viewport[3] != h)
-			glViewport(x, y, w, h);
-
-		_viewport[0] = x;
-		_viewport[1] = y;
-		_viewport[2] = w;
-		_viewport[3] = h;
-	}
+	//	// Blend Mode (affects rgb of colors based on alpha/rgb of source and destination pixels in shaders)
+	//	void glUtil::blendState(bool state)
+	//	{
+	//		if (_blendState == state)
+	//			return;
+	//	
+	//		if(state)
+	//			glEnable(GL_BLEND);
+	//		else
+	//			glDisable(GL_BLEND);
+	//	
+	//		_blendState = state;
+	//	}
+	//	
+	//	void glUtil::blendMode(Blend_Source src = Blend_Source::SRC_ALPHA, Blend_Destination dest = Blend_Destination::ONE_MINUS_SRC_ALPHA)
+	//	{
+	//		if(_blendsrc != src || _blenddest != dest)
+	//			glBlendFunc((GLenum)src, (GLenum)dest);
+	//	
+	//		_blendsrc = src;
+	//		_blenddest = dest;
+	//	}
+	//	
+	//	void glUtil::blendEquation(Blend_Equation equation)
+	//	{
+	//		if(_blendequation != equation)
+	//			glBlendEquation((GLenum)equation);
+	//	
+	//		_blendequation = equation;
+	//	}
+	//	
+	//	void glUtil::depthState(bool state)
+	//	{
+	//		if (_depthState == state)
+	//			return;
+	//	
+	//		if(state)
+	//			glEnable(GL_DEPTH_TEST);
+	//		else
+	//			glDisable(GL_DEPTH_TEST);
+	//	
+	//		_depthState = state;
+	//	}
+	//	// Depth Test (What depth value will overwrite the existing one)
+	//	void glUtil::depthTest(Depth_Pass_Rule Rule = Depth_Pass_Rule::LESS_OR_EQUAL)
+	//	{
+	//		if (_rule != Rule)
+	//			glDepthFunc((GLenum)Rule);
+	//	
+	//		_rule = Rule;
+	//	}
+	//	void glUtil::depthMask(bool state)
+	//	{
+	//		if(_depthMask != state)
+	//			glDepthMask(state);
+	//	
+	//		_depthMask = state;
+	//	}
+	//	
+	//	// Wireframe Mode
+	//	void glUtil::wireframe(bool state)
+	//	{
+	//		if (_wireframe != state)
+	//		{
+	//			if (state)
+	//				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//			else
+	//				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//		}
+	//	
+	//		_wireframe = state;
+	//	}
+	//	
+	//	// viewport
+	//	void glUtil::viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h)
+	//	{
+	//		if(_viewport[0] != x || _viewport[1] != y || _viewport[2] != w || _viewport[3] != h)
+	//			glViewport(x, y, w, h);
+	//	
+	//		_viewport[0] = x;
+	//		_viewport[1] = y;
+	//		_viewport[2] = w;
+	//		_viewport[3] = h;
+	//	}
 
 	// BUFFERS //
 	GLuint glUtil::generateVAO()

@@ -67,17 +67,17 @@ namespace Vxl
 	void Material::BindStates()
 	{
 		// Bind Modes
-		glUtil::cullMode(m_CullType);
-		glUtil::blendState(m_BlendState);
+		Graphics::SetCullMode(m_CullType);
+		Graphics::SetBlendState(m_BlendState);
 		if (m_BlendState)
 		{
-			glUtil::blendMode(m_BlendSource, m_BlendDest);
-			glUtil::blendEquation(m_BlendEq);
+			Graphics::SetBlendMode(m_BlendSource, m_BlendDest);
+			Graphics::SetBlendEquation(m_BlendEq);
 		}
-		glUtil::depthTest(m_DepthFunc);
-		glUtil::depthState(m_DepthRead);
-		glUtil::depthMask(m_DepthWrite);
-		glUtil::wireframe(m_Wireframe);
+		Graphics::SetDepthPassRule(m_DepthFunc);
+		Graphics::SetDepthTestState(m_DepthRead);
+		Graphics::SetDepthMask(m_DepthWrite);
+		Graphics::SetWireframeState(m_Wireframe);
 	}
 	void Material::BindTextures()
 	{

@@ -94,12 +94,12 @@ namespace Vxl
 		// Glew/Opengl Init
 		if (!glUtil::initGlew())
 			VXL_ASSERT(false, "Glew failed to initialized");
+		//glUtil::initHints();
 
 		// Graphics [newer]
 		if(!Graphics::Setup())
 			VXL_ASSERT(false, "Glew failed to initialized");
-
-		glUtil::initHints();
+		Graphics::initHints();
 
 		// Get version info
 		Logger.log("~~~~~~~~~~~~~~~~~~");
@@ -260,9 +260,9 @@ namespace Vxl
 	{
 		// Locked Aspect Ratio (Black bars on edges)
 		if (m_useCustomAspectRatio)
-			glUtil::viewport(m_viewportOffset[0], m_viewportOffset[1], m_viewportSize[0], m_viewportSize[1]);
+			Graphics::SetViewport(m_viewportOffset[0], m_viewportOffset[1], m_viewportSize[0], m_viewportSize[1]);
 		else
-			glUtil::viewport(0, 0, m_size[0], m_size[1]);
+			Graphics::SetViewport(0, 0, m_size[0], m_size[1]);
 	}
 
 	void Window::Update()

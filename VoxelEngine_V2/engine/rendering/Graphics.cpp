@@ -24,7 +24,7 @@
 
 namespace Vxl
 {
-	// Statics
+	// Global Variables //
 	int Graphics::GLVersionMajor = -1;
 	int Graphics::GLVersionMinor = -1;
 	int Graphics::GLObjectNameMaxLength = -1;
@@ -34,6 +34,19 @@ namespace Vxl
 	std::string Graphics::Gpu_OpenGLVersion;
 	std::string Graphics::Gpu_Vendor;
 	glVendorType Graphics::Vendor = glVendorType::UNKNOWN;
+
+	// Tracking Data //
+	CullMode			gl_cullmode = CullMode::NONE;
+	bool				gl_blendState = false;
+	bool				gl_depthTestState = false;
+	bool				gl_depthMask = true;
+	bool				gl_wireframe = false;
+	bool				gl_seamlessCubemaps = false;
+	BlendSource			gl_blendsrc = BlendSource::NONE;
+	BlendDestination	gl_blenddest = BlendDestination::NONE;
+	BlendEquation		gl_blendequation = BlendEquation::NONE;
+	DepthPassRule		gl_depthpassrule = DepthPassRule::NONE;
+	GLsizei				gl_viewport[4] = { -1, -1, -1, -1 };
 
 	// ~ Graphics Enums ~ //
 	int GL_ObjectType[] =
@@ -52,7 +65,7 @@ namespace Vxl
 		GL_RENDERBUFFER,
 		GL_FRAMEBUFFER
 	};
-	int GL_ShaderType[]
+	int GL_ShaderType[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -63,7 +76,7 @@ namespace Vxl
 		GL_TESS_EVALUATION_SHADER,
 		GL_COMPUTE_SHADER
 	};
-	const char* GL_ShaderNames[]
+	const char* GL_ShaderNames[] =
 	{
 		"NULL", // Error (Used for placeholder)
 
@@ -73,6 +86,59 @@ namespace Vxl
 		"TESS_CONTROL_SHADER",
 		"TESS_EVALUATION_SHADER",
 		"COMPUTE_SHADER"
+	};
+	GLbitfield GL_BufferBit[] =
+	{
+		0, // Error (Used for placeholder) [0 used to prevent blit error]
+
+		GL_COLOR_BUFFER_BIT,
+		GL_DEPTH_BUFFER_BIT,
+		GL_STENCIL_BUFFER_BIT,
+		GL_ACCUM_BUFFER_BIT
+	};
+	int GL_BlendSource[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_ZERO,
+		GL_ONE,
+		GL_DST_COLOR,
+		GL_ONE_MINUS_DST_COLOR,
+		GL_SRC_ALPHA,
+		GL_ONE_MINUS_SRC_ALPHA
+	};
+	int GL_BlendDestination[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_ZERO,
+		GL_ONE,
+		GL_DST_COLOR,
+		GL_ONE_MINUS_DST_COLOR,
+		GL_SRC_ALPHA,
+		GL_ONE_MINUS_SRC_ALPHA
+	};
+	int GL_BlendEquation[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_FUNC_ADD,
+		GL_FUNC_SUBTRACT,
+		GL_FUNC_REVERSE_SUBTRACT,
+		GL_MIN,
+		GL_MAX
+	};
+	int GL_DepthPassRule[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_LESS,
+		GL_EQUAL,
+		GL_GREATER,
+		GL_LEQUAL,
+		GL_GEQUAL,
+		GL_NOTEQUAL,
+		GL_ALWAYS
 	};
 
 	// ~ Setup ~ //
@@ -121,6 +187,36 @@ namespace Vxl
 		// All good
 		return true;
 	}
+	void Graphics::initHints()
+	{
+		// Reset cpp variables
+		gl_cullmode = CullMode::NONE;
+		gl_blendState = false;
+		gl_blendsrc = BlendSource::NONE;
+		gl_blenddest = BlendDestination::NONE;
+		gl_blendequation = BlendEquation::NONE;
+		gl_depthpassrule = DepthPassRule::NONE;
+		gl_depthTestState = false;
+		gl_depthMask = true;
+		gl_wireframe = false;
+		gl_seamlessCubemaps = false;
+		for (int i = 0; i < 4; i++)
+			gl_viewport[i] = -1;
+
+		// Set Default Cull Mode
+		SetCullMode(CullMode::COUNTER_CLOCKWISE);
+		// Set Default Blend info
+		SetBlendState(true);
+		SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
+		SetBlendEquation(BlendEquation::FUNC_ADD);
+		// Set Default Depth info
+		SetDepthTestState(true);
+		SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
+		// Set Default Wireframe info
+		SetWireframeState(false);
+		// Cubemap edges are hidden
+		SetSeamlessCubemap(true);
+	}
 
 	// ~ GPU Name ~ //
 	void Graphics::SetGLName(ObjectType identifier, uint32_t id, const std::string &label)
@@ -135,6 +231,169 @@ namespace Vxl
 		glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
 		//
 #endif
+	}
+
+	// ~ States ~ //
+	void Graphics::SetCullMode(CullMode cullmode)
+	{
+		if (gl_cullmode != cullmode)
+		{
+			switch (cullmode)
+			{
+			case CullMode::NO_CULL:
+				glDisable(GL_CULL_FACE);
+				break;
+
+			case CullMode::COUNTER_CLOCKWISE:
+				glEnable(GL_CULL_FACE);
+				glFrontFace(GL_CCW);
+				break;
+
+			case CullMode::CLOCKWISE:
+				glEnable(GL_CULL_FACE);
+				glFrontFace(GL_CW);
+				break;
+			default:
+				VXL_ASSERT(FALSE, "GL ERROR: Invalid CullMode");
+				break;
+			}
+		}
+
+		gl_cullmode = cullmode;
+	}
+	void Graphics::SetBlendState(bool state)
+	{
+		if (gl_blendState == state)
+			return;
+
+		if (state)
+			glEnable(GL_BLEND);
+		else
+			glDisable(GL_BLEND);
+
+		gl_blendState = state;
+	}
+	void Graphics::SetDepthTestState(bool state)
+	{
+		if (gl_blendState == state)
+			return;
+
+		if (state)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+
+		gl_blendState = state;
+	}
+	void Graphics::SetWireframeState(bool state)
+	{
+		if (gl_wireframe == state)
+			return;
+		
+		if (state)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		
+		gl_wireframe = state;
+	}
+	void Graphics::SetDepthMask(bool state)
+	{
+		if (gl_depthMask == state)
+			return;
+
+		glDepthMask(state);
+		gl_depthMask = state;
+	}
+	void Graphics::SetSeamlessCubemap(bool state)
+	{
+		if (gl_depthMask == state)
+			return;
+
+		if (state)
+			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		else
+			glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+		gl_depthMask = state;
+	}
+
+	// ~ Blending ~ //
+	void Graphics::SetBlendMode(BlendSource src, BlendDestination dest)
+	{
+		if (gl_blendsrc == src && gl_blenddest == dest)
+			return;
+
+		glBlendFunc(GL_BlendSource[(int)src], GL_BlendDestination[(int)dest]);
+		gl_blendsrc = src;
+		gl_blenddest = dest;
+	}
+	void Graphics::SetBlendEquation(BlendEquation eq)
+	{
+		if (gl_blendequation == eq)
+			return;
+
+		glBlendEquation(GL_BlendEquation[(int)eq]);
+		gl_blendequation = eq;
+	}
+
+	// ~ Depth ~ //
+	void Graphics::SetDepthPassRule(DepthPassRule rule)
+	{
+		if (gl_depthpassrule == rule)
+			return;
+
+		glDepthFunc(GL_DepthPassRule[(int)rule]);
+		gl_depthpassrule = rule;
+	}
+
+	// ~ Viewport ~ //
+	void Graphics::SetViewport(int x, int y, int w, int h)
+	{
+		if (gl_viewport[0] == x && gl_viewport[1] == y && gl_viewport[2] == w && gl_viewport[3] == h)
+			return;
+		
+		glViewport(x, y, w, h);	
+		gl_viewport[0] = x;
+		gl_viewport[1] = y;
+		gl_viewport[2] = w;
+		gl_viewport[3] = h;
+	}
+
+	// ~ Clear Buffer [Setup] ~ //
+	void Graphics::SetClearColor(float r, float g, float b, float a)
+	{
+		glClearColor(r, g, b, a);
+	}
+	void Graphics::SetClearColor(const Color3F& c, float a)
+	{
+		glClearColor(c.r, c.g, c.b, a);
+	}
+	void Graphics::SetClearColor(const Color4F& c)
+	{
+		glClearColor(c.r, c.g, c.b, c.a);
+	}
+	void Graphics::SetClearDepth(float f)
+	{
+		VXL_ASSERT(f >= 0.0f && f <= 1.0f, "Depth Value must be between 0 and 1 inclusif");
+		glClearDepth(f);
+	}
+	void Graphics::SetClearStencil(int i)
+	{
+		glClearStencil(i);
+	}
+	// ~ Clear Buffer [Call] ~ //
+	void Graphics::ClearBuffer(BufferBit clearBit)
+	{
+		glClear(GL_BufferBit[(int)clearBit]);
+	}
+	void Graphics::ClearBuffer(BufferBit clearBit, BufferBit clearBit2)
+	{
+		glClear(GL_BufferBit[(int)clearBit] | GL_BufferBit[(int)clearBit2]);
+	}
+	void Graphics::ClearAllBuffers()
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
 	// ~ Sends Uniforms to Shader ~ //
@@ -598,7 +857,7 @@ namespace Vxl
 
 		char name[256]; int len, numCompS;
 
-		uint32_t shaderCount = shaders.size();
+		uint32_t shaderCount = (uint32_t)shaders.size();
 		for (uint32_t s = 0; s < shaderCount; s++)
 		{
 			int subroutineCount;

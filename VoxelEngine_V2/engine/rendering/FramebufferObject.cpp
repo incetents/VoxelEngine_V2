@@ -2,6 +2,7 @@
 #include "Precompiled.h"
 #include "FramebufferObject.h"
 #include "RenderBuffer.h"
+#include "Graphics.h"
 
 #include "../textures/Texture.h"
 #include "../textures/RenderTexture.h"
@@ -20,12 +21,12 @@ namespace Vxl
 		if (m_type == Attachment_Type::TEXTURE)
 		{
 			m_texture = new RenderTexture(Width, Height, m_formatType, m_channelType, m_pixelType);
-			glUtil::setGLName(glNameType::TEXTURE, m_texture->GetID(), "FBO_" + m_name + "_Tex_" + m_name);
+			Graphics::SetGLName(ObjectType::TEXTURE, m_texture->GetID(), "FBO_" + m_name + "_Tex_" + m_name);
 		}
 		else
 		{
 			m_buffer = new RenderBuffer(Width, Height, m_formatType, m_channelType, m_pixelType);
-			glUtil::setGLName(glNameType::TEXTURE, m_buffer->GetID(), "FBO_" + m_name + "_RenderBuf_" + m_name);
+			Graphics::SetGLName(ObjectType::TEXTURE, m_buffer->GetID(), "FBO_" + m_name + "_RenderBuf_" + m_name);
 		}
 
 
@@ -130,7 +131,7 @@ namespace Vxl
 		// Create FBO
 		glGenFramebuffers(1, &m_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-		glUtil::setGLName(glNameType::FRAMEBUFFER, m_id, "FBO_" + m_name);
+		Graphics::SetGLName(ObjectType::FRAMEBUFFER, m_id, "FBO_" + m_name);
 
 		// Color attachments
 		for (unsigned int i = 0; i < m_textureCount; i++)
@@ -222,8 +223,26 @@ namespace Vxl
 	}
 	void FramebufferObject::clearBuffers()
 	{
-		glUtil::clearColor(m_clearColor);
-		glUtil::clearBuffer(m_clearBuffers);
+		Graphics::SetClearColor(m_clearColor);
+
+		switch (m_clearMode)
+		{
+		case ClearMode::COLOR:
+			Graphics::ClearBuffer(BufferBit::COLOR);
+			break;
+		case ClearMode::COLOR_DEPTH:
+			Graphics::ClearBuffer(BufferBit::COLOR, BufferBit::DEPTH);
+			break;
+		case ClearMode::COLOR_STENCIL:
+			Graphics::ClearBuffer(BufferBit::COLOR, BufferBit::STENCIL);
+			break;
+		case ClearMode::COLOR_DEPTH_STENCIL:
+			Graphics::ClearAllBuffers();
+			break;
+		default:
+			VXL_ASSERT(false, "Unknown ClearMode flag for FBO");
+		}
+
 	}
 	void FramebufferObject::clearBuffer(unsigned int index)
 	{
@@ -247,6 +266,13 @@ namespace Vxl
 	{
 		VXL_ASSERT(m_depth == nullptr, "FBO, cannot add multiple depth/stencil attachments");
 
+		if (depthFormatType == DepthFormat_Type::STENCIL8)
+			m_clearMode = ClearMode::COLOR_STENCIL;
+		else if (depthFormatType == DepthFormat_Type::DEPTH24_STENCIL8 || depthFormatType == DepthFormat_Type::DEPTH32F_STENCIL8)
+			m_clearMode = ClearMode::COLOR_DEPTH_STENCIL;
+		else
+			m_clearMode = ClearMode::COLOR_DEPTH;
+
 		// Select Pixel/Channel Type [for glReadPixels]
 		Pixel_Type PixelType;
 		Channel_Type ChannelType;
@@ -259,13 +285,13 @@ namespace Vxl
 	{
 		bindFBO();
 
-		glUtil::viewport(0, 0, m_width, m_height);
+		Graphics::SetViewport(0, 0, m_width, m_height);
 	}
 	void FramebufferObject::bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH)
 	{
 		bindFBO();
 
-		glUtil::viewport(viewportX, viewportY, viewportW, viewportH);
+		Graphics::SetViewport(viewportX, viewportY, viewportW, viewportH);
 	}
 	void FramebufferObject::unbind()
 	{

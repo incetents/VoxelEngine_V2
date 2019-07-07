@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Mesh.h"
 
+#include "Graphics.h"
+
 #include "../math/Model.h"
 
 #include "../utilities/logger.h"
@@ -136,7 +138,7 @@ namespace Vxl
 	Mesh::Mesh(const std::string& glName)
 	{
 		if (!glName.empty())
-			glUtil::setGLName(glNameType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + glName);
+			Graphics::SetGLName(ObjectType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + glName);
 	}
 
 	Mesh* Mesh::Create(const std::string& name)

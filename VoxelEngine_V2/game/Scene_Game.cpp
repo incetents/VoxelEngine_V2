@@ -19,6 +19,7 @@
 #include "../engine/rendering/Shader.h"
 #include "../engine/rendering/Debug.h"
 #include "../engine/rendering/UBO.h"
+#include "../engine/rendering/Graphics.h"
 
 #include "../engine/textures/Texture.h"
 #include "../engine/textures/RenderTexture.h"
@@ -170,7 +171,7 @@ namespace Vxl
 		_mesh->m_uvs.set(uvs, 4);
 		_mesh->m_indices.set(indices, 6);
 		_mesh->GenerateNormals(false);
-		_mesh->GenerateTangents(=);
+		_mesh->GenerateTangents();
 		
 		std::vector<Matrix4x4> m_models;
 		for (float x = 0; x < 5.0f; x++)
@@ -580,7 +581,7 @@ namespace Vxl
 		_fbo->blitDepth(*_fbo_editor);
 		RenderManager.RenderEditorObjects();
 
-		glUtil::clearBuffer(Buffer_Bit_Type::DEPTH);
+		Graphics::ClearBuffer(BufferBit::DEPTH);
 		RenderManager.RenderEditorObjectsPostDepth();
 		//
 		GPUTimer::EndTimer();
@@ -669,7 +670,7 @@ namespace Vxl
 			{
 				_fbo_colorpicker->bind();
 				_fbo_colorpicker->clearBuffers();
-				glUtil::blendState(false);
+				Graphics::SetBlendState(false);
 
 				material_colorPicker->BindProgram();
 
@@ -697,7 +698,7 @@ namespace Vxl
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetArrowZ()->Draw();
 
-				glUtil::cullMode(Cull_Type::NO_CULL);
+				Graphics::SetCullMode(CullMode::NO_CULL);
 
 				// X Plane
 				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
@@ -717,7 +718,7 @@ namespace Vxl
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetHalfQuadZ()->Draw();
 
-				glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
+				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
 
 				RawArray<GLubyte> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
@@ -899,7 +900,7 @@ namespace Vxl
 			{
 				_fbo_colorpicker->bind();
 				_fbo_colorpicker->clearBuffers();
-				glUtil::blendState(false);
+				Graphics::SetBlendState(false);
 
 				material_colorPicker->BindProgram();
 
@@ -1003,14 +1004,13 @@ namespace Vxl
 
 		Window.BindWindowViewport();
 
-		glUtil::blendState(false);
-		glUtil::wireframe(false);
-		glUtil::depthTest(Depth_Pass_Rule::ALWAYS);
+		Graphics::SetBlendState(false);
+		Graphics::SetWireframeState(false);
+		Graphics::SetDepthPassRule(DepthPassRule::ALWAYS);
 
 		// ~~~~~~~~~~~~~~~~~ //
-		glUtil::clearColor(Color4F(0, 0, 0, 0));
-		glUtil::clearBuffer();
-
+		Graphics::SetClearColor(0, 0, 0, 0);
+		Graphics::ClearAllBuffers();
 		
 		ShaderProgram* _shader_showRenderTarget = ShaderProgram::Get("showRenderTarget");
 

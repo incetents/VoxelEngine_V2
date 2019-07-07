@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "UBO.h"
 
+#include "Graphics.h"
+
 #include "../math/Vector2.h"
 #include "../math/Vector3.h"
 #include "../math/Vector4.h"
@@ -38,7 +40,7 @@ namespace Vxl
 		glBindBufferBase(GL_UNIFORM_BUFFER, m_slot, m_id);
 
 		// set name
-		glUtil::setGLName(glNameType::BUFFER, m_id, "UBO_" + m_name);
+		Graphics::SetGLName(ObjectType::BUFFER, m_id, "UBO_" + m_name);
 
 		// unbind
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);

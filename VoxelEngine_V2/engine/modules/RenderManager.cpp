@@ -14,6 +14,7 @@
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/FramebufferObject.h"
+#include "../rendering/Graphics.h"
 #include "../window/window.h"
 #include "../editor/Editor.h"
 #include "../objects/GameObject.h"
@@ -208,7 +209,7 @@ namespace Vxl
 	}
 	void RenderManager::ReloadWindow()
 	{
-		glUtil::initHints(); // important for reset reasons
+		Graphics::initHints(); // Newer version
 
 		Destroy();
 
@@ -376,8 +377,8 @@ namespace Vxl
 	}
 	void RenderManager::RenderEditorObjects()
 	{
-		glUtil::blendState(true);
-		glUtil::blendMode(Blend_Source::SRC_ALPHA, Blend_Destination::ONE_MINUS_SRC_ALPHA);
+		Graphics::SetBlendState(true);
+		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
 
 		// Draw Lights
 		auto billboard = Material::Get("billboard");
@@ -419,20 +420,21 @@ namespace Vxl
 
 		lines->SetProperty<bool>("passthrough", false);
 
-		glUtil::depthMask(false);
-		glUtil::depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
+		Graphics::SetDepthMask(false);
+		Graphics::SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
+
 		Debug.RenderWorldLines();
 
-		glUtil::depthTest(Depth_Pass_Rule::GREATER);
+		Graphics::SetDepthPassRule(DepthPassRule::GREATER);
 		// ???
 
-		glUtil::depthTest(Depth_Pass_Rule::LESS_OR_EQUAL);
+		Graphics::SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
 
 		lines->SetProperty<bool>("passthrough", true);
 
 		Debug.RenderScreenLines();
 
-		glUtil::depthMask(true);
+		Graphics::SetDepthMask(true);
 
 		// Draw Debug Wireframe Sphere
 		auto passthrough = Material::Get("passthrough");
@@ -440,8 +442,9 @@ namespace Vxl
 		passthrough->m_property_useTexture.SetProperty(false);
 		passthrough->m_property_useModel.SetProperty(true);
 		
-		glUtil::wireframe(true);
-		glUtil::cullMode(Cull_Type::NO_CULL);
+		Graphics::SetWireframeState(true);
+		Graphics::SetCullMode(CullMode::NO_CULL);
+
 		glLineWidth(5.0f);
 		for (const auto& sphere : Debug.m_wireframeSpheres)
 		{
@@ -450,8 +453,9 @@ namespace Vxl
 			Geometry.GetIcoSphere()->Draw();
 		}
 		glLineWidth(1.0f);
-		glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
-		glUtil::wireframe(false);
+
+		Graphics::SetWireframeState(false);
+		Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
 	}
 
@@ -507,7 +511,7 @@ namespace Vxl
 				simpleLight->m_property_alpha.SetProperty(0.85f);
 				Geometry.GetCubeSmall()->Draw();
 
-				glUtil::cullMode(Cull_Type::NO_CULL);
+				Graphics::SetCullMode(CullMode::NO_CULL);
 
 				// X Plane
 				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
@@ -542,7 +546,7 @@ namespace Vxl
 					simpleLight->m_property_color.SetProperty(Color3F::BLUE);
 				Geometry.GetHalfQuadZ()->Draw();
 
-				glUtil::cullMode(Cull_Type::COUNTER_CLOCKWISE);
+				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
 				// revert
 				simpleLight->m_property_alpha.SetProperty(1.0f);

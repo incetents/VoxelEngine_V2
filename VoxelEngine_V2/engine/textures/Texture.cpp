@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Texture.h"
 
+#include "../rendering/Graphics.h"
+
 #include "../rendering/glUtil.h"
 #include "../utilities/logger.h"
 #include "../utilities/stringUtil.h"
@@ -48,7 +50,7 @@ namespace Vxl
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath);
-		glUtil::setGLName(glNameType::TEXTURE, m_id, "Tex_" + Name);
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + Name);
 
 		// finished
 		Unbind();
@@ -93,7 +95,7 @@ namespace Vxl
 		updateMipmapping();
 
 		// glName
-		glUtil::setGLName(glNameType::TEXTURE, m_id, "Tex_" + name);
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
 
 		// finished
 		Unbind();

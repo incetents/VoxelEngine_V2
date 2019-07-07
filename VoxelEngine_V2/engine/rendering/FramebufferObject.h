@@ -2,7 +2,10 @@
 #pragma once
 
 #include <Windows.h>
+
 #include "glUtil.h"
+#include "Graphics.h"
+
 #include "../math/Color.h"
 #include "../utilities/Asset.h"
 #include "../utilities/Util.h"
@@ -81,12 +84,22 @@ namespace Vxl
 			void Bind();
 			void Unbind();
 		};
+
+		enum class ClearMode
+		{
+			COLOR,
+			COLOR_DEPTH,
+			COLOR_STENCIL,
+			COLOR_DEPTH_STENCIL
+		};
+
 	private:
+
 		// Fbo
 		const std::string m_name;
 		GLuint	m_id = -1;
 		Color4F m_clearColor = Color4F(0,0,0,0);
-		UINT    m_clearBuffers = (GLbitfield)Buffer_Bit_Type::COLOR | (GLbitfield)Buffer_Bit_Type::DEPTH | (GLbitfield)Buffer_Bit_Type::STENCIL;
+		ClearMode m_clearMode = ClearMode::COLOR;
 		UINT	m_width = 0;
 		UINT	m_height = 0;
 		bool	m_fullscreen = false; // Width/Height will attempt to match screen's resolution
@@ -120,10 +133,6 @@ namespace Vxl
 		inline void setClearColor(Color4F c)
 		{
 			m_clearColor = c;
-		}
-		inline void setClearBuffer(Buffer_Bit_Type b1, Buffer_Bit_Type b2 = Buffer_Bit_Type::NONE, Buffer_Bit_Type b3 = Buffer_Bit_Type::NONE, Buffer_Bit_Type b4 = Buffer_Bit_Type::NONE)
-		{
-			m_clearBuffers = (GLbitfield)b1 | (GLbitfield)b2 | (GLbitfield)b3 | (GLbitfield)b4;
 		}
 		inline void setSize(unsigned int Width, unsigned int Height)
 		{

@@ -19,7 +19,7 @@ namespace Vxl
 	class Matrix4x4;
 	class Shader;
 
-	// Vendor Types
+	// ~ Vendor Types ~ //
 	enum class glVendorType
 	{
 		UNKNOWN = 0,
@@ -27,7 +27,7 @@ namespace Vxl
 		AMD,
 		INTEL
 	};
-	// Object Types
+	// ~ Object Types ~ //
 	enum class ObjectType
 	{
 		NONE = 0, // Error (Used for placeholder)
@@ -44,7 +44,7 @@ namespace Vxl
 		RENDERBUFFER,
 		FRAMEBUFFER
 	};
-	// Shader Types
+	// ~ Shader Types ~ //
 	enum class ShaderType
 	{
 		NONE = 0, // Error (Used for placeholder)
@@ -56,13 +56,71 @@ namespace Vxl
 		TESSELATION_EVALUATION ,
 		COMPUTE,
 	};
-
-	// Special Containers //
-	struct UniformData
+	// ~ Buffer Bit Type ~ //
+	enum class BufferBit
 	{
-		uint32_t location;
-		uint32_t type;
-		std::string name;
+		NONE = 0, // Error (Used for placeholder) [0 to prevent blit error]
+
+		COLOR,
+		DEPTH,
+		STENCIL
+	};
+	// ~ Cull Modes ~ //
+	enum class CullMode
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		NO_CULL,
+		COUNTER_CLOCKWISE,
+		CLOCKWISE
+	};
+	// ~ Blend Source ~ //
+	enum class BlendSource
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		ZERO,
+		ONE,
+		DST_COLOR,
+		ONE_MINUS_DST_COLOR,
+		SRC_ALPHA,
+		ONE_MINUS_SRC_ALPHA
+	};
+	// ~ Blend Destination ~ //
+	enum class BlendDestination
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		ZERO,
+		ONE,
+		SRC_COLOR,
+		ONE_MINUS_SRC_COLOR,
+		SRC_ALPHA,
+		ONE_MINUS_SRC_ALPHA
+	};
+	// ~ Blend Equation ~ //
+	enum class BlendEquation
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		FUNC_ADD,
+		FUNC_SUBTRACT,
+		FUNC_REVERSE_SUBTRACT,
+		MIN,
+		MAX
+	};
+	// ~ Depth Pass Rule ~ //
+	enum class DepthPassRule
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		LESS,
+		EQUAL,
+		GREATER,
+		LESS_OR_EQUAL,
+		GREATER_OR_EQUAL,
+		NOT_EQUAL,
+		ALWAYS
 	};
 
 	// ~ Object Typedefs ~ //
@@ -85,9 +143,39 @@ namespace Vxl
 
 		// ~ Setup ~ //
 		bool Setup();
+		void initHints();
 
 		// ~ GPU Name ~ //
 		void SetGLName(ObjectType identifier, uint32_t id, const std::string &label);
+
+		// ~ States ~ //
+		void SetCullMode(CullMode cullmode);
+		void SetBlendState(bool state);
+		void SetDepthTestState(bool state);
+		void SetWireframeState(bool state);
+		void SetDepthMask(bool state);
+		void SetSeamlessCubemap(bool state);
+
+		// ~ Blending ~ //
+		void SetBlendMode(BlendSource src, BlendDestination dest);
+		void SetBlendEquation(BlendEquation eq);
+
+		// ~ Depth ~ //
+		void SetDepthPassRule(DepthPassRule rule);
+
+		// ~ Viewport ~ //
+		void SetViewport(int x, int y, int w, int h);
+
+		// ~ Clear Buffer [Setup] ~ //
+		void SetClearColor(float r, float g, float b, float a);
+		void SetClearColor(const Color3F& c, float a);
+		void SetClearColor(const Color4F& c);
+		void SetClearDepth(float f);
+		void SetClearStencil(int i);
+		// ~ Clear Buffer [Call] ~ //
+		void ClearBuffer(BufferBit clearBit);
+		void ClearBuffer(BufferBit clearBit, BufferBit clearBit2);
+		void ClearAllBuffers();
 
 		// ~ Uniforms ~ //
 		struct Uniform
@@ -220,10 +308,6 @@ namespace Vxl
 			std::map<ShaderType, UniformSubroutine> AcquireUniformSubroutines(ShaderProgramID id, std::vector<Vxl::Shader*> shaders);
 		}
 
-		
-
-		// ~ Uniforms ~ //
-		//static std::vector<UniformData> GetUniforms(ShaderProgramID id);
 	};
 
 }

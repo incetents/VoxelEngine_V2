@@ -48,7 +48,7 @@ namespace Vxl
 		bool initGlew();
 
 		// Init hints
-		void initHints();
+		//void initHints();
 
 		// Get Version Data
 		const char* getRendererVersion();
@@ -67,8 +67,8 @@ namespace Vxl
 		bool VeryifyDataType(const std::string& name, GLenum type);
 
 		// Set OpenGL Name
-		static int GLNameMaxLength = -1;
-		void setGLName(glNameType identifier, GLuint name, const std::string &label);
+		//	static int GLNameMaxLength = -1;
+		//	void setGLName(glNameType identifier, GLuint name, const std::string &label);
 
 		// Get Format Type from channel count
 		Channel_Type getChannelType(int ChannelCount);
@@ -83,35 +83,35 @@ namespace Vxl
 		// Get Pixel/Channel Data From DepthFormat
 		void getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType);
 
-		// Clear Setup
-		void clearColor(float r, float g, float b, float a = 1.0f);
-		void clearColor(const Color3F& c, float a = 1.0f);
-		void clearColor(const Color4F& c);
-		void clearDepth(float);
-		void clearStencil(int);
-		// Clear Buffer
-		void clearBuffer();
-		void clearBuffer(UINT bitCode);
-		void clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b = Buffer_Bit_Type::NONE, Buffer_Bit_Type c = Buffer_Bit_Type::NONE, Buffer_Bit_Type d = Buffer_Bit_Type::NONE);
-		
-		// Cull Mode
-		void cullMode(Cull_Type);
-
-		// Blend Data
-		void blendState(bool state);
-		void blendMode(Blend_Source src, Blend_Destination dst);
-		void blendEquation(Blend_Equation equation);
-
-		// Depth Rule
-		void depthState(bool state);
-		void depthMask(bool state);
-		void depthTest(Depth_Pass_Rule Rule);
-
-		// Wireframe
-		void wireframe(bool state);
-
-		// viewport
-		void viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h);
+		//	// Clear Setup
+		//	void clearColor(float r, float g, float b, float a = 1.0f);
+		//	void clearColor(const Color3F& c, float a = 1.0f);
+		//	void clearColor(const Color4F& c);
+		//	void clearDepth(float);
+		//	void clearStencil(int);
+		//	// Clear Buffer
+		//	void clearBuffer();
+		//	void clearBuffer(UINT bitCode);
+		//	void clearBuffer(Buffer_Bit_Type a, Buffer_Bit_Type b = Buffer_Bit_Type::NONE, Buffer_Bit_Type c = Buffer_Bit_Type::NONE, Buffer_Bit_Type d = Buffer_Bit_Type::NONE);
+		//	
+		//	// Cull Mode
+		//	void cullMode(Cull_Type);
+		//	
+		//	// Blend Data
+		//	void blendState(bool state);
+		//	void blendMode(Blend_Source src, Blend_Destination dst);
+		//	void blendEquation(Blend_Equation equation);
+		//
+		//	// Depth Rule
+		//	void depthState(bool state);
+		//	void depthMask(bool state);
+		//	void depthTest(Depth_Pass_Rule Rule);
+		//	
+		//	// Wireframe
+		//	void wireframe(bool state);
+		//	
+		//	// viewport
+		//	void viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h);
 
 		// BUFFERS //
 		// VAO

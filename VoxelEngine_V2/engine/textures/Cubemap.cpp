@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Cubemap.h"
 
+#include "../rendering/Graphics.h"
+
 #include "../rendering/glUtil.h"
 #include "../utilities/stringUtil.h"
 
@@ -52,7 +54,7 @@ namespace Vxl
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath1);
-		glUtil::setGLName(glNameType::TEXTURE, m_id, "Cubemap_" + Name);
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Cubemap_" + Name);
 
 		// finished
 		Unbind();

@@ -11,22 +11,22 @@
 namespace Vxl
 {
 	// glNameType
-	enum class glNameType
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		BUFFER = GL_BUFFER,
-		SHADER = GL_SHADER,
-		PROGRAM = GL_PROGRAM,
-		VERTEX_ARRAY = GL_VERTEX_ARRAY,
-		QUERY = GL_QUERY,
-		PROGRAM_PIPELINE = GL_PROGRAM_PIPELINE,
-		TRANSFORM_FEEDBACK = GL_TRANSFORM_FEEDBACK,
-		SAMPLER = GL_SAMPLER,
-		TEXTURE = GL_TEXTURE,
-		RENDERBUFFER = GL_RENDERBUFFER,
-		FRAMEBUFFER = GL_FRAMEBUFFER
-	};
+	//	enum class glNameType
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		BUFFER = GL_BUFFER,
+	//		SHADER = GL_SHADER,
+	//		PROGRAM = GL_PROGRAM,
+	//		VERTEX_ARRAY = GL_VERTEX_ARRAY,
+	//		QUERY = GL_QUERY,
+	//		PROGRAM_PIPELINE = GL_PROGRAM_PIPELINE,
+	//		TRANSFORM_FEEDBACK = GL_TRANSFORM_FEEDBACK,
+	//		SAMPLER = GL_SAMPLER,
+	//		TEXTURE = GL_TEXTURE,
+	//		RENDERBUFFER = GL_RENDERBUFFER,
+	//		FRAMEBUFFER = GL_FRAMEBUFFER
+	//	};
 	// Data Types
 	enum class DataType
 	{
@@ -78,70 +78,70 @@ namespace Vxl
 	};
 
 	// Buffer Bit Type
-	enum class Buffer_Bit_Type
-	{
-		NONE = 0, // Error (Used for placeholder) [0 to prevent blit error]
-
-		COLOR = GL_COLOR_BUFFER_BIT,
-		DEPTH = GL_DEPTH_BUFFER_BIT,
-		STENCIL = GL_STENCIL_BUFFER_BIT,
-		ACCUM = GL_ACCUM_BUFFER_BIT
-	};
+	//	enum class Buffer_Bit_Type
+	//	{
+	//		NONE = 0, // Error (Used for placeholder) [0 to prevent blit error]
+	//	
+	//		COLOR = GL_COLOR_BUFFER_BIT,
+	//		DEPTH = GL_DEPTH_BUFFER_BIT,
+	//		STENCIL = GL_STENCIL_BUFFER_BIT,
+	//		ACCUM = GL_ACCUM_BUFFER_BIT
+	//	};
 	// Cull Mode
-	enum class Cull_Type
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		NO_CULL,
-		COUNTER_CLOCKWISE,
-		CLOCKWISE
-	};
+	//	enum class Cull_Type
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		NO_CULL,
+	//		COUNTER_CLOCKWISE,
+	//		CLOCKWISE
+	//	};
 	// Blend type
-	enum class Blend_Source
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		ZERO = GL_ZERO,
-		ONE = GL_ONE,
-		DST_COLOR = GL_DST_COLOR,
-		ONE_MINUS_DST_COLOR = GL_ONE_MINUS_DST_COLOR,
-		SRC_ALPHA = GL_SRC_ALPHA,
-		ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA
-	};
-	enum class Blend_Destination
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		ZERO = GL_ZERO,
-		ONE = GL_ONE,
-		SRC_COLOR = GL_DST_COLOR,
-		ONE_MINUS_SRC_COLOR = GL_ONE_MINUS_DST_COLOR,
-		SRC_ALPHA = GL_SRC_ALPHA,
-		ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA
-	};
-	enum class Blend_Equation
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		FUNC_ADD = GL_FUNC_ADD,
-		FUNC_SUBTRACT = GL_FUNC_SUBTRACT,
-		FUNC_REVERSE_SUBTRACT = GL_FUNC_REVERSE_SUBTRACT,
-		MIN = GL_MIN,
-		MAX = GL_MAX
-	};
-	// Depth Mode (What depth value will overwrite the existing one) 0=you, 1=farthest point
-	enum class Depth_Pass_Rule
-	{
-		NONE = -1, // Error (Used for placeholder)
-
-		LESS = GL_LESS,
-		EQUAL = GL_EQUAL,
-		GREATER = GL_GREATER,
-		LESS_OR_EQUAL = GL_LEQUAL,
-		GREATER_OR_EQUAL = GL_GEQUAL,
-		NOT_EQUAL = GL_NOTEQUAL,
-		ALWAYS = GL_ALWAYS
-	};
+	//	enum class Blend_Source
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		ZERO = GL_ZERO,
+	//		ONE = GL_ONE,
+	//		DST_COLOR = GL_DST_COLOR,
+	//		ONE_MINUS_DST_COLOR = GL_ONE_MINUS_DST_COLOR,
+	//		SRC_ALPHA = GL_SRC_ALPHA,
+	//		ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA
+	//	};
+	//	enum class Blend_Destination
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		ZERO = GL_ZERO,
+	//		ONE = GL_ONE,
+	//		SRC_COLOR = GL_DST_COLOR,
+	//		ONE_MINUS_SRC_COLOR = GL_ONE_MINUS_DST_COLOR,
+	//		SRC_ALPHA = GL_SRC_ALPHA,
+	//		ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA
+	//	};
+	//	enum class Blend_Equation
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		FUNC_ADD = GL_FUNC_ADD,
+	//		FUNC_SUBTRACT = GL_FUNC_SUBTRACT,
+	//		FUNC_REVERSE_SUBTRACT = GL_FUNC_REVERSE_SUBTRACT,
+	//		MIN = GL_MIN,
+	//		MAX = GL_MAX
+	//	};
+	//	// Depth Mode (What depth value will overwrite the existing one) 0=you, 1=farthest point
+	//	enum class Depth_Pass_Rule
+	//	{
+	//		NONE = -1, // Error (Used for placeholder)
+	//	
+	//		LESS = GL_LESS,
+	//		EQUAL = GL_EQUAL,
+	//		GREATER = GL_GREATER,
+	//		LESS_OR_EQUAL = GL_LEQUAL,
+	//		GREATER_OR_EQUAL = GL_GEQUAL,
+	//		NOT_EQUAL = GL_NOTEQUAL,
+	//		ALWAYS = GL_ALWAYS
+	//	};
 	// Draw Type
 	enum class Draw_Type
 	{
