@@ -27,7 +27,7 @@
 //  2018-01-07: OpenGL: Changed GLSL shader version from 330 to 150.
 //  2017-09-01: OpenGL: Save and restore current bound sampler. Save and restore current polygon mode.
 //  2017-05-01: OpenGL: Fixed save and restore of current blend func state.
-//  2017-05-01: OpenGL: Fixed save and restore of current GL_ACTIVE_TEXTURE.
+//  2017-05-01: OpenGL: Fixed save and restore of current GL_ActiveTexture.
 //  2016-09-05: OpenGL: Fixed save and restore of current scissor rectangle.
 //  2016-07-29: OpenGL: Explicitly setting GL_UNPACK_ROW_LENGTH to reduce issues because SDL changes it. (#752)
 
@@ -140,7 +140,7 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 
     // Backup GL state
-    GLenum last_active_texture; glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*)&last_active_texture);
+    GLenum last_ActiveTexture; glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*)&last_ActiveTexture);
     glActiveTexture(GL_TEXTURE0);
     GLint last_program; glGetIntegerv(GL_CURRENT_PROGRAM, &last_program);
     GLint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
@@ -262,7 +262,7 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 #ifdef GL_SAMPLER_BINDING
     glBindSampler(0, last_sampler);
 #endif
-    glActiveTexture(last_active_texture);
+    glActiveTexture(last_ActiveTexture);
     glBindVertexArray(last_vertex_array);
     glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
     glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);

@@ -12,7 +12,7 @@ namespace Vxl
 {
 	class Color3F;
 	class Color4F;
-	enum class Channel_Type;
+	enum class TextureChannelType;
 
 	enum class VendorType
 	{
@@ -70,10 +70,10 @@ namespace Vxl
 		//	static int GLNameMaxLength = -1;
 		//	void setGLName(glNameType identifier, GLuint name, const std::string &label);
 
-		// Get Format Type from channel count
-		Channel_Type getChannelType(int ChannelCount);
-		unsigned int getChannelCount(Channel_Type type);
-		unsigned int getChannelCount(Format_Type format);
+		//	// Get Format Type from channel count
+		//	TextureChannelType getChannelType(int ChannelCount);
+		//	unsigned int getChannelCount(TextureChannelType type);
+		//	unsigned int getChannelCount(TextureFormat format);
 
 		//	// Get info from ShaderDataType
 		//	uint32_t getValueCount(ShaderDataType data);
@@ -81,7 +81,7 @@ namespace Vxl
 		//	DataType getDataType(ShaderDataType data);
 
 		// Get Pixel/Channel Data From DepthFormat
-		void getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType);
+		//void getPixelChannelData(DepthTextureFormat format, TextureChannelType& channelType, TexturePixelType& pixelType);
 
 		//	// Clear Setup
 		//	void clearColor(float r, float g, float b, float a = 1.0f);
@@ -142,12 +142,12 @@ namespace Vxl
 		//	bool isDrawTypePoints(Draw_Type type);
 
 		// TEXTURES //
-		void setActiveTexture(Active_Texture level);
-		void setActiveTexture(int level);
-		void setActiveTexture(unsigned int level);
+		//	void setActiveTexture(TextureLevel level);
+		//	void setActiveTexture(int level);
+		//	void setActiveTexture(unsigned int level);
 
-		void bindTexture(Texture_Type type, GLuint& texture_id);
-		void unbindTexture(Texture_Type type);
+		//void bindTexture(Texture_Type type, GLuint& texture_id);
+		//void unbindTexture(Texture_Type type);
 
 		// MISC //
 		//std::string shaderTypeToString(const ShaderType& type);

@@ -112,6 +112,10 @@ namespace Vxl
 		{
 			return Color3F(r, g, b);
 		}
+		float getStartPointer(void) const
+		{
+
+		}
 
 		// Overloads
 		Color4F operator+(const Color4F& c) const;

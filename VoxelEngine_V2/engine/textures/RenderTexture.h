@@ -13,9 +13,9 @@ namespace Vxl
 		// Channel/Pixel used only for reading
 		RenderTexture(
 			int Width, int Height,
-			Format_Type FormatType = Format_Type::RGBA8,
-			Channel_Type m_channelType = Channel_Type::RGBA,
-			Pixel_Type PixelType = Pixel_Type::UNSIGNED_BYTE
+			TextureFormat FormatType = TextureFormat::RGBA8,
+			TextureChannelType ChannelType = TextureChannelType::RGBA,
+			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
 		);
 
 		// Update mipmaps

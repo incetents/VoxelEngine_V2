@@ -54,6 +54,8 @@
 
 //#define GL_CLAMP_READ_COLOR 0x891C
 
+#include "../engine/rendering/glUtil.h"
+
 namespace Vxl
 {
 	void Scene_Game::Setup()
@@ -83,27 +85,69 @@ namespace Vxl
 		//_camera->update();
 		//_camera->SetMain();
 
+		
+
+		
+
+		int fbo = Graphics::FramebufferObject::Create();
+		Graphics::FramebufferObject::Bind(fbo);
+		//
+		int tex = Graphics::Texture::Create();
+		Graphics::Texture::Bind(TextureType::TEX_2D, tex);
+
+		Graphics::Texture::SetWrapping(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH);
+		Graphics::Texture::SetFiltering(TextureType::TEX_2D, TextureFilter::LINEAR, false);
+
+		Graphics::Texture::SetStorage(TextureType::TEX_2D, 1, TextureFormat::RGBA8, 100, 100);
+		Graphics::Texture::Unbind(TextureType::TEX_2D);
+		//
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+		GLenum e = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+
+		switch (e) {
+
+		case GL_FRAMEBUFFER_UNDEFINED:
+			Logger.error("FBO Undefined");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			Logger.error("FBO Incomplete Attachment");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			Logger.error("FBO Missing Attachment");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+			Logger.error("FBO Incomplete Draw Buffer");
+			break;
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			Logger.error("FBO Unsupported");
+			break;
+		case GL_FRAMEBUFFER_COMPLETE:
+			//FBO is OK
+			break;
+		}
+
 		// FBO
 		_fbo = FramebufferObject::Create("Gbuffer");
 		_fbo->setClearColor(Color4F(-1, -1, 0, 1));
 		_fbo->setSizeToWindowSize();
-		_fbo->addTexture("albedo", Format_Type::R11F_G11F_B10F);
-		_fbo->addTexture("normal", Format_Type::RGBA16_SNORM);
+		_fbo->addTexture("albedo", TextureFormat::R11F_G11F_B10F);
+		_fbo->addTexture("normal", TextureFormat::RGBA16_SNORM);
 		_fbo->addTexture("test");
-		_fbo->addDepth(DepthFormat_Type::DEPTH16, Attachment_Type::TEXTURE);
-		_fbo->init();
+		_fbo->addDepth(TextureDepthFormat::DEPTH16, Attachment_Type::TEXTURE);
+		_fbo->complete();
 
 		_fbo_editor = FramebufferObject::Create("EditorPost");
 		_fbo_editor->setSizeToWindowSize();
 		_fbo_editor->addTexture("albedo");
-		_fbo_editor->addDepth(DepthFormat_Type::DEPTH16, Attachment_Type::BUFFER);
-		_fbo_editor->init();
+		_fbo_editor->addDepth(TextureDepthFormat::DEPTH16, Attachment_Type::BUFFER);
+		_fbo_editor->complete();
 
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker");
 		_fbo_colorpicker->setSizeToWindowSize();
-		_fbo_colorpicker->addTexture("color", Format_Type::RGBA8);
-		_fbo_colorpicker->addDepth(DepthFormat_Type::DEPTH16, Attachment_Type::BUFFER);
-		_fbo_colorpicker->init();
+		_fbo_colorpicker->addTexture("color", TextureFormat::RGBA8);
+		_fbo_colorpicker->addDepth(TextureDepthFormat::DEPTH16, Attachment_Type::BUFFER);
+		_fbo_colorpicker->complete();
 
 		ShaderProgram* _shader_skybox			= ShaderProgram::Get("skybox");
 		ShaderProgram* _shader_gbuffer			= ShaderProgram::Get("gbuffer");
@@ -191,7 +235,7 @@ namespace Vxl
 		// Entities
 		GameObject* _entity1 = GameObject::Create("_entity1");
 		_entity1->SetMaterial(material_gbuffer);
-		_entity1->SetTexture(_tex, Active_Texture::LEVEL0);
+		_entity1->SetTexture(_tex, TextureLevel::LEVEL0);
 		_entity1->SetMesh(_mesh);
 		_entity1->m_transform.setScale(+0.5f);
 		
@@ -200,21 +244,21 @@ namespace Vxl
 		
 		GameObject* _entity2 = GameObject::Create("_entity2");
 		_entity2->SetMaterial(material_gbuffer);
-		//_entity2->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		//_entity2->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
 		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		_entity2->SetColor(Color3F(1, 1, 0));
 
 		GameObject* _errorCube = GameObject::Create("_errorCube");
 		_errorCube->SetMaterial(material_gbuffer);
-		//_errorCube->m_material.SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		//_errorCube->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
 		//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
 		_errorCube->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
 		_errorCube->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
 		//_errorCube->SetColor(Color3F(1, 1, 0));
 		
 		GameObject* _entity3 = GameObject::Create("_entity3");
-		_entity3->SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_entity3->SetTexture(_tex_crate, TextureLevel::LEVEL0);
 		_entity3->SetMaterial(material_gbuffer);
 		_entity3->SetMesh(Geometry.GetIcosahedron());
 		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
@@ -223,7 +267,7 @@ namespace Vxl
 		
 		GameObject* _entity5 = GameObject::Create("_entity5");
 		_entity5->SetMaterial(material_gbuffer);
-		_entity5->SetTexture(_tex_gridtest, Active_Texture::LEVEL0);
+		_entity5->SetTexture(_tex_gridtest, TextureLevel::LEVEL0);
 		_entity5->SetMesh(Geometry.GetSphereUV_Good());
 		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
 		//_entity5->SetColor(Color3F(1, 1, 1));
@@ -231,7 +275,7 @@ namespace Vxl
 
 		GameObject* _entity6 = GameObject::Create("_entity6");
 		_entity6->SetMaterial(material_gbuffer);
-		_entity6->SetTexture(Texture::Get("grid_test"), Active_Texture::LEVEL0);
+		_entity6->SetTexture(Texture::Get("grid_test"), TextureLevel::LEVEL0);
 		_entity6->SetMesh(Geometry.GetQuadY());
 		_entity6->m_transform.setPosition(Vector3(0, -10, 0));
 		_entity6->m_transform.setScale(Vector3(20, 1, 20));
@@ -240,7 +284,7 @@ namespace Vxl
 		
 		GameObject* _skybox = GameObject::Create("_skybox");
 		_skybox->SetMaterial(material_skybox);
-		_skybox->SetTexture(_cubemap1, Active_Texture::LEVEL0);
+		_skybox->SetTexture(_cubemap1, TextureLevel::LEVEL0);
 		_skybox->SetMesh(Geometry.GetInverseCube());
 		_skybox->m_useTransform = false;
 		_skybox->SetSelectable(false);
@@ -250,7 +294,7 @@ namespace Vxl
 		//
 		GameObject* _crate1 = GameObject::Create("_crate1");
 		_crate1->SetMaterial(material_gbuffer);
-		_crate1->SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate1->SetTexture(_tex_crate, TextureLevel::LEVEL0);
 		_crate1->SetMesh(Geometry.GetCylinderX());
 		_crate1->m_transform.setPosition(1, 0, 0);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
@@ -258,7 +302,7 @@ namespace Vxl
 		
 		GameObject* _crate2 = GameObject::Create("_crate2");
 		_crate2->SetMaterial(material_gbuffer);
-		_crate2->SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate2->SetTexture(_tex_crate, TextureLevel::LEVEL0);
 		_crate2->SetMesh(Geometry.GetCylinderY());
 		//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate2->m_transform.setPosition(0, 2, 0);
@@ -266,7 +310,7 @@ namespace Vxl
 
 		GameObject* _crate3 = GameObject::Create("_crate3");
 		_crate3->SetMaterial(material_gbuffer);
-		_crate3->SetTexture(_tex_crate, Active_Texture::LEVEL0);
+		_crate3->SetTexture(_tex_crate, TextureLevel::LEVEL0);
 		_crate3->SetMesh(Geometry.GetCylinderZ());
 		//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		_crate3->m_transform.setPosition(1, 2, 0);
@@ -313,7 +357,7 @@ namespace Vxl
 
 		GameObject* _billboard1 = GameObject::Create("_quad1");
 		_billboard1->SetMaterial(material_billboard);
-		_billboard1->SetTexture(Texture::Get("beato"), Active_Texture::LEVEL0);
+		_billboard1->SetTexture(Texture::Get("beato"), TextureLevel::LEVEL0);
 		_billboard1->SetMesh(Geometry.GetQuadZ());
 		_billboard1->m_transform.setPosition(7, 3, -3);
 
@@ -588,7 +632,7 @@ namespace Vxl
 
 		//	if (Input.getKeyDown(KeyCode::K))
 		//	{
-		//		_fbo->bindTexture(1, Active_Texture::LEVEL0);
+		//		_fbo->bindTexture(1, ActiveTexture::LEVEL0);
 		//		GLubyte* pixels = new GLubyte[Window.GetWindowWidth() * Window.GetScreenHeight() * 4];
 		//		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 		//	
@@ -614,7 +658,7 @@ namespace Vxl
 		//	// GBUFFER No model
 		//	_material_gbuffer_no_model->Bind();
 		//	
-		//	glUtil::setActiveTexture(Active_Texture::LEVEL0);
+		//	glUtil::setActiveTexture(ActiveTexture::LEVEL0);
 		//	BlockAtlas.BindAtlas();
 		//	
 		//	TerrainManager.Draw();
@@ -1023,8 +1067,8 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 3);
 
-				_fbo->bindTexture(0, Active_Texture::LEVEL0);
-				_fbo_editor->bindTexture(0, Active_Texture::LEVEL1);
+				_fbo->bindTexture(0, TextureLevel::LEVEL0);
+				_fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
 				break;
 			}
 			// Show Albedo
@@ -1033,7 +1077,7 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
 
-				_fbo->bindTexture(0, Active_Texture::LEVEL0);
+				_fbo->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Normal
@@ -1042,7 +1086,7 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 1);
 
-				_fbo->bindTexture(1, Active_Texture::LEVEL0);
+				_fbo->bindTexture(1, TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Depth
@@ -1053,7 +1097,7 @@ namespace Vxl
 				_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
 				_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
 
-				_fbo->bindDepth(Active_Texture::LEVEL0);
+				_fbo->bindDepth(TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Editor
@@ -1062,7 +1106,7 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
 
-				_fbo_editor->bindTexture(0, Active_Texture::LEVEL0);
+				_fbo_editor->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 		}
@@ -1087,11 +1131,11 @@ namespace Vxl
 		//		_shader_showRenderTarget->SetUniform("zFar", Camera::GetMain()->getZfar());
 		//	
 		//		glUtil::viewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
-		//		_fbo->bindDepth(Active_Texture::LEVEL0);
+		//		_fbo->bindDepth(ActiveTexture::LEVEL0);
 		//		Geometry.GetFullQuad()->Draw();
 		//	}
 
-		// _fbo->bindDepth(Active_Texture::LEVEL0);
+		// _fbo->bindDepth(ActiveTexture::LEVEL0);
 		// Geometry::GetFullQuad()->Draw();
 
 

@@ -11,9 +11,9 @@ namespace Vxl
 		GLuint	m_id = -1;
 		int		m_width;
 		int		m_height;
-		Format_Type	 m_formatType;
-		Channel_Type m_channelType;
-		Pixel_Type	 m_pixelType;
+		TextureFormat	 m_formatType;
+		TextureChannelType m_channelType;
+		TexturePixelType	 m_pixelType;
 		int			 m_channelCount;
 	public:
 		RenderBuffer(const RenderBuffer&) = delete;
@@ -21,9 +21,9 @@ namespace Vxl
 		// Channel/Pixel used only for reading
 		RenderBuffer(
 			int Width, int Height,
-			Format_Type FormatType,
-			Channel_Type ChannelType,
-			Pixel_Type PixelType
+			TextureFormat FormatType,
+			TextureChannelType ChannelType,
+			TexturePixelType PixelType
 		);
 		~RenderBuffer();
 
@@ -42,15 +42,15 @@ namespace Vxl
 		{
 			return m_height;
 		}
-		inline Format_Type	GetFormatType(void) const
+		inline TextureFormat	GetFormatType(void) const
 		{
 			return m_formatType;
 		}
-		inline Channel_Type GetChannelType(void) const
+		inline TextureChannelType GetChannelType(void) const
 		{
 			return m_channelType;
 		}
-		inline Pixel_Type	GetPixelType(void) const
+		inline TexturePixelType	GetPixelType(void) const
 		{
 			return m_pixelType;
 		}

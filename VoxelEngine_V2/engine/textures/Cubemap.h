@@ -22,11 +22,11 @@ namespace Vxl
 			const std::string& filePath6,
 			bool			InvertY = true,
 			bool			UseMipMapping = true,
-			Wrap_Mode		WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode		FilterMode = Filter_Mode::LINEAR,
-			Format_Type		FormatType = Format_Type::RGBA8,
-			Pixel_Type		PixelType = Pixel_Type::UNSIGNED_BYTE,
-			Anisotropic_Mode AnisotropicMode = Anisotropic_Mode::NONE
+			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
+			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 	public:
 
@@ -36,11 +36,11 @@ namespace Vxl
 			const std::string& filePath1, const std::string& filePath2, const std::string& filePath3, const std::string& filePath4, const std::string& filePath5, const std::string& filePath6,
 			bool InvertY = false,
 			bool UseMipMapping = true,
-			Wrap_Mode WrapMode = Wrap_Mode::CLAMP_STRETCH,
-			Filter_Mode		FilterMode = Filter_Mode::LINEAR,
-			Format_Type		FormatType = Format_Type::RGBA8,
-			Pixel_Type		PixelType = Pixel_Type::UNSIGNED_BYTE,
-			Anisotropic_Mode AnisotropicMode = Anisotropic_Mode::NONE
+			TextureWrapping		WrapMode = TextureWrapping::CLAMP_STRETCH,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
+			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 
 		Cubemap(const Cubemap&) = delete;

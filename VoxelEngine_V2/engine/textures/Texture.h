@@ -19,24 +19,24 @@ namespace Vxl
 			const std::string&	filePath,
 			bool				InvertY = true,
 			bool				UseMipMapping = true,
-			Wrap_Mode			WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode			FilterMode = Filter_Mode::LINEAR,
-			Format_Type			FormatType = Format_Type::RGBA8,
-			Channel_Type		ChannelType = Channel_Type::RGBA,
-			Pixel_Type			PixelType = Pixel_Type::UNSIGNED_BYTE,
-			Anisotropic_Mode	AnistropicMode = Anisotropic_Mode::NONE
+			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
+			//TextureChannelType	ChannelType = TextureChannelType::RGBA,
+			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode		AnistropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom]
 		Texture(
 			const std::string& name,
 			std::vector<Color3F> pixels, UINT width,
 			bool				UseMipMapping = true,
-			Wrap_Mode			WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode			FilterMode = Filter_Mode::LINEAR,
-			Format_Type			FormatType = Format_Type::RGBA8,
-			Channel_Type		ChannelType = Channel_Type::RGBA,
-			Pixel_Type			PixelType = Pixel_Type::UNSIGNED_BYTE,
-			Anisotropic_Mode	AnisotropicMode = Anisotropic_Mode::NONE
+			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
+			TextureChannelType	ChannelType = TextureChannelType::RGBA,
+			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 
 	public:
@@ -46,24 +46,24 @@ namespace Vxl
 			const std::string& filePath,
 			bool				InvertY = true,
 			bool				UseMipMapping = true,
-			Wrap_Mode			WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode			FilterMode = Filter_Mode::LINEAR,
-			Format_Type			FormatType = Format_Type::RGBA8,
-			Channel_Type		ChannelType = Channel_Type::RGBA,
-			Pixel_Type			PixelType = Pixel_Type::UNSIGNED_BYTE,
-			Anisotropic_Mode	AnisotropicMode = Anisotropic_Mode::NONE
+			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
+			//TextureChannelType	ChannelType = TextureChannelType::RGBA,
+			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Create custom texture
 		static Texture* CreateCustom(
 			const std::string& name,
 			std::vector<Color3F> pixels, UINT width,
 			bool				UseMipMapping = true,
-			Wrap_Mode			WrapMode = Wrap_Mode::REPEAT,
-			Filter_Mode			FilterMode = Filter_Mode::LINEAR,
-			Format_Type			FormatType = Format_Type::RGBA8,
-			Channel_Type		ChannelType = Channel_Type::RGBA,
-			Pixel_Type			PixelType = Pixel_Type::UNSIGNED_BYTE,
-			Anisotropic_Mode	AnisotropicMode = Anisotropic_Mode::NONE
+			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
+			TextureChannelType	ChannelType = TextureChannelType::RGBA,
+			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		
 

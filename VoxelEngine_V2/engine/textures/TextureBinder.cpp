@@ -14,7 +14,7 @@ namespace Vxl
 		if (m_textures.empty())
 		{
 			// Bind null texture on first active layer
-			Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+			Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
 		}
 		else
 		{
@@ -26,7 +26,7 @@ namespace Vxl
 				// Bind Null texture if texture isn't loaded
 				if (_tex == nullptr || !_tex->IsLoaded())
 				{
-					Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+					Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
 				}
 				// Bind texture normally
 				else

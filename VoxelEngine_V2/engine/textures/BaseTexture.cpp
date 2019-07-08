@@ -2,6 +2,7 @@
 #include "Precompiled.h"
 #include "BaseTexture.h"
 
+#include "../rendering/Graphics.h"
 #include "../rendering/glUtil.h"
 #include "../utilities/Macros.h"
 
@@ -10,12 +11,12 @@
 namespace Vxl
 {
 	// Keep track of all active texture slots
-	std::map<Texture_Type, UINT> BaseTexture::m_activeTextures;
+	//std::map<TextureType, UINT> BaseTexture::m_activeTextures;
 
-	void FlipTextureY(UCHAR* array, GLuint width, GLuint height, GLuint channels)
+	void FlipTextureY(UCHAR* array, uint32_t width, uint32_t height, uint32_t channels)
 	{
 		unsigned char* Tmp = new unsigned char[width * channels];
-		for (GLuint y = 0; y < height / 2; y++)
+		for (uint32_t y = 0; y < height / 2; y++)
 		{
 			// Top row
 			UINT index1 = ((height - y) - 1) * width * channels;
@@ -32,72 +33,46 @@ namespace Vxl
 
 	void BaseTexture::updateParameters()
 	{
-		GLenum Target = (GLenum)m_type;
+		Graphics::Texture::Bind(m_type, m_id);
 
-		glBindTexture(Target, m_id);
+		Graphics::Texture::SetWrapping(m_type, m_wrapMode);
+		Graphics::Texture::SetFiltering(m_type, m_filterMode, m_mipMapping);
 
-		// Wrapping
-		glTexParameteri(Target, GL_TEXTURE_WRAP_S, (GLenum)m_wrapMode);
-		glTexParameteri(Target, GL_TEXTURE_WRAP_T, (GLenum)m_wrapMode);
-
-		if (m_wrapMode == Wrap_Mode::CLAMP_BORDER)
-			glTexParameterfv(Target, GL_TEXTURE_BORDER_COLOR, &(m_borderColor[0]));
-
-		// Mag Filter
-		glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, (GLenum)m_filterMode);
-
-		// Min Filter
-		if (m_mipMapping)
-		{
-			if(m_filterMode == Filter_Mode::LINEAR)
-				glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			else
-				glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-
-			// Unused Options
-			// GL_LINEAR_MIPMAP_NEAREST
-			// GL_NEAREST_MIPMAP_LINEAR
-		}
-		else
-			glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, (GLenum)m_filterMode);
-
-		// Anistropic Mode cnanot be larger than Maximum given size
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, min(glInfo.MAX_ANISOTROPY, (float)m_anisotropicMode));
+		if (m_wrapMode == TextureWrapping::CLAMP_BORDER)
+			Graphics::Texture::SetBorderColor(m_type, m_borderColor);
+		
+		Graphics::Texture::SetAnistropic(m_type, m_anisotropicMode);
+		
 	}
 	void BaseTexture::updateStorage()
 	{
-		glTexStorage2D(GL_TEXTURE_2D, m_mipMapping ? 3 : 1, (GLenum)m_formatType, m_width, m_height);
+		Graphics::Texture::SetStorage(m_type, m_mipMapping ? 3 : 1, m_formatType, m_width, m_height);
 	}
-	void BaseTexture::updateStorage(const GLvoid* pixels)
+	void BaseTexture::updateStorage(const void* pixels)
 	{
-		glTexStorage2D(GL_TEXTURE_2D, m_mipMapping ? 3 : 1, (GLenum)m_formatType, m_width, m_height);
-
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, (GLenum)m_channelType, (GLenum)m_pixelType, pixels);
-
-		// Legacy
-		//glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_dataType, pixels);
+		Graphics::Texture::SetStorage(m_type, m_mipMapping ? 3 : 1, m_formatType, m_width, m_height,
+			pixels, m_channelType, m_pixelType);
+	
 	}
-	void BaseTexture::updateTexImageCubemap(unsigned int side, const GLvoid* pixels)
+	void BaseTexture::updateTexImageCubemap(unsigned int side, const void* pixels)
 	{
-		VXL_ASSERT(side < 6, "Side index too large for cubemap");
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
-			0, (GLenum)m_formatType, m_width, m_height, 0, (GLenum)m_channelType, (GLenum)m_pixelType, pixels
-		);
+		Graphics::Texture::SetStorageCubemap(side, 1, m_formatType, m_width, m_height,
+			pixels, m_channelType, m_pixelType);
 	}
 	void BaseTexture::updateMipmapping()
 	{
 		if (m_mipMapping)
-			glGenerateMipmap((GLenum)m_type);
+			Graphics::Texture::GenerateMipmap(m_type);
 	}
 
 	BaseTexture::BaseTexture(
-		Texture_Type Type,
-		Wrap_Mode WrapMode,
-		Filter_Mode FilterMode,
-		Format_Type FormatType,
-		Channel_Type ChannelType,
-		Pixel_Type PixelType,
-		Anisotropic_Mode AnisotropicMode,
+		TextureType Type,
+		TextureWrapping WrapMode,
+		TextureFilter FilterMode,
+		TextureFormat FormatType,
+		TextureChannelType ChannelType,
+		TexturePixelType PixelType,
+		AnisotropicMode AnisotropicMode,
 		bool MipMapping
 	)
 		: m_type(Type),
@@ -109,64 +84,46 @@ namespace Vxl
 		m_anisotropicMode(AnisotropicMode),
 		m_mipMapping(MipMapping)
 	{
-		glGenTextures(1, &m_id);
-		VXL_ASSERT(m_id != -1, "Base Texture index is -1");
+		m_id = Graphics::Texture::Create();
 
-		m_channelCount = glUtil::getChannelCount(ChannelType);
+		m_channelCount = Graphics::GetChannelCount(ChannelType);
 		if (m_channelCount == -1)
-			m_channelCount = glUtil::getChannelCount(FormatType);
+			m_channelCount = Graphics::GetChannelCount(FormatType);
 
 		updateParameters();
 	}
 	BaseTexture::~BaseTexture()
 	{
-		glDeleteTextures(1, &m_id);
+		Graphics::Texture::Delete(m_id);
 	}
 
-	void BaseTexture::Bind(Active_Texture layer) const
+	void BaseTexture::Bind(TextureLevel layer) const
 	{
-		// Update active texture slot
-		glUtil::setActiveTexture(layer);
-
-		// Don't bind texture if it hasn't changed
-		if (m_activeTextures[m_type] != m_id)
-			glBindTexture((GLenum)m_type, m_id);
-
-		// update bound texture
-		m_activeTextures[m_type] = m_id;
+		Graphics::Texture::SetActiveLevel(layer);
+		Graphics::Texture::Bind(m_type, m_id);
 	}
 	void BaseTexture::Bind() const
 	{
-		// Don't bind texture if it hasn't changed
-		if (m_activeTextures[m_type] != m_id)
-			glBindTexture((GLenum)m_type, m_id);
-
-		// update bound texture
-		m_activeTextures[m_type] = m_id;
+		Graphics::Texture::Bind(m_type, m_id);
 	}
 	void BaseTexture::Unbind() const
 	{
-		// Don't bind texture if it hasn't changed
-		if (m_activeTextures[m_type] != 0)
-			glBindTexture((GLenum)m_type, 0);
-
-		// update bound texture
-		m_activeTextures[m_type] = 0;
+		Graphics::Texture::Unbind(m_type);
 	}
 
-	void BaseTexture::setWrapMode(Wrap_Mode W)
+	void BaseTexture::setWrapMode(TextureWrapping W)
 	{
 		m_wrapMode = W;
 
 		updateParameters();
 	}
-	void BaseTexture::setFilterMode(Filter_Mode filter)
+	void BaseTexture::setFilterMode(TextureFilter filter)
 	{
 		m_filterMode = filter;
 
 		updateParameters();
 	}
-	void BaseTexture::setAnistropicMode(Anisotropic_Mode Anso)
+	void BaseTexture::setAnistropicMode(AnisotropicMode Anso)
 	{
 		m_anisotropicMode = Anso;
 

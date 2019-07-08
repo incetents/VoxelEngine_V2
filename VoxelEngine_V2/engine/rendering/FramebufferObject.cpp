@@ -12,7 +12,7 @@
 
 namespace Vxl
 {
-	GLuint FramebufferObject::m_boundID = 0;
+	//GLuint FramebufferObject::m_boundID = 0;
 
 	void FramebufferObject::Attachment::load(int Width, int Height)
 	{
@@ -53,21 +53,21 @@ namespace Vxl
 
 		return m_texture->GetID();
 	}
-	Format_Type	FramebufferObject::Attachment::GetFormatType(void) const
+	TextureFormat	FramebufferObject::Attachment::GetFormatType(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetFormatType();
 
 		return m_texture->GetFormatType();
 	}
-	Channel_Type FramebufferObject::Attachment::GetChannelType(void) const
+	TextureChannelType FramebufferObject::Attachment::GetChannelType(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetChannelType();
 
 		return m_texture->GetChannelType();
 	}
-	Pixel_Type FramebufferObject::Attachment::GetPixelType(void) const
+	TexturePixelType FramebufferObject::Attachment::GetPixelType(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
 			return m_buffer->GetPixelType();
@@ -129,8 +129,9 @@ namespace Vxl
 		}
 
 		// Create FBO
-		glGenFramebuffers(1, &m_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+		m_id = Graphics::FramebufferObject::Create();
+		Graphics::FramebufferObject::Bind(m_id);
+
 		Graphics::SetGLName(ObjectType::FRAMEBUFFER, m_id, "FBO_" + m_name);
 
 		// Color attachments
@@ -145,21 +146,26 @@ namespace Vxl
 		}
 
 		// Depth attachment
-		m_depth->load(m_width, m_height);
-		if (m_depth->isRenderTexture())
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
-		else
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth->GetID());
+		if (m_depth != nullptr)
+		{
+			m_depth->load(m_width, m_height);
+			if (m_depth->isRenderTexture())
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
+			else
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth->GetID());
+		}
 
 		// Final Check
-		checkFBOStatus();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		if (!Graphics::FramebufferObject::CheckStatus())
+			Logger.error("Failed to create FBO: " + m_name);
+		//checkFBOStatus();
+		Graphics::FramebufferObject::Unbind();
 	}
 	void FramebufferObject::unload()
 	{
 		if (m_id != -1)
 		{
-			glDeleteFramebuffers(1, &m_id);
+			Graphics::FramebufferObject::Delete(m_id);
 			m_id = -1;
 
 			// Destroy attached textures and depth/stencil
@@ -169,51 +175,51 @@ namespace Vxl
 		}
 	}
 
-	bool FramebufferObject::checkFBOStatus()
-	{
-		// Check if FBO was Created Correctly
-		GLenum e = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-		switch (e) {
-
-		case GL_FRAMEBUFFER_UNDEFINED:
-			Logger.error("FBO Undefined\n");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-			Logger.error("FBO Incomplete Attachment\n");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-			Logger.error("FBO Missing Attachment\n");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-			Logger.error("FBO Incomplete Draw Buffer\n");
-			break;
-		case GL_FRAMEBUFFER_UNSUPPORTED:
-			Logger.error("FBO Unsupported\n");
-			break;
-		case GL_FRAMEBUFFER_COMPLETE:
-			//FBO is OK
-			break;
-
-		default:
-			//Unknown FBO
-			Logger.error("FBO Error, Unknown: " + std::to_string(e));
-			break;
-		}
-
-		// Return true if framebuffer complete
-		return (e == GL_FRAMEBUFFER_COMPLETE) ? true : false;
-	}
+	//	bool FramebufferObject::checkFBOStatus()
+	//	{
+	//		// Check if FBO was Created Correctly
+	//		GLenum e = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+	//		switch (e) {
+	//	
+	//		case GL_FRAMEBUFFER_UNDEFINED:
+	//			Logger.error("FBO Undefined\n");
+	//			break;
+	//		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+	//			Logger.error("FBO Incomplete Attachment\n");
+	//			break;
+	//		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+	//			Logger.error("FBO Missing Attachment\n");
+	//			break;
+	//		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+	//			Logger.error("FBO Incomplete Draw Buffer\n");
+	//			break;
+	//		case GL_FRAMEBUFFER_UNSUPPORTED:
+	//			Logger.error("FBO Unsupported\n");
+	//			break;
+	//		case GL_FRAMEBUFFER_COMPLETE:
+	//			//FBO is OK
+	//			break;
+	//	
+	//		default:
+	//			//Unknown FBO
+	//			Logger.error("FBO Error, Unknown: " + std::to_string(e));
+	//			break;
+	//		}
+	//	
+	//		// Return true if framebuffer complete
+	//		return (e == GL_FRAMEBUFFER_COMPLETE) ? true : false;
+	//	}
 
 	void FramebufferObject::bindFBO()
 	{
 		// Don't bind FBO if it hasn't changed
-		if (m_boundID != m_id)
+		//if (m_boundID != m_id)
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-			glDrawBuffers(m_textureCount, _Global_Color_Attachment_Calls);
+			Graphics::FramebufferObject::Bind(m_id);
+			Graphics::FramebufferObject::DrawBuffers(m_textureCount);
 		}
 		// update bound FBO
-		m_boundID = m_id;
+		//m_boundID = m_id;
 	}
 	void FramebufferObject::setSizeToWindowSize()
 	{
@@ -244,41 +250,41 @@ namespace Vxl
 		}
 
 	}
-	void FramebufferObject::clearBuffer(unsigned int index)
+	void FramebufferObject::clearBuffer(uint32_t attachmentIndex)
 	{
-		VXL_ASSERT(index < m_textureCount, "FBO, Index out of bounds");
-		glClearBufferfv(GL_COLOR, index, &m_clearColor[0]);
+		VXL_ASSERT(attachmentIndex < m_textureCount, "FBO, Index out of bounds");
+		Graphics::ClearBufferFBOAttachment(attachmentIndex, m_clearColor);
 	}
 
 	void FramebufferObject::addTexture(
 		const std::string& name,
-		Format_Type FormatType,
+		TextureFormat FormatType,
 		Attachment_Type fboRenderType
 	)
 	{
 		VXL_ASSERT(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments(), "FBO, too many color attachments");
 		
 		// Create new render texture
-		m_textures.push_back(new Attachment(name, fboRenderType, FormatType, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE));
+		m_textures.push_back(new Attachment(name, fboRenderType, FormatType, TextureChannelType::RGBA, TexturePixelType::UNSIGNED_BYTE));
 		m_textureCount++;
 	}
-	void FramebufferObject::addDepth(DepthFormat_Type depthFormatType, Attachment_Type fboRenderType)
+	void FramebufferObject::addDepth(TextureDepthFormat depthFormatType, Attachment_Type fboRenderType)
 	{
 		VXL_ASSERT(m_depth == nullptr, "FBO, cannot add multiple depth/stencil attachments");
 
-		if (depthFormatType == DepthFormat_Type::STENCIL8)
+		if (depthFormatType == TextureDepthFormat::STENCIL8)
 			m_clearMode = ClearMode::COLOR_STENCIL;
-		else if (depthFormatType == DepthFormat_Type::DEPTH24_STENCIL8 || depthFormatType == DepthFormat_Type::DEPTH32F_STENCIL8)
+		else if (depthFormatType == TextureDepthFormat::DEPTH24_STENCIL8 || depthFormatType == TextureDepthFormat::DEPTH32F_STENCIL8)
 			m_clearMode = ClearMode::COLOR_DEPTH_STENCIL;
 		else
 			m_clearMode = ClearMode::COLOR_DEPTH;
 
 		// Select Pixel/Channel Type [for glReadPixels]
-		Pixel_Type PixelType;
-		Channel_Type ChannelType;
-		glUtil::getPixelChannelData(depthFormatType, ChannelType, PixelType);
+		TexturePixelType PixelType;
+		TextureChannelType ChannelType;
+		Graphics::GetPixelChannelData(depthFormatType, ChannelType, PixelType);
 
-		m_depth = new Attachment("depth", fboRenderType, (Format_Type)depthFormatType, ChannelType, PixelType);
+		m_depth = new Attachment("depth", fboRenderType, Graphics::GetFormat(depthFormatType), ChannelType, PixelType);
 	}
 
 	void FramebufferObject::bind()
@@ -295,25 +301,24 @@ namespace Vxl
 	}
 	void FramebufferObject::unbind()
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		Graphics::FramebufferObject::Unbind();
 
-		m_boundID = 0;
+		//m_boundID = 0;
 	}
 
-	void FramebufferObject::bindTexture(unsigned int index, Active_Texture layer)
+	void FramebufferObject::bindTexture(uint32_t index, TextureLevel layer)
 	{
 		VXL_ASSERT(index < m_textureCount, "FBO, bindTexture index out of bounds");
 		VXL_ASSERT(m_textures[index]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
-		glUtil::setActiveTexture(layer);
-
+		Graphics::Texture::SetActiveLevel(layer);
 		m_textures[index]->Bind();
 	}
-	void FramebufferObject::bindDepth(Active_Texture layer)
+	void FramebufferObject::bindDepth(TextureLevel layer)
 	{
 		VXL_ASSERT(m_depth->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
-		glUtil::setActiveTexture(layer);
+		Graphics::Texture::SetActiveLevel(layer);
 		m_depth->Bind();
 	}
 
@@ -341,7 +346,7 @@ namespace Vxl
 	void FramebufferObject::generateMipmaps(unsigned int textureIndex)
 	{
 		VXL_ASSERT(textureIndex < m_textureCount, "FBO, index out of bounds");
-		VXL_ASSERT(m_id == m_boundID, "FBO" + m_name + "must be bound before generating mipmaps for its color attachments");
+		//VXL_ASSERT(m_id == m_boundID, "FBO" + m_name + "must be bound before generating mipmaps for its color attachments");
 		VXL_ASSERT(m_textures[textureIndex]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		// Create mipmapping for Fbo Texture

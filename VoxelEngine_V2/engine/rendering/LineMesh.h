@@ -19,7 +19,7 @@ namespace Vxl
 		VBO	m_VBO;
 
 		DrawType m_type;
-		GLuint	  m_drawCount = 0;	// Vertices Drawn
+		uint32_t m_drawCount = 0;	// Vertices Drawn
 
 
 	public:

@@ -88,7 +88,7 @@ namespace Vxl
 				return;
 
 			if (m_VBO == -1)
-				glGenBuffers(1, &m_VBO);
+				m_VBO = Graphics::VBO::Create();
 
 			m_empty = false;
 			m_Size = _count * sizeof(Type);
@@ -104,7 +104,7 @@ namespace Vxl
 		template<typename Type = float>
 		void SetVertices(std::vector<Type> _arr, BufferUsage _mode)
 		{
-			SetVertices(&_arr[0], (GLuint)_arr.size(), _mode);
+			SetVertices(&_arr[0], (uint32_t)_arr.size(), _mode);
 		}
 
 		template<typename Type = float>

@@ -40,9 +40,9 @@ namespace Vxl
 			Attachment(
 				const std::string& name,
 				Attachment_Type type,
-				Format_Type formatType,
-				Channel_Type channelType,
-				Pixel_Type pixelType
+				TextureFormat formatType,
+				TextureChannelType channelType,
+				TexturePixelType pixelType
 			)
 				: m_name(name), m_type(type), m_formatType(formatType), m_channelType(channelType), m_pixelType(pixelType)
 			{}
@@ -52,9 +52,9 @@ namespace Vxl
 			}
 
 			const std::string	m_name;
-			const Format_Type	m_formatType;
-			const Channel_Type	m_channelType;
-			const Pixel_Type	m_pixelType;
+			const TextureFormat	m_formatType;
+			const TextureChannelType	m_channelType;
+			const TexturePixelType	m_pixelType;
 
 			// Attachment can only be one type
 			union
@@ -76,9 +76,9 @@ namespace Vxl
 			}
 
 			GLuint			GetID(void) const;
-			Format_Type		GetFormatType(void) const;
-			Channel_Type	GetChannelType(void) const;
-			Pixel_Type		GetPixelType(void) const;
+			TextureFormat		GetFormatType(void) const;
+			TextureChannelType	GetChannelType(void) const;
+			TexturePixelType		GetPixelType(void) const;
 			int				GetChannelCount(void) const;
 
 			void Bind();
@@ -96,25 +96,25 @@ namespace Vxl
 	private:
 
 		// Fbo
-		const std::string m_name;
-		GLuint	m_id = -1;
-		Color4F m_clearColor = Color4F(0,0,0,0);
-		ClearMode m_clearMode = ClearMode::COLOR;
-		UINT	m_width = 0;
-		UINT	m_height = 0;
-		bool	m_fullscreen = false; // Width/Height will attempt to match screen's resolution
+		const std::string	m_name;
+		FramebufferObjectID	m_id = -1;
+		Color4F				m_clearColor = Color4F(0,0,0,0);
+		ClearMode			m_clearMode = ClearMode::COLOR;
+		UINT				m_width = 0;
+		UINT				m_height = 0;
+		bool				m_fullscreen = false; // Width/Height will attempt to match screen's resolution
 		// Attachments
 		std::vector<Attachment*>	m_textures;
 		GLuint						m_textureCount = 0;
 		Attachment*					m_depth = nullptr;
 		// Tracker //
-		static GLuint m_boundID;
+		//static GLuint m_boundID;
 
 		// Utility
 		void load();
 		void unload();
 
-		bool checkFBOStatus();
+		//bool checkFBOStatus();
 		void bindFBO();
 		
 		// Constructor
@@ -125,7 +125,7 @@ namespace Vxl
 
 		~FramebufferObject();
 
-		inline void init()
+		inline void complete()
 		{
 			VXL_ASSERT(m_width > 0 && m_width > 0, "Invalid FBO Init Size");
 			load();
@@ -158,15 +158,15 @@ namespace Vxl
 
 		// Clears the color from an entire Texture
 		void clearBuffers();
-		void clearBuffer(unsigned int index);
+		void clearBuffer(uint32_t attachmentIndex);
 
 		void addTexture(
 			const std::string& name,
-			Format_Type FormatType		= Format_Type::RGBA8,
+			TextureFormat FormatType		= TextureFormat::RGBA8,
 			Attachment_Type fboRenderType = Attachment_Type::TEXTURE
 		);
 		void addDepth(
-			DepthFormat_Type depthFormatType,
+			TextureDepthFormat depthFormatType,
 			Attachment_Type fboRenderType
 		);
 
@@ -174,8 +174,8 @@ namespace Vxl
 		void bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH);
 		static void unbind();
 
-		void bindTexture(unsigned int index, Active_Texture layer);
-		void bindDepth(Active_Texture layer);
+		void bindTexture(uint32_t index, TextureLevel layer);
+		void bindDepth(TextureLevel layer);
 
 		void blitDepth(const FramebufferObject& fbo);
 

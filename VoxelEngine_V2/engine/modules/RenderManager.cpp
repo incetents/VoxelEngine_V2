@@ -391,9 +391,9 @@ namespace Vxl
 			billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getWorldModel(), true);
 		
 			if (LightTexture)
-				LightTexture->Bind(Active_Texture::LEVEL0);
+				LightTexture->Bind(TextureLevel::LEVEL0);
 			else
-				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+				Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
 
 			Geometry.GetQuadZ()->Draw();
 		}
@@ -406,9 +406,9 @@ namespace Vxl
 			billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getWorldModel(), true);
 
 			if (LightTexture)
-				CameraTexture->Bind(Active_Texture::LEVEL0);
+				CameraTexture->Bind(TextureLevel::LEVEL0);
 			else
-				Debug.GetNullTexture()->Bind(Active_Texture::LEVEL0);
+				Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
 
 			Geometry.GetQuadZ()->Draw();
 		}

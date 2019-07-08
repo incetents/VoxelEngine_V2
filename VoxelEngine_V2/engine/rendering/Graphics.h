@@ -211,6 +211,158 @@ namespace Vxl
 		INDEXED,
 		INDEXED_INSTANCED
 	};
+	// ~ Texture Info ~ //
+	enum class TextureType
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		TEX_1D,
+		TEX_2D,
+		TEX_3D,
+		TEX_1D_ARRAY,
+		TEX_2D_ARRAY,
+		TEX_RECT,
+		TEX_CUBEMAP,
+		TEX_CUBEMAP_ARRAY,
+		TEX_BUFFER,
+		TEX_2D_MULTISAMPLE,
+		TEX_2D_MULTISAMPLE_ARRAY
+	};
+	enum class TextureWrapping
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		REPEAT,
+		CLAMP_BORDER,
+		CLAMP_STRETCH,
+		MIRROR_REPEAT,
+		MIRROR_CLAMP
+	};
+	enum class TextureFilter
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		NEAREST,
+		LINEAR
+	};
+	enum class TextureFormat
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		// 1 channel
+		R8,
+		R8_SNORM,
+		R16,
+		R16_SNORM,
+		R16F,
+		// 2 channels
+		RG8,
+		RG8_SNORM,
+		RG16,
+		RG16_SNORM,
+		RG16F,
+		// 3 channels
+		RGB8,
+		RGB8_SNORM,
+		RGB16,
+		RGB16_SNORM,
+		RGB16F,
+		// 4 channels
+		RGBA8,
+		RGBA8_SNORM,
+		RGBA16,
+		RGBA16_SNORM,
+		RGBA16F,
+		R11F_G11F_B10F,// GOOD FOR GBUFFER
+
+		// [ Special ]
+		SRGB8,
+		SRGBA8,
+
+		// [DepthFormat]
+		STENCIL8,
+		DEPTH16,
+		DEPTH24,
+		DEPTH32,
+		DEPTH32F,
+		DEPTH24_STENCIL8,
+		DEPTH32F_STENCIL8
+	};
+	enum class TextureDepthFormat
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		STENCIL8,
+		DEPTH16,
+		DEPTH24,
+		DEPTH32,
+		DEPTH32F,
+		DEPTH24_STENCIL8,
+		DEPTH32F_STENCIL8
+	};
+	enum class TextureChannelType
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		R,		// 1 channel
+		RG,		// 2 channels
+		RGB,	// 3 channels
+		RGBA,	// 4 channels
+
+		BGR,	// 3 channels
+		BGRA,	// 4 channels
+
+		STENCIL,		// ? channels 
+		DEPTH,			// ? channels
+		DEPTH_STENCIL,	// ? channels
+	};
+	enum class TexturePixelType
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		UNSIGNED_BYTE,
+		BYTE,
+		UNSIGNED_SHORT,
+		SHORT,
+		UNSIGNED_INT,
+		INT,
+		HALF_FLOAT,
+		FLOAT,
+		UNSIGNED_BYTE_3_3_2,
+		UNSIGNED_SHORT_5_6_5,
+		UNSIGNED_SHORT_4_4_4_4,
+		UNSIGNED_SHORT_5_5_5_1,
+		UNSIGNED_INT_8_8_8_8,
+		UNSIGNED_INT_10_10_10_2
+	};
+	enum class TextureLevel
+	{
+		NONE = 0, // Error (Used for placeholder)
+
+		LEVEL0,
+		LEVEL1,
+		LEVEL2,
+		LEVEL3,
+		LEVEL4,
+		LEVEL5,
+		LEVEL6,
+		LEVEL7,
+		LEVEL8,
+	};
+	enum class AnisotropicMode
+	{
+		NONE = 1,
+		LOW = 4,
+		MEDIUM = 8,
+		HIGH = 16
+	};
+	enum class PixelAlignment
+	{
+		ALIGN_1 = 1,
+		ALIGN_2 = 2,
+		ALIGN_4 = 4,
+		ALIGN_8 = 8
+	};
 
 	// ~ Object Typedefs ~ //
 	typedef uint32_t ShaderID;
@@ -218,6 +370,9 @@ namespace Vxl
 	typedef uint32_t VAOID;
 	typedef uint32_t VBOID;
 	typedef uint32_t EBOID;
+	typedef uint32_t TextureID;
+	typedef uint32_t RenderBufferID;
+	typedef uint32_t FramebufferObjectID;
 
 	// Graphics Caller
 	namespace Graphics
@@ -268,12 +423,21 @@ namespace Vxl
 		void ClearBuffer(BufferBit clearBit);
 		void ClearBuffer(BufferBit clearBit, BufferBit clearBit2);
 		void ClearAllBuffers();
+		// Clears buffer of a specific fbo attachment //
+		void ClearBufferFBOAttachment(uint32_t attachmentIndex, float r, float g, float b, float a);
+		void ClearBufferFBOAttachment(uint32_t attachmentIndex, const Color3F& clearColor, float a);
+		void ClearBufferFBOAttachment(uint32_t attachmentIndex, const Color4F& clearColor);
 
 		// ~ Conversion ~ //
 		uint32_t GetValueCount(AttributeType type);
 		uint32_t GetSize(AttributeType type);
 		DataType GetDataType(AttributeType type);
 		DrawSubType GetDrawSubType(DrawType type);
+		void GetPixelChannelData(TextureDepthFormat format, TextureChannelType& channelType, TexturePixelType& pixelType);
+		TextureChannelType GetChannelType(int ChannelCount);
+		uint32_t GetChannelCount(TextureChannelType type);
+		uint32_t GetChannelCount(TextureFormat format);
+		TextureFormat GetFormat(TextureDepthFormat format);
 
 		// ~ Uniforms ~ //
 		struct Uniform
@@ -427,7 +591,6 @@ namespace Vxl
 			void	SetVertexAttrib(uint32_t bufferIndex, int valueCount, DataType datatype, uint32_t strideSize, uint32_t strideOffset, bool normalized);
 			void	SetVertexAttribDivisor(uint32_t bufferIndex, uint32_t divisor);
 		}
-
 		namespace EBO
 		{
 			EBOID	Create(void);
@@ -445,6 +608,49 @@ namespace Vxl
 			void Indexed(DrawType type, uint32_t count);
 			void ArrayInstanced(DrawType type, uint32_t count, uint32_t instanceCount);
 			void IndexedInstanced(DrawType type, uint32_t count, uint32_t instanceCount);
+		}
+
+		// ~ Texture ~ //
+		namespace Texture
+		{
+			TextureID	Create(void);
+			void		Delete(TextureID id);
+			void		Bind(TextureType type, TextureID textureID);
+			void		Unbind(TextureType type);
+			void		SetActiveLevel(TextureLevel level);
+			void		SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height);
+			void		SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
+				const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype);
+			void		SetStorageCubemap(uint32_t side, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
+				const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype);
+			void		GenerateMipmap(TextureType type);
+			void		SetWrapping(TextureType type, TextureWrapping wrap);
+			void		SetFiltering(TextureType type, TextureFilter filter, bool mipmapping);
+			void		SetAnistropic(TextureType type, AnisotropicMode aniso);
+			void		SetBorderColor(TextureType type, const Color4F& color);
+			void		SetPixelPackAlignment(PixelAlignment align);
+			void		SetPixelUnpackAlignment(PixelAlignment align);
+		}
+		namespace RenderBuffer
+		{
+			RenderBufferID	Create(void);
+			void			Delete(RenderBufferID id);
+			void			Bind(RenderBufferID id);
+			void			Unbind(void);
+			void			SetStorage(TextureFormat format, int width, int height);
+		}
+
+		// ~ Framebuffer Object ~ //
+		namespace FramebufferObject
+		{
+			FramebufferObjectID Create(void);
+			void				Delete(FramebufferObjectID id);
+			void				Bind(FramebufferObjectID id);
+			void				DrawBuffers(uint32_t textureCount);
+			void				Unbind(void);
+			bool				CheckStatus(void);
+
+		
 		}
 	};
 

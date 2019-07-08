@@ -47,9 +47,12 @@ namespace Vxl
 	BlendEquation		gl_blendequation = BlendEquation::NONE;
 	DepthPassRule		gl_depthpassrule = DepthPassRule::NONE;
 	GLsizei				gl_viewport[4] = { -1, -1, -1, -1 };
+	TextureID			gl_activeTextureId = 0;
+	TextureLevel		gl_activeTextureLayer = TextureLevel::NONE;
+	FramebufferObjectID gl_activeFBO = 0;
 
 	// ~ Graphics Enums ~ //
-	int GL_ObjectType[] =
+	const int GL_ObjectType[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -65,7 +68,7 @@ namespace Vxl
 		GL_RENDERBUFFER,
 		GL_FRAMEBUFFER
 	};
-	int GL_ShaderType[] =
+	const int GL_ShaderType[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -87,7 +90,7 @@ namespace Vxl
 		"TESS_EVALUATION_SHADER",
 		"COMPUTE_SHADER"
 	};
-	GLbitfield GL_BufferBit[] =
+	const GLbitfield GL_BufferBit[] =
 	{
 		0, // Error (Used for placeholder) [0 used to prevent blit error]
 
@@ -96,7 +99,7 @@ namespace Vxl
 		GL_STENCIL_BUFFER_BIT,
 		GL_ACCUM_BUFFER_BIT
 	};
-	int GL_BlendSource[] =
+	const int GL_BlendSource[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -107,7 +110,7 @@ namespace Vxl
 		GL_SRC_ALPHA,
 		GL_ONE_MINUS_SRC_ALPHA
 	};
-	int GL_BlendDestination[] =
+	const int GL_BlendDestination[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -118,7 +121,7 @@ namespace Vxl
 		GL_SRC_ALPHA,
 		GL_ONE_MINUS_SRC_ALPHA
 	};
-	int GL_BlendEquation[] =
+	const int GL_BlendEquation[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -128,7 +131,7 @@ namespace Vxl
 		GL_MIN,
 		GL_MAX
 	};
-	int GL_DepthPassRule[] =
+	const int GL_DepthPassRule[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -140,7 +143,7 @@ namespace Vxl
 		GL_NOTEQUAL,
 		GL_ALWAYS
 	};
-	int GL_DataType[] =
+	const int GL_DataType[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -158,7 +161,7 @@ namespace Vxl
 		GL_UNSIGNED_INT_2_10_10_10_REV,
 		GL_UNSIGNED_INT_10F_11F_11F_REV
 	};
-	int GL_BufferUsage[] =
+	const int GL_BufferUsage[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -172,7 +175,7 @@ namespace Vxl
 		GL_DYNAMIC_READ,
 		GL_DYNAMIC_COPY
 	};
-	int GL_DrawType[] =
+	const int GL_DrawType[] =
 	{
 		-1, // Error (Used for placeholder)
 
@@ -188,6 +191,154 @@ namespace Vxl
 		GL_TRIANGLES_ADJACENCY,			// Geom			(triangles adjacency)
 		GL_TRIANGLE_STRIP_ADJACENCY,	// Geom (triangles adjacency)
 		GL_PATCHES						// Tesselation Control
+	};
+	const int GL_TextureType[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_TEXTURE_1D,
+		GL_TEXTURE_2D,
+		GL_TEXTURE_3D,
+		GL_TEXTURE_1D_ARRAY,
+		GL_TEXTURE_2D_ARRAY,
+		GL_TEXTURE_RECTANGLE,
+		GL_TEXTURE_CUBE_MAP,
+		GL_TEXTURE_CUBE_MAP_ARRAY,
+		GL_TEXTURE_BUFFER,
+		GL_TEXTURE_2D_MULTISAMPLE,
+		GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+	};
+	const int GL_TextureWrapping[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_REPEAT,
+		GL_CLAMP_TO_BORDER,
+		GL_CLAMP_TO_EDGE,
+		GL_MIRRORED_REPEAT,
+		GL_MIRROR_CLAMP_TO_EDGE
+	};
+	const int GL_TextureFiltering[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_NEAREST,
+		GL_LINEAR
+	};
+	const int GL_TextureFormat[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		// 1 channel
+		GL_R8,
+		GL_R8_SNORM,
+		GL_R16,
+		GL_R16_SNORM,
+		GL_R16F,
+		// 2 channels
+		GL_RG8,
+		GL_RG8_SNORM,
+		GL_RG16,
+		GL_RG16_SNORM,
+		GL_RG16F,
+		// 3 channels
+		GL_RGB8,
+		GL_RGB8_SNORM,
+		GL_RGB16,
+		GL_RGB16_SNORM,
+		GL_RGB16F,
+		// 4 channels
+		GL_RGBA8,
+		GL_RGBA8_SNORM,
+		GL_RGBA16,
+		GL_RGBA16_SNORM,
+		GL_RGBA16F,
+		GL_R11F_G11F_B10F,// GOOD FOR GBUFFER
+
+		// [ Special ]
+		GL_SRGB8,
+		GL_SRGB8_ALPHA8,
+
+		// [DepthTextureFormat]
+		GL_STENCIL_INDEX8,
+		GL_DEPTH_COMPONENT16,
+		GL_DEPTH_COMPONENT24,
+		GL_DEPTH_COMPONENT32,
+		GL_DEPTH_COMPONENT32F,
+		GL_DEPTH24_STENCIL8,
+		GL_DEPTH32F_STENCIL8
+	};
+	const int GL_TextureDepthFormat[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_STENCIL_INDEX8,
+		GL_DEPTH_COMPONENT16,
+		GL_DEPTH_COMPONENT24,
+		GL_DEPTH_COMPONENT32,
+		GL_DEPTH_COMPONENT32F,
+		GL_DEPTH24_STENCIL8,
+		GL_DEPTH32F_STENCIL8
+	};
+	const int GL_TextureChannelType[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_RED,	// 1 channel
+		GL_RG,	// 2 channels
+		GL_RGB,	// 3 channels
+		GL_RGBA,// 4 channels
+
+		GL_BGR,	// 3 channels
+		GL_BGRA, // 4 channels
+
+		GL_STENCIL_INDEX, // ? channels 
+		GL_DEPTH_COMPONENT, // ? channels
+		GL_DEPTH_STENCIL, // ? channels
+	};
+	const int GL_TexturePixelType[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_UNSIGNED_BYTE,
+		GL_BYTE,
+		GL_UNSIGNED_SHORT,
+		GL_SHORT,
+		GL_UNSIGNED_INT,
+		GL_INT,
+		GL_HALF_FLOAT,
+		GL_FLOAT,
+		GL_UNSIGNED_BYTE_3_3_2,
+		GL_UNSIGNED_SHORT_5_6_5,
+		GL_UNSIGNED_SHORT_4_4_4_4,
+		GL_UNSIGNED_SHORT_5_5_5_1,
+		GL_UNSIGNED_INT_8_8_8_8,
+		GL_UNSIGNED_INT_10_10_10_2
+	};
+	const int GL_TextureLayer[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_TEXTURE0,
+		GL_TEXTURE1,
+		GL_TEXTURE2,
+		GL_TEXTURE3,
+		GL_TEXTURE4,
+		GL_TEXTURE5,
+		GL_TEXTURE6,
+		GL_TEXTURE7,
+		GL_TEXTURE8,
+	};
+	const GLenum GL_ColorAttachments[] =
+	{
+		GL_COLOR_ATTACHMENT0,  GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2,  GL_COLOR_ATTACHMENT3,
+		GL_COLOR_ATTACHMENT4,  GL_COLOR_ATTACHMENT5,
+		GL_COLOR_ATTACHMENT6,  GL_COLOR_ATTACHMENT7,
+		GL_COLOR_ATTACHMENT8,  GL_COLOR_ATTACHMENT9,
+		GL_COLOR_ATTACHMENT10, GL_COLOR_ATTACHMENT11,
+		GL_COLOR_ATTACHMENT12, GL_COLOR_ATTACHMENT13,
+		GL_COLOR_ATTACHMENT14, GL_COLOR_ATTACHMENT15
 	};
 
 	// ~ Setup ~ //
@@ -251,6 +402,9 @@ namespace Vxl
 		gl_seamlessCubemaps = false;
 		for (int i = 0; i < 4; i++)
 			gl_viewport[i] = -1;
+
+		gl_activeTextureId = 0;
+		gl_activeTextureLayer = TextureLevel::NONE;
 
 		// Set Default Cull Mode
 		SetCullMode(CullMode::COUNTER_CLOCKWISE);
@@ -444,6 +598,21 @@ namespace Vxl
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
+	void Graphics::ClearBufferFBOAttachment(uint32_t attachmentIndex, float r, float g, float b, float a)
+	{
+		float c[4] = { r, g, b, a };
+		glClearBufferfv(GL_COLOR, attachmentIndex, c);
+	}
+	void Graphics::ClearBufferFBOAttachment(uint32_t attachmentIndex, const Color3F& clearColor, float a)
+	{
+		float c[4] = { clearColor.r, clearColor.g, clearColor.b, a };
+		glClearBufferfv(GL_COLOR, attachmentIndex, c);
+	}
+	void Graphics::ClearBufferFBOAttachment(uint32_t attachmentIndex, const Color4F& clearColor)
+	{
+		float c[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
+		glClearBufferfv(GL_COLOR, attachmentIndex, c);
+	}
 
 	// ~ Conversion ~ //
 	uint32_t Graphics::GetValueCount(AttributeType type)
@@ -547,6 +716,163 @@ namespace Vxl
 		default:
 			VXL_ASSERT(false, "Unknown DrawType for GetDrawSubType()");
 			return DrawSubType::TRIANGLES;
+		}
+	}
+	void Graphics::GetPixelChannelData(TextureDepthFormat format, TextureChannelType& channelType, TexturePixelType& pixelType)
+	{
+		switch (format)
+		{
+		case TextureDepthFormat::STENCIL8:
+			channelType = TextureChannelType::STENCIL;
+			pixelType = TexturePixelType::UNSIGNED_BYTE;
+			return;
+		case TextureDepthFormat::DEPTH16:
+			channelType = TextureChannelType::DEPTH;
+			pixelType = TexturePixelType::UNSIGNED_SHORT;
+			return;
+		case TextureDepthFormat::DEPTH24:
+			channelType = TextureChannelType::DEPTH;
+			pixelType = TexturePixelType::UNSIGNED_INT_8_8_8_8;
+			return;
+		case TextureDepthFormat::DEPTH24_STENCIL8:
+			channelType = TextureChannelType::DEPTH_STENCIL;
+			pixelType = TexturePixelType::UNSIGNED_INT_8_8_8_8;
+			return;
+		case TextureDepthFormat::DEPTH32:
+		case TextureDepthFormat::DEPTH32F:
+			channelType = TextureChannelType::DEPTH;
+			pixelType = TexturePixelType::UNSIGNED_INT;
+			return;
+		case TextureDepthFormat::DEPTH32F_STENCIL8:
+			channelType = TextureChannelType::DEPTH_STENCIL;
+			pixelType = TexturePixelType::UNSIGNED_INT;
+			return;
+		}
+
+		VXL_ASSERT(false, "Invalid DepthFormat Type");
+	}
+	TextureChannelType Graphics::GetChannelType(int ChannelCount)
+	{
+		switch (ChannelCount)
+		{
+		default:
+		case 0:
+			return TextureChannelType::NONE;
+		case 1:
+			return TextureChannelType::R;
+		case 2:
+			return TextureChannelType::RG;
+		case 3:
+			return TextureChannelType::RGB;
+		case 4:
+			return TextureChannelType::RGBA;
+		}
+
+		VXL_ASSERT(false, "Invalid Channel Count");
+		return TextureChannelType::NONE;
+	}
+	uint32_t Graphics::GetChannelCount(TextureChannelType type)
+	{
+		// Solve channel count based on channel type
+		switch (type)
+		{
+		case TextureChannelType::NONE:
+			return 0;
+		case TextureChannelType::R:
+			return 1;
+		case TextureChannelType::RG:
+			return 2;
+		case TextureChannelType::RGB:
+		case TextureChannelType::BGR:
+			return 3;
+		case TextureChannelType::RGBA:
+		case TextureChannelType::BGRA:
+			return 4;
+			// Special Case [Cannot figure out channel count based on this information alone]
+		case TextureChannelType::DEPTH:
+		case TextureChannelType::DEPTH_STENCIL:
+			return -1;
+		}
+
+		VXL_ASSERT(false, "Invalid Channel Type");
+		return 0;
+	}
+	uint32_t Graphics::GetChannelCount(TextureFormat format)
+	{
+		// Special exceptions
+		switch (format)
+		{
+			// 1 Channel
+		case TextureFormat::R8:
+		case TextureFormat::R8_SNORM:
+		case TextureFormat::R16:
+		case TextureFormat::R16_SNORM:
+		case TextureFormat::R16F:
+			return 1;
+			// 2 Channels
+		case TextureFormat::RG8:
+		case TextureFormat::RG8_SNORM:
+		case TextureFormat::RG16:
+		case TextureFormat::RG16_SNORM:
+		case TextureFormat::RG16F:
+		case TextureFormat::DEPTH16:// Special
+			return 2;
+			// 3 Channels
+		case TextureFormat::RGB8:
+		case TextureFormat::RGB8_SNORM:
+		case TextureFormat::RGB16:
+		case TextureFormat::RGB16_SNORM:
+		case TextureFormat::RGB16F:
+		case TextureFormat::R11F_G11F_B10F:// Special
+		case TextureFormat::SRGB8:// Special
+		case TextureFormat::DEPTH24:// Special
+			return 3;
+			// 4 ChannelS
+		case TextureFormat::RGBA8:
+		case TextureFormat::RGBA8_SNORM:
+		case TextureFormat::RGBA16:
+		case TextureFormat::RGBA16_SNORM:
+		case TextureFormat::RGBA16F:
+		case TextureFormat::SRGBA8:// Special
+		case TextureFormat::DEPTH32:// Special
+		case TextureFormat::DEPTH32F:// Special
+		case TextureFormat::DEPTH24_STENCIL8:// Special
+			return 4;
+		case TextureFormat::DEPTH32F_STENCIL8:
+			return 8; // 64 bits total (24 bits padding for alignment)
+		}
+
+		VXL_ASSERT(false, "Invalid Format Type");
+		return 0;
+	}
+	TextureFormat Graphics::GetFormat(TextureDepthFormat format)
+	{
+		switch (format)
+		{
+		case TextureDepthFormat::STENCIL8:
+			return TextureFormat::STENCIL8;
+
+		case TextureDepthFormat::DEPTH16:
+			return TextureFormat::DEPTH16;
+
+		case TextureDepthFormat::DEPTH24:
+			return TextureFormat::DEPTH24;
+
+		case TextureDepthFormat::DEPTH32:
+			return TextureFormat::DEPTH32;
+
+		case TextureDepthFormat::DEPTH32F:
+			return TextureFormat::DEPTH32F;
+
+		case TextureDepthFormat::DEPTH24_STENCIL8:
+			return TextureFormat::DEPTH24_STENCIL8;
+
+		case TextureDepthFormat::DEPTH32F_STENCIL8:
+			return TextureFormat::DEPTH32F_STENCIL8;
+
+		default:
+			VXL_ASSERT(false, "TextureDepthFormat value not recognized for GetFormat()");
+			return TextureFormat::DEPTH16;
 		}
 	}
 
@@ -1163,6 +1489,7 @@ namespace Vxl
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, OffsetBytes, SizeBytes, data);
 	}
 
+	// ~ Draw ~ //
 	void Graphics::Draw::Array(DrawType type, uint32_t count)
 	{
 		glDrawArrays(GL_DrawType[(int)type], 0, count);
@@ -1179,4 +1506,231 @@ namespace Vxl
 	{
 		glDrawElementsInstanced(GL_DrawType[(int)type], count, GL_UNSIGNED_INT, 0, instanceCount);
 	}
+
+	// ~ Texture ~ //
+	TextureID Graphics::Texture::Create(void)
+	{
+		TextureID id;
+		glGenTextures(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenTextures()");
+
+		return id;
+	}
+	void Graphics::Texture::Delete(TextureID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteTextures()");
+
+		glDeleteTextures(1, &id);
+	}
+	void Graphics::Texture::Bind(TextureType type, TextureID textureID)
+	{
+		if (gl_activeTextureId == textureID)
+			return;
+
+		glBindTexture(GL_TextureType[(int)type], textureID);
+		gl_activeTextureId = textureID;
+	}
+	void Graphics::Texture::Unbind(TextureType type)
+	{
+		if (gl_activeTextureId == 0)
+			return;
+
+		glBindTexture(GL_TextureType[(int)type], 0);
+		gl_activeTextureId = 0;
+	}
+	void Graphics::Texture::SetActiveLevel(TextureLevel level)
+	{
+		if (gl_activeTextureLayer == level)
+			return;
+
+		glActiveTexture(GL_TextureLayer[(int)level]);
+		gl_activeTextureLayer = level;
+	}
+	void Graphics::Texture::SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height)
+	{
+		switch (type)
+		{
+		case TextureType::TEX_2D:
+		case TextureType::TEX_1D_ARRAY:
+		case TextureType::TEX_RECT:
+		case TextureType::TEX_CUBEMAP:
+			glTexStorage2D(GL_TextureType[(int)type], levels, GL_TextureFormat[(int)format], width, height);
+			break;
+		default:
+			VXL_ASSERT(false, "TextureType Type not allowed for SetStorage(no pixels)");
+		}
+
+	}
+	void Graphics::Texture::SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
+		const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype)
+	{
+		switch (type)
+		{
+		case TextureType::TEX_2D:
+		case TextureType::TEX_1D_ARRAY:
+		case TextureType::TEX_RECT:
+		case TextureType::TEX_CUBEMAP:
+			glTexStorage2D(GL_TextureType[(int)type], levels, GL_TextureFormat[(int)format], width, height);
+			break;
+		default:
+			VXL_ASSERT(false, "TextureType Type not allowed for SetStorage(pixels)");
+		}
+
+		glTexSubImage2D(GL_TextureType[(int)type], 0, 0, 0, width, height, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels);
+	}
+	void Graphics::Texture::SetStorageCubemap(uint32_t side, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
+		const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype)
+	{
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
+			0, GL_TextureFormat[(int)format], width, height, 0, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels
+		);
+	}
+
+	void Graphics::Texture::GenerateMipmap(TextureType type)
+	{
+		glGenerateMipmap(GL_TextureType[(int)type]);
+	}
+	void Graphics::Texture::SetWrapping(TextureType type, TextureWrapping wrap)
+	{
+		glTexParameteri(GL_TextureType[(int)type], GL_TEXTURE_WRAP_S, GL_TextureWrapping[(int)wrap]);
+		glTexParameteri(GL_TextureType[(int)type], GL_TEXTURE_WRAP_T, GL_TextureWrapping[(int)wrap]);
+	}
+	void Graphics::Texture::SetFiltering(TextureType type, TextureFilter filter, bool mipmapping)
+	{
+		// Mag Filter
+		glTexParameteri(GL_TextureType[(int)type], GL_TEXTURE_MAG_FILTER, GL_TextureFiltering[(int)filter]);
+
+		// Min Filter
+		if (mipmapping)
+		{
+			if (filter == TextureFilter::LINEAR)
+				glTexParameteri(GL_TextureType[(int)type], GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			else
+				glTexParameteri(GL_TextureType[(int)type], GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+			// Unused Options
+			// GL_LINEAR_MIPMAP_NEAREST
+			// GL_NEAREST_MIPMAP_LINEAR
+		}
+		else
+			glTexParameteri(GL_TextureType[(int)type], GL_TEXTURE_MIN_FILTER, GL_TextureFiltering[(int)filter]);
+	}
+	void Graphics::Texture::SetAnistropic(TextureType type, AnisotropicMode aniso)
+	{
+		glTexParameterf(GL_TextureType[(int)type], GL_TEXTURE_MAX_ANISOTROPY, min(GLMaxAnisotropy, (float)aniso));
+	}
+	void Graphics::Texture::SetBorderColor(TextureType type, const Color4F& color)
+	{
+		float c[4] = { color.r, color.g, color.b, color.a };
+		glTexParameterfv(GL_TextureType[(int)type], GL_TEXTURE_BORDER_COLOR, c);
+	}
+	void Graphics::Texture::SetPixelPackAlignment(PixelAlignment align)
+	{
+		glPixelStorei(GL_PACK_ALIGNMENT, (int)align);
+	}
+	void Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment align)
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT, (int)align);
+	}
+
+	RenderBufferID Graphics::RenderBuffer::Create(void)
+	{
+		RenderBufferID id;
+		glGenRenderbuffers(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenRenderbuffers()");
+
+		return id;
+	}
+	void Graphics::RenderBuffer::Delete(RenderBufferID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glGenRenderbuffers()");
+
+		glDeleteRenderbuffers(1, &id);
+	}
+	void Graphics::RenderBuffer::Bind(RenderBufferID id)
+	{
+		glBindRenderbuffer(GL_RENDERBUFFER, id);
+	}
+	void Graphics::RenderBuffer::Unbind(void)
+	{
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	}
+	void Graphics::RenderBuffer::SetStorage(TextureFormat format, int width, int height)
+	{
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_TextureFormat[(int)format], width, height);
+	}
+
+	FramebufferObjectID Graphics::FramebufferObject::Create(void)
+	{
+		FramebufferObjectID id;
+		glGenFramebuffers(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenFramebuffers()");
+
+		return id;
+	}
+	void Graphics::FramebufferObject::Delete(FramebufferObjectID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteFramebuffers()");
+
+		glDeleteFramebuffers(1, &id);
+	}
+	void Graphics::FramebufferObject::Bind(FramebufferObjectID id)
+	{
+		if (gl_activeFBO == id)
+			return;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, id);
+		gl_activeFBO = id;
+	}
+	void Graphics::FramebufferObject::DrawBuffers(uint32_t textureCount)
+	{
+		glDrawBuffers(textureCount, GL_ColorAttachments);
+	}
+	void Graphics::FramebufferObject::Unbind()
+	{
+		if (gl_activeFBO == 0)
+			return;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		gl_activeFBO = 0;
+	}
+	bool Graphics::FramebufferObject::CheckStatus(void)
+	{
+		// Check if FBO was Created Correctly
+		GLenum e = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+		switch (e) {
+
+		case GL_FRAMEBUFFER_UNDEFINED:
+			Logger.error("FBO Undefined");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			Logger.error("FBO Incomplete Attachment");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			Logger.error("FBO Missing Attachment");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+			Logger.error("FBO Incomplete Draw Buffer");
+			break;
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			Logger.error("FBO Unsupported");
+			break;
+		case GL_FRAMEBUFFER_COMPLETE:
+			//FBO is OK
+			break;
+
+		default:
+			//Unknown FBO
+			Logger.error("FBO Error, Unknown: " + std::to_string(e));
+			break;
+		}
+
+		// Return true if framebuffer complete
+		return (e == GL_FRAMEBUFFER_COMPLETE) ? true : false;
+	}
+
+	
 }

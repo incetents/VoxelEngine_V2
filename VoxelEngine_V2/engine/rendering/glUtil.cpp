@@ -299,102 +299,102 @@ namespace Vxl
 //	#endif
 //		}
 
-	// Get Format Type from channel count
-	Channel_Type glUtil::getChannelType(int ChannelCount)
-	{
-		switch (ChannelCount)
-		{
-		default:
-		case 0:
-			return Channel_Type::NONE;
-		case 1:
-			return Channel_Type::R;
-		case 2:
-			return Channel_Type::RG;
-		case 3:
-			return Channel_Type::RGB;
-		case 4:
-			return Channel_Type::RGBA;
-		}
+	//	// Get Format Type from channel count
+	//	TextureChannelType glUtil::getChannelType(int ChannelCount)
+	//	{
+	//		switch (ChannelCount)
+	//		{
+	//		default:
+	//		case 0:
+	//			return TextureChannelType::NONE;
+	//		case 1:
+	//			return TextureChannelType::R;
+	//		case 2:
+	//			return TextureChannelType::RG;
+	//		case 3:
+	//			return TextureChannelType::RGB;
+	//		case 4:
+	//			return TextureChannelType::RGBA;
+	//		}
+	//	
+	//		VXL_ASSERT(false, "Invalid Channel Count");
+	//		return TextureChannelType::NONE;
+	//	}
+	//	unsigned int glUtil::getChannelCount(TextureChannelType type)
+	//	{
+	//		// Solve channel count based on channel type
+	//		switch (type)
+	//		{
+	//		case TextureChannelType::NONE:
+	//			return 0;
+	//		case TextureChannelType::R:
+	//			return 1;
+	//		case TextureChannelType::RG:
+	//			return 2;
+	//		case TextureChannelType::RGB:
+	//		case TextureChannelType::BGR:
+	//			return 3;
+	//		case TextureChannelType::RGBA:
+	//		case TextureChannelType::BGRA:
+	//			return 4;
+	//			// Special Case [Cannot figure out channel count based on this information alone]
+	//		case TextureChannelType::DEPTH:
+	//		case TextureChannelType::DEPTH_STENCIL:
+	//			return -1;
+	//		}
+	//		
+	//		VXL_ASSERT(false, "Invalid Channel Type");
+	//		return 0;
+	//	}
 
-		VXL_ASSERT(false, "Invalid Channel Count");
-		return Channel_Type::NONE;
-	}
-	unsigned int glUtil::getChannelCount(Channel_Type type)
-	{
-		// Solve channel count based on channel type
-		switch (type)
-		{
-		case Channel_Type::NONE:
-			return 0;
-		case Channel_Type::R:
-			return 1;
-		case Channel_Type::RG:
-			return 2;
-		case Channel_Type::RGB:
-		case Channel_Type::BGR:
-			return 3;
-		case Channel_Type::RGBA:
-		case Channel_Type::BGRA:
-			return 4;
-			// Special Case [Cannot figure out channel count based on this information alone]
-		case Channel_Type::DEPTH:
-		case Channel_Type::DEPTH_STENCIL:
-			return -1;
-		}
-		
-		VXL_ASSERT(false, "Invalid Channel Type");
-		return 0;
-	}
-
-	unsigned int glUtil::getChannelCount(Format_Type format)
-	{
-		// Special exceptions
-		switch (format)
-		{
-			// 1 Channel
-		case Format_Type::R8:
-		case Format_Type::R8_SNORM:
-		case Format_Type::R16:
-		case Format_Type::R16_SNORM:
-		case Format_Type::R16F:
-			return 1;
-			// 2 Channels
-		case Format_Type::RG8:
-		case Format_Type::RG8_SNORM:
-		case Format_Type::RG16:
-		case Format_Type::RG16_SNORM:
-		case Format_Type::RG16F:
-		case Format_Type::DEPTH16:// Special
-			return 2;
-			// 3 Channels
-		case Format_Type::RGB8:
-		case Format_Type::RGB8_SNORM:
-		case Format_Type::RGB16:
-		case Format_Type::RGB16_SNORM:
-		case Format_Type::RGB16F:
-		case Format_Type::R11F_G11F_B10F:// Special
-		case Format_Type::SRGB8:// Special
-		case Format_Type::DEPTH24:// Special
-			return 3;
-			// 4 ChannelS
-		case Format_Type::RGBA8:
-		case Format_Type::RGBA8_SNORM:
-		case Format_Type::RGBA16:
-		case Format_Type::RGBA16_SNORM:
-		case Format_Type::RGBA16F:
-		case Format_Type::SRGBA8:// Special
-		case Format_Type::DEPTH32:// Special
-		case Format_Type::DEPTH32F:// Special
-		case Format_Type::DEPTH24_STENCIL8:// Special
-			return 4;
-		case Format_Type::DEPTH32F_STENCIL8:
-			return 8; // 64 bits total (24 bits padding for alignment)
-		}
-
-		VXL_ASSERT(false, "Invalid Format Type");
-		return 0;
-	}
+	//	unsigned int glUtil::getChannelCount(TextureFormat format)
+	//	{
+	//		// Special exceptions
+	//		switch (format)
+	//		{
+	//			// 1 Channel
+	//		case TextureFormat::R8:
+	//		case TextureFormat::R8_SNORM:
+	//		case TextureFormat::R16:
+	//		case TextureFormat::R16_SNORM:
+	//		case TextureFormat::R16F:
+	//			return 1;
+	//			// 2 Channels
+	//		case TextureFormat::RG8:
+	//		case TextureFormat::RG8_SNORM:
+	//		case TextureFormat::RG16:
+	//		case TextureFormat::RG16_SNORM:
+	//		case TextureFormat::RG16F:
+	//		case TextureFormat::DEPTH16:// Special
+	//			return 2;
+	//			// 3 Channels
+	//		case TextureFormat::RGB8:
+	//		case TextureFormat::RGB8_SNORM:
+	//		case TextureFormat::RGB16:
+	//		case TextureFormat::RGB16_SNORM:
+	//		case TextureFormat::RGB16F:
+	//		case TextureFormat::R11F_G11F_B10F:// Special
+	//		case TextureFormat::SRGB8:// Special
+	//		case TextureFormat::DEPTH24:// Special
+	//			return 3;
+	//			// 4 ChannelS
+	//		case TextureFormat::RGBA8:
+	//		case TextureFormat::RGBA8_SNORM:
+	//		case TextureFormat::RGBA16:
+	//		case TextureFormat::RGBA16_SNORM:
+	//		case TextureFormat::RGBA16F:
+	//		case TextureFormat::SRGBA8:// Special
+	//		case TextureFormat::DEPTH32:// Special
+	//		case TextureFormat::DEPTH32F:// Special
+	//		case TextureFormat::DEPTH24_STENCIL8:// Special
+	//			return 4;
+	//		case TextureFormat::DEPTH32F_STENCIL8:
+	//			return 8; // 64 bits total (24 bits padding for alignment)
+	//		}
+	//	
+	//		VXL_ASSERT(false, "Invalid Format Type");
+	//		return 0;
+	//	}
 
 	//
 	//	uint32_t glUtil::getValueCount(ShaderDataType data)
@@ -478,40 +478,40 @@ namespace Vxl
 	//		}
 	//	}
 
-	// Get Pixel/Channel Data From DepthFormat
-	void glUtil::getPixelChannelData(DepthFormat_Type format, Channel_Type& channelType, Pixel_Type& pixelType)
-	{
-		switch (format)
-		{
-		case DepthFormat_Type::STENCIL8:
-			channelType = Channel_Type::STENCIL;
-			pixelType = Pixel_Type::UNSIGNED_BYTE;
-			return;
-		case DepthFormat_Type::DEPTH16:
-			channelType = Channel_Type::DEPTH;
-			pixelType = Pixel_Type::UNSIGNED_SHORT;
-			return;
-		case DepthFormat_Type::DEPTH24:
-			channelType = Channel_Type::DEPTH;
-			pixelType = Pixel_Type::UNSIGNED_INT_8_8_8_8;
-			return;
-		case DepthFormat_Type::DEPTH24_STENCIL8:
-			channelType = Channel_Type::DEPTH_STENCIL;
-			pixelType = Pixel_Type::UNSIGNED_INT_8_8_8_8;
-			return;
-		case DepthFormat_Type::DEPTH32:
-		case DepthFormat_Type::DEPTH32F:
-			channelType = Channel_Type::DEPTH;
-			pixelType = Pixel_Type::UNSIGNED_INT;
-			return;
-		case DepthFormat_Type::DEPTH32F_STENCIL8:
-			channelType = Channel_Type::DEPTH_STENCIL;
-			pixelType = Pixel_Type::UNSIGNED_INT;
-			return;
-		}
-
-		VXL_ASSERT(false, "Invalid DepthFormat Type");
-	}
+	//	// Get Pixel/Channel Data From DepthFormat
+	//	void glUtil::getPixelChannelData(DepthTextureFormat format, TextureChannelType& channelType, TexturePixelType& pixelType)
+	//	{
+	//		switch (format)
+	//		{
+	//		case DepthTextureFormat::STENCIL8:
+	//			channelType = TextureChannelType::STENCIL;
+	//			pixelType = TexturePixelType::UNSIGNED_BYTE;
+	//			return;
+	//		case DepthTextureFormat::DEPTH16:
+	//			channelType = TextureChannelType::DEPTH;
+	//			pixelType = TexturePixelType::UNSIGNED_SHORT;
+	//			return;
+	//		case DepthTextureFormat::DEPTH24:
+	//			channelType = TextureChannelType::DEPTH;
+	//			pixelType = TexturePixelType::UNSIGNED_INT_8_8_8_8;
+	//			return;
+	//		case DepthTextureFormat::DEPTH24_STENCIL8:
+	//			channelType = TextureChannelType::DEPTH_STENCIL;
+	//			pixelType = TexturePixelType::UNSIGNED_INT_8_8_8_8;
+	//			return;
+	//		case DepthTextureFormat::DEPTH32:
+	//		case DepthTextureFormat::DEPTH32F:
+	//			channelType = TextureChannelType::DEPTH;
+	//			pixelType = TexturePixelType::UNSIGNED_INT;
+	//			return;
+	//		case DepthTextureFormat::DEPTH32F_STENCIL8:
+	//			channelType = TextureChannelType::DEPTH_STENCIL;
+	//			pixelType = TexturePixelType::UNSIGNED_INT;
+	//			return;
+	//		}
+	//	
+	//		VXL_ASSERT(false, "Invalid DepthFormat Type");
+	//	}
 
 
 	//	void glUtil::clearColor(float r, float g, float b, float a)
@@ -773,35 +773,35 @@ namespace Vxl
 	//	}
 
 	// TEXTURES //
-	Active_Texture activeSlot = Active_Texture::LEVEL0;
-	void glUtil::setActiveTexture(Active_Texture level)
-	{
-		if (activeSlot == level)
-			return;
+	//	TextureLevel activeSlot = TextureLevel::LEVEL0;
+	//	void glUtil::setActiveTexture(TextureLevel level)
+	//	{
+	//		if (activeSlot == level)
+	//			return;
+	//	
+	//		glActiveTexture(GLenum(level));
+	//	
+	//		activeSlot = level;
+	//	}
+	//	void glUtil::setActiveTexture(int level)
+	//	{
+	//		TextureLevel _level = TextureLevel(GL_TEXTURE0 + level);
+	//		setActiveTexture(_level);
+	//	}
+	//	void glUtil::setActiveTexture(unsigned int level)
+	//	{
+	//		glActiveTexture(GL_TEXTURE0 + level);
+	//	}
 
-		glActiveTexture(GLenum(level));
-
-		activeSlot = level;
-	}
-	void glUtil::setActiveTexture(int level)
-	{
-		Active_Texture _level = Active_Texture(GL_TEXTURE0 + level);
-		setActiveTexture(_level);
-	}
-	void glUtil::setActiveTexture(unsigned int level)
-	{
-		glActiveTexture(GL_TEXTURE0 + level);
-	}
-
-	void glUtil::bindTexture(Texture_Type type, GLuint& texture_id)
-	{
-		glBindTexture((GLenum)type, texture_id);
-	}
-
-	void glUtil::unbindTexture(Texture_Type type)
-	{
-		glBindTexture((GLenum)type, 0);
-	}
+	//	void glUtil::bindTexture(Texture_Type type, GLuint& texture_id)
+	//	{
+	//		glBindTexture((GLenum)type, texture_id);
+	//	}
+	//	
+	//	void glUtil::unbindTexture(Texture_Type type)
+	//	{
+	//		glBindTexture((GLenum)type, 0);
+	//	}
 
 	// MISC //
 	//	std::string glUtil::shaderTypeToString(const ShaderType& type)

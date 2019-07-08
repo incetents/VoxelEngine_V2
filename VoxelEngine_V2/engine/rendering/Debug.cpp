@@ -207,8 +207,8 @@ namespace Vxl
 		pixels.push_back(Color3F::PURPLE);
 
 		m_null_texture = Texture::CreateCustom("null", pixels, 4, true,
-			Wrap_Mode::CLAMP_STRETCH, Filter_Mode::NEAREST,
-			Format_Type::RGB8, Channel_Type::RGB, Pixel_Type::UNSIGNED_BYTE
+			TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
+			TextureFormat::RGB8, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE
 		);
 
 		VXL_ASSERT(m_null_texture, "Failed to create null texture");

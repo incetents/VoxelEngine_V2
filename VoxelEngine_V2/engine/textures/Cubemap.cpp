@@ -20,13 +20,13 @@ namespace Vxl
 		const std::string& filePath6,
 		bool			InvertY,
 		bool			UseMipMapping,
-		Wrap_Mode		WrapMode,
-		Filter_Mode		FilterMode,
-		Format_Type		FormatType,
-		Pixel_Type		PixelType,
-		Anisotropic_Mode AnisotropicMode
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		TexturePixelType	PixelType,
+		AnisotropicMode		AnisotropicMode
 	)
-		: BaseTexture(Texture_Type::TEX_CUBEMAP, WrapMode, FilterMode, FormatType, Channel_Type::NONE, PixelType, AnisotropicMode, UseMipMapping)
+		: BaseTexture(TextureType::TEX_CUBEMAP, WrapMode, FilterMode, FormatType, TextureChannelType::NONE, PixelType, AnisotropicMode, UseMipMapping)
 	{
 		m_image[0] = SOIL_load_image(filePath1.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 		m_image[1] = SOIL_load_image(filePath2.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
@@ -43,7 +43,7 @@ namespace Vxl
 				FlipTextureY(m_image[i], m_width, m_height, m_channelCount);
 		}
 
-		m_channelType = glUtil::getChannelType(m_channelCount);
+		m_channelType = Graphics::GetChannelType(m_channelCount);
 
 		// Storage
 		for (GLuint i = 0; i < 6; i++)
@@ -71,11 +71,11 @@ namespace Vxl
 		const std::string& filePath1, const std::string& filePath2, const std::string& filePath3, const std::string& filePath4, const std::string& filePath5, const std::string& filePath6,
 		bool InvertY,
 		bool UseMipMapping,
-		Wrap_Mode WrapMode,
-		Filter_Mode FilterMode,
-		Format_Type	FormatType,
-		Pixel_Type PixelType,
-		Anisotropic_Mode AnisotropicMode
+		TextureWrapping WrapMode,
+		TextureFilter FilterMode,
+		TextureFormat	FormatType,
+		TexturePixelType PixelType,
+		AnisotropicMode AnisotropicMode
 	) {
 		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType);
 

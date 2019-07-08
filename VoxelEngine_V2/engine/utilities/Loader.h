@@ -6,10 +6,10 @@
 
 namespace Vxl
 {
-	enum class Wrap_Mode;
-	enum class Filter_Mode;
+	enum class TextureWrapping;
+	enum class TextureFilter;
 	enum class ShaderType;
-	enum class Anisotropic_Mode : GLubyte;
+	enum class AnisotropicMode;
 
 	class Loader
 	{
@@ -59,12 +59,12 @@ namespace Vxl
 		static const std::string TAG_MEDIUM;
 		static const std::string TAG_HIGH;
 
-		static Wrap_Mode DecipherWrapMode(const std::string& str);
-		static Filter_Mode DecipherFilterMode(const std::string& str);
+		static TextureWrapping DecipherWrapMode(const std::string& str);
+		static TextureFilter DecipherFilterMode(const std::string& str);
 		static ShaderType DeciperShaderType(const std::string& str);
 		static bool DecipherFlipType(const std::string& str);
 		static bool DecipherMipMapType(const std::string& str);
-		static Anisotropic_Mode DecipherAnisotropicMode(const std::string& str);
+		static AnisotropicMode DecipherAnisotropicMode(const std::string& str);
 	public:
 
 		static bool LoadScript_ImportFiles(const std::string& filePath);

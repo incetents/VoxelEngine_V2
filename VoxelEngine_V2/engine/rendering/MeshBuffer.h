@@ -31,13 +31,13 @@ namespace Vxl
 		}
 
 
-		virtual void set(Type* arr, GLuint size, BufferUsage mode = BufferUsage::STATIC_DRAW)
+		virtual void set(Type* arr, uint32_t size, BufferUsage mode = BufferUsage::STATIC_DRAW)
 		{
 			m_vbo.SetVertices(arr, size, mode);
 		}
 		virtual void set(const std::vector<Type>& vec, BufferUsage mode = BufferUsage::STATIC_DRAW)
 		{
-			m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), mode);
+			m_vbo.SetVertices(vec.data(), (uint32_t)vec.size(), mode);
 		}
 
 		virtual void update(Type* arr, int offset, int size)
@@ -81,7 +81,7 @@ namespace Vxl
 	public:
 		MeshBufferMem(){}
 		 
-		void set(Type* arr, GLuint size, BufferUsage mode = BufferUsage::STATIC_DRAW) override
+		void set(Type* arr, uint32_t size, BufferUsage mode = BufferUsage::STATIC_DRAW) override
 		{
 			vertices = std::vector<Type>(arr, arr + size);
 			vertices.shrink_to_fit();
@@ -93,7 +93,7 @@ namespace Vxl
 			vertices = vec;
 			vertices.shrink_to_fit();
 
-			MeshBuffer<Type, Buf, Atr>::m_vbo.SetVertices(vec.data(), (GLuint)vec.size(), mode);
+			MeshBuffer<Type, Buf, Atr>::m_vbo.SetVertices(vec.data(), (uint32_t)vec.size(), mode);
 		}
 
 		void update(Type* arr, int offset, int size) override

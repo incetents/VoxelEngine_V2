@@ -59,29 +59,29 @@ namespace Vxl
 	const std::string Loader::TAG_MEDIUM = "MEDIUM";
 	const std::string Loader::TAG_HIGH = "HIGH";
 
-	Wrap_Mode Loader::DecipherWrapMode(const std::string& str)
+	TextureWrapping Loader::DecipherWrapMode(const std::string& str)
 	{
 		if (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_WRAPMODE_REPEAT) == 0)
-			return Wrap_Mode::REPEAT;
+			return TextureWrapping::REPEAT;
 		else if (str.compare(TAG_WRAPMODE_CLAMP_BORDER) == 0)
-			return Wrap_Mode::CLAMP_BORDER;
+			return TextureWrapping::CLAMP_BORDER;
 		else if (str.compare(TAG_WRAPMODE_CLAMP_STRETCH) == 0)
-			return Wrap_Mode::CLAMP_STRETCH;
+			return TextureWrapping::CLAMP_STRETCH;
 		else if (str.compare(TAG_WRAPMODE_MIRROR_REPEAT) == 0)
-			return Wrap_Mode::MIRROR_REPEAT;
+			return TextureWrapping::MIRROR_REPEAT;
 		else if (str.compare(TAG_WRAPMODE_MIRROR_CLAMP) == 0)
-			return Wrap_Mode::MIRROR_CLAMP;
+			return TextureWrapping::MIRROR_CLAMP;
 		else
-			return Wrap_Mode::NONE;
+			return TextureWrapping::NONE;
 	}
-	Filter_Mode Loader::DecipherFilterMode(const std::string& str)
+	TextureFilter Loader::DecipherFilterMode(const std::string& str)
 	{
 		if (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_FILTERMODE_LINEAR) == 0)
-			return Filter_Mode::LINEAR;
+			return TextureFilter::LINEAR;
 		else if (str.compare(TAG_FILTERMODE_NEAREST) == 0)
-			return Filter_Mode::NEAREST;
+			return TextureFilter::NEAREST;
 		else
-			return Filter_Mode::NONE;
+			return TextureFilter::NONE;
 	}
 	ShaderType Loader::DeciperShaderType(const std::string& str)
 	{
@@ -108,16 +108,16 @@ namespace Vxl
 	{
 		return (str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_MIPMAP_TRUE) == 0);
 	}
-	Anisotropic_Mode Loader::DecipherAnisotropicMode(const std::string& str)
+	AnisotropicMode Loader::DecipherAnisotropicMode(const std::string& str)
 	{
 		if(str.compare(TAG_DEFAULT) == 0 || str.compare(TAG_HIGH) == 0)
-			return Anisotropic_Mode::HIGH;
+			return AnisotropicMode::HIGH;
 		else if (str.compare(TAG_MEDIUM) == 0)
-			return Anisotropic_Mode::MEDIUM;
+			return AnisotropicMode::MEDIUM;
 		else if (str.compare(TAG_LOW) == 0)
-			return Anisotropic_Mode::LOW;
+			return AnisotropicMode::LOW;
 		else
-			return Anisotropic_Mode::NONE;
+			return AnisotropicMode::NONE;
 	}
 
 	bool Loader::LoadScript_ImportFiles(const std::string& filePath)
@@ -206,9 +206,9 @@ namespace Vxl
 				{
 					auto Name = Segments[0];
 					auto filePath = Segments[1];
-					Wrap_Mode WM = Wrap_Mode::REPEAT;
-					Filter_Mode Filter = Filter_Mode::LINEAR;
-					Anisotropic_Mode ANSO = Anisotropic_Mode::HIGH;
+					TextureWrapping WM = TextureWrapping::REPEAT;
+					TextureFilter Filter = TextureFilter::LINEAR;
+					AnisotropicMode ANSO = AnisotropicMode::HIGH;
 					bool FlipY = true;
 					bool MipMap = true;
 
@@ -227,7 +227,7 @@ namespace Vxl
 						break;
 					}
 
-					Texture::Load(Name, filePath, FlipY, MipMap, WM, Filter, Format_Type::RGBA8, Channel_Type::RGBA, Pixel_Type::UNSIGNED_BYTE, ANSO);
+					Texture::Load(Name, filePath, FlipY, MipMap, WM, Filter, TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, ANSO);
 				}
 				/* CUBEMAP */
 				else if (_state == LoadState::CUBEMAP && SegmentCount == 7)

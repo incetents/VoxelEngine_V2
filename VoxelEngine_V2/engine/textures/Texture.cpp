@@ -4,7 +4,7 @@
 
 #include "../rendering/Graphics.h"
 
-#include "../rendering/glUtil.h"
+#include "../rendering/Graphics.h"
 #include "../utilities/logger.h"
 #include "../utilities/stringUtil.h"
 #include "../math/Color.h"
@@ -19,14 +19,14 @@ namespace Vxl
 		const std::string& filePath,
 		bool			InvertY,
 		bool			UseMipMapping,
-		Wrap_Mode		WrapMode,
-		Filter_Mode		FilterMode,
-		Format_Type		FormatType,
-		Channel_Type	ChannelType,
-		Pixel_Type		PixelType,
-		Anisotropic_Mode  AnisotropicMode
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		//TextureChannelType	ChannelType,
+		TexturePixelType		PixelType,
+		AnisotropicMode  AnisotropicMode
 	)
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::NONE, PixelType, AnisotropicMode, UseMipMapping)
 	{
 		m_image = SOIL_load_image(filePath.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 
@@ -38,7 +38,7 @@ namespace Vxl
 		}
 
 		// Get Correct channel data
-		m_channelType = glUtil::getChannelType(m_channelCount);
+		m_channelType = Graphics::GetChannelType(m_channelCount);
 
 		// Invert Y
 		if (InvertY)
@@ -61,14 +61,14 @@ namespace Vxl
 		const std::string& name,
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
-		Wrap_Mode		WrapMode,
-		Filter_Mode		FilterMode,
-		Format_Type		FormatType,
-		Channel_Type	ChannelType,
-		Pixel_Type		PixelType,
-		Anisotropic_Mode  AnisotropicMode
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		TextureChannelType	ChannelType,
+		TexturePixelType	PixelType,
+		AnisotropicMode		AnisotropicMode
 	) 
-		: BaseTexture(Texture_Type::TEX_2D, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
 	{
 
 		UINT pixelsCount = (UINT)pixels.size();
@@ -90,7 +90,8 @@ namespace Vxl
 		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
 
 		// Storage
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // helps prevent textures smaller than 4x4 not get corrupted
+		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // helps prevent textures smaller than 4x4 not get corrupted
 		updateStorage(&m_image[0]);
 		updateMipmapping();
 
@@ -107,14 +108,14 @@ namespace Vxl
 		const std::string& filePath,
 		bool			InvertY,
 		bool			UseMipMapping,
-		Wrap_Mode		WrapMode,
-		Filter_Mode		FilterMode,
-		Format_Type		FormatType,
-		Channel_Type	ChannelType,
-		Pixel_Type		PixelType,
-		Anisotropic_Mode  AnisotropicMode
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		//TextureChannelType	ChannelType,
+		TexturePixelType	PixelType,
+		AnisotropicMode		AnisotropicMode
 	) {
-		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
+		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType, AnisotropicMode);
 
 		AddToDatabase(name, _texture);
 
@@ -132,12 +133,12 @@ namespace Vxl
 		const std::string& name,
 		std::vector<Color3F> pixels, UINT width,
 		bool			UseMipMapping,
-		Wrap_Mode		WrapMode,
-		Filter_Mode		FilterMode,
-		Format_Type		FormatType,
-		Channel_Type	ChannelType,
-		Pixel_Type		PixelType,
-		Anisotropic_Mode  AnisotropicMode
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		TextureChannelType	ChannelType,
+		TexturePixelType	PixelType,
+		AnisotropicMode		AnisotropicMode
 	) {
 		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
