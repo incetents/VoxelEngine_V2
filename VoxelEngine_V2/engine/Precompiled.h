@@ -41,10 +41,9 @@
 #include "modules/Scene.h"
 
 #include "rendering/Debug.h"
-#include "rendering/Enums.h"
 #include "rendering/FramebufferObject.h"
 #include "rendering/Geometry.h"
-#include "rendering/glUtil.h"
+#include "rendering/Graphics.h"
 #include "rendering/Mesh.h"
 #include "rendering/Shader.h"
 #include "rendering/UBO.h"

@@ -2,7 +2,6 @@
 #include "Precompiled.h"
 #include "Entity.h"
 
-#include "../rendering/glUtil.h"
 #include "../rendering/Mesh.h"
 #include "../modules/RenderManager.h"
 #include "../utilities/Time.h"

@@ -39,7 +39,7 @@ namespace Vxl
 		//Camera* _camera;
 		CameraObject* _cameraObject;
 
-		FramebufferObject* _fbo;
+		FramebufferObject* _fbo_gbuffer;
 		FramebufferObject* _fbo_editor;
 		FramebufferObject* _fbo_colorpicker;
 

@@ -3,7 +3,6 @@
 
 #include "MeshBuffer.h"
 #include "VBO.h"
-//#include "glUtil.h"
 #include "Graphics.h"
 
 #include "../utilities/Asset.h"

@@ -1,8 +1,15 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+﻿// Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Graphics.h"
 
 #include <GL/gl3w.h>
+
+#include "FramebufferObject.h"
+#include "Shader.h"
+#include "RenderBuffer.h"
+
+#include "../textures/Texture.h"
+#include "../textures/RenderTexture.h"
 
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
@@ -15,12 +22,13 @@
 #include "../math/Matrix4x4.h"
 #include "../math/Color.h"
 
-#include "Shader.h"
-
 #include <algorithm>
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
+
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
 namespace Vxl
 {
@@ -29,11 +37,20 @@ namespace Vxl
 	int Graphics::GLVersionMinor = -1;
 	int Graphics::GLObjectNameMaxLength = -1;
 	float Graphics::GLMaxAnisotropy = -1;
+	int Graphics::GLMaxFBOColorAttachments = -1;
+	int Graphics::GLMaxUniformBindings = -1;
 
 	std::string Graphics::Gpu_Renderer;
 	std::string Graphics::Gpu_OpenGLVersion;
 	std::string Graphics::Gpu_Vendor;
-	glVendorType Graphics::Vendor = glVendorType::UNKNOWN;
+	VendorType Graphics::Vendor = VendorType::UNKNOWN;
+
+	int Graphics::VRAM_Maximum_KB = -1;
+	int Graphics::VRAM_Current_KB = -1;
+
+	bool Graphics::UsingErrorCallback = false;
+
+	
 
 	// Tracking Data //
 	CullMode			gl_cullmode = CullMode::NONE;
@@ -50,6 +67,7 @@ namespace Vxl
 	TextureID			gl_activeTextureId = 0;
 	TextureLevel		gl_activeTextureLayer = TextureLevel::NONE;
 	FramebufferObjectID gl_activeFBO = 0;
+	float				gl_lineWidth = 1.0f;
 
 	// ~ Graphics Enums ~ //
 	const int GL_ObjectType[] =
@@ -340,6 +358,119 @@ namespace Vxl
 		GL_COLOR_ATTACHMENT12, GL_COLOR_ATTACHMENT13,
 		GL_COLOR_ATTACHMENT14, GL_COLOR_ATTACHMENT15
 	};
+	const int GL_QueryType[] =
+	{
+		GL_SAMPLES_PASSED,
+		GL_ANY_SAMPLES_PASSED,
+		GL_ANY_SAMPLES_PASSED_CONSERVATIVE,
+		GL_PRIMITIVES_GENERATED,
+		GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
+		GL_TIME_ELAPSED
+	};
+
+	// Error Message
+	void CALLBACK OpenGLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data)
+	{
+		char buffer[9] = { '\0' };
+		sprintf_s(buffer, "%.8x", id);
+
+		std::string message("OpenGL(0x");
+		message += buffer;
+		message += "): ";
+
+		switch (type)
+		{
+		case GL_DEBUG_TYPE_ERROR:
+			message += "Error";
+			break;
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+			message += "Deprecated behavior";
+			break;
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+			message += "Undefined behavior";
+			break;
+		case GL_DEBUG_TYPE_PORTABILITY:
+			message += "Portability issue";
+			break;
+		case GL_DEBUG_TYPE_PERFORMANCE:
+			message += "Performance issue";
+			break;
+		case GL_DEBUG_TYPE_MARKER:
+			message += "Stream annotation";
+			break;
+		case GL_DEBUG_TYPE_OTHER_ARB:
+			message += "Other";
+			break;
+		}
+
+		message += " \nSource: ";
+		switch (source)
+		{
+		case GL_DEBUG_SOURCE_API:
+			message += "API";
+			break;
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+			message += "Window system";
+			break;
+		case GL_DEBUG_SOURCE_SHADER_COMPILER:
+			message += "Shader compiler";
+			break;
+		case GL_DEBUG_SOURCE_THIRD_PARTY:
+			message += "Third party";
+			break;
+		case GL_DEBUG_SOURCE_APPLICATION:
+			message += "Application";
+			break;
+		case GL_DEBUG_SOURCE_OTHER:
+			message += "Other";
+		}
+
+		message += " \nSeverity: ";
+		switch (severity)
+		{
+		case GL_DEBUG_SEVERITY_HIGH:
+			message += "HIGH";
+			break;
+		case GL_DEBUG_SEVERITY_MEDIUM:
+			message += "Medium";
+			break;
+		case GL_DEBUG_SEVERITY_LOW:
+			message += "Low";
+			break;
+		case GL_DEBUG_SEVERITY_NOTIFICATION:
+			message += "Notification";
+		}
+
+		message += " \n";
+		message += msg;
+		message += " \n";
+
+		if (type == GL_DEBUG_TYPE_ERROR || severity == GL_DEBUG_SEVERITY_HIGH)
+		{
+			Logger.error(message);
+			std::system("PAUSE");
+		}
+		else
+		{
+			// For some reason it hates how im storing my VBOs/EBOs
+			//Logger.log(message);
+		}
+	}
+	void Graphics::InitOpenGLDebugCallback(void)
+	{
+		// Debug CallBack
+#if defined(GLOBAL_ERROR_CALLBACK) && !defined(GLOBAL_USE_GLNAMES)
+		//GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		//if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+		{
+			UsingErrorCallback = true;
+			glEnable(GL_DEBUG_OUTPUT);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			glDebugMessageCallback(OpenGLDebugCallback, stderr);
+			//	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, 0, GL_FALSE);
+		}
+#endif
+	}
 
 	// ~ Setup ~ //
 	bool Graphics::Setup()
@@ -365,8 +496,6 @@ namespace Vxl
 		}
 
 		// Acquire GPU info
-		auto test = glGetString(GL_RENDERER);
-
 		Gpu_Renderer = std::string((reinterpret_cast<char const*>(glGetString(GL_RENDERER))));
 		Gpu_OpenGLVersion = std::string((reinterpret_cast<char const*>(glGetString(GL_VERSION))));
 		Gpu_Vendor = std::string((reinterpret_cast<char const*>(glGetString(GL_VENDOR))));
@@ -375,14 +504,23 @@ namespace Vxl
 		std::string VendorStr = Gpu_Vendor;
 		std::transform(VendorStr.begin(), VendorStr.end(), VendorStr.begin(), ::tolower);
 		if (VendorStr.find("nvidia") != -1)
-			Vendor = glVendorType::NVIDIA;
+			Vendor = VendorType::NVIDIA;
 		else if (VendorStr.find("ati") != -1 || VendorStr.find("radeon") != -1)
-			Vendor = glVendorType::AMD;
+			Vendor = VendorType::AMD;
 		else if (VendorStr.find("intel") != -1)
-			Vendor = glVendorType::INTEL;
+			Vendor = VendorType::INTEL;
 
 		// Acquire Restrictions
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &GLMaxAnisotropy);
+		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &GLMaxFBOColorAttachments);
+		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &GLMaxUniformBindings);
+
+		// VRAM MAximum
+		if (Vendor == VendorType::NVIDIA)
+		{
+			glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &VRAM_Maximum_KB);
+			glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &VRAM_Current_KB);
+		}
 
 		// All good
 		return true;
@@ -402,6 +540,7 @@ namespace Vxl
 		gl_seamlessCubemaps = false;
 		for (int i = 0; i < 4; i++)
 			gl_viewport[i] = -1;
+		gl_lineWidth = 1.0f;
 
 		gl_activeTextureId = 0;
 		gl_activeTextureLayer = TextureLevel::NONE;
@@ -421,6 +560,38 @@ namespace Vxl
 		SetSeamlessCubemap(true);
 	}
 
+	// Check if string name matches GL type
+	bool Graphics::VeryifyDataType(const std::string& name, uint32_t type)
+	{
+		// Bool
+		if (name.compare("bool") == 0 && type == GL_BOOL)
+			return true;
+		// Float
+		if (name.compare("float") == 0 && type == GL_FLOAT)
+			return true;
+		// Vec2
+		if (name.compare("class Vxl::Vector2") == 0 && type == GL_FLOAT_VEC2)
+			return true;
+		// Vec3 - Color3F
+		if ((name.compare("class Vxl::Vector3") == 0 || name.compare("class Vxl::Color3F") == 0) && type == GL_FLOAT_VEC3)
+			return true;
+		// Vec4
+		if ((name.compare("class Vxl::Vector4") == 0 || name.compare("class Vxl::Color4F") == 0) && type == GL_FLOAT_VEC4)
+			return true;
+		// Mat2
+		if (name.compare("class Vxl::Matrix2x2") == 0 && type == GL_FLOAT_MAT2)
+			return true;
+		// Mat3
+		if (name.compare("class Vxl::Matrix3x3") == 0 && type == GL_FLOAT_MAT3)
+			return true;
+		// Mat4
+		if (name.compare("class Vxl::Matrix4x4") == 0 && type == GL_FLOAT_MAT4)
+			return true;
+
+		return false;
+	}
+
+	
 	// ~ GPU Name ~ //
 	void Graphics::SetGLName(ObjectType identifier, uint32_t id, const std::string &label)
 	{
@@ -561,6 +732,17 @@ namespace Vxl
 		gl_viewport[1] = y;
 		gl_viewport[2] = w;
 		gl_viewport[3] = h;
+	}
+
+	// ~ LineWidth ~ //
+	void Graphics::SetLineWidth(float w)
+	{
+		// No chnage to float
+		if (fabs(gl_lineWidth - w) < FLT_EPSILON)
+			return;
+
+		glLineWidth(w);
+		gl_lineWidth = w;
 	}
 
 	// ~ Clear Buffer [Setup] ~ //
@@ -1634,6 +1816,7 @@ namespace Vxl
 		glPixelStorei(GL_UNPACK_ALIGNMENT, (int)align);
 	}
 
+	// ~ Renderbuffer ~ //
 	RenderBufferID Graphics::RenderBuffer::Create(void)
 	{
 		RenderBufferID id;
@@ -1662,6 +1845,7 @@ namespace Vxl
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_TextureFormat[(int)format], width, height);
 	}
 
+	// ~ Framebuffer Object ~ //
 	FramebufferObjectID Graphics::FramebufferObject::Create(void)
 	{
 		FramebufferObjectID id;
@@ -1732,5 +1916,159 @@ namespace Vxl
 		return (e == GL_FRAMEBUFFER_COMPLETE) ? true : false;
 	}
 
-	
+	void Graphics::FramebufferObject::AttachRenderTexture(const Vxl::RenderTexture& texture, uint32_t attachmentIndex)
+	{
+		VXL_ASSERT(attachmentIndex < (uint32_t)GLMaxFBOColorAttachments, "attachmentIndex too high for AttachRenderTexture()");
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, texture.GetID(), 0);
+	}
+	void Graphics::FramebufferObject::AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture)
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.GetID(), 0);
+	}
+	void Graphics::FramebufferObject::AttachRenderBuffer(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex)
+	{
+		VXL_ASSERT(attachmentIndex < (uint32_t)GLMaxFBOColorAttachments, "attachmentIndex too high for AttachRenderTexture()");
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_RENDERBUFFER, texture.GetID());
+	}
+	void Graphics::FramebufferObject::AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture)
+	{
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, texture.GetID());
+	}
+
+	RawArray<uint8_t> Graphics::FramebufferObject::ReadPixels(const Vxl::FramebufferAttachment& texture, uint32_t attachmentIndex, int x, int y, int w, int h)
+	{
+		if(attachmentIndex != -1)
+			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+
+		RawArray<uint8_t> Array;
+		Array.start = new GLubyte[w * h * texture.GetChannelCount()];
+		glReadPixels(
+			x, y, w, h,
+			GL_TextureChannelType[(int)texture.GetChannelType()],
+			GL_TexturePixelType[(int)texture.GetPixelType()],
+			Array.start
+		);
+		return Array;
+	}
+	void Graphics::FramebufferObject::BlitColor(FramebufferObjectID source, FramebufferObjectID destination, int width, int height, uint32_t srcAttachment, uint32_t destAttachment)
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destination);
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + srcAttachment);
+
+		// Actually ends up breaking the blit?
+		//	const GLenum bufs[] = { destAttachment };
+		//	glDrawBuffers(1, bufs);
+
+		glBlitFramebuffer(
+			0, 0, width, height,
+			0, 0, width, height,
+			GL_COLOR_BUFFER_BIT,
+			GL_NEAREST
+		);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+		// ? Is this necessary ?
+		glReadBuffer(GL_FRONT);
+	}
+	void Graphics::FramebufferObject::BlitDepth(FramebufferObjectID source, FramebufferObjectID destination, int width, int height)
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destination);
+
+		glBlitFramebuffer(
+			0, 0, width, height,
+			0, 0, width, height,
+			GL_DEPTH_BUFFER_BIT,
+			GL_NEAREST
+		);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	}
+
+	// ~ UBO ~ //
+	UBOID Graphics::UBO::Create(uint32_t slot, uint32_t totalBytes, BufferUsage usage)
+	{
+		UBOID id;
+		glGenBuffers(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenBuffers()");
+
+		// Bind
+		Bind(id);
+
+		// Allocate size
+		glBufferData(GL_UNIFORM_BUFFER, totalBytes, NULL, GL_BufferUsage[(int)usage]);
+
+		// Set to slot
+		glBindBufferBase(GL_UNIFORM_BUFFER, slot, id);
+
+		return id;
+	}
+	void Graphics::UBO::Delete(UBOID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteBuffers()");
+
+		glDeleteBuffers(1, &id);
+	}
+	void Graphics::UBO::Bind(UBOID id)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, id);
+	}
+	void Graphics::UBO::Unbind(void)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+	void Graphics::UBO::UpdateBuffer(void* buffer, uint32_t totalBytes, uint32_t offset)
+	{
+		glBufferSubData(GL_UNIFORM_BUFFER, offset, totalBytes, buffer);
+	}
+
+	// ~ Queries ~ //
+	QueryID Graphics::Query::Create(void)
+	{
+		QueryID id;
+		glGenQueries(1, &id);
+
+		VXL_ASSERT(id != -1, "GL ERROR: glGenQueries()");
+
+		return id;
+	}
+	void Graphics::Query::Delete(QueryID id)
+	{
+		VXL_ASSERT(id != -1, "GL ERROR: glDeleteQueries()");
+
+		glDeleteQueries(1, &id);
+	}
+
+	std::map<Graphics::Query::Type, bool> gl_QueryStatus;
+
+	void Graphics::Query::Start(QueryID id, Type type)
+	{
+		VXL_ASSERT(!gl_QueryStatus[type], "GL ERROR: Query is already Active, glBeginQuery()");
+
+		glBeginQuery(GL_QueryType[(int)type], id);
+		gl_QueryStatus[type] = true;
+	}
+	void Graphics::Query::End(Type type)
+	{
+		VXL_ASSERT(gl_QueryStatus[type], "GL ERROR: Query isn't Active, glEndQuery()");
+
+		glEndQuery(GL_QueryType[(int)type]);
+		gl_QueryStatus[type] = false;
+	}
+	bool Graphics::Query::CheckFinished(QueryID id)
+	{
+		int ready = 0;
+		glGetQueryObjectiv(id, GL_QUERY_RESULT_AVAILABLE, &ready);
+		return ready > 0;
+	}
+	uint64_t Graphics::Query::GetResult(QueryID id)
+	{
+		uint64_t result;
+		glGetQueryObjectui64v(id, GL_QUERY_RESULT, &result);
+		return result;
+	}
 }

@@ -1,9 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include <Windows.h>
-
-#include "glUtil.h"
 #include "Graphics.h"
 
 #include "../math/Color.h"
@@ -12,8 +9,8 @@
 #include "../utilities/Containers.h"
 #include "../utilities/Macros.h"
 
-//#include "Texture.h"
 #include <vector>
+#include <Windows.h>
 
 namespace Vxl
 {
@@ -28,62 +25,64 @@ namespace Vxl
 		TEXTURE
 	};
 
+	class FramebufferAttachment
+	{
+		Attachment_Type	m_type;
+		bool			m_empty = true;
+	public:
+		FramebufferAttachment(
+			const std::string& name,
+			Attachment_Type type,
+			TextureFormat formatType,
+			TextureChannelType channelType,
+			TexturePixelType pixelType
+		)
+			: m_name(name), m_type(type), m_formatType(formatType), m_channelType(channelType), m_pixelType(pixelType)
+		{}
+		~FramebufferAttachment()
+		{
+			unload();
+		}
+
+		const std::string	m_name;
+		const TextureFormat	m_formatType;
+		const TextureChannelType	m_channelType;
+		const TexturePixelType	m_pixelType;
+
+		// Attachment can only be one type
+		union
+		{
+			RenderTexture* m_renderTexture;
+			RenderBuffer* m_renderBuffer;
+		};
+
+		void load(int Width, int Height);
+		void unload();
+
+		inline bool isRenderTexture(void) const
+		{
+			return m_type == Attachment_Type::TEXTURE;
+		}
+		inline bool isRenderBuffer(void) const
+		{
+			return m_type == Attachment_Type::BUFFER;
+		}
+
+		uint32_t			GetID(void) const;
+		TextureFormat		GetFormatType(void) const;
+		TextureChannelType	GetChannelType(void) const;
+		TexturePixelType	GetPixelType(void) const;
+		int					GetChannelCount(void) const;
+
+		void Bind();
+		void Unbind();
+	};
+
 	class FramebufferObject : public Asset<FramebufferObject>
 	{
 		friend class RenderManager;
 	private:
-		class Attachment
-		{
-			Attachment_Type	m_type;
-			bool			m_empty = true;
-		public:
-			Attachment(
-				const std::string& name,
-				Attachment_Type type,
-				TextureFormat formatType,
-				TextureChannelType channelType,
-				TexturePixelType pixelType
-			)
-				: m_name(name), m_type(type), m_formatType(formatType), m_channelType(channelType), m_pixelType(pixelType)
-			{}
-			~Attachment()
-			{
-				unload();
-			}
-
-			const std::string	m_name;
-			const TextureFormat	m_formatType;
-			const TextureChannelType	m_channelType;
-			const TexturePixelType	m_pixelType;
-
-			// Attachment can only be one type
-			union
-			{
-				RenderTexture* m_texture;
-				RenderBuffer* m_buffer;
-			};
-
-			void load(int Width, int Height);
-			void unload();
-
-			inline bool isRenderTexture(void) const
-			{
-				return m_type == Attachment_Type::TEXTURE;
-			}
-			inline bool isRenderBuffer(void) const
-			{
-				return m_type == Attachment_Type::BUFFER;
-			}
-
-			GLuint			GetID(void) const;
-			TextureFormat		GetFormatType(void) const;
-			TextureChannelType	GetChannelType(void) const;
-			TexturePixelType		GetPixelType(void) const;
-			int				GetChannelCount(void) const;
-
-			void Bind();
-			void Unbind();
-		};
+		
 
 		enum class ClearMode
 		{
@@ -100,13 +99,13 @@ namespace Vxl
 		FramebufferObjectID	m_id = -1;
 		Color4F				m_clearColor = Color4F(0,0,0,0);
 		ClearMode			m_clearMode = ClearMode::COLOR;
-		UINT				m_width = 0;
-		UINT				m_height = 0;
+		uint32_t			m_width = 0;
+		uint32_t			m_height = 0;
 		bool				m_fullscreen = false; // Width/Height will attempt to match screen's resolution
 		// Attachments
-		std::vector<Attachment*>	m_textures;
-		GLuint						m_textureCount = 0;
-		Attachment*					m_depth = nullptr;
+		std::vector<FramebufferAttachment*>	m_textures;
+		uint8_t								m_textureCount = 0;
+		FramebufferAttachment*				m_depth = nullptr;
 		// Tracker //
 		//static GLuint m_boundID;
 
@@ -143,15 +142,15 @@ namespace Vxl
 		// Size will copy Window's resolution
 		void setSizeToWindowSize();
 
-		inline GLuint GetID(void) const
+		inline uint32_t GetID(void) const
 		{
 			return m_id;
 		}
-		inline GLuint GetWidth(void) const
+		inline uint32_t GetWidth(void) const
 		{
 			return m_width;
 		}
-		inline GLuint GetHeight(void) const
+		inline uint32_t GetHeight(void) const
 		{
 			return m_height;
 		}
@@ -171,20 +170,21 @@ namespace Vxl
 		);
 
 		void bind();
-		void bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH);
+		void bind(uint32_t viewportX, uint32_t viewportY, uint32_t viewportW, uint32_t viewportH);
 		static void unbind();
 
 		void bindTexture(uint32_t index, TextureLevel layer);
 		void bindDepth(TextureLevel layer);
 
-		void blitDepth(const FramebufferObject& fbo);
+		void blitColor(const FramebufferObject& destFBO, uint32_t srcAttachment, uint32_t destAttachment);
+		void blitDepth(const FramebufferObject& destFBO);
 
 		void generateMipmaps(unsigned int textureIndex);
 
-		RawArray<GLubyte> readPixels(u_int textureIndex, int x, int y, int w, int h);
-		RawArray<GLubyte> readPixelsFromMouse(u_int textureIndex, int w, int h);
+		RawArray<uint8_t> readPixels(uint32_t textureIndex, int x, int y, int w, int h);
+		RawArray<uint8_t> readPixelsFromMouse(uint32_t textureIndex, int w, int h);
 
-		RawArray<GLubyte> readDepthPixels(int x, int y, int w, int h);
-		RawArray<GLubyte> readDepthPixelsFromMouse(int w, int h);
+		RawArray<uint8_t> readDepthPixels(int x, int y, int w, int h);
+		RawArray<uint8_t> readDepthPixelsFromMouse(int w, int h);
 	};
 }

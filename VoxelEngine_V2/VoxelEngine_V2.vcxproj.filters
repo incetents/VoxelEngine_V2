@@ -195,9 +195,6 @@
     <ClCompile Include="engine\rendering\Geometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\rendering\glUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\rendering\LineMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -422,16 +419,10 @@
     <ClInclude Include="engine\rendering\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\rendering\Enums.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\rendering\FramebufferObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\rendering\Geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\rendering\glUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\rendering\LineMesh.h">

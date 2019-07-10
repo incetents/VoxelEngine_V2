@@ -7,8 +7,6 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
-#include "../rendering/glUtil.h"
-
 #include "../utilities/Time.h"
 #include "../utilities/Util.h"
 
@@ -45,10 +43,10 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		std::string m1 = "GPU TOTAL: " + std::to_string(glUtil::GetGPUMem_TotalKB() / 1000) + " [MB]";
+		std::string m1 = "GPU TOTAL: " + std::to_string(Graphics::VRAM_Maximum_KB / 1000) + " [MB]";
 		ImGui::Text(m1.c_str());
 
-		std::string m2 = "GPU Current: " + std::to_string(glUtil::GetGPUMem_CurrentKB() / 1000) + " [MB]";
+		std::string m2 = "GPU Current: " + std::to_string(Graphics::VRAM_Current_KB / 1000) + " [MB]";
 		ImGui::Text(m2.c_str());
 
 		ImGui::Separator();

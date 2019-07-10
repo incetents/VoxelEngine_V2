@@ -4,7 +4,6 @@
 
 #include "../rendering/Graphics.h"
 
-#include "../rendering/glUtil.h"
 #include "../utilities/stringUtil.h"
 
 #include <SOIL/SOIL.h>
@@ -35,7 +34,7 @@ namespace Vxl
 		m_image[4] = SOIL_load_image(filePath5.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 		m_image[5] = SOIL_load_image(filePath6.c_str(), &m_width, &m_height, &m_channelCount, SOIL_LOAD_AUTO);
 
-		for (GLuint i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			if (!m_image[i])
 				return;
@@ -46,7 +45,7 @@ namespace Vxl
 		m_channelType = Graphics::GetChannelType(m_channelCount);
 
 		// Storage
-		for (GLuint i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			updateTexImageCubemap(i, m_image[i]);
 		}
@@ -62,7 +61,7 @@ namespace Vxl
 	}
 	Cubemap::~Cubemap()
 	{
-		for (GLuint i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 			delete[] m_image[i];
 	}
 

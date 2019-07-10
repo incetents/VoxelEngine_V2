@@ -2,7 +2,6 @@
 // Referenced from: https://github.com/TheCherno/Hazel/blob/master/Hazel/src/Hazel/Renderer/Buffer.h
 #pragma once
 
-//#include "glUtil.h"
 #include "Graphics.h"
 
 #include <vector>

@@ -14,87 +14,87 @@ namespace Vxl
 {
 	//GLuint FramebufferObject::m_boundID = 0;
 
-	void FramebufferObject::Attachment::load(int Width, int Height)
+	void FramebufferAttachment::load(int Width, int Height)
 	{
 		unload();
 
 		if (m_type == Attachment_Type::TEXTURE)
 		{
-			m_texture = new RenderTexture(Width, Height, m_formatType, m_channelType, m_pixelType);
-			Graphics::SetGLName(ObjectType::TEXTURE, m_texture->GetID(), "FBO_" + m_name + "_Tex_" + m_name);
+			m_renderTexture = new RenderTexture(Width, Height, m_formatType, m_channelType, m_pixelType);
+			Graphics::SetGLName(ObjectType::TEXTURE, m_renderTexture->GetID(), "FBO_" + m_name + "_Tex_" + m_name);
 		}
 		else
 		{
-			m_buffer = new RenderBuffer(Width, Height, m_formatType, m_channelType, m_pixelType);
-			Graphics::SetGLName(ObjectType::TEXTURE, m_buffer->GetID(), "FBO_" + m_name + "_RenderBuf_" + m_name);
+			m_renderBuffer = new RenderBuffer(Width, Height, m_formatType, m_channelType, m_pixelType);
+			Graphics::SetGLName(ObjectType::TEXTURE, m_renderBuffer->GetID(), "FBO_" + m_name + "_RenderBuf_" + m_name);
 		}
 
 
 		m_empty = false;
 	}
 
-	void FramebufferObject::Attachment::unload()
+	void FramebufferAttachment::unload()
 	{
 		if (!m_empty)
 		{
 			if (m_type == Attachment_Type::BUFFER)
-				delete m_buffer;
+				delete m_renderBuffer;
 			else if (m_type == Attachment_Type::TEXTURE)
-				delete m_texture;
+				delete m_renderTexture;
 
 			m_empty = true;
 		}
 	}
 
-	GLuint FramebufferObject::Attachment::GetID(void) const
+	uint32_t FramebufferAttachment::GetID(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
-			return m_buffer->GetID();
+			return m_renderBuffer->GetID();
 
-		return m_texture->GetID();
+		return m_renderTexture->GetID();
 	}
-	TextureFormat	FramebufferObject::Attachment::GetFormatType(void) const
+	TextureFormat	FramebufferAttachment::GetFormatType(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
-			return m_buffer->GetFormatType();
+			return m_renderBuffer->GetFormatType();
 
-		return m_texture->GetFormatType();
+		return m_renderTexture->GetFormatType();
 	}
-	TextureChannelType FramebufferObject::Attachment::GetChannelType(void) const
+	TextureChannelType FramebufferAttachment::GetChannelType(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
-			return m_buffer->GetChannelType();
+			return m_renderBuffer->GetChannelType();
 
-		return m_texture->GetChannelType();
+		return m_renderTexture->GetChannelType();
 	}
-	TexturePixelType FramebufferObject::Attachment::GetPixelType(void) const
+	TexturePixelType FramebufferAttachment::GetPixelType(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
-			return m_buffer->GetPixelType();
+			return m_renderBuffer->GetPixelType();
 
-		return m_texture->GetPixelType();
+		return m_renderTexture->GetPixelType();
 	}
-	int FramebufferObject::Attachment::GetChannelCount(void) const
+	int FramebufferAttachment::GetChannelCount(void) const
 	{
 		if (m_type == Attachment_Type::BUFFER)
-			return m_buffer->GetChannelCount();
+			return m_renderBuffer->GetChannelCount();
 
-		return m_texture->GetChannelCount();
+		return m_renderTexture->GetChannelCount();
 	}
 
-	void FramebufferObject::Attachment::Bind()
+	void FramebufferAttachment::Bind()
 	{
 		if (m_type == Attachment_Type::BUFFER)
-			m_buffer->Bind();
+			m_renderBuffer->Bind();
 		else
-			m_texture->Bind();
+			m_renderTexture->Bind();
 	}
-	void FramebufferObject::Attachment::Unbind()
+	void FramebufferAttachment::Unbind()
 	{
 		if (m_type == Attachment_Type::BUFFER)
-			m_buffer->Unbind();
+			m_renderBuffer->Unbind();
 		else
-			m_texture->Unbind();
+			m_renderTexture->Unbind();
 	}
 
 	FramebufferObject::FramebufferObject(const std::string& name)
@@ -140,9 +140,9 @@ namespace Vxl
 			m_textures[i]->load(m_width, m_height);
 
 			if (m_textures[i]->isRenderTexture())
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i]->GetID(), 0);
+				Graphics::FramebufferObject::AttachRenderTexture(*m_textures[i]->m_renderTexture, i);
 			else
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_RENDERBUFFER, m_textures[i]->GetID());
+				Graphics::FramebufferObject::AttachRenderBuffer(*m_textures[i]->m_renderBuffer, i);
 		}
 
 		// Depth attachment
@@ -150,9 +150,9 @@ namespace Vxl
 		{
 			m_depth->load(m_width, m_height);
 			if (m_depth->isRenderTexture())
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->GetID(), 0);
+				Graphics::FramebufferObject::AttachRenderTextureAsDepth(*m_depth->m_renderTexture);
 			else
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth->GetID());
+				Graphics::FramebufferObject::AttachRenderBufferAsDepth(*m_depth->m_renderBuffer);
 		}
 
 		// Final Check
@@ -174,41 +174,6 @@ namespace Vxl
 			m_depth->unload();
 		}
 	}
-
-	//	bool FramebufferObject::checkFBOStatus()
-	//	{
-	//		// Check if FBO was Created Correctly
-	//		GLenum e = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-	//		switch (e) {
-	//	
-	//		case GL_FRAMEBUFFER_UNDEFINED:
-	//			Logger.error("FBO Undefined\n");
-	//			break;
-	//		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-	//			Logger.error("FBO Incomplete Attachment\n");
-	//			break;
-	//		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-	//			Logger.error("FBO Missing Attachment\n");
-	//			break;
-	//		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-	//			Logger.error("FBO Incomplete Draw Buffer\n");
-	//			break;
-	//		case GL_FRAMEBUFFER_UNSUPPORTED:
-	//			Logger.error("FBO Unsupported\n");
-	//			break;
-	//		case GL_FRAMEBUFFER_COMPLETE:
-	//			//FBO is OK
-	//			break;
-	//	
-	//		default:
-	//			//Unknown FBO
-	//			Logger.error("FBO Error, Unknown: " + std::to_string(e));
-	//			break;
-	//		}
-	//	
-	//		// Return true if framebuffer complete
-	//		return (e == GL_FRAMEBUFFER_COMPLETE) ? true : false;
-	//	}
 
 	void FramebufferObject::bindFBO()
 	{
@@ -262,10 +227,10 @@ namespace Vxl
 		Attachment_Type fboRenderType
 	)
 	{
-		VXL_ASSERT(m_textureCount < (GLuint)glUtil::GetMaxFBOColorAttachments(), "FBO, too many color attachments");
+		VXL_ASSERT(m_textureCount < (uint32_t)Graphics::GLMaxFBOColorAttachments, "FBO, too many color attachments");
 		
 		// Create new render texture
-		m_textures.push_back(new Attachment(name, fboRenderType, FormatType, TextureChannelType::RGBA, TexturePixelType::UNSIGNED_BYTE));
+		m_textures.push_back(new FramebufferAttachment(name, fboRenderType, FormatType, TextureChannelType::RGBA, TexturePixelType::UNSIGNED_BYTE));
 		m_textureCount++;
 	}
 	void FramebufferObject::addDepth(TextureDepthFormat depthFormatType, Attachment_Type fboRenderType)
@@ -284,7 +249,7 @@ namespace Vxl
 		TextureChannelType ChannelType;
 		Graphics::GetPixelChannelData(depthFormatType, ChannelType, PixelType);
 
-		m_depth = new Attachment("depth", fboRenderType, Graphics::GetFormat(depthFormatType), ChannelType, PixelType);
+		m_depth = new FramebufferAttachment("depth", fboRenderType, Graphics::GetFormat(depthFormatType), ChannelType, PixelType);
 	}
 
 	void FramebufferObject::bind()
@@ -293,7 +258,7 @@ namespace Vxl
 
 		Graphics::SetViewport(0, 0, m_width, m_height);
 	}
-	void FramebufferObject::bind(UINT viewportX, UINT viewportY, UINT viewportW, UINT viewportH)
+	void FramebufferObject::bind(uint32_t viewportX, uint32_t viewportY, uint32_t viewportW, uint32_t viewportH)
 	{
 		bindFBO();
 
@@ -302,8 +267,6 @@ namespace Vxl
 	void FramebufferObject::unbind()
 	{
 		Graphics::FramebufferObject::Unbind();
-
-		//m_boundID = 0;
 	}
 
 	void FramebufferObject::bindTexture(uint32_t index, TextureLevel layer)
@@ -321,25 +284,30 @@ namespace Vxl
 		Graphics::Texture::SetActiveLevel(layer);
 		m_depth->Bind();
 	}
-
-	void FramebufferObject::blitDepth(const FramebufferObject& fbo)
+	
+	void FramebufferObject::blitColor(const FramebufferObject& destFBO, uint32_t srcAttachment, uint32_t destAttachment)
 	{
+		// Both fbos must have attachments
+		VXL_ASSERT(srcAttachment < m_textureCount, "SrcAttachment Not Found for blitColor()");
+		VXL_ASSERT(destAttachment < destFBO.m_textureCount, "SrcAttachment Not Found for blitColor()");
 		// Must have matching formats
-		VXL_ASSERT(m_depth->GetFormatType() == fbo.m_depth->GetFormatType(), "FBO, blitDepth doesn't have matching depth formats");
+		//VXL_ASSERT(m_textures[srcAttachment]->GetFormatType() == destFBO.m_textures[srcAttachment]->GetFormatType(), "FBO, blitColor doesn't have matching formats");
 		// Must have matching sizes
-		VXL_ASSERT(m_width == fbo.m_width && m_height == fbo.m_height, "FBO, blitDepth doesn't have matching sizes");
+		VXL_ASSERT(m_width == destFBO.m_width && m_height == destFBO.m_height, "FBO, blitColor doesn't have matching sizes");
+		
+		Graphics::FramebufferObject::BlitColor(m_id, destFBO.m_id, m_width, m_height, srcAttachment, destAttachment);
+	}
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_id);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo.m_id);
+	void FramebufferObject::blitDepth(const FramebufferObject& destFBO)
+	{
+		// Both fbos must have depth
+		VXL_ASSERT(m_depth != nullptr && destFBO.m_depth != nullptr, "FBO, blitDepth doesn't have depth on both FBO's");
+		// Must have matching formats
+		VXL_ASSERT(m_depth->GetFormatType() == destFBO.m_depth->GetFormatType(), "FBO, blitDepth doesn't have matching depth formats");
+		// Must have matching sizes
+		VXL_ASSERT(m_width == destFBO.m_width && m_height == destFBO.m_height, "FBO, blitDepth doesn't have matching sizes");
 
-		glBlitFramebuffer(
-			0, 0, m_width, m_height,
-			0, 0, fbo.m_width, fbo.m_height,
-			GL_DEPTH_BUFFER_BIT,
-			GL_NEAREST
-		);
-
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		Graphics::FramebufferObject::BlitDepth(m_id, destFBO.m_id, m_width, m_height);
 	}
 
 	// Generates mipmap of current texture
@@ -350,34 +318,21 @@ namespace Vxl
 		VXL_ASSERT(m_textures[textureIndex]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		// Create mipmapping for Fbo Texture
-		m_textures[textureIndex]->m_texture->updateMipmapping();
+		m_textures[textureIndex]->m_renderTexture->updateMipmapping();
 	}
 
 	// Notice, SNORM TEXTURES CANNOT BE READ
-	RawArray<GLubyte> FramebufferObject::readPixels(u_int textureIndex, int x, int y, int w, int h)
+	RawArray<uint8_t> FramebufferObject::readPixels(u_int attachmentIndex, int x, int y, int w, int h)
 	{
-		VXL_ASSERT(textureIndex < m_textureCount, "FBO readpixels: index out of bounds");
+		VXL_ASSERT(attachmentIndex < m_textureCount, "FBO readpixels: index out of bounds");
 		
 		// Ignore if x,y coordinates are outside FBO range
 		if (x < 0 || y < 0)
-			return RawArray<GLubyte>();
+			return RawArray<uint8_t>();
 
-		auto Texture = m_textures[textureIndex];
-		
-		RawArray<GLubyte> Array;
-		Array.start = new GLubyte[w * h * Texture->GetChannelCount()];
-
-		glReadBuffer(GL_COLOR_ATTACHMENT0 + textureIndex);
-		glReadPixels(
-			x, y, w, h,
-			(GLenum)Texture->GetChannelType(),
-			(GLenum)Texture->GetPixelType(),
-			Array.start
-		);
-
-		return Array;
+		return Graphics::FramebufferObject::ReadPixels(*m_textures[attachmentIndex], attachmentIndex, x, y, w, h);
 	}
-	RawArray<GLubyte> FramebufferObject::readPixelsFromMouse(u_int textureIndex, int w, int h)
+	RawArray<uint8_t> FramebufferObject::readPixelsFromMouse(u_int attachmentIndex, int w, int h)
 	{
 		float px, py;
 		px = Input.getMousePosViewportX();  // [0 -> 1] horizontally across viewport
@@ -387,24 +342,14 @@ namespace Vxl
 		px *= m_width;
 		py *= m_height;
 
-		return readPixels(textureIndex, (int)px, (int)py, w, h);
+		return readPixels(attachmentIndex, (int)px, (int)py, w, h);
 	}
 
-	RawArray<GLubyte> FramebufferObject::readDepthPixels(int x, int y, int w, int h)
+	RawArray<uint8_t> FramebufferObject::readDepthPixels(int x, int y, int w, int h)
 	{
-		RawArray<GLubyte> Array;
-		Array.start = new GLubyte[w * h * m_depth->GetChannelCount()];
-
-		glReadPixels(
-			x, y, w, h,
-			(GLenum)m_depth->GetChannelType(),
-			(GLenum)m_depth->GetPixelType(),
-			Array.start
-		);
-
-		return Array;
+		return Graphics::FramebufferObject::ReadPixels(*m_depth, -1, x, y, w, h);
 	}
-	RawArray<GLubyte> FramebufferObject::readDepthPixelsFromMouse(int w, int h)
+	RawArray<uint8_t> FramebufferObject::readDepthPixelsFromMouse(int w, int h)
 	{
 		float px, py;
 		px = Input.getMousePosViewportX();  // [0 -> 1] horizontally across viewport

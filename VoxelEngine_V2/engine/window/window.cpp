@@ -3,7 +3,6 @@
 #include "window.h"
 
 #include "glfwCallbacks.h"
-#include "../rendering/glUtil.h"
 
 #include "../utilities/logger.h"
 #include "../utilities/Macros.h"
@@ -91,21 +90,16 @@ namespace Vxl
 		ImGui::StyleColorsDark();
 #endif
 
-		// Glew/Opengl Init
-		if (!glUtil::initGlew())
-			VXL_ASSERT(false, "Glew failed to initialized");
-		//glUtil::initHints();
-
-		// Graphics [newer]
+		// Graphics Setup
 		if(!Graphics::Setup())
 			VXL_ASSERT(false, "Glew failed to initialized");
 		Graphics::initHints();
 
 		// Get version info
 		Logger.log("~~~~~~~~~~~~~~~~~~");
-		Logger.log("Renderer: " + glInfo.Gpu_Renderer);
-		Logger.log("OpenGL version supported: " + glInfo.Gpu_OpenGLVersion);
-		Logger.log("Vendor: " + glInfo.Gpu_Vendor);
+		Logger.log("Renderer: " + Graphics::Gpu_Renderer);
+		Logger.log("OpenGL version supported: " + Graphics::Gpu_OpenGLVersion);
+		Logger.log("Vendor: " + Graphics::Gpu_Vendor);
 		Logger.log("~~~~~~~~~~~~~~~~~~");
 
 		// Create first frame empty
@@ -118,7 +112,7 @@ namespace Vxl
 		EndFrame();
 
 		// opengl error callback
-		glUtil::initOpenglErrorCallback();
+		Graphics::InitOpenGLDebugCallback();
 
 		m_setup = true;
 	}

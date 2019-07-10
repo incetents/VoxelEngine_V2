@@ -1,16 +1,16 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../rendering/Enums.h"
+#include "Graphics.h"
 
 namespace Vxl
 {
 	class RenderBuffer
 	{
 	private:
-		GLuint	m_id = -1;
-		int		m_width;
-		int		m_height;
+		uint32_t	m_id = -1;
+		int			m_width;
+		int			m_height;
 		TextureFormat	 m_formatType;
 		TextureChannelType m_channelType;
 		TexturePixelType	 m_pixelType;
@@ -30,7 +30,7 @@ namespace Vxl
 		void Bind(void) const;
 		static void Unbind(void);
 
-		inline GLuint	GetID(void) const
+		inline uint32_t	GetID(void) const
 		{
 			return m_id;
 		}

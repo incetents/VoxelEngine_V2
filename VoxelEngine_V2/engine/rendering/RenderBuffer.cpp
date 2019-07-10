@@ -2,7 +2,6 @@
 #include "Precompiled.h"
 #include "RenderBuffer.h"
 
-#include "../rendering/glUtil.h"
 #include "../rendering/Graphics.h"
 
 namespace Vxl

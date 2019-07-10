@@ -11,7 +11,6 @@
 #include "../rendering/LineMesh.h"
 
 #include "VBO.h"
-#include "glUtil.h"
 
 #include <vector>
 #include <assert.h>

@@ -3,7 +3,6 @@
 #include "BaseTexture.h"
 
 #include "../rendering/Graphics.h"
-#include "../rendering/glUtil.h"
 #include "../utilities/Macros.h"
 
 #include <assert.h>

@@ -51,11 +51,6 @@
 
 #include "../game/terrain/TerrainManager.h"
 
-
-//#define GL_CLAMP_READ_COLOR 0x891C
-
-#include "../engine/rendering/glUtil.h"
-
 namespace Vxl
 {
 	void Scene_Game::Setup()
@@ -85,57 +80,16 @@ namespace Vxl
 		//_camera->update();
 		//_camera->SetMain();
 
-		
-
-		
-
-		int fbo = Graphics::FramebufferObject::Create();
-		Graphics::FramebufferObject::Bind(fbo);
-		//
-		int tex = Graphics::Texture::Create();
-		Graphics::Texture::Bind(TextureType::TEX_2D, tex);
-
-		Graphics::Texture::SetWrapping(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH);
-		Graphics::Texture::SetFiltering(TextureType::TEX_2D, TextureFilter::LINEAR, false);
-
-		Graphics::Texture::SetStorage(TextureType::TEX_2D, 1, TextureFormat::RGBA8, 100, 100);
-		Graphics::Texture::Unbind(TextureType::TEX_2D);
-		//
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
-
-		GLenum e = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-
-		switch (e) {
-
-		case GL_FRAMEBUFFER_UNDEFINED:
-			Logger.error("FBO Undefined");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-			Logger.error("FBO Incomplete Attachment");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-			Logger.error("FBO Missing Attachment");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-			Logger.error("FBO Incomplete Draw Buffer");
-			break;
-		case GL_FRAMEBUFFER_UNSUPPORTED:
-			Logger.error("FBO Unsupported");
-			break;
-		case GL_FRAMEBUFFER_COMPLETE:
-			//FBO is OK
-			break;
-		}
 
 		// FBO
-		_fbo = FramebufferObject::Create("Gbuffer");
-		_fbo->setClearColor(Color4F(-1, -1, 0, 1));
-		_fbo->setSizeToWindowSize();
-		_fbo->addTexture("albedo", TextureFormat::R11F_G11F_B10F);
-		_fbo->addTexture("normal", TextureFormat::RGBA16_SNORM);
-		_fbo->addTexture("test");
-		_fbo->addDepth(TextureDepthFormat::DEPTH16, Attachment_Type::TEXTURE);
-		_fbo->complete();
+		_fbo_gbuffer = FramebufferObject::Create("Gbuffer");
+		_fbo_gbuffer->setClearColor(Color4F(-1, -1, 0, 1));
+		_fbo_gbuffer->setSizeToWindowSize();
+		_fbo_gbuffer->addTexture("albedo", TextureFormat::R11F_G11F_B10F);
+		_fbo_gbuffer->addTexture("normal", TextureFormat::RGBA16_SNORM);
+		_fbo_gbuffer->addTexture("test");
+		_fbo_gbuffer->addDepth(TextureDepthFormat::DEPTH16, Attachment_Type::TEXTURE);
+		_fbo_gbuffer->complete();
 
 		_fbo_editor = FramebufferObject::Create("EditorPost");
 		_fbo_editor->setSizeToWindowSize();
@@ -209,7 +163,7 @@ namespace Vxl
 			Vector2(1,1),
 			Vector2(0,1)
 		};
-		GLuint indices[6] = { 0, 1, 2, 0, 2, 3 };
+		uint32_t indices[6] = { 0, 1, 2, 0, 2, 3 };
 		
 		_mesh->m_positions.set(pos, 4);
 		_mesh->m_uvs.set(uvs, 4);
@@ -590,8 +544,8 @@ namespace Vxl
 
 		//_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT("TESTMODE", 0));
 
-		_fbo->bind();
-		_fbo->clearBuffers();
+		_fbo_gbuffer->bind();
+		_fbo_gbuffer->clearBuffers();
 		//
 		GPUTimer::StartTimer("Gbuffer");
 		CPUTimer::StartTimer("Gbuffer");
@@ -622,7 +576,7 @@ namespace Vxl
 		//
 		GPUTimer::StartTimer("EditorObjects");
 		//
-		_fbo->blitDepth(*_fbo_editor);
+		_fbo_gbuffer->blitDepth(*_fbo_editor);
 		RenderManager.RenderEditorObjects();
 
 		Graphics::ClearBuffer(BufferBit::DEPTH);
@@ -765,7 +719,7 @@ namespace Vxl
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
 
-				RawArray<GLubyte> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
+				RawArray<uint8_t> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
 
 				unsigned int EditorIndex;
 				Util::DataConversion::uchars_to_uint(data.start, EditorIndex);
@@ -870,7 +824,7 @@ namespace Vxl
 					DragSpeed = Editor.GetSelectionTransform().CameraDistance / 3.0f;
 				}
 
-				std::cout << DragSpeed << std::endl;
+				//std::cout << DragSpeed << std::endl;
 
 				VXL_ASSERT(Axis_ScreenDirection.LengthSqr() != 0.0f, "Axis_ScreenDirection is zero");
 
@@ -993,7 +947,7 @@ namespace Vxl
 				}
 
 
-				RawArray<GLubyte> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
+				RawArray<uint8_t> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
 
 				//	std::cout <<
 				//	(unsigned int)data[0] << ' ' <<
@@ -1042,6 +996,8 @@ namespace Vxl
 		
 		// ~~ //
 
+		//_fbo_gbuffer->blitColor(*_fbo_editor, 1, 0);
+
 		// Backbuffer
 		FramebufferObject::unbind();
 		//glDrawBuffer(GL_BACK);
@@ -1067,7 +1023,7 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 3);
 
-				_fbo->bindTexture(0, TextureLevel::LEVEL0);
+				_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
 				_fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
 				break;
 			}
@@ -1077,7 +1033,7 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
 
-				_fbo->bindTexture(0, TextureLevel::LEVEL0);
+				_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Normal
@@ -1086,7 +1042,7 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 1);
 
-				_fbo->bindTexture(1, TextureLevel::LEVEL0);
+				_fbo_gbuffer->bindTexture(1, TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Depth
@@ -1097,7 +1053,7 @@ namespace Vxl
 				_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
 				_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
 
-				_fbo->bindDepth(TextureLevel::LEVEL0);
+				_fbo_gbuffer->bindDepth(TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Editor

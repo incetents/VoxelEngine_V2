@@ -231,15 +231,15 @@ namespace Vxl
 		m_faces.push_back(Vector3i(9, 8, 1));
 
 		// Recursion
-		GLuint faceCount = (GLuint)m_faces.size();
-		GLuint offset = 0;
-		for (GLuint i = 0; i < subdivisions; i++)
+		uint32_t faceCount = (uint32_t)m_faces.size();
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < subdivisions; i++)
 		{
 			std::vector<Vector3> NewPoints;
 			std::vector<Vector3i> NewFaces;
 			Vec3 Tri[3];
 			Vec3 Mid[3];
-			for (GLuint i = 0; i < faceCount; i++)
+			for (uint32_t i = 0; i < faceCount; i++)
 			{
 				Vector3i face = m_faces[i];
 				Tri[0] = m_points[face.x];
@@ -264,7 +264,7 @@ namespace Vxl
 			}
 			m_faces = NewFaces;
 			m_points = NewPoints;
-			faceCount = (GLuint)m_faces.size();
+			faceCount = (uint32_t)m_faces.size();
 		}
 
 		// Find North/South Poles of isocahedron
@@ -290,7 +290,7 @@ namespace Vxl
 		Vec3 Normals[3];
 		Vec2 UVs[3];
 		// Solve for UV
-		for (GLuint i = 0; i < faceCount; i++)
+		for (uint32_t i = 0; i < faceCount; i++)
 		{
 			Tri[0] = m_points[m_faces[i].x];
 			Tri[1] = m_points[m_faces[i].y];
@@ -605,7 +605,7 @@ namespace Vxl
 			Vector3(+1, 0, 0),
 			Vector3(+1, 0, 0),
 		};
-		GLuint indices[] = {
+		uint32_t indices[] = {
 			0, 1, 2, 0, 2, 3,
 			4, 6, 5, 6, 4, 7,
 			9, 8, 10, 10, 8, 11,
@@ -634,7 +634,7 @@ namespace Vxl
 			Vector2(0, 1)
 		};
 
-		GLuint indices[] = { 0, 1, 2, 0, 2, 3 };
+		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
 		Mesh* _mesh = Mesh::Create(MeshName);
 		//
@@ -722,7 +722,7 @@ namespace Vxl
 		//	Vector3(0, 0, +1),
 		//	Vector3(0, 0, +1)
 		//};
-		GLuint indices[] = {0, 1, 2, 0, 2, 3};
+		uint32_t indices[] = {0, 1, 2, 0, 2, 3};
 
 		m_fullQuad = Mesh::Create("FullQuad");
 		//
@@ -750,7 +750,7 @@ namespace Vxl
 		//	Vector3(0, 0, +1),
 		//	Vector3(0, 0, +1)
 		//};
-		GLuint indices[] = { 0, 1, 2 };
+		uint32_t indices[] = { 0, 1, 2 };
 
 		m_fullTriangle = Mesh::Create("FullTriangle");
 		//
@@ -873,7 +873,7 @@ namespace Vxl
 		//		Vector3(+1, 0, 0),
 		//		Vector3(+1, 0, 0),
 		//	};
-		//	GLuint indices[] = {
+		//	uint32_t indices[] = {
 		//		0, 1, 2, 0, 2, 3,
 		//		4, 6, 5, 6, 4, 7,
 		//		9, 8, 10, 10, 8, 11,
@@ -991,7 +991,7 @@ namespace Vxl
 			Vector3(-1, 0, 0),
 			Vector3(-1, 0, 0),
 		};
-		GLuint indices[] = {
+		uint32_t indices[] = {
 			1, 0, 2, 2, 0, 3,
 			6, 4, 5, 4, 6, 7,
 			8, 9, 10, 8, 10, 11,
@@ -1042,7 +1042,7 @@ namespace Vxl
 			Vector2(0.5f, 1.0f),
 			Vector2(0.5f, 0.0f)
 		};
-		GLuint indices[] = {
+		uint32_t indices[] = {
 			0, 4, 1,
 			1, 4, 2,
 			2, 4, 3,

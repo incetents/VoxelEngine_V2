@@ -32,18 +32,14 @@ namespace Vxl
 	{
 		friend class Material;
 	private:
-#ifdef _DEBUG
-		const ShaderProgram* m_program = nullptr;
-#endif
-		const std::string	m_propertyName;
-		Graphics::Uniform	m_uniform;
-		bool				m_isUsed = true;
+		const ShaderProgram*	m_program = nullptr;
+		const std::string		m_propertyName;
+		Graphics::Uniform		m_uniform;
+		bool					m_isUsed = true;
 
 		void AcquireUniform(const ShaderProgram& program)
 		{
-#ifdef _DEBUG
 			m_program = &program;
-#endif
 
 			if (program.CheckUniform(m_propertyName))
 			{
@@ -51,8 +47,9 @@ namespace Vxl
 
 				uint32_t UniformType = m_uniform.type;
 				std::string TypeName = typeid(Type).name();
-				
-				glUtil::VeryifyDataType(TypeName, UniformType);
+		
+				// Check if Uniform data type from shader matches selected data type from material template
+				VXL_ASSERT(Graphics::VeryifyDataType(TypeName, UniformType), "Material Type does not Match Uniform Type, Property Name = " + m_propertyName);
 
 				m_isUsed = true;
 			}

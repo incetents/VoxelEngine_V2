@@ -82,7 +82,6 @@
     <ClCompile Include="engine\math\Vector2.cpp" />
     <ClCompile Include="engine\math\Vector3.cpp" />
     <ClCompile Include="engine\math\Vector4.cpp" />
-    <ClCompile Include="engine\rendering\glUtil.cpp" />
     <ClCompile Include="engine\main.cpp" />
     <ClCompile Include="engine\rendering\Mesh.cpp" />
     <ClCompile Include="engine\rendering\Shader.cpp" />
@@ -133,7 +132,6 @@
     <ClInclude Include="engine\math\Vector2.h" />
     <ClInclude Include="engine\math\Vector3.h" />
     <ClInclude Include="engine\math\Vector4.h" />
-    <ClInclude Include="engine\rendering\Enums.h" />
     <ClInclude Include="engine\rendering\Mesh.h" />
     <ClInclude Include="engine\rendering\VBOLayout.h" />
     <ClInclude Include="engine\textures\BaseTexture.h" />
@@ -155,7 +153,6 @@
     <ClInclude Include="engine\utilities\Util.h" />
     <ClInclude Include="engine\editor\DevConsole.h" />
     <ClInclude Include="engine\window\glfwCallbacks.h" />
-    <ClInclude Include="engine\rendering\glUtil.h" />
     <ClInclude Include="engine\editor\Hierarchy.h" />
     <ClInclude Include="engine\editor\Inspector.h" />
     <ClInclude Include="engine\editor\Performance.h" />

@@ -445,14 +445,14 @@ namespace Vxl
 		Graphics::SetWireframeState(true);
 		Graphics::SetCullMode(CullMode::NO_CULL);
 
-		glLineWidth(5.0f);
+		Graphics::SetLineWidth(5.0f);
 		for (const auto& sphere : Debug.m_wireframeSpheres)
 		{
 			passthrough->m_property_color.SetProperty(sphere.color.getRGB());
 			passthrough->m_property_model.SetPropertyMatrix(sphere.model, true);
 			Geometry.GetIcoSphere()->Draw();
 		}
-		glLineWidth(1.0f);
+		Graphics::SetLineWidth(1.0f);
 
 		Graphics::SetWireframeState(false);
 		Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);

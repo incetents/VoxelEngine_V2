@@ -1,6 +1,8 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "../utilities/Containers.h"
+
 #include <stdint.h>
 #include <vector>
 #include <string>
@@ -20,9 +22,13 @@ namespace Vxl
 	class Matrix3x3;
 	class Matrix4x4;
 	class Shader;
+	class Texture;
+	class FramebufferAttachment;
+	class RenderTexture;
+	class RenderBuffer;
 
 	// ~ Vendor Types ~ //
-	enum class glVendorType
+	enum class VendorType
 	{
 		UNKNOWN = 0,
 		NVIDIA,
@@ -373,6 +379,8 @@ namespace Vxl
 	typedef uint32_t TextureID;
 	typedef uint32_t RenderBufferID;
 	typedef uint32_t FramebufferObjectID;
+	typedef uint32_t UBOID;
+	typedef uint32_t QueryID;
 
 	// Graphics Caller
 	namespace Graphics
@@ -382,15 +390,27 @@ namespace Vxl
 		extern int GLVersionMinor;
 		extern int GLObjectNameMaxLength;
 		extern float GLMaxAnisotropy;
+		extern int GLMaxFBOColorAttachments;
+		extern int GLMaxUniformBindings;
 
 		extern std::string Gpu_Renderer;
 		extern std::string Gpu_OpenGLVersion;
 		extern std::string Gpu_Vendor;
-		extern glVendorType Vendor;
+		extern VendorType Vendor;
+
+		extern int VRAM_Maximum_KB;
+		extern int VRAM_Current_KB;
+		//extern int RAM;
+
+		extern bool UsingErrorCallback;
 
 		// ~ Setup ~ //
 		bool Setup();
 		void initHints();
+		void InitOpenGLDebugCallback(void);
+
+		// ~ SPECIAL ~ //
+		bool VeryifyDataType(const std::string& name, uint32_t type);
 
 		// ~ GPU Name ~ //
 		void SetGLName(ObjectType identifier, uint32_t id, const std::string &label);
@@ -412,6 +432,9 @@ namespace Vxl
 
 		// ~ Viewport ~ //
 		void SetViewport(int x, int y, int w, int h);
+
+		// ~ LineWidth ~ //
+		void SetLineWidth(float w);
 
 		// ~ Clear Buffer [Setup] ~ //
 		void SetClearColor(float r, float g, float b, float a);
@@ -631,6 +654,8 @@ namespace Vxl
 			void		SetPixelPackAlignment(PixelAlignment align);
 			void		SetPixelUnpackAlignment(PixelAlignment align);
 		}
+		
+		// ~ Renderbuffer ~ //
 		namespace RenderBuffer
 		{
 			RenderBufferID	Create(void);
@@ -649,8 +674,46 @@ namespace Vxl
 			void				DrawBuffers(uint32_t textureCount);
 			void				Unbind(void);
 			bool				CheckStatus(void);
+			void AttachRenderTexture(const Vxl::RenderTexture& texture, uint32_t attachmentIndex);
+			void AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture);
+			void AttachRenderBuffer(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex);
+			void AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture);
 
-		
+			RawArray<uint8_t>	ReadPixels(const Vxl::FramebufferAttachment& texture, uint32_t attachmentIndex, int x, int y, int w, int h);
+			void BlitColor(FramebufferObjectID source, FramebufferObjectID destination, int width, int height, uint32_t srcAttachment, uint32_t destAttachment);
+			void BlitDepth(FramebufferObjectID source, FramebufferObjectID destination, int width, int height);
+		}
+
+		// ~ UBO ~ //
+		namespace UBO
+		{
+			UBOID	Create(uint32_t slot, uint32_t totalBytes, BufferUsage usage);
+			void	Delete(UBOID id);
+			void	Bind(UBOID id);
+			void	Unbind(void);
+			void	UpdateBuffer(void* buffer, uint32_t totalBytes, uint32_t offset);
+		}
+
+		// ~ Queries ~ //
+		namespace Query
+		{
+			enum class Type
+			{
+				SAMPLES_PASSED = 0,
+				ANY_SAMPLES_PASSED,
+				ANY_SAMPLES_PASSED_CONSERVATIVE,
+				PRIMITIVES_GENERATED,
+				TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
+				TIME_ELAPSED
+			};
+
+			QueryID		Create(void);
+			void		Delete(QueryID id);
+
+			void		Start(QueryID id, Type type);
+			void		End(Type type);
+			bool		CheckFinished(QueryID id);
+			uint64_t	GetResult(QueryID id);
 		}
 	};
 

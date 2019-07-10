@@ -2,8 +2,8 @@
 #include "Precompiled.h"
 #include "Time.h"
 
+#include "../rendering/Graphics.h"
 #include "../utilities/Macros.h"
-#include "../rendering/glUtil.h"
 #include <assert.h>
 #include <GLFW/glfw3.h>
 
@@ -111,34 +111,38 @@ namespace Vxl
 	GPUTimer::GPUTimer()
 	{
 #ifdef GLOBAL_GPU_TIMERS
-		glGenQueries(1, &m_ID);
+		m_ID = Graphics::Query::Create();
 #endif
 	}
 	GPUTimer::~GPUTimer()
 	{
 #ifdef GLOBAL_GPU_TIMERS
-		glDeleteQueries(1, &m_ID);
+		Graphics::Query::Delete(m_ID);
 #endif
 	}
 
 	void GPUTimer::Begin()
 	{
-		glBeginQuery(GL_TIME_ELAPSED, m_ID);
+		Graphics::Query::Start(m_ID, Graphics::Query::Type::TIME_ELAPSED);
+		//glBeginQuery(GL_TIME_ELAPSED, m_ID);
 	}
 	void GPUTimer::End()
 	{
-		glEndQuery(GL_TIME_ELAPSED);
+		Graphics::Query::End(Graphics::Query::Type::TIME_ELAPSED);
+		//glEndQuery(GL_TIME_ELAPSED);
 	}
 
 	void GPUTimer::Update()
 	{
 #ifdef GLOBAL_GPU_TIMERS
-		int ready = false;
-		glGetQueryObjectiv(m_ID, GL_QUERY_RESULT_AVAILABLE, &ready);
+		bool ready = Graphics::Query::CheckFinished(m_ID);
+		//int ready = false;
+		//glGetQueryObjectiv(m_ID, GL_QUERY_RESULT_AVAILABLE, &ready);
 
-		if (ready != 0)
+		if (ready)
 		{
-			glGetQueryObjectui64v(m_ID, GL_QUERY_RESULT, &m_elapsedTime);
+			m_elapsedTime = Graphics::Query::GetResult(m_ID);
+			//glGetQueryObjectui64v(m_ID, GL_QUERY_RESULT, &m_elapsedTime);
 
 			m_elapsedTime_MS[m_elapsedTime_MS_index] = (double)m_elapsedTime / 1000000.0;
 			m_elapsedTime_MS_index++;

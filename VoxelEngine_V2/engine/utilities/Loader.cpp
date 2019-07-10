@@ -15,8 +15,6 @@
 #include "../textures/Cubemap.h"
 
 #include "../rendering/Shader.h"
-#include "../rendering/Enums.h"
-
 #include "../rendering/Graphics.h"
 
 #include "logger.h"

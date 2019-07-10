@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "glUtil.h"
+#include "Graphics.h"
 #include "../utilities/singleton.h"
 
 #include <assert.h>
@@ -22,9 +22,9 @@ namespace Vxl
 	{
 		friend class UBOManager;
 	private:
-		GLuint				m_id;
+		uint32_t			m_id;
 		const unsigned int	m_totalBytes;
-		const GLuint		m_slot;
+		const uint32_t		m_slot;
 		const std::string	m_name;
 		void*				m_buffer = nullptr;
 		bool				m_bufferDirty = false;
@@ -32,7 +32,7 @@ namespace Vxl
 		void load();
 		void unload();
 
-		UniformBufferObject(unsigned int Bytes, GLuint slot, const std::string& glName)
+		UniformBufferObject(unsigned int Bytes, uint32_t slot, const std::string& glName)
 			: m_totalBytes(Bytes), m_slot(slot), m_name(glName)
 		{
 			load();
