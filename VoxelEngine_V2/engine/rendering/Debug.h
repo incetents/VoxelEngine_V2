@@ -3,7 +3,7 @@
 
 #include "../utilities/singleton.h"
 
-#include "../math/Vector3.h"
+#include "../math/Vector.h"
 #include "../math/Matrix4x4.h"
 #include "../math/Color.h"
 

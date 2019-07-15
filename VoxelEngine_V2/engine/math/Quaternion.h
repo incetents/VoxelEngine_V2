@@ -3,8 +3,6 @@
 
 namespace Vxl
 {
-	class Vector3;
-	class Vector4;
 	class Matrix3x3;
 	class Matrix4x4;
 	class Degrees;

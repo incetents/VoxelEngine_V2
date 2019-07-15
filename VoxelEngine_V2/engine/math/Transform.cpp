@@ -41,7 +41,7 @@ namespace Vxl
 			m_forward	= FinalRotationMatrix.GetColumn(2).Normalize();
 
 			// Update World position
-			m_worldPosition = m_world_ModelMatrix.GetColumn(3);
+			m_worldPosition = Vector3(m_world_ModelMatrix.GetColumn(3));
 			// Update World Scale
 			m_lossyScale.x = Vector3::Length(m_world_ModelMatrix[0], m_world_ModelMatrix[1], m_world_ModelMatrix[2]);
 			m_lossyScale.y = Vector3::Length(m_world_ModelMatrix[4], m_world_ModelMatrix[5], m_world_ModelMatrix[6]);
@@ -130,7 +130,8 @@ namespace Vxl
 		if (lengthSqr < FLT_EPSILON)
 			return *this;
 
-		Vector3 Nforward = forward / sqrt(lengthSqr);
+		Vector3 Nforward = forward.Normalize();
+		Vector3 NforwardXZ = forward.NormalizeXZ();
 
 		if (Nforward.CompareFuzzy(Vector3::UP))
 		{
@@ -147,12 +148,12 @@ namespace Vxl
 			return *this;
 		}
 
-		Degrees yaw = Vector3::GetAngleDegrees(Vector3::FORWARD, Nforward.NormalizeXZ());
+		float yaw = Vector3::GetAngleDegrees(Vector3::FORWARD, NforwardXZ);
 		if (Nforward.x > 0)
 			yaw = -yaw;
-		Degrees pitch = Vector3::GetAngleDegrees(Vector3::UP, Nforward);
+		float pitch = Vector3::GetAngleDegrees(Vector3::UP, Nforward);
 
-		m_euler_rotation = Vector3(-pitch.Get() + 90.0f, yaw.Get(), 0);
+		m_euler_rotation = Vector3(-pitch + 90.0f, yaw, 0);
 
 		SetDirty();
 		return *this;

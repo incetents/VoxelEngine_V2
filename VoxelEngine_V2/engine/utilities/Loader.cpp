@@ -7,8 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
+#include "../math/Vector.h"
 #include "../math/Model.h"
 
 #include "../textures/Texture.h"

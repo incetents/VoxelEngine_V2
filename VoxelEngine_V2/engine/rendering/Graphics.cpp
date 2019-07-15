@@ -14,9 +14,7 @@
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
 
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
-#include "../math/Vector4.h"
+#include "../math/Vector.h"
 #include "../math/Matrix2x2.h"
 #include "../math/Matrix3x3.h"
 #include "../math/Matrix4x4.h"
@@ -26,6 +24,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
+#include <Windows.h>
+#include <Psapi.h>
 
 #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
@@ -47,6 +47,14 @@ namespace Vxl
 
 	int Graphics::VRAM_Maximum_KB = -1;
 	int Graphics::VRAM_Current_KB = -1;
+
+	uint64_t Graphics::CPU::VirtualMemory::Total_KB = -1;
+	uint64_t Graphics::CPU::VirtualMemory::Used_KB = -1;
+	uint64_t Graphics::CPU::VirtualMemory::UsedByProcess_KB = -1;
+
+	uint64_t Graphics::CPU::RAM::Total_KB = -1;
+	uint64_t Graphics::CPU::RAM::Used_KB = -1;
+	uint64_t Graphics::CPU::RAM::UsedByProcess_KB = -1;
 
 	bool Graphics::UsingErrorCallback = false;
 
@@ -560,6 +568,30 @@ namespace Vxl
 		SetSeamlessCubemap(true);
 	}
 
+	// Updates specific values
+	void Graphics::GetRuntimeGLValues(void)
+	{
+		if (Vendor == VendorType::NVIDIA)
+		{
+			glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &VRAM_Current_KB);
+		}
+
+		MEMORYSTATUSEX memInfo;
+		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+		GlobalMemoryStatusEx(&memInfo);
+
+		PROCESS_MEMORY_COUNTERS_EX pmc;
+		GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+
+		CPU::VirtualMemory::Total_KB = memInfo.ullTotalPageFile / 1024;
+		CPU::VirtualMemory::Used_KB = (memInfo.ullTotalPageFile - memInfo.ullAvailPageFile) / 1024;
+		CPU::VirtualMemory::UsedByProcess_KB = pmc.PrivateUsage / 1024;
+
+		CPU::RAM::Total_KB = memInfo.ullTotalPhys / 1024;
+		CPU::RAM::Used_KB = (memInfo.ullTotalPhys - memInfo.ullAvailPhys) / 1024;
+		CPU::RAM::UsedByProcess_KB = pmc.WorkingSetSize / 1024;
+	}
+
 	// Check if string name matches GL type
 	bool Graphics::VeryifyDataType(const std::string& name, uint32_t type)
 	{
@@ -570,13 +602,13 @@ namespace Vxl
 		if (name.compare("float") == 0 && type == GL_FLOAT)
 			return true;
 		// Vec2
-		if (name.compare("class Vxl::Vector2") == 0 && type == GL_FLOAT_VEC2)
+		if (name.compare("class Vxl::_Vector2<float>") == 0 && type == GL_FLOAT_VEC2)
 			return true;
 		// Vec3 - Color3F
-		if ((name.compare("class Vxl::Vector3") == 0 || name.compare("class Vxl::Color3F") == 0) && type == GL_FLOAT_VEC3)
+		if ((name.compare("class Vxl::_Vector3<float>") == 0 || name.compare("class Vxl::Color3F") == 0) && type == GL_FLOAT_VEC3)
 			return true;
 		// Vec4
-		if ((name.compare("class Vxl::Vector4") == 0 || name.compare("class Vxl::Color4F") == 0) && type == GL_FLOAT_VEC4)
+		if ((name.compare("class Vxl::_Vector4<float>") == 0 || name.compare("class Vxl::Color4F") == 0) && type == GL_FLOAT_VEC4)
 			return true;
 		// Mat2
 		if (name.compare("class Vxl::Matrix2x2") == 0 && type == GL_FLOAT_MAT2)
@@ -1941,7 +1973,7 @@ namespace Vxl
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 
 		RawArray<uint8_t> Array;
-		Array.start = new GLubyte[w * h * texture.GetChannelCount()];
+		Array.Allocate(w * h * texture.GetChannelCount());
 		glReadPixels(
 			x, y, w, h,
 			GL_TextureChannelType[(int)texture.GetChannelType()],

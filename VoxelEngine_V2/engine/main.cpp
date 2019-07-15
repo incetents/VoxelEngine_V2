@@ -77,6 +77,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		Input.Update();
 		Window.EndFrame();
 		TimeController.EndFrame();
+
+		// Special
+#if _DEBUG
+		Graphics::GetRuntimeGLValues();
+#endif
 	}
 
 	// Cleanup

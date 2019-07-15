@@ -29,9 +29,7 @@
 #include "math/Random.h"
 #include "math/Rotation.h"
 #include "math/Transform.h"
-#include "math/Vector2.h"
-#include "math/Vector3.h"
-#include "math/Vector4.h"
+#include "math/Vector.h"
 
 #include "modules/Component.h"
 #include "modules/Entity.h"

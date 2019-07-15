@@ -322,7 +322,7 @@ namespace Vxl
 	}
 
 	// Notice, SNORM TEXTURES CANNOT BE READ
-	RawArray<uint8_t> FramebufferObject::readPixels(u_int attachmentIndex, int x, int y, int w, int h)
+	RawArray<uint8_t> FramebufferObject::readPixels(uint32_t attachmentIndex, int x, int y, int w, int h)
 	{
 		VXL_ASSERT(attachmentIndex < m_textureCount, "FBO readpixels: index out of bounds");
 		
@@ -332,7 +332,7 @@ namespace Vxl
 
 		return Graphics::FramebufferObject::ReadPixels(*m_textures[attachmentIndex], attachmentIndex, x, y, w, h);
 	}
-	RawArray<uint8_t> FramebufferObject::readPixelsFromMouse(u_int attachmentIndex, int w, int h)
+	RawArray<uint8_t> FramebufferObject::readPixelsFromMouse(uint32_t attachmentIndex, int w, int h)
 	{
 		float px, py;
 		px = Input.getMousePosViewportX();  // [0 -> 1] horizontally across viewport

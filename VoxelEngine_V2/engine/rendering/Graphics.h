@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../utilities/Containers.h"
+#include "../math/Vector.h"
 
 #include <stdint.h>
 #include <vector>
@@ -13,9 +14,6 @@
 namespace Vxl
 {
 	// Forward Declare
-	class Vector2;
-	class Vector3;
-	class Vector4;
 	class Color3F;
 	class Color4F;
 	class Matrix2x2;
@@ -385,7 +383,7 @@ namespace Vxl
 	// Graphics Caller
 	namespace Graphics
 	{
-		// Static information
+		// Static GPU information
 		extern int GLVersionMajor;
 		extern int GLVersionMinor;
 		extern int GLObjectNameMaxLength;
@@ -400,6 +398,24 @@ namespace Vxl
 
 		extern int VRAM_Maximum_KB;
 		extern int VRAM_Current_KB;
+
+		// Static CPU information
+		namespace CPU
+		{
+			namespace VirtualMemory
+			{
+				extern uint64_t Total_KB;
+				extern uint64_t Used_KB;
+				extern uint64_t UsedByProcess_KB;
+			}
+			namespace RAM
+			{
+				extern uint64_t Total_KB;
+				extern uint64_t Used_KB;
+				extern uint64_t UsedByProcess_KB;
+			}
+		}
+
 		//extern int RAM;
 
 		extern bool UsingErrorCallback;
@@ -410,6 +426,7 @@ namespace Vxl
 		void InitOpenGLDebugCallback(void);
 
 		// ~ SPECIAL ~ //
+		void GetRuntimeGLValues(void);
 		bool VeryifyDataType(const std::string& name, uint32_t type);
 
 		// ~ GPU Name ~ //

@@ -4,12 +4,11 @@
 #include "Block.h"
 #include <Windows.h>
 
+#include "../engine/math/Vector.h"
+
 namespace Vxl
 {
 	class Mesh;
-	class Vector2;
-	class Vector3;
-	class Vector3i;
 	class Block;
 
 	class ChunkMesh

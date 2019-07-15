@@ -1,15 +1,14 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include <string>
+#include "Vector.h"
 
+#include <string>
 
 namespace Vxl
 {
 	class Matrix2x2;
 	class Matrix4x4;
-	class Vector2;
-	class Vector3;
 	class Degrees;
 	class Radians;
 	enum class Axis;

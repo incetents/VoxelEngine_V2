@@ -124,25 +124,20 @@ namespace Vxl
 	void GPUTimer::Begin()
 	{
 		Graphics::Query::Start(m_ID, Graphics::Query::Type::TIME_ELAPSED);
-		//glBeginQuery(GL_TIME_ELAPSED, m_ID);
 	}
 	void GPUTimer::End()
 	{
 		Graphics::Query::End(Graphics::Query::Type::TIME_ELAPSED);
-		//glEndQuery(GL_TIME_ELAPSED);
 	}
 
 	void GPUTimer::Update()
 	{
 #ifdef GLOBAL_GPU_TIMERS
 		bool ready = Graphics::Query::CheckFinished(m_ID);
-		//int ready = false;
-		//glGetQueryObjectiv(m_ID, GL_QUERY_RESULT_AVAILABLE, &ready);
-
+	
 		if (ready)
 		{
 			m_elapsedTime = Graphics::Query::GetResult(m_ID);
-			//glGetQueryObjectui64v(m_ID, GL_QUERY_RESULT, &m_elapsedTime);
 
 			m_elapsedTime_MS[m_elapsedTime_MS_index] = (double)m_elapsedTime / 1000000.0;
 			m_elapsedTime_MS_index++;

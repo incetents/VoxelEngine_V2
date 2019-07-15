@@ -5,7 +5,7 @@
 #include <Xinput.h>
 
 #include "../utilities/singleton.h"
-#include "../math/Vector2.h"
+#include "../math/Vector.h"
 
 namespace Vxl
 {

@@ -7,9 +7,6 @@
 
 namespace Vxl
 {
-	class Vector3;
-	class Vector3i;
-
 	static class TerrainManager : public Singleton<class TerrainManager>
 	{
 	private:

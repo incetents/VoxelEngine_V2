@@ -4,9 +4,7 @@
 #include "../utilities/Asset.h"
 #include "../utilities/Util.h"
 
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector4.h"
+#include "Vector.h"
 
 #include <string>
 #include <vector>

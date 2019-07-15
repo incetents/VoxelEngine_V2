@@ -5,9 +5,7 @@
 #include "Mesh.h"
 
 #include "../math/MathCore.h"
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
-#include "../math/Vector4.h"
+#include "../math/Vector.h"
 
 namespace Vxl
 {
@@ -431,7 +429,9 @@ namespace Vxl
 		}
 
 		for (const auto& p : positions)
+		{
 			normals.push_back(p.Normalize());
+		}
 
 		Mesh* _mesh = Mesh::Create(MeshName);
 		//
@@ -777,120 +777,6 @@ namespace Vxl
 	{
 		m_cube = GenerateCube("Cube", 1.0f);
 		m_cube_small = GenerateCube("Cube_small", 0.25f);
-		//	Vector3 pos[] = {
-		//		// Front Face
-		//		Vector3(-0.5f, -0.5f, +0.5f),
-		//		Vector3(+0.5f, -0.5f, +0.5f),
-		//		Vector3(+0.5f, +0.5f, +0.5f),
-		//		Vector3(-0.5f, +0.5f, +0.5f),
-		//		//
-		//		Vector3(-0.5f, -0.5f, -0.5f),
-		//		Vector3(+0.5f, -0.5f, -0.5f),
-		//		Vector3(+0.5f, +0.5f, -0.5f),
-		//		Vector3(-0.5f, +0.5f, -0.5f),
-		//		//
-		//		Vector3(-0.5f, +0.5f, -0.5f),
-		//		Vector3(+0.5f, +0.5f, -0.5f),
-		//		Vector3(+0.5f, +0.5f, +0.5f),
-		//		Vector3(-0.5f, +0.5f, +0.5f),
-		//		//
-		//		Vector3(-0.5f, -0.5f, -0.5f),
-		//		Vector3(+0.5f, -0.5f, -0.5f),
-		//		Vector3(+0.5f, -0.5f, +0.5f),
-		//		Vector3(-0.5f, -0.5f, +0.5f),
-		//		//
-		//		Vector3(-0.5f, -0.5f, -0.5f),
-		//		Vector3(-0.5f, +0.5f, -0.5f),
-		//		Vector3(-0.5f, +0.5f, +0.5f),
-		//		Vector3(-0.5f, -0.5f, +0.5f),
-		//		//
-		//		Vector3(+0.5f, -0.5f, -0.5f),
-		//		Vector3(+0.5f, +0.5f, -0.5f),
-		//		Vector3(+0.5f, +0.5f, +0.5f),
-		//		Vector3(+0.5f, -0.5f, +0.5f),
-		//	};
-		//	Vector2 uvs[] = {
-		//		//
-		//		Vector2(0, 0),
-		//		Vector2(1, 0),
-		//		Vector2(1, 1),
-		//		Vector2(0, 1),
-		//		//
-		//		Vector2(1, 0),
-		//		Vector2(0, 0),
-		//		Vector2(0, 1),
-		//		Vector2(1, 1),
-		//		//
-		//		Vector2(0, 1),
-		//		Vector2(1, 1),
-		//		Vector2(1, 0),
-		//		Vector2(0, 0),
-		//		//
-		//		Vector2(1, 0),
-		//		Vector2(0, 0),
-		//		Vector2(0, 1),
-		//		Vector2(1, 1),
-		//		//
-		//		Vector2(0, 0),
-		//		Vector2(0, 1),
-		//		Vector2(1, 1),
-		//		Vector2(1, 0),
-		//		//
-		//		Vector2(1, 0),
-		//		Vector2(1, 1),
-		//		Vector2(0, 1),
-		//		Vector2(0, 0),
-		//	};
-		//	Vector3 normals[] = {
-		//		//
-		//		Vector3(0, 0, +1),
-		//		Vector3(0, 0, +1),
-		//		Vector3(0, 0, +1),
-		//		Vector3(0, 0, +1),
-		//		//
-		//		Vector3(0, 0, -1),
-		//		Vector3(0, 0, -1),
-		//		Vector3(0, 0, -1),
-		//		Vector3(0, 0, -1),
-		//		//
-		//		Vector3(0, +1, 0),
-		//		Vector3(0, +1, 0),
-		//		Vector3(0, +1, 0),
-		//		Vector3(0, +1, 0),
-		//		//
-		//		Vector3(0, -1, 0),
-		//		Vector3(0, -1, 0),
-		//		Vector3(0, -1, 0),
-		//		Vector3(0, -1, 0),
-		//		//
-		//		Vector3(-1, 0, 0),
-		//		Vector3(-1, 0, 0),
-		//		Vector3(-1, 0, 0),
-		//		Vector3(-1, 0, 0),
-		//		//
-		//		Vector3(+1, 0, 0),
-		//		Vector3(+1, 0, 0),
-		//		Vector3(+1, 0, 0),
-		//		Vector3(+1, 0, 0),
-		//	};
-		//	uint32_t indices[] = {
-		//		0, 1, 2, 0, 2, 3,
-		//		4, 6, 5, 6, 4, 7,
-		//		9, 8, 10, 10, 8, 11,
-		//		12, 13, 14, 12, 14, 15,
-		//		17, 16, 18, 18, 16, 19,
-		//		21, 22, 20, 22, 23, 20
-		//	};
-		//	
-		//	m_cube = Mesh::Create("Cube");
-		//	//
-		//	m_cube->m_positions.set(pos, 24);
-		//	m_cube->m_uvs.set(uvs, 24);
-		//	m_cube->m_normals.set(normals, 24);
-		//	m_cube->m_indices.set(indices, 36);
-		//	m_cube->GenerateTangents();
-		//	//
-		//	m_cube->Bind();
 	}
 
 	void Geometry::CreateInverseCube()

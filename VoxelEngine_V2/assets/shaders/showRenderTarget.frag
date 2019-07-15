@@ -1,5 +1,6 @@
 // Copyright(c) 2018 Emmanuel Lajeunesse
 #version 420 core
+#include "_math.glsl"
 
 // Input
 in fragment_data
@@ -28,10 +29,19 @@ float LinearizeDepth(float depth)
 {
     return (2.0 * zNear * zFar) / (zFar + zNear - (2.0 * depth - 1.0) * (zFar - zNear));
 }
-// Makes depth value easier to notice visually
+// Visualize depth buffer
 float VisualizeDepth(float depth)
 {
-	return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
+	depth = depth * depth;
+	depth = depth * depth;
+	depth = depth * depth;
+	depth = depth * depth;
+	depth = depth * depth;
+	depth = depth * depth;
+	depth = depth * depth;
+	depth = depth * depth;
+	depth = depth * depth;
+	return depth;
 }
 
 //Main
@@ -43,7 +53,6 @@ void main()
 	{
 		// normal
 		_texture.rgb = abs(_texture.rgb); // make it visible on both sides
-		
 		output_color = _texture;
 	}
 	else if(outputMode == 2)
@@ -57,6 +66,12 @@ void main()
 		// composite 2 textures
 		vec4 _texture2 = texture(texture2, f_data.uv);
 		output_color = vec4(mix(_texture.rgb, _texture2.rgb, _texture2.a), 1);
+	}
+	else if(outputMode == 4)
+	{
+		// convert to readable HSL regardless of color
+		float Hue = dot(_texture.rgb, vec3(8860.0f)); 
+		output_color = vec4(HSV_TO_RGB(Hue, 0.75f, 1),1);
 	}
 	else // == 0
 		// normal

@@ -9,8 +9,6 @@
 
 namespace Vxl
 {
-	class Vector4;
-
 	namespace Util
 	{
 		// Vector merging

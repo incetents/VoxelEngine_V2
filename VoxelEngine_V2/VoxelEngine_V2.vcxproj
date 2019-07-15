@@ -79,9 +79,6 @@
     <ClCompile Include="engine\math\Quaternion.cpp" />
     <ClCompile Include="engine\math\Rotation.cpp" />
     <ClCompile Include="engine\math\Transform.cpp" />
-    <ClCompile Include="engine\math\Vector2.cpp" />
-    <ClCompile Include="engine\math\Vector3.cpp" />
-    <ClCompile Include="engine\math\Vector4.cpp" />
     <ClCompile Include="engine\main.cpp" />
     <ClCompile Include="engine\rendering\Mesh.cpp" />
     <ClCompile Include="engine\rendering\Shader.cpp" />
@@ -98,6 +95,7 @@
   <ItemGroup>
     <ClInclude Include="engine\editor\Editor.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
+    <ClInclude Include="engine\math\Vector.h" />
     <ClInclude Include="engine\objects\CameraObject.h" />
     <ClInclude Include="engine\objects\LightObject.h" />
     <ClInclude Include="engine\math\Model.h" />
@@ -129,9 +127,6 @@
     <ClInclude Include="engine\math\Random.h" />
     <ClInclude Include="engine\math\Rotation.h" />
     <ClInclude Include="engine\math\Transform.h" />
-    <ClInclude Include="engine\math\Vector2.h" />
-    <ClInclude Include="engine\math\Vector3.h" />
-    <ClInclude Include="engine\math\Vector4.h" />
     <ClInclude Include="engine\rendering\Mesh.h" />
     <ClInclude Include="engine\rendering\VBOLayout.h" />
     <ClInclude Include="engine\textures\BaseTexture.h" />

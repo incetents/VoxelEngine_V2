@@ -1,9 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
-#include "../math/Vector4.h"
+#include "../math/Vector.h"
 #include "../math/Matrix4x4.h"
 
 #include "VBO.h"

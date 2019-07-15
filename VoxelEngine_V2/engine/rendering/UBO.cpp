@@ -4,9 +4,7 @@
 
 #include "Graphics.h"
 
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
-#include "../math/Vector4.h"
+#include "../math/Vector.h"
 #include "../math/Matrix2x2.h"
 #include "../math/Matrix3x3.h"
 #include "../math/Matrix4x4.h"
@@ -32,21 +30,11 @@ namespace Vxl
 
 		m_id = Graphics::UBO::Create(m_slot, m_totalBytes, BufferUsage::DYNAMIC_DRAW);
 
-		//	glGenBuffers(1, &m_id);
-		//	glBindBuffer(GL_UNIFORM_BUFFER, m_id);
-		//	
-		//	// Allocate size
-		//	glBufferData(GL_UNIFORM_BUFFER, m_totalBytes, NULL, GL_DYNAMIC_DRAW);
-		//	
-		//	// Set to slot
-		//	glBindBufferBase(GL_UNIFORM_BUFFER, m_slot, m_id);
-
 		// set name
 		Graphics::SetGLName(ObjectType::BUFFER, m_id, "UBO_" + m_name);
 
 		// unbind
 		Graphics::UBO::Unbind();
-		//glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 	void UniformBufferObject::unload()
 	{
@@ -55,7 +43,6 @@ namespace Vxl
 		m_buffer = nullptr;
 
 		Graphics::UBO::Delete(m_id);
-		//glDeleteBuffers(1, &m_id);
 	}
 
 	void* UniformBufferObject::GetBufferLocation(unsigned int byteOffset) const
@@ -68,19 +55,16 @@ namespace Vxl
 	void UniformBufferObject::Bind()
 	{
 		Graphics::UBO::Bind(m_id);
-		//glBindBuffer(GL_UNIFORM_BUFFER, m_id);
 
 		if (m_bufferDirty)
 		{
 			Graphics::UBO::UpdateBuffer(m_buffer, m_totalBytes, 0);
-			//glBufferSubData(GL_UNIFORM_BUFFER, 0, m_totalBytes, m_buffer);
 			m_bufferDirty = false;
 		}
 	}
 	void UniformBufferObject::Unbind() const
 	{
 		Graphics::UBO::Unbind();
-		//glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	void UniformBufferObject::sendMatrix(const Matrix2x2 &matrix, unsigned int byteOffset)

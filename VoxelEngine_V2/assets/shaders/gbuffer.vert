@@ -40,10 +40,11 @@ void main()
 
 		// Position
 		f_data.pos = vec3(model * vec4(m_position, 1.0));
-		// Normal
-		f_data.normal = vec3(model * vec4(m_normal, 0));
-		f_data.tangent = vec3(model * vec4(m_tangent, 0));
-		f_data.bitangent = vec3(model * vec4(m_bitangent, 0));
+		// Normals
+		mat3 RotScaleModel = mat3(model); // ignores position
+		f_data.normal = RotScaleModel * m_normal;
+		f_data.tangent = RotScaleModel * m_tangent;
+		f_data.bitangent = RotScaleModel * m_bitangent;
 	}
 	// Passthrough
 	else

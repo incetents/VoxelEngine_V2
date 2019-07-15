@@ -2,8 +2,6 @@
 #include "Precompiled.h"
 #include "TerrainManager.h"
 
-#include "../engine/math/Vector3.h"
-
 namespace Vxl
 {
 	Vector3i TerrainManager::GetChunkPosition(Vector3 worldPosition)

@@ -7,15 +7,13 @@
 
 #include "Graphics.h"
 
+#include "../math/Vector.h"
 #include "../utilities/Macros.h"
 
 namespace Vxl
 {
 	enum class ShaderType;
 	class Shader;
-	class Vector2;
-	class Vector3;
-	class Vector4;
 	class Color3F;
 	class Color4F;
 	class Matrix2x2;

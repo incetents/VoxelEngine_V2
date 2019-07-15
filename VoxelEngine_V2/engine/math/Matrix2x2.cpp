@@ -1,7 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Matrix2x2.h"
-#include "Vector2.h"
+#include "Vector.h"
 #include "MathCore.h"
 #include "Lerp.h"
 

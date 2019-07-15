@@ -43,11 +43,34 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		std::string m1 = "GPU TOTAL: " + std::to_string(Graphics::VRAM_Maximum_KB / 1000) + " [MB]";
-		ImGui::Text(m1.c_str());
+		if (ImGui::CollapsingHeader("GPU Memory"))
+		{
+			std::string m1 = "GPU TOTAL: " + std::to_string(Graphics::VRAM_Maximum_KB / 1000) + " [MB]";
+			ImGui::Text(m1.c_str());
 
-		std::string m2 = "GPU Current: " + std::to_string(Graphics::VRAM_Current_KB / 1000) + " [MB]";
-		ImGui::Text(m2.c_str());
+			std::string m2 = "GPU Current: " + std::to_string(Graphics::VRAM_Current_KB / 1000) + " [MB]";
+			ImGui::Text(m2.c_str());
+		}
+		if (ImGui::CollapsingHeader("CPU Memory"))
+		{
+			std::string c1 = "CPU Virtual Memory [Total] : " + std::to_string(Graphics::CPU::VirtualMemory::Total_KB / 1000) + " [MB]";
+			ImGui::Text(c1.c_str());
+
+			std::string c2 = "CPU Virtual Memory [Used] : " + std::to_string(Graphics::CPU::VirtualMemory::Used_KB / 1000) + " [MB]";
+			ImGui::Text(c2.c_str());
+
+			std::string c3 = "CPU Virtual Memory [UsedByProcess] : " + std::to_string(Graphics::CPU::VirtualMemory::UsedByProcess_KB / 1000) + " [MB]";
+			ImGui::Text(c3.c_str());
+
+			std::string r1 = "CPU RAM [Total] : " + std::to_string(Graphics::CPU::RAM::Total_KB / 1000) + " [MB]";
+			ImGui::Text(r1.c_str());
+
+			std::string r2 = "CPU RAM [Used] : " + std::to_string(Graphics::CPU::RAM::Used_KB / 1000) + " [MB]";
+			ImGui::Text(r2.c_str());
+
+			std::string r3 = "CPU RAM [UsedByProcess] : " + std::to_string(Graphics::CPU::RAM::UsedByProcess_KB / 1000) + " [MB]";
+			ImGui::Text(r3.c_str());
+		}
 
 		ImGui::Separator();
 
@@ -147,7 +170,8 @@ namespace Vxl
 				"Albedo",
 				"Normal",
 				"Depth",
-				"Editor"
+				"Editor",
+				"ColorPicker"
 			};
 			static int fbo_override_current = 0;
 			ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);
@@ -206,6 +230,21 @@ namespace Vxl
 			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
+		// Integers Ranged
+		ImGui::Text("Integers Ranged:");
+		if (m_integersRanged.size() > 0)
+		{
+			for (auto it = m_integersRanged.begin(); it != m_integersRanged.end(); it++)
+			{
+				ImGui::Text(it->first.c_str());
+				ImGui::SameLine();
+				ImGui::SliderInt(it->first.c_str(), &it->second.x, it->second.y, it->second.z);
+			}
+		}
+		else
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
+		ImGui::Separator();
+
 		// Floats
 		ImGui::Text("Floats:");
 		if (m_floats.size() > 0)
@@ -221,6 +260,21 @@ namespace Vxl
 			ImGui::TextColored(ImGuiColor::Orange, "~None~");
 		ImGui::Separator();
 
+		// Floats Ranged
+		ImGui::Text("Floats Ranged:");
+		if (m_floatsRanged.size() > 0)
+		{
+			for (auto it = m_floatsRanged.begin(); it != m_floatsRanged.end(); it++)
+			{
+				ImGui::Text(it->first.c_str());
+				ImGui::SameLine();
+				ImGui::SliderFloat(it->first.c_str(), &it->second.x, it->second.y, it->second.z);
+			}
+		}
+		else
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
+		ImGui::Separator();
+
 		// Double
 		ImGui::Text("Doubles:");
 		if (m_doubles.size() > 0)
@@ -230,6 +284,23 @@ namespace Vxl
 				ImGui::Text(it->first.c_str());
 				ImGui::SameLine();
 				ImGui::InputDouble(it->first.c_str(), &it->second);
+			}
+		}
+		else
+			ImGui::TextColored(ImGuiColor::Orange, "~None~");
+		ImGui::Separator();
+
+		// Double
+		ImGui::Text("Doubles Ranged:");
+		if (m_doublesRanged.size() > 0)
+		{
+			for (auto it = m_doublesRanged.begin(); it != m_doublesRanged.end(); it++)
+			{
+				ImGui::Text(it->first.c_str());
+				ImGui::SameLine();
+				float v = (float)it->second.x;
+				ImGui::SliderFloat(it->first.c_str(), &v, (float)it->second.y, (float)it->second.z);
+				it->second.x = (double)v;
 			}
 		}
 		else

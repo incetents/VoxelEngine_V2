@@ -1,12 +1,13 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "Vector.h"
+
 #include <string>
 #include <sstream>
 
 namespace Vxl
 {
-	class Vector2;
 	class Degrees;
 	class Radians;
 	enum class Axis;

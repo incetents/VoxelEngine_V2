@@ -6,9 +6,7 @@
 #include "Matrix2x2.h"
 #include "Matrix3x3.h"
 #include "Matrix4x4.h"
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector4.h"
+#include "Vector.h"
 #include "Quaternion.h"
 #include "Rotation.h"
 
@@ -291,7 +289,7 @@ namespace Vxl
 		}
 		inline Transform& setPosition(const Vector4& position)
 		{
-			m_position = position;
+			m_position = Vector3(position);
 			SetDirty();
 			return *this;
 		}
@@ -435,7 +433,7 @@ namespace Vxl
 		}
 		inline Transform& increasePosition(const Vector4& translate)
 		{
-			m_position += translate;
+			m_position += Vector3(translate);
 			SetDirty();
 			return *this;
 		}

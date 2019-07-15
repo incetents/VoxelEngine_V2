@@ -27,9 +27,7 @@
 
 #include "../engine/math/Color.h"
 #include "../engine/math/Transform.h"
-#include "../engine/math/Vector2.h"
-#include "../engine/math/Vector3.h"
-#include "../engine/math/Vector4.h"
+#include "../engine/math/Vector.h"
 #include "../engine/math/MathCore.h"
 #include "../engine/math/Lerp.h"
 #include "../engine/math/Model.h"
@@ -176,7 +174,7 @@ namespace Vxl
 		{
 			for (float y = 0; y < 5.0f; y++)
 			{
-				Transform t(Vec3(x * 1.2f, y * 1.2f, -7.0f));
+				Transform t(Vec3(x * 1.2f, y * 1.2f, 0.0f));
 				m_models.push_back(t.getLocalModel().Transpose());
 			}
 		}
@@ -191,7 +189,8 @@ namespace Vxl
 		_entity1->SetMaterial(material_gbuffer);
 		_entity1->SetTexture(_tex, TextureLevel::LEVEL0);
 		_entity1->SetMesh(_mesh);
-		_entity1->m_transform.setScale(+0.5f);
+		_entity1->m_transform.setScale(1.0f);
+		_entity1->m_transform.setPositionZ(-7.0f);
 		
 		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
 		Mesh* jiggyMesh = Mesh::Get("jiggy");
@@ -542,7 +541,7 @@ namespace Vxl
 		//		sub.Connect("Colour1", "ColorGreen");
 		//	
 
-		//_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT("TESTMODE", 0));
+		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT_RANGE("TESTMODE", 0, 0, 3));
 
 		_fbo_gbuffer->bind();
 		_fbo_gbuffer->clearBuffers();
@@ -553,17 +552,18 @@ namespace Vxl
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects();
 
-		//	RawArray<GLubyte> test = _fbo->readDepthPixel(
-		//		Input.getMouseX(),
-		//		Window.GetResolutionHeight() - Input.getMouseY(),
-		//		1, 1
-		//	);
-		//	
-		//	std::cout << (unsigned int)test[0] << std::endl;
-		//	std::cout << (unsigned int)test[1] << std::endl;
-		//	std::cout << "~~~" << std::endl;
-		//	
-		//	test.Deallocate();
+		
+		//	if (Input.getKeyDown(KeyCode::K))
+		//	{
+		//		RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
+		//		std::cout << (uint32_t)test[0] << std::endl;
+		//		std::cout << (uint32_t)test[1] << std::endl;
+		//		//std::cout << (uint32_t)test[2] << std::endl;
+		//		//std::cout << (uint32_t)test[3] << std::endl;
+		//		std::cout << "~~~" << std::endl;
+		//		test.Deallocate();
+		//	}
+		
 
 		//
 		CPUTimer::EndTimer("Gbuffer");
@@ -584,30 +584,7 @@ namespace Vxl
 		//
 		GPUTimer::EndTimer();
 
-		//	if (Input.getKeyDown(KeyCode::K))
-		//	{
-		//		_fbo->bindTexture(1, ActiveTexture::LEVEL0);
-		//		GLubyte* pixels = new GLubyte[Window.GetWindowWidth() * Window.GetScreenHeight() * 4];
-		//		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-		//	
-		//		GLuint r, g, b, a; // or GLbyte r, g, b, a;
-		//	
-		//		size_t x = 1;
-		//		size_t y = 1;
-		//	
-		//		size_t elmes_per_line = 256 * 4; // elements per line = 256 * "RGBA"
-		//	
-		//		size_t row = y * elmes_per_line;
-		//		size_t col = x * 4;
-		//	
-		//		r = pixels[row + col];
-		//		g = pixels[row + col + 1];
-		//		b = pixels[row + col + 2];
-		//		a = pixels[row + col + 3];
-		//	
-		//	
-		//		delete[] pixels;
-		//	}
+		
 
 		//	// GBUFFER No model
 		//	_material_gbuffer_no_model->Bind();
@@ -1063,6 +1040,15 @@ namespace Vxl
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
 
 				_fbo_editor->bindTexture(0, TextureLevel::LEVEL0);
+				break;
+			}
+			// Show Color Picker
+			case 5:
+			{
+				_shader_showRenderTarget->Bind();
+				_shader_showRenderTarget->SetUniform("outputMode", 4);
+
+				_fbo_colorpicker->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 		}

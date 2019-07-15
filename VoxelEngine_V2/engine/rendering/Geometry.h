@@ -1,13 +1,12 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "../math/Vector.h"
 #include "../utilities/singleton.h"
 #include <string>
 
 namespace Vxl
 {
-	class Vector2;
-	class Vector3;
 	class Mesh;
 	enum class Axis;
 

@@ -3,8 +3,6 @@
 
 #include "../utilities/singleton.h"
 
-#include "../math/Vector4.h"
-
 #include <Windows.h>
 #include <string>
 #include <vector>

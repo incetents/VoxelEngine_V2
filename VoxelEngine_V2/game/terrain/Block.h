@@ -1,9 +1,7 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../engine/math/Vector2.h"
-#include "../engine/math/Vector3.h"
-#include "../engine/math/Vector4.h"
+#include "../engine/math/Vector.h"
 #include "../engine/utilities/singleton.h"
 
 #include <Windows.h>

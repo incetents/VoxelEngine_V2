@@ -2,8 +2,6 @@
 #include "Precompiled.h"
 #include "Util.h"
 
-#include "../math/Vector4.h"
-
 namespace Vxl
 {
 	namespace Util

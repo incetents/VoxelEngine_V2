@@ -4,10 +4,9 @@
 #include "../utilities/singleton.h"
 #include "../utilities/Macros.h"
 
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
-#include "../math/Vector4.h"
+#include "../math/Vector.h"
 #include "../math/Color.h"
+#include "../math/MathCore.h"
 
 #include <map>
 #include <utility>
@@ -33,6 +32,10 @@ namespace Vxl
 		std::map<std::string, Vector4> m_vec4;
 		std::map<std::string, Color3F> m_color3;
 		std::map<std::string, Color4F> m_color4;
+
+		std::map<std::string, Vector3i> m_integersRanged;
+		std::map<std::string, Vector3> m_floatsRanged;
+		std::map<std::string, Vector3d> m_doublesRanged;
 
 		std::map<std::string, std::pair<bool, std::string>> m_display_values;
 
@@ -124,6 +127,31 @@ namespace Vxl
 			return m_color4[str];
 		}
 
+		int		GetIntRange(const std::string& str, int _default, int _min, int _max)
+		{
+			if (m_integersRanged.find(str) == m_integersRanged.end())
+				m_integersRanged[str] = Vector3i(_default, _min, _max);
+
+			VXL_ASSERT(m_integersRanged.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many ranged integers in Custom Data"); // in case something went wrong
+			return MacroClamp(m_integersRanged[str].x, _min, _max);
+		}
+		float	GetFloatRange(const std::string& str, float _default, float _min, float _max)
+		{
+			if (m_floatsRanged.find(str) == m_floatsRanged.end())
+				m_floatsRanged[str] = Vector3(_default, _min, _max);
+
+			VXL_ASSERT(m_floatsRanged.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many ranged floats in Custom Data"); // in case something went wrong
+			return MacroClamp(m_floatsRanged[str].x, _min, _max);
+		}
+		double	GetDoubleRange(const std::string& str, double _default, double _min, double _max)
+		{
+			if (m_doublesRanged.find(str) == m_doublesRanged.end())
+				m_doublesRanged[str] = Vector3d(_default, _min, _max);
+
+			VXL_ASSERT(m_doublesRanged.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many ranged doubles in Custom Data"); // in case something went wrong
+			return MacroClamp(m_doublesRanged[str].x, _min, _max);
+		}
+
 		// display data
 		inline void ShowFloat(const std::string& name, float _value)
 		{
@@ -140,6 +168,10 @@ namespace Vxl
 #define DEVCONSOLE_GET_COLOR3(x, y) DevConsole.GetColor3(x, y)
 #define DEVCONSOLE_GET_COLOR4(x, y) DevConsole.GetColor4(x, y)
 
+#define DEVCONSOLE_GET_INT_RANGE(x, y, a, b) DevConsole.GetIntRange(x, y, a, b)
+#define DEVCONSOLE_GET_FLOAT_RANGE(x, y, a, b) DevConsole.GetFloatRange(x, y, a, b)
+#define DEVCONSOLE_GET_DOUBLE_RANGE(x, y, a, b) DevConsole.GetDoubleRange(x, y, a, b)
+
 		// Draw
 		void Draw(Scene* scene);
 #else
@@ -153,6 +185,10 @@ namespace Vxl
 #define DEVCONSOLE_GET_VEC4(x, y) y
 #define DEVCONSOLE_GET_COLOR3(x, y) y
 #define DEVCONSOLE_GET_COLOR4(x, y) y
+
+#define DEVCONSOLE_GET_INT_RANGE(x, y, a, b) y
+#define DEVCONSOLE_GET_FLOAT_RANGE(x, y, a, b) y
+#define DEVCONSOLE_GET_DOUBLE_RANGE(x, y, a, b) y
 
 	public:
 		void Draw(Scene* scene) {}
