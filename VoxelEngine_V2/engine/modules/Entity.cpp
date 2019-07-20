@@ -11,11 +11,42 @@
 
 namespace Vxl
 {
+	// Unique IDs
+	uint32_t Entity::m_maxUniqueID = 0;
+	std::stack<uint32_t> Entity::m_discardedUniqueIDs;
+	std::map<uint32_t, Entity*> Entity::m_EntitiesByID;
+
 	Entity::Entity(const std::string& name, EntityType type)
 		: m_type(type)
 	{
 		SetName(name);
 		AddComponent(&m_transform, this);
+
+		// Check if there are discarded IDs to use
+		if (!m_discardedUniqueIDs.empty())
+		{
+			m_uniqueID = m_discardedUniqueIDs.top();
+			m_discardedUniqueIDs.pop();
+		}
+		// Generate new ID
+		else
+		{
+			m_uniqueID = (++m_maxUniqueID);
+		}
+
+		// Store Self by ID
+		m_EntitiesByID[m_uniqueID] = this;
+		// Create ColorID
+		m_colorID = Util::DataConversion::uint_to_color4(m_uniqueID);
+
+		VXL_ASSERT(m_maxUniqueID != -1, "You've reached the maximum unique ID's for Entities (that's 2.1 billion ._.')");
+	}
+	Entity::~Entity()
+	{
+		// Remove self by ID
+		m_EntitiesByID.erase(m_uniqueID);
+		// Remove Unique ID
+		m_discardedUniqueIDs.push(m_uniqueID);
 	}
 
 	void Entity::SetName(const std::string _name)

@@ -366,7 +366,6 @@ namespace Vxl
 
 			// Get GameObject for rendering
 			std::set<GameObject*>* entities = materialSet.second;
-			std::set<GameObject*> BENT = *entities;
 
 			for (auto& ent : *entities)
 			{
@@ -374,6 +373,60 @@ namespace Vxl
 					ent->Draw();
 			}
 		}
+
+	}
+	// Effectively non-gameobject entities need to have their own color ID show up in the color ID attachment.
+	// This function takes care of that without affecting albedo,normals,metallic,smoothness,etc...
+	void RenderManager::RenderSceneOtherObjectColorIDs()
+	{
+		// Extra Objects for COLOR ID
+		auto gbuffer_mat = Material::Get("gbuffer");
+		gbuffer_mat->BindProgram();
+		gbuffer_mat->BindStates();
+
+		// Force specific fbo draw buffers
+		auto fbo_gbuffer = FramebufferObject::Get("gbuffer");
+		// Store Depth for later usage
+		auto fbo_colorpicker = FramebufferObject::Get("ColorPicker");
+		
+		fbo_gbuffer->blitDepth(*fbo_colorpicker);
+
+		// Only render to COLOR ID Texture
+		fbo_gbuffer->disableAttachment(0);
+		fbo_gbuffer->disableAttachment(1);
+
+		// Default
+		gbuffer_mat->m_property_useModel.SetProperty(true);
+		gbuffer_mat->m_property_useInstancing.SetProperty(false);
+		gbuffer_mat->m_property_useTexture.SetProperty(false);
+		gbuffer_mat->m_property_tint.SetProperty(Color3F(1,1,1));
+		gbuffer_mat->m_property_color.SetProperty(Color3F(1,1,1));
+		
+		// Render CameraObjects
+		auto Cameras = CameraObject::GetDatabase();
+		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
+		{
+			gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
+			gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
+
+			Geometry.GetSphere()->Draw();
+		}
+		// Render LightObjects
+		auto Lights = LightObject::GetDatabase();
+		for (auto it = Lights.begin(); it != Lights.end(); it++)
+		{
+			gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
+			gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
+
+			Geometry.GetSphere()->Draw();
+		}
+
+		// Fix fbo draw buffers
+		fbo_gbuffer->enableAttachment(0);
+		fbo_gbuffer->enableAttachment(1);
+
+		// Revert Depth
+		fbo_colorpicker->blitDepth(*fbo_gbuffer);
 	}
 	void RenderManager::RenderEditorObjects()
 	{

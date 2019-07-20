@@ -266,7 +266,7 @@ namespace Vxl
 		Transform& setWorldPosition(const Vector3& position);
 		inline Transform& setWorldPosition(const Vector4& position)
 		{
-			return setWorldPosition(Vector3(position));
+			return setWorldPosition(position.GetVector3());
 		}
 
 		inline Transform& setPosition(float x, float y, float z)
@@ -289,7 +289,7 @@ namespace Vxl
 		}
 		inline Transform& setPosition(const Vector4& position)
 		{
-			m_position = Vector3(position);
+			m_position = position.GetVector3();
 			SetDirty();
 			return *this;
 		}
@@ -409,7 +409,7 @@ namespace Vxl
 		}
 		inline Transform& increaseWorldPosition(const Vector4& translate)
 		{
-			setWorldPosition(getWorldPosition() + Vector3(translate));
+			setWorldPosition(getWorldPosition() + translate.GetVector3());
 			return *this;
 		}
 
@@ -433,7 +433,7 @@ namespace Vxl
 		}
 		inline Transform& increasePosition(const Vector4& translate)
 		{
-			m_position += Vector3(translate);
+			m_position += translate.GetVector3();
 			SetDirty();
 			return *this;
 		}

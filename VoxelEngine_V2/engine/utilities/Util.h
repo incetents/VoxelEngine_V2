@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <iterator>
 
-
 namespace Vxl
 {
 	namespace Util
@@ -75,6 +74,7 @@ namespace Vxl
 
 			// Breaks uint into 4 uchars that are converted into [0,1] floats
 			static Vector4 uint_to_vec4(unsigned int input);
+			static Color4F uint_to_color4(unsigned int input);
 		};
 
 		// Aspect Ratio //

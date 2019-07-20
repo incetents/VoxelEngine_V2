@@ -87,6 +87,7 @@ namespace Vxl
 		// Render
 		void RenderFullScreen();
 		void RenderSceneGameObjects();
+		void RenderSceneOtherObjectColorIDs();
 		void RenderEditorObjects();
 		void RenderEditorObjectsPostDepth();
 

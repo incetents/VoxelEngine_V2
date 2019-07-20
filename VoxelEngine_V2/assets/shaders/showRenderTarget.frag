@@ -70,7 +70,7 @@ void main()
 	else if(outputMode == 4)
 	{
 		// convert to readable HSL regardless of color
-		float Hue = dot(_texture.rgb, vec3(8860.0f)); 
+		float Hue = dot(_texture.rgb, vec3(8794.0f)); 
 		output_color = vec4(HSV_TO_RGB(Hue, 0.75f, 1),1);
 	}
 	else // == 0

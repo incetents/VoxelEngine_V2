@@ -28,7 +28,6 @@ namespace Vxl
 			Transform* parent = m_parent;
 			while (parent != nullptr)
 			{
-				//m_worldrotation *= parent->getLocalRotation();
 				m_worldrotation = parent->getLocalRotation() * m_worldrotation;
 				m_world_ModelMatrix = parent->getLocalModel() * m_world_ModelMatrix;
 				parent = parent->getParent();

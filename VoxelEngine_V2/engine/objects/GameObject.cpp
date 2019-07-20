@@ -105,6 +105,12 @@ namespace Vxl
 				m_material->m_property_tint.SetProperty(m_Tint);
 			}
 
+			// ~ ColorID ~ //
+			if (m_material->m_property_output.IsUsed())
+			{
+				m_material->m_property_output.SetProperty(m_colorID);
+			}
+
 			// Draw Mesh
 			m_mesh->Draw();
 		}

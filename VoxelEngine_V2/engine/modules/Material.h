@@ -179,7 +179,7 @@ namespace Vxl
 		MaterialProperty<Color3F>		m_property_tint			 = MaterialProperty<Color3F>("VXL_tint");
 		MaterialProperty<Vector4>		m_property_viewport		 = MaterialProperty<Vector4>("VXL_viewport");
 		MaterialProperty<float>			m_property_alpha		 = MaterialProperty<float>("VXL_alpha");
-		MaterialProperty<Vector4>		m_property_output		 = MaterialProperty<Vector4>("VXL_output");
+		MaterialProperty<Color4F>		m_property_output		 = MaterialProperty<Color4F>("VXL_output");
 
 		template<typename Type>
 		void SetProperty(const std::string& _uniformName, Type _data)

@@ -97,8 +97,6 @@ namespace Vxl
 			Graphics::VBO::Bind(m_VBO);
 			Graphics::VBO::BindData(m_Size, (void*)_arr, _mode);
 
-			//glUtil::bindArray(m_VBO, m_Size, (GLvoid*)_arr, (GLenum)_mode);
-
 			UpdateDrawCount();
 		}
 		template<typename Type = float>
@@ -112,8 +110,6 @@ namespace Vxl
 		{
 			Graphics::VBO::Bind(m_VBO);
 			Graphics::VBO::BindSubData(offset, m_Size, (void*)_arr);
-
-			//glUtil::bindVBOSubData(m_VBO, offset, m_Size, (GLvoid*)_arr);
 		}
 
 		template<typename Type = float>
@@ -123,8 +119,6 @@ namespace Vxl
 
 			Graphics::VBO::Bind(m_VBO);
 			Graphics::VBO::BindSubData(offset, size, (void*)_arr);
-
-			//glUtil::bindVBOSubData(m_VBO, offset, size, (GLvoid*)_arr);
 		}
 
 		inline void SetLayout(const BufferLayout& layout)
@@ -155,7 +149,6 @@ namespace Vxl
 		}
 
 		void Bind();
-		void Draw(DrawType _draw);
 	};
 
 	// Element Buffer Object
@@ -212,7 +205,6 @@ namespace Vxl
 		}
 
 		void Bind();
-		void Draw(DrawType _draw);
 	};
 }
 

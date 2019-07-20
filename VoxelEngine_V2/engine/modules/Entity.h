@@ -5,6 +5,10 @@
 #include "../math/Transform.h"
 #include "../math/Color.h"
 #include "../utilities/Asset.h"
+#include "../utilities/Util.h"
+
+#include <map>
+#include <stack>
 
 #define MAX_ENTITY_NAME_LENGTH 256
 
@@ -31,21 +35,29 @@ namespace Vxl
 		// Locked Constructor
 		Entity(const std::string& name, EntityType type);
 
-		// Data
+		// Core Data
+		uint32_t	m_uniqueID;
+		Color4F		m_colorID;
 		EntityType  m_type;
 		std::string	m_name;
 		Color3F		m_Color = Color3F(1, 1, 1);
 		Color3F		m_Tint	= Color3F(1, 1, 1);
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
 		Vector3		m_AABB[2]; // AABB based on OBB
+
 		// Editor Information
 		Color3F		m_labelColor = Color3F(1, 1, 1); // Inspector
 		bool		m_isSelectable = true; //
 		bool		m_isSelected = false; // 
 
+		// Unique IDs
+		static uint32_t m_maxUniqueID;
+		static std::stack<uint32_t> m_discardedUniqueIDs;
+		static std::map<uint32_t, Entity*> m_EntitiesByID;
+
 	public:
 		// Destructor
-		virtual ~Entity() {}
+		virtual ~Entity();
 
 		// Data
 		Transform			m_transform;
@@ -53,6 +65,19 @@ namespace Vxl
 		bool				m_isActive = true;
 		bool				m_isColoredObject = false;
 		
+		// ID
+		inline uint64_t GetUniqueID(void) const
+		{
+			return m_uniqueID;
+		}
+		static Entity* GetEntityByID(uint32_t id)
+		{
+			if (m_EntitiesByID.find(id) == m_EntitiesByID.end())
+				return nullptr;
+
+			return m_EntitiesByID[id];
+		}
+
 		// Editor Information
 		inline void SetSelectable(bool state)
 		{

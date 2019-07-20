@@ -981,6 +981,10 @@ namespace Vxl
 		}
 
 		// ~ Return ~ //
+		_Vector2<Type> GetVector2() const
+		{
+			return _Vector2<Type>(x, y);
+		}
 		_Vector2<Type> GetVector2(uint32_t index1, uint32_t index2) const
 		{
 			return _Vector2<Type>(*(&x + index1), *(&x + index2));
@@ -1433,9 +1437,17 @@ namespace Vxl
 		}
 
 		// ~ Return ~ //
+		_Vector2<Type> GetVector2() const
+		{
+			return _Vector2<Type>(x, y);
+		}
 		_Vector2<Type> GetVector2(uint32_t index1, uint32_t index2) const
 		{
 			return _Vector2<Type>(*(&x + index1), *(&x + index2));
+		}
+		_Vector3<Type> GetVector3() const
+		{
+			return _Vector3<Type>(x, y, z);
 		}
 		_Vector3<Type> GetVector3(uint32_t index1, uint32_t index2, uint32_t index3) const
 		{

@@ -80,12 +80,12 @@ namespace Vxl
 
 
 		// FBO
-		_fbo_gbuffer = FramebufferObject::Create("Gbuffer");
+		_fbo_gbuffer = FramebufferObject::Create("gbuffer");
 		_fbo_gbuffer->setClearColor(Color4F(-1, -1, 0, 1));
 		_fbo_gbuffer->setSizeToWindowSize();
 		_fbo_gbuffer->addTexture("albedo", TextureFormat::R11F_G11F_B10F);
 		_fbo_gbuffer->addTexture("normal", TextureFormat::RGBA16_SNORM);
-		_fbo_gbuffer->addTexture("test");
+		_fbo_gbuffer->addTexture("colorID", TextureFormat::RGBA8);
 		_fbo_gbuffer->addDepth(TextureDepthFormat::DEPTH16, Attachment_Type::TEXTURE);
 		_fbo_gbuffer->complete();
 
@@ -551,6 +551,7 @@ namespace Vxl
 		//
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects();
+		RenderManager.RenderSceneOtherObjectColorIDs();
 
 		
 		//	if (Input.getKeyDown(KeyCode::K))
@@ -568,6 +569,8 @@ namespace Vxl
 		//
 		CPUTimer::EndTimer("Gbuffer");
 		GPUTimer::EndTimer();
+
+		
 
 		_fbo_editor->bind();
 		_fbo_editor->clearBuffers();
@@ -652,24 +655,24 @@ namespace Vxl
 				material_colorPicker->m_property_useModel.SetProperty(true);
 				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
 
-				Vector4 color;
+				Color4F color;
 
 				// Cube (ignored)
-				material_colorPicker->m_property_output.SetProperty(Vector4(0, 0, 0, 0));
+				material_colorPicker->m_property_output.SetProperty(Color4F(0, 0, 0, 0));
 				Geometry.GetCubeSmall()->Draw();
 
 				// X-arrow
-				color = Util::DataConversion::uint_to_vec4(1u);
+				color = Util::DataConversion::uint_to_color4(1u);
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetArrowX()->Draw();
 
 				// Y-arrow
-				color = Util::DataConversion::uint_to_vec4(2u);
+				color = Util::DataConversion::uint_to_color4(2u);
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetArrowY()->Draw();
 
 				// Z-arrow
-				color = Util::DataConversion::uint_to_vec4(3u);
+				color = Util::DataConversion::uint_to_color4(3u);
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetArrowZ()->Draw();
 
@@ -677,19 +680,19 @@ namespace Vxl
 
 				// X Plane
 				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
-				color = Util::DataConversion::uint_to_vec4(4u);
+				color = Util::DataConversion::uint_to_color4(4u);
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetHalfQuadX()->Draw();
 
 				// Y Plane
 				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
-				color = Util::DataConversion::uint_to_vec4(5u);
+				color = Util::DataConversion::uint_to_color4(5u);
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetHalfQuadY()->Draw();
 
 				// Z Plane
 				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
-				color = Util::DataConversion::uint_to_vec4(6u);
+				color = Util::DataConversion::uint_to_color4(6u);
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetHalfQuadZ()->Draw();
 
@@ -873,58 +876,8 @@ namespace Vxl
 		{
 			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 			{
-				_fbo_colorpicker->bind();
-				_fbo_colorpicker->clearBuffers();
-				Graphics::SetBlendState(false);
-
-				material_colorPicker->BindProgram();
-
-				auto Entities = RenderManager.GetAllEntities();
-				unsigned int EntityCount = (unsigned int)Entities.size();
-
-				for (unsigned int i = 0; i < EntityCount; i++)
-				{
-					auto Entity = Entities[i];
-
-					// Ignore if not active or not clickable
-					if (!Entity->IsFamilyActive() || !Entity->IsSelectable())
-						continue;
-
-					// Convert ID into color
-					Vector4 color = Util::DataConversion::uint_to_vec4(i + 1u);
-
-					// Vert
-					material_colorPicker->m_property_useModel.SetProperty(Entity->m_useTransform);
-					if (Entity->m_useTransform)
-						material_colorPicker->m_property_model.SetPropertyMatrix(Entity->m_transform.getWorldModel(), true);
-
-					material_colorPicker->m_property_useInstancing.SetProperty(false);
-
-					// Frag
-					material_colorPicker->m_property_output.SetProperty(color);
-
-					// Different Effect based on type
-					if (Entity->GetType() == EntityType::GAMEOBJECT)
-					{
-						GameObject* GameObj = dynamic_cast<GameObject*>(Entity);
-
-						material_colorPicker->m_property_useInstancing.SetProperty(!GameObj->GetMesh()->m_instances.Empty());
-
-						GameObj->GetMesh()->Draw();
-					}
-					else if (Entity->GetType() == EntityType::CAMERA)
-					{
-						Geometry.GetSphere()->Draw();
-					}
-					else if (Entity->GetType() == EntityType::LIGHT)
-					{
-						Geometry.GetSphere()->Draw();
-					}
-
-				}
-
-
-				RawArray<uint8_t> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
+				_fbo_gbuffer->bind();
+				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(2, 1, 1);
 
 				//	std::cout <<
 				//	(unsigned int)data[0] << ' ' <<
@@ -932,33 +885,34 @@ namespace Vxl
 				//	(unsigned int)data[2] << ' ' <<
 				//	(unsigned int)data[3] << ' ' <<
 				//	std::endl;
-
+				
 				unsigned int EntityIndex;
 				Util::DataConversion::uchars_to_uint(data.start, EntityIndex);
-				EntityIndex--;
+				std::cout << "Unique ID: " << EntityIndex << std::endl;
 				data.Deallocate();
 
+				Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
+
 				// Found an entity
-				if (EntityIndex < EntityCount)
+				if (SelectedEntity)
 				{
 					if (Input.getKey(KeyCode::LEFT_CONTROL))
 					{
-						if (!Entities[EntityIndex]->IsSelected())
-							Editor.AddSelection(Entities[EntityIndex]);
+						if (!SelectedEntity->IsSelected())
+							Editor.AddSelection(SelectedEntity);
 						else
-							Editor.RemoveSelection(Entities[EntityIndex]);
+							Editor.RemoveSelection(SelectedEntity);
 					}
 					else
 					{
 						Editor.ClearSelection();
-						Editor.AddSelection(Entities[EntityIndex]);
+						Editor.AddSelection(SelectedEntity);
 					}
 				}
 				else
 				{
 					Editor.ClearSelection();
 				}
-
 
 				//if ()
 				//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
@@ -1048,7 +1002,8 @@ namespace Vxl
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 4);
 
-				_fbo_colorpicker->bindTexture(0, TextureLevel::LEVEL0);
+				_fbo_gbuffer->bindTexture(2, TextureLevel::LEVEL0);
+				//_fbo_colorpicker->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 		}

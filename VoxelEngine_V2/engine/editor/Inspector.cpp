@@ -66,6 +66,9 @@ namespace Vxl
 				if (ImGui::InputText("input text", Name, IM_ARRAYSIZE(Name)))
 					Entity->SetName(std::string(Name));
 
+				// ID
+				ImGui::TextColored(ImGuiColor::Orange, "ID: %d", Entity->GetUniqueID());
+
 				// Color
 				float EntityColor[3] = { Entity->GetLabelColor().r, Entity->GetLabelColor().g, Entity->GetLabelColor().b };
 

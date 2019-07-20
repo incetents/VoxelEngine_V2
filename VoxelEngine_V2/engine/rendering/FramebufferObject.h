@@ -106,8 +106,8 @@ namespace Vxl
 		std::vector<FramebufferAttachment*>	m_textures;
 		uint8_t								m_textureCount = 0;
 		FramebufferAttachment*				m_depth = nullptr;
-		// Tracker //
-		//static GLuint m_boundID;
+		// Tracker
+		static FramebufferObjectID m_boundFBO;
 
 		// Utility
 		void load();
@@ -154,6 +154,10 @@ namespace Vxl
 		{
 			return m_height;
 		}
+		inline uint8_t GetAttachmentCount(void) const
+		{
+			return m_textureCount;
+		}
 
 		// Clears the color from an entire Texture
 		void clearBuffers();
@@ -168,6 +172,11 @@ namespace Vxl
 			TextureDepthFormat depthFormatType,
 			Attachment_Type fboRenderType
 		);
+
+		// Enable fbo attachments at runtime
+		void enableAttachment(uint32_t attachmentIndex);
+		// Disable fbo attachments at runtime
+		void disableAttachment(uint32_t attachmentIndex);
 
 		void bind();
 		void bind(uint32_t viewportX, uint32_t viewportY, uint32_t viewportW, uint32_t viewportH);

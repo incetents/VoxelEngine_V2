@@ -455,8 +455,8 @@ namespace Vxl
 
 		if (type == GL_DEBUG_TYPE_ERROR || severity == GL_DEBUG_SEVERITY_HIGH)
 		{
-			Logger.error(message);
-			std::system("PAUSE");
+			//Logger.error(message);
+			//std::system("PAUSE");
 		}
 		else
 		{
@@ -1901,9 +1901,14 @@ namespace Vxl
 		glBindFramebuffer(GL_FRAMEBUFFER, id);
 		gl_activeFBO = id;
 	}
-	void Graphics::FramebufferObject::DrawBuffers(uint32_t textureCount)
+	void Graphics::FramebufferObject::DrawBuffers(uint32_t attachmentCount)
 	{
-		glDrawBuffers(textureCount, GL_ColorAttachments);
+		glDrawBuffers(attachmentCount, GL_ColorAttachments);
+	}
+	void Graphics::FramebufferObject::DrawBuffer(uint32_t attachmentIndex)
+	{
+		GLenum arr[] = { GL_COLOR_ATTACHMENT0 + attachmentIndex };
+		glDrawBuffers(1, arr);
 	}
 	void Graphics::FramebufferObject::Unbind()
 	{
@@ -1953,6 +1958,10 @@ namespace Vxl
 		VXL_ASSERT(attachmentIndex < (uint32_t)GLMaxFBOColorAttachments, "attachmentIndex too high for AttachRenderTexture()");
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, texture.GetID(), 0);
 	}
+	void Graphics::FramebufferObject::DeattachRenderTexture(uint32_t attachmentIndex)
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, 0, 0);
+	}
 	void Graphics::FramebufferObject::AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.GetID(), 0);
@@ -2000,7 +2009,9 @@ namespace Vxl
 			GL_NEAREST
 		);
 
+		// Revert to default
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gl_activeFBO); // 500 IQ workaround for opengl
 
 		// ? Is this necessary ?
 		glReadBuffer(GL_FRONT);
@@ -2017,7 +2028,9 @@ namespace Vxl
 			GL_NEAREST
 		);
 
+		// Revert to default
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gl_activeFBO); // 500 IQ workaround for opengl
 	}
 
 	// ~ UBO ~ //

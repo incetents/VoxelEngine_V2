@@ -12,7 +12,7 @@
 
 namespace Vxl
 {
-	//GLuint FramebufferObject::m_boundID = 0;
+	FramebufferObjectID FramebufferObject::m_boundFBO = 0;
 
 	void FramebufferAttachment::load(int Width, int Height)
 	{
@@ -177,14 +177,9 @@ namespace Vxl
 
 	void FramebufferObject::bindFBO()
 	{
-		// Don't bind FBO if it hasn't changed
-		//if (m_boundID != m_id)
-		{
-			Graphics::FramebufferObject::Bind(m_id);
-			Graphics::FramebufferObject::DrawBuffers(m_textureCount);
-		}
-		// update bound FBO
-		//m_boundID = m_id;
+		m_boundFBO = m_id;
+		Graphics::FramebufferObject::Bind(m_id);
+		Graphics::FramebufferObject::DrawBuffers(m_textureCount);
 	}
 	void FramebufferObject::setSizeToWindowSize()
 	{
@@ -252,6 +247,23 @@ namespace Vxl
 		m_depth = new FramebufferAttachment("depth", fboRenderType, Graphics::GetFormat(depthFormatType), ChannelType, PixelType);
 	}
 
+	void FramebufferObject::enableAttachment(uint32_t attachmentIndex)
+	{
+		if (m_textures[attachmentIndex]->isRenderTexture())
+				Graphics::FramebufferObject::AttachRenderTexture(*m_textures[attachmentIndex]->m_renderTexture, attachmentIndex);
+		else
+			Graphics::FramebufferObject::AttachRenderBuffer(*m_textures[attachmentIndex]->m_renderBuffer, attachmentIndex);
+	}
+	void FramebufferObject::disableAttachment(uint32_t attachmentIndex)
+	{
+		// Color attachments
+		if (m_textures[attachmentIndex]->isRenderTexture())
+			Graphics::FramebufferObject::DeattachRenderTexture(attachmentIndex);
+			//Graphics::FramebufferObject::AttachRenderTexture(*m_textures[i]->m_renderTexture, i);
+		//else
+			//Graphics::FramebufferObject::AttachRenderBuffer(*m_textures[i]->m_renderBuffer, i);
+	}
+
 	void FramebufferObject::bind()
 	{
 		bindFBO();
@@ -302,7 +314,7 @@ namespace Vxl
 	{
 		// Both fbos must have depth
 		VXL_ASSERT(m_depth != nullptr && destFBO.m_depth != nullptr, "FBO, blitDepth doesn't have depth on both FBO's");
-		// Must have matching formats
+		// Must have matching depth formats
 		VXL_ASSERT(m_depth->GetFormatType() == destFBO.m_depth->GetFormatType(), "FBO, blitDepth doesn't have matching depth formats");
 		// Must have matching sizes
 		VXL_ASSERT(m_width == destFBO.m_width && m_height == destFBO.m_height, "FBO, blitDepth doesn't have matching sizes");
@@ -314,7 +326,7 @@ namespace Vxl
 	void FramebufferObject::generateMipmaps(unsigned int textureIndex)
 	{
 		VXL_ASSERT(textureIndex < m_textureCount, "FBO, index out of bounds");
-		//VXL_ASSERT(m_id == m_boundID, "FBO" + m_name + "must be bound before generating mipmaps for its color attachments");
+		VXL_ASSERT(m_boundFBO == m_id, "FBO must be found before generating mipmaps");
 		VXL_ASSERT(m_textures[textureIndex]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		// Create mipmapping for Fbo Texture

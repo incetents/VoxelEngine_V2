@@ -688,10 +688,12 @@ namespace Vxl
 			FramebufferObjectID Create(void);
 			void				Delete(FramebufferObjectID id);
 			void				Bind(FramebufferObjectID id);
-			void				DrawBuffers(uint32_t textureCount);
+			void				DrawBuffers(uint32_t attachmentCount);
+			void				DrawBuffer(uint32_t attachmentIndex);
 			void				Unbind(void);
 			bool				CheckStatus(void);
 			void AttachRenderTexture(const Vxl::RenderTexture& texture, uint32_t attachmentIndex);
+			void DeattachRenderTexture(uint32_t attachmentIndex);
 			void AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture);
 			void AttachRenderBuffer(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex);
 			void AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture);

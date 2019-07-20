@@ -2,6 +2,9 @@
 #include "Precompiled.h"
 #include "Util.h"
 
+#include "../math/Vector.h"
+#include "../math/Color.h"
+
 namespace Vxl
 {
 	namespace Util
@@ -53,6 +56,17 @@ namespace Vxl
 			unsigned char cx, cy, cz, cw;
 			uint_to_uchars(input, cx, cy, cz, cw);
 			return Vector4(
+				(float)cx / 255.0f,
+				(float)cy / 255.0f,
+				(float)cz / 255.0f,
+				(float)cw / 255.0f
+			);
+		}
+		Color4F DataConversion::uint_to_color4(unsigned int input)
+		{
+			unsigned char cx, cy, cz, cw;
+			uint_to_uchars(input, cx, cy, cz, cw);
+			return Color4F(
 				(float)cx / 255.0f,
 				(float)cy / 255.0f,
 				(float)cz / 255.0f,

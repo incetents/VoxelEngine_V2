@@ -45,12 +45,6 @@ namespace Vxl
 		}
 	}
 
-	void VBO::Draw(DrawType _draw)
-	{
-		Logger.error("plz no");
-		//glDrawArrays((GLenum)_draw, 0, m_DrawCount);
-	}
-
 	// EBO //
 
 	void EBO::SetIndices(uint32_t* _arr, uint32_t _count, BufferUsage _mode)
@@ -77,11 +71,6 @@ namespace Vxl
 	{
 		if (m_EBO != -1)
 			Graphics::EBO::Bind(m_EBO);
-	}
-	void EBO::Draw(DrawType _draw)
-	{
-		Logger.error("plz no");
-		//glDrawElements((GLenum)_draw, m_DrawCount, GL_UNSIGNED_INT, 0);
 	}
 }
 
