@@ -1,7 +1,0 @@
-﻿  glUtil.cpp
-glUtil.obj : error LNK2019: unresolved external symbol _gl3wInit referenced in function "bool __cdecl Vxl::glUtil::initGlew(void)" (?initGlew@glUtil@Vxl@@YA_NXZ)
-glUtil.obj : error LNK2019: unresolved external symbol _gl3wIsSupported referenced in function "bool __cdecl Vxl::glUtil::initGlew(void)" (?initGlew@glUtil@Vxl@@YA_NXZ)
-C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\VoxelEngine_V2\\lib\glfw3.lib : warning LNK4272: library machine type 'x64' conflicts with target machine type 'x86'
-C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\VoxelEngine_V2\\lib\glfw3dll.lib : warning LNK4272: library machine type 'x64' conflicts with target machine type 'x86'
-C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\VoxelEngine_V2\\lib\soil.lib : warning LNK4272: library machine type 'x64' conflicts with target machine type 'x86'
-C:\Users\User\Desktop\C++Projects\VoxelEngine_V2\Debug\VoxelEngine_V2.exe : fatal error LNK1120: 2 unresolved externals

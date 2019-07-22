@@ -8,9 +8,9 @@ namespace Vxl
 		friend class RenderManager;
 	private:
 		Layer() {} // New ones cannot be created outside rendermanager
-		UINT m_id; // Unique bit ID
+		uint32_t m_id; // Unique bit ID
 	public:
-		inline const UINT GetID(void) const
+		inline const uint32_t GetID(void) const
 		{
 			return m_id;
 		}

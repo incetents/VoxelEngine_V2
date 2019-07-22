@@ -24,6 +24,9 @@
 #VERT billboard_vert  	./assets/shaders/billboard.vert
 #FRAG billboard_frag 	./assets/shaders/billboard.frag
 
+#VERT font_vert  	./assets/shaders/font.vert
+#FRAG font_frag 	./assets/shaders/font.frag
+
 //#VERT broken ./assets/shaders/broken.txt
 
 //----------------------------------------
@@ -38,6 +41,7 @@ lines 				lines_vert					lines_geom 				lines_frag
 colorPicker 		gbuffer_vert 				colorPicker_frag
 showRenderTarget 	passthrough_vert 			showRenderTarget
 billboard 			billboard_vert				billboard_frag
+font 				font_vert 					font_frag
 
 //----------------------------------------
 #TEXTURE

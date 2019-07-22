@@ -15,6 +15,7 @@
 
 namespace Vxl
 {
+	typedef std::map<std::string, Graphics::Attribute> AttributeStorage;
 	typedef std::map<std::string, Graphics::Uniform> UniformStorage;
 	typedef std::map<std::string, Graphics::UniformBlock> UniformBlockStorage;
 	typedef std::map<ShaderType, Graphics::UniformSubroutine> SubroutineStorage;
@@ -113,6 +114,8 @@ namespace Vxl
 		bool				 m_linked = false;
 		BYTE				 m_shaderCount : 3; // 3 bits, val is 8 max
 		std::vector<Shader*> m_shaders;
+		// Attributes //
+		AttributeStorage	 m_attributes;
 		// Uniforms //
 		UniformStorage		 m_uniforms;
 		UniformBlockStorage  m_uniformBlocks;
@@ -121,7 +124,7 @@ namespace Vxl
 		// Error //			 
 		std::string			 m_errorMessage;
 		// Tracker //		 
-		static uint32_t		 m_boundID;
+		//static uint32_t		 m_boundID;
 
 		// Utility
 		bool createProgram();
@@ -157,7 +160,6 @@ namespace Vxl
 
 		void Bind(void) const;
 		static void Unbind(void);
-		static UINT GetBoundProgram(void);
 
 		// Uniform
 

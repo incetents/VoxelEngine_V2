@@ -49,10 +49,14 @@
 
 #include "../game/terrain/TerrainManager.h"
 
+#include "../engine/rendering/Text.h"
+
 namespace Vxl
 {
 	void Scene_Game::Setup()
 	{
+		Text::Init();
+
 		Loader::LoadScript_ImportFiles("./assets/scripts/ImportFiles.txt");
 
 		//_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
@@ -553,6 +557,25 @@ namespace Vxl
 		RenderManager.RenderSceneGameObjects();
 		RenderManager.RenderSceneOtherObjectColorIDs();
 
+		// Font Rndering Testing //
+		auto shader_font = ShaderProgram::Get("font");
+		shader_font->Bind();
+
+		Graphics::SetDepthMask(false);
+		Graphics::SetDepthTestState(false);
+		Graphics::SetBlendState(true);
+		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
+
+		shader_font->SetUniformMatrix("projection", Matrix4x4::Orthographic(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, -10, 10), true);
+		shader_font->SetUniform<Vector3>("textColor", Vector3(1, 1, 1));
+
+		Graphics::Texture::SetActiveLevel(TextureLevel::LEVEL0);
+
+		Text::Render("quickly", sinf(Time.GetTime() * 4.0) * 100.0f + 100.0f, cosf(Time.GetTime() * 4.0) * 100.0f + 100.0f, 1.0f);
+
+		shader_font->Unbind();
+		// Font Rndering Testing //
+
 		
 		//	if (Input.getKeyDown(KeyCode::K))
 		//	{
@@ -564,6 +587,8 @@ namespace Vxl
 		//		std::cout << "~~~" << std::endl;
 		//		test.Deallocate();
 		//	}
+
+		// FONT TEST END
 		
 
 		//
@@ -584,6 +609,7 @@ namespace Vxl
 
 		Graphics::ClearBuffer(BufferBit::DEPTH);
 		RenderManager.RenderEditorObjectsPostDepth();
+
 		//
 		GPUTimer::EndTimer();
 
@@ -1003,7 +1029,6 @@ namespace Vxl
 				_shader_showRenderTarget->SetUniform("outputMode", 4);
 
 				_fbo_gbuffer->bindTexture(2, TextureLevel::LEVEL0);
-				//_fbo_colorpicker->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 		}

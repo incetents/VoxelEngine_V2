@@ -62,14 +62,14 @@ namespace Vxl
 		{}
 		void SetProperty(Type _data)
 		{
-			VXL_ASSERT(ShaderProgram::GetBoundProgram() == m_program->GetID(), "Cannot change property without binding associated program first");
+			VXL_ASSERT(Graphics::ShaderProgram::GetCurrentlyActive() == m_program->GetID(), "Cannot change property without binding associated program first");
 			VXL_ASSERT(m_uniform.location != -1, "Property has no attached Uniform");
 			m_uniform.Send<Type>(_data);
 		}
 		// Only works for matrices
 		void SetPropertyMatrix(Type _data, bool _transpose)
 		{
-			VXL_ASSERT(ShaderProgram::GetBoundProgram() == m_program->GetID(), "Cannot change property without binding associated program first");
+			VXL_ASSERT(Graphics::ShaderProgram::GetCurrentlyActive() == m_program->GetID(), "Cannot change property without binding associated program first");
 			VXL_ASSERT(m_uniform.location != -1, "Property has no attached Uniform");
 			m_uniform.SendMatrix<Type>(_data, _transpose);
 		}

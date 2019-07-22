@@ -106,8 +106,6 @@ namespace Vxl
 		std::vector<FramebufferAttachment*>	m_textures;
 		uint8_t								m_textureCount = 0;
 		FramebufferAttachment*				m_depth = nullptr;
-		// Tracker
-		static FramebufferObjectID m_boundFBO;
 
 		// Utility
 		void load();

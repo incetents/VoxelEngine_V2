@@ -63,6 +63,7 @@ namespace Vxl
 
 		// Bind Shader
 		m_shaderProgram->Bind();
+		
 	}
 	void Material::BindStates()
 	{

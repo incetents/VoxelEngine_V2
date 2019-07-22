@@ -390,6 +390,7 @@ namespace Vxl
 		extern float GLMaxAnisotropy;
 		extern int GLMaxFBOColorAttachments;
 		extern int GLMaxUniformBindings;
+		extern int GLMaxAttributes;
 
 		extern std::string Gpu_Renderer;
 		extern std::string Gpu_OpenGLVersion;
@@ -478,6 +479,15 @@ namespace Vxl
 		uint32_t GetChannelCount(TextureChannelType type);
 		uint32_t GetChannelCount(TextureFormat format);
 		TextureFormat GetFormat(TextureDepthFormat format);
+
+		// ~ Attributes ~ //
+		struct Attribute
+		{
+			uint32_t location;
+			uint32_t type;
+			int size;
+			std::string name;
+		};
 
 		// ~ Uniforms ~ //
 		struct Uniform
@@ -602,9 +612,11 @@ namespace Vxl
 			bool			Link(ShaderProgramID program);
 			bool			Validate(ShaderProgramID program);
 			void			Enable(ShaderProgramID program);
-			void			Disable();
+			void			Disable(void);
+			ShaderProgramID		GetCurrentlyActive(void);
 			std::string		GetError(ShaderProgramID id);
 
+			std::map<std::string, Attribute> AcquireAttributes(ShaderProgramID id);
 			std::map<std::string, Uniform> AcquireUniforms(ShaderProgramID id);
 			std::map<std::string, UniformBlock> AcquireUniformBlocks(ShaderProgramID id);
 			std::map<ShaderType, UniformSubroutine> AcquireUniformSubroutines(ShaderProgramID id, std::vector<Vxl::Shader*> shaders);
@@ -692,6 +704,7 @@ namespace Vxl
 			void				DrawBuffer(uint32_t attachmentIndex);
 			void				Unbind(void);
 			bool				CheckStatus(void);
+			FramebufferObjectID	GetCurrentlyBound(void);
 			void AttachRenderTexture(const Vxl::RenderTexture& texture, uint32_t attachmentIndex);
 			void DeattachRenderTexture(uint32_t attachmentIndex);
 			void AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture);

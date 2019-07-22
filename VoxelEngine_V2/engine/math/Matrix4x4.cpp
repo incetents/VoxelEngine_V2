@@ -252,20 +252,20 @@ namespace Vxl
 		float zdiff = zfar - znear;
 
 		return Matrix4x4(
-			2.0f / xdiff, 0, 0, 0,
-			0, 2.0f / ydiff, 0, 0,
-			0, 0, 2.0f / zdiff, 0,
-			-(xmax + xmin) / xdiff, -(ymax + ymin) / ydiff, -(zfar + znear) / zdiff, 1.0f
+			2.0f / xdiff, 0, 0, -(xmax + xmin) / xdiff,
+			0, 2.0f / ydiff, 0, -(ymax + ymin) / ydiff,
+			0, 0, -2.0f / zdiff, -(zfar + znear) / zdiff,
+			0, 0, 0, 1.0f
 		);
 	}
 	// [ROW MAJOR]
 	Matrix4x4 Matrix4x4::OrthographicInverse(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
 	{
 		return Matrix4x4(
-			(xmax - xmin) / +2.0f, 0, 0, 0,
-			0, (ymax - ymin) / +2.0f, 0, 0,
-			0, 0, (zfar - znear) / -2.0f, 0,
-			(xmax + xmin) / +2.0f, (ymax + ymin) / +2.0f, (zfar + znear) / -2.0f, 1.0f
+			(xmax - xmin) * 0.5f, 0, 0, (xmax + xmin) * 0.5f,
+			0, (ymax - ymin) * 0.5f, 0, (ymax + ymin) * 0.5f,
+			0, 0, (zfar - znear) * -0.5f, (zfar + znear) * -0.5f,
+			0, 0, 0, 1.0f
 		);
 	}
 	void Matrix4x4::Orthographic_UpdateX(Matrix4x4& M, float xmin, float xmax)

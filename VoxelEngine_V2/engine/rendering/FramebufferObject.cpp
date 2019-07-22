@@ -12,8 +12,6 @@
 
 namespace Vxl
 {
-	FramebufferObjectID FramebufferObject::m_boundFBO = 0;
-
 	void FramebufferAttachment::load(int Width, int Height)
 	{
 		unload();
@@ -177,7 +175,6 @@ namespace Vxl
 
 	void FramebufferObject::bindFBO()
 	{
-		m_boundFBO = m_id;
 		Graphics::FramebufferObject::Bind(m_id);
 		Graphics::FramebufferObject::DrawBuffers(m_textureCount);
 	}
@@ -326,7 +323,7 @@ namespace Vxl
 	void FramebufferObject::generateMipmaps(unsigned int textureIndex)
 	{
 		VXL_ASSERT(textureIndex < m_textureCount, "FBO, index out of bounds");
-		VXL_ASSERT(m_boundFBO == m_id, "FBO must be found before generating mipmaps");
+		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be found before generating mipmaps");
 		VXL_ASSERT(m_textures[textureIndex]->isRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		// Create mipmapping for Fbo Texture

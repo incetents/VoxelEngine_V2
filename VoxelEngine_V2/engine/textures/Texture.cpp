@@ -23,8 +23,8 @@ namespace Vxl
 		TextureFilter		FilterMode,
 		TextureFormat		FormatType,
 		//TextureChannelType	ChannelType,
-		TexturePixelType		PixelType,
-		AnisotropicMode  AnisotropicMode
+		TexturePixelType	PixelType,
+		AnisotropicMode		AnisotropicMode
 	)
 		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::NONE, PixelType, AnisotropicMode, UseMipMapping)
 	{
@@ -59,7 +59,7 @@ namespace Vxl
 	// [ Create Custom ]
 	Texture::Texture(
 		const std::string& name,
-		std::vector<Color3F> pixels, UINT width,
+		std::vector<Color3F> pixels, uint32_t width,
 		bool			UseMipMapping,
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
@@ -91,8 +91,41 @@ namespace Vxl
 
 		// Storage
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
-		//glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // helps prevent textures smaller than 4x4 not get corrupted
+
 		updateStorage(&m_image[0]);
+		updateMipmapping();
+
+		// glName
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
+
+		// finished
+		Unbind();
+		m_loaded = true;
+	}
+	// Constructor [Create custom]
+	Texture::Texture(
+		const std::string& name,
+		void* pixels,
+		uint32_t width, uint32_t height,
+		bool				UseMipMapping,
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		TextureChannelType	ChannelType,
+		TexturePixelType	PixelType,
+		AnisotropicMode		AnisotropicMode
+	)	
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
+	{
+		m_width = width;
+		m_height = height;
+		m_channelCount = 3;
+
+		// Storage
+		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
+
+		//updateParameters();
+		updateStorage(pixels);
 		updateMipmapping();
 
 		// glName
@@ -131,7 +164,7 @@ namespace Vxl
 
 	Texture* Texture::CreateCustom(
 		const std::string& name,
-		std::vector<Color3F> pixels, UINT width,
+		std::vector<Color3F> pixels, uint32_t width,
 		bool			UseMipMapping,
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
@@ -141,6 +174,32 @@ namespace Vxl
 		AnisotropicMode		AnisotropicMode
 	) {
 		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
+
+		AddToDatabase(name, _texture);
+
+		if (_texture == nullptr)
+			return false;
+		else if (!_texture->IsLoaded())
+			return false;
+
+		Message_Created(name, _texture);
+
+		return _texture;
+	}
+	// Create custom texture
+	Texture* Texture::CreateCustom(
+		const std::string& name,
+		void* pixels, uint32_t width, uint32_t height,
+		bool				UseMipMapping,
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		TextureChannelType	ChannelType,
+		TexturePixelType	PixelType,
+		AnisotropicMode		AnisotropicMode
+	)
+	{
+		Texture* _texture = new Texture(name, pixels, width, height, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
 		AddToDatabase(name, _texture);
 

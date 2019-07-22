@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../utilities/singleton.h"
+#include "../math/Vector.h"
 
 #include <Windows.h>
 #include <string>

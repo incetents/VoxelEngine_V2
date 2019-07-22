@@ -20,6 +20,5 @@ namespace Vxl
 	{
 		m_VAO.bind();
 		Graphics::Draw::Array(m_type, m_drawCount);
-		//glDrawArrays((GLenum)m_type, 0, m_drawCount);
 	}
 }

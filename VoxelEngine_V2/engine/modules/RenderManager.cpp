@@ -467,6 +467,7 @@ namespace Vxl
 		}
 
 		// Draw Debug Lines
+
 		auto lines = Material::Get("lines");
 		lines->BindProgram();
 		lines->m_property_viewport.SetProperty(Window.GetViewport());
@@ -488,6 +489,8 @@ namespace Vxl
 		Debug.RenderScreenLines();
 
 		Graphics::SetDepthMask(true);
+
+
 
 		// Draw Debug Wireframe Sphere
 		auto passthrough = Material::Get("passthrough");

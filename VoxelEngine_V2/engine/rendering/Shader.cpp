@@ -138,7 +138,7 @@ namespace Vxl
 
 	// SHADER PROGRAM //
 
-	uint32_t ShaderProgram::m_boundID = 0;
+	//uint32_t ShaderProgram::m_boundID = 0;
 
 	bool ShaderProgram::createProgram()
 	{
@@ -209,6 +209,9 @@ namespace Vxl
 
 		if (m_linked)
 		{
+			// attributes //
+			m_attributes = Graphics::ShaderProgram::AcquireAttributes(m_id);
+			// uniforms //
 			m_uniforms = Graphics::ShaderProgram::AcquireUniforms(m_id);
 			m_uniformBlocks = Graphics::ShaderProgram::AcquireUniformBlocks(m_id);
 			m_subroutines = Graphics::ShaderProgram::AcquireUniformSubroutines(m_id, m_shaders);
@@ -231,7 +234,7 @@ namespace Vxl
 	void ShaderProgram::Bind() const
 	{
 		// Don't bind program if it hasn't changed
-		if (m_boundID != m_id)
+		//if (m_boundID != m_id)
 			Graphics::ShaderProgram::Enable(m_id);
 
 		// Bind subroutines
@@ -242,22 +245,17 @@ namespace Vxl
 		}
 
 		// update bound program
-		ShaderProgram::m_boundID = m_id;
+		//ShaderProgram::m_boundID = m_id;
 	}
 
 	void ShaderProgram::Unbind()
 	{
 		// Don't bind program if it hasn't changed
-		if (m_boundID != 0)
+		//if (m_boundID != 0)
 			Graphics::ShaderProgram::Disable();
 
 		// update bound program
-		ShaderProgram::m_boundID = 0;
-	}
-
-	UINT ShaderProgram::GetBoundProgram(void)
-	{
-		return m_boundID;
+		//ShaderProgram::m_boundID = 0;
 	}
 
 }

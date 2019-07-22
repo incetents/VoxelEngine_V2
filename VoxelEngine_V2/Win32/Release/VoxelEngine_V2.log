@@ -1,0 +1,133 @@
+﻿  Editor.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\editor\editor.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Input.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\input\input.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  XGamePad.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\input\xgamepad.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  MathCore.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\mathcore.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Model.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\model.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  CameraObject.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\objects\cameraobject.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Entity.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\modules\entity.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  GameObject.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\objects\gameobject.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Layer.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\modules\layer.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  LightObject.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\objects\lightobject.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Material.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\modules\material.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  RenderManager.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\modules\rendermanager.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Scene.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\modules\scene.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Debug.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\debug.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  FramebufferObject.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\framebufferobject.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Geometry.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\geometry.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Graphics.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\graphics.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  LineMesh.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\linemesh.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  RenderBuffer.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\renderbuffer.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  UBO.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\ubo.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Compiling...
+  VBO.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\vbo.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  BaseTexture.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\textures\basetexture.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Cubemap.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\textures\cubemap.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  RenderTexture.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\textures\rendertexture.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Texture.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\textures\texture.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  TextureBinder.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\textures\texturebinder.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  FileIO.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\utilities\fileio.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Loader.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\utilities\loader.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Macros.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\utilities\macros.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Time.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\utilities\time.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Util.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\utilities\util.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  DevConsole.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\editor\devconsole.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Hierarchy.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\editor\hierarchy.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Inspector.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\editor\inspector.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Performance.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\editor\performance.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  ShaderErrors.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\editor\shadererrors.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Scene_Game.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\game\scene_game.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Block.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\game\terrain\block.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Chunk.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\game\terrain\chunk.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  ChunkMesh.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\game\terrain\chunkmesh.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Compiling...
+  TerrainManager.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\game\terrain\terrainmanager.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  imgui.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\imgui\imgui.cpp(1): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  imgui_colors.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\imgui\imgui_colors.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  imgui_demo.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\imgui\imgui_demo.cpp(1): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  imgui_draw.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\imgui\imgui_draw.cpp(1): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  imgui_impl_glfw.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\imgui\imgui_impl_glfw.cpp(1): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  imgui_impl_opengl3.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\imgui\imgui_impl_opengl3.cpp(1): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  imgui_widgets.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\imgui\imgui_widgets.cpp(1): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Color.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\color.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Matrix2x2.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\matrix2x2.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Matrix3x3.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\matrix3x3.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Matrix4x4.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\matrix4x4.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  MatrixStack.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\matrixstack.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Quaternion.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\quaternion.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Rotation.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\rotation.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Transform.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\math\transform.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  main.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\main.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Mesh.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\mesh.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Shader.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\shader.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Uniform.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\uniform.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  Compiling...
+  Precompiled.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\precompiled.cpp(1): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  stringUtil.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\utilities\stringutil.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  glfwCallbacks.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\window\glfwcallbacks.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  window.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\window\window.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory
+  MeshBuffer.cpp
+c:\users\incet\onedrive\desktop\c++ projects\voxelengine_v2\voxelengine_v2\engine\rendering\meshbuffer.cpp(2): fatal error C1083: Cannot open precompiled header file: 'Win32\Release\VoxelEngine_V2.pch': No such file or directory

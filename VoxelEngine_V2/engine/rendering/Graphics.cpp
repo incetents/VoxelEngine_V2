@@ -39,6 +39,7 @@ namespace Vxl
 	float Graphics::GLMaxAnisotropy = -1;
 	int Graphics::GLMaxFBOColorAttachments = -1;
 	int Graphics::GLMaxUniformBindings = -1;
+	int Graphics::GLMaxAttributes = -1;
 
 	std::string Graphics::Gpu_Renderer;
 	std::string Graphics::Gpu_OpenGLVersion;
@@ -75,6 +76,7 @@ namespace Vxl
 	TextureID			gl_activeTextureId = 0;
 	TextureLevel		gl_activeTextureLayer = TextureLevel::NONE;
 	FramebufferObjectID gl_activeFBO = 0;
+	ShaderProgramID		gl_activeShaderProgram = 0;
 	float				gl_lineWidth = 1.0f;
 
 	// ~ Graphics Enums ~ //
@@ -522,6 +524,7 @@ namespace Vxl
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &GLMaxAnisotropy);
 		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &GLMaxFBOColorAttachments);
 		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &GLMaxUniformBindings);
+		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &GLMaxAttributes);
 
 		// VRAM MAximum
 		if (Vendor == VendorType::NVIDIA)
@@ -552,6 +555,9 @@ namespace Vxl
 
 		gl_activeTextureId = 0;
 		gl_activeTextureLayer = TextureLevel::NONE;
+
+		gl_activeFBO = 0;
+		gl_activeShaderProgram = 0;
 
 		// Set Default Cull Mode
 		SetCullMode(CullMode::COUNTER_CLOCKWISE);
@@ -1428,11 +1434,23 @@ namespace Vxl
 	}
 	void Graphics::ShaderProgram::Enable(ShaderProgramID program)
 	{
+		if (gl_activeShaderProgram == program)
+			return;
+
 		glUseProgram(program);
+		gl_activeShaderProgram = program;
 	}
 	void Graphics::ShaderProgram::Disable()
 	{
+		if (gl_activeShaderProgram == 0)
+			return;
+
 		glUseProgram(0);
+		gl_activeShaderProgram = 0;
+	}
+	ShaderProgramID Graphics::ShaderProgram::GetCurrentlyActive(void)
+	{
+		return gl_activeShaderProgram;
 	}
 	std::string	Graphics::ShaderProgram::GetError(ShaderProgramID id)
 	{
@@ -1455,12 +1473,11 @@ namespace Vxl
 	}
 	std::map<std::string, Graphics::Uniform> Graphics::ShaderProgram::AcquireUniforms(ShaderProgramID id)
 	{
-		GLint uniform_count;
-
 		const GLsizei bufSize = 128; // maximum name length
 		GLchar name[bufSize]; // variable name in GLSL
 		GLsizei length; // name length
 
+		GLint uniform_count;
 		glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &uniform_count);
 		//printf("Active Uniforms: %d\n", m_uniformCount);
 
@@ -1593,6 +1610,37 @@ namespace Vxl
 
 		return subroutines;
 	}
+	
+	std::map<std::string, Graphics::Attribute> Graphics::ShaderProgram::AcquireAttributes(ShaderProgramID id)
+	{
+		GLint size; // size of the variable
+		GLenum type; // type of the variable (float, vec3 or mat4, etc)
+
+		const GLsizei bufSize = 16; // maximum name length
+		GLchar name[bufSize]; // variable name in GLSL
+		GLsizei length; // name length
+
+		std::map<std::string, Graphics::Attribute> attributes;
+
+		int attributeCount;
+		glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &attributeCount);
+		//printf("Active Attributes: %d\n", attributeCount);
+
+		for (GLint i = 0; i < attributeCount; i++)
+		{
+			glGetActiveAttrib(id, (GLuint)i, bufSize, &length, &size, &type, name);
+
+			auto& attrib = attributes[name];
+			attrib.location = glGetAttribLocation(id, name);
+			attrib.type = type;
+			attrib.size = size;
+			attrib.name = name;
+
+			//printf("Attribute #%d Type: %u Name: %s\n", loc, type, name);
+		}
+
+		return attributes;
+	}
 
 	// ~ Buffers ~ //
 
@@ -1656,7 +1704,7 @@ namespace Vxl
 
 	void Graphics::VBO::SetVertexAttribState(uint32_t bufferIndex, bool state)
 	{
-		if(state)
+		if (state)
 			glEnableVertexAttribArray(bufferIndex);
 		else
 			glDisableVertexAttribArray(bufferIndex);
@@ -1952,6 +2000,10 @@ namespace Vxl
 		// Return true if framebuffer complete
 		return (e == GL_FRAMEBUFFER_COMPLETE) ? true : false;
 	}
+	FramebufferObjectID Graphics::FramebufferObject::GetCurrentlyBound(void)
+	{
+		return gl_activeFBO;
+	}
 
 	void Graphics::FramebufferObject::AttachRenderTexture(const Vxl::RenderTexture& texture, uint32_t attachmentIndex)
 	{
@@ -2009,9 +2061,9 @@ namespace Vxl
 			GL_NEAREST
 		);
 
-		// Revert to default
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gl_activeFBO); // 500 IQ workaround for opengl
+		// Revert to default // 500 IQ workaround for opengl
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, gl_activeFBO);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gl_activeFBO); 
 
 		// ? Is this necessary ?
 		glReadBuffer(GL_FRONT);
@@ -2028,9 +2080,9 @@ namespace Vxl
 			GL_NEAREST
 		);
 
-		// Revert to default
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gl_activeFBO); // 500 IQ workaround for opengl
+		// Revert to default // 500 IQ workaround for opengl
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, gl_activeFBO);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gl_activeFBO); 
 	}
 
 	// ~ UBO ~ //

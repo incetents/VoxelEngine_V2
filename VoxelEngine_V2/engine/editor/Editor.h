@@ -2,6 +2,8 @@
 #pragma once
 
 #include "../utilities/singleton.h"
+#include "../math/Vector.h"
+#include "../math/Matrix4x4.h"
 #include "../math/MathCore.h"
 
 #include <vector>

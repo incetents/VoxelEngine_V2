@@ -67,9 +67,6 @@ namespace Vxl
 				TextureBinder::BindTextures();
 			}
 
-			// Set Material Properties
-			auto p = ShaderProgram::GetBoundProgram();
-
 			// ~ Model ~ //
 			if(m_material->m_property_useModel.IsUsed())
 				m_material->m_property_useModel.SetProperty(m_useTransform);
