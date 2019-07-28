@@ -38,3 +38,9 @@ Debug/
 x64/
 
 \.vs/
+
+build32/
+
+build64/
+
+VoxelEngine_V2/Win32/
