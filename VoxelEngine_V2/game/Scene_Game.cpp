@@ -56,6 +56,7 @@ namespace Vxl
 	void Scene_Game::Setup()
 	{
 		Text::Init();
+		Text::LoadFont("arial", "assets/fonts/arial.ttf");
 
 		Loader::LoadScript_ImportFiles("./assets/scripts/ImportFiles.txt");
 
@@ -331,6 +332,8 @@ namespace Vxl
 	}
 	void Scene_Game::Destroy()
 	{
+		Text::Destroy();
+
 		TerrainManager.Destroy();
 	}
 
@@ -557,7 +560,7 @@ namespace Vxl
 		RenderManager.RenderSceneGameObjects();
 		RenderManager.RenderSceneOtherObjectColorIDs();
 
-		// Font Rndering Testing //
+		// Font Rendering Testing //
 		auto shader_font = ShaderProgram::Get("font");
 		shader_font->Bind();
 
@@ -571,10 +574,17 @@ namespace Vxl
 
 		Graphics::Texture::SetActiveLevel(TextureLevel::LEVEL0);
 
-		Text::Render("quickly", sinf(Time.GetTime() * 4.0) * 100.0f + 100.0f, cosf(Time.GetTime() * 4.0) * 100.0f + 100.0f, 1.0f);
+		//Text::Render("quickly", sinf(Time.GetTime() * 3.0) * 100.0f + 200.0f, cosf(Time.GetTime() * 3.0) * 100.0f + 200.0f, 2.0f);
+		Text::Render("abcdefghijklmnopqrstuvwxyz", 100.0f, 100.0f, 1.0f);
+
+		Text myText("quickly fox on brown bricks");
+		myText.SetFont("arial");
+		myText.UpdateVertices();
+		myText.Render();
+
 
 		shader_font->Unbind();
-		// Font Rndering Testing //
+		// Font Rendering Testing //
 
 		
 		//	if (Input.getKeyDown(KeyCode::K))

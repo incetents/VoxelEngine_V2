@@ -33,5 +33,6 @@ namespace Vxl
 		std::vector<std::string> splitStr(const std::string& str, std::string delimiters);
 		// Extract Data Simply
 		std::string extractFirst(const std::string& str, char start, char end);
+		std::string extractNameFromPath(const std::string& str);
 	}
 }

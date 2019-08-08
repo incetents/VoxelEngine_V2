@@ -14,7 +14,7 @@ namespace Vxl
 	GameObject::GameObject(const std::string& name)
 		: Entity(name, EntityType::GAMEOBJECT)
 	{
-		//AddComponent(&m_material, this);
+		
 	}
 
 	GameObject::~GameObject()

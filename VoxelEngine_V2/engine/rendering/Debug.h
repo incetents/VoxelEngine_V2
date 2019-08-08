@@ -45,23 +45,8 @@ namespace Vxl
 
 				delete m_mesh;
 				m_mesh = new LineMesh(type == PositionType::VEC3);
-
-				//	if (type == PositionType::VEC3)
-				//	{
-				//		m_mesh->AddStrideHint(BufferType::VERTEX, 3, 0); // loc 0
-				//		m_mesh->AddStrideHint(BufferType::COLOR, 4, 3); // loc 3
-				//		m_mesh->AddStrideHint(BufferType::LINEWIDTH, 1, 7); // loc 1
-				//	}
-				//	else
-				//	{
-				//		m_mesh->AddStrideHint(BufferType::VERTEX, 2, 0); // loc 0
-				//		m_mesh->AddStrideHint(BufferType::COLOR, 4, 2); // loc 3
-				//		m_mesh->AddStrideHint(BufferType::LINEWIDTH, 1, 6); // loc 1
-				//	}
-
-				//m_mesh->SetVertices();
-				//m_mesh->Bind();
 			}
+
 			void AddLine_Vec3(
 				const Vector3& P1, const Vector3& P2,
 				float Width,
@@ -69,31 +54,35 @@ namespace Vxl
 			) {
 				VXL_ASSERT(m_type == PositionType::VEC3, "Invalid LineSet Type for this function");
 
-				if (m_mesh->m_vertexIndex >= m_mesh->m_vertices.size())
+				// Vertices
+				std::vector<float>& vertices = m_mesh->m_buffer.getVerticesEditing();
+
+				// Resize if reached vector size limit
+				if (m_mesh->m_vertexIndex >= vertices.size())
 				{
-					m_mesh->m_vertices.resize(m_mesh->m_vertices.size() + VertexIncrementAmount);
+					vertices.resize(vertices.size() + VertexIncrementAmount);
 					m_mesh->m_resizeDirty = true;
 				}
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 0] = P1.x;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 1] = P1.y;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 2] = P1.z;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 3] = C1.r;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 4] = C1.g;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 5] = C1.b;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 6] = C1.a;
+				vertices[m_mesh->m_vertexIndex + 0] = P1.x;
+				vertices[m_mesh->m_vertexIndex + 1] = P1.y;
+				vertices[m_mesh->m_vertexIndex + 2] = P1.z;
+				vertices[m_mesh->m_vertexIndex + 3] = C1.r;
+				vertices[m_mesh->m_vertexIndex + 4] = C1.g;
+				vertices[m_mesh->m_vertexIndex + 5] = C1.b;
+				vertices[m_mesh->m_vertexIndex + 6] = C1.a;
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 7] = Width;
+				vertices[m_mesh->m_vertexIndex + 7] = Width;
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 8] = P2.x;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 9] = P2.y;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 10] = P2.z;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 11] = C2.r;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 12] = C2.g;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 13] = C2.b;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 14] = C2.a;
+				vertices[m_mesh->m_vertexIndex + 8] = P2.x;
+				vertices[m_mesh->m_vertexIndex + 9] = P2.y;
+				vertices[m_mesh->m_vertexIndex + 10] = P2.z;
+				vertices[m_mesh->m_vertexIndex + 11] = C2.r;
+				vertices[m_mesh->m_vertexIndex + 12] = C2.g;
+				vertices[m_mesh->m_vertexIndex + 13] = C2.b;
+				vertices[m_mesh->m_vertexIndex + 14] = C2.a;
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 15] = Width;
+				vertices[m_mesh->m_vertexIndex + 15] = Width;
 
 				// Offset counter
 				m_mesh->m_vertexIndex += 16;
@@ -106,29 +95,33 @@ namespace Vxl
 			) {
 				VXL_ASSERT(m_type == PositionType::VEC2, "Invalid LineSet Type for this function");
 
-				if (m_mesh->m_vertexIndex >= m_mesh->m_vertices.size())
+				// Vertices
+				std::vector<float>& vertices = m_mesh->m_buffer.getVerticesEditing();
+
+				// Resize if reached vector size limit
+				if (m_mesh->m_vertexIndex >= vertices.size())
 				{
-					m_mesh->m_vertices.resize(m_mesh->m_vertices.size() + VertexIncrementAmount);
+					vertices.resize(vertices.size() + VertexIncrementAmount);
 					m_mesh->m_resizeDirty = true;
 				}
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 0] = P1.x;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 1] = P1.y;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 2] = C1.r;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 3] = C1.g;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 4] = C1.b;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 5] = C1.a;
+				vertices[m_mesh->m_vertexIndex + 0] = P1.x;
+				vertices[m_mesh->m_vertexIndex + 1] = P1.y;
+				vertices[m_mesh->m_vertexIndex + 2] = C1.r;
+				vertices[m_mesh->m_vertexIndex + 3] = C1.g;
+				vertices[m_mesh->m_vertexIndex + 4] = C1.b;
+				vertices[m_mesh->m_vertexIndex + 5] = C1.a;
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 6] = Width;
+				vertices[m_mesh->m_vertexIndex + 6] = Width;
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 7] = P2.x;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 8] = P2.y;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 9] = C2.r;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 10] = C2.g;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 11] = C2.b;
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 12] = C2.a;
+				vertices[m_mesh->m_vertexIndex + 7] = P2.x;
+				vertices[m_mesh->m_vertexIndex + 8] = P2.y;
+				vertices[m_mesh->m_vertexIndex + 9] = C2.r;
+				vertices[m_mesh->m_vertexIndex + 10] = C2.g;
+				vertices[m_mesh->m_vertexIndex + 11] = C2.b;
+				vertices[m_mesh->m_vertexIndex + 12] = C2.a;
 
-				m_mesh->m_vertices[m_mesh->m_vertexIndex + 13] = Width;
+				vertices[m_mesh->m_vertexIndex + 13] = Width;
 
 				// Offset counter
 				m_mesh->m_vertexIndex += 14;

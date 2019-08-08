@@ -137,6 +137,14 @@ namespace Vxl
 
 	Mesh::Mesh(const std::string& glName)
 	{
+		// Default Buffer Layouts
+		m_positions.setLayout(BufferLayout({ {BufferType::POSITION, AttributeType::VEC3, false} }));
+		m_uvs.setLayout(BufferLayout({ {BufferType::UV, AttributeType::VEC2, false} }));
+		m_normals.setLayout(BufferLayout({ {BufferType::NORMAL, AttributeType::VEC3, false} }));
+		m_tangents.setLayout(BufferLayout({ {BufferType::TANGENT, AttributeType::VEC3, false} }));
+		m_bitangents.setLayout(BufferLayout({ {BufferType::BITANGENT, AttributeType::VEC3, false} }));
+
+		// GL Name
 		if (!glName.empty())
 			Graphics::SetGLName(ObjectType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + glName);
 	}
@@ -182,8 +190,8 @@ namespace Vxl
 	}
 
 	void Mesh::GenerateNormals(
-		Vector3* _vertices, uint32_t _vertCount,
-		uint32_t* _indices, uint32_t _indexCount,
+		const Vector3* _vertices, uint32_t _vertCount,
+		const uint32_t* _indices, uint32_t _indexCount,
 		bool smooth
 	){
 		if (_vertices == nullptr || _vertCount == 0)
@@ -371,9 +379,9 @@ namespace Vxl
 	}
 
 	void Mesh::GenerateTangents(
-		Vector3* _vertices, uint32_t _vertCount,
-		Vector2* _uvs, uint32_t _UVCount,
-		uint32_t* _indices, uint32_t _indexCount
+		const Vector3* _vertices, uint32_t _vertCount,
+		const Vector2* _uvs, uint32_t _UVCount,
+		const uint32_t* _indices, uint32_t _indexCount
 	)
 	{
 		if (_vertices == nullptr || _vertCount == 0)
@@ -515,8 +523,8 @@ namespace Vxl
 		if (m_normals.Empty() && !m_positions.Empty())
 		{
 			GenerateNormals(
-				m_positions.vertices.data(), (uint32_t)m_positions.vertices.size(),
-				m_indices.indices.data(), (uint32_t)m_indices.indices.size(),
+				m_positions.getVertices().data(), (uint32_t)m_positions.getVertices().size(),
+				m_indices.getIndices().data(), (uint32_t)m_indices.getIndices().size(),
 				Smooth
 			);
 		}
@@ -527,9 +535,9 @@ namespace Vxl
 		if ((m_tangents.Empty() || m_bitangents.Empty()) && !m_positions.Empty() && !m_uvs.Empty())
 		{
 			GenerateTangents(
-				m_positions.vertices.data(), (uint32_t)m_positions.vertices.size(),
-				m_uvs.vertices.data(), (uint32_t)m_uvs.vertices.size(),
-				m_indices.indices.data(), (uint32_t)m_indices.indices.size()
+				m_positions.getVertices().data(), (uint32_t)m_positions.getVertices().size(),
+				m_uvs.getVertices().data(), (uint32_t)m_uvs.getVertices().size(),
+				m_indices.getIndices().data(), (uint32_t)m_indices.getIndices().size()
 			);
 		}
 	}
@@ -571,14 +579,13 @@ namespace Vxl
 		/*	Bind Data	*/
 		m_VAO.bind();
 
-		m_positions.m_vbo.Bind();
-		m_uvs.m_vbo.Bind();
-		m_normals.m_vbo.Bind();
-		m_tangents.m_vbo.Bind();
-		m_bitangents.m_vbo.Bind();
-		//m_colors.m_vbo.Bind();
-		m_instances.m_vbo.Bind();
-		m_indices.m_ebo.Bind();
+		m_positions.bind();
+		m_uvs.bind();
+		m_normals.bind();
+		m_tangents.bind();
+		m_bitangents.bind();
+		m_instances.bind();
+		m_indices.bind();
 
 		m_VAO.unbind();
 		/*				*/	
@@ -591,11 +598,12 @@ namespace Vxl
 		// Min/Max
 		m_min = Vector3::ZERO;
 		m_max = Vector3::ZERO;
-		UINT PosCount = (UINT)m_positions.vertices.size();
-		for (UINT i = 0; i < PosCount; i++)
+		uint32_t PosCount = (uint32_t)m_positions.getVertices().size();
+		auto PosVertices = m_positions.getVertices();
+		for (uint32_t i = 0; i < PosCount; i++)
 		{
-			m_min = Vector3::Min(m_min, m_positions.vertices[i]);
-			m_max = Vector3::Max(m_max, m_positions.vertices[i]);
+			m_min = Vector3::Min(m_min, PosVertices[i]);
+			m_max = Vector3::Max(m_max, PosVertices[i]);
 		}
 	}
 

@@ -132,16 +132,9 @@ namespace Vxl
 		// If vertex index is at start, nothing is being drawn anyways
 		if (m_worldLines.m_mesh->m_vertexIndex > 0)
 		{
-			if (m_worldLines.m_mesh->m_resizeDirty)
-			{
-				m_worldLines.m_mesh->SetVertices();
-				m_worldLines.m_mesh->Bind();
-			}
-			else
-			{
-				m_worldLines.m_mesh->UpdateVertices();
-				m_worldLines.m_mesh->Bind();
-			}
+			m_worldLines.m_mesh->m_buffer.reload(m_worldLines.m_mesh->m_resizeDirty);
+
+			m_worldLines.m_mesh->Bind();
 
 			m_worldLines.m_mesh->Draw();
 		}
@@ -152,16 +145,8 @@ namespace Vxl
 		// If vertex index is at start, nothing is being drawn anyways
 		if (m_screenLines.m_mesh->m_vertexIndex > 0)
 		{
-			if (m_screenLines.m_mesh->m_resizeDirty)
-			{
-				m_screenLines.m_mesh->SetVertices();
-				m_screenLines.m_mesh->Bind();
-			}
-			else
-			{
-				m_screenLines.m_mesh->UpdateVertices();
-				m_screenLines.m_mesh->Bind();
-			}
+			m_screenLines.m_mesh->m_buffer.reload(m_screenLines.m_mesh->m_resizeDirty);
+			m_screenLines.m_mesh->Bind();
 
 			m_screenLines.m_mesh->Draw();
 		}
@@ -171,11 +156,10 @@ namespace Vxl
 	{
 		// reset index flag
 		m_worldLines.m_mesh->m_vertexIndex = 0;
-		std::fill(m_worldLines.m_mesh->m_vertices.begin(), m_worldLines.m_mesh->m_vertices.end(), 0);
+		m_worldLines.m_mesh->m_buffer.clear();
 
-		// reset index flag
 		m_screenLines.m_mesh->m_vertexIndex = 0;
-		std::fill(m_screenLines.m_mesh->m_vertices.begin(), m_screenLines.m_mesh->m_vertices.end(), 0);
+		m_screenLines.m_mesh->m_buffer.clear();
 
 		// reset wireframe sphere list
 		m_wireframeSpheres.clear();

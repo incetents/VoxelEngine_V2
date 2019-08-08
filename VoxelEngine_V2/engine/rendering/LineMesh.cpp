@@ -7,11 +7,11 @@ namespace Vxl
 	void LineMesh::Bind(DrawType type)
 	{
 		m_type = type;
-		m_drawCount = m_VBO.GetDrawCount();
+		m_drawCount = m_buffer.GetDrawCount();
 
 		m_VAO.bind();
 
-		m_VBO.Bind();
+		m_buffer.bind();
 
 		m_VAO.unbind();
 	}

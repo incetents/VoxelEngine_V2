@@ -46,12 +46,12 @@ namespace Vxl
 	{
 	private:
 		VBOID			m_VBO = -1;
-		uint32_t			m_TypeSize = 0; // ex: Float = 4
-		uint32_t			m_DrawCount = 0; // Values to be read for drawing
-		uint32_t			m_Size = 0; // Bytes of space used
+		uint32_t		m_TypeSize = 0; // ex: Float = 4
+		uint32_t		m_DrawCount = 0; // Values to be read for drawing
+		uint32_t		m_Size = 0; // Bytes of space used
 		bool			m_empty = true;
 		BufferLayout	m_layout;
-		BufferUsage m_bindMode;
+		BufferUsage		m_bindMode;
 		
 		void UpdateDrawCount();
 
@@ -84,6 +84,9 @@ namespace Vxl
 		template<typename Type = float>
 		void SetVertices(Type* _arr, uint32_t _count, BufferUsage _mode)
 		{
+			VXL_ASSERT(_mode != BufferUsage::NONE, "Incorrect BufferUsage for VBO");
+			m_bindMode = _mode;
+			
 			if (_count == 0)
 				return;
 
@@ -92,7 +95,6 @@ namespace Vxl
 
 			m_empty = false;
 			m_Size = _count * sizeof(Type);
-			m_bindMode = _mode;
 
 			Graphics::VBO::Bind(m_VBO);
 			Graphics::VBO::BindData(m_Size, (void*)_arr, _mode);
@@ -148,7 +150,7 @@ namespace Vxl
 			return m_bindMode;
 		}
 
-		void Bind();
+		void Bind() const;
 	};
 
 	// Element Buffer Object
@@ -165,6 +167,7 @@ namespace Vxl
 		EBO() {}
 		EBO(uint32_t* _arr, uint32_t _count, BufferUsage _mode = BufferUsage::STATIC_DRAW)
 		{
+			VXL_ASSERT(_mode != BufferUsage::NONE, "Incorrect BufferUsage for EBO");
 			SetIndices(_arr, _count, _mode);
 		}
 		~EBO()
@@ -176,10 +179,17 @@ namespace Vxl
 		void SetIndices(uint32_t* _arr, uint32_t _count, BufferUsage _mode = BufferUsage::STATIC_DRAW);
 		void SetIndices(std::vector<uint32_t> _arr, BufferUsage _mode = BufferUsage::STATIC_DRAW);
 
-		void UpdateIndices(uint32_t* _arr, int offset = 0)
+		void UpdateIndices(uint32_t* _arr, int offset)
 		{
 			Graphics::EBO::Bind(m_EBO);
 			Graphics::EBO::BindSubData(offset, m_Size, _arr);
+		}
+		void UpdateIndices(uint32_t* _arr, int offset, uint32_t size)
+		{
+			VXL_ASSERT(size + offset <= m_Size, "VBO: Size + Offset too large for updating vertices");
+
+			Graphics::EBO::Bind(m_EBO);
+			Graphics::EBO::BindSubData(offset, size, (void*)_arr);
 		}
 
 		inline uint32_t GetVBO(void) const
@@ -204,7 +214,7 @@ namespace Vxl
 			return m_bindMode;
 		}
 
-		void Bind();
+		void Bind() const;
 	};
 }
 

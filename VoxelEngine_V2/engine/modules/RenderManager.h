@@ -27,7 +27,9 @@ namespace Vxl
 	{
 		friend class Hierarchy;
 	private:
+	public: // TEMP PUBLIC
 		Scene* m_currentScene = nullptr;
+	private:
 
 		// [True = FullQuad] or [False = Fulltriangle]
 		bool m_FSQMode = false;

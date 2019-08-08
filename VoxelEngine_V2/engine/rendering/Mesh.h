@@ -40,15 +40,15 @@ namespace Vxl
 
 		// Fills m_normals Based on existing positions and/or indices
 		void GenerateNormals(
-			Vector3* _vertices, uint32_t _vertCount,
-			uint32_t* _indices = nullptr, uint32_t _indexCount = 0,
+			const Vector3* _vertices, uint32_t _vertCount,
+			const uint32_t* _indices = nullptr, uint32_t _indexCount = 0,
 			bool smooth = false
 		);
 		// Fills m_tangents and m_bitangents based on existing positions/uvs/indices
 		void GenerateTangents(
-			Vector3* _vertices, uint32_t _vertCount,
-			Vector2* _uvs, uint32_t _UVCount,
-			uint32_t* _indices = nullptr, uint32_t _indexCount = 0
+			const Vector3* _vertices, uint32_t _vertCount,
+			const Vector2* _uvs, uint32_t _UVCount,
+			const uint32_t* _indices = nullptr, uint32_t _indexCount = 0
 		);
 
 		Mesh(const std::string& glName = "");
@@ -58,14 +58,13 @@ namespace Vxl
 		static Mesh* Create(const std::string& name, Model* model);
 		virtual ~Mesh();
 
-		MeshBufferMem<Vector3, BufferType::POSITION, AttributeType::VEC3> m_positions;
-		MeshBufferMem<Vector2, BufferType::UV, AttributeType::VEC2>		m_uvs;
-		MeshBuffer<Vector3, BufferType::NORMAL, AttributeType::VEC3>		m_normals;
-		MeshBuffer<Vector3, BufferType::TANGENT, AttributeType::VEC3>		m_tangents;
-		MeshBuffer<Vector3, BufferType::BITANGENT, AttributeType::VEC3>	m_bitangents;
-		//MeshBuffer<Vector4, BufferType::COLOR, 4>		m_colors;
-		MeshBufferInstancing							m_instances;
-		MeshBufferIndices								m_indices;
+		MeshBufferMem<Vector3>	m_positions;
+		MeshBufferMem<Vector2>	m_uvs;
+		MeshBuffer<Vector3>		m_normals;
+		MeshBuffer<Vector3>		m_tangents;
+		MeshBuffer<Vector3>		m_bitangents;
+		MeshBufferInstancing	m_instances;
+		MeshBufferIndices		m_indices;
 
 		// Update all data from model
 		void Set(Model* _model);

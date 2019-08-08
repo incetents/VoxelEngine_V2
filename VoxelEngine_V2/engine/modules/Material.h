@@ -130,8 +130,7 @@ namespace Vxl
 				while (m_masterOrder.find(NewOrder) != m_masterOrder.end())
 				{
 					NewOrder++;
-					VXL_ASSERT(NewOrder < (0xffffffff), "Order for Material has reached largest possible UINT number");
-					VXL_RETURN_ON_FAIL(NewOrder < (0xffffffff));
+					VXL_RETURN_ON_FAIL(NewOrder < (0xffffffff), "Order for Material has reached largest possible UINT number");
 				}
 				Material* MovingMaterial = m_masterOrder[_order];
 				m_masterOrder[_order] = this;

@@ -85,6 +85,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	}
 
 	// Cleanup
+	RenderManager.m_currentScene->Destroy();
 	RenderManager.Destroy();
 	Window.Shutdown();
 

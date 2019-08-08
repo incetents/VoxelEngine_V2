@@ -88,10 +88,22 @@ namespace Vxl
 		{
 			size_t loc1 = str.find_first_of(start);
 			size_t loc2 = str.find_first_of(end);
-			if (loc1 == -1 || loc2 == -1)
+
+			// Nothing found
+			if (loc1 == std::string::npos || loc2 == std::string::npos)
 				return std::string();
 
 			return str.substr(loc1 + 1, loc2 - loc1 - 1);
+		}
+		std::string extractNameFromPath(const std::string& str)
+		{
+			size_t loc1 = str.find_last_of('\\');
+
+			// Nothing found
+			if (loc1 == std::string::npos)
+				return std::string();
+
+			return str.substr(loc1 + 1, str.length() - loc1 - 1);
 		}
 	}
 }

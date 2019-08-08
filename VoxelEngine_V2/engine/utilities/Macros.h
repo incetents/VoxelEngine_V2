@@ -25,6 +25,7 @@
 // Macros that do Misc work //
 
 #include "../utilities/logger.h"
+#include "../utilities/stringUtil.h"
 
 void AssertFail(const std::string& message, const std::string& title);
 
@@ -34,12 +35,14 @@ void AssertFail(const std::string& message, const std::string& title);
 // Assert Macros
 #ifdef _DEBUG
 // ~~~ //
-#define VXL_ASSERT(expression, message) if(!(expression)) { Logger.error(message);\
-AssertFail(#message ## "\n\nFunction: " + std::string(__FUNCSIG__) + "\nLine: " + std::to_string(__LINE__) + "\n\nFile:\n" + std::string(__FILE__), "Assert Failed"); }
-#define VXL_RETURN_ON_FAIL(expression) if(!(expression)) { return; }
+#define VXL_ERROR(message) { Logger.error(message);\
+AssertFail(std::string(message) + "\n\nFile: " + Vxl::stringUtil::extractNameFromPath(__FILE__) + "\n\nFunction: " + std::string(__FUNCSIG__) + "\nLine: " + std::to_string(__LINE__) + "\n\nPath:" + std::string(__FILE__), "Assert Failed"); }
+#define VXL_ASSERT(expression, message) if(!(expression)) { VXL_ERROR(message); }
+#define VXL_RETURN_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return; }
 //
 #else
 // ~~~ //
+#define VXL_ERROR(message) __noop;
 #define VXL_ASSERT(expression, message) __noop;
 #define VXL_RETURN_ON_FAIL(expression) __noop;
 //

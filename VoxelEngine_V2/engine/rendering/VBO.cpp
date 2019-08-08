@@ -10,7 +10,7 @@ namespace Vxl
 		m_DrawCount = m_Size / m_layout.m_stride;
 	}
 
-	void VBO::Bind()
+	void VBO::Bind() const
 	{
 		if (m_empty)
 			return;
@@ -49,6 +49,9 @@ namespace Vxl
 
 	void EBO::SetIndices(uint32_t* _arr, uint32_t _count, BufferUsage _mode)
 	{
+		VXL_ASSERT(_mode != BufferUsage::NONE, "Incorrect BufferUsage for EBO");
+		m_bindMode = _mode;
+
 		if (_count == 0)
 			return;
 
@@ -59,7 +62,6 @@ namespace Vxl
 
 		m_Size = _count * sizeof(uint32_t);
 		m_DrawCount = _count;
-		m_bindMode = _mode;
 		Graphics::EBO::Bind(m_EBO);
 		Graphics::EBO::BindData(m_Size, _arr, _mode);
 	}
@@ -67,7 +69,7 @@ namespace Vxl
 	{
 		SetIndices(&_arr[0], (uint32_t)_arr.size(), _mode);
 	}
-	void EBO::Bind()
+	void EBO::Bind() const
 	{
 		if (m_EBO != -1)
 			Graphics::EBO::Bind(m_EBO);

@@ -119,10 +119,16 @@ namespace Vxl
 	{
 		m_width = width;
 		m_height = height;
-		m_channelCount = 3;
+		m_channelCount = Graphics::GetChannelCount(ChannelType);
 
 		// Storage
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
+
+		uint32_t pixelCount = width * height * m_channelCount;
+		m_image = new UCHAR[pixelCount];
+		memcpy(m_image, pixels, pixelCount * sizeof(UCHAR));
+
+		//m_image = (UCHAR*)pixels;
 
 		//updateParameters();
 		updateStorage(pixels);
