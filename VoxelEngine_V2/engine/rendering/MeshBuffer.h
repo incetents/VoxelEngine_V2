@@ -75,6 +75,12 @@ namespace Vxl
 			m_vbo.UpdateVertices(vec.data(), offset, size);
 		}
 
+		MeshBuffer<Type>& operator=(std::vector<uint32_t> vec)
+		{
+			set(vec);
+			return *this;
+		}
+
 		inline UINT GetDrawCount(void) const
 		{
 			return m_vbo.GetDrawCount();
@@ -93,7 +99,7 @@ namespace Vxl
 	template<typename Type>
 	class MeshBufferMem
 	{
-	private:
+	public:
 		VBO m_vbo;
 		BufferUsage m_bindMode = BufferUsage::STATIC_DRAW;
 		bool m_hasLayout = false;
@@ -134,7 +140,7 @@ namespace Vxl
 		{
 			if (dirtyVertices)
 			{
-				if(resizedVertices)
+				if(resizedVertices || m_vbo.IsEmpty())
 					m_vbo.SetVertices(vertices, m_bindMode);
 				else
 					m_vbo.UpdateVertices(vertices.data(), 0);
@@ -149,7 +155,6 @@ namespace Vxl
 		// Set all vertices to zeroes
 		void setZeroes()
 		{
-			//resizedVertices = true;
 			dirtyVertices = true;
 
 			std::fill(vertices.begin(), vertices.end(), 0);
@@ -157,73 +162,49 @@ namespace Vxl
 
 		void set(Type* arr, uint32_t size)
 		{
+			// Flags
+			dirtyVertices = true;
+			resizedVertices = size != (uint32_t)vertices.size();
 			// Edit Vertices
 			vertices = std::vector<Type>(arr, arr + size);
 			vertices.shrink_to_fit();
-
-			// update VBO
-			m_vbo.SetVertices(vertices, m_bindMode);
 		}
 		void set(const std::vector<Type>& vec)
 		{
+			// Flags
+			dirtyVertices = true;
+			resizedVertices = (uint32_t)vec.size() != (uint32_t)vertices.size();
 			// Edit Vertices
 			vertices = vec;
 			vertices.shrink_to_fit();
-
-			// update VBO
-			m_vbo.SetVertices(vertices, m_bindMode);
 		}
 
-		//	void update(Type* arr) override
-		//	{
-		//		// Flags
-		//		dirtyVertices = true;
-		//		// Edit Vertices
-		//		vertices = std::vector<Type>(arr, arr + vertices.size());
-		//		vertices.shrink_to_fit();
-		//	}
-		//	void update(Type* arr, uint32_t offset, uint32_t size) override
-		//	{
-		//		// Flags
-		//		dirtyVertices = true;
-		//		resizedVertices = (uint32_t)size != vertices.size();
-		//		// Edit Vertices
-		//		vertices = std::vector<Type>(arr, arr + size);
-		//		vertices.shrink_to_fit();
-		//	}
-
-		//	void update(const std::vector<Type>& vec)
-		//	{
-		//		// Flags
-		//		dirtyVertices = true;
-		//		resizedVertices = vec.size() != vertices.size();
-		//		// Edit Vertices
-		//		vertices = vec;
-		//		vertices.shrink_to_fit();
-		//	}
-		//	void update(const std::vector<Type>& vec, uint32_t offset, uint32_t size) override
-		//	{
-		//		// Flags
-		//		dirtyVertices = true;
-		//		resizedVertices = (uint32_t)size != vertices.size();
-		//		// Edit Vertices
-		//		vertices = vec;
-		//		vertices.shrink_to_fit();
-		//	}
-
+		Type operator[](uint32_t index) const
+		{
+			return vertices[index];
+		}
 		Type& operator[](uint32_t index)
 		{
 			return vertices[index];
 		}
 
+		MeshBufferMem<Type>& operator=(std::vector<uint32_t> vec)
+		{
+			set(vec);
+			return *this;
+		}
+
+		// Notice, requires vbo to be bound first //
 		inline UINT GetDrawCount(void) const
 		{
 			return m_vbo.GetDrawCount();
 		}
+		// Notice, requires vbo to be bound first //
 		inline UINT GetSize(void) const
 		{
 			return m_vbo.GetSize();
 		}
+		// Notice, requires vbo to be bound first //
 		inline bool Empty() const
 		{
 			return m_vbo.IsEmpty();
@@ -235,9 +216,11 @@ namespace Vxl
 	{
 	private:
 		EBO m_ebo;
-		std::vector<uint32_t> indices;
-		bool dirtyIndices = false;
 		BufferUsage m_bindMode = BufferUsage::STATIC_DRAW;
+
+		std::vector<uint32_t> indices;
+		bool dirtyVertices = false;
+		bool resizedVertices = false;
 	public:
 
 		// Only applies changes on calling the "Set" function
@@ -246,77 +229,62 @@ namespace Vxl
 			m_bindMode = usage;
 		}
 
-		void bind(void) const
+		std::vector<uint32_t>& getIndices(void)
 		{
-			VXL_ASSERT(!dirtyIndices, "MeshBuffer Indices needs to be reloaded");
+			return indices;
+		}
+		uint32_t getIndexCount(void) const
+		{
+			return (uint32_t)indices.size();
+		}
+
+		void setVerticesDirty(bool sizeHasChanged)
+		{
+			dirtyVertices = true;
+			resizedVertices = sizeHasChanged;
+		}
+
+		void bind(void)
+		{
+			if (dirtyVertices)
+			{
+				if(resizedVertices || m_ebo.IsEmpty())
+					m_ebo.SetIndices(indices, m_bindMode);
+				else
+					m_ebo.UpdateIndices(indices.data(), 0);
+			}
 
 			m_ebo.Bind();
-		}
-		
-		// Ref of indices, non-editable
-		const std::vector<uint32_t>& getIndices(void)
-		{
-			return indices;
-		}
-		// Get ref of vertices for editing, must call reload to update changes
-		std::vector<uint32_t>& getIndicesEditing(void)
-		{
-			dirtyIndices = true;
-			return indices;
-		}
 
-		// Re-send stored indices to EBO
-		void reload(bool SizeHasChanged)
-		{
-			dirtyIndices = false;
-
-			if (SizeHasChanged)
-				m_ebo.SetIndices(indices, m_bindMode);
-			else
-				m_ebo.UpdateIndices(indices.data(), 0);
+			dirtyVertices = false;
+			resizedVertices = false;
 		}
 
 		void set(uint32_t* arr, uint32_t size)
 		{
+			// Flags
+			dirtyVertices = true;
+			resizedVertices = size != (uint32_t)indices.size();
+			// Edit Indices
 			indices = std::vector<uint32_t>(arr, arr + size);
 			indices.shrink_to_fit();
-
-			m_ebo.SetIndices(arr, size, m_bindMode);
 		}
 		void set(const std::vector<uint32_t>& vec)
 		{
+			// Flags
+			dirtyVertices = true;
+			resizedVertices = (uint32_t)vec.size() != (uint32_t)indices.size();
+			// Edit Indices
 			indices = vec;
-			indices.shrink_to_fit();
-
-			m_ebo.SetIndices(vec, m_bindMode);
 		}
 
-		void update(uint32_t* arr)
+		uint32_t operator[](uint32_t index) const
 		{
-			indices = std::vector<uint32_t>(arr, arr + indices.size());
-			indices.shrink_to_fit();
-		
-			m_ebo.UpdateIndices(arr, 0);
+			return indices[index];
 		}
-		void update(uint32_t* arr, int offset, int size)
+		uint32_t& operator[](uint32_t index)
 		{
-			indices = std::vector<uint32_t>(arr, arr + size);
-			indices.shrink_to_fit();
-
-			m_ebo.UpdateIndices(arr, offset, size);
-		}
-
-		void update(std::vector<uint32_t>& vec)
-		{
-			indices = vec;
-		
-			m_ebo.UpdateIndices(vec.data(), 0);
-		}
-		void update(std::vector<uint32_t>& vec, int offset, int size)
-		{
-			indices = vec;
-
-			m_ebo.UpdateIndices(vec.data(), offset, size);
+			return indices[index];
 		}
 
 		MeshBufferIndices& operator=(std::vector<uint32_t> vec)
@@ -325,14 +293,17 @@ namespace Vxl
 			return *this;
 		}
 
+		// Requires EBO to be bound first //
 		inline UINT GetDrawCount(void) const
 		{
 			return m_ebo.GetDrawCount();
 		}
+		// Requires EBO to be bound first //
 		inline UINT GetSize(void) const
 		{
 			return m_ebo.GetSize();
 		}
+		// Requires EBO to be bound first //
 		inline bool Empty()
 		{
 			return m_ebo.IsEmpty();

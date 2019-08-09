@@ -51,18 +51,20 @@ namespace Vxl
 		{
 			Draw_Function = &Mesh::DrawArrayInstances;
 			m_drawCount = m_positions.GetDrawCount();
-			
+
 		}
 		else if (m_mode == DrawMode::INDEXED)
 		{
 			Draw_Function = &Mesh::DrawIndexed;
 			m_drawCount = m_indices.GetDrawCount();
 		}
-		else
+		else if (m_mode == DrawMode::INDEXED_INSTANCED)
 		{
 			Draw_Function = &Mesh::DrawIndexedInstances;
 			m_drawCount = m_indices.GetDrawCount();
 		}
+		else
+			VXL_ASSERT(false, "ERROR MESH MODE");
 
 		// Update Special Data
 		switch (m_type)
@@ -545,7 +547,6 @@ namespace Vxl
 	{
 		m_type = type;
 		m_subtype = Graphics::GetDrawSubType(type);
-		UpdateDrawInfo();
 
 		// SIZE Assert Check //
 #ifdef _DEBUG
@@ -574,6 +575,7 @@ namespace Vxl
 			}
 		}
 #endif
+		
 
 		/*	Bind Data	*/
 		m_VAO.bind();
@@ -589,6 +591,7 @@ namespace Vxl
 		m_VAO.unbind();
 		/*				*/	
 
+		UpdateDrawInfo(); // Must be called after data is bound
 		RecalculateMinMax();
 	}
 
@@ -609,6 +612,7 @@ namespace Vxl
 	void Mesh::Draw()
 	{
 		m_VAO.bind();
+
 		(*this.*Draw_Function)();
 	}
 }
