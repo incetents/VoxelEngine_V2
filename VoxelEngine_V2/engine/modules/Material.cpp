@@ -76,8 +76,8 @@ namespace Vxl
 			Graphics::SetBlendEquation(m_BlendEq);
 		}
 		Graphics::SetDepthPassRule(m_DepthFunc);
-		Graphics::SetDepthTestState(m_DepthRead);
-		Graphics::SetDepthMask(m_DepthWrite);
+		Graphics::SetDepthRead(m_DepthRead);
+		Graphics::SetDepthWrite(m_DepthWrite);
 		Graphics::SetWireframeState(m_Wireframe);
 	}
 	void Material::BindTextures()

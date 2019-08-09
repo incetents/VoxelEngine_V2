@@ -183,7 +183,6 @@ namespace Vxl
 		m_normals.set(_model->normals);
 		m_tangents.set(_model->tangents);
 		m_bitangents.set(_model->bitangents);
-		//m_colors.set(_model->colors);
 		m_indices.set(_model->indices);
 
 		Bind();
@@ -523,7 +522,7 @@ namespace Vxl
 		if (m_normals.Empty() && !m_positions.Empty())
 		{
 			GenerateNormals(
-				m_positions.getVertices().data(), (uint32_t)m_positions.getVertices().size(),
+				m_positions.getVertices().data(), m_positions.getVertexCount(),
 				m_indices.getIndices().data(), (uint32_t)m_indices.getIndices().size(),
 				Smooth
 			);
@@ -535,8 +534,8 @@ namespace Vxl
 		if ((m_tangents.Empty() || m_bitangents.Empty()) && !m_positions.Empty() && !m_uvs.Empty())
 		{
 			GenerateTangents(
-				m_positions.getVertices().data(), (uint32_t)m_positions.getVertices().size(),
-				m_uvs.getVertices().data(), (uint32_t)m_uvs.getVertices().size(),
+				m_positions.getVertices().data(), m_positions.getVertexCount(),
+				m_uvs.getVertices().data(), m_uvs.getVertexCount(),
 				m_indices.getIndices().data(), (uint32_t)m_indices.getIndices().size()
 			);
 		}
@@ -598,8 +597,8 @@ namespace Vxl
 		// Min/Max
 		m_min = Vector3::ZERO;
 		m_max = Vector3::ZERO;
-		uint32_t PosCount = (uint32_t)m_positions.getVertices().size();
-		auto PosVertices = m_positions.getVertices();
+		uint32_t PosCount = (uint32_t)m_positions.getVertexCount();
+		auto& PosVertices = m_positions.getVertices();
 		for (uint32_t i = 0; i < PosCount; i++)
 		{
 			m_min = Vector3::Min(m_min, PosVertices[i]);

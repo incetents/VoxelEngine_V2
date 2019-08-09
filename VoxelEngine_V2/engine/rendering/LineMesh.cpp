@@ -4,6 +4,32 @@
 
 namespace Vxl
 {
+	LineMesh::LineMesh(bool isVec3)
+	{
+		m_buffer.setBindMode(BufferUsage::DYNAMIC_DRAW);
+
+		if (isVec3)
+		{
+			BufferLayout layout =
+			{
+				{BufferType::POSITION, AttributeType::VEC3, false},
+				{BufferType::COLOR, AttributeType::VEC4, false},
+				{BufferType::LINEWIDTH, AttributeType::FLOAT, false}
+			};
+			m_buffer.setLayout(layout);
+		}
+		else
+		{
+			BufferLayout layout =
+			{
+				{BufferType::POSITION, AttributeType::VEC2, false},
+				{BufferType::COLOR, AttributeType::VEC4, false},
+				{BufferType::LINEWIDTH, AttributeType::FLOAT, false}
+			};
+			m_buffer.setLayout(layout);
+		}
+	}
+
 	void LineMesh::Bind(DrawType type)
 	{
 		m_type = type;

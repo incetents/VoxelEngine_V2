@@ -21,14 +21,14 @@ layout (binding = 0) uniform sampler2D texture1;
 layout (binding = 1) uniform sampler2D texture2;
 // Uniforms
 uniform int outputMode = 0;
-uniform float zNear = 1;
-uniform float zFar = 1;
+//uniform float zNear = 1;
+//uniform float zFar = 1;
 
 // Puts depth into linear space
-float LinearizeDepth(float depth)
-{
-    return (2.0 * zNear * zFar) / (zFar + zNear - (2.0 * depth - 1.0) * (zFar - zNear));
-}
+//float LinearizeDepth(float depth)
+//{
+//    return (2.0 * zNear * zFar) / (zFar + zNear - (2.0 * depth - 1.0) * (zFar - zNear));
+//}
 // Visualize depth buffer
 float VisualizeDepth(float depth)
 {

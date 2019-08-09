@@ -560,33 +560,47 @@ namespace Vxl
 		RenderManager.RenderSceneGameObjects();
 		RenderManager.RenderSceneOtherObjectColorIDs();
 
+		//auto test = ShaderProgram::Get("gbuffer");
+		//test->Bind();
+		//
+		//Graphics::SetDepthTestState(false);
+		//
+		//Geometry.GetSphere()->Draw();
+		//
+		//Graphics::SetDepthTestState(true);
+		//
+		//test->Unbind();
+
 		// Font Rendering Testing //
 		auto shader_font = ShaderProgram::Get("font");
 		shader_font->Bind();
-
-		Graphics::SetDepthMask(false);
-		Graphics::SetDepthTestState(false);
+		
+		Graphics::SetDepthRead(false);
+		Graphics::SetDepthWrite(false);
 		Graphics::SetBlendState(true);
 		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
-
+		
 		shader_font->SetUniformMatrix("projection", Matrix4x4::Orthographic(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, -10, 10), true);
 		shader_font->SetUniform<Vector3>("textColor", Vector3(1, 1, 1));
-
-		Graphics::Texture::SetActiveLevel(TextureLevel::LEVEL0);
-
-		//Text::Render("quickly", sinf(Time.GetTime() * 3.0) * 100.0f + 200.0f, cosf(Time.GetTime() * 3.0) * 100.0f + 200.0f, 2.0f);
-		Text::Render("abcdefghijklmnopqrstuvwxyz", 100.0f, 100.0f, 1.0f);
-
-		Text myText("quickly fox on brown bricks");
-		myText.SetFont("arial");
-		myText.UpdateVertices();
-		myText.Render();
-
+		
+		//	Graphics::Texture::SetActiveLevel(TextureLevel::LEVEL0);
+		//	
+		//	//Text::Render("quickly", sinf(Time.GetTime() * 3.0) * 100.0f + 200.0f, cosf(Time.GetTime() * 3.0) * 100.0f + 200.0f, 2.0f);
+		//	Text::Render("abcdefghijklmnopqrstuvwxyz", 100.0f, 100.0f, 1.0f);
+		
+		//	Text myText("quickly fox on brown bricks");
+		//	myText.SetFont("arial");
+		//	myText.UpdateVertices(1.0f);
+		//	myText.Render(100.f, 200.f);
+		
+		Graphics::SetBlendState(false);
+		Graphics::SetDepthRead(true);
+		Graphics::SetDepthWrite(true);
 
 		shader_font->Unbind();
 		// Font Rendering Testing //
-
 		
+
 		//	if (Input.getKeyDown(KeyCode::K))
 		//	{
 		//		RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
@@ -1017,8 +1031,8 @@ namespace Vxl
 			{
 				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 2);
-				_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
-				_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
+				//_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
+				//_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
 
 				_fbo_gbuffer->bindDepth(TextureLevel::LEVEL0);
 				break;

@@ -15,6 +15,7 @@ namespace Vxl
 	protected:
 		VBO m_vbo;
 		BufferUsage m_bindMode = BufferUsage::STATIC_DRAW;
+		bool m_hasLayout = false;
 	public:
 
 		// Only applies changes on calling the "Set" function
@@ -23,40 +24,54 @@ namespace Vxl
 			m_bindMode = usage;
 		}
 
-		virtual void bind(void) const
-		{
-			m_vbo.Bind();
-		}
-
 		virtual void setLayout(const BufferLayout& layout)
 		{
+			m_hasLayout = true;
 			m_vbo.SetLayout(layout);
+		}
+
+		virtual void bind(void) const
+		{
+			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before binding");
+			m_vbo.Bind();
 		}
 
 		virtual void set(Type* arr, uint32_t size)
 		{
+			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before modifying");
+
 			m_vbo.SetVertices(arr, size, m_bindMode);
 		}
 		virtual void set(const std::vector<Type>& vec)
 		{
+			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before modifying");
+
 			m_vbo.SetVertices(vec.data(), (uint32_t)vec.size(), m_bindMode);
 		}
 
 		virtual void update(Type* arr)
 		{
+			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before modifying");
+
 			m_vbo.UpdateVertices(arr, 0);
 		}
 		virtual void update(Type* arr, int offset, int size)
 		{
+			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before modifying");
+
 			m_vbo.UpdateVertices(arr, offset, size);
 		}
 
 		virtual void update(const std::vector<Type>& vec)
 		{
+			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before modifying");
+
 			m_vbo.UpdateVertices(vec.data(), 0);
 		}
 		virtual void update(const std::vector<Type>& vec, int offset, int size)
 		{
+			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before modifying");
+
 			m_vbo.UpdateVertices(vec.data(), offset, size);
 		}
 
@@ -68,7 +83,7 @@ namespace Vxl
 		{
 			return m_vbo.GetSize();
 		}
-		inline bool Empty()
+		inline bool Empty() const
 		{
 			return m_vbo.IsEmpty();
 		}
@@ -76,99 +91,143 @@ namespace Vxl
 
 	// Contains VBO + vector for vertices
 	template<typename Type>
-	class MeshBufferMem : public MeshBuffer<Type>
+	class MeshBufferMem
 	{
-	public:
+	private:
+		VBO m_vbo;
+		BufferUsage m_bindMode = BufferUsage::STATIC_DRAW;
+		bool m_hasLayout = false;
+
 		std::vector<Type> vertices;
 		bool dirtyVertices = false;
+		bool resizedVertices = false;
 	public:
 		 
-		void bind(void) const override
+		// Only applies changes on calling the "Set" function
+		void setBindMode(BufferUsage usage)
 		{
-			VXL_ASSERT(!dirtyVertices, "MeshBufferMem Vertices needs to be reloaded");
-
-			MeshBuffer<Type>::m_vbo.Bind();
+			m_bindMode = usage;
 		}
 
-		// Ref of vertices, non-editable
-		const std::vector<Type>& getVertices(void)
+		virtual void setLayout(const BufferLayout& layout)
+		{
+			m_hasLayout = true;
+			m_vbo.SetLayout(layout);
+		}
+
+		std::vector<Type>& getVertices(void)
 		{
 			return vertices;
 		}
-		// Get ref of vertices for editing, must call reload to update changes
-		std::vector<Type>& getVerticesEditing(void)
+		uint32_t getVertexCount(void) const
+		{
+			return (uint32_t)vertices.size();
+		}
+
+		void setVerticesDirty(bool sizeHasChanged)
 		{
 			dirtyVertices = true;
-			return vertices;
+			resizedVertices = sizeHasChanged;
 		}
 
-		// Re-send stored vertices to VBO
-		void reload(bool SizeHasChanged)
+		void bind(void)
 		{
-			dirtyVertices = false;
+			if (dirtyVertices)
+			{
+				if(resizedVertices)
+					m_vbo.SetVertices(vertices, m_bindMode);
+				else
+					m_vbo.UpdateVertices(vertices.data(), 0);
+			}
 
-			if (SizeHasChanged)
-				MeshBuffer<Type>::m_vbo.SetVertices(vertices.data(), (uint32_t)vertices.size(), MeshBuffer<Type>::m_bindMode);
-			else
-				MeshBuffer<Type>::m_vbo.UpdateVertices(vertices.data(), 0);
+			m_vbo.Bind();
+
+			dirtyVertices = false;
+			resizedVertices = false;
 		}
 
 		// Set all vertices to zeroes
-		void clear()
+		void setZeroes()
 		{
-			// Nothing to clear
-			if (vertices.size() == 0)
-				return;
+			//resizedVertices = true;
+			dirtyVertices = true;
 
 			std::fill(vertices.begin(), vertices.end(), 0);
-			reload(false);
 		}
 
-		void set(Type* arr, uint32_t size) override
+		void set(Type* arr, uint32_t size)
 		{
+			// Edit Vertices
 			vertices = std::vector<Type>(arr, arr + size);
 			vertices.shrink_to_fit();
 
-			MeshBuffer<Type>::m_vbo.SetVertices(arr, size, MeshBuffer<Type>::m_bindMode);
+			// update VBO
+			m_vbo.SetVertices(vertices, m_bindMode);
 		}
-		void set(const std::vector<Type>& vec) override
+		void set(const std::vector<Type>& vec)
 		{
+			// Edit Vertices
 			vertices = vec;
 			vertices.shrink_to_fit();
 
-			MeshBuffer<Type>::m_vbo.SetVertices(vec.data(), (uint32_t)vec.size(), MeshBuffer<Type>::m_bindMode);
+			// update VBO
+			m_vbo.SetVertices(vertices, m_bindMode);
 		}
 
-		void update(Type* arr) override
+		//	void update(Type* arr) override
+		//	{
+		//		// Flags
+		//		dirtyVertices = true;
+		//		// Edit Vertices
+		//		vertices = std::vector<Type>(arr, arr + vertices.size());
+		//		vertices.shrink_to_fit();
+		//	}
+		//	void update(Type* arr, uint32_t offset, uint32_t size) override
+		//	{
+		//		// Flags
+		//		dirtyVertices = true;
+		//		resizedVertices = (uint32_t)size != vertices.size();
+		//		// Edit Vertices
+		//		vertices = std::vector<Type>(arr, arr + size);
+		//		vertices.shrink_to_fit();
+		//	}
+
+		//	void update(const std::vector<Type>& vec)
+		//	{
+		//		// Flags
+		//		dirtyVertices = true;
+		//		resizedVertices = vec.size() != vertices.size();
+		//		// Edit Vertices
+		//		vertices = vec;
+		//		vertices.shrink_to_fit();
+		//	}
+		//	void update(const std::vector<Type>& vec, uint32_t offset, uint32_t size) override
+		//	{
+		//		// Flags
+		//		dirtyVertices = true;
+		//		resizedVertices = (uint32_t)size != vertices.size();
+		//		// Edit Vertices
+		//		vertices = vec;
+		//		vertices.shrink_to_fit();
+		//	}
+
+		Type& operator[](uint32_t index)
 		{
-			vertices = std::vector<Type>(arr, arr + vertices.size());
-			vertices.shrink_to_fit();
-		
-			MeshBuffer<Type>::m_vbo.UpdateVertices(arr, 0);
+			return vertices[index];
 		}
-		void update(Type* arr, int offset, int size) override
+
+		inline UINT GetDrawCount(void) const
 		{
-			vertices = std::vector<Type>(arr, arr + size);
-			vertices.shrink_to_fit();
-
-			MeshBuffer<Type>::m_vbo.UpdateVertices(arr, offset, size);
+			return m_vbo.GetDrawCount();
 		}
-
-		void update(const std::vector<Type>& vec) override
+		inline UINT GetSize(void) const
 		{
-			vertices = vec;
-			vertices.shrink_to_fit();
-		
-			MeshBuffer<Type>::m_vbo.UpdateVertices(vec.data(), 0);
+			return m_vbo.GetSize();
 		}
-		void update(const std::vector<Type>& vec, int offset, int size) override
+		inline bool Empty() const
 		{
-			vertices = vec;
-			vertices.shrink_to_fit();
-
-			MeshBuffer<Type>::m_vbo.UpdateVertices(vec.data(), offset, size);
+			return m_vbo.IsEmpty();
 		}
-
 	};
 
 	// Contains EBO + vector for indices
@@ -250,14 +309,12 @@ namespace Vxl
 		void update(std::vector<uint32_t>& vec)
 		{
 			indices = vec;
-			indices.shrink_to_fit();
 		
 			m_ebo.UpdateIndices(vec.data(), 0);
 		}
 		void update(std::vector<uint32_t>& vec, int offset, int size)
 		{
 			indices = vec;
-			indices.shrink_to_fit();
 
 			m_ebo.UpdateIndices(vec.data(), offset, size);
 		}

@@ -55,7 +55,7 @@ namespace Vxl
 				VXL_ASSERT(m_type == PositionType::VEC3, "Invalid LineSet Type for this function");
 
 				// Vertices
-				std::vector<float>& vertices = m_mesh->m_buffer.getVerticesEditing();
+				auto& vertices = m_mesh->m_buffer.getVertices();
 
 				// Resize if reached vector size limit
 				if (m_mesh->m_vertexIndex >= vertices.size())
@@ -96,7 +96,8 @@ namespace Vxl
 				VXL_ASSERT(m_type == PositionType::VEC2, "Invalid LineSet Type for this function");
 
 				// Vertices
-				std::vector<float>& vertices = m_mesh->m_buffer.getVerticesEditing();
+				//std::vector<float>& vertices = m_mesh->m_buffer.getVerticesEditing();
+				auto& vertices = m_mesh->m_buffer.getVertices();
 
 				// Resize if reached vector size limit
 				if (m_mesh->m_vertexIndex >= vertices.size())

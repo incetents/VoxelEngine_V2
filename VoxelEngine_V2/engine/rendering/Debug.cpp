@@ -132,7 +132,8 @@ namespace Vxl
 		// If vertex index is at start, nothing is being drawn anyways
 		if (m_worldLines.m_mesh->m_vertexIndex > 0)
 		{
-			m_worldLines.m_mesh->m_buffer.reload(m_worldLines.m_mesh->m_resizeDirty);
+			m_worldLines.m_mesh->m_buffer.setVerticesDirty(m_worldLines.m_mesh->m_resizeDirty);
+			m_worldLines.m_mesh->m_resizeDirty = false;
 
 			m_worldLines.m_mesh->Bind();
 
@@ -145,7 +146,9 @@ namespace Vxl
 		// If vertex index is at start, nothing is being drawn anyways
 		if (m_screenLines.m_mesh->m_vertexIndex > 0)
 		{
-			m_screenLines.m_mesh->m_buffer.reload(m_screenLines.m_mesh->m_resizeDirty);
+			m_screenLines.m_mesh->m_buffer.setVerticesDirty(m_screenLines.m_mesh->m_resizeDirty);
+			m_screenLines.m_mesh->m_resizeDirty = false;
+
 			m_screenLines.m_mesh->Bind();
 
 			m_screenLines.m_mesh->Draw();
@@ -156,10 +159,10 @@ namespace Vxl
 	{
 		// reset index flag
 		m_worldLines.m_mesh->m_vertexIndex = 0;
-		m_worldLines.m_mesh->m_buffer.clear();
+		m_worldLines.m_mesh->m_buffer.setZeroes();
 
 		m_screenLines.m_mesh->m_vertexIndex = 0;
-		m_screenLines.m_mesh->m_buffer.clear();
+		m_screenLines.m_mesh->m_buffer.setZeroes();
 
 		// reset wireframe sphere list
 		m_wireframeSpheres.clear();

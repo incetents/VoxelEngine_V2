@@ -4,11 +4,12 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "../textures/Texture.h"
-#include "../math/Vector.h"
 #include "../rendering/VBO.h"
 #include "../rendering/MeshBuffer.h"
+#include "../rendering/FramebufferObject.h"
+#include "../textures/Texture.h"
 #include "../modules/Component.h"
+#include "../math/Vector.h"
 
 #include <map>
 #include <string>
@@ -45,10 +46,17 @@ namespace Vxl
 	protected:
 		static std::map<std::string, Font*> m_fonts;
 
-		VBO			m_VBO;
+		// For rendering
+		VAO			m_VAO;
+		//
+		FramebufferObject* m_FBO;
+		Texture*	m_texture;
+
+		MeshBufferMem<float> m_buffer;
+
+		//VBO			m_VBO;
 		Font*		m_font = nullptr;
 		std::string m_text;
-		MeshBufferMem<float> m_buffer;
 	public:
 		// DEBUG
 		static void Init();
@@ -65,8 +73,8 @@ namespace Vxl
 		Text(const std::string& text);
 
 		// Utility
-		void UpdateVertices();
-		void Render() {}
+		void UpdateVertices(float scale);
+		void Render(float x, float y);
 
 		// Setters
 		inline void SetFont(const std::string& fontName)

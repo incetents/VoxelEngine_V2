@@ -474,7 +474,7 @@ namespace Vxl
 
 		lines->SetProperty<bool>("passthrough", false);
 
-		Graphics::SetDepthMask(false);
+		Graphics::SetDepthWrite(false);
 		Graphics::SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
 
 		Debug.RenderWorldLines();
@@ -488,7 +488,7 @@ namespace Vxl
 
 		Debug.RenderScreenLines();
 
-		Graphics::SetDepthMask(true);
+		Graphics::SetDepthWrite(true);
 
 
 

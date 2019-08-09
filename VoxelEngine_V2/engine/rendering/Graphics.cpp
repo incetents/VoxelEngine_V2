@@ -457,7 +457,7 @@ namespace Vxl
 
 		if (type == GL_DEBUG_TYPE_ERROR || severity == GL_DEBUG_SEVERITY_HIGH)
 		{
-			//Logger.error(message);
+			Logger.error(message);
 			//std::system("PAUSE");
 		}
 		else
@@ -566,7 +566,7 @@ namespace Vxl
 		SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
 		SetBlendEquation(BlendEquation::FUNC_ADD);
 		// Set Default Depth info
-		SetDepthTestState(true);
+		SetDepthRead(true);
 		SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
 		// Set Default Wireframe info
 		SetWireframeState(false);
@@ -640,7 +640,7 @@ namespace Vxl
 
 		std::string labelEdit = label + " (" + std::to_string(id) + ")";
 		VXL_ASSERT(labelEdit.size() < GLObjectNameMaxLength, "GLName is too big");
-		glObjectLabel((GLenum)identifier, id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
+		glObjectLabel(GL_ObjectType[(int)identifier], id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
 		//
 #endif
 	}
@@ -685,7 +685,7 @@ namespace Vxl
 
 		gl_blendState = state;
 	}
-	void Graphics::SetDepthTestState(bool state)
+	void Graphics::SetDepthRead(bool state)
 	{
 		if (gl_blendState == state)
 			return;
@@ -709,7 +709,7 @@ namespace Vxl
 		
 		gl_wireframe = state;
 	}
-	void Graphics::SetDepthMask(bool state)
+	void Graphics::SetDepthWrite(bool state)
 	{
 		if (gl_depthMask == state)
 			return;

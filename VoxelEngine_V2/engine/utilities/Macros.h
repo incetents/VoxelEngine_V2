@@ -7,12 +7,12 @@
 
 // [x] whether or not Graphics::SetGLName(...) should actually call glObjectLabel(...)
 #ifdef _DEBUG
-#define GLOBAL_USE_GLNAMES // conflicts with GLOBAL_ERROR_CALLBACK
+//#define GLOBAL_USE_GLNAMES // conflicts with GLOBAL_ERROR_CALLBACK
 #endif
 
 // [x] whether glUtil.cpp OpenglErrorCallback is used
 #ifdef _DEBUG
-//#define GLOBAL_ERROR_CALLBACK // conflicts with GLOBAL_USE_GLNAMES
+#define GLOBAL_ERROR_CALLBACK // conflicts with GLOBAL_USE_GLNAMES
 #endif
 
 // [x] whether GPUTimer::StartTimer and GPUTimer::EndTimer actually do anything

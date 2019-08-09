@@ -26,31 +26,7 @@ namespace Vxl
 		UINT				m_vertexIndex = 0;
 		bool				m_resizeDirty = false;
 
-		LineMesh(bool isVec3)
-		{
-			m_buffer.setBindMode(BufferUsage::DYNAMIC_DRAW);
-
-			if (isVec3)
-			{
-				BufferLayout layout =
-				{
-					{BufferType::POSITION, AttributeType::VEC3, false},
-					{BufferType::COLOR, AttributeType::VEC4, false},
-					{BufferType::LINEWIDTH, AttributeType::FLOAT, false}
-				};
-				m_buffer.setLayout(layout);
-			}
-			else
-			{
-				BufferLayout layout =
-				{
-					{BufferType::POSITION, AttributeType::VEC2, false},
-					{BufferType::COLOR, AttributeType::VEC4, false},
-					{BufferType::LINEWIDTH, AttributeType::FLOAT, false}
-				};
-				m_buffer.setLayout(layout);
-			}
-		}
+		LineMesh(bool isVec3);
 
 		void Bind(DrawType type = DrawType::LINES);
 		void Draw();

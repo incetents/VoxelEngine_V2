@@ -436,9 +436,9 @@ namespace Vxl
 		// ~ States ~ //
 		void SetCullMode(CullMode cullmode);
 		void SetBlendState(bool state);
-		void SetDepthTestState(bool state);
+		void SetDepthRead(bool state);
 		void SetWireframeState(bool state);
-		void SetDepthMask(bool state);
+		void SetDepthWrite(bool state);
 		void SetSeamlessCubemap(bool state);
 
 		// ~ Blending ~ //

@@ -167,34 +167,34 @@ namespace Vxl
 		template<typename Type>
 		void					SetUniform(const std::string& name, Type data)
 		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist");
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
 			m_uniforms[name].Send<Type>(data);
 		}
 		// [Faster] Set uniform (Custom call for matrix)
 		template<typename Type>
 		void					SetUniformMatrix(const std::string& name, Type data, bool transpose)
 		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist");
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
 			m_uniforms[name].SendMatrix<Type>(data, transpose);
 		}
 		// [Slower] Set uniform, regardless if shader is bound
 		template<typename Type>
 		void					SetProgramUniform(const std::string& name, Type data)
 		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist");
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
 			m_uniforms[name].Send<Type>(m_id, data);
 		}
 		// [Slower] Set uniform, regardless if shader is bound (Custom call for matrix)
 		template<typename Type>
 		void					SetProgramUniformMatrix(const std::string& name, Type data, bool transpose)
 		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist");
+			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
 			m_uniforms[name].SendMatrix<Type>(m_id, data, transpose);
 		}
 		
 		inline const Graphics::Uniform& GetUniform(const std::string& name) const
 		{
-			VXL_ASSERT(CheckUniform(name), "Uniform does not exist for this shader");
+			VXL_ASSERT(CheckUniform(name), "Uniform does not exist for this shader: " + name);
 			return m_uniforms.at(name);
 		}
 		inline bool				CheckUniform(const std::string& name) const
