@@ -67,8 +67,7 @@ namespace Vxl
 		// Create
 		CameraObject* _entity = new CameraObject(UniqueName, _znear, _zfar);
 		// Store in entity database
-		AddToDatabase(UniqueName, _entity);
-		Message_Created(UniqueName, _entity);
+		AddNamedAsset(UniqueName, _entity, AssetMessage::CREATED);
 		// Return
 		return _entity;
 	}

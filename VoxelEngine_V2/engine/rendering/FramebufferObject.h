@@ -17,7 +17,7 @@ namespace Vxl
 	class RenderBuffer;
 	class RenderTexture;
 
-	enum class Attachment_Type
+	enum class AttachmentType
 	{
 		// Render Buffer [Cannot bind like a texture]
 		BUFFER,
@@ -27,45 +27,61 @@ namespace Vxl
 
 	class FramebufferAttachment
 	{
-		Attachment_Type	m_type;
-		bool			m_empty = true;
+		friend class FramebufferObject;
+	private:
+		// Data
+		const AttachmentType	m_type;
+		bool					m_empty = true;
+		bool					m_isReference = false; // Whether Attachment is being read from somewhere else
+
+		// Attachment Info
+		const std::string	parent_name;
+		const std::string	attachment_name;
+		TextureFormat		attachment_formatType;
+		TexturePixelType	attachment_pixelType;
+
+		// Attachment Data [ Can only be one object ]
+		union
+		{
+			RenderTexture* m_renderTexture;
+			RenderBuffer*  m_renderBuffer;
+		};
+
 	public:
 		FramebufferAttachment(
+			const std::string& Parentname,
 			const std::string& name,
-			Attachment_Type type,
+			AttachmentType type,
 			TextureFormat formatType,
-			TextureChannelType channelType,
 			TexturePixelType pixelType
 		)
-			: m_name(name), m_type(type), m_formatType(formatType), m_channelType(channelType), m_pixelType(pixelType)
+			: parent_name(Parentname), attachment_name(name), m_type(type), attachment_formatType(formatType), attachment_pixelType(pixelType)
 		{}
+		FramebufferAttachment(
+			const std::string& Parentname,
+			const std::string& name,
+			RenderTexture* renderTexture
+		)
+			: parent_name(Parentname), attachment_name(name), m_type(AttachmentType::TEXTURE)
+		{
+			m_renderTexture = renderTexture;
+			m_isReference = true;
+		}
 		~FramebufferAttachment()
 		{
 			unload();
 		}
-
-		const std::string	m_name;
-		const TextureFormat	m_formatType;
-		const TextureChannelType	m_channelType;
-		const TexturePixelType	m_pixelType;
-
-		// Attachment can only be one type
-		union
-		{
-			RenderTexture* m_renderTexture;
-			RenderBuffer* m_renderBuffer;
-		};
 
 		void load(int Width, int Height);
 		void unload();
 
 		inline bool isRenderTexture(void) const
 		{
-			return m_type == Attachment_Type::TEXTURE;
+			return m_type == AttachmentType::TEXTURE;
 		}
 		inline bool isRenderBuffer(void) const
 		{
-			return m_type == Attachment_Type::BUFFER;
+			return m_type == AttachmentType::BUFFER;
 		}
 
 		uint32_t			GetID(void) const;
@@ -161,14 +177,20 @@ namespace Vxl
 		void clearBuffers();
 		void clearBuffer(uint32_t attachmentIndex);
 
-		void addTexture(
+		void addAttachment(
 			const std::string& name,
 			TextureFormat FormatType		= TextureFormat::RGBA8,
-			Attachment_Type fboRenderType = Attachment_Type::TEXTURE
+			AttachmentType fboRenderType = AttachmentType::TEXTURE
 		);
+		// Reference Attachment -> FBO will not clean up this RenderTexture
+		void addAttachment(
+			const std::string& name,
+			RenderTexture* renderTexture
+		);
+
 		void addDepth(
 			TextureDepthFormat depthFormatType,
-			Attachment_Type fboRenderType
+			AttachmentType fboRenderType
 		);
 
 		// Enable fbo attachments at runtime

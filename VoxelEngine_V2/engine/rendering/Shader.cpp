@@ -115,7 +115,8 @@ namespace Vxl
 	Shader* Shader::Load(const std::string& name, const std::string& filePath, ShaderType type)
 	{
 		Shader* _shader = new Shader(name, filePath, type);
-		AddToDatabase(name, _shader);
+
+		AddNamedAsset(name, _shader, AssetMessage::CREATED);
 
 		if (!_shader->HasLoaded())
 		{
@@ -127,11 +128,6 @@ namespace Vxl
 			Logger.error("Shader [" + name + "] failed to compile");
 			Logger.error(_shader->m_errorMessage);
 		}
-		else
-		{
-			Message_Created(name, _shader);
-		}
-
 
 		return _shader;
 	}
@@ -176,7 +172,7 @@ namespace Vxl
 	)
 	{
 		ShaderProgram* _program = new ShaderProgram(name);
-		AddToDatabase(name, _program);
+		AddNamedAsset(name, _program, AssetMessage::LOADED);
 
 		_program->m_shaders = shaders;
 		_program->m_shaderCount = _program->m_shaders.size();
@@ -186,10 +182,6 @@ namespace Vxl
 		if (!_program->IsLinked())
 		{
 			Logger.error("Shader Program [" + name + "] failed to link");
-		}
-		else
-		{
-			Message_Loaded(name, _program);
 		}
 
 		return _program;

@@ -22,7 +22,7 @@ namespace Vxl
 		RenderBuffer(
 			int Width, int Height,
 			TextureFormat FormatType,
-			TextureChannelType ChannelType,
+			//TextureChannelType ChannelType,
 			TexturePixelType PixelType
 		);
 		~RenderBuffer();

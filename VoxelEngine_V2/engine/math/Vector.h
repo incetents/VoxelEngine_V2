@@ -284,11 +284,11 @@ namespace Vxl
 		// Min
 		_Vector2<Type>& Min(Type f)
 		{
-			return Min(*this, f);
+			return (*this = Min(*this, f));
 		}
 		_Vector2<Type>& Min(const _Vector2<Type>& v)
 		{
-			return Min(*this, v);
+			return (*this = Min(*this, v));
 		}
 		static _Vector2<Type> Min(const _Vector2<Type>& v1, float f)
 		{
@@ -307,11 +307,11 @@ namespace Vxl
 		// Max
 		_Vector2<Type>& Max(Type f)
 		{
-			return Max(*this, f);
+			return (*this = Max(*this, f));
 		}
 		_Vector2<Type>& Max(const _Vector2<Type>& v)
 		{
-			return Max(*this, v);
+			return (*this = Max(*this, v));
 		}
 		static _Vector2<Type> Max(const _Vector2<Type>& v1, float f)
 		{

@@ -89,7 +89,7 @@ namespace Vxl
 		{
 			return m_vbo.GetSize();
 		}
-		inline bool Empty() const
+		inline bool IsEmpty() const
 		{
 			return m_vbo.IsEmpty();
 		}
@@ -138,6 +138,8 @@ namespace Vxl
 
 		void bind(void)
 		{
+			VXL_ASSERT(m_hasLayout, "MeshBufferMem missing Layout");
+
 			if (dirtyVertices)
 			{
 				if(resizedVertices || m_vbo.IsEmpty())
@@ -155,6 +157,8 @@ namespace Vxl
 		// Set all vertices to zeroes
 		void setZeroes()
 		{
+			VXL_ASSERT(m_hasLayout, "MeshBufferMem missing Layout");
+
 			dirtyVertices = true;
 
 			std::fill(vertices.begin(), vertices.end(), 0);
@@ -162,6 +166,8 @@ namespace Vxl
 
 		void set(Type* arr, uint32_t size)
 		{
+			VXL_ASSERT(m_hasLayout, "MeshBufferMem missing Layout");
+
 			// Flags
 			dirtyVertices = true;
 			resizedVertices = size != (uint32_t)vertices.size();
@@ -171,6 +177,8 @@ namespace Vxl
 		}
 		void set(const std::vector<Type>& vec)
 		{
+			VXL_ASSERT(m_hasLayout, "MeshBufferMem missing Layout");
+
 			// Flags
 			dirtyVertices = true;
 			resizedVertices = (uint32_t)vec.size() != (uint32_t)vertices.size();
@@ -205,9 +213,9 @@ namespace Vxl
 			return m_vbo.GetSize();
 		}
 		// Notice, requires vbo to be bound first //
-		inline bool Empty() const
+		inline bool IsEmpty() const
 		{
-			return m_vbo.IsEmpty();
+			return m_vbo.IsEmpty() && (uint32_t)vertices.size() == 0u;
 		}
 	};
 
@@ -304,9 +312,9 @@ namespace Vxl
 			return m_ebo.GetSize();
 		}
 		// Requires EBO to be bound first //
-		inline bool Empty()
+		inline bool IsEmpty()
 		{
-			return m_ebo.IsEmpty();
+			return m_ebo.IsEmpty() && (uint32_t)indices.size() == 0u;
 		}
 	};
 

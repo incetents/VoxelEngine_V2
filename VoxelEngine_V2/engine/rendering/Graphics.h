@@ -280,8 +280,8 @@ namespace Vxl
 		R11F_G11F_B10F,// GOOD FOR GBUFFER
 
 		// [ Special ]
-		SRGB8,
-		SRGBA8,
+		SRGB8, // 3 channels
+		SRGBA8, // 4 channels
 
 		// [DepthFormat]
 		STENCIL8,
@@ -316,9 +316,9 @@ namespace Vxl
 		BGR,	// 3 channels
 		BGRA,	// 4 channels
 
-		STENCIL,		// ? channels 
-		DEPTH,			// ? channels
-		DEPTH_STENCIL,	// ? channels
+		STENCIL,		// channel count varies 
+		DEPTH,			// channel count varies
+		DEPTH_STENCIL,	// channel count varies
 	};
 	enum class TexturePixelType
 	{
@@ -362,6 +362,7 @@ namespace Vxl
 	};
 	enum class PixelAlignment
 	{
+		NONE = 0,
 		ALIGN_1 = 1,
 		ALIGN_2 = 2,
 		ALIGN_4 = 4,
@@ -474,8 +475,9 @@ namespace Vxl
 		uint32_t GetSize(AttributeType type);
 		DataType GetDataType(AttributeType type);
 		DrawSubType GetDrawSubType(DrawType type);
-		void GetPixelChannelData(TextureDepthFormat format, TextureChannelType& channelType, TexturePixelType& pixelType);
+		TexturePixelType GetPixelData(TextureDepthFormat format);
 		TextureChannelType GetChannelType(int ChannelCount);
+		TextureChannelType GetChannelType(TextureFormat format);
 		uint32_t GetChannelCount(TextureChannelType type);
 		uint32_t GetChannelCount(TextureFormat format);
 		TextureFormat GetFormat(TextureDepthFormat format);
@@ -706,10 +708,11 @@ namespace Vxl
 			bool				CheckStatus(void);
 			FramebufferObjectID	GetCurrentlyBound(void);
 			void AttachRenderTexture(const Vxl::RenderTexture& texture, uint32_t attachmentIndex);
-			void DeattachRenderTexture(uint32_t attachmentIndex);
 			void AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture);
+			void DetachRenderTexture(uint32_t attachmentIndex);
 			void AttachRenderBuffer(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex);
 			void AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture);
+			void DetachRenderBuffer(uint32_t attachmentIndex);
 
 			RawArray<uint8_t>	ReadPixels(const Vxl::FramebufferAttachment& texture, uint32_t attachmentIndex, int x, int y, int w, int h);
 			void BlitColor(FramebufferObjectID source, FramebufferObjectID destination, int width, int height, uint32_t srcAttachment, uint32_t destAttachment);

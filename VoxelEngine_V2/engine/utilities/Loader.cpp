@@ -190,8 +190,8 @@ namespace Vxl
 					
 					for (unsigned int i = 1; i < SegmentCount; i++)
 					{
-						if (Shader::CheckIfExists(Segments[i]))
-							Shaders.push_back(Shader::Get(Segments[i]));
+						if (Shader::CheckAsset(Segments[i]))
+							Shaders.push_back(Shader::GetAsset(Segments[i]));
 						else
 							Logger.error("Attempting to load non-existing Shader: " + Segments[i]);
 					}

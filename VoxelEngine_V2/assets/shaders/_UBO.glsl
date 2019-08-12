@@ -1,3 +1,5 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
+
 // Uniform Blocks used in shaders
 layout (std140) uniform UBO_Camera_0
 {

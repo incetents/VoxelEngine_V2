@@ -1,3 +1,5 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
+
 // Math.glsl
 #define PI (3.14159)
 float rand(vec2 co){

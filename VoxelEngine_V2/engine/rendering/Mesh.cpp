@@ -155,8 +155,7 @@ namespace Vxl
 	{
 		Mesh* _mesh = new Mesh(name);
 
-		AddToDatabase(name, _mesh);
-		Message_Created(name, _mesh);
+		AddNamedAsset(name, _mesh, AssetMessage::CREATED);
 
 		return _mesh;
 	}
@@ -164,8 +163,7 @@ namespace Vxl
 	{
 		Mesh* _mesh = new Mesh(name);
 
-		AddToDatabase(name, _mesh);
-		Message_Created(name, _mesh);
+		AddNamedAsset(name, _mesh, AssetMessage::CREATED);
 
 		_mesh->Set(_model);
 
@@ -521,7 +519,7 @@ namespace Vxl
 	void Mesh::GenerateNormals(bool Smooth)
 	{
 		// Generate Missing Normals
-		if (m_normals.Empty() && !m_positions.Empty())
+		if (m_normals.IsEmpty() && !m_positions.IsEmpty())
 		{
 			GenerateNormals(
 				m_positions.getVertices().data(), m_positions.getVertexCount(),
@@ -533,7 +531,7 @@ namespace Vxl
 	void Mesh::GenerateTangents()
 	{
 		// Generate Missing Tangents
-		if ((m_tangents.Empty() || m_bitangents.Empty()) && !m_positions.Empty() && !m_uvs.Empty())
+		if ((m_tangents.IsEmpty() || m_bitangents.IsEmpty()) && !m_positions.IsEmpty() && !m_uvs.IsEmpty())
 		{
 			GenerateTangents(
 				m_positions.getVertices().data(), m_positions.getVertexCount(),

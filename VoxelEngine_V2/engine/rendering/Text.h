@@ -22,6 +22,8 @@ namespace Vxl
 		Vector2i m_size;
 		Vector2i m_bearing;
 		uint32_t m_advance;
+		float m_bboxWidth;
+		float m_bboxHeight;
 	};
 
 	class Font
@@ -29,11 +31,10 @@ namespace Vxl
 	public:
 		FT_Face m_face;
 		std::map<char, FontCharacter> m_characters;
+		uint32_t m_fontHeight;
 
-		VAO m_VAO;
-		VBO	m_VBO;
 	public:
-		Font(const std::string& filepath);
+		Font(const std::string& filepath, uint32_t fontHeight);
 
 		inline FT_Face GetFace(void) const
 		{
@@ -44,46 +45,51 @@ namespace Vxl
 	class Text
 	{
 	protected:
+		// Fonts
 		static std::map<std::string, Font*> m_fonts;
 
-		// For rendering
-		VAO			m_VAO;
-		//
-		FramebufferObject* m_FBO;
-		Texture*	m_texture;
+		// Graphics Resources [ Shared ]
+		static FramebufferObject*	m_FBO;
+		static VAO*					m_VAO;
+		static MeshBufferMem<float>*m_buffer;
+		// Texture for text
+		RenderTexture* m_renderTexture = nullptr;
 
-		MeshBufferMem<float> m_buffer;
+		Font* m_font = nullptr;
+		
+		// How much space is required for renderTexture
+		Vector2 CalculateTextureSize();
 
-		//VBO			m_VBO;
-		Font*		m_font = nullptr;
-		std::string m_text;
 	public:
-		// DEBUG
+		// Settings
+		std::string m_text;
+		float m_scale = 10.0f;
+
+		// Setup
 		static void Init();
 		static void Destroy();
-		static void Render(const std::string& text, float x, float y, float scale);
-		
-		// Setup
 		static void LoadFont(const std::string& fontName, const std::string& fontPath)
 		{
-			m_fonts[fontName] = new Font(fontPath);
+			m_fonts[fontName] = new Font(fontPath, 48);
 		}
 		
 		// Creation
 		Text(const std::string& text);
+		~Text();
 
 		// Utility
-		void UpdateVertices(float scale);
-		void Render(float x, float y);
+		void RenderToFBO();
+		//void Render();
+
+		RenderTexture* GetRenderTexture(void) const
+		{
+			return m_renderTexture;
+		}
 
 		// Setters
 		inline void SetFont(const std::string& fontName)
 		{
 			m_font = m_fonts[fontName];
-		}
-		inline void SetText(const std::string& text)
-		{
-			m_text = text;
 		}
 
 		// Getters
@@ -96,4 +102,5 @@ namespace Vxl
 			return m_text;
 		}
 	};
+
 }

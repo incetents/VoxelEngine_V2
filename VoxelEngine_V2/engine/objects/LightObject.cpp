@@ -51,8 +51,7 @@ namespace Vxl
 		LightObject* _entity = new LightObject(UniqueName, type);
 
 		// Store in entity database
-		AddToDatabase(UniqueName, _entity);
-		Message_Created(UniqueName, _entity);
+		AddNamedAsset(UniqueName, _entity, AssetMessage::CREATED);
 		// Return
 		return _entity;
 	}

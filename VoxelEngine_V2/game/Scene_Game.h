@@ -10,7 +10,6 @@ namespace Vxl
 {
 	class ShaderProgram;
 	class FramebufferObject;
-	//class Camera;
 	class Mesh;
 	class Transform;
 	class XGamePad;
@@ -22,6 +21,7 @@ namespace Vxl
 	class LightObject;
 	class CameraObject;
 	class SkyboxObject;
+	class Text;
 
 	class Scene_Game : public Scene
 	{
@@ -45,11 +45,13 @@ namespace Vxl
 
 		Material* material_skybox;
 		Material* material_gbuffer;
-		Material* material_passthrough;
+		Material* material_passthroughWorld;
 		Material* material_billboard;
 		Material* material_lines;
 		Material* material_simpleLight;
 		Material* material_colorPicker;
+
+		Text* myText = nullptr;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

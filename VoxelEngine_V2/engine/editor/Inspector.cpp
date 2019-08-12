@@ -58,13 +58,13 @@ namespace Vxl
 
 				// Name
 				static char Name[MAX_ENTITY_NAME_LENGTH];
-				strcpy_s(Name, Entity->GetName().c_str());
+				strcpy_s(Name, Entity->GetDisplayName().c_str());
 
 				ImGui::Text("Name: "); ImGui::SameLine();
 
 				ImGui::PushItemWidth(-1);
 				if (ImGui::InputText("input text", Name, IM_ARRAYSIZE(Name)))
-					Entity->SetName(std::string(Name));
+					Entity->SetDisplayName(std::string(Name));
 
 				// ID
 				ImGui::TextColored(ImGuiColor::Orange, "ID: %d", Entity->GetUniqueID());

@@ -59,7 +59,7 @@ namespace Vxl
 
 	void RenderManager::UpdateAllWindowAspectCameras()
 	{
-		auto AllCameras = CameraObject::GetDatabase();
+		auto AllCameras = CameraObject::GetAllNamedAssets();
 		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 		{
 			if (camera->second->isPerspectiveWindowAspect())
@@ -186,8 +186,8 @@ namespace Vxl
 		ShaderProgram::ProgramsFailed.clear();
 		ShaderProgram::ProgramsFailedSize = 0;
 
-		auto Programs = ShaderProgram::GetDatabase();
-		auto Shaders = Shader::GetDatabase();
+		auto Programs = ShaderProgram::GetAllNamedAssets();
+		auto Shaders = Shader::GetAllNamedAssets();
 
 		for (auto Program : Programs)
 			Program.second->detachShaders();
@@ -203,7 +203,7 @@ namespace Vxl
 			Program.second->Link();
 		}
 
-		auto Materials = Material::GetDatabase();
+		auto Materials = Material::GetAllNamedAssets();
 		for (auto Mat : Materials)
 			Mat.second->UpdateProperties();
 	}
@@ -222,7 +222,7 @@ namespace Vxl
 	}
 	void RenderManager::ReloadFBOS()
 	{
-		auto fbos = FramebufferObject::GetDatabase();
+		auto fbos = FramebufferObject::GetAllNamedAssets();
 		for (auto& fbo : fbos)
 		{
 			if (fbo.second->m_fullscreen)
@@ -255,12 +255,12 @@ namespace Vxl
 		GPUTimer::DestroyTimers();
 
 		// Destroy all Entities
-		GameObject::DeleteAndClearAll();
-		LightObject::DeleteAndClearAll();
-		CameraObject::DeleteAndClearAll();
+		GameObject::DeleteAllAssets();
+		LightObject::DeleteAllAssets();
+		CameraObject::DeleteAllAssets();
 
 		// Delete Materials
-		Material::DeleteAndClearAll();
+		Material::DeleteAllAssets();
 
 		Material::m_masterOrder.clear();
 		Material::m_masterOrderDirty = true;
@@ -277,18 +277,18 @@ namespace Vxl
 		ShaderProgram::ProgramsFailed.clear();
 		ShaderProgram::ProgramsFailedSize = 0;
 		// Delete Shaders
-		ShaderProgram::DeleteAndClearAll();
-		Shader::DeleteAndClearAll();
+		ShaderProgram::DeleteAllAssets();
+		Shader::DeleteAllAssets();
 
 		// Delete Textures
-		Texture::DeleteAndClearAll();
-		Cubemap::DeleteAndClearAll();
+		Texture::DeleteAllAssets();
+		Cubemap::DeleteAllAssets();
 
 		// Delete Framebuffers
-		FramebufferObject::DeleteAndClearAll();
+		FramebufferObject::DeleteAllAssets();
 
 		// Delete Meshes
-		Mesh::DeleteAndClearAll();
+		Mesh::DeleteAllAssets();
 	}
 	void RenderManager::Update()
 	{
@@ -380,14 +380,14 @@ namespace Vxl
 	void RenderManager::RenderSceneOtherObjectColorIDs()
 	{
 		// Extra Objects for COLOR ID
-		auto gbuffer_mat = Material::Get("gbuffer");
+		auto gbuffer_mat = Material::GetAsset("gbuffer");
 		gbuffer_mat->BindProgram();
 		gbuffer_mat->BindStates();
 
 		// Force specific fbo draw buffers
-		auto fbo_gbuffer = FramebufferObject::Get("gbuffer");
+		auto fbo_gbuffer = FramebufferObject::GetAsset("gbuffer");
 		// Store Depth for later usage
-		auto fbo_colorpicker = FramebufferObject::Get("ColorPicker");
+		auto fbo_colorpicker = FramebufferObject::GetAsset("ColorPicker");
 		
 		fbo_gbuffer->blitDepth(*fbo_colorpicker);
 
@@ -403,7 +403,7 @@ namespace Vxl
 		gbuffer_mat->m_property_color.SetProperty(Color3F(1,1,1));
 		
 		// Render CameraObjects
-		auto Cameras = CameraObject::GetDatabase();
+		auto Cameras = CameraObject::GetAllNamedAssets();
 		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
 		{
 			gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
@@ -412,7 +412,7 @@ namespace Vxl
 			Geometry.GetSphere()->Draw();
 		}
 		// Render LightObjects
-		auto Lights = LightObject::GetDatabase();
+		auto Lights = LightObject::GetAllNamedAssets();
 		for (auto it = Lights.begin(); it != Lights.end(); it++)
 		{
 			gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
@@ -434,11 +434,11 @@ namespace Vxl
 		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
 
 		// Draw Lights
-		auto billboard = Material::Get("billboard");
+		auto billboard = Material::GetAsset("billboard");
 		billboard->BindProgram();
 		
-		Texture* LightTexture = Texture::Get("editor_lightbulb");
-		auto AllLights = LightObject::GetDatabase();
+		Texture* LightTexture = Texture::GetAsset("editor_lightbulb");
+		auto AllLights = LightObject::GetAllNamedAssets();
 		for (auto light = AllLights.begin(); light != AllLights.end(); light++)
 		{
 			billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getWorldModel(), true);
@@ -452,8 +452,8 @@ namespace Vxl
 		}
 
 		// Draw Cameras
-		Texture* CameraTexture = Texture::Get("editor_camera");
-		auto AllCameras = CameraObject::GetDatabase();
+		Texture* CameraTexture = Texture::GetAsset("editor_camera");
+		auto AllCameras = CameraObject::GetAllNamedAssets();
 		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 		{
 			billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getWorldModel(), true);
@@ -468,7 +468,7 @@ namespace Vxl
 
 		// Draw Debug Lines
 
-		auto lines = Material::Get("lines");
+		auto lines = Material::GetAsset("lines");
 		lines->BindProgram();
 		lines->m_property_viewport.SetProperty(Window.GetViewport());
 
@@ -493,7 +493,7 @@ namespace Vxl
 
 
 		// Draw Debug Wireframe Sphere
-		auto passthrough = Material::Get("passthrough");
+		auto passthrough = Material::GetAsset("passthroughWorld");
 		passthrough->BindProgram();
 		passthrough->m_property_useTexture.SetProperty(false);
 		passthrough->m_property_useModel.SetProperty(true);
@@ -520,7 +520,7 @@ namespace Vxl
 		// Draw Editor Arrows (if selection applies)
 		if (Editor.HasSelection())
 		{
-			auto simpleLight = Material::Get("simpleLight");
+			auto simpleLight = Material::GetAsset("simpleLight");
 			simpleLight->BindProgram();
 
 			simpleLight->m_property_useModel.SetProperty(true);

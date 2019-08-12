@@ -1,6 +1,5 @@
-// Copyright(c) 2018 Emmanuel Lajeunesse
+// Copyright(c) 2019 Emmanuel Lajeunesse
 #version 420 core
-#include "_UBO.glsl"
 //precision highp float;
 
 // Input

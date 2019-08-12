@@ -30,8 +30,7 @@ namespace Vxl
 		// Create
 		GameObject* _entity = new GameObject(UniqueName);
 		// Store in entity database
-		AddToDatabase(UniqueName, _entity);
-		Message_Created(UniqueName, _entity);
+		AddNamedAsset(UniqueName, _entity, AssetMessage::CREATED);
 		// Return
 		return _entity;
 	}

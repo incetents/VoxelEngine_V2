@@ -21,7 +21,7 @@ layout (binding = 0) uniform sampler2D albedo_handler;
 uniform vec3 VXL_tint = vec3(1,1,1);
 uniform vec4 VXL_output 	= vec4(0,0,0,0); // used for color ID
 
-// Main
+//
 void main()
 {
 	output_albedo = texture(albedo_handler, f_data.uv);

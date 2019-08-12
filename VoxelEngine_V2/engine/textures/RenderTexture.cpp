@@ -7,10 +7,10 @@ namespace Vxl
 	RenderTexture::RenderTexture(
 		int Width, int Height,
 		TextureFormat FormatType,
-		TextureChannelType ChannelType,
 		TexturePixelType PixelType
 	)
-		: BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST, FormatType, ChannelType, PixelType, AnisotropicMode::NONE, false)
+		: BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
+			FormatType, Graphics::GetChannelType(FormatType), PixelType, AnisotropicMode::NONE, false)
 	{
 		m_width = Width;
 		m_height = Height;

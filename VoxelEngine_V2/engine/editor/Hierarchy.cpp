@@ -49,7 +49,7 @@ namespace Vxl
 			}
 
 			// Node + Name
-			std::string Name = _entity->GetName();
+			std::string Name = _entity->GetDisplayName();
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -92,7 +92,7 @@ namespace Vxl
 			}
 
 			// Node + Name
-			std::string Name = _entity->GetName();
+			std::string Name = _entity->GetDisplayName();
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -155,11 +155,13 @@ namespace Vxl
 				{
 					if (Entity->GetType() == EntityType::GAMEOBJECT)
 					{
-						GameObject::Delete((GameObject*)Entity);
+						//GameObject::DeleteNamedAsset((GameObject*)Entity);
+						GameObject::DeleteNamedAsset(Entity->GetName());
 					}
 					else if (Entity->GetType() == EntityType::CAMERA)
 					{
-						CameraObject::Delete((CameraObject*)Entity);
+						//CameraObject::DeleteNamedAsset((CameraObject*)Entity);
+						CameraObject::DeleteNamedAsset(Entity->GetName());
 					}
 				}
 				Editor.ClearSelection();
@@ -169,7 +171,7 @@ namespace Vxl
 			{
 				auto object = GameObject::Create("Generic Object");
 				object->SetMesh(Geometry.GetSphereUV_Good());
-				object->SetMaterial(Material::Get("gbuffer"));
+				object->SetMaterial(Material::GetAsset("gbuffer"));
 				object->SetColor(Color3F(1, 0, 0));
 			}
 			ImGui::SameLine();
@@ -181,7 +183,7 @@ namespace Vxl
 					{
 						auto GEntity = dynamic_cast<GameObject*>(Entity);
 
-						auto object = GameObject::Create(GEntity->GetName());
+						auto object = GameObject::Create(GEntity->GetDisplayName());
 						object->SetMesh(GEntity->GetMesh());
 						object->SetMaterial(GEntity->GetMaterial());
 						object->SetColor(GEntity->GetColor());

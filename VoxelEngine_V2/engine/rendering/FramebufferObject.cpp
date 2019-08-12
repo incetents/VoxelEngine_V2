@@ -14,30 +14,52 @@ namespace Vxl
 {
 	void FramebufferAttachment::load(int Width, int Height)
 	{
+		if (m_isReference)
+		{
+			if (m_type == AttachmentType::TEXTURE)
+			{
+				VXL_ASSERT(m_renderTexture->GetWidth() == Width && m_renderTexture->GetHeight() == Height, "FBO Attachment Ref, Size mismatch");
+				Graphics::SetGLName(ObjectType::TEXTURE, m_renderTexture->GetID(), "FBO_Tex_RENDERTEXTURE");
+			}
+			else
+			{
+				VXL_ASSERT(m_renderBuffer->GetWidth() == Width && m_renderBuffer->GetHeight() == Height, "FBO Attachment Ref, Size mismatch");
+			}
+			
+			m_empty = false;
+			return;
+		}
+
 		unload();
 
-		if (m_type == Attachment_Type::TEXTURE)
+		if (m_type == AttachmentType::TEXTURE)
 		{
-			m_renderTexture = new RenderTexture(Width, Height, m_formatType, m_channelType, m_pixelType);
-			Graphics::SetGLName(ObjectType::TEXTURE, m_renderTexture->GetID(), "FBO_" + m_name + "_Tex_" + m_name);
+			m_renderTexture = new RenderTexture(Width, Height, attachment_formatType, attachment_pixelType);
+
+			if(!attachment_name.empty())
+				Graphics::SetGLName(ObjectType::TEXTURE, m_renderTexture->GetID(), "FBO_" + parent_name + "_Tex_" + attachment_name);
 		}
 		else
 		{
-			m_renderBuffer = new RenderBuffer(Width, Height, m_formatType, m_channelType, m_pixelType);
-			Graphics::SetGLName(ObjectType::TEXTURE, m_renderBuffer->GetID(), "FBO_" + m_name + "_RenderBuf_" + m_name);
-		}
+			m_renderBuffer = new RenderBuffer(Width, Height, attachment_formatType, attachment_pixelType);
 
+			if(!attachment_name.empty())
+				Graphics::SetGLName(ObjectType::TEXTURE, m_renderBuffer->GetID(), "FBO_" + parent_name + "_RenderBuf_" + attachment_name);
+		}
 
 		m_empty = false;
 	}
 
 	void FramebufferAttachment::unload()
 	{
+		if (m_isReference)
+			return;
+
 		if (!m_empty)
 		{
-			if (m_type == Attachment_Type::BUFFER)
+			if (m_type == AttachmentType::BUFFER)
 				delete m_renderBuffer;
-			else if (m_type == Attachment_Type::TEXTURE)
+			else if (m_type == AttachmentType::TEXTURE)
 				delete m_renderTexture;
 
 			m_empty = true;
@@ -46,35 +68,35 @@ namespace Vxl
 
 	uint32_t FramebufferAttachment::GetID(void) const
 	{
-		if (m_type == Attachment_Type::BUFFER)
+		if (m_type == AttachmentType::BUFFER)
 			return m_renderBuffer->GetID();
 
 		return m_renderTexture->GetID();
 	}
 	TextureFormat	FramebufferAttachment::GetFormatType(void) const
 	{
-		if (m_type == Attachment_Type::BUFFER)
+		if (m_type == AttachmentType::BUFFER)
 			return m_renderBuffer->GetFormatType();
 
 		return m_renderTexture->GetFormatType();
 	}
 	TextureChannelType FramebufferAttachment::GetChannelType(void) const
 	{
-		if (m_type == Attachment_Type::BUFFER)
+		if (m_type == AttachmentType::BUFFER)
 			return m_renderBuffer->GetChannelType();
 
 		return m_renderTexture->GetChannelType();
 	}
 	TexturePixelType FramebufferAttachment::GetPixelType(void) const
 	{
-		if (m_type == Attachment_Type::BUFFER)
+		if (m_type == AttachmentType::BUFFER)
 			return m_renderBuffer->GetPixelType();
 
 		return m_renderTexture->GetPixelType();
 	}
 	int FramebufferAttachment::GetChannelCount(void) const
 	{
-		if (m_type == Attachment_Type::BUFFER)
+		if (m_type == AttachmentType::BUFFER)
 			return m_renderBuffer->GetChannelCount();
 
 		return m_renderTexture->GetChannelCount();
@@ -82,14 +104,14 @@ namespace Vxl
 
 	void FramebufferAttachment::Bind()
 	{
-		if (m_type == Attachment_Type::BUFFER)
+		if (m_type == AttachmentType::BUFFER)
 			m_renderBuffer->Bind();
 		else
 			m_renderTexture->Bind();
 	}
 	void FramebufferAttachment::Unbind()
 	{
-		if (m_type == Attachment_Type::BUFFER)
+		if (m_type == AttachmentType::BUFFER)
 			m_renderBuffer->Unbind();
 		else
 			m_renderTexture->Unbind();
@@ -106,8 +128,7 @@ namespace Vxl
 	){
 		FramebufferObject* _FBO = new FramebufferObject(name);
 
-		AddToDatabase(name, _FBO);
-		Message_Created(name, _FBO);
+		AddNamedAsset(name, _FBO, AssetMessage::CREATED);
 
 		return _FBO;
 	}
@@ -168,8 +189,13 @@ namespace Vxl
 
 			// Destroy attached textures and depth/stencil
 			for (auto& tex : m_textures)
-				tex->unload();
-			m_depth->unload();
+			{
+				if (!tex->m_isReference)
+					tex->unload();
+			}
+
+			if(m_depth)
+				m_depth->unload();
 		}
 	}
 
@@ -213,19 +239,31 @@ namespace Vxl
 		Graphics::ClearBufferFBOAttachment(attachmentIndex, m_clearColor);
 	}
 
-	void FramebufferObject::addTexture(
+	void FramebufferObject::addAttachment(
 		const std::string& name,
 		TextureFormat FormatType,
-		Attachment_Type fboRenderType
+		AttachmentType fboRenderType
 	)
 	{
 		VXL_ASSERT(m_textureCount < (uint32_t)Graphics::GLMaxFBOColorAttachments, "FBO, too many color attachments");
 		
 		// Create new render texture
-		m_textures.push_back(new FramebufferAttachment(name, fboRenderType, FormatType, TextureChannelType::RGBA, TexturePixelType::UNSIGNED_BYTE));
+		m_textures.push_back(new FramebufferAttachment(m_name, name, fboRenderType, FormatType, TexturePixelType::UNSIGNED_BYTE));
 		m_textureCount++;
 	}
-	void FramebufferObject::addDepth(TextureDepthFormat depthFormatType, Attachment_Type fboRenderType)
+	void FramebufferObject::addAttachment(
+		const std::string& name,
+		RenderTexture* renderTexture
+	)
+	{
+		VXL_ASSERT(m_textureCount < (uint32_t)Graphics::GLMaxFBOColorAttachments, "FBO, too many color attachments");
+
+		// Add new rendertexture
+		m_textures.push_back(new FramebufferAttachment(m_name, name, renderTexture));
+		m_textureCount++;
+	}
+
+	void FramebufferObject::addDepth(TextureDepthFormat depthFormatType, AttachmentType fboRenderType)
 	{
 		VXL_ASSERT(m_depth == nullptr, "FBO, cannot add multiple depth/stencil attachments");
 
@@ -236,12 +274,7 @@ namespace Vxl
 		else
 			m_clearMode = ClearMode::COLOR_DEPTH;
 
-		// Select Pixel/Channel Type [for glReadPixels]
-		TexturePixelType PixelType;
-		TextureChannelType ChannelType;
-		Graphics::GetPixelChannelData(depthFormatType, ChannelType, PixelType);
-
-		m_depth = new FramebufferAttachment("depth", fboRenderType, Graphics::GetFormat(depthFormatType), ChannelType, PixelType);
+		m_depth = new FramebufferAttachment(m_name, "depth", fboRenderType, Graphics::GetFormat(depthFormatType), Graphics::GetPixelData(depthFormatType));
 	}
 
 	void FramebufferObject::enableAttachment(uint32_t attachmentIndex)
@@ -255,10 +288,9 @@ namespace Vxl
 	{
 		// Color attachments
 		if (m_textures[attachmentIndex]->isRenderTexture())
-			Graphics::FramebufferObject::DeattachRenderTexture(attachmentIndex);
-			//Graphics::FramebufferObject::AttachRenderTexture(*m_textures[i]->m_renderTexture, i);
-		//else
-			//Graphics::FramebufferObject::AttachRenderBuffer(*m_textures[i]->m_renderBuffer, i);
+			Graphics::FramebufferObject::DetachRenderTexture(attachmentIndex);
+		else
+			Graphics::FramebufferObject::DetachRenderBuffer(attachmentIndex);
 	}
 
 	void FramebufferObject::bind()

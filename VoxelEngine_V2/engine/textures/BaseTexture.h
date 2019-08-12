@@ -81,7 +81,7 @@ namespace Vxl
 		}
 		inline int GetHeight(void) const
 		{
-			return m_width;
+			return m_height;
 		}
 		inline int GetChannelCount(void) const
 		{

@@ -1,4 +1,4 @@
-// Copyright(c) 2018 Emmanuel Lajeunesse
+// Copyright(c) 2019 Emmanuel Lajeunesse
 #version 420 core
 
 // Input
@@ -23,7 +23,7 @@ layout (binding = 0) uniform sampler2D texture1;
 uniform vec3 VXL_color = vec3(1,1,1);
 uniform float VXL_alpha = 1.0;
 
-//Main
+//
 void main()
 {
 	float d = dot(normalize(f_data.normal), vec3(0.57735, 0.57735, 0.57735)); // -1 to 1 brightness
@@ -35,4 +35,6 @@ void main()
 	output_albedo.a = VXL_alpha;
 
 	output_normal = vec4(normalize(f_data.normal), 1.0); // worldspace Normals
+	
+	//output_albedo.rgb = f_data.normal;
 }

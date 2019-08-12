@@ -78,14 +78,13 @@ namespace Vxl
 	) {
 		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType);
 
-		AddToDatabase(name, _cubemap);
+		AddNamedAsset(name, _cubemap, AssetMessage::LOADED);
 
-		if (_cubemap == nullptr)
-			return false;
-		else if (!_cubemap->IsLoaded())
-			return false;
-
-		Message_Loaded(name, _cubemap);
+		if (!_cubemap->IsLoaded())
+		{
+			Logger.error("Cubemap [" + name + "] failed to load");
+			return nullptr;
+		}
 
 		return _cubemap;
 	}

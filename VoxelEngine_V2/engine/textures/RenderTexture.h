@@ -14,7 +14,6 @@ namespace Vxl
 		RenderTexture(
 			int Width, int Height,
 			TextureFormat FormatType = TextureFormat::RGBA8,
-			TextureChannelType ChannelType = TextureChannelType::RGBA,
 			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
 		);
 

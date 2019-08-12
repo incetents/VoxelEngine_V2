@@ -22,7 +22,6 @@ namespace Vxl
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
 		TextureFormat		FormatType,
-		//TextureChannelType	ChannelType,
 		TexturePixelType	PixelType,
 		AnisotropicMode		AnisotropicMode
 	)
@@ -49,8 +48,9 @@ namespace Vxl
 		updateMipmapping();
 
 		// glName
-		auto Name = stringUtil::nameFromFilepath(filePath);
-		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + Name);
+		auto name = stringUtil::nameFromFilepath(filePath);
+		if(!name.empty())
+			Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
 
 		// finished
 		Unbind();
@@ -96,7 +96,8 @@ namespace Vxl
 		updateMipmapping();
 
 		// glName
-		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
+		if(!name.empty())
+			Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
 
 		// finished
 		Unbind();
@@ -128,14 +129,12 @@ namespace Vxl
 		m_image = new UCHAR[pixelCount];
 		memcpy(m_image, pixels, pixelCount * sizeof(UCHAR));
 
-		//m_image = (UCHAR*)pixels;
-
-		//updateParameters();
 		updateStorage(pixels);
 		updateMipmapping();
 
 		// glName
-		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
+		if(!name.empty())
+			Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
 
 		// finished
 		Unbind();
@@ -150,20 +149,21 @@ namespace Vxl
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
 		TextureFormat		FormatType,
-		//TextureChannelType	ChannelType,
 		TexturePixelType	PixelType,
 		AnisotropicMode		AnisotropicMode
 	) {
 		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType, AnisotropicMode);
 
-		AddToDatabase(name, _texture);
+		if (name.empty())
+			AddUnnamedAsset(_texture, AssetMessage::LOADED);
+		else
+			AddNamedAsset(name, _texture, AssetMessage::LOADED);
 
-		if (_texture == nullptr)
-			return false;
-		else if (!_texture->IsLoaded())
-			return false;
-
-		Message_Loaded(name, _texture);
+		if (!_texture->IsLoaded())
+		{
+			Logger.error("Texture [" + name + "] failed to load");
+			return nullptr;
+		}
 
 		return _texture;
 	}
@@ -181,14 +181,16 @@ namespace Vxl
 	) {
 		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
-		AddToDatabase(name, _texture);
+		if (name.empty())
+			AddUnnamedAsset(_texture, AssetMessage::LOADED);
+		else
+			AddNamedAsset(name, _texture, AssetMessage::LOADED);
 
-		if (_texture == nullptr)
-			return false;
-		else if (!_texture->IsLoaded())
-			return false;
-
-		Message_Created(name, _texture);
+		if (!_texture->IsLoaded())
+		{
+			Logger.error("Texture [" + name + "] failed to load");
+			return nullptr;
+		}
 
 		return _texture;
 	}
@@ -207,14 +209,16 @@ namespace Vxl
 	{
 		Texture* _texture = new Texture(name, pixels, width, height, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
-		AddToDatabase(name, _texture);
+		if (name.empty())
+			AddUnnamedAsset(_texture, AssetMessage::CREATED);
+		else
+			AddNamedAsset(name, _texture, AssetMessage::CREATED);
 
-		if (_texture == nullptr)
-			return false;
-		else if (!_texture->IsLoaded())
-			return false;
-
-		Message_Created(name, _texture);
+		if (!_texture->IsLoaded())
+		{
+			Logger.error("Texture [" + name + "] failed to create");
+			return nullptr;
+		}
 
 		return _texture;
 	}

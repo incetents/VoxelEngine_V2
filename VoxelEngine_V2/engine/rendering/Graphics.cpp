@@ -78,6 +78,8 @@ namespace Vxl
 	FramebufferObjectID gl_activeFBO = 0;
 	ShaderProgramID		gl_activeShaderProgram = 0;
 	float				gl_lineWidth = 1.0f;
+	PixelAlignment		gl_pixelPackAlignment = PixelAlignment::ALIGN_4;
+	PixelAlignment		gl_pixelUnpackAlignment = PixelAlignment::ALIGN_4;
 
 	// ~ Graphics Enums ~ //
 	const int GL_ObjectType[] =
@@ -474,8 +476,6 @@ namespace Vxl
 		//if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
 		{
 			UsingErrorCallback = true;
-			glEnable(GL_DEBUG_OUTPUT);
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallback(OpenGLDebugCallback, stderr);
 			//	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, 0, GL_FALSE);
 		}
@@ -521,6 +521,7 @@ namespace Vxl
 			Vendor = VendorType::INTEL;
 
 		// Acquire Restrictions
+		glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLObjectNameMaxLength);
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &GLMaxAnisotropy);
 		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &GLMaxFBOColorAttachments);
 		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &GLMaxUniformBindings);
@@ -559,6 +560,9 @@ namespace Vxl
 		gl_activeFBO = 0;
 		gl_activeShaderProgram = 0;
 
+		gl_pixelPackAlignment = PixelAlignment::NONE;
+		gl_pixelUnpackAlignment = PixelAlignment::NONE;
+
 		// Set Default Cull Mode
 		SetCullMode(CullMode::COUNTER_CLOCKWISE);
 		// Set Default Blend info
@@ -572,6 +576,13 @@ namespace Vxl
 		SetWireframeState(false);
 		// Cubemap edges are hidden
 		SetSeamlessCubemap(true);
+		// Pixel pack/unpack
+		Graphics::Texture::SetPixelPackAlignment(PixelAlignment::ALIGN_4);
+		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_4);
+
+		// Enable Debug Outputs // Important for queries
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	}
 
 	// Updates specific values
@@ -635,9 +646,6 @@ namespace Vxl
 	{
 #if defined(GLOBAL_USE_GLNAMES) && !defined(GLOBAL_ERROR_CALLBACK)
 		//
-		if (GLObjectNameMaxLength == -1)
-			glGetIntegerv(GL_MAX_LABEL_LENGTH, &GLObjectNameMaxLength);
-
 		std::string labelEdit = label + " (" + std::to_string(id) + ")";
 		VXL_ASSERT(labelEdit.size() < GLObjectNameMaxLength, "GLName is too big");
 		glObjectLabel(GL_ObjectType[(int)identifier], id, static_cast<GLsizei>(labelEdit.size()), labelEdit.c_str());
@@ -938,38 +946,33 @@ namespace Vxl
 			return DrawSubType::TRIANGLES;
 		}
 	}
-	void Graphics::GetPixelChannelData(TextureDepthFormat format, TextureChannelType& channelType, TexturePixelType& pixelType)
+	TexturePixelType Graphics::GetPixelData(TextureDepthFormat format)
 	{
 		switch (format)
 		{
 		case TextureDepthFormat::STENCIL8:
-			channelType = TextureChannelType::STENCIL;
-			pixelType = TexturePixelType::UNSIGNED_BYTE;
-			return;
+			return TexturePixelType::UNSIGNED_BYTE;
+		
 		case TextureDepthFormat::DEPTH16:
-			channelType = TextureChannelType::DEPTH;
-			pixelType = TexturePixelType::UNSIGNED_SHORT;
-			return;
+			return TexturePixelType::UNSIGNED_SHORT;
+		
 		case TextureDepthFormat::DEPTH24:
-			channelType = TextureChannelType::DEPTH;
-			pixelType = TexturePixelType::UNSIGNED_INT_8_8_8_8;
-			return;
+			return TexturePixelType::UNSIGNED_INT_8_8_8_8;
+		
 		case TextureDepthFormat::DEPTH24_STENCIL8:
-			channelType = TextureChannelType::DEPTH_STENCIL;
-			pixelType = TexturePixelType::UNSIGNED_INT_8_8_8_8;
-			return;
+			return TexturePixelType::UNSIGNED_INT_8_8_8_8;
+		
 		case TextureDepthFormat::DEPTH32:
 		case TextureDepthFormat::DEPTH32F:
-			channelType = TextureChannelType::DEPTH;
-			pixelType = TexturePixelType::UNSIGNED_INT;
-			return;
+			return TexturePixelType::UNSIGNED_INT;
+		
 		case TextureDepthFormat::DEPTH32F_STENCIL8:
-			channelType = TextureChannelType::DEPTH_STENCIL;
-			pixelType = TexturePixelType::UNSIGNED_INT;
-			return;
-		}
+			return TexturePixelType::UNSIGNED_INT;
 
-		VXL_ASSERT(false, "Invalid DepthFormat Type");
+		default:
+			VXL_ASSERT(false, "Invalid DepthFormat Type");
+			return TexturePixelType::NONE;
+		}
 	}
 	TextureChannelType Graphics::GetChannelType(int ChannelCount)
 	{
@@ -989,6 +992,65 @@ namespace Vxl
 		}
 
 		VXL_ASSERT(false, "Invalid Channel Count");
+		return TextureChannelType::NONE;
+	}
+	TextureChannelType Graphics::GetChannelType(TextureFormat format)
+	{
+		switch (format)
+		{
+			// 1 Channel
+		case TextureFormat::R8:
+		case TextureFormat::R8_SNORM:
+		case TextureFormat::R16:
+		case TextureFormat::R16_SNORM:
+		case TextureFormat::R16F:
+			return TextureChannelType::R;
+			
+			// 2 Channels
+		case TextureFormat::RG8:
+		case TextureFormat::RG8_SNORM:
+		case TextureFormat::RG16:
+		case TextureFormat::RG16_SNORM:
+		case TextureFormat::RG16F:
+		case TextureFormat::DEPTH16:// Special
+			return TextureChannelType::RG;
+			
+			// 3 Channels
+		case TextureFormat::RGB8:
+		case TextureFormat::RGB8_SNORM:
+		case TextureFormat::RGB16:
+		case TextureFormat::RGB16_SNORM:
+		case TextureFormat::RGB16F:
+		case TextureFormat::R11F_G11F_B10F:// Special
+		case TextureFormat::SRGB8:// Special
+			return TextureChannelType::RGB;
+			
+			// 4 ChannelS
+		case TextureFormat::RGBA8:
+		case TextureFormat::RGBA8_SNORM:
+		case TextureFormat::RGBA16:
+		case TextureFormat::RGBA16_SNORM:
+		case TextureFormat::RGBA16F:
+		case TextureFormat::SRGBA8:// Special
+			return TextureChannelType::RGBA;
+
+			// Depth
+		case TextureFormat::DEPTH24:// Special
+		case TextureFormat::DEPTH32:// Special
+		case TextureFormat::DEPTH32F:// Special
+			return TextureChannelType::DEPTH;
+			
+			// Stencil
+		case TextureFormat::STENCIL8:// Special
+			return TextureChannelType::STENCIL;
+			
+			// Stencil + Depth
+		case TextureFormat::DEPTH24_STENCIL8:// Special
+		case TextureFormat::DEPTH32F_STENCIL8:// Special
+			return TextureChannelType::DEPTH_STENCIL;
+		}
+
+		VXL_ASSERT(false, "Invalid Texture Format");
 		return TextureChannelType::NONE;
 	}
 	uint32_t Graphics::GetChannelCount(TextureChannelType type)
@@ -1028,6 +1090,7 @@ namespace Vxl
 		case TextureFormat::R16:
 		case TextureFormat::R16_SNORM:
 		case TextureFormat::R16F:
+		case TextureFormat::STENCIL8:
 			return 1;
 			// 2 Channels
 		case TextureFormat::RG8:
@@ -1047,7 +1110,7 @@ namespace Vxl
 		case TextureFormat::SRGB8:// Special
 		case TextureFormat::DEPTH24:// Special
 			return 3;
-			// 4 ChannelS
+			// 4 Channels
 		case TextureFormat::RGBA8:
 		case TextureFormat::RGBA8_SNORM:
 		case TextureFormat::RGBA16:
@@ -1058,7 +1121,7 @@ namespace Vxl
 		case TextureFormat::DEPTH32F:// Special
 		case TextureFormat::DEPTH24_STENCIL8:// Special
 			return 4;
-		case TextureFormat::DEPTH32F_STENCIL8:
+		case TextureFormat::DEPTH32F_STENCIL8:// Special
 			return 8; // 64 bits total (24 bits padding for alignment)
 		}
 
@@ -1889,11 +1952,23 @@ namespace Vxl
 	}
 	void Graphics::Texture::SetPixelPackAlignment(PixelAlignment align)
 	{
+		if (gl_pixelPackAlignment == align)
+			return;
+
 		glPixelStorei(GL_PACK_ALIGNMENT, (int)align);
+		// affects glreadpixels and texture unpacking ex: glTexImage2D
+
+		gl_pixelPackAlignment = align;
 	}
 	void Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment align)
 	{
+		if (gl_pixelUnpackAlignment == align)
+			return;
+
 		glPixelStorei(GL_UNPACK_ALIGNMENT, (int)align);
+		// affects glreadpixels and texture unpacking ex: glTexImage2D
+
+		gl_pixelUnpackAlignment = align;
 	}
 
 	// ~ Renderbuffer ~ //
@@ -2010,13 +2085,13 @@ namespace Vxl
 		VXL_ASSERT(attachmentIndex < (uint32_t)GLMaxFBOColorAttachments, "attachmentIndex too high for AttachRenderTexture()");
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, texture.GetID(), 0);
 	}
-	void Graphics::FramebufferObject::DeattachRenderTexture(uint32_t attachmentIndex)
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, 0, 0);
-	}
 	void Graphics::FramebufferObject::AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.GetID(), 0);
+	}
+	void Graphics::FramebufferObject::DetachRenderTexture(uint32_t attachmentIndex)
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, 0, 0);
 	}
 	void Graphics::FramebufferObject::AttachRenderBuffer(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex)
 	{
@@ -2026,6 +2101,10 @@ namespace Vxl
 	void Graphics::FramebufferObject::AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture)
 	{
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, texture.GetID());
+	}
+	void Graphics::FramebufferObject::DetachRenderBuffer(uint32_t attachmentIndex)
+	{
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_RENDERBUFFER, 0);
 	}
 
 	RawArray<uint8_t> Graphics::FramebufferObject::ReadPixels(const Vxl::FramebufferAttachment& texture, uint32_t attachmentIndex, int x, int y, int w, int h)

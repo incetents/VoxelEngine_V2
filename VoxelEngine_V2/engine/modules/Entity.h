@@ -39,7 +39,8 @@ namespace Vxl
 		uint32_t	m_uniqueID;
 		Color4F		m_colorID;
 		EntityType  m_type;
-		std::string	m_name;
+		std::string	m_name;			// Used for storage with Asset class [Never modified]
+		std::string m_displayName;	// Used with editor when displaying name [can be modified]
 		Color3F		m_Color = Color3F(1, 1, 1);
 		Color3F		m_Tint	= Color3F(1, 1, 1);
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
@@ -99,7 +100,11 @@ namespace Vxl
 		}
 		
 		// Name
-		void SetName(const std::string _name);
+		void SetDisplayName(const std::string _name);
+		inline std::string GetDisplayName(void) const
+		{
+			return m_displayName;
+		}
 		inline std::string GetName(void) const
 		{
 			return m_name;

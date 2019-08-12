@@ -34,7 +34,8 @@
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
 
 gbuffer				gbuffer_vert				gbuffer_frag
-passthrough 		gbuffer_vert				passthrough_frag
+passthroughWorld 	gbuffer_vert				passthrough_frag
+passthrough 		passthrough_vert			passthrough_frag
 simpleLight 		gbuffer_vert				simpleLight_frag
 skybox				skybox_vert					skybox_frag
 lines 				lines_vert					lines_geom 				lines_frag

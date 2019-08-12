@@ -19,7 +19,8 @@ namespace Vxl
 	Entity::Entity(const std::string& name, EntityType type)
 		: m_type(type)
 	{
-		SetName(name);
+		m_name = name;
+		SetDisplayName(name);
 		AddComponent(&m_transform, this);
 
 		// Check if there are discarded IDs to use
@@ -49,16 +50,16 @@ namespace Vxl
 		m_discardedUniqueIDs.push(m_uniqueID);
 	}
 
-	void Entity::SetName(const std::string _name)
+	void Entity::SetDisplayName(const std::string _name)
 	{
 		if (_name.size() > MAX_ENTITY_NAME_LENGTH)
 		{
 			Logger.error("[Entity Error]");
-			Logger.error("New name is too large,\n[Orig Name]: " + m_name + "\n[New Name]: " + _name);
-			m_name = _name.substr(0, MAX_ENTITY_NAME_LENGTH);
+			Logger.error("New name is too large,\n[Orig Name]: " + m_displayName + "\n[New Name]: " + _name);
+			m_displayName = _name.substr(0, MAX_ENTITY_NAME_LENGTH);
 		}
 		else
-			m_name = _name;
+			m_displayName = _name;
 	}
 
 	// Update Bounding Box from Mesh

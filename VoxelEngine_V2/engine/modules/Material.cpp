@@ -27,8 +27,7 @@ namespace Vxl
 	{
 		Material* _material = new Material(_name, _order);
 
-		AddToDatabase(_name, _material);
-		Message_Created(_name, _material);
+		AddNamedAsset(_name, _material, AssetMessage::CREATED);
 
 		return _material;
 	}
