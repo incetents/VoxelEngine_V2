@@ -20,6 +20,30 @@ namespace Vxl
 		Unbind();
 	}
 
+	// Asset Creation
+	RenderTexture* RenderTexture::Create(
+		int Width, int Height,
+		TextureFormat FormatType,
+		TexturePixelType PixelType
+	)
+	{
+		RenderTexture* _texture = new RenderTexture(Width, Height, FormatType, PixelType);
+
+		AddUnnamedAsset(_texture, AssetMessage::CREATED);
+
+		if (!_texture->IsLoaded())
+		{
+			Logger.error("Render Texture failed to load");
+			return nullptr;
+		}
+
+		return _texture;
+	}
+
+	RenderTexture::~RenderTexture()
+	{
+	}
+
 	// Update mipmaps
 	void RenderTexture::updateMipmapping()
 	{

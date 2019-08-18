@@ -5,13 +5,23 @@
 
 namespace Vxl
 {
-	class RenderTexture : public BaseTexture
+	class RenderTexture : public BaseTexture, public Asset<RenderTexture>
 	{
+	private:
+		// Channel/Pixel used only for reading
+		RenderTexture(
+			int Width, int Height,
+			TextureFormat FormatType = TextureFormat::RGBA8,
+			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
+		);
+
 	public:
 		RenderTexture(const RenderTexture&) = delete;
 
-		// Channel/Pixel used only for reading
-		RenderTexture(
+		~RenderTexture();
+
+		// Asset Creation
+		static RenderTexture* Create(
 			int Width, int Height,
 			TextureFormat FormatType = TextureFormat::RGBA8,
 			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE

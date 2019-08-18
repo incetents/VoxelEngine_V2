@@ -45,11 +45,14 @@ namespace Vxl
 
 		Material* material_skybox;
 		Material* material_gbuffer;
+		Material* material_gbuffer_passthroughWorld;
+		Material* material_gbuffer_billboard;
 		Material* material_passthroughWorld;
 		Material* material_billboard;
 		Material* material_lines;
 		Material* material_simpleLight;
 		Material* material_colorPicker;
+		Material* material_font;
 
 		Text* myText = nullptr;
 

@@ -41,6 +41,11 @@ namespace Vxl
 			size_t lastDashLoc = filePath.find_last_of("/\\");
 			return filePath.substr(lastDashLoc + 1, filePath.length() - lastDashLoc);
 		}
+		// Count Characters in string
+		uint32_t countChar(const std::string& str, char c)
+		{
+			return std::count(str.begin(), str.end(), c);
+		}
 		// Remove characters from string
 		void removeChar(std::string& str, char c)
 		{

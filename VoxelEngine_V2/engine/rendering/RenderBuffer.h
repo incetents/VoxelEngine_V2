@@ -2,29 +2,36 @@
 #pragma once
 
 #include "Graphics.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {
-	class RenderBuffer
+	class RenderBuffer : public Asset<RenderBuffer>
 	{
 	private:
-		uint32_t	m_id = -1;
-		int			m_width;
-		int			m_height;
-		TextureFormat	 m_formatType;
-		TextureChannelType m_channelType;
-		TexturePixelType	 m_pixelType;
-		int			 m_channelCount;
+		uint32_t			m_id = -1;
+		int					m_width;
+		int					m_height;
+		TextureFormat		m_formatType;
+		TextureChannelType	m_channelType;
+		TexturePixelType	m_pixelType;
+		int					m_channelCount;
+
+		RenderBuffer(
+			int Width, int Height,
+			TextureFormat FormatType = TextureFormat::RGBA8,
+			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
+		);
+
 	public:
 		RenderBuffer(const RenderBuffer&) = delete;
 
-		// Channel/Pixel used only for reading
-		RenderBuffer(
+		static RenderBuffer* Create(
 			int Width, int Height,
-			TextureFormat FormatType,
-			//TextureChannelType ChannelType,
-			TexturePixelType PixelType
+			TextureFormat FormatType = TextureFormat::RGBA8,
+			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
 		);
+		
 		~RenderBuffer();
 
 		void Bind(void) const;

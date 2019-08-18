@@ -216,6 +216,9 @@
     <ClCompile Include="engine\rendering\Text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\objects\TextObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\Input.h">
@@ -444,6 +447,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\rendering\Text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\objects\TextObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

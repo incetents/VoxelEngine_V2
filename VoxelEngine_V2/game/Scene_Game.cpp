@@ -20,6 +20,7 @@
 #include "../engine/rendering/Debug.h"
 #include "../engine/rendering/UBO.h"
 #include "../engine/rendering/Graphics.h"
+#include "../engine/rendering/Text.h"
 
 #include "../engine/textures/Texture.h"
 #include "../engine/textures/RenderTexture.h"
@@ -35,6 +36,8 @@
 #include "../engine/objects/LightObject.h"
 #include "../engine/objects/CameraObject.h"
 #include "../engine/objects/GameObject.h"
+#include "../engine/objects/TextObject.h"
+
 #include "../engine/modules/Material.h"
 #include "../engine/modules/RenderManager.h"
 
@@ -49,7 +52,7 @@
 
 #include "../game/terrain/TerrainManager.h"
 
-#include "../engine/rendering/Text.h"
+
 
 namespace Vxl
 {
@@ -86,25 +89,33 @@ namespace Vxl
 
 		// FBO
 		_fbo_gbuffer = FramebufferObject::Create("gbuffer");
-		_fbo_gbuffer->setClearColor(Color4F(-1, -1, 0, 1));
-		_fbo_gbuffer->setSizeToWindowSize();
-		_fbo_gbuffer->addAttachment("albedo", TextureFormat::R11F_G11F_B10F);
-		_fbo_gbuffer->addAttachment("normal", TextureFormat::RGBA16_SNORM);
-		_fbo_gbuffer->addAttachment("colorID", TextureFormat::RGBA8);
-		_fbo_gbuffer->addDepth(TextureDepthFormat::DEPTH16, AttachmentType::TEXTURE);
-		_fbo_gbuffer->complete();
+		_fbo_gbuffer->SetClearColor(Color4F(-1, -1, 0, 1));
+		_fbo_gbuffer->SetSizeToWindowSize();
+		_fbo_gbuffer->Bind();
+		_fbo_gbuffer->SetAttachment(0, _fbo_gbuffer->CreateRenderTexture("albedo", TextureFormat::R11F_G11F_B10F));
+		_fbo_gbuffer->SetAttachment(1, _fbo_gbuffer->CreateRenderTexture("normal", TextureFormat::RGBA16_SNORM));
+		_fbo_gbuffer->SetAttachment(2, _fbo_gbuffer->CreateRenderTexture("colorID", TextureFormat::RGBA8));
+		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::TEXTURE);
+
+		_fbo_gbuffer->checkFBOStatus();
+		_fbo_gbuffer->Unbind();
 
 		_fbo_editor = FramebufferObject::Create("EditorPost");
-		_fbo_editor->setSizeToWindowSize();
-		_fbo_editor->addAttachment("albedo");
-		_fbo_editor->addDepth(TextureDepthFormat::DEPTH16, AttachmentType::BUFFER);
-		_fbo_editor->complete();
+		_fbo_editor->SetSizeToWindowSize();
+		_fbo_editor->Bind();
+		_fbo_editor->SetAttachment(0, _fbo_editor->CreateRenderTexture("albedo"));
+		_fbo_editor->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::BUFFER);
+		_fbo_editor->checkFBOStatus();
+		_fbo_editor->Unbind();
 
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker");
-		_fbo_colorpicker->setSizeToWindowSize();
-		_fbo_colorpicker->addAttachment("color", TextureFormat::RGBA8);
-		_fbo_colorpicker->addDepth(TextureDepthFormat::DEPTH16, AttachmentType::BUFFER);
-		_fbo_colorpicker->complete();
+		_fbo_colorpicker->SetSizeToWindowSize();
+		_fbo_colorpicker->Bind();
+		_fbo_colorpicker->SetAttachment(0, _fbo_colorpicker->CreateRenderTexture("color"));
+		_fbo_colorpicker->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::BUFFER);
+		_fbo_colorpicker->checkFBOStatus();
+		_fbo_colorpicker->Unbind();
+
 
 		ShaderProgram* _shader_skybox			= ShaderProgram::GetAsset("skybox");
 		ShaderProgram* _shader_gbuffer			= ShaderProgram::GetAsset("gbuffer");
@@ -114,16 +125,25 @@ namespace Vxl
 		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
 		ShaderProgram* _shader_billboard		= ShaderProgram::GetAsset("billboard");
 		ShaderProgram* _shader_simpleLight		= ShaderProgram::GetAsset("simpleLight");
+		ShaderProgram* _shader_font				= ShaderProgram::GetAsset("font");
 
 
 		material_skybox = Material::Create("skybox", 0);
 		material_skybox->SetProgram(*_shader_skybox);
 
+		// Gbuffer Materials [Should not do any blending]
+
 		material_gbuffer = Material::Create("gbuffer", 1);
 		material_gbuffer->SetProgram(*_shader_gbuffer);
-
-		// Gbuffer has no blending whatsoever
 		material_gbuffer->m_BlendState = false;
+
+		material_gbuffer_passthroughWorld = Material::Create("gbuffer_passthroughWorld", 2);
+		material_gbuffer_passthroughWorld->SetProgram(*_shader_passthroughWorld);
+		material_gbuffer_passthroughWorld->m_BlendState = false;
+
+		material_gbuffer_billboard = Material::Create("gbuffer_billboard", 3);
+		material_gbuffer_billboard->SetProgram(*_shader_billboard);
+		material_gbuffer_billboard->m_BlendState = false;
 
 		material_passthroughWorld = Material::Create("passthroughWorld", 2);
 		material_passthroughWorld->SetProgram(*_shader_passthroughWorld);
@@ -139,6 +159,18 @@ namespace Vxl
 
 		material_colorPicker = Material::Create("colorPicker", 6);
 		material_colorPicker->SetProgram(*_shader_colorPicker);
+
+		material_font = Material::Create("font", 100);
+		material_font->SetProgram(*_shader_font);
+		material_font->m_DepthRead = false;
+		material_font->m_DepthWrite = false;
+
+		/*
+			Graphics::SetDepthRead(false);
+		Graphics::SetDepthWrite(false);
+		Graphics::SetBlendState(true);
+		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
+		*/
 
 		_tex = Texture::GetAsset("beato");
 		_tex_crate = Texture::GetAsset("crate_diffuse");
@@ -314,10 +346,18 @@ namespace Vxl
 		_light1->m_transform.setPosition(5, 0, 0);
 
 		GameObject* _billboard1 = GameObject::Create("_quad1");
-		_billboard1->SetMaterial(material_billboard);
+		_billboard1->SetMaterial(material_gbuffer_billboard);
 		_billboard1->SetTexture(Texture::GetAsset("beato"), TextureLevel::LEVEL0);
 		_billboard1->SetMesh(Geometry.GetQuadZ());
 		_billboard1->m_transform.setPosition(7, 3, -3);
+
+		//	TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
+		//	
+		//	TextObject* _text1 = TextObject::Create("_text1");
+		//	_text1->m_transform.setPosition(-2, -3, 0);
+		//	_text1->SetFont("arial");
+		//	_text1->SetText("abcdefghijkl\nmnopqrstuvwxyz");
+		
 
 		//material_gbuffer
 		//material_billboard
@@ -542,6 +582,13 @@ namespace Vxl
 	}
 	void Scene_Game::Draw()
 	{
+		static bool once = true;
+		if (once)
+		{
+			once = false;
+			
+		}
+
 		ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
 		//	
@@ -553,15 +600,16 @@ namespace Vxl
 
 		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT_RANGE("TESTMODE", 0, 0, 3));
 
-		_fbo_gbuffer->bind();
-		_fbo_gbuffer->clearBuffers();
+		_fbo_gbuffer->Bind();
+		_fbo_gbuffer->DrawToBuffers();
+		_fbo_gbuffer->ClearBuffers();
 		//
 		GPUTimer::StartTimer("Gbuffer");
 		CPUTimer::StartTimer("Gbuffer");
 		//
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects();
-		RenderManager.RenderSceneOtherObjectColorIDs();
+		RenderManager.RenderSceneObjectsWithOnlyColorID();
 
 		//auto test = ShaderProgram::Get("gbuffer");
 		//test->Bind();
@@ -574,70 +622,79 @@ namespace Vxl
 		//
 		//test->Unbind();
 
-		// Font Rendering Testing //
-		auto shader_font = ShaderProgram::GetAsset("font");
-		shader_font->Bind();
+		// Font Rendering FBO //
+		auto material_font = Material::GetAsset("font");
+		material_font->BindProgram();
+		material_font->BindStates();
 		
-		Graphics::SetDepthRead(false);
-		Graphics::SetDepthWrite(false);
-		Graphics::SetBlendState(true);
-		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
-		
-		shader_font->SetUniformMatrix("projection", Matrix4x4::Orthographic(0, (float)SCREEN_WIDTH, 0, (float)SCREEN_HEIGHT, -10.f, 10.f), true);
-		shader_font->SetUniform<Vector3>("textColor", Vector3(1, 1, 1));
-		
-		//	Graphics::Texture::SetActiveLevel(TextureLevel::LEVEL0);
-		//	
-		//	//Text::Render("quickly", sinf(Time.GetTime() * 3.0) * 100.0f + 200.0f, cosf(Time.GetTime() * 3.0) * 100.0f + 200.0f, 2.0f);
-		//	Text::Render("abcdefghijklmnopqrstuvwxyz", 100.0f, 100.0f, 1.0f);
-		
-		if(myText == nullptr)
-			myText = new Text("quickly fox on brown bricks\nfake news");
-
-		myText->SetFont("arial");
-		myText->RenderToFBO();
-		//	myText.Render(100.f, 200.f);
-		
-		//Graphics::SetBlendState(false);
-		//Graphics::SetDepthRead(true);
-		//Graphics::SetDepthWrite(true);
-		
-		shader_font->Unbind();
-		// Font Rendering Testing //
-		
-		// TEST
+		//Graphics::SetBlendState(true);
+		//Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
 		//Graphics::SetDepthRead(false);
 		//Graphics::SetDepthWrite(false);
 		
-		_fbo_gbuffer->bind();
+		if (myText == nullptr)
+			myText = new Text("arial",
+				"\n\nfirst sentence\n"
+				"0wertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+				"q0ertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+				"qw0rtyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+				"qwe0tyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+				"qwer0yuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+				"qwert0uiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+				"qwerty0iop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+				"qwertyu0op[]{}asdfghjkl;:zxcvbnm,.<>?\n\n\n\n\n\n"
+			);
 		
-		auto RT = myText->GetRenderTexture();
-		RT->Bind(TextureLevel::LEVEL0);
+		if (myText->HasRenderTextureChanged())
+		{
 
-		auto passthrough = Material::GetAsset("passthroughWorld");
-		passthrough->BindProgram();
-		passthrough->m_property_useTexture.SetProperty(true);
-		passthrough->m_property_color.SetProperty(Color3F(1, 1, 1));
-		passthrough->m_property_useModel.SetProperty(true);
-		passthrough->m_property_useInstancing.SetProperty(false);
-		Matrix4x4 Scale = Matrix4x4::GetScale(Vector3(RT->GetWidth(), RT->GetHeight(), 1) / 200.0f);
-		passthrough->m_property_model.SetPropertyMatrix(Scale, true);
+			RenderTexture* MY_RT = myText->GetRenderTexture();
 
+			if (MY_RT)
+			{
+				material_font->m_property_model.SetPropertyMatrix(Matrix4x4::Orthographic(0, (float)MY_RT->GetWidth(), 0, (float)MY_RT->GetHeight(), -10.f, 10.f), true);
+				material_font->m_property_color.SetProperty(Color3F::WHITE);
+
+				myText->UpdateRenderTexture();
+			}
+		}
+		// Font Rendering FBO //
 		
+
+		// Text in GBUFFER //
+		_fbo_gbuffer->Bind();
+		_fbo_gbuffer->DrawToBuffers();
 		
-		//
-		Geometry.GetFullQuad()->Draw();
+		//	Graphics::SetBlendState(true);
+		//	Graphics::SetDepthRead(true);
+		//	Graphics::SetDepthWrite(true);
+
+		auto MY_RT = myText->GetRenderTexture();
+		if (MY_RT != nullptr)
+		{
+			auto passthrough = Material::GetAsset("passthroughWorld");
+			passthrough->BindProgram();
+			passthrough->BindStates();
+
+			passthrough->m_property_useTexture.SetProperty(true);
+			passthrough->m_property_color.SetProperty(Color3F(1, 1, 1));
+			passthrough->m_property_useModel.SetProperty(true);
+			passthrough->m_property_useInstancing.SetProperty(false);
+			Matrix4x4 Scale = Matrix4x4::GetScale(Vector3(MY_RT->GetWidth(), MY_RT->GetHeight(), 1) / 400.0f);
+			passthrough->m_property_model.SetPropertyMatrix(Scale, true);
+
+			//
+			MY_RT->Bind(TextureLevel::LEVEL0);
+			Geometry.GetFullQuad()->Draw();
+
+			//passthrough->Unbind();
+		}
 		
-		//passthrough->Unbind();
-		
-		_fbo_gbuffer->unbind();
+
+		_fbo_gbuffer->Unbind();
+		// Text in GBUFFER //
 
 		Graphics::SetBlendState(false);
-		Graphics::SetDepthRead(true);
-		Graphics::SetDepthWrite(true);
-
-		//Graphics::SetDepthRead(true);
-		//Graphics::SetDepthWrite(true);
 		//
 
 		//	if (Input.getKeyDown(KeyCode::K))
@@ -660,8 +717,9 @@ namespace Vxl
 
 		
 
-		_fbo_editor->bind();
-		_fbo_editor->clearBuffers();
+		_fbo_editor->Bind();
+		_fbo_editor->DrawToBuffers();
+		_fbo_editor->ClearBuffers();
 
 
 		//
@@ -735,8 +793,9 @@ namespace Vxl
 			// Highlighting over an Editor Axis not selected
 			if (!Input.getMouseButton(MouseButton::LEFT) && !Editor.m_controlAxisClicked && Editor.HasSelection())
 			{
-				_fbo_colorpicker->bind();
-				_fbo_colorpicker->clearBuffers();
+				_fbo_colorpicker->Bind();
+				_fbo_colorpicker->DrawToBuffers();
+				_fbo_colorpicker->ClearBuffers();
 				Graphics::SetBlendState(false);
 
 				material_colorPicker->BindProgram();
@@ -965,7 +1024,7 @@ namespace Vxl
 		{
 			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 			{
-				_fbo_gbuffer->bind();
+				_fbo_gbuffer->Bind();
 				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(2, 1, 1);
 
 				//	std::cout <<
@@ -1019,7 +1078,7 @@ namespace Vxl
 		//_fbo_gbuffer->blitColor(*_fbo_editor, 1, 0);
 
 		// Backbuffer
-		FramebufferObject::unbind();
+		FramebufferObject::Unbind();
 		//glDrawBuffer(GL_BACK);
 
 		Window.BindWindowViewport();

@@ -185,9 +185,9 @@ namespace Vxl
 		void DrawFrustum(float Width, Color4F Color);
 
 		// Behaviour
-		virtual void Update() override;
-		virtual void Draw() override;
+		virtual void Update(void) override;
+		virtual void Draw(void) override;
 	public:
-		virtual void TransformChanged() override;
+		virtual void TransformChanged(void) override;
 	};
 }

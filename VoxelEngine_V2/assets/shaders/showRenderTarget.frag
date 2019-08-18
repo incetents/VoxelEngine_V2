@@ -24,11 +24,11 @@ uniform int outputMode = 0;
 //uniform float zNear = 1;
 //uniform float zFar = 1;
 
-// Puts depth into linear space
-//float LinearizeDepth(float depth)
-//{
-//    return (2.0 * zNear * zFar) / (zFar + zNear - (2.0 * depth - 1.0) * (zFar - zNear));
-//}
+//	// Puts depth into linear space
+//	float LinearizeDepth(float depth)
+//	{
+//	    return (2.0 * zNear * zFar) / (zFar + zNear - (2.0 * depth - 1.0) * (zFar - zNear));
+//	}
 // Visualize depth buffer
 float VisualizeDepth(float depth)
 {

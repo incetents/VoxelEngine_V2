@@ -39,11 +39,13 @@ void AssertFail(const std::string& message, const std::string& title);
 AssertFail(std::string(message) + "\n\nFile: " + Vxl::stringUtil::extractNameFromPath(__FILE__) + "\n\nFunction: " + std::string(__FUNCSIG__) + "\nLine: " + std::to_string(__LINE__) + "\n\nPath:" + std::string(__FILE__), "Assert Failed"); }
 #define VXL_ASSERT(expression, message) if(!(expression)) { VXL_ERROR(message); }
 #define VXL_RETURN_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return; }
+#define VXL_RETURN_NULLPTR_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return nullptr; }
 //
 #else
 // ~~~ //
 #define VXL_ERROR(message) __noop;
 #define VXL_ASSERT(expression, message) __noop;
 #define VXL_RETURN_ON_FAIL(expression) __noop;
+#define VXL_RETURN_NULLPTR_ON_FAIL(expression) __noop;
 //
 #endif

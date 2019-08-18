@@ -174,26 +174,26 @@ namespace Vxl
 		pixels.reserve(16);
 
 		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F(0, 0, 0));
+		pixels.push_back(Color3F::BLACK);
 		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F(0, 0, 0));
+		pixels.push_back(Color3F::BLACK);
 
-		pixels.push_back(Color3F(0, 0, 0));
+		pixels.push_back(Color3F::BLACK);
 		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F(0, 0, 0));
-		pixels.push_back(Color3F::PURPLE);
-
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F(0, 0, 0));
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F(0, 0, 0));
-
-		pixels.push_back(Color3F(0, 0, 0));
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F(0, 0, 0));
+		pixels.push_back(Color3F::BLACK);
 		pixels.push_back(Color3F::PURPLE);
 
-		m_null_texture = Texture::CreateCustom("null", pixels, 4, true,
+		pixels.push_back(Color3F::PURPLE);
+		pixels.push_back(Color3F::BLACK);
+		pixels.push_back(Color3F::PURPLE);
+		pixels.push_back(Color3F::BLACK);
+
+		pixels.push_back(Color3F::BLACK);
+		pixels.push_back(Color3F::PURPLE);
+		pixels.push_back(Color3F::BLACK);
+		pixels.push_back(Color3F::PURPLE);
+
+		m_null_texture = Texture::CreateCustom("NULL", pixels, 4, true,
 			TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
 			TextureFormat::RGB8, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE
 		);

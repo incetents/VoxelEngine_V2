@@ -13,15 +13,15 @@ namespace Vxl
 	// Global Text Objects
 	FT_Library ft;
 	
-	Font::Font(const std::string& filepath, uint32_t fontHeight)
-		: m_fontHeight(fontHeight)
+	Font::Font(const std::string& filepath, uint32_t fontLevel)
+		: m_fontLevel(fontLevel)
 	{
 		// Load font
 		if (FT_New_Face(ft, filepath.c_str(), 0, &m_face))
 			Logger.error("ERROR::FREETYPE: Failed to load font");
 
 		// Set font size
-		FT_Set_Pixel_Sizes(m_face, 0, fontHeight);  
+		FT_Set_Pixel_Sizes(m_face, 0, fontLevel);  
 
 		// Fix alignment
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
@@ -57,11 +57,17 @@ namespace Vxl
 			charInfo.m_size = Vector2i(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
 			charInfo.m_bearing = Vector2i(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top);
 			charInfo.m_advance = m_face->glyph->advance.x;
+			charInfo.m_yOffset = charInfo.m_size.y - charInfo.m_bearing.y;
+			charInfo.m_advanceFlt = m_face->glyph->advance.x >> 6;
 			charInfo.m_bboxWidth = (m_face->bbox.xMax - m_face->bbox.xMin) >> 6;
 			charInfo.m_bboxHeight = (m_face->bbox.yMax - m_face->bbox.yMin) >> 6;
 
+			m_largestYOffset = max(m_largestYOffset, charInfo.m_yOffset);
+
 			m_characters[c] = charInfo;
 		}
+
+		m_fontHeight = m_face->size->metrics.height >> 6;
 
 		FT_Done_Face(m_face);
 	}
@@ -107,19 +113,17 @@ namespace Vxl
 		m_buffer = nullptr;
 	}
 
-
-	Text::Text(const std::string& text)
-	{
-		m_text = text;
-	}
 	Text::~Text()
 	{
-		delete m_renderTexture;
+		
 	}
 
-	Vector2 Text::CalculateTextureSize()
+	void Text::UpdateRenderTextureTargetSize()
 	{
-		Vector2 Scale;
+		m_renderTextureTargetSize = Vector2ui(0, 0);
+
+		float LocalWidth = 0;
+		float MaxWidth = 0;
 
 		// Iterate through all characters
 		std::string::const_iterator c;
@@ -127,69 +131,36 @@ namespace Vxl
 		{
 			FontCharacter ch = m_font->m_characters[*c];
 		
-			Scale.x += ch.m_bboxWidth;
-			Scale.y = max(Scale.y, ch.m_bboxHeight);
+			// Special characters
+			switch (*c)
+			{
+			case '\n':
+				LocalWidth = 0;
+				continue;
+			}
 
-		    //	float xpos = Cursor.x + ch.m_bearing.x * m_scale;
-		    //	float ypos = Cursor.y - (ch.m_size.y - ch.m_bearing.y) * m_scale;
-			//	float advance = (ch.m_advance >> 6) * m_scale;
-			//	
-			//	// Udpate edge values
-			//	SizeMin.Min(Vector2(xpos, ypos));
-			//	SizeMax.Max(Vector2(xpos + advance, ypos + m_font->m_fontHeight));
-			//	
-			//	// Special characters
-			//	switch (*c)
-			//	{
-			//	case '\n':
-			//		Cursor.y += m_font->m_fontHeight;
-			//		Cursor.x = 0;
-			//		continue;
-			//	}
-			//	
-			//	// Next glyph
-			//	Cursor.x += advance;
+			LocalWidth += ch.m_advanceFlt * m_scale;
+			MaxWidth = max(MaxWidth, LocalWidth);
 		}
 		
-		//return Vector2(SizeMax - SizeMin);
+		m_renderTextureTargetSize.x = MaxWidth;
+		m_renderTextureTargetSize.y = m_font->m_fontLevel * m_scale * m_lineCount;
 
-		return Vector2(1920, 600);
+		// Update Render Texture
+		if (m_renderTexture != nullptr)
+			RenderTexture::DeleteUnnamedAsset(m_renderTexture);
 
-		//return Scale;
+		m_renderTexture = RenderTexture::Create(m_renderTextureTargetSize.x, m_renderTextureTargetSize.y);
 	}
 
-	void Text::RenderToFBO()
+	void Text::UpdateRenderTexture()
 	{
 		VXL_RETURN_ON_FAIL(m_font, "Font missing for text: " + m_text);
 		
-		// Calculate RenderTexture Size
-		Vector2 RenderTextureSize = CalculateTextureSize();
-
-	
-
-		// Texture
-		if (m_renderTexture == nullptr)
-		{
-			m_renderTexture = new RenderTexture(RenderTextureSize.x, RenderTextureSize.y);
-		}
-
-		auto id = m_renderTexture->GetID();
-
-		// FBO
-		if (m_FBO == nullptr)
-		{
-			m_FBO = FramebufferObject::Create("asd");
-			m_FBO->setSize(RenderTextureSize.x, RenderTextureSize.y);
-			m_FBO->addAttachment("", m_renderTexture);
-			m_FBO->complete();
-
-			m_FBO->setClearColor(Color4F(0, 0, 0, 1));
-		}
-
-		m_FBO->bind();
-		m_FBO->clearBuffers();
+		m_FBO->Bind();
+		m_FBO->DrawToBuffers();
+		m_FBO->ClearBuffers();
 		
-
 		// Vertices
 		std::vector<float>& Vertices	= m_buffer->getVertices();
 		bool Resize						= Vertices.size() != 24;
@@ -205,8 +176,10 @@ namespace Vxl
 
 		m_VAO->bind();
 
-		// Positions
-		Vector2 Cursor(0, m_font->m_fontHeight); // { 0, 0 }
+		float lineHeight = m_font->m_fontLevel * m_scale;
+
+		// Positions (y Starts at top, also offsets y of all text so that characters like lowercase 'q' don't get cut off)
+		Vector2 Cursor(0, m_font->m_largestYOffset * m_scale + lineHeight * (m_lineCount - 1));
 		
 		// Iterate through all characters
 		std::string::const_iterator c;
@@ -215,13 +188,13 @@ namespace Vxl
 			FontCharacter ch = m_font->m_characters[*c];
 		
 		    float xpos = Cursor.x + ch.m_bearing.x * m_scale;
-		    float ypos = Cursor.y - (ch.m_size.y - ch.m_bearing.y) * m_scale;
+		    float ypos = Cursor.y - (ch.m_yOffset) * m_scale;
 		
 			// Special characters
 			switch (*c)
 			{
 			case '\n':
-				Cursor.y -= m_font->m_fontHeight;
+				Cursor.y -= lineHeight;
 				Cursor.x = 0;
 				continue;
 			}
@@ -262,13 +235,24 @@ namespace Vxl
 		m_VAO->unbind();
 
 		// FBO
-		m_FBO->unbind();
+		m_FBO->Unbind();
 
-		// Update Vertices
-		//m_buffer.set(Resize);
+		// Flag
+		m_renderTextureDirty = false;
 	}
-	//void Text::Render(float x, float y)
-	//{
-	//
-	//}
+
+	void Text::SetText(const std::string& text)
+	{
+		std::string newString = text;
+		stringUtil::trim(newString);
+
+		// No change
+		if (m_text.compare(newString) == 0)
+			return;
+
+		m_text = newString;
+		m_lineCount = stringUtil::countChar(m_text, '\n') + 1;
+		m_renderTextureDirty = true;
+		UpdateRenderTextureTargetSize();
+	}
 }

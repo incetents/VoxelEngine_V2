@@ -21,7 +21,6 @@ namespace Vxl
 	class Matrix4x4;
 	class Shader;
 	class Texture;
-	class FramebufferAttachment;
 	class RenderTexture;
 	class RenderBuffer;
 
@@ -702,7 +701,8 @@ namespace Vxl
 			FramebufferObjectID Create(void);
 			void				Delete(FramebufferObjectID id);
 			void				Bind(FramebufferObjectID id);
-			void				DrawBuffers(uint32_t attachmentCount);
+			void				DrawBuffers(std::vector<uint32_t> attachments);
+			//void				DrawBuffers(uint32_t attachmentCount);
 			void				DrawBuffer(uint32_t attachmentIndex);
 			void				Unbind(void);
 			bool				CheckStatus(void);
@@ -714,7 +714,8 @@ namespace Vxl
 			void AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture);
 			void DetachRenderBuffer(uint32_t attachmentIndex);
 
-			RawArray<uint8_t>	ReadPixels(const Vxl::FramebufferAttachment& texture, uint32_t attachmentIndex, int x, int y, int w, int h);
+			RawArray<uint8_t>	ReadPixels(const Vxl::RenderTexture& texture, uint32_t attachmentIndex, int x, int y, int w, int h);
+			RawArray<uint8_t>	ReadPixels(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex, int x, int y, int w, int h);
 			void BlitColor(FramebufferObjectID source, FramebufferObjectID destination, int width, int height, uint32_t srcAttachment, uint32_t destAttachment);
 			void BlitDepth(FramebufferObjectID source, FramebufferObjectID destination, int width, int height);
 		}

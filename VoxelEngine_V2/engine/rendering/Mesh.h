@@ -54,6 +54,7 @@ namespace Vxl
 		Mesh(const std::string& glName = "");
 	public:
 		// Stores Mesh in Database optionally
+		static Mesh* Create();
 		static Mesh* Create(const std::string& name);
 		static Mesh* Create(const std::string& name, Model* model);
 		virtual ~Mesh();

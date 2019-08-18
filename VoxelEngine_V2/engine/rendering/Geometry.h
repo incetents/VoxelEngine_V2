@@ -78,7 +78,7 @@ namespace Vxl
 		void CreateArrows();
 
 	public:
-		void Setup()
+		void InitGLResources()
 		{
 			CreateFullQuad();
 			CreateFullTriangle();

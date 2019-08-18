@@ -151,6 +151,14 @@ namespace Vxl
 			Graphics::SetGLName(ObjectType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + glName);
 	}
 
+	Mesh* Mesh::Create()
+	{
+		Mesh* _mesh = new Mesh();
+
+		AddUnnamedAsset(_mesh, AssetMessage::CREATED);
+
+		return _mesh;
+	}
 	Mesh* Mesh::Create(const std::string& name)
 	{
 		Mesh* _mesh = new Mesh(name);

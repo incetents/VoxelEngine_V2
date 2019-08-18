@@ -26,6 +26,9 @@ namespace Vxl
 		
 		// Get name from file path
 		std::string nameFromFilepath(const std::string& filePath);
+
+		// Count Characters in string
+		uint32_t countChar(const std::string& str, char c);
 		
 		// Remove characters from string
 		void removeChar(std::string& str, char c);

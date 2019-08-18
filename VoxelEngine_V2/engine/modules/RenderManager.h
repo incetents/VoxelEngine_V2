@@ -34,7 +34,7 @@ namespace Vxl
 		// [True = FullQuad] or [False = Fulltriangle]
 		bool m_FSQMode = false;
 		Layer* m_layers;
-		UINT m_layerToRender = ~0;
+		uint32_t m_layerToRender = ~0;
 
 		// Main Camera
 		CameraObject* m_mainCamera = nullptr;
@@ -45,14 +45,14 @@ namespace Vxl
 		// GameObjects per Material
 		std::map<Material*, std::set<GameObject*>*> m_gameObjectsPerMaterial;
 		// All Materials with their gameobjects, sorted by their OrderID
-		std::map<UINT, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted;
+		std::map<uint32_t, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted;
 
 	public:
 		RenderManager();
 
 		// Utility
 		void SetNewScene(Scene* _scene);
-		const Layer& GetLayer(UINT index);
+		const Layer& GetLayer(uint32_t index);
 		inline const std::vector<Entity*> GetAllEntities(void) const
 		{
 			return m_allEntities;
@@ -79,17 +79,20 @@ namespace Vxl
 		void ReloadFBOS();
 
 		// Behaviour
-		void CreateSpecialManagers();
-		void Destroy();
+		void InitSceneGLResources();
+		void DestroySceneGLResources();
 		void Update();
 		void UpdateFixed();
 		void Draw();
 		void DrawImGui();
+		// Special Resources allocated untraditionally
+		void InitGlobalGLResources();
+		void DestroyGlobalGLResources();
 
 		// Render
 		void RenderFullScreen();
 		void RenderSceneGameObjects();
-		void RenderSceneOtherObjectColorIDs();
+		void RenderSceneObjectsWithOnlyColorID();
 		void RenderEditorObjects();
 		void RenderEditorObjectsPostDepth();
 

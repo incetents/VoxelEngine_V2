@@ -22,8 +22,27 @@ namespace Vxl
 		Graphics::RenderBuffer::SetStorage(FormatType, m_width, m_height);
 		Graphics::RenderBuffer::Unbind();
 
-
 	}
+
+	RenderBuffer* RenderBuffer::Create(
+		int Width, int Height,
+		TextureFormat FormatType,
+		TexturePixelType PixelType
+	)
+	{
+		RenderBuffer* _buffer = new RenderBuffer(Width, Height, FormatType, PixelType);
+
+		AddUnnamedAsset(_buffer, AssetMessage::CREATED);
+
+		if (_buffer->GetID() == -1)
+		{
+			Logger.error("RenderBuffer failed to create");
+			return nullptr;
+		}
+
+		return _buffer;
+	}
+
 	RenderBuffer::~RenderBuffer()
 	{
 		Graphics::RenderBuffer::Delete(m_id);

@@ -34,7 +34,7 @@ namespace Vxl
 		Asset<Type>& operator=(const Asset&) = delete;
 		
 		// Database
-		static UNNAMED_ASSETS m_assets;
+		static UNNAMED_ASSETS m_unnamed_assets;
 		static NAMED_ASSETS m_named_assets;
 		
 		// If name already exists, append additional info on it to make it unique
@@ -92,11 +92,11 @@ namespace Vxl
 			}
 
 			// Check for duplicate
-			if(m_assets.find(object) != m_assets.end())
+			if(m_unnamed_assets.find(object) != m_unnamed_assets.end())
 				Logger.error("Duplicate Object, Ptr = " + name + "]\t\t object: " + std::string(typeid(Type).name()));
 
 			// Store
-			m_assets.insert(object);
+			m_unnamed_assets.insert(object);
 		}
 	public:
 
@@ -137,9 +137,9 @@ namespace Vxl
 			if (!object)
 				return;
 
-			if (m_assets.find(object) != m_assets.end())
+			if (m_unnamed_assets.find(object) != m_unnamed_assets.end())
 			{
-				m_assets.erase(object);
+				m_unnamed_assets.erase(object);
 				delete object;
 			}
 		}
@@ -148,11 +148,11 @@ namespace Vxl
 			for (auto it = m_named_assets.begin(); it != m_named_assets.end(); it++)
 				delete it->second;
 
-			for (auto it = m_assets.begin(); it != m_assets.end(); it++)
+			for (auto it = m_unnamed_assets.begin(); it != m_unnamed_assets.end(); it++)
 				delete *it;
 
 			m_named_assets.clear();
-			m_assets.clear();
+			m_unnamed_assets.clear();
 		}
 
 		// ~ Get Asset Info ~ //
@@ -175,7 +175,7 @@ namespace Vxl
 	};
 
 	template<class Type>
-	std::set<Type*> Asset<Type>::m_assets;
+	std::set<Type*> Asset<Type>::m_unnamed_assets;
 	template<class Type>
 	std::map<std::string, Type*> Asset<Type>::m_named_assets;
 }

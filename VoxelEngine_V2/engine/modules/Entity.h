@@ -21,8 +21,8 @@ namespace Vxl
 	{
 		GAMEOBJECT,
 		LIGHT,
-		CAMERA,
-		SKYBOX
+		CAMERA
+		//SKYBOX
 	};
 
 	class Entity : public ComponentHandler
@@ -182,10 +182,10 @@ namespace Vxl
 		void UpdateBoundingBoxCheap(Mesh* _mesh);
 
 		// Behaviour
-		virtual void Update() = 0;
-		virtual void Draw() = 0;
+		virtual void Update(void) = 0;
+		virtual void Draw(void) = 0;
 	protected:
-		virtual void TransformChanged() = 0;
+		virtual void TransformChanged(void) = 0;
 	};
 }
 

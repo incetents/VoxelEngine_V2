@@ -3,10 +3,11 @@
 #include "GameObject.h"
 
 #include "../rendering/Mesh.h"
+#include "../rendering/Debug.h"
+
 #include "../modules/Material.h"
 #include "../modules/RenderManager.h"
 
-#include "../rendering/Debug.h"
 #include "../textures/Texture.h"
 
 namespace Vxl

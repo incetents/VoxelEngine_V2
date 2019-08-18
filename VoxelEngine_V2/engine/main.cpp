@@ -34,11 +34,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
 	//Window.SetCustomAspectRatio(true, 1.0f);
 
-	/* Special */
-	RenderManager.CreateSpecialManagers();
-	/* ~ */
+	/* Initial Call */
+	RenderManager.InitGlobalGLResources();
 	RenderManager.SetNewScene(_scene);
-	//_scene->setup();
 
 	/* ~ */
 	while (!Window.GetClosed())
@@ -86,7 +84,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	// Cleanup
 	RenderManager.m_currentScene->Destroy();
-	RenderManager.Destroy();
+	RenderManager.DestroySceneGLResources();
+	RenderManager.DestroyGlobalGLResources();
 	Window.Shutdown();
 
 	return 0;

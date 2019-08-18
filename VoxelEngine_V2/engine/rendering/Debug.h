@@ -39,12 +39,15 @@ namespace Vxl
 
 			LineMesh*			m_mesh;
 
-			void Setup(UINT size, PositionType type)
+			void InitGLResources(UINT size, PositionType type)
 			{
 				m_type = type;
-
-				delete m_mesh;
 				m_mesh = new LineMesh(type == PositionType::VEC3);
+			}
+			void DestroyGLResources()
+			{
+				delete m_mesh;
+				m_mesh = nullptr;
 			}
 
 			void AddLine_Vec3(
@@ -156,13 +159,21 @@ namespace Vxl
 
 	public:
 		// Debug Lines
-		void Setup()
+		void InitGLResources()
 		{
-			m_worldLines.Setup(VertexIncrementAmount, LineSet::PositionType::VEC3);
-			m_screenLines.Setup(VertexIncrementAmount, LineSet::PositionType::VEC2);
+			m_worldLines.InitGLResources(VertexIncrementAmount, LineSet::PositionType::VEC3);
+			m_screenLines.InitGLResources(VertexIncrementAmount, LineSet::PositionType::VEC2);
 
 			CreateDebugTextures();
 		}
+		void DestroyGLResources()
+		{
+			m_worldLines.DestroyGLResources();
+			m_screenLines.DestroyGLResources();
+
+			// Texture auto cleaned up
+		}
+
 		void DrawLine(
 			const Vector3& P1, const Vector3& P2,
 			float Width,

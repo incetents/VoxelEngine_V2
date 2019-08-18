@@ -10,7 +10,7 @@ namespace Vxl
 
 	class GameObject : public Entity, public Asset<GameObject>, public TextureBinder
 	{
-	private:
+	protected:
 		GameObject(const std::string& name);
 
 		// Data
@@ -21,11 +21,11 @@ namespace Vxl
 		// Destructor
 		~GameObject();
 
-		// Database Creation
+		// Asset Creation
 		static GameObject* Create(const std::string& name);
 
 		// Mesh
-		inline void SetMesh(Mesh* _mesh)
+		virtual void SetMesh(Mesh* _mesh)
 		{
 			m_mesh = _mesh;
 			// call callbacks since transform might change
@@ -37,17 +37,16 @@ namespace Vxl
 		}
 	
 		// Material
-		void SetMaterial(Material* _material);
+		virtual void SetMaterial(Material* _material);
 		inline Material* GetMaterial(void) const
 		{
 			return m_material;
 		}
 
-
 		// Behaviour
 		virtual void Update() override;
 		virtual void Draw() override;
-	private:
+	protected:
 		virtual void TransformChanged() override;
 	};
 }

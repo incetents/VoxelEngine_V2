@@ -64,8 +64,8 @@ namespace Vxl
 	// Tracking Data //
 	CullMode			gl_cullmode = CullMode::NONE;
 	bool				gl_blendState = false;
-	bool				gl_depthTestState = false;
-	bool				gl_depthMask = true;
+	bool				gl_depthRead = false;
+	bool				gl_depthWrite = true;
 	bool				gl_wireframe = false;
 	bool				gl_seamlessCubemaps = false;
 	BlendSource			gl_blendsrc = BlendSource::NONE;
@@ -546,8 +546,8 @@ namespace Vxl
 		gl_blenddest = BlendDestination::NONE;
 		gl_blendequation = BlendEquation::NONE;
 		gl_depthpassrule = DepthPassRule::NONE;
-		gl_depthTestState = false;
-		gl_depthMask = true;
+		gl_depthWrite = false;
+		gl_depthRead = true;
 		gl_wireframe = false;
 		gl_seamlessCubemaps = false;
 		for (int i = 0; i < 4; i++)
@@ -695,7 +695,7 @@ namespace Vxl
 	}
 	void Graphics::SetDepthRead(bool state)
 	{
-		if (gl_blendState == state)
+		if (gl_depthRead == state)
 			return;
 
 		if (state)
@@ -703,7 +703,7 @@ namespace Vxl
 		else
 			glDisable(GL_DEPTH_TEST);
 
-		gl_blendState = state;
+		gl_depthRead = state;
 	}
 	void Graphics::SetWireframeState(bool state)
 	{
@@ -719,15 +719,15 @@ namespace Vxl
 	}
 	void Graphics::SetDepthWrite(bool state)
 	{
-		if (gl_depthMask == state)
+		if (gl_depthWrite == state)
 			return;
 
 		glDepthMask(state);
-		gl_depthMask = state;
+		gl_depthWrite = state;
 	}
 	void Graphics::SetSeamlessCubemap(bool state)
 	{
-		if (gl_depthMask == state)
+		if (gl_seamlessCubemaps == state)
 			return;
 
 		if (state)
@@ -735,7 +735,7 @@ namespace Vxl
 		else
 			glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-		gl_depthMask = state;
+		gl_seamlessCubemaps = state;
 	}
 
 	// ~ Blending ~ //
@@ -2024,15 +2024,23 @@ namespace Vxl
 		glBindFramebuffer(GL_FRAMEBUFFER, id);
 		gl_activeFBO = id;
 	}
-	void Graphics::FramebufferObject::DrawBuffers(uint32_t attachmentCount)
+	void Graphics::FramebufferObject::DrawBuffers(std::vector<uint32_t> attachments)
 	{
-		glDrawBuffers(attachmentCount, GL_ColorAttachments);
+		for (auto& a : attachments)
+			a += GL_COLOR_ATTACHMENT0;
+
+		glDrawBuffers(attachments.size(), attachments.data());
 	}
+	//	void Graphics::FramebufferObject::DrawBuffers(uint32_t attachmentCount)
+	//	{
+	//		glDrawBuffers(attachmentCount, GL_ColorAttachments);
+	//	}
 	void Graphics::FramebufferObject::DrawBuffer(uint32_t attachmentIndex)
 	{
 		GLenum arr[] = { GL_COLOR_ATTACHMENT0 + attachmentIndex };
 		glDrawBuffers(1, arr);
 	}
+
 	void Graphics::FramebufferObject::Unbind()
 	{
 		if (gl_activeFBO == 0)
@@ -2107,7 +2115,22 @@ namespace Vxl
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_RENDERBUFFER, 0);
 	}
 
-	RawArray<uint8_t> Graphics::FramebufferObject::ReadPixels(const Vxl::FramebufferAttachment& texture, uint32_t attachmentIndex, int x, int y, int w, int h)
+	RawArray<uint8_t> Graphics::FramebufferObject::ReadPixels(const Vxl::RenderTexture& texture, uint32_t attachmentIndex, int x, int y, int w, int h)
+	{
+		if(attachmentIndex != -1)
+			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+
+		RawArray<uint8_t> Array;
+		Array.Allocate(w * h * texture.GetChannelCount());
+		glReadPixels(
+			x, y, w, h,
+			GL_TextureChannelType[(int)texture.GetChannelType()],
+			GL_TexturePixelType[(int)texture.GetPixelType()],
+			Array.start
+		);
+		return Array;
+	}
+	RawArray<uint8_t> Graphics::FramebufferObject::ReadPixels(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex, int x, int y, int w, int h)
 	{
 		if(attachmentIndex != -1)
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);

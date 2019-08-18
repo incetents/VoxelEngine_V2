@@ -1835,6 +1835,9 @@ namespace Vxl
 	typedef _Vector2<int> Vector2i;
 	typedef _Vector2<int> Vec2i;
 	typedef _Vector2<int> vec2i;
+	typedef _Vector2<unsigned int> Vector2ui;
+	typedef _Vector2<unsigned int> Vec2ui;
+	typedef _Vector2<unsigned int> vec2ui;
 	typedef _Vector2<char> Vector2c;
 	typedef _Vector2<char> Vec2c;
 	typedef _Vector2<char> vec2c;
@@ -1848,6 +1851,9 @@ namespace Vxl
 	typedef _Vector3<int> Vector3i;
 	typedef _Vector3<int> Vec3i;
 	typedef _Vector3<int> vec3i;
+	typedef _Vector3<unsigned int> Vector3ui;
+	typedef _Vector3<unsigned int> Vec3ui;
+	typedef _Vector3<unsigned int> vec3ui;
 	typedef _Vector3<char> Vector3c;
 	typedef _Vector3<char> Vec3c;
 	typedef _Vector3<char> vec3c;
@@ -1861,6 +1867,9 @@ namespace Vxl
 	typedef _Vector4<int> Vector4i;
 	typedef _Vector4<int> Vec4i;
 	typedef _Vector4<int> vec4i;
+	typedef _Vector4<unsigned int> Vector4ui;
+	typedef _Vector4<unsigned int> Vec4ui;
+	typedef _Vector4<unsigned int> vec4ui;
 	typedef _Vector4<char> Vector4c;
 	typedef _Vector4<char> Vec4c;
 	typedef _Vector4<char> vec4c;

@@ -76,21 +76,19 @@ namespace Vxl
 		UniformBufferObject** m_ubos = nullptr;
 
 	public:
-		void Setup()
+		void InitGLResources()
 		{
-			if(m_ubos != nullptr)
-				delete[] m_ubos;
-
 			m_ubos = new UniformBufferObject*[2];
 			m_ubos[0] = new UniformBufferObject(64 * 3, UBOID::CAMERA, "Camera");
 			m_ubos[1] = new UniformBufferObject(0, UBOID::FAKE, "Empty");
 		}
-		void BindCamera(CameraObject* _camera);
-
-		~UBOManager()
+		void DestroyGLResources()
 		{
-			delete[] m_ubos;
+			if(m_ubos != nullptr)
+				delete[] m_ubos;
 		}
+
+		void BindCamera(CameraObject* _camera);
 	
 	} SingletonInstance(UBOManager);
 }

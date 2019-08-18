@@ -8,18 +8,25 @@
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
 #include "../utilities/Macros.h"
-#include "../textures/Texture.h"
+
 #include "../textures/Cubemap.h"
+#include "../textures/Texture.h"
+#include "../textures/RenderTexture.h"
+
 #include "../rendering/Debug.h"
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/FramebufferObject.h"
 #include "../rendering/Graphics.h"
+#include "../rendering/RenderBuffer.h"
+
 #include "../window/window.h"
 #include "../editor/Editor.h"
+
 #include "../objects/GameObject.h"
 #include "../objects/LightObject.h"
 #include "../objects/CameraObject.h"
+#include "../objects/TextObject.h"
 
 #include "../editor/DevConsole.h"
 
@@ -44,8 +51,10 @@ namespace Vxl
 		if (m_currentScene)
 		{
 			m_currentScene->Destroy();
-			Destroy();
+			DestroySceneGLResources();
 		}
+
+		InitSceneGLResources();
 
 		m_currentScene = _scene;
 
@@ -81,10 +90,6 @@ namespace Vxl
 				auto _GameObject = (GameObject*)_entity;
 				VXL_ASSERT(_GameObject->GetMaterial() != nullptr, "GameObject has no material");
 
-				// Check if entity already exists
-				//if (Util::IsInVector(m_allGameObjects, _GameObject))
-				//	return;
-
 				// Material/GameObjects set
 				auto key = _GameObject->GetMaterial();
 
@@ -94,37 +99,14 @@ namespace Vxl
 
 				m_gameObjectsPerMaterial[key]->insert(_GameObject);
 
-				//m_allGameObjects.push_back(_GameObject);
 				m_allEntities.push_back(_entity);
 
 				break;
 			}
-			case EntityType::CAMERA:
+			// Other Entities (Cameras, Lights, Text, etc...)
+			default:
 			{
-				auto _Camera = (CameraObject*)_entity;
-
-				// Check if entity already exists
-				//if (Util::IsInVector(m_allCameraObjects, _Camera))
-				//	return;
-
-				// Add
-				//m_allCameraObjects.push_back(_Camera);
 				m_allEntities.push_back(_entity);
-
-				break;
-			}
-			case EntityType::LIGHT:
-			{
-				auto _light = (LightObject*)_entity;
-
-				// Check if entity already exists
-				//if (Util::IsInVector(m_allLightObjects, _light))
-				//	return;
-
-				// Add
-				//m_allLightObjects.push_back(_light);
-				m_allEntities.push_back(_entity);
-
 				break;
 			}
 		}
@@ -211,11 +193,13 @@ namespace Vxl
 	{
 		Graphics::initHints(); // Newer version
 
-		Destroy();
+		DestroySceneGLResources();
+		DestroyGlobalGLResources();
 
 		Window.Reload();
 
-		CreateSpecialManagers();
+		InitGlobalGLResources();
+		InitSceneGLResources();
 
 		if (m_currentScene)
 			m_currentScene->Reload();
@@ -235,18 +219,29 @@ namespace Vxl
 				fbo.second->load();
 			}
 		}
-		FramebufferObject::unbind();
+		FramebufferObject::Unbind();
 	}
 
-	// Behaviour
-	void RenderManager::CreateSpecialManagers()
+	// 
+	void RenderManager::InitGlobalGLResources()
 	{
-		UBOManager.Setup();
-		Debug.Setup();
-		Geometry.Setup();
+		UBOManager.InitGLResources();
+		Debug.InitGLResources();
+		GlobalRenderText.InitGLResources();
 	}
-	// Destroy all data for next Window context
-	void RenderManager::Destroy()
+	void RenderManager::DestroyGlobalGLResources()
+	{
+		UBOManager.DestroyGLResources();
+		Debug.DestroyGLResources();
+		GlobalRenderText.DestoryGLResources();
+	}
+
+	//
+	void RenderManager::InitSceneGLResources()
+	{
+		Geometry.InitGLResources();
+	}
+	void RenderManager::DestroySceneGLResources()
 	{
 		// Remove selected entity
 		Editor.ClearSelection();
@@ -283,6 +278,10 @@ namespace Vxl
 		// Delete Textures
 		Texture::DeleteAllAssets();
 		Cubemap::DeleteAllAssets();
+		RenderTexture::DeleteAllAssets();
+
+		// Delete extra buffers
+		RenderBuffer::DeleteAllAssets();
 
 		// Delete Framebuffers
 		FramebufferObject::DeleteAllAssets();
@@ -373,11 +372,11 @@ namespace Vxl
 					ent->Draw();
 			}
 		}
-
 	}
+
 	// Effectively non-gameobject entities need to have their own color ID show up in the color ID attachment.
 	// This function takes care of that without affecting albedo,normals,metallic,smoothness,etc...
-	void RenderManager::RenderSceneOtherObjectColorIDs()
+	void RenderManager::RenderSceneObjectsWithOnlyColorID()
 	{
 		// Extra Objects for COLOR ID
 		auto gbuffer_mat = Material::GetAsset("gbuffer");
@@ -392,8 +391,8 @@ namespace Vxl
 		fbo_gbuffer->blitDepth(*fbo_colorpicker);
 
 		// Only render to COLOR ID Texture
-		fbo_gbuffer->disableAttachment(0);
-		fbo_gbuffer->disableAttachment(1);
+		fbo_gbuffer->DisableAttachment(0);
+		fbo_gbuffer->DisableAttachment(1);
 
 		// Default
 		gbuffer_mat->m_property_useModel.SetProperty(true);
@@ -422,8 +421,8 @@ namespace Vxl
 		}
 
 		// Fix fbo draw buffers
-		fbo_gbuffer->enableAttachment(0);
-		fbo_gbuffer->enableAttachment(1);
+		fbo_gbuffer->EnableAttachment(0);
+		fbo_gbuffer->EnableAttachment(1);
 
 		// Revert Depth
 		fbo_colorpicker->blitDepth(*fbo_gbuffer);
