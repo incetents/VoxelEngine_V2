@@ -30,8 +30,8 @@ void main()
 {
 	if(VXL_useTexture)
 	{
-		vec4 tex1 = texture(texture1, f_data.uv);
-		output_albedo = tex1;
+		vec4 _tex = texture(texture1, f_data.uv);
+		output_albedo = _tex;
 	}
 	else
 		output_albedo = vec4(VXL_color, 1);

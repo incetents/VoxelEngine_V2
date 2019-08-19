@@ -40,7 +40,8 @@ void main()
 	
 	if(VXL_useTexture)
 	{
-		output_albedo.rgb = texture(albedo_handler, f_data.uv).rgb * VXL_tint;
+		vec4 _tex = texture(albedo_handler, f_data.uv);
+		output_albedo.rgb = _tex.rgb * VXL_tint;
 	}
 	else
 	{

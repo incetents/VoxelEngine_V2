@@ -165,13 +165,6 @@ namespace Vxl
 		material_font->m_DepthRead = false;
 		material_font->m_DepthWrite = false;
 
-		/*
-			Graphics::SetDepthRead(false);
-		Graphics::SetDepthWrite(false);
-		Graphics::SetBlendState(true);
-		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
-		*/
-
 		_tex = Texture::GetAsset("beato");
 		_tex_crate = Texture::GetAsset("crate_diffuse");
 		_tex_gridtest = Texture::GetAsset("grid_test");
@@ -351,12 +344,12 @@ namespace Vxl
 		_billboard1->SetMesh(Geometry.GetQuadZ());
 		_billboard1->m_transform.setPosition(7, 3, -3);
 
-		//TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
+		TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
 		
-		//TextObject* _text1 = TextObject::Create("_text1");
-		//_text1->m_transform.setPosition(-2, -3, 0);
-		//_text1->SetFont("arial");
-		//_text1->SetText("abcdefghijkl\nmnopqrstuvwxyz");
+		TextObject* _text1 = TextObject::Create("_text1");
+		_text1->m_transform.setPosition(-2, -3, 0);
+		_text1->SetFont("arial");
+		_text1->SetText("abcdefghijkl\nmnopqrstuvwxyz\nquick brown fox jumped over the moon\n12345678900987654321");
 		
 		//_text1->SetTexture(Texture::GetAsset("beato"), TextureLevel::LEVEL0);
 
@@ -805,6 +798,7 @@ namespace Vxl
 				_fbo_colorpicker->ClearBuffers();
 
 				material_colorPicker->BindProgram();
+				material_colorPicker->BindStates();
 
 				material_colorPicker->m_property_useModel.SetProperty(true);
 				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
@@ -858,6 +852,9 @@ namespace Vxl
 				unsigned int EditorIndex;
 				Util::DataConversion::uchars_to_uint(data.start, EditorIndex);
 				data.Deallocate();
+
+				if (EditorIndex > 0)
+					Logger.log("test");
 
 				switch (EditorIndex)
 				{
