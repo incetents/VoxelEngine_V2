@@ -227,13 +227,13 @@ namespace Vxl
 	{
 		UBOManager.InitGLResources();
 		Debug.InitGLResources();
-		GlobalRenderText.InitGLResources();
+		//GlobalRenderText.InitGLResources();
 	}
 	void RenderManager::DestroyGlobalGLResources()
 	{
 		UBOManager.DestroyGLResources();
 		Debug.DestroyGLResources();
-		GlobalRenderText.DestoryGLResources();
+		//GlobalRenderText.DestoryGLResources();
 	}
 
 	//

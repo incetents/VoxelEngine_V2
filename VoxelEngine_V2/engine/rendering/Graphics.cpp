@@ -2128,6 +2128,7 @@ namespace Vxl
 			GL_TexturePixelType[(int)texture.GetPixelType()],
 			Array.start
 		);
+
 		return Array;
 	}
 	RawArray<uint8_t> Graphics::FramebufferObject::ReadPixels(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex, int x, int y, int w, int h)

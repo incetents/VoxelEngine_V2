@@ -58,8 +58,8 @@ namespace Vxl
 {
 	void Scene_Game::Setup()
 	{
-		Text::Init();
-		Text::LoadFont("arial", "assets/fonts/arial.ttf");
+		//Text::Init();
+		//Text::LoadFont("arial", "assets/fonts/arial.ttf");
 
 		Loader::LoadScript_ImportFiles("./assets/scripts/ImportFiles.txt");
 
@@ -96,7 +96,6 @@ namespace Vxl
 		_fbo_gbuffer->SetAttachment(1, _fbo_gbuffer->CreateRenderTexture("normal", TextureFormat::RGBA16_SNORM));
 		_fbo_gbuffer->SetAttachment(2, _fbo_gbuffer->CreateRenderTexture("colorID", TextureFormat::RGBA8));
 		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::TEXTURE);
-
 		_fbo_gbuffer->checkFBOStatus();
 		_fbo_gbuffer->Unbind();
 
@@ -351,13 +350,14 @@ namespace Vxl
 		_billboard1->SetMesh(Geometry.GetQuadZ());
 		_billboard1->m_transform.setPosition(7, 3, -3);
 
-		//	TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
-		//	
-		//	TextObject* _text1 = TextObject::Create("_text1");
-		//	_text1->m_transform.setPosition(-2, -3, 0);
-		//	_text1->SetFont("arial");
-		//	_text1->SetText("abcdefghijkl\nmnopqrstuvwxyz");
+		//TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
 		
+		//TextObject* _text1 = TextObject::Create("_text1");
+		//_text1->m_transform.setPosition(-2, -3, 0);
+		//_text1->SetFont("arial");
+		//_text1->SetText("abcdefghijkl\nmnopqrstuvwxyz");
+		
+		//_text1->SetTexture(Texture::GetAsset("beato"), TextureLevel::LEVEL0);
 
 		//material_gbuffer
 		//material_billboard
@@ -375,7 +375,7 @@ namespace Vxl
 		delete myText;
 		myText = nullptr;
 
-		Text::Destroy();
+		//Text::Destroy();
 
 		TerrainManager.Destroy();
 	}
@@ -622,91 +622,89 @@ namespace Vxl
 		//
 		//test->Unbind();
 
-		// Font Rendering FBO //
-		auto material_font = Material::GetAsset("font");
-		material_font->BindProgram();
-		material_font->BindStates();
-		
-		//Graphics::SetBlendState(true);
-		//Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
-		//Graphics::SetDepthRead(false);
-		//Graphics::SetDepthWrite(false);
-		
-		if (myText == nullptr)
-			myText = new Text("arial",
-				"\n\nfirst sentence\n"
-				"0wertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-				"q0ertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-				"qw0rtyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-				"qwe0tyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-				"qwer0yuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-				"qwert0uiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-				"qwerty0iop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-				"qwertyu0op[]{}asdfghjkl;:zxcvbnm,.<>?\n\n\n\n\n\n"
-			);
-		
-		if (myText->HasRenderTextureChanged())
-		{
-
-			RenderTexture* MY_RT = myText->GetRenderTexture();
-
-			if (MY_RT)
-			{
-				material_font->m_property_model.SetPropertyMatrix(Matrix4x4::Orthographic(0, (float)MY_RT->GetWidth(), 0, (float)MY_RT->GetHeight(), -10.f, 10.f), true);
-				material_font->m_property_color.SetProperty(Color3F::WHITE);
-
-				myText->UpdateRenderTexture();
-			}
-		}
-		// Font Rendering FBO //
-		
-
-		// Text in GBUFFER //
-		_fbo_gbuffer->Bind();
-		_fbo_gbuffer->DrawToBuffers();
-		
-		//	Graphics::SetBlendState(true);
-		//	Graphics::SetDepthRead(true);
-		//	Graphics::SetDepthWrite(true);
-
-		auto MY_RT = myText->GetRenderTexture();
-		if (MY_RT != nullptr)
-		{
-			auto passthrough = Material::GetAsset("passthroughWorld");
-			passthrough->BindProgram();
-			passthrough->BindStates();
-
-			passthrough->m_property_useTexture.SetProperty(true);
-			passthrough->m_property_color.SetProperty(Color3F(1, 1, 1));
-			passthrough->m_property_useModel.SetProperty(true);
-			passthrough->m_property_useInstancing.SetProperty(false);
-			Matrix4x4 Scale = Matrix4x4::GetScale(Vector3(MY_RT->GetWidth(), MY_RT->GetHeight(), 1) / 400.0f);
-			passthrough->m_property_model.SetPropertyMatrix(Scale, true);
-
-			//
-			MY_RT->Bind(TextureLevel::LEVEL0);
-			Geometry.GetFullQuad()->Draw();
-
-			//passthrough->Unbind();
-		}
-		
-
-		_fbo_gbuffer->Unbind();
-		// Text in GBUFFER //
-
-		Graphics::SetBlendState(false);
-		//
-
-		//	if (Input.getKeyDown(KeyCode::K))
+		//	// Font Rendering FBO //
+		//	auto material_font = Material::GetAsset("font");
+		//	material_font->BindProgram();
+		//	material_font->BindStates();
+		//	
+		//	//Graphics::SetBlendState(true);
+		//	//Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
+		//	//Graphics::SetDepthRead(false);
+		//	//Graphics::SetDepthWrite(false);
+		//	
+		//	if (myText == nullptr)
+		//		myText = new Text("arial",
+		//			"\n\nfirst sentence\n"
+		//			"0wertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+		//			"q0ertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+		//			"qw0rtyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+		//			"qwe0tyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+		//			"qwer0yuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+		//			"qwert0uiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+		//			"qwerty0iop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
+		//			"qwertyu0op[]{}asdfghjkl;:zxcvbnm,.<>?\n\n\n\n\n\n"
+		//		);
+		//	
+		//	if (myText->HasRenderTextureChanged())
 		//	{
-		//		RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
-		//		std::cout << (uint32_t)test[0] << std::endl;
-		//		std::cout << (uint32_t)test[1] << std::endl;
-		//		//std::cout << (uint32_t)test[2] << std::endl;
-		//		//std::cout << (uint32_t)test[3] << std::endl;
-		//		std::cout << "~~~" << std::endl;
-		//		test.Deallocate();
+		//	
+		//		RenderTexture* MY_RT = myText->GetRenderTexture();
+		//	
+		//		if (MY_RT)
+		//		{
+		//			material_font->m_property_model.SetPropertyMatrix(Matrix4x4::Orthographic(0, (float)MY_RT->GetWidth(), 0, (float)MY_RT->GetHeight(), -10.f, 10.f), true);
+		//			material_font->m_property_color.SetProperty(Color3F::WHITE);
+		//	
+		//			myText->UpdateRenderTexture();
+		//		}
 		//	}
+		//	// Font Rendering FBO //
+		//	
+		//	
+		//	// Text in GBUFFER //
+		//	_fbo_gbuffer->Bind();
+		//	_fbo_gbuffer->DrawToBuffers();
+		//	
+		//	//	Graphics::SetBlendState(true);
+		//	//	Graphics::SetDepthRead(true);
+		//	//	Graphics::SetDepthWrite(true);
+		//	
+		//	auto MY_RT = myText->GetRenderTexture();
+		//	if (MY_RT != nullptr)
+		//	{
+		//		auto passthrough = Material::GetAsset("passthroughWorld");
+		//		passthrough->BindProgram();
+		//		passthrough->BindStates();
+		//	
+		//		passthrough->m_property_useTexture.SetProperty(true);
+		//		passthrough->m_property_color.SetProperty(Color3F(1, 1, 1));
+		//		passthrough->m_property_useModel.SetProperty(true);
+		//		passthrough->m_property_useInstancing.SetProperty(false);
+		//		Matrix4x4 Scale = Matrix4x4::GetScale(Vector3(MY_RT->GetWidth(), MY_RT->GetHeight(), 1) / 400.0f);
+		//		passthrough->m_property_model.SetPropertyMatrix(Scale, true);
+		//	
+		//		//
+		//		MY_RT->Bind(TextureLevel::LEVEL0);
+		//		Geometry.GetFullQuad()->Draw();
+		//	
+		//		//passthrough->Unbind();
+		//	}
+		//	
+		//	
+		//	_fbo_gbuffer->Unbind();
+		//	// Text in GBUFFER //
+		//	
+		//	Graphics::SetBlendState(false);
+		//	//
+
+		if (Input.getKeyDown(KeyCode::K))
+		{
+			RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
+			std::cout << (uint32_t)test[0] << std::endl;
+			std::cout << (uint32_t)test[1] << std::endl;
+			std::cout << "~~~" << std::endl;
+			test.Deallocate();
+		}
 
 		// FONT TEST END
 		
