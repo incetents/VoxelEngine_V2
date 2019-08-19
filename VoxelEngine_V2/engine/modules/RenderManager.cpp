@@ -429,6 +429,9 @@ namespace Vxl
 	}
 	void RenderManager::RenderEditorObjects()
 	{
+		Graphics::SetDepthRead(true);
+		Graphics::SetDepthWrite(true);
+
 		Graphics::SetBlendState(true);
 		Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
 

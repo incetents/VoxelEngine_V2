@@ -65,7 +65,7 @@ namespace Vxl
 	CullMode			gl_cullmode = CullMode::NONE;
 	bool				gl_blendState = false;
 	bool				gl_depthRead = false;
-	bool				gl_depthWrite = true;
+	bool				gl_depthWrite = false;
 	bool				gl_wireframe = false;
 	bool				gl_seamlessCubemaps = false;
 	BlendSource			gl_blendsrc = BlendSource::NONE;
@@ -547,7 +547,7 @@ namespace Vxl
 		gl_blendequation = BlendEquation::NONE;
 		gl_depthpassrule = DepthPassRule::NONE;
 		gl_depthWrite = false;
-		gl_depthRead = true;
+		gl_depthRead = false;
 		gl_wireframe = false;
 		gl_seamlessCubemaps = false;
 		for (int i = 0; i < 4; i++)
@@ -736,6 +736,20 @@ namespace Vxl
 			glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		gl_seamlessCubemaps = state;
+	}
+
+	// ~ State Getters ~ //
+	bool Graphics::GetDepthRead()
+	{
+		return gl_depthRead;
+	}
+
+	// ~ Debug ~ //
+	bool Graphics::Debug::GetDepthRead()
+	{
+		GLboolean value;
+		glGetBooleanv(GL_DEPTH_TEST, &value);
+		return value;
 	}
 
 	// ~ Blending ~ //
@@ -1012,7 +1026,6 @@ namespace Vxl
 		case TextureFormat::RG16:
 		case TextureFormat::RG16_SNORM:
 		case TextureFormat::RG16F:
-		case TextureFormat::DEPTH16:// Special
 			return TextureChannelType::RG;
 			
 			// 3 Channels
@@ -1035,6 +1048,7 @@ namespace Vxl
 			return TextureChannelType::RGBA;
 
 			// Depth
+		case TextureFormat::DEPTH16:// Special
 		case TextureFormat::DEPTH24:// Special
 		case TextureFormat::DEPTH32:// Special
 		case TextureFormat::DEPTH32F:// Special
@@ -2144,6 +2158,7 @@ namespace Vxl
 			GL_TexturePixelType[(int)texture.GetPixelType()],
 			Array.start
 		);
+		
 		return Array;
 	}
 	void Graphics::FramebufferObject::BlitColor(FramebufferObjectID source, FramebufferObjectID destination, int width, int height, uint32_t srcAttachment, uint32_t destAttachment)

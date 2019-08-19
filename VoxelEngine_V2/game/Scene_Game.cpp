@@ -158,6 +158,7 @@ namespace Vxl
 
 		material_colorPicker = Material::Create("colorPicker", 6);
 		material_colorPicker->SetProgram(*_shader_colorPicker);
+		material_colorPicker->m_BlendState = false;
 
 		material_font = Material::Create("font", 100);
 		material_font->SetProgram(*_shader_font);
@@ -706,6 +707,8 @@ namespace Vxl
 			test.Deallocate();
 		}
 
+		Graphics::SetBlendState(false);
+
 		// FONT TEST END
 		
 
@@ -723,7 +726,12 @@ namespace Vxl
 		//
 		GPUTimer::StartTimer("EditorObjects");
 		//
+
+		
 		_fbo_gbuffer->blitDepth(*_fbo_editor);
+
+
+		//Graphics::SetDepthRead(false);
 		RenderManager.RenderEditorObjects();
 
 		Graphics::ClearBuffer(BufferBit::DEPTH);
@@ -732,6 +740,7 @@ namespace Vxl
 		//
 		GPUTimer::EndTimer();
 
+		
 		
 
 		//	// GBUFFER No model
@@ -794,7 +803,6 @@ namespace Vxl
 				_fbo_colorpicker->Bind();
 				_fbo_colorpicker->DrawToBuffers();
 				_fbo_colorpicker->ClearBuffers();
-				Graphics::SetBlendState(false);
 
 				material_colorPicker->BindProgram();
 

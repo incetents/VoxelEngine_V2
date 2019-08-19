@@ -441,6 +441,15 @@ namespace Vxl
 		void SetDepthWrite(bool state);
 		void SetSeamlessCubemap(bool state);
 
+		// ~ State Getters ~ //
+		bool GetDepthRead();
+
+		// ~ Debug ~ // Expensive calls that are used for testing reasons
+		namespace Debug
+		{
+			bool GetDepthRead();
+		}
+
 		// ~ Blending ~ //
 		void SetBlendMode(BlendSource src, BlendDestination dest);
 		void SetBlendEquation(BlendEquation eq);
