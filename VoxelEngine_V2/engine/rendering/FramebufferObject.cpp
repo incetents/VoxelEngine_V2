@@ -4,7 +4,7 @@
 #include "RenderBuffer.h"
 #include "Graphics.h"
 
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 #include "../textures/RenderTexture.h"
 #include "../utilities/logger.h"
 #include "../window/window.h"
@@ -12,6 +12,33 @@
 
 namespace Vxl
 {
+	uint32_t FBOAttachment::GetID(void) const
+	{
+		switch (m_type)
+		{
+		case Type::BUFFER:
+			return m_renderBuffer->GetID();
+		case Type::TEXTURE:
+			return m_renderTexture->GetID();
+		default:
+			VXL_ASSERT(false, "Cannot get ID of empty FBO attachment");
+			return 0;
+		}
+	}
+	std::string FBOAttachment::GetName(void) const
+	{
+		switch (m_type)
+		{
+		case Type::BUFFER:
+			return m_renderBuffer->GetName();
+		case Type::TEXTURE:
+			return m_renderTexture->GetName();
+		default:
+			VXL_ASSERT(false, "Cannot get name of empty FBO attachment");
+			return "";
+		}
+	}
+
 	TextureFormat FBOAttachment::GetFormatType(void) const
 	{
 		if (m_type == Type::TEXTURE)
@@ -43,6 +70,15 @@ namespace Vxl
 		unload();
 	}
 
+	void FramebufferObject::updateAttachmentOrder()
+	{
+		m_attachmentOrder.clear();
+		m_attachmentOrder.resize(m_textures.size());
+		int i = 0;
+		for (const auto& tex : m_textures)
+			m_attachmentOrder[i++] = tex.first;
+	}
+
 	void FramebufferObject::load()
 	{
 		// Create FBO
@@ -70,23 +106,12 @@ namespace Vxl
 		Graphics::FramebufferObject::Bind(m_id);
 
 		Graphics::SetViewport(0, 0, m_width, m_height);
+
+		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
 	void FramebufferObject::SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 	{
 		Graphics::SetViewport(x, y, w, h);
-	}
-	void FramebufferObject::DrawToBuffers()
-	{
-		if (m_attachmentOrderDirty)
-		{
-			m_attachmentOrder.clear();
-			m_attachmentOrder.resize(m_textures.size());
-			int i = 0;
-			for (const auto& tex : m_textures)
-				m_attachmentOrder[i++] = tex.first;
-		}
-
-		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
 	void FramebufferObject::Unbind()
 	{
@@ -125,21 +150,25 @@ namespace Vxl
 
 	RenderTexture* FramebufferObject::CreateRenderTexture(const std::string& name, TextureFormat format) const
 	{
-		RenderTexture* _renderTexture = RenderTexture::Create(m_width, m_height, format);
+		RenderTexture* _renderTexture = RenderTexture::Create("FBO_" + m_name + "_Tex_" + name, m_width, m_height, format);
 
-		if(_renderTexture)
+		if (_renderTexture)
+		{
 			Graphics::SetGLName(ObjectType::TEXTURE, _renderTexture->GetID(), "FBO_" + m_name + "_Tex_" + name);
+		}
 
 		return _renderTexture;
 	}
 	RenderBuffer* FramebufferObject::CreateRenderBuffer(const std::string& name, TextureFormat format) const
 	{
-		RenderBuffer* _renderTexture = RenderBuffer::Create(m_width, m_height, format);
+		RenderBuffer* _renderBuffer = RenderBuffer::Create("FBO_" + m_name + "_Tex_" + name, m_width, m_height, format);
 
-		if(_renderTexture)
-			Graphics::SetGLName(ObjectType::TEXTURE, _renderTexture->GetID(), "FBO_" + m_name + "_Tex_" + name);
+		if (_renderBuffer)
+		{
+			Graphics::SetGLName(ObjectType::TEXTURE, _renderBuffer->GetID(), "FBO_" + m_name + "_Tex_" + name);
+		}
 
-		return _renderTexture;
+		return _renderBuffer;
 	}
 
 	void FramebufferObject::SetAttachment(
@@ -148,11 +177,13 @@ namespace Vxl
 	)
 	{
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
-		m_textures[_attachmentIndex].Set(_renderTexture);
-		m_attachmentOrderDirty = true;
-
 		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit attachments");
+
+		m_textures[_attachmentIndex].Set(_renderTexture);
+		updateAttachmentOrder();
+
 		Graphics::FramebufferObject::AttachRenderTexture(*_renderTexture, _attachmentIndex);
+		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
 	void FramebufferObject::SetAttachment(
 		uint32_t _attachmentIndex,
@@ -160,11 +191,27 @@ namespace Vxl
 	)
 	{
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
-		m_textures[_attachmentIndex].Set(_renderbuffer);
-		m_attachmentOrderDirty = true;
-
 		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit attachments");
+
+		m_textures[_attachmentIndex].Set(_renderbuffer);
+		updateAttachmentOrder();
+
 		Graphics::FramebufferObject::AttachRenderBuffer(*_renderbuffer, _attachmentIndex);
+		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
+	}
+	void FramebufferObject::RemoveAttachment(
+		uint32_t _attachmentIndex
+	)
+	{
+		VXL_ASSERT(m_id != -1, "FBO not initialized");
+		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit attachments");
+
+		DisableAttachment(_attachmentIndex);
+	
+		m_textures[_attachmentIndex].Remove();
+		updateAttachmentOrder();
+
+		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
 	RenderTexture* FramebufferObject::GetAttachmentRenderTexture(
 		uint32_t _attachmentIndex
@@ -181,14 +228,17 @@ namespace Vxl
 		VXL_RETURN_NULLPTR_ON_FAIL(m_textures[_attachmentIndex].GetType() == FBOAttachment::Type::BUFFER, "Incorrect Attachment Info");
 		return m_textures[_attachmentIndex].GetRenderBuffer();
 	}
-	void FramebufferObject::RemoveAttachment(
+	uint32_t FramebufferObject::GetAttachmentTextureID(
 		uint32_t _attachmentIndex
 	)
 	{
-		DisableAttachment(_attachmentIndex);
-	
-		m_textures[_attachmentIndex].Remove();
-		m_attachmentOrderDirty = true;
+		return m_textures[_attachmentIndex].GetID();
+	}
+	std::string FramebufferObject::GetAttachmentName(
+		uint32_t _attachmentIndex
+	)
+	{
+		return m_textures[_attachmentIndex].GetName();
 	}
 	void FramebufferObject::DisableAttachment(
 		uint32_t _attachmentIndex
@@ -239,9 +289,14 @@ namespace Vxl
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
 		VXL_ASSERT(_type != FBOAttachment::Type::NONE, "Incorrect Enum value");
 
+		// If depth already exists, delete it first
+		if (!m_depth.IsUnused())
+			RemoveDepth();
+
 		if (_type == FBOAttachment::Type::TEXTURE)
 		{
 			RenderTexture* _renderTexture = RenderTexture::Create(
+				"FBO_" + m_name + "_Depth",
 				m_width, m_height,
 				Graphics::GetFormat(_depthFormat),
 				Graphics::GetPixelData(_depthFormat)
@@ -257,6 +312,7 @@ namespace Vxl
 		else
 		{
 			RenderBuffer* _renderBuffer = RenderBuffer::Create(
+				"FBO_" + m_name + "_Depth",
 				m_width, m_height,
 				Graphics::GetFormat(_depthFormat),
 				Graphics::GetPixelData(_depthFormat)
@@ -282,9 +338,9 @@ namespace Vxl
 	void FramebufferObject::RemoveDepth(void)
 	{
 		if (m_depth.IsRenderTexture())
-			RenderTexture::DeleteUnnamedAsset(m_depth.GetRenderTexture());
+			RenderTexture::DeleteNamedAsset(m_depth.GetName());
 		else if (m_depth.IsRenderBuffer())
-			RenderBuffer::DeleteUnnamedAsset(m_depth.GetRenderBuffer());
+			RenderBuffer::DeleteNamedAsset(m_depth.GetName());
 
 		m_depth.Remove();
 		m_clearMode = ClearMode::COLOR;

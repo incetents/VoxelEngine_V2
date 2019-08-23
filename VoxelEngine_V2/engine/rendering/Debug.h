@@ -17,7 +17,7 @@
 
 namespace Vxl
 {
-	class Texture;
+	class Texture2D;
 
 	static class Debug : public Singleton<class Debug>
 	{
@@ -155,7 +155,7 @@ namespace Vxl
 		
 		// Debug Textures
 		void CreateDebugTextures();
-		Texture*			m_null_texture;
+		Texture2D*			m_null_texture;
 
 	public:
 		// Debug Lines
@@ -224,7 +224,7 @@ namespace Vxl
 		void End();
 
 		// Debug Texture
-		Texture* GetNullTexture(void) const
+		Texture2D* GetNullTexture(void) const
 		{
 			return m_null_texture;
 		}

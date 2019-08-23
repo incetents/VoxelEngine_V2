@@ -11,7 +11,7 @@
 namespace Vxl
 {
 	class BlockBase;
-	class Texture;
+	class Texture2D;
 
 	class Block
 	{
@@ -89,14 +89,14 @@ namespace Vxl
 	static class BlockAtlas : public Singleton<class BlockDictionary>
 	{
 	private:
-		Texture*	m_AtlasTexture = nullptr;
+		Texture2D*	m_AtlasTexture = nullptr;
 		UINT		m_blockPixelLength;
 		UINT		m_columns;
 		UINT		m_rows;
 		Vector4**	m_uvs = nullptr;
 	public:
-		void Set(Texture* atlas, UINT blockPixelLength);
-		Texture* GetTexture(void) const;
+		void Set(Texture2D* atlas, UINT blockPixelLength);
+		Texture2D* GetTexture(void) const;
 		void BindAtlas();
 		Vector4 GetUvs(UINT Column, UINT Row);
 

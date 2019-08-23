@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "Texture.h"
+#include "Texture2D.h"
 
 #include "../rendering/Graphics.h"
 
@@ -15,7 +15,7 @@
 namespace Vxl
 {
 	// [ Loading ]
-	Texture::Texture(
+	Texture2D::Texture2D(
 		const std::string& filePath,
 		bool			InvertY,
 		bool			UseMipMapping,
@@ -57,7 +57,7 @@ namespace Vxl
 		m_loaded = true;
 	}
 	// [ Create Custom ]
-	Texture::Texture(
+	Texture2D::Texture2D(
 		const std::string& name,
 		std::vector<Color3F> pixels, uint32_t width,
 		bool			UseMipMapping,
@@ -104,7 +104,7 @@ namespace Vxl
 		m_loaded = true;
 	}
 	// Constructor [Create custom]
-	Texture::Texture(
+	Texture2D::Texture2D(
 		const std::string& name,
 		void* pixels,
 		uint32_t width, uint32_t height,
@@ -141,7 +141,7 @@ namespace Vxl
 		m_loaded = true;
 	}
 
-	Texture* Texture::Load(
+	Texture2D* Texture2D::Load(
 		const std::string& name,
 		const std::string& filePath,
 		bool			InvertY,
@@ -152,7 +152,7 @@ namespace Vxl
 		TexturePixelType	PixelType,
 		AnisotropicMode		AnisotropicMode
 	) {
-		Texture* _texture = new Texture(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType, AnisotropicMode);
+		Texture2D* _texture = new Texture2D(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType, AnisotropicMode);
 
 		if (name.empty())
 			AddUnnamedAsset(_texture, AssetMessage::LOADED);
@@ -168,7 +168,7 @@ namespace Vxl
 		return _texture;
 	}
 
-	Texture* Texture::CreateCustom(
+	Texture2D* Texture2D::CreateCustom(
 		const std::string& name,
 		std::vector<Color3F> pixels, uint32_t width,
 		bool			UseMipMapping,
@@ -179,7 +179,7 @@ namespace Vxl
 		TexturePixelType	PixelType,
 		AnisotropicMode		AnisotropicMode
 	) {
-		Texture* _texture = new Texture(name, pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
+		Texture2D* _texture = new Texture2D(name, pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
 		if (name.empty())
 			AddUnnamedAsset(_texture, AssetMessage::LOADED);
@@ -195,7 +195,7 @@ namespace Vxl
 		return _texture;
 	}
 	// Create custom texture
-	Texture* Texture::CreateCustom(
+	Texture2D* Texture2D::CreateCustom(
 		const std::string& name,
 		void* pixels, uint32_t width, uint32_t height,
 		bool				UseMipMapping,
@@ -207,7 +207,7 @@ namespace Vxl
 		AnisotropicMode		AnisotropicMode
 	)
 	{
-		Texture* _texture = new Texture(name, pixels, width, height, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
+		Texture2D* _texture = new Texture2D(name, pixels, width, height, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
 
 		if (name.empty())
 			AddUnnamedAsset(_texture, AssetMessage::CREATED);
@@ -223,7 +223,7 @@ namespace Vxl
 		return _texture;
 	}
 
-	Texture::~Texture()
+	Texture2D::~Texture2D()
 	{
 		delete[] m_image;
 	}

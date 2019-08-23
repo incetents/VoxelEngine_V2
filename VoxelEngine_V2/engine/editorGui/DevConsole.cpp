@@ -26,6 +26,8 @@
 
 #include "../editor/Editor.h"
 
+#include "../textures/Texture2D.h"
+
 #include "windows.h"
 
 namespace Vxl
@@ -33,6 +35,8 @@ namespace Vxl
 	void DevConsole::Draw_Master(Scene* scene)
 	{
 		Scene_Game* Game = dynamic_cast<Scene_Game*>(scene);
+		if (!Game)
+			return;
 
 		ImGui::Text("FPS: %f", Time.GetFPS());
 		ImGui::Text("Time: %f", Time.GetTime());
@@ -163,23 +167,23 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		if (ImGui::CollapsingHeader("FBO Override"))
-		{
-			const char* fbo_override_choices[] = {
-				"[Default]",
-				"Albedo",
-				"Normal",
-				"Depth",
-				"Editor",
-				"ColorPicker"
-			};
-			static int fbo_override_current = 0;
-			ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);
-
-			Game->FBO_OVERRIDE = fbo_override_current;
-		}
-
-		ImGui::Separator();
+		//	if (ImGui::CollapsingHeader("FBO Override"))
+		//	{
+		//		const char* fbo_override_choices[] = {
+		//			"[Default]",
+		//			"Albedo",
+		//			"Normal",
+		//			"Depth",
+		//			"Editor",
+		//			"ColorPicker"
+		//		};
+		//		static int fbo_override_current = 0;
+		//		ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);
+		//	
+		//		Game->FBO_OVERRIDE = fbo_override_current;
+		//	}
+		//	
+		//	ImGui::Separator();
 
 		//ImGui::Text("Dear ImGui, %s", ImGui::GetVersion());
 
@@ -434,17 +438,17 @@ namespace Vxl
 		ImGui::PopItemWidth();
 	}
 
-	void DevConsole::Draw(Scene* scene)
+	void DevConsole::Draw()
 	{
-		static bool open = true;
+		//	static bool open = true;
+		//	
+		//	if (Input.getKeyDown(KeyCode::F1))
+		//		open = !open;
+		//	
+		//	if (!open)
+		//		return;
 
-		if (Input.getKeyDown(KeyCode::F1))
-			open = !open;
-
-		if (!open)
-			return;
-
-		if (ImGui::Begin("[F1] DevConsole", &open, ImVec2(280, 380), 0.9f, ImGuiWindowFlags_MenuBar))
+		//if (ImGui::Begin("[F1] DevConsole", &open, ImVec2(280, 380), 0.9f, ImGuiWindowFlags_MenuBar))
 		{
 			// Menu
 			if (ImGui::BeginMenuBar())
@@ -463,10 +467,14 @@ namespace Vxl
 				ImGui::EndMenuBar();
 			}
 
+			// TEST IMAGE
+			//	Texture2D* tex = Texture2D::GetAsset("beato");
+			//	ImGui::Image((void*)tex->GetID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+
 			switch (m_State)
 			{
 			case MenuState::MASTER:
-				Draw_Master(scene);
+				Draw_Master(m_scene);
 				break;
 			case MenuState::CUSTOM_VALUES:
 				Draw_CustomValues();
@@ -477,7 +485,7 @@ namespace Vxl
 			}
 
 		}
-		ImGui::End();
+		//ImGui::End();
 
 	}
 }

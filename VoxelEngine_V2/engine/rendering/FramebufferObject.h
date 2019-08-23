@@ -17,78 +17,6 @@ namespace Vxl
 	class RenderBuffer;
 	class RenderTexture;
 
-
-	//	class FramebufferAttachment
-	//	{
-	//		friend class FramebufferObject;
-	//	private:
-	//		// Data
-	//		const AttachmentType	m_type;
-	//		bool					m_empty = true;
-	//		bool					m_isReference = false; // Whether Attachment is being read from somewhere else
-	//	
-	//		// Attachment Info
-	//		const std::string	parent_name;
-	//		const std::string	attachment_name;
-	//		TextureFormat		attachment_formatType;
-	//		TexturePixelType	attachment_pixelType;
-	//	
-	//		// Attachment Data [ Can only be one object ]
-	//		union
-	//		{
-	//			RenderTexture* m_renderTexture;
-	//			RenderBuffer*  m_renderBuffer;
-	//		};
-	//	
-	//	public:
-	//		FramebufferAttachment(
-	//			const std::string& Parentname,
-	//			const std::string& name,
-	//			AttachmentType type,
-	//			TextureFormat formatType,
-	//			TexturePixelType pixelType
-	//		)
-	//			: parent_name(Parentname), attachment_name(name), m_type(type), attachment_formatType(formatType), attachment_pixelType(pixelType)
-	//		{}
-	//		FramebufferAttachment(
-	//			const std::string& Parentname,
-	//			const std::string& name,
-	//			RenderTexture* renderTexture
-	//		)
-	//			: parent_name(Parentname), attachment_name(name), m_type(AttachmentType::TEXTURE)
-	//		{
-	//			m_renderTexture = renderTexture;
-	//			m_isReference = true;
-	//		}
-	//		~FramebufferAttachment()
-	//		{
-	//			unload();
-	//		}
-	//	
-	//		void load(int Width, int Height);
-	//		void unload();
-	//	
-	//		inline bool isRenderTexture(void) const
-	//		{
-	//			return m_type == AttachmentType::TEXTURE;
-	//		}
-	//		inline bool isRenderBuffer(void) const
-	//		{
-	//			return m_type == AttachmentType::BUFFER;
-	//		}
-	//	
-	//		uint32_t			GetID(void) const;
-	//		TextureFormat		GetFormatType(void) const;
-	//		TextureChannelType	GetChannelType(void) const;
-	//		TexturePixelType	GetPixelType(void) const;
-	//		int					GetChannelCount(void) const;
-	//	
-	//		void Bind();
-	//		void Unbind();
-	//	};
-
-	
-
 	class FBOAttachment
 	{
 	public:
@@ -140,6 +68,8 @@ namespace Vxl
 			VXL_ASSERT(m_type == Type::BUFFER, "Incorrect FBO Attachment Type for Getter");
 			return m_renderBuffer;
 		}
+		uint32_t GetID(void) const;
+		std::string GetName(void) const;
 
 		TextureFormat GetFormatType(void) const;
 
@@ -187,8 +117,9 @@ namespace Vxl
 		// Attachments
 		mutable std::map<uint32_t, FBOAttachment>	m_textures;
 		std::vector<uint32_t>				m_attachmentOrder;
-		bool								m_attachmentOrderDirty = false;
 		FBOAttachment						m_depth;
+
+		void updateAttachmentOrder();
 
 		void load();
 		void unload();
@@ -223,7 +154,6 @@ namespace Vxl
 		// Binding related
 		void Bind();
 		void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-		void DrawToBuffers();
 		static void Unbind();
 
 		// Clears the color from an entire Texture
@@ -243,15 +173,26 @@ namespace Vxl
 			uint32_t _attachmentIndex,
 			RenderBuffer* _renderbuffer
 		);
+		void RemoveAttachment(
+			uint32_t _attachmentIndex
+		);
+		// Get Attachment Info
 		RenderTexture* GetAttachmentRenderTexture(
 			uint32_t _attachmentIndex
 		);
 		RenderBuffer* GetAttachmentRenderBuffer(
 			uint32_t _attachmentIndex
 		);
-		void RemoveAttachment(
+		uint32_t GetAttachmentTextureID(
 			uint32_t _attachmentIndex
 		);
+		std::string GetAttachmentName(
+			uint32_t _attachmentIndex
+		);
+		inline std::vector<uint32_t> GetAttachmentIndices()
+		{
+			return m_attachmentOrder;
+		}
 		// Attachment is still part of FBO class, it just doesn't get drawn to
 		void DisableAttachment(
 			uint32_t _attachmentIndex

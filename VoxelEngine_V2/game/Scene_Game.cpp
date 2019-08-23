@@ -20,9 +20,8 @@
 #include "../engine/rendering/Debug.h"
 #include "../engine/rendering/UBO.h"
 #include "../engine/rendering/Graphics.h"
-#include "../engine/rendering/Text.h"
 
-#include "../engine/textures/Texture.h"
+#include "../engine/textures/Texture2D.h"
 #include "../engine/textures/RenderTexture.h"
 #include "../engine/textures/Cubemap.h"
 
@@ -44,11 +43,11 @@
 #include "../engine/window/window.h"
 
 #include "../engine/editor/Editor.h"
-#include "../engine/editor/ShaderErrors.h"
-#include "../engine/editor/DevConsole.h"
-#include "../engine/editor/Hierarchy.h"
-#include "../engine/editor/Inspector.h"
-#include "../engine/editor/Performance.h"
+#include "../engine/editorGui/ShaderErrors.h"
+#include "../engine/editorGui/DevConsole.h"
+#include "../engine/editorGui/Hierarchy.h"
+#include "../engine/editorGui/Inspector.h"
+#include "../engine/editorGui/Performance.h"
 
 #include "../game/terrain/TerrainManager.h"
 
@@ -115,6 +114,20 @@ namespace Vxl
 		_fbo_colorpicker->checkFBOStatus();
 		_fbo_colorpicker->Unbind();
 
+		_fbo_composite = FramebufferObject::Create("composite");
+		_fbo_composite->SetSizeToWindowSize();
+		_fbo_composite->Bind();
+		_fbo_composite->SetAttachment(0, _fbo_composite->CreateRenderTexture("albedo"));
+		_fbo_composite->checkFBOStatus();
+		_fbo_composite->Unbind();
+
+		_fbo_showRenderTarget = FramebufferObject::Create("showRenderTarget");
+		_fbo_showRenderTarget->SetSizeToWindowSize();
+		_fbo_showRenderTarget->Bind();
+		_fbo_showRenderTarget->SetAttachment(0, _fbo_showRenderTarget->CreateRenderTexture("albedo"));
+		_fbo_showRenderTarget->checkFBOStatus();
+		_fbo_showRenderTarget->Unbind();
+
 
 		ShaderProgram* _shader_skybox			= ShaderProgram::GetAsset("skybox");
 		ShaderProgram* _shader_gbuffer			= ShaderProgram::GetAsset("gbuffer");
@@ -136,13 +149,13 @@ namespace Vxl
 		material_gbuffer->SetProgram(*_shader_gbuffer);
 		material_gbuffer->m_BlendState = false;
 
-		material_gbuffer_passthroughWorld = Material::Create("gbuffer_passthroughWorld", 2);
-		material_gbuffer_passthroughWorld->SetProgram(*_shader_passthroughWorld);
-		material_gbuffer_passthroughWorld->m_BlendState = false;
+		material_opaque_passthroughWorld = Material::Create("opaque_passthroughWorld", 2);
+		material_opaque_passthroughWorld->SetProgram(*_shader_passthroughWorld);
+		material_opaque_passthroughWorld->m_BlendState = false;
 
-		material_gbuffer_billboard = Material::Create("gbuffer_billboard", 3);
-		material_gbuffer_billboard->SetProgram(*_shader_billboard);
-		material_gbuffer_billboard->m_BlendState = false;
+		material_opaque_billboard = Material::Create("opaque_billboard", 3);
+		material_opaque_billboard->SetProgram(*_shader_billboard);
+		material_opaque_billboard->m_BlendState = false;
 
 		material_passthroughWorld = Material::Create("passthroughWorld", 2);
 		material_passthroughWorld->SetProgram(*_shader_passthroughWorld);
@@ -165,9 +178,9 @@ namespace Vxl
 		material_font->m_DepthRead = false;
 		material_font->m_DepthWrite = false;
 
-		_tex = Texture::GetAsset("beato");
-		_tex_crate = Texture::GetAsset("crate_diffuse");
-		_tex_gridtest = Texture::GetAsset("grid_test");
+		_tex = Texture2D::GetAsset("beato");
+		_tex_crate = Texture2D::GetAsset("crate_diffuse");
+		_tex_gridtest = Texture2D::GetAsset("grid_test");
 
 		_cubemap1 = Cubemap::GetAsset("craterlake");
 		
@@ -258,7 +271,7 @@ namespace Vxl
 
 		GameObject* _entity6 = GameObject::Create("_entity6");
 		_entity6->SetMaterial(material_gbuffer);
-		_entity6->SetTexture(Texture::GetAsset("grid_test"), TextureLevel::LEVEL0);
+		_entity6->SetTexture(Texture2D::GetAsset("grid_test"), TextureLevel::LEVEL0);
 		_entity6->SetMesh(Geometry.GetQuadY());
 		_entity6->m_transform.setPosition(Vector3(0, -10, 0));
 		_entity6->m_transform.setScale(Vector3(20, 1, 20));
@@ -339,8 +352,8 @@ namespace Vxl
 		_light1->m_transform.setPosition(5, 0, 0);
 
 		GameObject* _billboard1 = GameObject::Create("_quad1");
-		_billboard1->SetMaterial(material_gbuffer_billboard);
-		_billboard1->SetTexture(Texture::GetAsset("beato"), TextureLevel::LEVEL0);
+		_billboard1->SetMaterial(material_opaque_billboard);
+		_billboard1->SetTexture(Texture2D::GetAsset("beato"), TextureLevel::LEVEL0);
 		_billboard1->SetMesh(Geometry.GetQuadZ());
 		_billboard1->m_transform.setPosition(7, 3, -3);
 
@@ -366,11 +379,6 @@ namespace Vxl
 	}
 	void Scene_Game::Destroy()
 	{
-		delete myText;
-		myText = nullptr;
-
-		//Text::Destroy();
-
 		TerrainManager.Destroy();
 	}
 
@@ -595,7 +603,6 @@ namespace Vxl
 		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT_RANGE("TESTMODE", 0, 0, 3));
 
 		_fbo_gbuffer->Bind();
-		_fbo_gbuffer->DrawToBuffers();
 		_fbo_gbuffer->ClearBuffers();
 		//
 		GPUTimer::StartTimer("Gbuffer");
@@ -657,7 +664,6 @@ namespace Vxl
 		//	
 		//	// Text in GBUFFER //
 		//	_fbo_gbuffer->Bind();
-		//	_fbo_gbuffer->DrawToBuffers();
 		//	
 		//	//	Graphics::SetBlendState(true);
 		//	//	Graphics::SetDepthRead(true);
@@ -712,7 +718,6 @@ namespace Vxl
 		
 
 		_fbo_editor->Bind();
-		_fbo_editor->DrawToBuffers();
 		_fbo_editor->ClearBuffers();
 
 
@@ -794,7 +799,6 @@ namespace Vxl
 			if (!Input.getMouseButton(MouseButton::LEFT) && !Editor.m_controlAxisClicked && Editor.HasSelection())
 			{
 				_fbo_colorpicker->Bind();
-				_fbo_colorpicker->DrawToBuffers();
 				_fbo_colorpicker->ClearBuffers();
 
 				material_colorPicker->BindProgram();
@@ -1078,33 +1082,26 @@ namespace Vxl
 		
 		// ~~ //
 
-		//_fbo_gbuffer->blitColor(*_fbo_editor, 1, 0);
 
-		// Backbuffer
-		FramebufferObject::Unbind();
-		//glDrawBuffer(GL_BACK);
-
-		Window.BindWindowViewport();
-
+		// ~~~~
 		Graphics::SetBlendState(false);
 		Graphics::SetWireframeState(false);
 		Graphics::SetDepthPassRule(DepthPassRule::ALWAYS);
-
-		// ~~~~~~~~~~~~~~~~~ //
-		Graphics::SetClearColor(0, 0, 0, 0);
-		Graphics::ClearAllBuffers();
-		
+		// ~~~~
 		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
+		_shader_showRenderTarget->Bind();
 
-		// Final Pass / Back Buffer
-		switch (FBO_OVERRIDE)
+		//////////////////////
+		_fbo_showRenderTarget->Bind();
+		_fbo_showRenderTarget->ClearBuffers();
+
+		switch (renderTargetID)
 		{
 			// Output Normally
 			case 0:
 			{
-				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 3);
-
+		
 				_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
 				_fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
 				break;
@@ -1112,84 +1109,80 @@ namespace Vxl
 			// Show Albedo
 			case 1:
 			{
-				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
-
+		
 				_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Normal
 			case 2:
 			{
-				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 1);
-
+		
 				_fbo_gbuffer->bindTexture(1, TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Depth
 			case 3:
 			{
-				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 2);
 				//_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
 				//_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
-
+		
 				_fbo_gbuffer->bindDepth(TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Editor
 			case 4:
 			{
-				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 0);
-
+		
 				_fbo_editor->bindTexture(0, TextureLevel::LEVEL0);
 				break;
 			}
 			// Show Color Picker
 			case 5:
 			{
-				_shader_showRenderTarget->Bind();
 				_shader_showRenderTarget->SetUniform("outputMode", 4);
-
+		
 				_fbo_gbuffer->bindTexture(2, TextureLevel::LEVEL0);
 				break;
 			}
 		}
-		RenderManager.RenderFullScreen();
-		//
-	
 		
-		//	// Normals test
-		//	if (DevConsole.GetBool("Show Normals", false))
-		//	{
-		//		
-		//		
-		//		glUtil::viewport(0, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
-		//		
-		//		Geometry.GetFullQuad()->Draw();
-		//	}
-		//	// Depth test
-		//	if (DevConsole.GetBool("Show Depth", false))
-		//	{
-		//		_shader_showRenderTarget->SetUniform("outputMode", 2);
-		//		_shader_showRenderTarget->SetUniform("zNear", Camera::GetMain()->getZnear());
-		//		_shader_showRenderTarget->SetUniform("zFar", Camera::GetMain()->getZfar());
-		//	
-		//		glUtil::viewport(Window.GetScreenWidth() / 4, 0, Window.GetScreenWidth() / 4, Window.GetScreenHeight() / 4);
-		//		_fbo->bindDepth(ActiveTexture::LEVEL0);
-		//		Geometry.GetFullQuad()->Draw();
-		//	}
-
-		// _fbo->bindDepth(ActiveTexture::LEVEL0);
-		// Geometry::GetFullQuad()->Draw();
+		RenderManager.RenderFullScreen();
+		//////////////////////
 
 
-		//glDepthFunc(GL_LEQUAL);
-		//Window.ViewportToWindowSize();
+		//////////////////////
+		_fbo_composite->Bind();
+		_fbo_composite->ClearBuffers();
 
+		// Display Final Image
+		_shader_showRenderTarget->SetUniform("outputMode", 3);
 
+		_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
+		_fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
+		
+		RenderManager.RenderFullScreen();
+		//////////////////////
+	
+
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Display to backbuffer
+		FramebufferObject::Unbind();
+
+		Window.BindWindowViewport();
+
+		Graphics::SetBlendState(false);
+		Graphics::SetWireframeState(false);
+		Graphics::SetDepthPassRule(DepthPassRule::ALWAYS);
+
+		Graphics::SetClearColor(0, 0, 0, 0);
+		Graphics::ClearAllBuffers();
+
+		_fbo_composite->bindTexture(0, TextureLevel::LEVEL0);
+		RenderManager.RenderFullScreen();
 		
 		//	// SUBROUTINES
 		//	ShaderProgram* _shader_gbuffer = ShaderProgram::Get("gbuffer");
@@ -1211,18 +1204,5 @@ namespace Vxl
 		//	block->Set(&r, 1, 0);
 		//	block->Set(&g, 1, 1);
 
-	}
-	void Scene_Game::DrawImGui()
-	{
-		// Shader Errors
-		ShaderErrors.Draw();
-		// Inspector
-		Inspector.Draw();
-		// Hierarchy
-		Hierarchy.Draw();
-		// Performance
-		Performance.Draw();
-		// Dev Console
-		DevConsole.Draw(this);
 	}
 }

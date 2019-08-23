@@ -5,11 +5,12 @@
 namespace Vxl
 {
 	RenderTexture::RenderTexture(
+		std::string name,
 		int Width, int Height,
 		TextureFormat FormatType,
 		TexturePixelType PixelType
 	)
-		: BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
+		: m_name(name), BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
 			FormatType, Graphics::GetChannelType(FormatType), PixelType, AnisotropicMode::NONE, false)
 	{
 		m_width = Width;
@@ -22,18 +23,22 @@ namespace Vxl
 
 	// Asset Creation
 	RenderTexture* RenderTexture::Create(
+		std::string name,
 		int Width, int Height,
 		TextureFormat FormatType,
 		TexturePixelType PixelType
 	)
 	{
-		RenderTexture* _texture = new RenderTexture(Width, Height, FormatType, PixelType);
+		RenderTexture* _texture = new RenderTexture(name, Width, Height, FormatType, PixelType);
 
-		AddUnnamedAsset(_texture, AssetMessage::CREATED);
+		if(name.empty())
+			AddUnnamedAsset(_texture, AssetMessage::CREATED);
+		else
+			AddNamedAsset(name, _texture, AssetMessage::CREATED);
 
 		if (!_texture->IsLoaded())
 		{
-			Logger.error("Render Texture failed to load");
+			Logger.error("Render Texture failed to create");
 			return nullptr;
 		}
 

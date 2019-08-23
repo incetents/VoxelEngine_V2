@@ -20,7 +20,7 @@ namespace Vxl
 	class Matrix3x3;
 	class Matrix4x4;
 	class Shader;
-	class Texture;
+	class Texture2D;
 	class RenderTexture;
 	class RenderBuffer;
 

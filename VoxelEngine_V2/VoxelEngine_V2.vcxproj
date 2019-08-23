@@ -19,6 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="engine\editorGui\DevConsole.cpp" />
+    <ClCompile Include="engine\editorGui\GUIViewport.cpp" />
+    <ClCompile Include="engine\editorGui\GuiWindow.cpp" />
+    <ClCompile Include="engine\editorGui\Hierarchy.cpp" />
+    <ClCompile Include="engine\editorGui\Inspector.cpp" />
+    <ClCompile Include="engine\editorGui\Performance.cpp" />
+    <ClCompile Include="engine\editorGui\ShaderErrors.cpp" />
     <ClCompile Include="engine\editor\Editor.cpp" />
     <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
@@ -39,36 +46,45 @@
     <ClCompile Include="engine\rendering\Graphics.cpp" />
     <ClCompile Include="engine\rendering\LineMesh.cpp" />
     <ClCompile Include="engine\rendering\RenderBuffer.cpp" />
-    <ClCompile Include="engine\rendering\Text.cpp" />
     <ClCompile Include="engine\rendering\UBO.cpp" />
     <ClCompile Include="engine\rendering\VBO.cpp" />
     <ClCompile Include="engine\textures\BaseTexture.cpp" />
     <ClCompile Include="engine\textures\Cubemap.cpp" />
     <ClCompile Include="engine\textures\RenderTexture.cpp" />
-    <ClCompile Include="engine\textures\Texture.cpp" />
+    <ClCompile Include="engine\textures\Texture2D.cpp" />
     <ClCompile Include="engine\textures\TextureBinder.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Macros.cpp" />
     <ClCompile Include="engine\utilities\Time.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
-    <ClCompile Include="engine\editor\DevConsole.cpp" />
-    <ClCompile Include="engine\editor\Hierarchy.cpp" />
-    <ClCompile Include="engine\editor\Inspector.cpp" />
-    <ClCompile Include="engine\editor\Performance.cpp" />
-    <ClCompile Include="engine\editor\ShaderErrors.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
     <ClCompile Include="game\terrain\Block.cpp" />
     <ClCompile Include="game\terrain\Chunk.cpp" />
     <ClCompile Include="game\terrain\ChunkMesh.cpp" />
     <ClCompile Include="game\terrain\TerrainManager.cpp" />
-    <ClCompile Include="imgui\imgui.cpp" />
-    <ClCompile Include="imgui\imgui_colors.cpp" />
-    <ClCompile Include="imgui\imgui_demo.cpp" />
-    <ClCompile Include="imgui\imgui_draw.cpp" />
-    <ClCompile Include="imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="imgui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_colors.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imgui\implement\imgui_impl_glfw.cpp" />
+    <ClCompile Include="imgui\implement\imgui_impl_opengl3.cpp" />
     <ClCompile Include="include\GL\gl3w.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -99,7 +115,15 @@
     <ClCompile Include="engine\rendering\MeshBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\editorGui\DevConsole.h" />
+    <ClInclude Include="engine\editorGui\GUIViewport.h" />
+    <ClInclude Include="engine\editorGui\GuiWindow.h" />
+    <ClInclude Include="engine\editorGui\Hierarchy.h" />
+    <ClInclude Include="engine\editorGui\Inspector.h" />
+    <ClInclude Include="engine\editorGui\Performance.h" />
+    <ClInclude Include="engine\editorGui\ShaderErrors.h" />
     <ClInclude Include="engine\editor\Editor.h" />
+    <ClInclude Include="engine\editor\GUIViewport.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
     <ClInclude Include="engine\math\Vector.h" />
     <ClInclude Include="engine\objects\CameraObject.h" />
@@ -117,7 +141,6 @@
     <ClInclude Include="engine\rendering\Graphics.h" />
     <ClInclude Include="engine\rendering\LineMesh.h" />
     <ClInclude Include="engine\rendering\RenderBuffer.h" />
-    <ClInclude Include="engine\rendering\Text.h" />
     <ClInclude Include="engine\rendering\UBO.h" />
     <ClInclude Include="engine\rendering\VBO.h" />
     <ClInclude Include="engine\rendering\FramebufferObject.h" />
@@ -140,7 +163,7 @@
     <ClInclude Include="engine\textures\BaseTexture.h" />
     <ClInclude Include="engine\textures\Cubemap.h" />
     <ClInclude Include="engine\textures\RenderTexture.h" />
-    <ClInclude Include="engine\textures\Texture.h" />
+    <ClInclude Include="engine\textures\Texture2D.h" />
     <ClInclude Include="engine\rendering\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\textures\TextureBinder.h" />
@@ -169,9 +192,9 @@
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_colors.h" />
-    <ClInclude Include="imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\implement\imgui_impl_glfw.h" />
+    <ClInclude Include="imgui\implement\imgui_impl_opengl3.h" />
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />

@@ -7,15 +7,15 @@ namespace Vxl
 {
 	class Color3F;
 
-	class Texture : public BaseTexture, public Asset<Texture>
+	class Texture2D : public BaseTexture, public Asset<Texture2D>
 	{
 		friend class Loader;
 		friend class RenderManager;
 	protected:
-		UCHAR*		m_image = nullptr;
+		uint8_t* m_image = nullptr;
 
 		// Constructor [Load from file]
-		Texture(
+		Texture2D(
 			const std::string&	filePath,
 			bool				InvertY = true,
 			bool				UseMipMapping = true,
@@ -27,7 +27,7 @@ namespace Vxl
 			AnisotropicMode		AnistropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom]
-		Texture(
+		Texture2D(
 			const std::string& name,
 			std::vector<Color3F> pixels, uint32_t width,
 			bool				UseMipMapping = true,
@@ -39,7 +39,7 @@ namespace Vxl
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom]
-		Texture(
+		Texture2D(
 			const std::string& name,
 			void* pixels,
 			uint32_t width, uint32_t height,
@@ -54,7 +54,7 @@ namespace Vxl
 
 	public:
 		// Load Texture
-		static Texture* Load(
+		static Texture2D* Load(
 			const std::string& name,
 			const std::string& filePath,
 			bool				InvertY = true,
@@ -67,7 +67,7 @@ namespace Vxl
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Create custom texture
-		static Texture* CreateCustom(
+		static Texture2D* CreateCustom(
 			const std::string& name,
 			std::vector<Color3F> pixels, uint32_t width,
 			bool				UseMipMapping = true,
@@ -79,7 +79,7 @@ namespace Vxl
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Create custom texture
-		static Texture* CreateCustom(
+		static Texture2D* CreateCustom(
 			const std::string& name,
 			void* pixels, uint32_t width, uint32_t height,
 			bool				UseMipMapping = true,
@@ -92,12 +92,17 @@ namespace Vxl
 		);
 		
 
-		Texture(const Texture&) = delete;
-		~Texture();
+		Texture2D(const Texture2D&) = delete;
+		~Texture2D();
 
 		inline bool IsLoaded(void) const override
 		{
 			return m_loaded;
+		}
+		// Returns nullptr if nothing is being stored
+		inline uint8_t* GetImageData(void) const
+		{
+			return m_image;
 		}
 	};
 }

@@ -10,7 +10,7 @@
 #include "../math/Vector.h"
 #include "../math/Model.h"
 
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 #include "../textures/Cubemap.h"
 
 #include "../rendering/Shader.h"
@@ -224,7 +224,7 @@ namespace Vxl
 						break;
 					}
 
-					Texture::Load(Name, filePath, FlipY, MipMap, WM, Filter, TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, ANSO);
+					Texture2D::Load(Name, filePath, FlipY, MipMap, WM, Filter, TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, ANSO);
 				}
 				/* CUBEMAP */
 				else if (_state == LoadState::CUBEMAP && SegmentCount == 7)

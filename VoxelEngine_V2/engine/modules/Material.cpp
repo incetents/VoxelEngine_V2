@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Material.h"
 
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 
 #include "../rendering/Shader.h"
 #include "../rendering/Debug.h"

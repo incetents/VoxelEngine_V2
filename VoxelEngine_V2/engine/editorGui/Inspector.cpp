@@ -7,7 +7,7 @@
 #include "../imgui/imgui_internal.h"
 #include "../imgui/imgui_colors.h"
 
-#include "Editor.h"
+#include "../editor/Editor.h"
 #include "../modules/Entity.h"
 
 #include "../math/Vector.h"
@@ -42,16 +42,16 @@ namespace Vxl
 
 	void Inspector::Draw()
 	{
-		static bool open = true;
-
-		if (Input.getKeyDown(KeyCode::F2))
-			open = !open;
-
-		if (!open)
-			return;
-
-		if (ImGui::Begin("[F2] Inspector", &open, ImVec2(380, 280), 0.9f))
-		{
+		//	static bool open = true;
+		//	
+		//	if (Input.getKeyDown(KeyCode::F2))
+		//		open = !open;
+		//	
+		//	if (!open)
+		//		return;
+		//	
+		//	if (ImGui::Begin("[F2] Inspector", &open, ImVec2(380, 280), 0.9f))
+		//{
 			if (Editor.GetSelectedEntities().size() == 1)
 			{
 				auto Entity = Editor.GetSelectedEntities()[0];
@@ -173,8 +173,8 @@ namespace Vxl
 					ImGui::PopItemWidth();
 				}
 			}
-		}
-		ImGui::End();
+		//}
+		//ImGui::End();
 
 		//ImGui::IsWindowFocused();
 	}

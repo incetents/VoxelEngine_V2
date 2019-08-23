@@ -8,7 +8,7 @@
 #include "Shader.h"
 #include "RenderBuffer.h"
 
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 #include "../textures/RenderTexture.h"
 
 #include "../utilities/Logger.h"
@@ -2043,7 +2043,7 @@ namespace Vxl
 		for (auto& a : attachments)
 			a += GL_COLOR_ATTACHMENT0;
 
-		glDrawBuffers(attachments.size(), attachments.data());
+		glDrawBuffers((GLsizei)attachments.size(), attachments.data());
 	}
 	//	void Graphics::FramebufferObject::DrawBuffers(uint32_t attachmentCount)
 	//	{

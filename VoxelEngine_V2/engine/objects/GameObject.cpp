@@ -8,7 +8,7 @@
 #include "../modules/Material.h"
 #include "../modules/RenderManager.h"
 
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 
 namespace Vxl
 {

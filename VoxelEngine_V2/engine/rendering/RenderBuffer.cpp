@@ -7,11 +7,12 @@
 namespace Vxl
 {
 	RenderBuffer::RenderBuffer(
+		std::string name,
 		int Width, int Height,
 		TextureFormat FormatType,
 		TexturePixelType PixelType
 	)
-		: m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(Graphics::GetChannelType(FormatType)), m_pixelType(PixelType)
+		: m_name(name), m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(Graphics::GetChannelType(FormatType)), m_pixelType(PixelType)
 	{
 		m_channelCount = Graphics::GetChannelCount(FormatType);
 		if (m_channelCount == -1)
@@ -25,14 +26,18 @@ namespace Vxl
 	}
 
 	RenderBuffer* RenderBuffer::Create(
+		std::string name,
 		int Width, int Height,
 		TextureFormat FormatType,
 		TexturePixelType PixelType
 	)
 	{
-		RenderBuffer* _buffer = new RenderBuffer(Width, Height, FormatType, PixelType);
+		RenderBuffer* _buffer = new RenderBuffer(name, Width, Height, FormatType, PixelType);
 
-		AddUnnamedAsset(_buffer, AssetMessage::CREATED);
+		if(name.empty())
+			AddUnnamedAsset(_buffer, AssetMessage::CREATED);
+		else
+			AddNamedAsset(name, _buffer, AssetMessage::CREATED);
 
 		if (_buffer->GetID() == -1)
 		{

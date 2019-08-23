@@ -5,6 +5,7 @@
 #include <cstring>
 #include <functional>
 #include <map>
+#include <set>
 #include <memory>
 #include <optional>
 #include <string>
@@ -38,25 +39,37 @@
 #include "modules/RenderManager.h"
 #include "modules/Scene.h"
 
+#include "objects/CameraObject.h"
+#include "objects/GameObject.h"
+#include "objects/LightObject.h"
+#include "objects/TextObject.h"
+
 #include "rendering/Debug.h"
 #include "rendering/FramebufferObject.h"
 #include "rendering/Geometry.h"
 #include "rendering/Graphics.h"
+#include "rendering/LineMesh.h"
 #include "rendering/Mesh.h"
+#include "rendering/MeshBuffer.h"
+#include "rendering/RenderBuffer.h"
 #include "rendering/Shader.h"
 #include "rendering/UBO.h"
 #include "rendering/Uniform.h"
 #include "rendering/VBO.h"
+#include "rendering/VBOLayout.h"
 
-#include "textures/Texture.h"
+#include "textures/BaseTexture.h"
+#include "textures/Texture2D.h"
 #include "textures/Cubemap.h"
 #include "textures/RenderTexture.h"
+#include "textures/TextureBinder.h"
 
 #include "utilities/Asset.h"
 #include "utilities/FileIO.h"
 #include "utilities/Macros.h"
 #include "utilities/Loader.h"
 #include "utilities/logger.h"
+#include "utilities/Macros.h"
 #include "utilities/singleton.h"
 #include "utilities/stringUtil.h"
 #include "utilities/Time.h"

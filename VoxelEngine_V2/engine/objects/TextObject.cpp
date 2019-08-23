@@ -12,7 +12,7 @@
 #include "../rendering/Mesh.h"
 
 #include "../textures/RenderTexture.h"
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 
 #include "../utilities/stringUtil.h"
 
@@ -57,7 +57,7 @@ namespace Vxl
 				charInfo.m_texture = nullptr;
 			else
 			{
-				charInfo.m_texture = Texture::CreateCustom(
+				charInfo.m_texture = Texture2D::CreateCustom(
 					"",
 					(void*)m_face->glyph->bitmap.buffer,
 					(uint32_t)m_face->glyph->bitmap.width,
@@ -158,13 +158,13 @@ namespace Vxl
 			MaxWidth = max(MaxWidth, LocalWidth);
 		}
 		
-		m_renderTextureTargetSize.x = MaxWidth;
-		m_renderTextureTargetSize.y = m_font->m_fontHeight * m_scale * m_lineCount;
+		m_renderTextureTargetSize.x = (uint32_t)MaxWidth;
+		m_renderTextureTargetSize.y = (uint32_t)(m_font->m_fontHeight * m_scale * m_lineCount);
 
 		if (m_renderTexture)
 			RenderTexture::DeleteUnnamedAsset(m_renderTexture);
 
-		m_renderTexture = RenderTexture::Create(m_renderTextureTargetSize.x, m_renderTextureTargetSize.y);
+		m_renderTexture = RenderTexture::Create("", m_renderTextureTargetSize.x, m_renderTextureTargetSize.y);
 	}
 	void RenderText::UpdateRenderTexture()
 	{
@@ -176,14 +176,16 @@ namespace Vxl
 		GlobalRenderText.m_FBO->Bind();
 		GlobalRenderText.m_FBO->SetAttachment(0, m_renderTexture);
 		GlobalRenderText.m_FBO->ClearBuffers();
-		GlobalRenderText.m_FBO->DrawToBuffers();
+
+		//GlobalRenderText.m_FBO->Unbind();
+		//GlobalRenderText.m_FBO->Bind();
 
 		// Shader
 		auto material_font = Material::GetAsset("font");
 		material_font->BindProgram();
 		material_font->BindStates();
 		
-		material_font->m_property_model.SetPropertyMatrix(Matrix4x4::Orthographic(0, m_renderTextureTargetSize.x, 0, m_renderTextureTargetSize.y, -10.f, 10.f), true);
+		material_font->m_property_model.SetPropertyMatrix(Matrix4x4::Orthographic(0, (float)m_renderTextureTargetSize.x, 0, (float)m_renderTextureTargetSize.y, -10.f, 10.f), true);
 		material_font->m_property_color.SetProperty(Color3F::WHITE);
 
 		float m_scale = 1.0f;
@@ -269,7 +271,7 @@ namespace Vxl
 	TextObject::TextObject(const std::string& name)
 		: GameObject(name)
 	{
-		GameObject::SetMaterial(Material::GetAsset("gbuffer_passthroughWorld"));
+		GameObject::SetMaterial(Material::GetAsset("opaque_passthroughWorld"));
 		//GameObject::SetMesh(Geometry.GetCube());
 	}
 	TextObject::~TextObject()

@@ -135,135 +135,121 @@ namespace Vxl
 
 	void Hierarchy::Draw()
 	{
-		static bool open = true;
+		auto Entities = Editor.GetSelectedEntities();
 
-		if (Input.getKeyDown(KeyCode::F3))
-			open = !open;
+		ImGui::Text("Scene Graph:\t");
 
-		if (!open)
-			return;
-
-		if (ImGui::Begin("[F3] Hierarchy", &open, ImVec2(280, 380), 0.9f))
+		if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
 		{
-			auto Entities = Editor.GetSelectedEntities();
-
-			ImGui::Text("Scene Graph:\t");
-
-			if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
+			for (auto Entity : Entities)
 			{
-				for (auto Entity : Entities)
+				if (Entity->GetType() == EntityType::GAMEOBJECT)
 				{
-					if (Entity->GetType() == EntityType::GAMEOBJECT)
-					{
-						//GameObject::DeleteNamedAsset((GameObject*)Entity);
-						GameObject::DeleteNamedAsset(Entity->GetName());
-					}
-					else if (Entity->GetType() == EntityType::CAMERA)
-					{
-						//CameraObject::DeleteNamedAsset((CameraObject*)Entity);
-						CameraObject::DeleteNamedAsset(Entity->GetName());
-					}
+					//GameObject::DeleteNamedAsset((GameObject*)Entity);
+					GameObject::DeleteNamedAsset(Entity->GetName());
 				}
-				Editor.ClearSelection();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Add Sphere"))
-			{
-				auto object = GameObject::Create("Generic Object");
-				object->SetMesh(Geometry.GetSphereUV_Good());
-				object->SetMaterial(Material::GetAsset("gbuffer"));
-				object->SetColor(Color3F(1, 0, 0));
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Duplicate Selected GameObject(s)"))
-			{
-				for (auto Entity : Entities)
+				else if (Entity->GetType() == EntityType::CAMERA)
 				{
-					if (Entity->GetType() == EntityType::GAMEOBJECT)
-					{
-						auto GEntity = dynamic_cast<GameObject*>(Entity);
-
-						auto object = GameObject::Create(GEntity->GetDisplayName());
-						object->SetMesh(GEntity->GetMesh());
-						object->SetMaterial(GEntity->GetMaterial());
-						object->SetColor(GEntity->GetColor());
-						object->m_useTransform = GEntity->m_useTransform;
-						object->m_isActive = GEntity->m_isActive;
-						object->m_isColoredObject = GEntity->m_isColoredObject;
-						object->SetSelectable(GEntity->IsSelectable());
-						object->m_transform.setWorldPosition(GEntity->m_transform.getWorldPosition());
-						object->m_transform.setRotation(GEntity->m_transform.getRotationEuler());
-						object->m_transform.setScale(GEntity->m_transform.getScale());
-						object->m_transform.setParent(GEntity->m_transform.getParent());
-					}
+					//CameraObject::DeleteNamedAsset((CameraObject*)Entity);
+					CameraObject::DeleteNamedAsset(Entity->GetName());
 				}
 			}
-
-			// Display Hierarchy with selected entities
-			auto AllEntities = RenderManager.m_allEntities;
-			int EntityCount = (int)AllEntities.size();
-			for (int i = 0; i < EntityCount; i++)
+			Editor.ClearSelection();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Add Sphere"))
+		{
+			auto object = GameObject::Create("Generic Object");
+			object->SetMesh(Geometry.GetSphereUV_Good());
+			object->SetMaterial(Material::GetAsset("gbuffer"));
+			object->SetColor(Color3F(1, 0, 0));
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Duplicate Selected GameObject(s)"))
+		{
+			for (auto Entity : Entities)
 			{
-				auto Entity = AllEntities[i];
-
-				if (Entity->m_transform.getParent() == nullptr)
-					DisplayEntity(Entity, 0);
-			}
-			//
-
-			// Move Selection
-			if (ImGui::IsWindowFocused())
-			{
-				if (Input.getKeyDown(KeyCode::DOWN))
+				if (Entity->GetType() == EntityType::GAMEOBJECT)
 				{
-					if (Entities.size() == 1)
+					auto GEntity = dynamic_cast<GameObject*>(Entity);
+
+					auto object = GameObject::Create(GEntity->GetDisplayName());
+					object->SetMesh(GEntity->GetMesh());
+					object->SetMaterial(GEntity->GetMaterial());
+					object->SetColor(GEntity->GetColor());
+					object->m_useTransform = GEntity->m_useTransform;
+					object->m_isActive = GEntity->m_isActive;
+					object->m_isColoredObject = GEntity->m_isColoredObject;
+					object->SetSelectable(GEntity->IsSelectable());
+					object->m_transform.setWorldPosition(GEntity->m_transform.getWorldPosition());
+					object->m_transform.setRotation(GEntity->m_transform.getRotationEuler());
+					object->m_transform.setScale(GEntity->m_transform.getScale());
+					object->m_transform.setParent(GEntity->m_transform.getParent());
+				}
+			}
+		}
+
+		// Display Hierarchy with selected entities
+		auto AllEntities = RenderManager.m_allEntities;
+		int EntityCount = (int)AllEntities.size();
+		for (int i = 0; i < EntityCount; i++)
+		{
+			auto Entity = AllEntities[i];
+
+			if (Entity->m_transform.getParent() == nullptr)
+				DisplayEntity(Entity, 0);
+		}
+		//
+
+		// Move Selection
+		if (ImGui::IsWindowFocused())
+		{
+			if (Input.getKeyDown(KeyCode::DOWN))
+			{
+				if (Entities.size() == 1)
+				{
+					for (int i = 0; i < EntityCount; i++)
 					{
-						for (int i = 0; i < EntityCount; i++)
+						if (AllEntities[i] == Entities[0])
 						{
-							if (AllEntities[i] == Entities[0])
+							Editor.ClearSelection();
+							auto Entity = AllEntities[(i + 1) % EntityCount];
+
+							// Check for children
+							if (Entity->m_transform.getChildCount() > 0)
 							{
-								Editor.ClearSelection();
-								auto Entity = AllEntities[(i + 1) % EntityCount];
 
-								// Check for children
-								if (Entity->m_transform.getChildCount() > 0)
-								{
-
-								}
-								else
-								{
-
-								}
-
-
-								// Get Next Entity
-
-								Editor.AddSelection(Entity);
-								break;
 							}
+							else
+							{
+
+							}
+
+
+							// Get Next Entity
+
+							Editor.AddSelection(Entity);
+							break;
 						}
 					}
 				}
-				else if (Input.getKeyDown(KeyCode::UP))
+			}
+			else if (Input.getKeyDown(KeyCode::UP))
+			{
+				if (Entities.size() == 1)
 				{
-					if (Entities.size() == 1)
+					for (int i = 0; i < EntityCount; i++)
 					{
-						for (int i = 0; i < EntityCount; i++)
+						if (AllEntities[i] == Entities[0])
 						{
-							if (AllEntities[i] == Entities[0])
-							{
-								Editor.ClearSelection();
-								Editor.AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i - 1]);
-								break;
-							}
+							Editor.ClearSelection();
+							Editor.AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i - 1]);
+							break;
 						}
 					}
 				}
 			}
 		}
-		ImGui::End();
 	}
-
-
 }
 #endif

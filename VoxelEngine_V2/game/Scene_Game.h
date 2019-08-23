@@ -13,7 +13,7 @@ namespace Vxl
 	class Mesh;
 	class Transform;
 	class XGamePad;
-	class Texture;
+	class Texture2D;
 	class Cubemap;
 	class Material;
 	class Clock;
@@ -21,32 +21,32 @@ namespace Vxl
 	class LightObject;
 	class CameraObject;
 	class SkyboxObject;
-	class Text;
 
 	class Scene_Game : public Scene
 	{
 	public:
 		// Assets Loaded
-		Texture* _tex;
-		Texture* _tex_crate;
-		Texture* _tex_gridtest;
+		Texture2D* _tex;
+		Texture2D* _tex_crate;
+		Texture2D* _tex_gridtest;
 		Cubemap* _cubemap1;
 
 		// Assets Created
 		Mesh* _mesh;
 
 		// Assets Automated
-		//Camera* _camera;
 		CameraObject* _cameraObject;
 
 		FramebufferObject* _fbo_gbuffer;
 		FramebufferObject* _fbo_editor;
 		FramebufferObject* _fbo_colorpicker;
+		FramebufferObject* _fbo_composite;
+		FramebufferObject* _fbo_showRenderTarget;
 
 		Material* material_skybox;
 		Material* material_gbuffer;
-		Material* material_gbuffer_passthroughWorld;
-		Material* material_gbuffer_billboard;
+		Material* material_opaque_passthroughWorld;
+		Material* material_opaque_billboard;
 		Material* material_passthroughWorld;
 		Material* material_billboard;
 		Material* material_lines;
@@ -54,12 +54,10 @@ namespace Vxl
 		Material* material_colorPicker;
 		Material* material_font;
 
-		Text* myText = nullptr;
-
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;
 
-		int FBO_OVERRIDE = 0;
+		int renderTargetID = 0;
 
 	public:
 		void Setup() override;
@@ -68,6 +66,5 @@ namespace Vxl
 		void Update() override;
 		void UpdateFixed() override;
 		void Draw() override;
-		void DrawImGui() override;
 	};
 }

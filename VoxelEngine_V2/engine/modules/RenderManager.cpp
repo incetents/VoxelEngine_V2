@@ -10,7 +10,7 @@
 #include "../utilities/Macros.h"
 
 #include "../textures/Cubemap.h"
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 #include "../textures/RenderTexture.h"
 
 #include "../rendering/Debug.h"
@@ -28,10 +28,16 @@
 #include "../objects/CameraObject.h"
 #include "../objects/TextObject.h"
 
-#include "../editor/DevConsole.h"
+#include "../editorGui/DevConsole.h"
+#include "../editorGui/GUIViewport.h"
+#include "../editorGui/Hierarchy.h"
+#include "../editorGui/Inspector.h"
+#include "../editorGui/Performance.h"
+#include "../editorGui/ShaderErrors.h"
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
+#include "../imgui/imgui_colors.h"
 #endif
 
 #include <algorithm>
@@ -60,7 +66,7 @@ namespace Vxl
 
 		m_currentScene->Setup();
 	}
-	const Layer& RenderManager::GetLayer(UINT index)
+	const Layer& RenderManager::GetLayer(uint32_t index)
 	{
 		VXL_ASSERT(index < MAX_LAYERS, "Layer index out of bounds");
 		return m_layers[index];
@@ -276,7 +282,7 @@ namespace Vxl
 		Shader::DeleteAllAssets();
 
 		// Delete Textures
-		Texture::DeleteAllAssets();
+		Texture2D::DeleteAllAssets();
 		Cubemap::DeleteAllAssets();
 		RenderTexture::DeleteAllAssets();
 
@@ -314,12 +320,94 @@ namespace Vxl
 		m_currentScene->Draw();
 		Debug.End();
 	}
+	void RenderManager::InitImGui()
+	{
+		// Imgui Initial Values
+		DevConsole.Init("DevConsole", Vector2(280.f, 380.f), 0.9f, ImGuiWindowFlags_MenuBar);
+		ShaderErrors.Init("ShaderErrors", Vector2(700.f, 400.f), 0.9f);
+		ShaderErrors.SetOpen(false);
+		Inspector.Init("Inspector", Vector2(380, 280), 0.9f);
+		Hierarchy.Init("Hierarchy", Vector2(280, 380), 0.9f);
+		Performance.Init("Performance", Vector2(280, 680), 0.9f);
+		GUIViewport.Init("Viewport", Vector2(500, 500), 0.9f, ImGuiWindowFlags_MenuBar);
+		GUIViewport.SetPadding(false);
+
+		m_guiWindows.push_back(&DevConsole.instanceRef);
+		m_guiWindows.push_back(&ShaderErrors.instanceRef);
+		m_guiWindows.push_back(&Inspector.instanceRef);
+		m_guiWindows.push_back(&Hierarchy.instanceRef);
+		m_guiWindows.push_back(&Performance.instanceRef);
+		m_guiWindows.push_back(&GUIViewport.instanceRef);
+	}
 	void RenderManager::DrawImGui()
 	{
 #ifdef GLOBAL_IMGUI
 		ImGui::NewFrame();
 
-		m_currentScene->DrawImGui();
+		if (ImGui::BeginMainMenuBar())
+		{
+			// VIEW //
+			if (ImGui::BeginMenu("View"))
+			{
+
+				if (ImGui::MenuItem(DevConsole.GetName().c_str(), "", DevConsole.IsOpen()))
+				{ 
+					DevConsole.ToggleOpen();
+				}
+				if (ImGui::MenuItem("Inspector", "", Inspector.IsOpen()))
+				{
+					Inspector.ToggleOpen();
+				}
+				if (ImGui::MenuItem("Hierarchy", "", Hierarchy.IsOpen()))
+				{
+					Hierarchy.ToggleOpen();
+				}
+				if (ImGui::MenuItem("Performance", "", Performance.IsOpen()))
+				{
+					Performance.ToggleOpen();
+				}
+				if (ImGui::MenuItem("GUIViewport", "", GUIViewport.IsOpen()))
+				{
+					GUIViewport.ToggleOpen();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			// SHADER ERRORS //
+			{
+				bool hasErrors = ShaderErrors.HasErrors();
+
+				if (hasErrors)
+					ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::RedLight);
+				else
+					ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
+
+				//std::string name = "Shader Errors";
+				if (ImGui::MenuItem(hasErrors ? "Shader Errors !" : "Shader Errors"))
+				{
+					ShaderErrors.ToggleOpen();
+				}
+
+				ImGui::PopStyleColor();
+			}
+		}
+		ImGui::EndMainMenuBar();
+
+		for (auto& GUI : m_guiWindows)
+		{
+			if (!GUI->IsOpen())
+				continue;
+
+			GUI->SetScene(m_currentScene);
+			if (GUI->Begin())
+			{
+				GUI->Draw();
+			}
+			GUI->End();
+		}
+
+		//m_currentScene->DrawImGui();
 
 		ImGui::Render();
 #endif
@@ -439,7 +527,7 @@ namespace Vxl
 		auto billboard = Material::GetAsset("billboard");
 		billboard->BindProgram();
 		
-		Texture* LightTexture = Texture::GetAsset("editor_lightbulb");
+		Texture2D* LightTexture = Texture2D::GetAsset("editor_lightbulb");
 		auto AllLights = LightObject::GetAllNamedAssets();
 		for (auto light = AllLights.begin(); light != AllLights.end(); light++)
 		{
@@ -454,7 +542,7 @@ namespace Vxl
 		}
 
 		// Draw Cameras
-		Texture* CameraTexture = Texture::GetAsset("editor_camera");
+		Texture2D* CameraTexture = Texture2D::GetAsset("editor_camera");
 		auto AllCameras = CameraObject::GetAllNamedAssets();
 		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 		{

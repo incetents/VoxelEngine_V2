@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Block.h"
 
-#include "../engine/textures/Texture.h"
+#include "../engine/textures/Texture2D.h"
 #include "../engine/utilities/logger.h"
 
 namespace Vxl
@@ -28,7 +28,7 @@ namespace Vxl
 		return m_base->m_uvs[(int)_direction];
 	}
 
-	void BlockAtlas::Set(Texture* atlas, UINT blockPixelLength)
+	void BlockAtlas::Set(Texture2D* atlas, UINT blockPixelLength)
 	{
 		if (atlas == nullptr)
 		{
@@ -68,7 +68,7 @@ namespace Vxl
 			}
 		}
 	}
-	Texture* BlockAtlas::GetTexture(void) const
+	Texture2D* BlockAtlas::GetTexture(void) const
 	{
 		return m_AtlasTexture;
 	}

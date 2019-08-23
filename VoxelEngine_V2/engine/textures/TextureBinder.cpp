@@ -4,7 +4,7 @@
 
 #include "../rendering/Debug.h"
 
-#include "Texture.h"
+#include "Texture2D.h"
 
 namespace Vxl
 {

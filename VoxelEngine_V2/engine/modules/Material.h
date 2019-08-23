@@ -24,7 +24,7 @@ namespace Vxl
 {
 	class BaseTexture;
 	class Transform;
-	class Texture;
+	class Texture2D;
 	class GameObject;
 
 	template<typename Type>

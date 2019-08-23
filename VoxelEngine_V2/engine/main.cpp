@@ -35,6 +35,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	//Window.SetCustomAspectRatio(true, 1.0f);
 
 	/* Initial Call */
+	RenderManager.InitImGui();
 	RenderManager.InitGlobalGLResources();
 	RenderManager.SetNewScene(_scene);
 

@@ -9,7 +9,7 @@ namespace Vxl
 	// Forward Declaration
 	class Mesh;
 	class RenderTexture;
-	class Texture;
+	class Texture2D;
 	class FramebufferObject;
 	class VAO;
 	template<typename Type>
@@ -17,7 +17,7 @@ namespace Vxl
 
 	struct RenderCharacter
 	{
-		Texture* m_texture;
+		Texture2D* m_texture;
 		Vector2i m_size;
 		Vector2i m_bearing;
 		uint32_t m_advance;

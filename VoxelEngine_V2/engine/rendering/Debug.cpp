@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Debug.h"
 
-#include "../textures/Texture.h"
+#include "../textures/Texture2D.h"
 #include "../math/Color.h"
 #include "../utilities/Loader.h"
 #include "../modules/Entity.h"
@@ -193,7 +193,7 @@ namespace Vxl
 		pixels.push_back(Color3F::BLACK);
 		pixels.push_back(Color3F::PURPLE);
 
-		m_null_texture = Texture::CreateCustom("NULL", pixels, 4, true,
+		m_null_texture = Texture2D::CreateCustom("NULL", pixels, 4, true,
 			TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
 			TextureFormat::RGB8, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE
 		);

@@ -22,6 +22,7 @@ namespace Vxl
 	class CameraObject;
 	class LightObject;
 	class SkyboxObject;
+	class GuiWindow;
 
 	static class RenderManager : public Singleton<class RenderManager>
 	{
@@ -46,6 +47,9 @@ namespace Vxl
 		std::map<Material*, std::set<GameObject*>*> m_gameObjectsPerMaterial;
 		// All Materials with their gameobjects, sorted by their OrderID
 		std::map<uint32_t, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted;
+
+		// Imgui render window
+		std::vector<GuiWindow*> m_guiWindows;
 
 	public:
 		RenderManager();
@@ -84,6 +88,7 @@ namespace Vxl
 		void Update();
 		void UpdateFixed();
 		void Draw();
+		void InitImGui();
 		void DrawImGui();
 		// Special Resources allocated untraditionally
 		void InitGlobalGLResources();
