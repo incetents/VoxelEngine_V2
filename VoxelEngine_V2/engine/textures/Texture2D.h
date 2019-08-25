@@ -90,6 +90,10 @@ namespace Vxl
 			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
+		// Export Texture
+		static void ScreenshotBMP(
+			const std::string& filePath
+		);
 		
 
 		Texture2D(const Texture2D&) = delete;

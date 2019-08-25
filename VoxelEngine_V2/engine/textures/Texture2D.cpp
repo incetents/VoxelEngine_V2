@@ -8,9 +8,10 @@
 #include "../utilities/logger.h"
 #include "../utilities/stringUtil.h"
 #include "../math/Color.h"
+#include "../window/window.h"
+#include "../utilities/FileSystem.h"
 
 #include <SOIL/SOIL.h>
-#include <assert.h>
 
 namespace Vxl
 {
@@ -221,6 +222,25 @@ namespace Vxl
 		}
 
 		return _texture;
+	}
+
+	// Export Texture
+	void Texture2D::ScreenshotBMP(
+		const std::string& filePath
+	)
+	{
+		std::string finalFilePath = filePath + ".bmp";
+
+		File::DuplicateFixer(finalFilePath);
+		File::EnsureDirectory(finalFilePath);
+
+		int result = SOIL_save_screenshot
+		(
+			finalFilePath.c_str(),
+			SOIL_SAVE_TYPE_BMP,
+			0, 0, Window.GetWindowWidth(), Window.GetWindowHeight()
+		);
+		VXL_ASSERT(result > 0, "Screenshot Failed");
 	}
 
 	Texture2D::~Texture2D()

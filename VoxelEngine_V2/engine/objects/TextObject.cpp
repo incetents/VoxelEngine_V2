@@ -112,6 +112,7 @@ namespace Vxl
 	void GlobalRenderText::DestoryGLResources()
 	{
 		// FBO auto cleaned up
+		FramebufferObject::DeleteNamedAsset(m_FBO);
 		m_FBO = nullptr;
 
 		delete m_VAO;

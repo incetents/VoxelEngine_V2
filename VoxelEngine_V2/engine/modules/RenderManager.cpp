@@ -199,8 +199,8 @@ namespace Vxl
 	{
 		Graphics::initHints(); // Newer version
 
-		DestroySceneGLResources();
 		DestroyGlobalGLResources();
+		DestroySceneGLResources();
 
 		Window.Reload();
 
@@ -217,12 +217,13 @@ namespace Vxl
 		{
 			if (fbo.second->m_fullscreen)
 			{
-				fbo.second->unload();
 				// Adjust Size based on current window render size [effectively resizing FBO resolution]
 				fbo.second->m_width = Window.GetViewportWidth();
 				fbo.second->m_height = Window.GetViewportHeight();
+				fbo.second->Bind();
+				fbo.second->ReloadAttachments();
+				fbo.second->ReloadDepth();
 				//
-				fbo.second->load();
 			}
 		}
 		FramebufferObject::Unbind();
@@ -234,12 +235,14 @@ namespace Vxl
 		UBOManager.InitGLResources();
 		Debug.InitGLResources();
 		GlobalRenderText.InitGLResources();
+		GUIViewport.InitGLResources();
 	}
 	void RenderManager::DestroyGlobalGLResources()
 	{
 		UBOManager.DestroyGLResources();
 		Debug.DestroyGLResources();
 		GlobalRenderText.DestoryGLResources();
+		GUIViewport.DestroyGLResources();
 	}
 
 	//
@@ -354,19 +357,19 @@ namespace Vxl
 				{ 
 					DevConsole.ToggleOpen();
 				}
-				if (ImGui::MenuItem("Inspector", "", Inspector.IsOpen()))
+				if (ImGui::MenuItem(Inspector.GetName().c_str(), "", Inspector.IsOpen()))
 				{
 					Inspector.ToggleOpen();
 				}
-				if (ImGui::MenuItem("Hierarchy", "", Hierarchy.IsOpen()))
+				if (ImGui::MenuItem(Hierarchy.GetName().c_str(), "", Hierarchy.IsOpen()))
 				{
 					Hierarchy.ToggleOpen();
 				}
-				if (ImGui::MenuItem("Performance", "", Performance.IsOpen()))
+				if (ImGui::MenuItem(Performance.GetName().c_str(), "", Performance.IsOpen()))
 				{
 					Performance.ToggleOpen();
 				}
-				if (ImGui::MenuItem("GUIViewport", "", GUIViewport.IsOpen()))
+				if (ImGui::MenuItem(GUIViewport.GetName().c_str(), "", GUIViewport.IsOpen()))
 				{
 					GUIViewport.ToggleOpen();
 				}
@@ -383,7 +386,6 @@ namespace Vxl
 				else
 					ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
 
-				//std::string name = "Shader Errors";
 				if (ImGui::MenuItem(hasErrors ? "Shader Errors !" : "Shader Errors"))
 				{
 					ShaderErrors.ToggleOpen();
@@ -394,6 +396,7 @@ namespace Vxl
 		}
 		ImGui::EndMainMenuBar();
 
+		// Drawing All Imgui Windows here
 		for (auto& GUI : m_guiWindows)
 		{
 			if (!GUI->IsOpen())

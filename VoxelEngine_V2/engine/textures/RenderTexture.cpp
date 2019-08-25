@@ -49,7 +49,26 @@ namespace Vxl
 	{
 	}
 
-	// Update mipmaps
+	// Utility
+	void RenderTexture::RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType)
+	{
+		// Texture is immutable, destroy it and create a new one
+		Unbind();
+		Graphics::Texture::Delete(m_id);
+		m_id = Graphics::Texture::Create();
+		Bind();
+
+		// Fix values
+		m_width = (int)width;
+		m_height = (int)height;
+		m_formatType = format;
+		m_pixelType = pixelType;
+		
+		// Update gl values
+		updateParameters();
+		updateStorage();
+		Unbind();
+	}
 	void RenderTexture::updateMipmapping()
 	{
 		Bind();

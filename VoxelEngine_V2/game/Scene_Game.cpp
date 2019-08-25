@@ -582,6 +582,7 @@ namespace Vxl
 	{
 
 	}
+
 	void Scene_Game::Draw()
 	{
 		static bool once = true;
@@ -697,14 +698,14 @@ namespace Vxl
 		//	Graphics::SetBlendState(false);
 		//	//
 
-		if (Input.getKeyDown(KeyCode::K))
-		{
-			RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
-			std::cout << (uint32_t)test[0] << std::endl;
-			std::cout << (uint32_t)test[1] << std::endl;
-			std::cout << "~~~" << std::endl;
-			test.Deallocate();
-		}
+		//	if (Input.getKeyDown(KeyCode::K))
+		//	{
+		//		RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
+		//		std::cout << (uint32_t)test[0] << std::endl;
+		//		std::cout << (uint32_t)test[1] << std::endl;
+		//		std::cout << "~~~" << std::endl;
+		//		test.Deallocate();
+		//	}
 
 		Graphics::SetBlendState(false);
 
@@ -726,6 +727,7 @@ namespace Vxl
 		//
 
 		
+		// Editor objects needs gbuffer depth for proper overlay
 		_fbo_gbuffer->blitDepth(*_fbo_editor);
 
 
@@ -1094,7 +1096,7 @@ namespace Vxl
 		//////////////////////
 		_fbo_showRenderTarget->Bind();
 		_fbo_showRenderTarget->ClearBuffers();
-
+		
 		switch (renderTargetID)
 		{
 			// Output Normally
@@ -1167,6 +1169,8 @@ namespace Vxl
 		RenderManager.RenderFullScreen();
 		//////////////////////
 	
+		//_fbo_composite->SetClearColor(Color4F(1, 0, 0, 1));
+		//_fbo_composite->ClearBuffers();
 
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		// Display to backbuffer
@@ -1183,7 +1187,13 @@ namespace Vxl
 
 		_fbo_composite->bindTexture(0, TextureLevel::LEVEL0);
 		RenderManager.RenderFullScreen();
-		
+
+		// Screenshot
+		if (Input.getKeyDown(KeyCode::F1))
+		{
+			Texture2D::ScreenshotBMP("screenshots/gbuffer");
+		}
+
 		//	// SUBROUTINES
 		//	ShaderProgram* _shader_gbuffer = ShaderProgram::Get("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);

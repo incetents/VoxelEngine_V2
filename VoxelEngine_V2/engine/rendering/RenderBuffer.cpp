@@ -19,10 +19,15 @@ namespace Vxl
 			m_channelCount = Graphics::GetChannelCount(FormatType);
 
 		m_id = Graphics::RenderBuffer::Create();
-		Graphics::RenderBuffer::Bind(m_id);
-		Graphics::RenderBuffer::SetStorage(FormatType, m_width, m_height);
-		Graphics::RenderBuffer::Unbind();
 
+		// Storage
+		Bind();
+		UpdateStorage();
+		Unbind();
+	}
+	void RenderBuffer::UpdateStorage()
+	{
+		Graphics::RenderBuffer::SetStorage(m_formatType, m_width, m_height);
 	}
 
 	RenderBuffer* RenderBuffer::Create(
@@ -51,6 +56,25 @@ namespace Vxl
 	RenderBuffer::~RenderBuffer()
 	{
 		Graphics::RenderBuffer::Delete(m_id);
+	}
+
+	// Reload internal flags
+	void RenderBuffer::RecreateStorage(uint32_t width, uint32_t height, TextureFormat format)
+	{
+		// Texture is immutable, destroy it and create a new one
+		Unbind();
+		Graphics::RenderBuffer::Delete(m_id);
+		m_id = Graphics::RenderBuffer::Create();
+		Bind();
+
+		// Fix values
+		m_width = (int)width;
+		m_height = (int)height;
+		m_formatType = format;
+
+		// Update gl values
+		UpdateStorage();
+		Unbind();
 	}
 
 	void RenderBuffer::Bind(void) const

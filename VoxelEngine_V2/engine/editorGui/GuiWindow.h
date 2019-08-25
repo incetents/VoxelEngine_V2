@@ -18,6 +18,7 @@ namespace Vxl
 		int		m_flags = 0;
 		bool	m_open = true;
 		bool	m_padding = true;
+		
 	public:
 		inline void Init(std::string name, Vector2 initSize, float alpha, int flags = 0)
 		{

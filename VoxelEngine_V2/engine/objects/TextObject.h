@@ -68,7 +68,7 @@ namespace Vxl
 
 		// Text
 		std::string m_text;
-		uint32_t	m_lineCount = 0;
+		uint64_t	m_lineCount = 0;
 
 		// Update internal data for text render
 		void Update(const std::string& text);

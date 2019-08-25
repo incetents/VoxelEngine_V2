@@ -176,6 +176,9 @@ namespace Vxl
 		void RemoveAttachment(
 			uint32_t _attachmentIndex
 		);
+		// Re-attaches all textures/buffers back to current FBO
+		void ReloadAttachments();
+		void ReloadDepth();
 		// Get Attachment Info
 		RenderTexture* GetAttachmentRenderTexture(
 			uint32_t _attachmentIndex

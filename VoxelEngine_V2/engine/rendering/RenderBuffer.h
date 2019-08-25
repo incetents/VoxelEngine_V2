@@ -25,6 +25,7 @@ namespace Vxl
 			TextureFormat FormatType = TextureFormat::RGBA8,
 			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
 		);
+		void UpdateStorage();
 
 	public:
 		RenderBuffer(const RenderBuffer&) = delete;
@@ -37,6 +38,8 @@ namespace Vxl
 		);
 		
 		~RenderBuffer();
+
+		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format);
 
 		void Bind(void) const;
 		static void Unbind(void);

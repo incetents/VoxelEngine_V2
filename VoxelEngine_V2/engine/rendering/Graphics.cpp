@@ -74,6 +74,7 @@ namespace Vxl
 	DepthPassRule		gl_depthpassrule = DepthPassRule::NONE;
 	GLsizei				gl_viewport[4] = { -1, -1, -1, -1 };
 	TextureID			gl_activeTextureId = 0;
+	RenderBufferID		gl_activeBufferId = 0;
 	TextureLevel		gl_activeTextureLayer = TextureLevel::NONE;
 	FramebufferObjectID gl_activeFBO = 0;
 	ShaderProgramID		gl_activeShaderProgram = 0;
@@ -556,6 +557,8 @@ namespace Vxl
 
 		gl_activeTextureId = 0;
 		gl_activeTextureLayer = TextureLevel::NONE;
+
+		gl_activeBufferId = 0;
 
 		gl_activeFBO = 0;
 		gl_activeShaderProgram = 0;
@@ -1878,6 +1881,10 @@ namespace Vxl
 		glBindTexture(GL_TextureType[(int)type], 0);
 		gl_activeTextureId = 0;
 	}
+	TextureID Graphics::Texture::GetCurrentlyBound(void)
+	{
+		return gl_activeTextureId;
+	}
 	void Graphics::Texture::SetActiveLevel(TextureLevel level)
 	{
 		if (gl_activeTextureLayer == level)
@@ -2003,15 +2010,27 @@ namespace Vxl
 	}
 	void Graphics::RenderBuffer::Bind(RenderBufferID id)
 	{
+		if (gl_activeBufferId == id)
+			return;
+
 		glBindRenderbuffer(GL_RENDERBUFFER, id);
+		gl_activeBufferId = id;
 	}
 	void Graphics::RenderBuffer::Unbind(void)
 	{
+		if (gl_activeBufferId == 0)
+			return;
+
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		gl_activeBufferId = 0;
 	}
 	void Graphics::RenderBuffer::SetStorage(TextureFormat format, int width, int height)
 	{
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_TextureFormat[(int)format], width, height);
+	}
+	RenderBufferID Graphics::RenderBuffer::GetCurrentlyBound(void)
+	{
+		return gl_activeBufferId;
 	}
 
 	// ~ Framebuffer Object ~ //

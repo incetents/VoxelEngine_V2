@@ -32,13 +32,14 @@ namespace Vxl
 			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
 		);
 
-		// Get Name
+		// Getters
 		inline std::string GetName(void) const
 		{
 			return m_name;
 		}
 
-		// Update mipmaps
+		// Utility
+		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType);
 		void updateMipmapping();
 	};
 }

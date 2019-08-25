@@ -85,8 +85,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	// Cleanup
 	RenderManager.m_currentScene->Destroy();
-	RenderManager.DestroySceneGLResources();
 	RenderManager.DestroyGlobalGLResources();
+	RenderManager.DestroySceneGLResources();
 	Window.Shutdown();
 
 	return 0;

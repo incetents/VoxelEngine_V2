@@ -54,6 +54,7 @@
     <ClCompile Include="engine\textures\Texture2D.cpp" />
     <ClCompile Include="engine\textures\TextureBinder.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
+    <ClCompile Include="engine\utilities\FileSystem.cpp" />
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Macros.cpp" />
     <ClCompile Include="engine\utilities\Time.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="engine\utilities\Asset.h" />
     <ClInclude Include="engine\utilities\Containers.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />
+    <ClInclude Include="engine\utilities\FileSystem.h" />
     <ClInclude Include="engine\utilities\Loader.h" />
     <ClInclude Include="engine\utilities\logger.h" />
     <ClInclude Include="engine\utilities\Macros.h" />

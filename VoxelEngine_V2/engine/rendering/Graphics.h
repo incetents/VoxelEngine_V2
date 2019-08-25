@@ -679,6 +679,7 @@ namespace Vxl
 			void		Delete(TextureID id);
 			void		Bind(TextureType type, TextureID textureID);
 			void		Unbind(TextureType type);
+			TextureID	GetCurrentlyBound(void);
 			void		SetActiveLevel(TextureLevel level);
 			void		SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height);
 			void		SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
@@ -702,6 +703,7 @@ namespace Vxl
 			void			Bind(RenderBufferID id);
 			void			Unbind(void);
 			void			SetStorage(TextureFormat format, int width, int height);
+			RenderBufferID	GetCurrentlyBound(void);
 		}
 
 		// ~ Framebuffer Object ~ //

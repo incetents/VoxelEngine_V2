@@ -96,8 +96,8 @@ namespace Vxl
 
 	void FramebufferObject::SetSizeToWindowSize()
 	{
-		m_width = Window.GetResolutionWidth();
-		m_height = Window.GetResolutionHeight();
+		m_width = Window.GetViewportWidth();
+		m_height = Window.GetViewportHeight();
 		m_fullscreen = true;
 	}
 
@@ -212,6 +212,50 @@ namespace Vxl
 		updateAttachmentOrder();
 
 		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
+	}
+	void FramebufferObject::ReloadAttachments()
+	{
+		VXL_ASSERT(m_id != -1, "FBO not initialized");
+		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to reload attachments");
+
+		for (auto& texture : m_textures)
+		{
+			if (texture.second.IsRenderTexture())
+			{
+				auto render = texture.second.GetRenderTexture();
+				render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType(), render->GetPixelType());
+
+				Graphics::FramebufferObject::AttachRenderTexture(*texture.second.GetRenderTexture(), texture.first);
+			}
+			else if (texture.second.IsRenderBuffer())
+			{
+				auto render = texture.second.GetRenderBuffer();
+				render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType());
+
+				Graphics::FramebufferObject::AttachRenderBuffer(*texture.second.GetRenderBuffer(), texture.first);
+			}
+		}
+		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
+	}
+	void FramebufferObject::ReloadDepth()
+	{
+		VXL_ASSERT(m_id != -1, "FBO not initialized");
+		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to reload attachments");
+
+		if (m_depth.IsRenderTexture())
+		{
+			auto render = m_depth.GetRenderTexture();
+			render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType(), render->GetPixelType());
+
+			Graphics::FramebufferObject::AttachRenderTextureAsDepth(*m_depth.GetRenderTexture());
+		}
+		else if (m_depth.IsRenderBuffer())
+		{
+			auto render = m_depth.GetRenderBuffer();
+			render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType());
+
+			Graphics::FramebufferObject::AttachRenderBufferAsDepth(*m_depth.GetRenderBuffer());
+		}
 	}
 	RenderTexture* FramebufferObject::GetAttachmentRenderTexture(
 		uint32_t _attachmentIndex
