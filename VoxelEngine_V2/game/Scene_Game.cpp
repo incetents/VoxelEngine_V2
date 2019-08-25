@@ -20,6 +20,7 @@
 #include "../engine/rendering/Debug.h"
 #include "../engine/rendering/UBO.h"
 #include "../engine/rendering/Graphics.h"
+#include "../engine/rendering/RenderManager.h"
 
 #include "../engine/textures/Texture2D.h"
 #include "../engine/textures/RenderTexture.h"
@@ -38,7 +39,6 @@
 #include "../engine/objects/TextObject.h"
 
 #include "../engine/modules/Material.h"
-#include "../engine/modules/RenderManager.h"
 
 #include "../engine/window/window.h"
 
@@ -1089,78 +1089,14 @@ namespace Vxl
 		Graphics::SetBlendState(false);
 		Graphics::SetWireframeState(false);
 		Graphics::SetDepthPassRule(DepthPassRule::ALWAYS);
-		// ~~~~
-		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
-		_shader_showRenderTarget->Bind();
-
-		//////////////////////
-		_fbo_showRenderTarget->Bind();
-		_fbo_showRenderTarget->ClearBuffers();
-		
-		switch (renderTargetID)
-		{
-			// Output Normally
-			case 0:
-			{
-				_shader_showRenderTarget->SetUniform("outputMode", 3);
-		
-				_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
-				_fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
-				break;
-			}
-			// Show Albedo
-			case 1:
-			{
-				_shader_showRenderTarget->SetUniform("outputMode", 0);
-		
-				_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
-				break;
-			}
-			// Show Normal
-			case 2:
-			{
-				_shader_showRenderTarget->SetUniform("outputMode", 1);
-		
-				_fbo_gbuffer->bindTexture(1, TextureLevel::LEVEL0);
-				break;
-			}
-			// Show Depth
-			case 3:
-			{
-				_shader_showRenderTarget->SetUniform("outputMode", 2);
-				//_shader_showRenderTarget->SetUniform("zNear", RenderManager.GetMainCamera()->getZnear());
-				//_shader_showRenderTarget->SetUniform("zFar", RenderManager.GetMainCamera()->getZfar());
-		
-				_fbo_gbuffer->bindDepth(TextureLevel::LEVEL0);
-				break;
-			}
-			// Show Editor
-			case 4:
-			{
-				_shader_showRenderTarget->SetUniform("outputMode", 0);
-		
-				_fbo_editor->bindTexture(0, TextureLevel::LEVEL0);
-				break;
-			}
-			// Show Color Picker
-			case 5:
-			{
-				_shader_showRenderTarget->SetUniform("outputMode", 4);
-		
-				_fbo_gbuffer->bindTexture(2, TextureLevel::LEVEL0);
-				break;
-			}
-		}
-		
-		RenderManager.RenderFullScreen();
-		//////////////////////
-
 
 		//////////////////////
 		_fbo_composite->Bind();
 		_fbo_composite->ClearBuffers();
 
 		// Display Final Image
+		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
+		_shader_showRenderTarget->Bind();
 		_shader_showRenderTarget->SetUniform("outputMode", 3);
 
 		_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);

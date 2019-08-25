@@ -3,7 +3,7 @@
 
 #include "Editor.h"
 #include "../modules/Entity.h"
-#include "../modules/RenderManager.h"
+#include "../rendering/RenderManager.h"
 
 #include "../objects/CameraObject.h"
 

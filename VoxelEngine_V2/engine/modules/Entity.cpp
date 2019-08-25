@@ -3,7 +3,7 @@
 #include "Entity.h"
 
 #include "../rendering/Mesh.h"
-#include "../modules/RenderManager.h"
+#include "../rendering/RenderManager.h"
 #include "../utilities/Time.h"
 #include "../utilities/logger.h"
 

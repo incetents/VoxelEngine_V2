@@ -6,7 +6,7 @@
 
 #include "../utilities/logger.h"
 #include "../utilities/Macros.h"
-#include "../modules/RenderManager.h"
+#include "../rendering/RenderManager.h"
 
 #include <GLFW/glfw3.h>
 
@@ -26,8 +26,8 @@ namespace Vxl
 	}
 	void Window::Setup(
 		const std::string& name,
-		UINT width,
-		UINT height)
+		uint32_t width,
+		uint32_t height)
 	{
 		if (m_setup)
 			return;
@@ -60,8 +60,8 @@ namespace Vxl
 		// Initial Window Position
 		int posx, posy;
 		glfwGetWindowPos(m_window, &posx, &posy);
-		m_position[0] = (UINT)posx;
-		m_position[1] = (UINT)posy;
+		m_position[0] = (uint32_t)posx;
+		m_position[1] = (uint32_t)posy;
 
 		glfwMakeContextCurrent(m_window);
 
@@ -122,7 +122,7 @@ namespace Vxl
 		m_setup = false;
 		Setup(m_name, m_size[0], m_size[1]);
 	}
-	void Window::UpdateSizes(UINT width, UINT height)
+	void Window::UpdateSizes(uint32_t width, uint32_t height)
 	{
 		m_size[0] = width;
 		m_size[1] = height;
@@ -149,8 +149,8 @@ namespace Vxl
 			// Width clamp
 			if (m_size[0] > m_size[1])
 			{
-				UINT customWidth = (UINT)((float)m_size[1] * m_customAspectRatio);
-				UINT offsetWidth = (m_size[0] >> 1) - (customWidth >> 1);
+				uint32_t customWidth = (uint32_t)((float)m_size[1] * m_customAspectRatio);
+				uint32_t offsetWidth = (m_size[0] >> 1) - (customWidth >> 1);
 				m_viewportOffset[0] = offsetWidth;
 				m_viewportOffset[1] = 0;
 				m_viewportSize[0] = customWidth;
@@ -159,8 +159,8 @@ namespace Vxl
 			// Height clamp
 			else
 			{
-				UINT customHeight = (UINT)((float)m_size[0] / m_customAspectRatio);
-				UINT offsetHeight = (m_size[1] >> 1) - (customHeight >> 1);
+				uint32_t customHeight = (uint32_t)((float)m_size[0] / m_customAspectRatio);
+				uint32_t offsetHeight = (m_size[1] >> 1) - (customHeight >> 1);
 				m_viewportOffset[0] = 0;
 				m_viewportOffset[1] = offsetHeight;
 				m_viewportSize[0] = m_size[0];
@@ -193,16 +193,16 @@ namespace Vxl
 		Update();
 	}
 
-	void Window::SetPosition(UINT x, UINT y)
+	void Window::SetPosition(uint32_t x, uint32_t y)
 	{
 		glfwSetWindowPos(m_window, x, y);
 	}
-	void Window::SetSize(UINT width, UINT height)
+	void Window::SetSize(uint32_t width, uint32_t height)
 	{
 		UpdateSizes(width, height);
 		glfwSetWindowSize(m_window, width, height);
 	}
-	void Window::SetSizeLimits(UINT xmin, UINT xmax, UINT ymin, UINT ymax)
+	void Window::SetSizeLimits(uint32_t xmin, uint32_t xmax, uint32_t ymin, uint32_t ymax)
 	{
 		glfwSetWindowSizeLimits(m_window, xmin, ymin, xmax, ymax);
 	}

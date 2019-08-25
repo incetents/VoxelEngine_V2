@@ -29,11 +29,11 @@ namespace Vxl
 		bool		 m_windowFocus	= false;
 		GLFWwindow*  m_window;
 		std::string  m_name;
-		UINT		 m_position[2]; // Window position
-		UINT		 m_size[2]; // Window Size that can change
-		UINT		 m_resolution[2]; // Window Resolution (fbos and cameras will use this)
-		UINT		 m_viewportSize[2]; // Same as Window size except it can be smaller if custom aspect ratio makes the view smaller
-		UINT		 m_viewportOffset[2];
+		uint32_t 	 m_position[2]; // Window position
+		uint32_t 	 m_size[2]; // Window Size that can change
+		uint32_t 	 m_resolution[2]; // Window Resolution (fbos and cameras will use this)
+		uint32_t 	 m_viewportSize[2]; // Same as Window size except it can be smaller if custom aspect ratio makes the view smaller
+		uint32_t 	 m_viewportOffset[2];
 		float		 m_aspectRatio = 1.0f; // Based on Window size (resolution shouldn't affect this)
 		bool		 m_useCustomAspectRatio = false;
 		float		 m_customAspectRatio = 1.0f;
@@ -42,7 +42,7 @@ namespace Vxl
 		// FilePaths dragged into the Window context
 		std::vector<std::string> m_addedPaths;
 
-		void UpdateSizes(UINT width, UINT height);
+		void UpdateSizes(uint32_t width, uint32_t height);
 		void UpdateViewport();
 
 		void Destroy();
@@ -82,11 +82,11 @@ namespace Vxl
 		bool IsCursorOnImguiWindow();
 
 		// Window Pos
-		UINT GetPositionX(void) const
+		uint32_t GetPositionX(void) const
 		{
 			return m_position[0];
 		}
-		UINT GetPositionY(void) const
+		uint32_t GetPositionY(void) const
 		{
 			return m_position[1];
 		}
@@ -106,33 +106,33 @@ namespace Vxl
 		// ResolutionSize = FBO buffer/back buffer render size. If smaller/bigger than screen size, it gets scaled
 
 		// Returns Width of the entire window
-		UINT GetWindowWidth(void) const
+		uint32_t GetWindowWidth(void) const
 		{
 			return m_size[0];
 		}
 		// Returns Height of the entire window
-		UINT GetWindowHeight(void) const
+		uint32_t GetWindowHeight(void) const
 		{
 			return m_size[1];
 		}
 		
 		// Returns Width of the rendered viewport
-		UINT GetViewportWidth(void) const
+		uint32_t GetViewportWidth(void) const
 		{
 			return m_viewportSize[0];
 		}
 		// Returns Height of the rendered viewport
-		UINT GetViewportHeight(void) const
+		uint32_t GetViewportHeight(void) const
 		{
 			return m_viewportSize[1];
 		}
 		// Returns X offset of the rendered viewport
-		UINT GetViewportOffsetX(void) const
+		uint32_t GetViewportOffsetX(void) const
 		{
 			return m_viewportOffset[0];
 		}
 		// Returns Y offset of the rendered viewport
-		UINT GetViewportOffsetY(void) const
+		uint32_t GetViewportOffsetY(void) const
 		{
 			return m_viewportOffset[1];
 		}
@@ -143,12 +143,12 @@ namespace Vxl
 		}
 
 		// Returns Width of backbuffer resolution
-		UINT GetResolutionWidth(void) const
+		uint32_t GetResolutionWidth(void) const
 		{
 			return m_resolution[0];
 		}
 		// Returns Height of backbuffer resolution
-		UINT GetResolutionHeight(void) const
+		uint32_t GetResolutionHeight(void) const
 		{
 			return m_resolution[1];
 		}
@@ -164,8 +164,8 @@ namespace Vxl
 		bool InitGLFW();
 		void Setup(
 			const std::string& name,
-			UINT width,
-			UINT height);
+			uint32_t width,
+			uint32_t height);
 		void Reload();
 
 		void Shutdown();

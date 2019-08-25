@@ -36,7 +36,7 @@
 #include "modules/Entity.h"
 #include "modules/Layer.h"
 #include "modules/Material.h"
-#include "modules/RenderManager.h"
+#include "rendering/RenderManager.h"
 #include "modules/Scene.h"
 
 #include "objects/CameraObject.h"

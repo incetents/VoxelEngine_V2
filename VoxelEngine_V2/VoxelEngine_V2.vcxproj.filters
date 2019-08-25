@@ -96,9 +96,6 @@
     <ClCompile Include="game\terrain\ChunkMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\modules\RenderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\modules\Layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -225,6 +222,9 @@
     <ClCompile Include="engine\utilities\FileSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\rendering\RenderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\Input.h">
@@ -324,9 +324,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\terrain\ChunkMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\modules\RenderManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\modules\Layer.h">
@@ -480,6 +477,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\FileSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\RenderManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

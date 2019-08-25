@@ -2,9 +2,17 @@
 #include "Precompiled.h"
 #include "RenderManager.h"
 
-#include "Scene.h"
-#include "Layer.h"
-#include "Material.h"
+#include "Debug.h"
+#include "Geometry.h"
+#include "Mesh.h"
+#include "FramebufferObject.h"
+#include "Graphics.h"
+#include "RenderBuffer.h"
+
+#include "../modules/Scene.h"
+#include "../modules/Layer.h"
+#include "../modules/Material.h"
+
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
 #include "../utilities/Macros.h"
@@ -12,13 +20,6 @@
 #include "../textures/Cubemap.h"
 #include "../textures/Texture2D.h"
 #include "../textures/RenderTexture.h"
-
-#include "../rendering/Debug.h"
-#include "../rendering/Geometry.h"
-#include "../rendering/Mesh.h"
-#include "../rendering/FramebufferObject.h"
-#include "../rendering/Graphics.h"
-#include "../rendering/RenderBuffer.h"
 
 #include "../window/window.h"
 #include "../editor/Editor.h"

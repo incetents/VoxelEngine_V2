@@ -7,7 +7,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
-#include "../modules/RenderManager.h"
+#include "../rendering/RenderManager.h"
 #include "../modules/Material.h"
 
 #include "../objects/GameObject.h"

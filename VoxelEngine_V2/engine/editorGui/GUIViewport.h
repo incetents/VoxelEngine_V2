@@ -10,20 +10,36 @@ namespace Vxl
 {
 	class FramebufferObject;
 	class RenderTexture;
+	class ShaderProgram;
 
 	static class GUIViewport : public Singleton<class GUIViewport>, public GuiWindow
 	{
+		enum RenderMode
+		{
+			NONE,
+			COMPOSITE,
+			ALBEDO,
+			NORMAL,
+			DEPTH,
+			EDITOR,
+			COLOR_PICKER
+		};
+
 #ifdef GLOBAL_IMGUI
 		friend class RenderManager;
 	private:
-		bool m_xrayMode = false;
-		//uint32_t m_renderTexture = 0;
+		bool		m_xrayMode = false;
+		RenderMode	m_renderMode = RenderMode::NONE;
 		
 		// Gl Resources
-		FramebufferObject* m_fbo = nullptr;
-		RenderTexture* m_renderTexture = nullptr;
+		FramebufferObject*	m_fbo = nullptr;
+		RenderTexture*		m_renderTexture = nullptr;
+		ShaderProgram*		m_shader_showRenderTarget = nullptr;
+
 		void InitGLResources();
 		void DestroyGLResources();
+		// Render showrendertarget
+		void DrawRenderTarget();
 	public:
 		// Behaviour
 		void Draw() override;

@@ -10,7 +10,7 @@
 
 #include "modules/Material.h"
 #include "../game/Scene_Game.h"
-#include "modules/RenderManager.h"
+#include "rendering/RenderManager.h"
 
 /**/
 using namespace Vxl;

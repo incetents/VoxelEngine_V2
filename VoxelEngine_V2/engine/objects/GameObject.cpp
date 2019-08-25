@@ -6,7 +6,7 @@
 #include "../rendering/Debug.h"
 
 #include "../modules/Material.h"
-#include "../modules/RenderManager.h"
+#include "../rendering/RenderManager.h"
 
 #include "../textures/Texture2D.h"
 

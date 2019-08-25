@@ -12,7 +12,7 @@
 
 #include "../window/window.h"
 
-#include "../modules/RenderManager.h"
+#include "../rendering/RenderManager.h"
 #include "../modules/Entity.h"
 
 #include "../objects/CameraObject.h"

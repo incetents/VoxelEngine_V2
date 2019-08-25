@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "LightObject.h"
 
-#include "../modules/RenderManager.h"
+#include "../rendering/RenderManager.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/Geometry.h"
 
