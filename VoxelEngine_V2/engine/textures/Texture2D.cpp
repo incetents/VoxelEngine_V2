@@ -5,7 +5,7 @@
 #include "../rendering/Graphics.h"
 
 #include "../rendering/Graphics.h"
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 #include "../utilities/stringUtil.h"
 #include "../math/Color.h"
 #include "../window/window.h"

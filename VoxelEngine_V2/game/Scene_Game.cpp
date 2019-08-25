@@ -9,7 +9,7 @@
 #include "../engine/input/XGamePad.h"
 
 #include "../engine/utilities/Loader.h"
-#include "../engine/utilities/logger.h"
+#include "../engine/utilities/Logger.h"
 #include "../engine/utilities/stringUtil.h"
 #include "../engine/utilities/Time.h"
 

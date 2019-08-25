@@ -6,7 +6,7 @@
 
 #include "../math/Model.h"
 
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
 
 #include <assert.h>

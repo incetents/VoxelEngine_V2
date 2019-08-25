@@ -3,7 +3,7 @@
 #include "glfwCallbacks.h"
 
 #include "window.h"
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 
 #include <iostream>
 #include <GLFW/glfw3.h>

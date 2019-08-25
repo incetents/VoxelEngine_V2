@@ -3,7 +3,7 @@
 #include "Block.h"
 
 #include "../engine/textures/Texture2D.h"
-#include "../engine/utilities/logger.h"
+#include "../engine/utilities/Logger.h"
 
 namespace Vxl
 {

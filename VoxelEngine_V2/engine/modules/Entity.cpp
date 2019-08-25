@@ -5,7 +5,7 @@
 #include "../rendering/Mesh.h"
 #include "../rendering/RenderManager.h"
 #include "../utilities/Time.h"
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 
 #include <limits>
 

@@ -7,7 +7,7 @@
 #include <set>
 #include <map>
 
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 
 // Used as a means of inheriting a unique map of objects //
 namespace Vxl

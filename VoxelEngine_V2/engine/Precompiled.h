@@ -68,7 +68,7 @@
 #include "utilities/FileIO.h"
 #include "utilities/Macros.h"
 #include "utilities/Loader.h"
-#include "utilities/logger.h"
+#include "utilities/Logger.h"
 #include "utilities/Macros.h"
 #include "utilities/singleton.h"
 #include "utilities/stringUtil.h"

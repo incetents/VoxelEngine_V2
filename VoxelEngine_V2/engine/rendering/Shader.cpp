@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "Shader.h"
 
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 #include "../utilities/FileIO.h"
 
 namespace Vxl

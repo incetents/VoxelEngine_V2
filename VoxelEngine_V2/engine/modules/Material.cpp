@@ -13,7 +13,7 @@
 
 #include "../math/Transform.h"
 
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
 
 namespace Vxl

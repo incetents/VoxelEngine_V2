@@ -4,6 +4,8 @@
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 // Macros that are used to enable/disable portions of code before compilation //
 
+// [x] whether exe runs with console output
+//t#define GLOBAL_OUTPUT_CONSOLE
 
 // [x] whether or not Graphics::SetGLName(...) should actually call glObjectLabel(...)
 #ifdef _DEBUG
@@ -24,10 +26,22 @@
 // ~~~~~~~~~~~~~~~~~~~~~~~~~//
 // Macros that do Misc work //
 
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 #include "../utilities/stringUtil.h"
 
 void AssertFail(const std::string& message, const std::string& title);
+
+
+
+// Delete Copy and Assign Constructors
+#define NO_COPY_CONSTRUCTOR
+// Foo(Foo&) = delete;
+// Foo& operator=(const Foo&) = delete;
+
+
+#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+  TypeName(const TypeName&){}   \
+  void operator=(const TypeName&) {}
 
 // General Macros
 #define __STRINGIFY(x) #x

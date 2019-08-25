@@ -8,6 +8,8 @@
 
 namespace Vxl
 {
+	class Color4F;
+
 	namespace Util
 	{
 		// Vector merging

@@ -16,7 +16,7 @@
 #include "../rendering/Shader.h"
 #include "../rendering/Graphics.h"
 
-#include "logger.h"
+#include "Logger.h"
 #include "FileIO.h"
 
 namespace Vxl

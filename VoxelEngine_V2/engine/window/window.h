@@ -71,13 +71,14 @@ namespace Vxl
 			m_close = true;
 		}
 
-		void SetPosition(UINT x, UINT y);
-		void SetSize(UINT width, UINT height);
-		void SetSizeLimits(UINT xmin, UINT xmax, UINT ymin, UINT ymax);
+		void SetPosition(uint32_t x, uint32_t y);
+		void SetSize(uint32_t width, uint32_t height);
+		void SetSizeLimits(uint32_t xmin, uint32_t xmax, uint32_t ymin, uint32_t ymax);
 		void SetVSynch(bool state);
 		void SetCustomAspectRatio(bool state, float aspect = 1.0f);
 		void SetCursor(CursorMode mode);
 		void SetCursorPosition(double x, double y);
+		void SetIcon(const std::string& filePath);
 
 		bool IsCursorOnImguiWindow();
 

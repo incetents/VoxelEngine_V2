@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 
 #include "stringUtil.h"
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 
 namespace Vxl
 {

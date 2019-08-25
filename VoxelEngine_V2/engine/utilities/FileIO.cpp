@@ -2,7 +2,7 @@
 #include "Precompiled.h"
 #include "FileIO.h"
 
-#include "logger.h"
+#include "Logger.h"
 
 namespace Vxl
 {

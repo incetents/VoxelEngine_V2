@@ -6,7 +6,7 @@
 
 #include "../textures/Texture2D.h"
 #include "../textures/RenderTexture.h"
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 #include "../window/window.h"
 #include "../input/Input.h"
 

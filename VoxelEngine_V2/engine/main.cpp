@@ -5,8 +5,9 @@
 #include "input/Input.h"
 
 #include "utilities/Loader.h"
-#include "utilities/logger.h"
+#include "utilities/Logger.h"
 #include "utilities/Time.h"
+#include "utilities/Macros.h"
 
 #include "modules/Material.h"
 #include "../game/Scene_Game.h"
@@ -18,12 +19,11 @@ using namespace std;
 
 Scene_Game* _scene = new Scene_Game();
 
-#if _DEBUG
-// Console Mode
+#ifdef GLOBAL_OUTPUT_CONSOLE
 int main()
 #else
-// Disable Console in release mode
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
+#pragma comment(linker, "/SUBSYSTEM:Windows")// /ENTRY:mainCRTStartup")
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 #endif
 {
 	// GLFW Setup
@@ -33,6 +33,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	// Window
 	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
 	//Window.SetCustomAspectRatio(true, 1.0f);
+	Window.SetIcon("./assets/applogo/logo_32.png");
 
 	/* Initial Call */
 	RenderManager.InitImGui();

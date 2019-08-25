@@ -4,11 +4,13 @@
 
 #include "glfwCallbacks.h"
 
-#include "../utilities/logger.h"
+#include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
+#include "../utilities/FileSystem.h"
 #include "../rendering/RenderManager.h"
 
 #include <GLFW/glfw3.h>
+#include <SOIL/SOIL.h>
 
 #include "../rendering/Graphics.h"
 
@@ -239,6 +241,16 @@ namespace Vxl
 	void Window::SetCursorPosition(double x, double y)
 	{
 		glfwSetCursorPos(m_window, x, y);
+	}
+
+	void Window::SetIcon(const std::string& filePath)
+	{
+		GLFWimage icons[1];
+		icons[0].pixels = SOIL_load_image(filePath.c_str(), &icons[0].width, &icons[0].height, 0, SOIL_LOAD_RGBA);
+		VXL_RETURN_ON_FAIL(icons[0].pixels != nullptr, "Failed to load icon for window");
+		
+		glfwSetWindowIcon(m_window, 1, icons);
+		SOIL_free_image_data(icons[0].pixels);
 	}
 
 	bool Window::IsCursorOnImguiWindow()
