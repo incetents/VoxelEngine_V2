@@ -274,7 +274,8 @@ namespace Vxl
 		m_allEntities.clear();
 
 		m_gameObjectsPerMaterial.clear();
-		m_gameObjectsSorted.clear();
+		m_gameObjectsSorted_Opaque.clear();
+		m_gameObjectsSorted_Transparent.clear();
 
 		// Clear Shader Error Log
 		Shader::ShaderErrorLog.clear();
@@ -335,6 +336,7 @@ namespace Vxl
 		Performance.Init("Performance", Vector2(280, 680), 0.9f);
 		GUIViewport.Init("Viewport", Vector2(500, 500), 0.9f, ImGuiWindowFlags_MenuBar);
 		GUIViewport.SetPadding(false);
+		GUIViewport.SetOpen(false);
 
 		m_guiWindows.push_back(&DevConsole.instanceRef);
 		m_guiWindows.push_back(&ShaderErrors.instanceRef);
@@ -425,45 +427,91 @@ namespace Vxl
 			Geometry.GetFullTriangle()->Draw();
 	}
 
-	// render all gameobjects with their corresponding materials
-	void RenderManager::RenderSceneGameObjects()
+	void RenderManager::SortGameObjects()
 	{
 		// If material order has been changed, re-sort them all
 		if (Material::m_masterOrderDirty)
 		{
-			m_gameObjectsSorted.clear();
+			m_gameObjectsSorted_Opaque.clear();
+			m_gameObjectsSorted_Transparent.clear();
 
 			for (auto renderSet = m_gameObjectsPerMaterial.begin(); renderSet != m_gameObjectsPerMaterial.end(); renderSet++)
 			{
-				m_gameObjectsSorted[renderSet->first->GetOrder()] = std::pair<Material*, std::set<GameObject*>*>(renderSet->first, renderSet->second);
+				switch (renderSet->first->m_renderMode)
+				{
+				case MaterialRenderMode::Opaque:
+					m_gameObjectsSorted_Opaque[renderSet->first->GetOrder()] = std::pair<Material*, std::set<GameObject*>*>(renderSet->first, renderSet->second);
+					break;
+
+				case MaterialRenderMode::Transparent:
+					m_gameObjectsSorted_Transparent[renderSet->first->GetOrder()] = std::pair<Material*, std::set<GameObject*>*>(renderSet->first, renderSet->second);
+					break;
+				}
 			}
 
 			Material::m_masterOrderDirty = false;
 		}
+	}
+	void RenderManager::Render(Material* _material, const std::set<GameObject*>& _objects)
+	{
+		VXL_ASSERT(_material, "Material required to render objects");
+		_material->BindProgram();
+		_material->BindStates();
+		_material->BindTextures(); // Only occurs if shared textures is true
 
-
-		// Map that contains all sets of material/gameobjects in order
-		for (auto renderOrder = m_gameObjectsSorted.begin(); renderOrder != m_gameObjectsSorted.end(); renderOrder++)
+		for (auto& ent : _objects)
 		{
-			// Set of material/gameobjects
-			auto materialSet = renderOrder->second;
-
-			// Get Material for binding
-			Material* material = materialSet.first;
-			VXL_ASSERT(material, "Storing nullptr in renderSet");
-			material->BindProgram();
-			material->BindStates();
-			material->BindTextures(); // Only occurs if shared textures is true
-
-			// Get GameObject for rendering
-			std::set<GameObject*>* entities = materialSet.second;
-
-			for (auto& ent : *entities)
-			{
-				if (ent->IsFamilyActive())
-					ent->Draw();
-			}
+			if (ent->IsFamilyActive())
+				ent->Draw();
 		}
+	}
+
+	void RenderManager::RenderSceneGameObjects_Opaque()
+	{
+		SortGameObjects();
+
+		// Render all Opaque Objects
+		for (auto renderOrder = m_gameObjectsSorted_Opaque.begin(); renderOrder != m_gameObjectsSorted_Opaque.end(); renderOrder++)
+		{
+			Render(renderOrder->second.first, *renderOrder->second.second);
+		}
+	}
+	void RenderManager::RenderSceneGameObjects_Transparent()
+	{
+		SortGameObjects();
+
+		// Render all Opaque Objects
+		for (auto renderOrder = m_gameObjectsSorted_Transparent.begin(); renderOrder != m_gameObjectsSorted_Transparent.end(); renderOrder++)
+		{
+			Render(renderOrder->second.first, *renderOrder->second.second);
+		}
+		
+
+		//	// Render all Transparent Objects
+		//	for (auto renderOrder = m_gameObjectsSorted_Transparent.begin(); renderOrder != m_gameObjectsSorted_Transparent.end(); renderOrder++)
+		//	{
+		//		// Set of material/gameobjects
+		//		auto materialSet = renderOrder->second;
+		//	
+		//		// Get Material for binding
+		//		Material* material = materialSet.first;
+		//		VXL_ASSERT(material, "Storing nullptr in renderSet");
+		//		material->BindProgram();
+		//		material->BindStates();
+		//		material->BindTextures(); // Only occurs if shared textures is true
+		//	
+		//		// Override Color ID texture blending
+		//		Graphics::SetBlendMode(2, BlendSource::ONE, BlendDestination::ZERO);
+		//	
+		//		// Get GameObject for rendering
+		//		std::set<GameObject*>* entities = materialSet.second;
+		//	
+		//		for (auto& ent : *entities)
+		//		{
+		//			if (ent->IsFamilyActive())
+		//				ent->Draw();
+		//		}
+		//	}
 	}
 
 	// Effectively non-gameobject entities need to have their own color ID show up in the color ID attachment.
@@ -478,9 +526,9 @@ namespace Vxl
 		// Force specific fbo draw buffers
 		auto fbo_gbuffer = FramebufferObject::GetAsset("gbuffer");
 		// Store Depth for later usage
-		auto fbo_colorpicker = FramebufferObject::GetAsset("ColorPicker");
+		//auto fbo_colorpicker = FramebufferObject::GetAsset("ColorPicker");
 		
-		fbo_gbuffer->blitDepth(*fbo_colorpicker);
+		//fbo_gbuffer->blitDepth(*fbo_colorpicker);
 
 		// Only render to COLOR ID Texture
 		fbo_gbuffer->DisableAttachment(0);
@@ -517,7 +565,7 @@ namespace Vxl
 		fbo_gbuffer->EnableAttachment(1);
 
 		// Revert Depth
-		fbo_colorpicker->blitDepth(*fbo_gbuffer);
+		//fbo_colorpicker->blitDepth(*fbo_gbuffer);
 	}
 	void RenderManager::RenderEditorObjects()
 	{

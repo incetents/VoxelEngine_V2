@@ -12,7 +12,8 @@ in fragment_data
 // Output
 layout (location = 0) out vec4 output_albedo;
 layout (location = 1) out vec4 output_normal;
-layout (location = 2) out vec4 output_colorID;
+layout (location = 2) out vec4 output_reflection;
+layout (location = 3) out vec4 output_colorID;
 
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;

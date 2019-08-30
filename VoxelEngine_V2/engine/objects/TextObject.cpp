@@ -272,8 +272,7 @@ namespace Vxl
 	TextObject::TextObject(const std::string& name)
 		: GameObject(name)
 	{
-		GameObject::SetMaterial(Material::GetAsset("opaque_passthroughWorld"));
-		//GameObject::SetMesh(Geometry.GetCube());
+		GameObject::SetMaterial(Material::GetAsset("passthroughWorld"));
 	}
 	TextObject::~TextObject()
 	{

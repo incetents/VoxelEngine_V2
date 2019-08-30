@@ -71,7 +71,12 @@ namespace Vxl
 		Graphics::SetBlendState(m_BlendState);
 		if (m_BlendState)
 		{
-			Graphics::SetBlendMode(m_BlendSource, m_BlendDest);
+			// Normal Blend modes
+			Graphics::SetBlendMode(m_BlendFunc.source, m_BlendFunc.destination);
+			// Special Blend modes
+			for (auto& blendAttach : m_BlendFuncAttachments)
+				Graphics::SetBlendMode(blendAttach.first, blendAttach.second.source, blendAttach.second.destination);
+
 			Graphics::SetBlendEquation(m_BlendEq);
 		}
 		Graphics::SetDepthPassRule(m_DepthFunc);

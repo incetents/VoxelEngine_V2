@@ -21,6 +21,7 @@ namespace Vxl
 
 	static class Window : public Singleton<class Window>
 	{
+		DISALLOW_COPY_AND_ASSIGN(Window)
 		friend class glfwCallbacks;
 	private:
 		bool		 m_setup		= false;
@@ -48,6 +49,8 @@ namespace Vxl
 		void Destroy();
 		void Update();
 	public:
+
+		Window() {}
 
 		inline GLFWwindow* GetContext() const
 		{

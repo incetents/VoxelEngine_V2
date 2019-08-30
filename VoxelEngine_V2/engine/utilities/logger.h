@@ -1,8 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "Macros.h"
-
 #include "singleton.h"
 
 #include <vector>
@@ -40,9 +38,9 @@ namespace Vxl
 
 	class LoggerMessage
 	{
-		NO_COPY_CONSTRUCTOR
-		//LoggerMessage(const LoggerMessage&) = delete;
-		//LoggerMessage(const LoggerMessage&) {}
+		// Cannot use macro because Macros.h is including this file
+		LoggerMessage(const LoggerMessage&) = delete;
+		void operator=(const LoggerMessage&) = delete;
 	private:
 		// Data
 		std::string  m_string;

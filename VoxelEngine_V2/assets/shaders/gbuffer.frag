@@ -16,7 +16,8 @@ in fragment_data
 // Output
 layout (location = 0) out vec4 output_albedo;
 layout (location = 1) out vec4 output_normal;
-layout (location = 2) out vec4 output_colorID;
+layout (location = 2) out vec4 output_reflection;
+layout (location = 3) out vec4 output_colorID;
 // colorID, emissions, metallicness, roughness
 
 // Uniform Textures
@@ -26,6 +27,7 @@ uniform bool VXL_useTexture = false;
 uniform vec3 VXL_color 		= vec3(1,1,1);
 uniform vec3 VXL_tint 		= vec3(1,1,1);
 uniform vec4 VXL_output 	= vec4(0,0,0,0); // used for color ID
+uniform float VXL_alpha 	= 1.0;
 
 uniform int TESTMODE = 0;
 
@@ -60,11 +62,12 @@ void main()
 	if(TESTMODE == 3)
 		output_albedo = vec4(normalize(f_data.bitangent), 1.0);
 	
-	output_albedo.a = 1.0;
+	output_albedo.a = VXL_alpha;
 
 	//float d = dot(-getCameraForwad(), normalize(f_data.normal));	
 	//output_test = vec4(d, 0, 0.2, 1);
 
+	output_reflection = vec4(0,0,0,1);
 	output_colorID = VXL_output;
 	
 	//if(TESTMODE == 1)

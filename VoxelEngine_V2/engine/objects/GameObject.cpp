@@ -102,6 +102,12 @@ namespace Vxl
 				m_material->m_property_tint.SetProperty(m_Tint);
 			}
 
+			// ~ Alpha ~ //
+			if (m_material->m_property_alpha.IsUsed() && m_material->GetRenderMode() == MaterialRenderMode::Transparent)
+			{
+				m_material->m_property_alpha.SetProperty(m_alpha);
+			}
+
 			// ~ ColorID ~ //
 			if (m_material->m_property_output.IsUsed())
 			{

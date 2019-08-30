@@ -773,6 +773,10 @@ namespace Vxl
 		glBlendEquation(GL_BlendEquation[(int)eq]);
 		gl_blendequation = eq;
 	}
+	void Graphics::SetBlendMode(uint32_t attachmentIndex, BlendSource src, BlendDestination dest)
+	{
+		glBlendFunci(attachmentIndex, GL_BlendSource[(int)src], GL_BlendDestination[(int)dest]);
+	}
 
 	// ~ Depth ~ //
 	void Graphics::SetDepthPassRule(DepthPassRule rule)

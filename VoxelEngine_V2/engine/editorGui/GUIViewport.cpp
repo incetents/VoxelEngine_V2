@@ -118,7 +118,7 @@ namespace Vxl
 				m_shader_showRenderTarget->SetUniform("outputMode", 4);
 
 				auto gbuffer	= FramebufferObject::GetAsset("gbuffer");
-				gbuffer->bindTexture(2, TextureLevel::LEVEL0);
+				gbuffer->bindTexture(3, TextureLevel::LEVEL0);
 
 				break;
 			}
@@ -132,28 +132,6 @@ namespace Vxl
 
 	void GUIViewport::Draw()
 	{
-		// TEST
-		//	{
-		//	
-		//		Graphics::SetBlendState(false);
-		//		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
-		//	
-		//		m_fbo->Bind();
-		//		m_fbo->ClearBuffers();
-		//	
-		//		_shader_showRenderTarget->Bind();
-		//		_shader_showRenderTarget->SetUniform("outputMode", 3);
-		//	
-		//		auto gbuffer = FramebufferObject::GetAsset("gbuffer");
-		//		auto editor = FramebufferObject::GetAsset("EditorPost");
-		//		gbuffer->bindTexture(0, TextureLevel::LEVEL0);
-		//		editor->bindTexture(0, TextureLevel::LEVEL1);
-		//	
-		//		RenderManager.RenderFullScreen();
-		//	
-		//		m_fbo->Unbind();
-		//	}
-
 		// Menu
 		if (ImGui::BeginMenuBar())
 		{
@@ -207,7 +185,7 @@ namespace Vxl
 
 		// Get Correct Size for texture
 		ImVec2 size = ImGui::GetWindowSize();
-		size.y -= (35.0f + 5.0f); // Padding from "name bar" and "menu bar"
+		size.y -= (40.0f); // Padding from "name bar" and "menu bar"
 
 		if (m_xrayMode)
 		{

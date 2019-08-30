@@ -119,6 +119,13 @@ namespace Vxl
 		SRC_ALPHA,
 		ONE_MINUS_SRC_ALPHA
 	};
+	// ~ Blending ~ //
+	struct BlendFunction
+	{
+		BlendSource			source		= BlendSource::SRC_ALPHA;
+		BlendDestination	destination	= BlendDestination::ONE_MINUS_SRC_ALPHA;
+	};
+
 	// ~ Blend Equation ~ //
 	enum class BlendEquation
 	{
@@ -452,6 +459,7 @@ namespace Vxl
 
 		// ~ Blending ~ //
 		void SetBlendMode(BlendSource src, BlendDestination dest);
+		void SetBlendMode(uint32_t attachmentIndex, BlendSource src, BlendDestination dest);
 		void SetBlendEquation(BlendEquation eq);
 
 		// ~ Depth ~ //

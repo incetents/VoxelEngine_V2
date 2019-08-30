@@ -80,6 +80,12 @@ namespace Vxl
 		}
 	};
 
+	enum class MaterialRenderMode
+	{
+		Opaque,
+		Transparent
+	};
+
 	class Material : public Asset<Material>, public TextureBinder
 	{
 		friend class RenderManager;
@@ -91,6 +97,7 @@ namespace Vxl
 		static bool				m_masterOrderDirty; // Whether or not the master order has changed
 		UINT					m_order = -1; // Render Order
 		bool					m_sharedTextures = false; // [true] = binds materials textures
+		MaterialRenderMode		m_renderMode = MaterialRenderMode::Opaque;
 
 		// Locked Constructor
 		Material(const std::string& _name, UINT _order)
@@ -98,6 +105,9 @@ namespace Vxl
 		{
 			SetOrder(_order);
 		}
+
+		// Blend Attachment Overrides [for specific textures]
+		std::map<uint32_t, BlendFunction> m_BlendFuncAttachments;
 
 		// Utility
 		void UpdateProperties();
@@ -143,6 +153,11 @@ namespace Vxl
 		{
 			m_sharedTextures = state;
 		}
+		inline void SetRenderMode(MaterialRenderMode mode)
+		{
+			m_renderMode = mode;
+			m_masterOrderDirty = true;
+		}
 
 		// Getters
 		inline const ShaderProgram* GetShader(void) const
@@ -157,17 +172,34 @@ namespace Vxl
 		{
 			return m_sharedTextures;
 		}
+		inline MaterialRenderMode	GetRenderMode(void) const
+		{
+			return m_renderMode;
+		}
 
 		// GL States
 		CullMode			m_CullType		= CullMode::COUNTER_CLOCKWISE;
 		bool				m_BlendState	= true;
-		BlendSource			m_BlendSource	= BlendSource::SRC_ALPHA;
-		BlendDestination	m_BlendDest		= BlendDestination::ONE_MINUS_SRC_ALPHA;
+		BlendFunction		m_BlendFunc;
 		BlendEquation		m_BlendEq		= BlendEquation::FUNC_ADD;
 		DepthPassRule		m_DepthFunc		= DepthPassRule::LESS_OR_EQUAL;
 		bool				m_DepthRead		= true;
 		bool				m_DepthWrite	= true;
 		bool				m_Wireframe		= false;
+		void SetBlendFuncAttachment(uint32_t attachmentID, BlendSource src, BlendDestination dest)
+		{
+			m_BlendFuncAttachments[attachmentID].source = src;
+			m_BlendFuncAttachments[attachmentID].destination = dest;
+		}
+		void RemoveBlendFuncAttachment(uint32_t attachmentID)
+		{
+			if (m_BlendFuncAttachments.find(attachmentID) != m_BlendFuncAttachments.end())
+				m_BlendFuncAttachments.erase(attachmentID);
+		}
+		void RemoveAllBlendFuncAttachments()
+		{
+			m_BlendFuncAttachments.clear();
+		}
 
 		// Hardcoded Uniforms
 		MaterialProperty<bool>			m_property_useModel		 = MaterialProperty<bool>("VXL_useModel");

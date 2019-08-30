@@ -43,6 +43,7 @@ namespace Vxl
 		std::string m_displayName;	// Used with editor when displaying name [can be modified]
 		Color3F		m_Color = Color3F(1, 1, 1);
 		Color3F		m_Tint	= Color3F(1, 1, 1);
+		float		m_alpha = 1.0f;
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
 		Vector3		m_AABB[2]; // AABB based on OBB
 
@@ -176,6 +177,16 @@ namespace Vxl
 		inline Color3F GetTint(void)
 		{
 			return m_Tint;
+		}
+
+		// Warning, alpha only does anything if material is transparent
+		inline void SetAlpha(float a)
+		{
+			m_alpha = a;
+		}
+		inline float GetAlpha(void) const
+		{
+			return m_alpha;
 		}
 
 		// Update Bounding Box from Mesh

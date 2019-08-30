@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Logger.h"
 
+#include "Macros.h"
+
 namespace Vxl
 {
 	LoggerMessage::LoggerMessage(

@@ -44,9 +44,13 @@ namespace Vxl
 		std::vector<Entity*> m_allEntities;
 
 		// GameObjects per Material
+
 		std::map<Material*, std::set<GameObject*>*> m_gameObjectsPerMaterial;
 		// All Materials with their gameobjects, sorted by their OrderID
-		std::map<uint32_t, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted;
+		std::map<uint32_t, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted_Opaque;
+		std::map<uint32_t, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted_Transparent;
+		void SortGameObjects();
+		void Render(Material* _material, const std::set<GameObject*>& _objects);
 
 		// Imgui render window
 		std::vector<GuiWindow*> m_guiWindows;
@@ -96,7 +100,8 @@ namespace Vxl
 
 		// Render
 		void RenderFullScreen();
-		void RenderSceneGameObjects();
+		void RenderSceneGameObjects_Opaque();
+		void RenderSceneGameObjects_Transparent();
 		void RenderSceneObjectsWithOnlyColorID();
 		void RenderEditorObjects();
 		void RenderEditorObjectsPostDepth();

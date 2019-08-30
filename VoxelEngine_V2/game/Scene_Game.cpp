@@ -91,9 +91,10 @@ namespace Vxl
 		_fbo_gbuffer->SetClearColor(Color4F(-1, -1, 0, 1));
 		_fbo_gbuffer->SetSizeToWindowSize();
 		_fbo_gbuffer->Bind();
-		_fbo_gbuffer->SetAttachment(0, _fbo_gbuffer->CreateRenderTexture("albedo", TextureFormat::R11F_G11F_B10F));
+		_fbo_gbuffer->SetAttachment(0, _fbo_gbuffer->CreateRenderTexture("albedo", TextureFormat::RGBA8)); //R11F_G11F_B10F
 		_fbo_gbuffer->SetAttachment(1, _fbo_gbuffer->CreateRenderTexture("normal", TextureFormat::RGBA16_SNORM));
-		_fbo_gbuffer->SetAttachment(2, _fbo_gbuffer->CreateRenderTexture("colorID", TextureFormat::RGBA8));
+		_fbo_gbuffer->SetAttachment(2, _fbo_gbuffer->CreateRenderTexture("reflection", TextureFormat::RGBA8));
+		_fbo_gbuffer->SetAttachment(3, _fbo_gbuffer->CreateRenderTexture("colorID", TextureFormat::RGBA8));
 		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::TEXTURE);
 		_fbo_gbuffer->checkFBOStatus();
 		_fbo_gbuffer->Unbind();
@@ -159,6 +160,12 @@ namespace Vxl
 
 		material_passthroughWorld = Material::Create("passthroughWorld", 2);
 		material_passthroughWorld->SetProgram(*_shader_passthroughWorld);
+		material_passthroughWorld->SetRenderMode(MaterialRenderMode::Transparent);
+		material_passthroughWorld->m_DepthWrite = false;
+		//	material_passthroughWorld->m_BlendFunc.source = BlendSource::ONE;
+		//	material_passthroughWorld->m_BlendFunc.destination = BlendDestination::ONE;
+		// Color ID still passes normally by ignoring blend mode
+		material_passthroughWorld->SetBlendFuncAttachment(3, BlendSource::ONE, BlendDestination::ZERO);
 
 		material_billboard = Material::Create("billboard", 3);
 		material_billboard->SetProgram(*_shader_billboard);
@@ -252,6 +259,28 @@ namespace Vxl
 		_errorCube->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
 		_errorCube->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
 		//_errorCube->SetColor(Color3F(1, 1, 0));
+
+		GameObject* _alphaCube1 = GameObject::Create("_alphaCube1");
+		_alphaCube1->SetMaterial(material_passthroughWorld);
+		_alphaCube1->SetColor(Color3F(1, 0, 0));
+		_alphaCube1->SetAlpha(0.5f);
+		_alphaCube1->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		_alphaCube1->m_transform.setPosition(Vector3(-0.5f, -2, -3.0f));
+
+		GameObject* _alphaCube2 = GameObject::Create("_alphaCube2");
+		_alphaCube2->SetMaterial(material_passthroughWorld);
+		_alphaCube2->SetColor(Color3F(0, 1, 0));
+		_alphaCube2->SetAlpha(0.5f);
+		_alphaCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		_alphaCube2->m_transform.setPosition(Vector3(-1.5f, -2, -3.0f));
+
+		GameObject* _alphaCube3 = GameObject::Create("_alphaCube3");
+		_alphaCube3->SetMaterial(material_passthroughWorld);
+		_alphaCube3->SetColor(Color3F(0, 0, 1));
+		_alphaCube3->SetAlpha(0.5f);
+		_alphaCube3->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		_alphaCube3->m_transform.setPosition(Vector3(-2.5f, -2, -3.0f));
+
 		
 		GameObject* _entity3 = GameObject::Create("_entity3");
 		_entity3->SetTexture(_tex_crate, TextureLevel::LEVEL0);
@@ -610,93 +639,17 @@ namespace Vxl
 		CPUTimer::StartTimer("Gbuffer");
 		//
 		UBOManager.BindCamera(RenderManager.GetMainCamera());
-		RenderManager.RenderSceneGameObjects();
+		RenderManager.RenderSceneGameObjects_Opaque();
+
+		// Make sure gbuffer depth ends up with only depth from opaque objects
+		_fbo_gbuffer->blitDepth(*_fbo_colorpicker);
+
+		RenderManager.RenderSceneGameObjects_Transparent();
 		RenderManager.RenderSceneObjectsWithOnlyColorID();
 
-		//auto test = ShaderProgram::Get("gbuffer");
-		//test->Bind();
-		//
-		//Graphics::SetDepthTestState(false);
-		//
-		//Geometry.GetSphere()->Draw();
-		//
-		//Graphics::SetDepthTestState(true);
-		//
-		//test->Unbind();
+		_fbo_colorpicker->blitDepth(*_fbo_gbuffer);
 
-		//	// Font Rendering FBO //
-		//	auto material_font = Material::GetAsset("font");
-		//	material_font->BindProgram();
-		//	material_font->BindStates();
-		//	
-		//	//Graphics::SetBlendState(true);
-		//	//Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
-		//	//Graphics::SetDepthRead(false);
-		//	//Graphics::SetDepthWrite(false);
-		//	
-		//	if (myText == nullptr)
-		//		myText = new Text("arial",
-		//			"\n\nfirst sentence\n"
-		//			"0wertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-		//			"q0ertyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-		//			"qw0rtyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-		//			"qwe0tyuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-		//			"qwer0yuiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-		//			"qwert0uiop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-		//			"qwerty0iop[]{}asdfghjkl;:zxcvbnm,.<>?\n"
-		//			"qwertyu0op[]{}asdfghjkl;:zxcvbnm,.<>?\n\n\n\n\n\n"
-		//		);
-		//	
-		//	if (myText->HasRenderTextureChanged())
-		//	{
-		//	
-		//		RenderTexture* MY_RT = myText->GetRenderTexture();
-		//	
-		//		if (MY_RT)
-		//		{
-		//			material_font->m_property_model.SetPropertyMatrix(Matrix4x4::Orthographic(0, (float)MY_RT->GetWidth(), 0, (float)MY_RT->GetHeight(), -10.f, 10.f), true);
-		//			material_font->m_property_color.SetProperty(Color3F::WHITE);
-		//	
-		//			myText->UpdateRenderTexture();
-		//		}
-		//	}
-		//	// Font Rendering FBO //
-		//	
-		//	
-		//	// Text in GBUFFER //
-		//	_fbo_gbuffer->Bind();
-		//	
-		//	//	Graphics::SetBlendState(true);
-		//	//	Graphics::SetDepthRead(true);
-		//	//	Graphics::SetDepthWrite(true);
-		//	
-		//	auto MY_RT = myText->GetRenderTexture();
-		//	if (MY_RT != nullptr)
-		//	{
-		//		auto passthrough = Material::GetAsset("passthroughWorld");
-		//		passthrough->BindProgram();
-		//		passthrough->BindStates();
-		//	
-		//		passthrough->m_property_useTexture.SetProperty(true);
-		//		passthrough->m_property_color.SetProperty(Color3F(1, 1, 1));
-		//		passthrough->m_property_useModel.SetProperty(true);
-		//		passthrough->m_property_useInstancing.SetProperty(false);
-		//		Matrix4x4 Scale = Matrix4x4::GetScale(Vector3(MY_RT->GetWidth(), MY_RT->GetHeight(), 1) / 400.0f);
-		//		passthrough->m_property_model.SetPropertyMatrix(Scale, true);
-		//	
-		//		//
-		//		MY_RT->Bind(TextureLevel::LEVEL0);
-		//		Geometry.GetFullQuad()->Draw();
-		//	
-		//		//passthrough->Unbind();
-		//	}
-		//	
-		//	
-		//	_fbo_gbuffer->Unbind();
-		//	// Text in GBUFFER //
-		//	
-		//	Graphics::SetBlendState(false);
-		//	//
+
 
 		//	if (Input.getKeyDown(KeyCode::K))
 		//	{
@@ -707,7 +660,7 @@ namespace Vxl
 		//		test.Deallocate();
 		//	}
 
-		Graphics::SetBlendState(false);
+		//Graphics::SetBlendState(false);
 
 		// FONT TEST END
 		
@@ -741,53 +694,6 @@ namespace Vxl
 		GPUTimer::EndTimer();
 
 		
-		
-
-		//	// GBUFFER No model
-		//	_material_gbuffer_no_model->Bind();
-		//	
-		//	glUtil::setActiveTexture(ActiveTexture::LEVEL0);
-		//	BlockAtlas.BindAtlas();
-		//	
-		//	TerrainManager.Draw();
-
-
-		//for (int i = 0; i < _cubes.size(); i++)
-		//	_cubes[i]->Draw();
-
-		//_entity1->m_transform.increaseRotationX(rot);
-
-		//glActiveTexture(GL_TEXTURE0);
-		//_tex->Bind();
-
-		//Transform model1 = Transform(Vector3(0, 0, -5));
-		//Transform model2 = Transform(Vector3(5, 0, -5));
-		//Transform model3 = Transform(Vector3(-5, 0, -5));
-		//Transform model4 = Transform(Vector3(0, 5, -5));
-		//Transform model5 = Transform(Vector3(0, -5, -5));
-
-		//model1.setRotationX(rot / 2);
-		//model1.setRotationY(rot);
-		//
-		//model2.setRotationX(+rot / 2);
-		//model2.setRotationY(-rot);
-		//rot++;
-
-
-		//	_shader_gbuffer->SetUniform("model", model1.getWorldModel());
-		//	Geometry::GetCube()->Draw();
-		//	
-		//	_shader_gbuffer->SetUniform("model", model2.getWorldModel());
-		//	Geometry::GetCube()->Draw();
-		//	
-		//	_shader_gbuffer->SetUniform("model", model3.getWorldModel());
-		//	Geometry::GetCube()->Draw();
-		//	
-		//	_shader_gbuffer->SetUniform("model", model4.getWorldModel());
-		//	Geometry::GetCube()->Draw();
-		//	
-		//	_shader_gbuffer->SetUniform("model", model5.getWorldModel());
-		//	Geometry::GetCube()->Draw();
 
 		
 
@@ -1034,7 +940,7 @@ namespace Vxl
 			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 			{
 				_fbo_gbuffer->Bind();
-				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(2, 1, 1);
+				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
 
 				//	std::cout <<
 				//	(unsigned int)data[0] << ' ' <<
