@@ -70,20 +70,20 @@ namespace Vxl
 		// Update Bounding Box information
 		if (_mesh != nullptr)
 		{
-			// Update OBB 
-			Vector4 VMin = Vector4(_mesh->GetVertexMin(), 1);
-			Vector4 VMax = Vector4(_mesh->GetVertexMax(), 1);
-			Matrix4x4 RotationScaleModel = m_transform.getWorldModel();
-			RotationScaleModel.OverrideCenter(Vector3::ZERO);
+			// Update OBB
+			Vector3 _scale = _mesh->GetVertexMax() - _mesh->GetVertexMin();
+			Vector3 _right = m_transform.getRight() * _scale.x * 0.5f;
+			Vector3 _up = m_transform.getUp() * _scale.y * 0.5f;
+			Vector3 _forward = m_transform.getForward() * _scale.z * 0.5f;
 
-			m_OBB[0] = Vector3(RotationScaleModel * VMin); // x0 y0 z0
-			m_OBB[1] = Vector3(RotationScaleModel * Vector4(VMax.x, VMin.y, VMin.z, 1)); // x1 y0 z0
-			m_OBB[2] = Vector3(RotationScaleModel * Vector4(VMin.x, VMax.y, VMin.z, 1)); // x0 y1 z0
-			m_OBB[3] = Vector3(RotationScaleModel * Vector4(VMax.x, VMax.y, VMin.z, 1)); // x1 y1 z0
-			m_OBB[4] = Vector3(RotationScaleModel * Vector4(VMin.x, VMin.y, VMax.z, 1)); // x0 y0 z1
-			m_OBB[5] = Vector3(RotationScaleModel * Vector4(VMax.x, VMin.y, VMax.z, 1)); // x1 y0 z1
-			m_OBB[6] = Vector3(RotationScaleModel * Vector4(VMin.x, VMax.y, VMax.z, 1)); // x0 y1 z1
-			m_OBB[7] = Vector3(RotationScaleModel * VMax); // x1 y1 z1
+			m_OBB[0] = - _right - _up - _forward; // x0 y0 z0
+			m_OBB[1] =   _right - _up - _forward; // x1 y0 z0
+			m_OBB[2] = - _right + _up - _forward; // x0 y1 z0
+			m_OBB[3] =   _right + _up - _forward; // x1 y1 z0
+			m_OBB[4] = - _right - _up + _forward; // x0 y0 z1
+			m_OBB[5] =   _right - _up + _forward; // x1 y0 z1
+			m_OBB[6] = - _right + _up + _forward; // x0 y1 z1
+			m_OBB[7] =   _right + _up + _forward; // x1 y1 z1
 
 #pragma push_macro("MACRONAME")
 #undef max
