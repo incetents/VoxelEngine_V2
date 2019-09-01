@@ -31,9 +31,14 @@ namespace Vxl
 		// Data
 		float r, g, b;
 
-		static Color3F lerp(Color3F start, Color3F end, float t)
+		static Color3F lerp(const Color3F& start, const Color3F& end, float t)
 		{
 			return (start * (1.0f - t) + end * t);
+		}
+
+		std::string ToString(void) const
+		{
+			return std::to_string(r) + ' ' + std::to_string(g) + ' ' + std::to_string(b);
 		}
 
 		// Overloads
@@ -102,7 +107,7 @@ namespace Vxl
 		float r, g, b, a;
 
 		// Lerp
-		static Color4F lerp(Color4F start, Color4F end, float t)
+		static Color4F lerp(const Color4F& start, const Color4F& end, float t)
 		{
 			return (start * (1.0f - t) + end * t);
 		}
@@ -112,9 +117,9 @@ namespace Vxl
 		{
 			return Color3F(r, g, b);
 		}
-		float getStartPointer(void) const
+		std::string ToString(void) const
 		{
-
+			return std::to_string(r) + ' ' + std::to_string(g) + ' ' + std::to_string(b) + ' ' + std::to_string(a);
 		}
 
 		// Overloads

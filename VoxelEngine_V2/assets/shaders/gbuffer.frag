@@ -29,8 +29,6 @@ uniform vec3 VXL_tint 		= vec3(1,1,1);
 uniform vec4 VXL_output 	= vec4(0,0,0,0); // used for color ID
 uniform float VXL_alpha 	= 1.0;
 
-uniform int TESTMODE = 0;
-
 //Main
 void main()
 {
@@ -55,12 +53,12 @@ void main()
 	
 	output_normal = vec4(normalize(f_data.normal), 1); // worldspace Normals
 	
-	if(TESTMODE == 1)
-		output_albedo = vec4(normalize(f_data.normal), 1.0);
-	if(TESTMODE == 2)
-		output_albedo = vec4(normalize(f_data.tangent), 1.0);
-	if(TESTMODE == 3)
-		output_albedo = vec4(normalize(f_data.bitangent), 1.0);
+	//	if(TESTMODE == 1)
+	//		output_albedo = vec4(normalize(f_data.normal), 1.0);
+	//	if(TESTMODE == 2)
+	//		output_albedo = vec4(normalize(f_data.tangent), 1.0);
+	//	if(TESTMODE == 3)
+	//		output_albedo = vec4(normalize(f_data.bitangent), 1.0);
 	
 	output_albedo.a = VXL_alpha;
 

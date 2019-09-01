@@ -272,7 +272,7 @@ namespace Vxl
 	TextObject::TextObject(const std::string& name)
 		: GameObject(name)
 	{
-		GameObject::SetMaterial(Material::GetAsset("passthroughWorld"));
+		GameObject::SetMaterial(Material::GetAsset("transparent_passthroughWorld"));
 	}
 	TextObject::~TextObject()
 	{

@@ -6,6 +6,8 @@
 
 namespace Vxl
 {
+	class BaseTexture;
+
 	class RenderBuffer : public Asset<RenderBuffer>
 	{
 	private:
@@ -44,6 +46,9 @@ namespace Vxl
 		void Bind(void) const;
 		static void Unbind(void);
 		
+		void Copy(const BaseTexture& _texture);
+		void Copy(const RenderBuffer& _texture);
+
 		inline uint32_t	GetID(void) const
 		{
 			return m_id;

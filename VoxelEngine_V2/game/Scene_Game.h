@@ -45,6 +45,7 @@ namespace Vxl
 
 		Material* material_skybox;
 		Material* material_gbuffer;
+		Material* material_transparent_gbuffer;
 		Material* material_opaque_passthroughWorld;
 		Material* material_opaque_billboard;
 		Material* material_passthroughWorld;

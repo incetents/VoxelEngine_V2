@@ -21,6 +21,7 @@
 #include "../engine/rendering/UBO.h"
 #include "../engine/rendering/Graphics.h"
 #include "../engine/rendering/RenderManager.h"
+#include "../engine/rendering/RenderBuffer.h"
 
 #include "../engine/textures/Texture2D.h"
 #include "../engine/textures/RenderTexture.h"
@@ -95,7 +96,7 @@ namespace Vxl
 		_fbo_gbuffer->SetAttachment(1, _fbo_gbuffer->CreateRenderTexture("normal", TextureFormat::RGBA16_SNORM));
 		_fbo_gbuffer->SetAttachment(2, _fbo_gbuffer->CreateRenderTexture("reflection", TextureFormat::RGBA8));
 		_fbo_gbuffer->SetAttachment(3, _fbo_gbuffer->CreateRenderTexture("colorID", TextureFormat::RGBA8));
-		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::TEXTURE);
+		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH24_STENCIL8, FBOAttachment::Type::TEXTURE);
 		_fbo_gbuffer->checkFBOStatus();
 		_fbo_gbuffer->Unbind();
 
@@ -103,7 +104,7 @@ namespace Vxl
 		_fbo_editor->SetSizeToWindowSize();
 		_fbo_editor->Bind();
 		_fbo_editor->SetAttachment(0, _fbo_editor->CreateRenderTexture("albedo"));
-		_fbo_editor->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::BUFFER);
+		_fbo_editor->SetDepth(TextureDepthFormat::DEPTH24_STENCIL8, FBOAttachment::Type::BUFFER);
 		_fbo_editor->checkFBOStatus();
 		_fbo_editor->Unbind();
 
@@ -111,7 +112,7 @@ namespace Vxl
 		_fbo_colorpicker->SetSizeToWindowSize();
 		_fbo_colorpicker->Bind();
 		_fbo_colorpicker->SetAttachment(0, _fbo_colorpicker->CreateRenderTexture("color"));
-		_fbo_colorpicker->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::BUFFER);
+		_fbo_colorpicker->SetDepth(TextureDepthFormat::DEPTH24_STENCIL8, FBOAttachment::Type::BUFFER);
 		_fbo_colorpicker->checkFBOStatus();
 		_fbo_colorpicker->Unbind();
 
@@ -150,6 +151,15 @@ namespace Vxl
 		material_gbuffer->SetProgram(*_shader_gbuffer);
 		material_gbuffer->m_BlendState = false;
 
+		material_transparent_gbuffer = Material::Create("transparent_gbuffer", 1000);
+		material_transparent_gbuffer->SetProgram(*_shader_gbuffer);
+		material_transparent_gbuffer->SetRenderMode(MaterialRenderMode::Transparent);
+		material_transparent_gbuffer->m_DepthWrite = false;
+		material_transparent_gbuffer->m_BlendFunc.source = BlendSource::ONE;
+		material_transparent_gbuffer->m_BlendFunc.destination = BlendDestination::ONE;
+		// Color ID still passes normally by ignoring blend mode
+		material_transparent_gbuffer->SetBlendFuncAttachment(3, BlendSource::ONE, BlendDestination::ZERO);
+
 		material_opaque_passthroughWorld = Material::Create("opaque_passthroughWorld", 2);
 		material_opaque_passthroughWorld->SetProgram(*_shader_passthroughWorld);
 		material_opaque_passthroughWorld->m_BlendState = false;
@@ -158,12 +168,12 @@ namespace Vxl
 		material_opaque_billboard->SetProgram(*_shader_billboard);
 		material_opaque_billboard->m_BlendState = false;
 
-		material_passthroughWorld = Material::Create("passthroughWorld", 2);
+		material_passthroughWorld = Material::Create("transparent_passthroughWorld", 1001);
 		material_passthroughWorld->SetProgram(*_shader_passthroughWorld);
 		material_passthroughWorld->SetRenderMode(MaterialRenderMode::Transparent);
 		material_passthroughWorld->m_DepthWrite = false;
-		//	material_passthroughWorld->m_BlendFunc.source = BlendSource::ONE;
-		//	material_passthroughWorld->m_BlendFunc.destination = BlendDestination::ONE;
+		material_passthroughWorld->m_BlendFunc.source = BlendSource::ONE;
+		material_passthroughWorld->m_BlendFunc.destination = BlendDestination::ONE;
 		// Color ID still passes normally by ignoring blend mode
 		material_passthroughWorld->SetBlendFuncAttachment(3, BlendSource::ONE, BlendDestination::ZERO);
 
@@ -241,7 +251,7 @@ namespace Vxl
 		_entity1->SetMesh(_mesh);
 		_entity1->m_transform.setScale(1.0f);
 		_entity1->m_transform.setPositionZ(-7.0f);
-		
+
 		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
 		Mesh* jiggyMesh = Mesh::GetAsset("jiggy");
 		
@@ -261,21 +271,21 @@ namespace Vxl
 		//_errorCube->SetColor(Color3F(1, 1, 0));
 
 		GameObject* _alphaCube1 = GameObject::Create("_alphaCube1");
-		_alphaCube1->SetMaterial(material_passthroughWorld);
+		_alphaCube1->SetMaterial(material_transparent_gbuffer);
 		_alphaCube1->SetColor(Color3F(1, 0, 0));
 		_alphaCube1->SetAlpha(0.5f);
 		_alphaCube1->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
 		_alphaCube1->m_transform.setPosition(Vector3(-0.5f, -2, -3.0f));
 
 		GameObject* _alphaCube2 = GameObject::Create("_alphaCube2");
-		_alphaCube2->SetMaterial(material_passthroughWorld);
+		_alphaCube2->SetMaterial(material_transparent_gbuffer);
 		_alphaCube2->SetColor(Color3F(0, 1, 0));
 		_alphaCube2->SetAlpha(0.5f);
 		_alphaCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
 		_alphaCube2->m_transform.setPosition(Vector3(-1.5f, -2, -3.0f));
 
 		GameObject* _alphaCube3 = GameObject::Create("_alphaCube3");
-		_alphaCube3->SetMaterial(material_passthroughWorld);
+		_alphaCube3->SetMaterial(material_transparent_gbuffer);
 		_alphaCube3->SetColor(Color3F(0, 0, 1));
 		_alphaCube3->SetAlpha(0.5f);
 		_alphaCube3->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
@@ -614,13 +624,6 @@ namespace Vxl
 
 	void Scene_Game::Draw()
 	{
-		static bool once = true;
-		if (once)
-		{
-			once = false;
-			
-		}
-
 		ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
 		//	
@@ -630,7 +633,9 @@ namespace Vxl
 		//		sub.Connect("Colour1", "ColorGreen");
 		//	
 
-		_shader_gbuffer->SetProgramUniform<int>("TESTMODE", DEVCONSOLE_GET_INT_RANGE("TESTMODE", 0, 0, 3));
+		// UBO BINDING per frame
+		UBOManager.BindCamera(*RenderManager.GetMainCamera());
+		UBOManager.BindTime();
 
 		_fbo_gbuffer->Bind();
 		_fbo_gbuffer->ClearBuffers();
@@ -638,17 +643,26 @@ namespace Vxl
 		GPUTimer::StartTimer("Gbuffer");
 		CPUTimer::StartTimer("Gbuffer");
 		//
-		UBOManager.BindCamera(RenderManager.GetMainCamera());
 		RenderManager.RenderSceneGameObjects_Opaque();
 
 		// Make sure gbuffer depth ends up with only depth from opaque objects
-		_fbo_gbuffer->blitDepth(*_fbo_colorpicker);
+		_fbo_gbuffer->GetDepthRenderTexture()->Copy(*_fbo_colorpicker->GetDepthRenderBuffer());
+
+		//	Graphics::CopyTexture(
+		//		_fbo_gbuffer->GetDepthTextureID(), TextureType::TEX_2D,
+		//		_fbo_colorpicker->GetDepthTextureID(), TextureType::RENDERBUFFER,
+		//		_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight()
+		//	);
 
 		RenderManager.RenderSceneGameObjects_Transparent();
 		RenderManager.RenderSceneObjectsWithOnlyColorID();
 
-		_fbo_colorpicker->blitDepth(*_fbo_gbuffer);
-
+		_fbo_colorpicker->GetDepthRenderBuffer()->Copy(*_fbo_gbuffer->GetDepthRenderTexture());
+		//	Graphics::CopyTexture(
+		//		_fbo_colorpicker->GetDepthTextureID(), TextureType::RENDERBUFFER,
+		//		_fbo_gbuffer->GetDepthTextureID(), TextureType::TEX_2D,
+		//		_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight()
+		//	);
 
 
 		//	if (Input.getKeyDown(KeyCode::K))
@@ -681,8 +695,13 @@ namespace Vxl
 
 		
 		// Editor objects needs gbuffer depth for proper overlay
-		_fbo_gbuffer->blitDepth(*_fbo_editor);
+		//_fbo_gbuffer->blitDepth(*_fbo_editor);
 
+		Graphics::CopyTexture(
+			_fbo_gbuffer->GetDepthTextureID(), TextureType::TEX_2D,
+			_fbo_editor->GetDepthTextureID(), TextureType::RENDERBUFFER,
+			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight()
+		);
 
 		//Graphics::SetDepthRead(false);
 		RenderManager.RenderEditorObjects();

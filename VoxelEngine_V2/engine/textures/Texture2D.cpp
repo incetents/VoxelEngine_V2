@@ -42,7 +42,7 @@ namespace Vxl
 
 		// Invert Y
 		if (InvertY)
-			FlipTextureY(m_image, m_width, m_height, m_channelCount);
+			FlipImageVertically(m_image);
 
 		// Storage
 		updateStorage(&m_image[0]);

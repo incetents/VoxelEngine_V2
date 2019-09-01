@@ -6,6 +6,7 @@
 
 #include "../textures/Texture2D.h"
 #include "../textures/RenderTexture.h"
+#include "../rendering/UBO.h"
 #include "../utilities/Logger.h"
 #include "../window/window.h"
 #include "../input/Input.h"
@@ -108,6 +109,8 @@ namespace Vxl
 		Graphics::SetViewport(0, 0, m_width, m_height);
 
 		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
+
+		UBOManager.BindFBOSize(*this);
 	}
 	void FramebufferObject::SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 	{
@@ -388,6 +391,24 @@ namespace Vxl
 
 		m_depth.Remove();
 		m_clearMode = ClearMode::COLOR;
+	}
+	RenderTexture* FramebufferObject::GetDepthRenderTexture()
+	{
+		VXL_RETURN_NULLPTR_ON_FAIL(m_depth.GetType() == FBOAttachment::Type::TEXTURE, "Incorrect Depth Info");
+		return m_depth.GetRenderTexture();
+	}
+	RenderBuffer* FramebufferObject::GetDepthRenderBuffer()
+	{
+		VXL_RETURN_NULLPTR_ON_FAIL(m_depth.GetType() == FBOAttachment::Type::BUFFER, "Incorrect Depth Info");
+		return m_depth.GetRenderBuffer();
+	}
+	uint32_t FramebufferObject::GetDepthTextureID()
+	{
+		return m_depth.GetID();
+	}
+	std::string FramebufferObject::GetDepthtName()
+	{
+		return m_depth.GetName();
 	}
 	bool FramebufferObject::checkFBOStatus()
 	{

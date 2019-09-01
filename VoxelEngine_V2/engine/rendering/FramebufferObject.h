@@ -204,11 +204,17 @@ namespace Vxl
 			uint32_t _attachmentIndex
 		);
 
+		// Editing Depth Info
 		void SetDepth(
 			TextureDepthFormat _depthFormat,
 			FBOAttachment::Type _type
 		);
 		void RemoveDepth(void);
+		// Get Depth Info
+		RenderTexture* GetDepthRenderTexture();
+		RenderBuffer* GetDepthRenderBuffer();
+		uint32_t GetDepthTextureID();
+		std::string GetDepthtName();
 
 		// Utility //
 		bool checkFBOStatus();

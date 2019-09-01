@@ -528,8 +528,6 @@ namespace Vxl
 		// Store Depth for later usage
 		//auto fbo_colorpicker = FramebufferObject::GetAsset("ColorPicker");
 		
-		//fbo_gbuffer->blitDepth(*fbo_colorpicker);
-
 		// Only render to COLOR ID Texture
 		fbo_gbuffer->DisableAttachment(0);
 		fbo_gbuffer->DisableAttachment(1);
@@ -563,9 +561,6 @@ namespace Vxl
 		// Fix fbo draw buffers
 		fbo_gbuffer->EnableAttachment(0);
 		fbo_gbuffer->EnableAttachment(1);
-
-		// Revert Depth
-		//fbo_colorpicker->blitDepth(*fbo_gbuffer);
 	}
 	void RenderManager::RenderEditorObjects()
 	{
@@ -635,7 +630,7 @@ namespace Vxl
 
 
 		// Draw Debug Wireframe Sphere
-		auto passthrough = Material::GetAsset("passthroughWorld");
+		auto passthrough = Material::GetAsset("transparent_passthroughWorld");
 		passthrough->BindProgram();
 		passthrough->m_property_useTexture.SetProperty(false);
 		passthrough->m_property_useModel.SetProperty(true);

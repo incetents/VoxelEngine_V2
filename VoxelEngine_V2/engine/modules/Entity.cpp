@@ -2,6 +2,10 @@
 #include "Precompiled.h"
 #include "Entity.h"
 
+#include "../objects/GameObject.h"
+#include "../objects/LightObject.h"
+#include "../objects/CameraObject.h"
+
 #include "../rendering/Mesh.h"
 #include "../rendering/RenderManager.h"
 #include "../utilities/Time.h"
@@ -20,7 +24,6 @@ namespace Vxl
 		: m_type(type)
 	{
 		m_name = name;
-		SetDisplayName(name);
 		AddComponent(&m_transform, this);
 
 		// Check if there are discarded IDs to use
@@ -50,16 +53,21 @@ namespace Vxl
 		m_discardedUniqueIDs.push(m_uniqueID);
 	}
 
-	void Entity::SetDisplayName(const std::string _name)
+	// Rename Entity
+	void Entity::Rename(const std::string& newName)
 	{
-		if (_name.size() > MAX_ENTITY_NAME_LENGTH)
+		switch (m_type)
 		{
-			Logger.error("[Entity Error]");
-			Logger.error("New name is too large,\n[Orig Name]: " + m_displayName + "\n[New Name]: " + _name);
-			m_displayName = _name.substr(0, MAX_ENTITY_NAME_LENGTH);
+		case EntityType::GAMEOBJECT:
+			m_name = ((GameObject*)this)->RenameAsset(m_name, newName);
+			break;
+		case EntityType::LIGHT:
+			m_name = ((LightObject*)this)->RenameAsset(m_name, newName);
+			break;
+		case EntityType::CAMERA:
+			m_name = ((CameraObject*)this)->RenameAsset(m_name, newName);
+			break;
 		}
-		else
-			m_displayName = _name;
 	}
 
 	// Update Bounding Box from Mesh

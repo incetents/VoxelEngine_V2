@@ -169,6 +169,19 @@ namespace Vxl
 		UNSIGNED_INT_2_10_10_10_REV,
 		UNSIGNED_INT_10F_11F_11F_REV
 	};
+	// ~ Generic Data Type ~ //
+	enum class GenericDataType
+	{
+		BOOL,
+		INT,
+		FLOAT,
+		DOUBLE,
+		VEC2,
+		VEC3,
+		VEC4,
+		COLOR3,
+		COLOR4
+	};
 	// ~ Buffer Usage ~ //
 	enum class BufferUsage
 	{
@@ -236,7 +249,9 @@ namespace Vxl
 		TEX_CUBEMAP_ARRAY,
 		TEX_BUFFER,
 		TEX_2D_MULTISAMPLE,
-		TEX_2D_MULTISAMPLE_ARRAY
+		TEX_2D_MULTISAMPLE_ARRAY,
+
+		RENDERBUFFER // special case
 	};
 	enum class TextureWrapping
 	{
@@ -497,6 +512,13 @@ namespace Vxl
 		uint32_t GetChannelCount(TextureChannelType type);
 		uint32_t GetChannelCount(TextureFormat format);
 		TextureFormat GetFormat(TextureDepthFormat format);
+
+		// ~ Copy Texture ~ //
+		void CopyTexture(
+			TextureID src, TextureType srcType,
+			TextureID dest, TextureType destType,
+			uint32_t width, uint32_t height
+		);
 
 		// ~ Attributes ~ //
 		struct Attribute

@@ -446,9 +446,6 @@
     <ClInclude Include="engine\editor\GUIViewport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\editor\DevConsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\editor\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>

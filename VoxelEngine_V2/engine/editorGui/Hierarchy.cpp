@@ -49,7 +49,7 @@ namespace Vxl
 			}
 
 			// Node + Name
-			std::string Name = _entity->GetDisplayName();
+			std::string Name = _entity->GetName();
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -92,7 +92,7 @@ namespace Vxl
 			}
 
 			// Node + Name
-			std::string Name = _entity->GetDisplayName();
+			std::string Name = _entity->GetName();
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -165,7 +165,7 @@ namespace Vxl
 			object->SetColor(Color3F(1, 0, 0));
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Duplicate Selected GameObject(s)"))
+		if (ImGui::Button("Duplicate GameObject(s)"))
 		{
 			for (auto Entity : Entities)
 			{
@@ -173,7 +173,7 @@ namespace Vxl
 				{
 					auto GEntity = dynamic_cast<GameObject*>(Entity);
 
-					auto object = GameObject::Create(GEntity->GetDisplayName());
+					auto object = GameObject::Create(GEntity->GetName());
 					object->SetMesh(GEntity->GetMesh());
 					object->SetMaterial(GEntity->GetMaterial());
 					object->SetColor(GEntity->GetColor());

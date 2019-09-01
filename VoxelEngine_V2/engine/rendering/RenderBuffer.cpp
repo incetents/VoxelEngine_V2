@@ -3,6 +3,7 @@
 #include "RenderBuffer.h"
 
 #include "../rendering/Graphics.h"
+#include "../textures/BaseTexture.h"
 
 namespace Vxl
 {
@@ -84,5 +85,32 @@ namespace Vxl
 	void RenderBuffer::Unbind(void)
 	{
 		Graphics::RenderBuffer::Unbind();
+	}
+
+	void RenderBuffer::Copy(const BaseTexture& _texture)
+	{
+		// Sizes and Formats must be identical
+		VXL_ASSERT((int)m_width == (int)_texture.GetWidth(), "Copy Texture Error [Widths do not match]");
+		VXL_ASSERT((int)m_height == (int)_texture.GetHeight(), "Copy Texture Error [Heights do not match]");
+		VXL_ASSERT(m_formatType == _texture.GetFormatType(), "Copy Texture Error [Formats do not match]");
+
+		Graphics::CopyTexture(
+			m_id, TextureType::RENDERBUFFER,
+			_texture.GetID(), _texture.GetType(),
+			m_width, m_height
+		);
+	}
+	void RenderBuffer::Copy(const RenderBuffer& _texture)
+	{
+		// Sizes and Formats must be identical
+		VXL_ASSERT((int)m_width == (int)_texture.GetWidth(), "Copy Texture Error [Widths do not match]");
+		VXL_ASSERT((int)m_height == (int)_texture.GetHeight(), "Copy Texture Error [Heights do not match]");
+		VXL_ASSERT(m_formatType == _texture.GetFormatType(), "Copy Texture Error [Formats do not match]");
+
+		Graphics::CopyTexture(
+			m_id, TextureType::RENDERBUFFER,
+			_texture.GetID(), TextureType::RENDERBUFFER,
+			m_width, m_height
+		);
 	}
 }

@@ -9,17 +9,34 @@
 #include "../math/Matrix3x3.h"
 #include "../math/Matrix4x4.h"
 #include "../objects/CameraObject.h"
+#include "../rendering/FramebufferObject.h"
+
+#include "../utilities/Time.h"
 
 namespace Vxl
 {
 	// UBOManager //
-	void UBOManager::BindCamera(CameraObject* _camera)
+	void UBOManager::BindCamera(const CameraObject& _camera)
 	{
 		// Transpose Matrices so that they are Column Major
-		m_ubos[UBOID::CAMERA]->sendMatrix(_camera->getViewProjection().Transpose(), 0);
-		m_ubos[UBOID::CAMERA]->sendMatrix(_camera->getView().Transpose(), 64);
-		m_ubos[UBOID::CAMERA]->sendMatrix(_camera->getProjection().Transpose(), 128);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getViewProjection().Transpose(), 0);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getView().Transpose(), 64);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getProjection().Transpose(), 128);
 		m_ubos[UBOID::CAMERA]->Bind();
+	}
+	void UBOManager::BindTime()
+	{
+		float _time[4] = {Time.GetTime() / 20.0, Time.GetTime(), Time.GetTime() * 2.0, Time.GetTime() * 3.0};
+		m_ubos[UBOID::TIME]->sendVector(Vector4(_time[0], _time[1], _time[2], _time[3]), 0);
+		m_ubos[UBOID::TIME]->sendVector(Vector4(sinf(_time[0]), sinf(_time[1]), sinf(_time[2]), sinf(_time[3])), 16);
+		m_ubos[UBOID::TIME]->sendVector(Vector4(cosf(_time[0]), cosf(_time[1]), cosf(_time[2]), cosf(_time[3])), 32);
+		m_ubos[UBOID::TIME]->Bind();
+	}
+	void UBOManager::BindFBOSize(const FramebufferObject& _fbo)
+	{
+		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(_fbo.GetWidth(), _fbo.GetHeight()), 0);
+		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(1.0f / _fbo.GetWidth(), 1.0f / _fbo.GetHeight()), 8);
+		m_ubos[UBOID::FBO_SIZE]->Bind();
 	}
 
 	// UBO //

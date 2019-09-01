@@ -55,7 +55,7 @@ namespace Vxl
 		{
 			return m_currentFPS;
 		}
-		inline float* GetFPSHistogram(void)
+		inline const float* GetFPSHistogram(void) const
 		{
 			return m_histogramFPS;
 		}
@@ -63,7 +63,7 @@ namespace Vxl
 		{
 			return HISTOGRAM_SIZE;
 		}
-		inline double GetTime()
+		inline double GetTime() const
 		{
 			return m_time;
 		}

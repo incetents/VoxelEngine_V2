@@ -3,6 +3,7 @@
 #include "BaseTexture.h"
 
 #include "../rendering/Graphics.h"
+#include "../rendering/RenderBuffer.h"
 #include "../utilities/Macros.h"
 
 #include <assert.h>
@@ -63,6 +64,23 @@ namespace Vxl
 		if (m_mipMapping)
 			Graphics::Texture::GenerateMipmap(m_type);
 	}
+	void BaseTexture::FlipImageVertically(uint8_t* imagePixels)
+	{
+		VXL_ASSERT(imagePixels, "Cannot flip texture/image if pixels are not stored");
+
+		unsigned char* Tmp = new unsigned char[m_width * m_channelCount];
+		for (uint32_t y = 0; y < m_height / 2; y++)
+		{
+			// Top row
+			UINT index1 = ((m_height - y) - 1) * m_width * m_channelCount;
+			UINT index2 = y * m_width * m_channelCount;
+			// Temp
+			memcpy(Tmp, &imagePixels[index1], m_width * m_channelCount);
+			// Swap
+			memcpy(&imagePixels[index1], &imagePixels[index2], m_width * m_channelCount);
+			memcpy(&imagePixels[index2], Tmp, m_width * m_channelCount);
+		}
+	}
 
 	BaseTexture::BaseTexture(
 		TextureType Type,
@@ -108,6 +126,33 @@ namespace Vxl
 	void BaseTexture::Unbind() const
 	{
 		Graphics::Texture::Unbind(m_type);
+	}
+
+	void BaseTexture::Copy(const BaseTexture& _texture)
+	{
+		// Sizes and Formats must be identical
+		VXL_ASSERT((int)m_width == (int)_texture.m_width, "Copy Texture Error [Widths do not match]");
+		VXL_ASSERT((int)m_height == (int)_texture.m_height, "Copy Texture Error [Heights do not match]");
+		VXL_ASSERT(m_formatType == _texture.m_formatType, "Copy Texture Error [Formats do not match]");
+
+		Graphics::CopyTexture(
+			m_id, m_type,
+			_texture.m_id, _texture.m_type,
+			m_width, m_height
+		);
+	}
+	void BaseTexture::Copy(const RenderBuffer& _texture)
+	{
+		// Sizes and Formats must be identical
+		VXL_ASSERT((int)m_width == (int)_texture.GetWidth(), "Copy Texture Error [Widths do not match]");
+		VXL_ASSERT((int)m_height == (int)_texture.GetHeight(), "Copy Texture Error [Heights do not match]");
+		VXL_ASSERT(m_formatType == _texture.GetFormatType(), "Copy Texture Error [Formats do not match]");
+
+		Graphics::CopyTexture(
+			m_id, m_type,
+			_texture.GetID(), TextureType::RENDERBUFFER,
+			m_width, m_height
+		);
 	}
 
 	void BaseTexture::setWrapMode(TextureWrapping W)

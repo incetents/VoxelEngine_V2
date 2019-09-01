@@ -38,8 +38,9 @@ namespace Vxl
 		{
 			if (!m_image[i])
 				return;
+
 			else if (InvertY)
-				FlipTextureY(m_image[i], m_width, m_height, m_channelCount);
+				FlipImageVertically(m_image[i]);
 		}
 
 		m_channelType = Graphics::GetChannelType(m_channelCount);

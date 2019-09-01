@@ -15,6 +15,7 @@ namespace Vxl
 	class Matrix3x3;
 	class Matrix4x4;
 	class CameraObject;
+	class FramebufferObject;
 
 	class UniformBufferObject
 	{
@@ -70,7 +71,9 @@ namespace Vxl
 		enum UBOID
 		{
 			CAMERA = 0,
-			FAKE
+			TIME = 1,
+			FBO_SIZE = 2,
+			TOTAL
 		};
 
 		UniformBufferObject** m_ubos = nullptr;
@@ -78,9 +81,12 @@ namespace Vxl
 	public:
 		void InitGLResources()
 		{
-			m_ubos = new UniformBufferObject*[2];
+			// 16 = vec4
+			// 64 = mat4
+			m_ubos = new UniformBufferObject*[(int)UBOID::TOTAL];
 			m_ubos[0] = new UniformBufferObject(64 * 3, UBOID::CAMERA, "Camera");
-			m_ubos[1] = new UniformBufferObject(0, UBOID::FAKE, "Empty");
+			m_ubos[1] = new UniformBufferObject(16 * 3, UBOID::TIME, "Time");
+			m_ubos[2] = new UniformBufferObject(16, UBOID::FBO_SIZE, "FBO_Size");
 		}
 		void DestroyGLResources()
 		{
@@ -88,7 +94,9 @@ namespace Vxl
 				delete[] m_ubos;
 		}
 
-		void BindCamera(CameraObject* _camera);
+		void BindCamera(const CameraObject& _camera);
+		void BindTime();
+		void BindFBOSize(const FramebufferObject& _fbo);
 	
 	} SingletonInstance(UBOManager);
 }

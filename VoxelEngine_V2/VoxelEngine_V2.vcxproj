@@ -180,7 +180,6 @@
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\utilities\Time.h" />
     <ClInclude Include="engine\utilities\Util.h" />
-    <ClInclude Include="engine\editor\DevConsole.h" />
     <ClInclude Include="engine\window\glfwCallbacks.h" />
     <ClInclude Include="engine\editor\Hierarchy.h" />
     <ClInclude Include="engine\editor\Inspector.h" />

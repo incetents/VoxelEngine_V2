@@ -237,7 +237,8 @@ namespace Vxl
 		GL_TEXTURE_CUBE_MAP_ARRAY,
 		GL_TEXTURE_BUFFER,
 		GL_TEXTURE_2D_MULTISAMPLE,
-		GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+		GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+		GL_RENDERBUFFER
 	};
 	const int GL_TextureWrapping[] =
 	{
@@ -1180,6 +1181,20 @@ namespace Vxl
 		}
 	}
 
+	// Copy Texture
+	void Graphics::CopyTexture(
+		TextureID src, TextureType srcType,
+		TextureID dest, TextureType destType,
+		uint32_t width, uint32_t height
+	)
+	{
+		glCopyImageSubData(
+			src, GL_TextureType[(int)srcType], 0, 0, 0, 0,
+			dest, GL_TextureType[(int)destType], 0, 0, 0, 0,
+			width, height, 1
+		);
+	}
+
 	// ~ Sends Uniforms to Shader ~ //
 	template<>
 	void Graphics::Uniform::Send<bool>(bool data)
@@ -1932,6 +1947,13 @@ namespace Vxl
 	void Graphics::Texture::SetStorageCubemap(uint32_t side, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
 		const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype)
 	{
+		// called once per cubemap
+		//glTexStorage2D(GL_TEXTURE_CUBE_MAP, levels, GL_TextureFormat[(int)format], width, height);
+		
+		// called once per cubemap face [ x6 times ]
+		//glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side, 0, 0, 0, width, height, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels);
+
+
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
 			0, GL_TextureFormat[(int)format], width, height, 0, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels
 		);
@@ -2132,7 +2154,23 @@ namespace Vxl
 	}
 	void Graphics::FramebufferObject::AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture)
 	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.GetID(), 0);
+		GLenum AttachmentType;
+		switch (texture.GetChannelType())
+		{
+		case TextureChannelType::STENCIL:
+			AttachmentType = GL_STENCIL_ATTACHMENT;
+			break;
+		case TextureChannelType::DEPTH:
+			AttachmentType = GL_DEPTH_ATTACHMENT;
+			break;
+		case TextureChannelType::DEPTH_STENCIL:
+			AttachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+			break;
+		default:
+			VXL_ERROR("Invalid ChannelType for FBO Depth Attachment");
+		}
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentType, GL_TEXTURE_2D, texture.GetID(), 0);
 	}
 	void Graphics::FramebufferObject::DetachRenderTexture(uint32_t attachmentIndex)
 	{
@@ -2145,7 +2183,23 @@ namespace Vxl
 	}
 	void Graphics::FramebufferObject::AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture)
 	{
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, texture.GetID());
+		GLenum AttachmentType;
+		switch (texture.GetChannelType())
+		{
+		case TextureChannelType::STENCIL:
+			AttachmentType = GL_STENCIL_ATTACHMENT;
+			break;
+		case TextureChannelType::DEPTH:
+			AttachmentType = GL_DEPTH_ATTACHMENT;
+			break;
+		case TextureChannelType::DEPTH_STENCIL:
+			AttachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+			break;
+		default:
+			VXL_ERROR("Invalid ChannelType for FBO Depth Attachment");
+		}
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, AttachmentType, GL_RENDERBUFFER, texture.GetID());
 	}
 	void Graphics::FramebufferObject::DetachRenderBuffer(uint32_t attachmentIndex)
 	{

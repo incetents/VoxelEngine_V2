@@ -41,7 +41,7 @@ namespace Vxl
 		static std::string FixNameDuplicate(const std::string& name)
 		{
 			std::string Finalname = name;
-			static int DuplicateCounter = 0;
+			int DuplicateCounter = 0;
 			// Add to name if duplicate found
 			while (m_named_assets.find(Finalname) != m_named_assets.end())
 				Finalname = name + " (" + std::to_string(DuplicateCounter++) + ')';
@@ -104,6 +104,18 @@ namespace Vxl
 		static bool CheckAsset(const std::string& name)
 		{
 			return (m_named_assets.find(name) != m_named_assets.end());
+		}
+		// Returns newName [ in case it had to modified such as "newName(0)" ]
+		static std::string RenameAsset(const std::string& _oldName, const std::string& _newName)
+		{
+			VXL_ASSERT(CheckAsset(_oldName), "No Asset with name: " + _oldName);
+
+			Type* _asset = m_named_assets[_oldName];
+			m_named_assets.erase(_oldName);
+
+			std::string newName = FixNameDuplicate(_newName);
+			m_named_assets[newName] = _asset;
+			return newName;
 		}
 
 		// ~ Asset Deletion ~ //

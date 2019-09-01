@@ -22,7 +22,6 @@ namespace Vxl
 		GAMEOBJECT,
 		LIGHT,
 		CAMERA
-		//SKYBOX
 	};
 
 	class Entity : public ComponentHandler
@@ -40,7 +39,6 @@ namespace Vxl
 		Color4F		m_colorID;
 		EntityType  m_type;
 		std::string	m_name;			// Used for storage with Asset class [Never modified]
-		std::string m_displayName;	// Used with editor when displaying name [can be modified]
 		Color3F		m_Color = Color3F(1, 1, 1);
 		Color3F		m_Tint	= Color3F(1, 1, 1);
 		float		m_alpha = 1.0f;
@@ -101,11 +99,7 @@ namespace Vxl
 		}
 		
 		// Name
-		void SetDisplayName(const std::string _name);
-		inline std::string GetDisplayName(void) const
-		{
-			return m_displayName;
-		}
+		void Rename(const std::string& newName);
 		inline std::string GetName(void) const
 		{
 			return m_name;
