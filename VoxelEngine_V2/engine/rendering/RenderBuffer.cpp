@@ -21,6 +21,9 @@ namespace Vxl
 
 		m_id = Graphics::RenderBuffer::Create();
 
+		if(!m_name.empty())
+			Graphics::SetGLName(ObjectType::TEXTURE, m_id, name); // or GL_BUFFER ???
+
 		// Storage
 		Bind();
 		UpdateStorage();

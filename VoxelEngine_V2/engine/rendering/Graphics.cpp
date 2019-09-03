@@ -381,7 +381,16 @@ namespace Vxl
 		GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
 		GL_TIME_ELAPSED
 	};
-
+	const int GL_CubemapFace[] =
+	{
+		-1,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	};
 	// Error Message
 	void CALLBACK OpenGLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data)
 	{
@@ -1912,7 +1921,8 @@ namespace Vxl
 		glActiveTexture(GL_TextureLayer[(int)level]);
 		gl_activeTextureLayer = level;
 	}
-	void Graphics::Texture::SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height)
+
+	void Graphics::Texture::CreateStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height)
 	{
 		switch (type)
 		{
@@ -1923,40 +1933,26 @@ namespace Vxl
 			glTexStorage2D(GL_TextureType[(int)type], levels, GL_TextureFormat[(int)format], width, height);
 			break;
 		default:
-			VXL_ASSERT(false, "TextureType Type not allowed for SetStorage(no pixels)");
+			VXL_ASSERT(false, "TextureType Type not allowed for CreateStorage");
 		}
-
 	}
-	void Graphics::Texture::SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
-		const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype)
+	void Graphics::Texture::SetStorage(TextureType type, uint32_t width, uint32_t height, TextureChannelType channelType, TexturePixelType pixeltype, const void* pixels)
 	{
 		switch (type)
 		{
 		case TextureType::TEX_2D:
 		case TextureType::TEX_1D_ARRAY:
-		case TextureType::TEX_RECT:
-		case TextureType::TEX_CUBEMAP:
-			glTexStorage2D(GL_TextureType[(int)type], levels, GL_TextureFormat[(int)format], width, height);
+			glTexSubImage2D(GL_TextureType[(int)type], 0, 0, 0, width, height, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels);
 			break;
 		default:
 			VXL_ASSERT(false, "TextureType Type not allowed for SetStorage(pixels)");
 		}
-
-		glTexSubImage2D(GL_TextureType[(int)type], 0, 0, 0, width, height, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels);
 	}
-	void Graphics::Texture::SetStorageCubemap(uint32_t side, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
-		const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype)
+	void Graphics::Texture::SetStorage(CubemapFace type, uint32_t width, uint32_t height, TextureChannelType channelType, TexturePixelType pixeltype, const void* pixels)
 	{
-		// called once per cubemap
-		//glTexStorage2D(GL_TEXTURE_CUBE_MAP, levels, GL_TextureFormat[(int)format], width, height);
-		
-		// called once per cubemap face [ x6 times ]
-		//glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side, 0, 0, 0, width, height, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels);
+		VXL_ASSERT(type != CubemapFace::NONE, "SetStorage enum incorrect -> [NONE]");
 
-
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
-			0, GL_TextureFormat[(int)format], width, height, 0, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels
-		);
+		glTexSubImage2D(GL_CubemapFace[(int)type], 0, 0, 0, width, height, GL_TextureChannelType[(int)channelType], GL_TexturePixelType[(int)pixeltype], pixels);
 	}
 
 	void Graphics::Texture::GenerateMipmap(TextureType type)

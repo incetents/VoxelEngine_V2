@@ -161,7 +161,7 @@ namespace Vxl
 		void ClearBuffer(uint32_t attachmentIndex);
 
 		// Creating Attachment Info
-		RenderTexture* CreateRenderTexture(const std::string& name, TextureFormat format = TextureFormat::RGBA8) const;
+		RenderTexture* CreateRenderTexture(const std::string& name, TextureFormat format = TextureFormat::RGBA8, bool mipmapping = false) const;
 		RenderBuffer* CreateRenderBuffer(const std::string& name, TextureFormat format = TextureFormat::RGBA8) const;
 
 		// Editing Attachment Info
@@ -225,7 +225,7 @@ namespace Vxl
 		void blitColor(const FramebufferObject& destFBO, uint32_t srcAttachment, uint32_t destAttachment);
 		void blitDepth(const FramebufferObject& destFBO);
 
-		void generateMipmaps(uint32_t _attachmentIndex);
+		void updateMipmaps(uint32_t _attachmentIndex);
 
 		RawArray<uint8_t> readPixels(uint32_t _attachmentIndex, int x, int y, int w, int h);
 		RawArray<uint8_t> readPixelsFromMouse(uint32_t _attachmentIndex, int w, int h);

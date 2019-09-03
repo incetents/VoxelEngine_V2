@@ -26,7 +26,8 @@ namespace Vxl
 	}
 	void UBOManager::BindTime()
 	{
-		float _time[4] = {Time.GetTime() / 20.0, Time.GetTime(), Time.GetTime() * 2.0, Time.GetTime() * 3.0};
+		float _t = (float)Time.GetTime();
+		float _time[4] = {_t / 20.0f, _t, _t * 2.0f, _t * 3.0f};
 		m_ubos[UBOID::TIME]->sendVector(Vector4(_time[0], _time[1], _time[2], _time[3]), 0);
 		m_ubos[UBOID::TIME]->sendVector(Vector4(sinf(_time[0]), sinf(_time[1]), sinf(_time[2]), sinf(_time[3])), 16);
 		m_ubos[UBOID::TIME]->sendVector(Vector4(cosf(_time[0]), cosf(_time[1]), cosf(_time[2]), cosf(_time[3])), 32);
@@ -34,8 +35,8 @@ namespace Vxl
 	}
 	void UBOManager::BindFBOSize(const FramebufferObject& _fbo)
 	{
-		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(_fbo.GetWidth(), _fbo.GetHeight()), 0);
-		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(1.0f / _fbo.GetWidth(), 1.0f / _fbo.GetHeight()), 8);
+		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2((float)_fbo.GetWidth(), (float)_fbo.GetHeight()), 0);
+		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(1.0f / (float)_fbo.GetWidth(), 1.0f / (float)_fbo.GetHeight()), 8);
 		m_ubos[UBOID::FBO_SIZE]->Bind();
 	}
 

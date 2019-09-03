@@ -10,30 +10,27 @@
 
 namespace Vxl
 {
-	// Keep track of all active texture slots
-	//std::map<TextureType, UINT> BaseTexture::m_activeTextures;
-
-	void FlipTextureY(UCHAR* array, uint32_t width, uint32_t height, uint32_t channels)
-	{
-		unsigned char* Tmp = new unsigned char[width * channels];
-		for (uint32_t y = 0; y < height / 2; y++)
-		{
-			// Top row
-			UINT index1 = ((height - y) - 1) * width * channels;
-			UINT index2 = y * width * channels;
-			// Temp
-			memcpy(Tmp, &array[index1], width * channels);
-			// Swap
-			memcpy(&array[index1], &array[index2], width * channels);
-			memcpy(&array[index2], Tmp, width * channels);
-		}
-	}
-
 	/* BASE TEXTURE */
 
-	void BaseTexture::updateParameters()
+	void BaseTexture::load()
 	{
-		Graphics::Texture::Bind(m_type, m_id);
+		VXL_ASSERT(m_id == -1, "Cannot call load on Texture that is alread loaded");
+
+		m_id = Graphics::Texture::Create();
+		Bind();
+	}
+	void BaseTexture::unload()
+	{
+		VXL_ASSERT(m_id != -1, "Cannot call load on Texture that is alread loaded");
+
+		Unbind();
+		Graphics::Texture::Delete(m_id);
+		m_id = -1;
+	}
+
+	void BaseTexture::UpdateParameters()
+	{
+		VXL_ASSERT(Graphics::Texture::GetCurrentlyBound() == m_id, "Texture must be bound to Update its Parameters")
 
 		Graphics::Texture::SetWrapping(m_type, m_wrapMode);
 		Graphics::Texture::SetFiltering(m_type, m_filterMode, m_mipMapping);
@@ -44,32 +41,30 @@ namespace Vxl
 		Graphics::Texture::SetAnistropic(m_type, m_anisotropicMode);
 		
 	}
-	void BaseTexture::updateStorage()
+	void BaseTexture::CreateStorage()
 	{
-		Graphics::Texture::SetStorage(m_type, m_mipMapping ? 3 : 1, m_formatType, m_width, m_height);
+		Graphics::Texture::CreateStorage(m_type, m_mipMapping ? 3 : 1, m_formatType, m_width, m_height);
 	}
-	void BaseTexture::updateStorage(const void* pixels)
+	void BaseTexture::SetStorage(const void* pixels)
 	{
-		Graphics::Texture::SetStorage(m_type, m_mipMapping ? 3 : 1, m_formatType, m_width, m_height,
-			pixels, m_channelType, m_pixelType);
-	
+		Graphics::Texture::SetStorage(m_type, m_width, m_height, m_channelType, m_pixelType, pixels);
 	}
-	void BaseTexture::updateTexImageCubemap(unsigned int side, const void* pixels)
+
+	void BaseTexture::UpdateMipmapping()
 	{
-		Graphics::Texture::SetStorageCubemap(side, 1, m_formatType, m_width, m_height,
-			pixels, m_channelType, m_pixelType);
-	}
-	void BaseTexture::updateMipmapping()
-	{
+		VXL_ASSERT(Graphics::Texture::GetCurrentlyBound() == m_id, "Texture must be bound to update its mipmaps");
+
 		if (m_mipMapping)
+		{
 			Graphics::Texture::GenerateMipmap(m_type);
+		}
 	}
 	void BaseTexture::FlipImageVertically(uint8_t* imagePixels)
 	{
 		VXL_ASSERT(imagePixels, "Cannot flip texture/image if pixels are not stored");
 
 		unsigned char* Tmp = new unsigned char[m_width * m_channelCount];
-		for (uint32_t y = 0; y < m_height / 2; y++)
+		for (uint32_t y = 0; y < (uint32_t)m_height / 2; y++)
 		{
 			// Top row
 			UINT index1 = ((m_height - y) - 1) * m_width * m_channelCount;
@@ -101,17 +96,17 @@ namespace Vxl
 		m_anisotropicMode(AnisotropicMode),
 		m_mipMapping(MipMapping)
 	{
-		m_id = Graphics::Texture::Create();
+		load();
 
 		m_channelCount = Graphics::GetChannelCount(ChannelType);
 		if (m_channelCount == -1)
 			m_channelCount = Graphics::GetChannelCount(FormatType);
 
-		updateParameters();
+		UpdateParameters();
 	}
 	BaseTexture::~BaseTexture()
 	{
-		Graphics::Texture::Delete(m_id);
+		unload();
 	}
 
 	void BaseTexture::Bind(TextureLevel layer) const
@@ -159,24 +154,24 @@ namespace Vxl
 	{
 		m_wrapMode = W;
 
-		updateParameters();
+		UpdateParameters();
 	}
 	void BaseTexture::setFilterMode(TextureFilter filter)
 	{
 		m_filterMode = filter;
 
-		updateParameters();
+		UpdateParameters();
 	}
 	void BaseTexture::setAnistropicMode(AnisotropicMode Anso)
 	{
 		m_anisotropicMode = Anso;
 
-		updateParameters();
+		UpdateParameters();
 	}
 	void BaseTexture::setBorderColor(Color4F color)
 	{
 		m_borderColor = color;
 
-		updateParameters();
+		UpdateParameters();
 	}
 }

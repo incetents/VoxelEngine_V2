@@ -645,24 +645,14 @@ namespace Vxl
 		//
 		RenderManager.RenderSceneGameObjects_Opaque();
 
-		// Make sure gbuffer depth ends up with only depth from opaque objects
+		// Remember Depth gbuffer depth
 		_fbo_gbuffer->GetDepthRenderTexture()->Copy(*_fbo_colorpicker->GetDepthRenderBuffer());
-
-		//	Graphics::CopyTexture(
-		//		_fbo_gbuffer->GetDepthTextureID(), TextureType::TEX_2D,
-		//		_fbo_colorpicker->GetDepthTextureID(), TextureType::RENDERBUFFER,
-		//		_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight()
-		//	);
 
 		RenderManager.RenderSceneGameObjects_Transparent();
 		RenderManager.RenderSceneObjectsWithOnlyColorID();
 
+		// Revert Gbuffer Depth [Opaque only depth]
 		_fbo_colorpicker->GetDepthRenderBuffer()->Copy(*_fbo_gbuffer->GetDepthRenderTexture());
-		//	Graphics::CopyTexture(
-		//		_fbo_colorpicker->GetDepthTextureID(), TextureType::RENDERBUFFER,
-		//		_fbo_gbuffer->GetDepthTextureID(), TextureType::TEX_2D,
-		//		_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight()
-		//	);
 
 
 		//	if (Input.getKeyDown(KeyCode::K))
@@ -696,12 +686,7 @@ namespace Vxl
 		
 		// Editor objects needs gbuffer depth for proper overlay
 		//_fbo_gbuffer->blitDepth(*_fbo_editor);
-
-		Graphics::CopyTexture(
-			_fbo_gbuffer->GetDepthTextureID(), TextureType::TEX_2D,
-			_fbo_editor->GetDepthTextureID(), TextureType::RENDERBUFFER,
-			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight()
-		);
+		_fbo_gbuffer->GetDepthRenderTexture()->Copy(*_fbo_editor->GetDepthRenderBuffer());
 
 		//Graphics::SetDepthRead(false);
 		RenderManager.RenderEditorObjects();
@@ -713,7 +698,6 @@ namespace Vxl
 		GPUTimer::EndTimer();
 
 		
-
 		
 
 		// Editor Axis Objects

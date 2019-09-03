@@ -45,12 +45,14 @@ namespace Vxl
 
 		m_channelType = Graphics::GetChannelType(m_channelCount);
 
+		CreateStorage();
+
 		// Storage
 		for (uint32_t i = 0; i < 6; i++)
 		{
-			updateTexImageCubemap(i, m_image[i]);
+			SetStorageCubemap((CubemapFace)(i + 1), m_image[i]);
 		}
-		updateMipmapping();
+		UpdateMipmapping();
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath1);
@@ -64,6 +66,11 @@ namespace Vxl
 	{
 		for (uint32_t i = 0; i < 6; i++)
 			delete[] m_image[i];
+	}
+
+	void Cubemap::SetStorageCubemap(CubemapFace face, const void* pixels)
+	{
+		Graphics::Texture::SetStorage(face, m_width, m_height, m_channelType, m_pixelType, pixels);
 	}
 
 	Cubemap* Cubemap::Load(

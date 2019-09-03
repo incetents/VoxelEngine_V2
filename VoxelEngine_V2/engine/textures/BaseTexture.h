@@ -12,8 +12,6 @@ namespace Vxl
 {
 	class RenderBuffer;
 	
-	void FlipTextureY(UCHAR* array, uint32_t width, uint32_t height, uint32_t channels);
-
 	class BaseTexture
 	{
 	protected:
@@ -33,12 +31,17 @@ namespace Vxl
 		TexturePixelType	m_pixelType;
 		AnisotropicMode		m_anisotropicMode;
 
+		// Creation/Deletion
+		void load();
+		void unload();
+
+		// Storage
+		virtual void CreateStorage(); // Create space for texture [immutable, cannot be resized]
+		virtual void SetStorage(const void* pixels);
+
 		// Utility
-		void updateParameters();
-		void updateStorage();
-		void updateStorage(const void* pixels);
-		void updateTexImageCubemap(unsigned int side = 0, const void* pixels = nullptr);
-		void updateMipmapping();
+		void UpdateParameters();
+		void UpdateMipmapping();
 		void FlipImageVertically(uint8_t* imagePixels);
 
 	public:

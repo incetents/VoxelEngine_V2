@@ -43,8 +43,8 @@ namespace Vxl
 		//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 		// Set OpenGL Version for Context
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_MAJOR);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_MINOR);
 		// Set OpenGL to Core Mode
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -87,7 +87,7 @@ namespace Vxl
 		ImGui::CreateContext();
 
 		ImGui_ImplGlfw_InitForOpenGL(GetContext(), true);
-		ImGui_ImplOpenGL3_Init("#version 430");
+		ImGui_ImplOpenGL3_Init("#version 450");
 
 		ImGui::StyleColorsDark();
 #endif

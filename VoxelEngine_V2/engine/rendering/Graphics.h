@@ -11,6 +11,10 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i)) 
 
+// Target OPENGL Version for context
+#define OPENGL_MAJOR 4
+#define OPENGL_MINOR 5
+
 namespace Vxl
 {
 	// Forward Declare
@@ -390,6 +394,17 @@ namespace Vxl
 		ALIGN_8 = 8
 	};
 
+	enum class CubemapFace
+	{
+		NONE = 0,
+		POSITIVE_X,
+		NEGATIVE_X,
+		POSITIVE_Y,
+		NEGATIVE_Y,
+		POSITIVE_Z,
+		NEGATIVE_Z
+	};
+
 	// ~ Object Typedefs ~ //
 	typedef uint32_t ShaderID;
 	typedef uint32_t ShaderProgramID;
@@ -711,11 +726,11 @@ namespace Vxl
 			void		Unbind(TextureType type);
 			TextureID	GetCurrentlyBound(void);
 			void		SetActiveLevel(TextureLevel level);
-			void		SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height);
-			void		SetStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
-				const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype);
-			void		SetStorageCubemap(uint32_t side, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height,
-				const void* pixels, TextureChannelType channelType, TexturePixelType pixeltype);
+
+			void		CreateStorage(TextureType type, uint32_t levels, TextureFormat format, uint32_t width, uint32_t height);
+			void		SetStorage(TextureType type, uint32_t width, uint32_t height, TextureChannelType channelType, TexturePixelType pixeltype, const void* pixels);
+			void		SetStorage(CubemapFace type, uint32_t width, uint32_t height, TextureChannelType channelType, TexturePixelType pixeltype, const void* pixels);
+
 			void		GenerateMipmap(TextureType type);
 			void		SetWrapping(TextureType type, TextureWrapping wrap);
 			void		SetFiltering(TextureType type, TextureFilter filter, bool mipmapping);

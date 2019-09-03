@@ -45,8 +45,9 @@ namespace Vxl
 			FlipImageVertically(m_image);
 
 		// Storage
-		updateStorage(&m_image[0]);
-		updateMipmapping();
+		CreateStorage();
+		SetStorage(&m_image[0]);
+		UpdateMipmapping();
 
 		// glName
 		auto name = stringUtil::nameFromFilepath(filePath);
@@ -93,8 +94,10 @@ namespace Vxl
 		// Storage
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
 
-		updateStorage(&m_image[0]);
-		updateMipmapping();
+		CreateStorage();
+		SetStorage(&m_image[0]);
+
+		UpdateMipmapping();
 
 		// glName
 		if(!name.empty())
@@ -127,11 +130,13 @@ namespace Vxl
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
 
 		uint32_t pixelCount = width * height * m_channelCount;
-		m_image = new UCHAR[pixelCount];
-		memcpy(m_image, pixels, pixelCount * sizeof(UCHAR));
+		m_image = new uint8_t[pixelCount];
+		memcpy(m_image, pixels, pixelCount * sizeof(uint8_t));
 
-		updateStorage(pixels);
-		updateMipmapping();
+		CreateStorage();
+		SetStorage(&m_image[0]);
+
+		UpdateMipmapping();
 
 		// glName
 		if(!name.empty())

@@ -13,7 +13,8 @@ namespace Vxl
 			std::string name,
 			int Width, int Height,
 			TextureFormat FormatType = TextureFormat::RGBA8,
-			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
+			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE,
+			bool MipMapping = false
 		);
 
 		// Data
@@ -29,7 +30,8 @@ namespace Vxl
 			std::string name,
 			int Width, int Height,
 			TextureFormat FormatType = TextureFormat::RGBA8,
-			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
+			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE,
+			bool MipMapping = false
 		);
 
 		// Getters
@@ -40,6 +42,6 @@ namespace Vxl
 
 		// Utility
 		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType);
-		void updateMipmapping();
+		void UpdateMipmapping();
 	};
 }

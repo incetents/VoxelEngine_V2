@@ -151,25 +151,19 @@ namespace Vxl
 		Graphics::ClearBufferFBOAttachment(_attachmentIndex, m_clearColor);
 	}
 
-	RenderTexture* FramebufferObject::CreateRenderTexture(const std::string& name, TextureFormat format) const
+	RenderTexture* FramebufferObject::CreateRenderTexture(const std::string& name, TextureFormat format, bool mipmapping) const
 	{
-		RenderTexture* _renderTexture = RenderTexture::Create("FBO_" + m_name + "_Tex_" + name, m_width, m_height, format);
-
-		if (_renderTexture)
-		{
-			Graphics::SetGLName(ObjectType::TEXTURE, _renderTexture->GetID(), "FBO_" + m_name + "_Tex_" + name);
-		}
+		RenderTexture* _renderTexture = RenderTexture::Create(
+			"FBO_" + m_name + "_Tex_" + name, m_width, m_height, format,
+			TexturePixelType::UNSIGNED_BYTE, mipmapping
+		);
 
 		return _renderTexture;
 	}
 	RenderBuffer* FramebufferObject::CreateRenderBuffer(const std::string& name, TextureFormat format) const
 	{
-		RenderBuffer* _renderBuffer = RenderBuffer::Create("FBO_" + m_name + "_Tex_" + name, m_width, m_height, format);
-
-		if (_renderBuffer)
-		{
-			Graphics::SetGLName(ObjectType::TEXTURE, _renderBuffer->GetID(), "FBO_" + m_name + "_Tex_" + name);
-		}
+		RenderBuffer* _renderBuffer = RenderBuffer::Create(
+			"FBO_" + m_name + "_Tex_" + name, m_width, m_height, format);
 
 		return _renderBuffer;
 	}
@@ -464,14 +458,14 @@ namespace Vxl
 	}
 
 	// Generates mipmap of current texture
-	void FramebufferObject::generateMipmaps(uint32_t _attachmentIndex)
+	void FramebufferObject::updateMipmaps(uint32_t _attachmentIndex)
 	{
 		VXL_ASSERT(HasAttachment(_attachmentIndex), "FBO, index out of bounds");
 		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be found before generating mipmaps");
 		VXL_ASSERT(m_textures[_attachmentIndex].IsRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		// Create mipmapping for Fbo Texture
-		m_textures[_attachmentIndex].GetRenderTexture()->updateMipmapping();
+		m_textures[_attachmentIndex].GetRenderTexture()->UpdateMipmapping();
 	}
 
 	// Notice, SNORM TEXTURES CANNOT BE READ

@@ -46,6 +46,8 @@ namespace Vxl
 		Cubemap(const Cubemap&) = delete;
 		~Cubemap();
 
+		void SetStorageCubemap(CubemapFace face, const void* pixels);
+
 		inline bool IsLoaded(void) const override
 		{
 			return m_loaded;

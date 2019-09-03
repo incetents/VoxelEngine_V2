@@ -77,6 +77,8 @@ void main()
 	else // == 0
 		// normal
 		output_color = _texture;
+		
+	output_color.a = 1.0;
 }
 
 

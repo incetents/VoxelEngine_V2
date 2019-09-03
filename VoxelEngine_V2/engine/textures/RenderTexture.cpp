@@ -8,16 +8,20 @@ namespace Vxl
 		std::string name,
 		int Width, int Height,
 		TextureFormat FormatType,
-		TexturePixelType PixelType
+		TexturePixelType PixelType,
+		bool MipMapping
 	)
 		: m_name(name), BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
-			FormatType, Graphics::GetChannelType(FormatType), PixelType, AnisotropicMode::NONE, false)
+			FormatType, Graphics::GetChannelType(FormatType), PixelType, AnisotropicMode::NONE, MipMapping)
 	{
 		m_width = Width;
 		m_height = Height;
 
+		if(!m_name.empty())
+			Graphics::SetGLName(ObjectType::TEXTURE, m_id, m_name);
+
 		// Storage
-		updateStorage();
+		CreateStorage();
 		Unbind();
 	}
 
@@ -26,10 +30,11 @@ namespace Vxl
 		std::string name,
 		int Width, int Height,
 		TextureFormat FormatType,
-		TexturePixelType PixelType
+		TexturePixelType PixelType,
+		bool MipMapping
 	)
 	{
-		RenderTexture* _texture = new RenderTexture(name, Width, Height, FormatType, PixelType);
+		RenderTexture* _texture = new RenderTexture(name, Width, Height, FormatType, PixelType, MipMapping);
 
 		if(name.empty())
 			AddUnnamedAsset(_texture, AssetMessage::CREATED);
@@ -53,10 +58,12 @@ namespace Vxl
 	void RenderTexture::RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType)
 	{
 		// Texture is immutable, destroy it and create a new one
-		Unbind();
-		Graphics::Texture::Delete(m_id);
-		m_id = Graphics::Texture::Create();
-		Bind();
+		unload();
+		load();
+
+		// Fix name
+		if(!m_name.empty())
+			Graphics::SetGLName(ObjectType::TEXTURE, m_id, m_name);
 
 		// Fix values
 		m_width = (int)width;
@@ -65,14 +72,13 @@ namespace Vxl
 		m_pixelType = pixelType;
 		
 		// Update gl values
-		updateParameters();
-		updateStorage();
+		UpdateParameters();
+		CreateStorage();
 		Unbind();
 	}
-	void RenderTexture::updateMipmapping()
+	void RenderTexture::UpdateMipmapping()
 	{
-		Bind();
-		m_mipMapping = true;
-		BaseTexture::updateMipmapping();
+		VXL_ASSERT(m_mipMapping, "Cannot update RenderTexture mipmaps because it needs to be created with the mipmap flag");
+		BaseTexture::UpdateMipmapping();
 	}
 }

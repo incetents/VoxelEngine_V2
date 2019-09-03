@@ -480,38 +480,16 @@ namespace Vxl
 	{
 		SortGameObjects();
 
+		auto fbo_gbuffer = FramebufferObject::GetAsset("gbuffer");
+		fbo_gbuffer->DisableAttachment(1); // Don't draw normals
+
 		// Render all Opaque Objects
 		for (auto renderOrder = m_gameObjectsSorted_Transparent.begin(); renderOrder != m_gameObjectsSorted_Transparent.end(); renderOrder++)
 		{
 			Render(renderOrder->second.first, *renderOrder->second.second);
 		}
-		
 
-		//	// Render all Transparent Objects
-		//	for (auto renderOrder = m_gameObjectsSorted_Transparent.begin(); renderOrder != m_gameObjectsSorted_Transparent.end(); renderOrder++)
-		//	{
-		//		// Set of material/gameobjects
-		//		auto materialSet = renderOrder->second;
-		//	
-		//		// Get Material for binding
-		//		Material* material = materialSet.first;
-		//		VXL_ASSERT(material, "Storing nullptr in renderSet");
-		//		material->BindProgram();
-		//		material->BindStates();
-		//		material->BindTextures(); // Only occurs if shared textures is true
-		//	
-		//		// Override Color ID texture blending
-		//		Graphics::SetBlendMode(2, BlendSource::ONE, BlendDestination::ZERO);
-		//	
-		//		// Get GameObject for rendering
-		//		std::set<GameObject*>* entities = materialSet.second;
-		//	
-		//		for (auto& ent : *entities)
-		//		{
-		//			if (ent->IsFamilyActive())
-		//				ent->Draw();
-		//		}
-		//	}
+		fbo_gbuffer->EnableAttachment(1); // Revert
 	}
 
 	// Effectively non-gameobject entities need to have their own color ID show up in the color ID attachment.
