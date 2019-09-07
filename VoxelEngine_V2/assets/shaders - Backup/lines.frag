@@ -4,14 +4,14 @@
 // Input
 in vec4 v_color;
 
-// Output
+//Values sent out (to final array)
 layout (location = 0) out vec4 output_albedo;
 
-// Uniforms
+// uniforms
 uniform vec4 _line_color;
 uniform vec2 _line_width;
 
-// Main
+//Main
 void main()
 {
 	output_albedo = v_color;

@@ -2,7 +2,7 @@
 #version 420 core
 
 // Input
-in vertex_data
+in fragment_data
 {
 	vec3 pos;
 	vec2 uv;
@@ -10,7 +10,7 @@ in vertex_data
 	vec3 tangent;
 	vec3 bitangent;
 
-} v_data;
+} f_data;
 
 // Output
 layout (location = 0) out vec4 output_albedo;
@@ -32,7 +32,7 @@ void main()
 {
 	if(VXL_useTexture)
 	{
-		vec4 _tex = texture(texture1, v_data.uv);
+		vec4 _tex = texture(texture1, f_data.uv);
 		output_albedo = _tex;
 		output_albedo.a *= VXL_alpha;
 	}

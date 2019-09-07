@@ -140,6 +140,7 @@ namespace Vxl
 		ShaderProgram* _shader_billboard		= ShaderProgram::GetAsset("billboard");
 		ShaderProgram* _shader_simpleLight		= ShaderProgram::GetAsset("simpleLight");
 		ShaderProgram* _shader_font				= ShaderProgram::GetAsset("font");
+		ShaderProgram* _shader_showNormals		= ShaderProgram::GetAsset("showNormals");
 
 
 		material_skybox = Material::Create("skybox", 0);
@@ -189,6 +190,10 @@ namespace Vxl
 		material_colorPicker = Material::Create("colorPicker", 6);
 		material_colorPicker->SetProgram(*_shader_colorPicker);
 		material_colorPicker->m_BlendState = false;
+
+		material_showNormals = Material::Create("showNormals", 20);
+		material_showNormals->SetProgram(*_shader_showNormals);
+		material_showNormals->m_BlendState = false;
 
 		material_font = Material::Create("font", 100);
 		material_font->SetProgram(*_shader_font);
@@ -305,15 +310,26 @@ namespace Vxl
 		_entity5->SetTexture(_tex_gridtest, TextureLevel::LEVEL0);
 		_entity5->SetMesh(Geometry.GetSphereUV_Good());
 		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
-		//_entity5->SetColor(Color3F(1, 1, 1));
-
 
 		GameObject* _entity6 = GameObject::Create("_entity6");
 		_entity6->SetMaterial(material_gbuffer);
-		_entity6->SetTexture(Texture2D::GetAsset("grid_test"), TextureLevel::LEVEL0);
-		_entity6->SetMesh(Geometry.GetQuadY());
-		_entity6->m_transform.setPosition(Vector3(0, -10, 0));
-		_entity6->m_transform.setScale(Vector3(20, 1, 20));
+		_entity6->SetTexture(_tex_gridtest, TextureLevel::LEVEL0);
+		_entity6->SetMesh(Geometry.GetCube());
+		_entity6->m_transform.setPosition(Vector3(5, -4, 0));
+
+		GameObject* _entity6_b = GameObject::Create("_entity6_normals");
+		_entity6_b->SetMaterial(material_showNormals);
+		_entity6_b->SetTexture(_tex_gridtest, TextureLevel::LEVEL0);
+		_entity6_b->SetMesh(Geometry.GetCube());
+		_entity6_b->m_transform.setPosition(Vector3(5, -4, 0));
+
+
+		GameObject* _entity7 = GameObject::Create("_entity7");
+		_entity7->SetMaterial(material_gbuffer);
+		_entity7->SetTexture(Texture2D::GetAsset("grid_test"), TextureLevel::LEVEL0);
+		_entity7->SetMesh(Geometry.GetQuadY());
+		_entity7->m_transform.setPosition(Vector3(0, -10, 0));
+		_entity7->m_transform.setScale(Vector3(20, 1, 20));
 		//_entity5->SetColor(Color3F(1, 1, 1));
 		
 		

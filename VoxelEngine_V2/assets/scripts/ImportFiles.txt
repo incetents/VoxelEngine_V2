@@ -27,7 +27,12 @@
 #VERT font_vert  	./assets/shaders/font.vert
 #FRAG font_frag 	./assets/shaders/font.frag
 
+#VERT showNormals_vert	./assets/shaders/showNormals.vert
+#GEOM showNormals_geom 	./assets/shaders/showNormals.geom
+#FRAG showNormals_frag	./assets/shaders/showNormals.frag
+
 //#VERT broken ./assets/shaders/broken.txt
+
 
 //----------------------------------------
 #SHADERPROGRAM
@@ -43,6 +48,7 @@ colorPicker 		gbuffer_vert 				colorPicker_frag
 showRenderTarget 	passthrough_vert 			showRenderTarget
 billboard 			billboard_vert				billboard_frag
 font 				font_vert 					font_frag
+showNormals			showNormals_vert 			showNormals_geom 		showNormals_frag
 
 //----------------------------------------
 #TEXTURE

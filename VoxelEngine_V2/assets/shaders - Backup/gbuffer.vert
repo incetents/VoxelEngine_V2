@@ -11,7 +11,7 @@ layout (location = 7) in vec3 m_bitangent;
 layout (location = 8) in mat4 instanceMatrix;
 
 // Output
-out vertex_data
+out fragment_data
 {
 	vec3 pos;
 	vec2 uv;
@@ -19,7 +19,7 @@ out vertex_data
 	vec3 tangent;
 	vec3 bitangent;
 
-} v_data;
+} f_data;
 
 // Uniforms
 uniform mat4 VXL_model			= mat4(1.0);
@@ -39,27 +39,27 @@ void main()
 			model *= instanceMatrix;
 
 		// Position
-		v_data.pos = vec3(model * vec4(m_position, 1.0));
+		f_data.pos = vec3(model * vec4(m_position, 1.0));
 		// Normals
 		mat3 RotScaleModel = mat3(model); // ignores position
-		v_data.normal = RotScaleModel * m_normal;
-		v_data.tangent = RotScaleModel * m_tangent;
-		v_data.bitangent = RotScaleModel * m_bitangent;
+		f_data.normal = RotScaleModel * m_normal;
+		f_data.tangent = RotScaleModel * m_tangent;
+		f_data.bitangent = RotScaleModel * m_bitangent;
 	}
 	// Passthrough
 	else
 	{
 		// Position
-		v_data.pos = m_position;
+		f_data.pos = m_position;
 		// Normal
-		v_data.normal = m_normal;
-		v_data.tangent = m_tangent;
-		v_data.bitangent = m_bitangent;
+		f_data.normal = m_normal;
+		f_data.tangent = m_tangent;
+		f_data.bitangent = m_bitangent;
 	}
 	
-	gl_Position = viewProjection * vec4(v_data.pos, 1); 
+	gl_Position = viewProjection * vec4(f_data.pos, 1); 
 	
 	// UV
-	v_data.uv = m_uv;
+	f_data.uv = m_uv;
 	
 }

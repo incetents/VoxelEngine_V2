@@ -5,13 +5,13 @@
 //include "math.glsl"  [[replace // with # to get actual include]]
 
 //Values To get from Vertex Shader
-in vertex_data
+in fragment_data
 {
 	vec3 pos;
 	//vec2 uv;
 	//vec3 color;
 
-} v_data;
+} f_data;
 
 //Values sent out (to final array)
 layout (location = 0) out vec4 final_color;
@@ -106,16 +106,16 @@ layout(location = 2) subroutine uniform test_t myNum; // pointer to subroutine
 void main()
 {
 	//final_color = vec4(1,1,1,1);
-	//final_color = vec4(v_data.uv.x, v_data.uv.y, 0.5, 1.0);
-	//final_color = vec4(v_data.color, 1);
+	//final_color = vec4(f_data.uv.x, f_data.uv.y, 0.5, 1.0);
+	//final_color = vec4(f_data.color, 1);
 	final_color = vec4(red,green,blue,1);
 	//final_color = vec4(value1,value2,value3,1);
 	//final_color = vec4(Colour1() + Colour2());
 	//final_color.a = myNum();
 	
-	//vec4 a = texture(handler1, v_data.uv);
-	//vec4 b = texture(handler2, v_data.uv);
-	//vec4 c = texture(albedo_handler, v_data.uv);
+	//vec4 a = texture(handler1, f_data.uv);
+	//vec4 b = texture(handler2, f_data.uv);
+	//vec4 c = texture(albedo_handler, f_data.uv);
 	//final_color = a/3 + b/3 + c/3;
 	//final_color = a/4 + b/4 + c/4 + vec4(value1/1, value2/1, value3/1, 0);
 	//final_color /= vec4(255,255,255,255);

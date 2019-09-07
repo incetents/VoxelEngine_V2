@@ -7,11 +7,11 @@ layout (location = 0) in vec3 m_position;
 layout (location = 1) in vec2 m_uv;
 
 // Output
-out vertex_data
+out fragment_data
 {
 	vec2 uv;
 
-} v_data;
+} f_data;
 
 // Uniforms
 uniform mat4 VXL_model	= mat4(1.0);
@@ -20,7 +20,7 @@ uniform vec2 size 		= vec2(1.0,1.0);
 // Main
 void main()
 {
-	v_data.uv = m_uv;
+	f_data.uv = m_uv;
 	
 	mat4 ModelView = view * VXL_model;
 	

@@ -54,6 +54,7 @@ namespace Vxl
 		Material* material_simpleLight;
 		Material* material_colorPicker;
 		Material* material_font;
+		Material* material_showNormals;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

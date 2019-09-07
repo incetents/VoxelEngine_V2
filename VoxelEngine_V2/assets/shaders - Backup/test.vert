@@ -8,18 +8,18 @@ layout (location = 0) in vec3 m_position;
 
 
 //Values to send to Frag
-out vertex_data
+out fragment_data
 {
 	vec3 pos;
 	//vec2 uv;
 	//vec3 color;
 
-} v_data;
+} f_data;
 
 void main()
 {
-	v_data.pos = m_position;
-	//v_data.uv = m_uv;
-	//v_data.color = m_color;
+	f_data.pos = m_position;
+	//f_data.uv = m_uv;
+	//f_data.color = m_color;
 	gl_Position = vec4(m_position, 1.0);// + Toaster();// + Coaster();
 }

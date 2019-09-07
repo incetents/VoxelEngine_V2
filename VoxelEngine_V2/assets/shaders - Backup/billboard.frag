@@ -3,11 +3,11 @@
 #include "_UBO.glsl"
 
 // Input
-in vertex_data
+in fragment_data
 {
 	vec2 uv;
 
-} v_data;
+} f_data;
 
 // Output
 layout (location = 0) out vec4 output_albedo;
@@ -25,7 +25,7 @@ uniform vec4 VXL_output 	= vec4(0,0,0,0); // used for color ID
 //
 void main()
 {
-	output_albedo = texture(albedo_handler, v_data.uv);
+	output_albedo = texture(albedo_handler, f_data.uv);
 	
 	if(output_albedo.a < 0.01)
 		discard;

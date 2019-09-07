@@ -4,7 +4,7 @@
 #include "_UBO.glsl"
 
 // Input
-in vertex_data
+in fragment_data
 {
 	vec3 pos;
 	vec2 uv;
@@ -12,7 +12,7 @@ in vertex_data
 	vec3 tangent;
 	vec3 bitangent;
 	
-} v_data;
+} f_data;
 
 // Output
 layout (location = 0) out vec4 output_color;
@@ -48,7 +48,7 @@ float VisualizeDepth(float depth)
 //Main
 void main()
 {
-	vec4 _texture = texture(texture1, v_data.uv);
+	vec4 _texture = texture(texture1, f_data.uv);
 	// Output Mode
 	if(outputMode == 1)
 	{
@@ -65,7 +65,7 @@ void main()
 	else if(outputMode == 3)
 	{
 		// composite 2 textures
-		vec4 _texture2 = texture(texture2, v_data.uv);
+		vec4 _texture2 = texture(texture2, f_data.uv);
 		output_color = vec4(mix(_texture.rgb, _texture2.rgb, _texture2.a), 1);
 	}
 	else if(outputMode == 4)

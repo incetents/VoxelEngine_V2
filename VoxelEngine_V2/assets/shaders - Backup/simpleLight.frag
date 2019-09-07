@@ -2,7 +2,7 @@
 #version 420 core
 
 // Input
-in vertex_data
+in fragment_data
 {
 	vec3 pos;
 	vec2 uv;
@@ -10,7 +10,7 @@ in vertex_data
 	vec3 tangent;
 	vec3 bitangent;
 
-} v_data;
+} f_data;
 
 // Values sent out (to final array)
 layout (location = 0) out vec4 output_albedo;
@@ -26,7 +26,7 @@ uniform float VXL_alpha = 1.0;
 //
 void main()
 {
-	float d = dot(normalize(v_data.normal), vec3(0.57735, 0.57735, 0.57735)); // -1 to 1 brightness
+	float d = dot(normalize(f_data.normal), vec3(0.57735, 0.57735, 0.57735)); // -1 to 1 brightness
 	d = d * 0.5 + 0.5; // put into 0-1 range
 	vec3 light = vec3(0.25,0.25,0.25);
 	vec3 dark = vec3(0.5,0.5,0.5);
@@ -34,7 +34,7 @@ void main()
 	output_albedo.rgb = mix(VXL_color - dark, VXL_color + light, d);
 	output_albedo.a = VXL_alpha;
 
-	output_normal = vec4(normalize(v_data.normal), 1.0); // worldspace Normals
+	output_normal = vec4(normalize(f_data.normal), 1.0); // worldspace Normals
 	
-	//output_albedo.rgb = v_data.normal;
+	//output_albedo.rgb = f_data.normal;
 }

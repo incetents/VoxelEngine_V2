@@ -6,16 +6,16 @@
 layout (location = 0) in vec3 m_position;
 
 // Output
-out vertex_data
+out fragment_data
 {
 	vec3 uvw;
 
-} v_data;
+} f_data;
 
 // Main
 void main()
 {
-	v_data.uvw = m_position;
+	f_data.uvw = m_position;
 	
 	// Remove position from view matrix since skybox doesn't move
 	mat4 viewStill = view;
