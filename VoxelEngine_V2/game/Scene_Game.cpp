@@ -12,6 +12,7 @@
 #include "../engine/utilities/Logger.h"
 #include "../engine/utilities/stringUtil.h"
 #include "../engine/utilities/Time.h"
+#include "../engine/utilities/FileIO.h"
 
 #include "../engine/rendering/FramebufferObject.h"
 #include "../engine/rendering/Geometry.h"
@@ -58,6 +59,12 @@ namespace Vxl
 {
 	void Scene_Game::Setup()
 	{
+		GlobalFiles.LoadFile("_UBO.glsl", "./assets/files/_UBO.glsl");
+		GlobalFiles.LoadFile("_Math.glsl", "./assets/files/_Math.glsl");
+
+		//ShaderBuilder builder;
+		//builder.Create("");
+
 		//Text::Init();
 		//Text::LoadFont("arial", "assets/fonts/arial.ttf");
 

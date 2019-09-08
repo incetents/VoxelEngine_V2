@@ -1,6 +1,6 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
 #version 420 core
-#include "_UBO.glsl"
+#include "./assets/files/_UBO.glsl"
 
 //precision highp float;
 
@@ -24,5 +24,5 @@ void main()
 	if(passthrough)
 		gl_Position = vec4(m_position, 1.0); 
 	else
-		gl_Position = viewProjection * vec4(m_position, 1.0); 
+		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
 }

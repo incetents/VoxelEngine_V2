@@ -35,6 +35,23 @@ namespace Vxl
 			trim(s);
 			return s;
 		}
+		// Removal
+		std::string stripComments(const std::string& str)
+		{
+			std::string result;
+			std::vector<std::string> lines = splitStr(str, '\n');
+			for (auto& line : lines)
+			{
+				std::size_t index = line.find_first_of("//");
+				if (index != std::string::npos)
+				{
+					result += line.substr(0, index - 1) + '\n';
+				}
+				else
+					result += line + '\n';
+			}
+			return result;
+		}
 		// Get name from file path
 		std::string nameFromFilepath(const std::string& filePath)
 		{
@@ -109,6 +126,37 @@ namespace Vxl
 				return std::string();
 
 			return str.substr(loc1 + 1, str.length() - loc1 - 1);
+		}
+		std::string extractSection(const std::string& str, char start, char end, std::size_t startIndex)
+		{
+			std::size_t readStart = str.find_first_of(start, startIndex);
+			if (readStart == std::string::npos)
+				return std::string();
+
+			size_t length = str.length();
+			uint32_t counter = 1;
+			size_t readEnd = readStart;
+			for (size_t i = readStart + 1; i < length; i++)
+			{
+				if (str[i] == start)
+					counter++;
+				else if (str[i] == end)
+					counter--;
+
+				if (counter == 0)
+				{
+					readEnd = i;
+					break;
+				}
+			}
+
+			// Offset to make sure it doesn't extract start and end characters
+			readStart++;
+			readEnd -= 2;
+			if (readEnd < readStart)
+				return std::string();
+
+			return str.substr(readStart, readEnd - readStart + 1);
 		}
 	}
 }

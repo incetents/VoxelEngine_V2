@@ -5,7 +5,7 @@
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 // Macros that are used to enable/disable portions of code before compilation //
 
-// [x] whether exe runs with console output
+// [x] whether executable runs with console output
 #define GLOBAL_OUTPUT_CONSOLE
 
 // [x] whether or not Graphics::SetGLName(...) should actually call glObjectLabel(...)
@@ -23,6 +23,9 @@
 
 // [x] whether any of the ImGui libraries are used
 #define GLOBAL_IMGUI
+
+// [x] whether Shaders store a backup of their compiled code [for debugging]
+#define GLOBAL_SHADER_CODE_BACKUP
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~//
 // Macros that do Misc work //

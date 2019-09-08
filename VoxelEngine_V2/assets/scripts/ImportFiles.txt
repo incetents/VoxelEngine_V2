@@ -2,34 +2,36 @@
 #SHADER
 // order: [Name] [FilePath]
 
-#VERT gbuffer_vert 		./assets/shaders/gbuffer.vert
-#FRAG gbuffer_frag 		./assets/shaders/gbuffer.frag
+showNormals 	./assets/materials/showNormals.material
 
-#VERT passthrough_vert 	./assets/shaders/passthrough.vert
-#FRAG passthrough_frag 	./assets/shaders/passthrough.frag
+gbuffer_vert 		./assets/shaders/gbuffer.vert
+gbuffer_frag 		./assets/shaders/gbuffer.frag
 
-#VERT skybox_vert 	./assets/shaders/skybox.vert
-#FRAG skybox_frag 	./assets/shaders/skybox.frag
+passthrough_vert 	./assets/shaders/passthrough.vert
+passthrough_frag 	./assets/shaders/passthrough.frag
 
-#VERT lines_vert 	./assets/shaders/lines.vert
-#GEOM lines_geom 	./assets/shaders/lines.geom
-#FRAG lines_frag 	./assets/shaders/lines.frag
+skybox_vert 	./assets/shaders/skybox.vert
+skybox_frag 	./assets/shaders/skybox.frag
 
-#FRAG colorPicker_frag 	./assets/shaders/colorPicker.frag
+lines_vert 	./assets/shaders/lines.vert
+lines_geom 	./assets/shaders/lines.geom
+lines_frag 	./assets/shaders/lines.frag
 
-#FRAG simpleLight_frag 	./assets/shaders/simpleLight.frag
+colorPicker_frag 	./assets/shaders/colorPicker.frag
 
-#FRAG showRenderTarget  ./assets/shaders/showRenderTarget.frag
+simpleLight_frag 	./assets/shaders/simpleLight.frag
 
-#VERT billboard_vert  	./assets/shaders/billboard.vert
-#FRAG billboard_frag 	./assets/shaders/billboard.frag
+showRenderTarget  ./assets/shaders/showRenderTarget.frag
 
-#VERT font_vert  	./assets/shaders/font.vert
-#FRAG font_frag 	./assets/shaders/font.frag
+billboard_vert  	./assets/shaders/billboard.vert
+billboard_frag 	./assets/shaders/billboard.frag
 
-#VERT showNormals_vert	./assets/shaders/showNormals.vert
-#GEOM showNormals_geom 	./assets/shaders/showNormals.geom
-#FRAG showNormals_frag	./assets/shaders/showNormals.frag
+font_vert  	./assets/shaders/font.vert
+font_frag 	./assets/shaders/font.frag
+
+//showNormals_vert	./assets/shaders/showNormals.vert
+//showNormals_geom 	./assets/shaders/showNormals.geom
+//showNormals_frag	./assets/shaders/showNormals.frag
 
 //#VERT broken ./assets/shaders/broken.txt
 
@@ -48,7 +50,7 @@ colorPicker 		gbuffer_vert 				colorPicker_frag
 showRenderTarget 	passthrough_vert 			showRenderTarget
 billboard 			billboard_vert				billboard_frag
 font 				font_vert 					font_frag
-showNormals			showNormals_vert 			showNormals_geom 		showNormals_frag
+showNormals 		showNormals
 
 //----------------------------------------
 #TEXTURE

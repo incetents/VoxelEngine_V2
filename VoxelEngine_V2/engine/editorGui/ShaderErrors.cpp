@@ -50,7 +50,10 @@ namespace Vxl
 					{
 						ImGui::PopStyleColor();
 
-						ImGui::Text(Log.second->GetCompiledCode().c_str());
+						if (Log.second->GetCompiledCode().empty())
+							ImGui::Text("Shader Code Storage Disabled from Macro -> GLOBAL_SHADER_CODE_BACKUP");
+						else
+							ImGui::Text(Log.second->GetCompiledCode().c_str());
 						ImGui::TreePop();
 					}
 					else

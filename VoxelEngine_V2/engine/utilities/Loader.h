@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace Vxl
 {
@@ -23,6 +24,8 @@ namespace Vxl
 			CUBEMAP,
 			MODEL
 		};
+		
+		static std::map<std::string, std::string> ShaderPaths;
 
 		static const std::string TAG_DEFAULT;
 
@@ -65,6 +68,7 @@ namespace Vxl
 		static bool DecipherFlipType(const std::string& str);
 		static bool DecipherMipMapType(const std::string& str);
 		static AnisotropicMode DecipherAnisotropicMode(const std::string& str);
+	
 	public:
 
 		static bool LoadScript_ImportFiles(const std::string& filePath);

@@ -20,16 +20,14 @@ namespace Vxl
 	typedef std::map<std::string, Graphics::UniformBlock> UniformBlockStorage;
 	typedef std::map<ShaderType, Graphics::UniformSubroutine> SubroutineStorage;
 
-	class Shader : public Asset<Shader>
+	class Shader
 	{
 		friend class ShaderProgram;
 		friend class RenderManager;
 	private:
-		bool				m_hasLoaded = false;
 		bool				m_hasCompiled = false;
 		ShaderID			m_id = -1;
 		const std::string   m_name;
-		const std::string	m_filePath;
 		std::string			m_sourceBackup; // has line numbers appended
 		std::string			m_errorMessage;
 		const ShaderType	m_type;
@@ -37,23 +35,23 @@ namespace Vxl
 		bool compile(const std::string& source);
 		void updateErrorMessage();
 
-		bool load();
+		void load(const std::string& shaderCode);
 		void unload();
 
-		// Constructor
-		Shader(const std::string& name, const std::string& filePath, ShaderType type)
-			: m_name(name + '[' + Graphics::Shader::GetName(type) + ']'), m_filePath(filePath), m_type(type)
-		{
-			m_hasLoaded = load();
-		}
-
 	public:
-		// Load
-		static Shader* Load(
-			const std::string& name,
-			const std::string& filePath,
-			ShaderType type
-		);
+
+		// Constructor
+		Shader(const std::string& name, const std::string& shaderCode, ShaderType type)
+			: m_name(name + '[' + Graphics::Shader::GetName(type) + ']'), m_type(type)
+		{
+			load(shaderCode);
+
+			if (!HasCompiled())
+			{
+				Logger.error("Shader [" + name + "] failed to compile");
+				Logger.error(m_errorMessage);
+			}
+		}
 
 		~Shader()
 		{
@@ -64,16 +62,12 @@ namespace Vxl
 		static std::unordered_map<std::string, const Shader*> ShaderErrorLog;
 		static UINT ShaderErrorLogSize;
 
-		void reload()
+		void Reload(const std::string& shaderCode)
 		{
 			unload();
-			m_hasLoaded = load();
+			load(shaderCode);
 		}
 
-		inline bool					HasLoaded(void) const
-		{
-			return m_hasLoaded;
-		}
 		inline bool					HasCompiled(void) const
 		{
 			return m_hasCompiled;
@@ -106,6 +100,7 @@ namespace Vxl
 
 	class ShaderProgram : public Asset<ShaderProgram>
 	{
+		DISALLOW_COPY_AND_ASSIGN(ShaderProgram);
 		friend class RenderManager;
 	private:
 		// Program //
@@ -114,6 +109,7 @@ namespace Vxl
 		bool				 m_linked = false;
 		BYTE				 m_shaderCount : 3; // 3 bits, val is 8 max
 		std::vector<Shader*> m_shaders;
+		std::vector<std::string> m_filePaths;
 		// Attributes //
 		AttributeStorage	 m_attributes;
 		// Uniforms //
@@ -123,37 +119,34 @@ namespace Vxl
 		bool				 m_usingSubroutines;
 		// Error //			 
 		std::string			 m_errorMessage;
-		// Tracker //		 
-		//static uint32_t		 m_boundID;
 
 		// Utility
-		bool createProgram();
-		void destroyProgram();
+		bool CreateProgram();
+		void DestroyProgram();
 
-		void attachShaders();
-		void detachShaders();
+		void AttachShaders();
+		void DetachShaders();
+
+		void ReloadShaders();
+		void LoadShaders();
+		void UnloadShaders();
 
 		void Link();
 
 		// Constructor
-		ShaderProgram(const std::string& name)
-			: m_name(name)
-		{
-			createProgram();
-		}
+		ShaderProgram(
+			const std::string& name,
+			const std::vector<std::string>& filePaths
+		);
 
 	public:
 		// Load
 		static ShaderProgram* Load(
 			const std::string& name,
-			const std::vector<Shader*>& shaders
+			const std::vector<std::string>& filePaths
 		);
 
-		~ShaderProgram()
-		{
-			detachShaders();
-			destroyProgram();
-		}
+		~ShaderProgram();
 
 		static std::set<const ShaderProgram*> ProgramsFailed;
 		static UINT ProgramsFailedSize;
@@ -251,9 +244,12 @@ namespace Vxl
 			return m_errorMessage;
 		}
 
-		// Remove default
-		ShaderProgram(const ShaderProgram&) = delete;
-		ShaderProgram& operator=(const ShaderProgram&) = delete;
+		// Acquire Shaders
+		inline std::vector<Shader*> GetShaders(void) const
+		{
+			return m_shaders;
+		}
+
 	};
 }
 

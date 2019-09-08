@@ -35,6 +35,7 @@
 #include "../editorGui/Inspector.h"
 #include "../editorGui/Performance.h"
 #include "../editorGui/ShaderErrors.h"
+#include "../editorGui/ShaderCodeViewer.h"
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
@@ -176,20 +177,10 @@ namespace Vxl
 		ShaderProgram::ProgramsFailedSize = 0;
 
 		auto Programs = ShaderProgram::GetAllNamedAssets();
-		auto Shaders = Shader::GetAllNamedAssets();
-
-		for (auto Program : Programs)
-			Program.second->detachShaders();
-
-		for (auto Shader : Shaders)
-			Shader.second->reload();
 
 		for (auto Program : Programs)
 		{
-			Program.second->destroyProgram();
-			Program.second->createProgram();
-			Program.second->attachShaders();
-			Program.second->Link();
+			Program.second->ReloadShaders();
 		}
 
 		auto Materials = Material::GetAllNamedAssets();
@@ -284,7 +275,6 @@ namespace Vxl
 		ShaderProgram::ProgramsFailedSize = 0;
 		// Delete Shaders
 		ShaderProgram::DeleteAllAssets();
-		Shader::DeleteAllAssets();
 
 		// Delete Textures
 		Texture2D::DeleteAllAssets();
@@ -337,6 +327,8 @@ namespace Vxl
 		GUIViewport.Init("Viewport", Vector2(500, 500), 0.9f, ImGuiWindowFlags_MenuBar);
 		GUIViewport.SetPadding(false);
 		GUIViewport.SetOpen(false);
+		ShaderCodeViewer.Init("ShaderCodeViewer", Vector2(700, 400), 0.9f);
+		ShaderCodeViewer.SetOpen(false);
 
 		m_guiWindows.push_back(&DevConsole.instanceRef);
 		m_guiWindows.push_back(&ShaderErrors.instanceRef);
@@ -344,6 +336,7 @@ namespace Vxl
 		m_guiWindows.push_back(&Hierarchy.instanceRef);
 		m_guiWindows.push_back(&Performance.instanceRef);
 		m_guiWindows.push_back(&GUIViewport.instanceRef);
+		m_guiWindows.push_back(&ShaderCodeViewer.instanceRef);
 	}
 	void RenderManager::DrawImGui()
 	{
@@ -355,27 +348,39 @@ namespace Vxl
 			// VIEW //
 			if (ImGui::BeginMenu("View"))
 			{
+				for (GuiWindow* window : m_guiWindows)
+				{
+					if (ImGui::MenuItem(window->GetName().c_str(), "", window->IsOpen()))
+					{ 
+						window->ToggleOpen();
+					}
+				}
 
-				if (ImGui::MenuItem(DevConsole.GetName().c_str(), "", DevConsole.IsOpen()))
-				{ 
-					DevConsole.ToggleOpen();
-				}
-				if (ImGui::MenuItem(Inspector.GetName().c_str(), "", Inspector.IsOpen()))
-				{
-					Inspector.ToggleOpen();
-				}
-				if (ImGui::MenuItem(Hierarchy.GetName().c_str(), "", Hierarchy.IsOpen()))
-				{
-					Hierarchy.ToggleOpen();
-				}
-				if (ImGui::MenuItem(Performance.GetName().c_str(), "", Performance.IsOpen()))
-				{
-					Performance.ToggleOpen();
-				}
-				if (ImGui::MenuItem(GUIViewport.GetName().c_str(), "", GUIViewport.IsOpen()))
-				{
-					GUIViewport.ToggleOpen();
-				}
+
+				//	if (ImGui::MenuItem(DevConsole.GetName().c_str(), "", DevConsole.IsOpen()))
+				//	{ 
+				//		DevConsole.ToggleOpen();
+				//	}
+				//	if (ImGui::MenuItem(Inspector.GetName().c_str(), "", Inspector.IsOpen()))
+				//	{
+				//		Inspector.ToggleOpen();
+				//	}
+				//	if (ImGui::MenuItem(Hierarchy.GetName().c_str(), "", Hierarchy.IsOpen()))
+				//	{
+				//		Hierarchy.ToggleOpen();
+				//	}
+				//	if (ImGui::MenuItem(Performance.GetName().c_str(), "", Performance.IsOpen()))
+				//	{
+				//		Performance.ToggleOpen();
+				//	}
+				//	if (ImGui::MenuItem(GUIViewport.GetName().c_str(), "", GUIViewport.IsOpen()))
+				//	{
+				//		GUIViewport.ToggleOpen();
+				//	}
+				//	if (ImGui::MenuItem(ShaderCodeViewer.GetName().c_str(), "", ShaderCodeViewer.IsOpen()))
+				//	{
+				//		ShaderCodeViewer.ToggleOpen();
+				//	}
 
 				ImGui::EndMenu();
 			}

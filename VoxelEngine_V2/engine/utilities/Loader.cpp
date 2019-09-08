@@ -21,6 +21,8 @@
 
 namespace Vxl
 {
+	std::map<std::string, std::string> Loader::ShaderPaths;
+
 	const std::string Loader::TAG_DEFAULT = "DEFAULT";
 
 	const std::string Loader::TAG_LOAD_SHADER = "#SHADER";
@@ -119,7 +121,7 @@ namespace Vxl
 
 	bool Loader::LoadScript_ImportFiles(const std::string& filePath)
 	{
-		std::string File = IO::readFile(filePath);
+		std::string File = FileIO::readFile(filePath);
 		if (File.empty())
 			return false;
 		
@@ -169,34 +171,31 @@ namespace Vxl
 			else
 			{
 				/* SHADER */
-				if (_state == LoadState::SHADER && SegmentCount == 3)
-				{
-					auto Tag  = Segments[0];
-					auto Name = Segments[1];
-					auto Path = Segments[2];
-
-					ShaderType Type = DeciperShaderType(Tag);
-
-					if (Type == ShaderType::NONE)
-						continue;
-
-					Shader::Load(Name, Path, Type);
-				}
-				/* SHADER PROGRAM */
-				else if (_state == LoadState::SHADER_PROGRAM && SegmentCount >= 3)
+				if (_state == LoadState::SHADER && SegmentCount == 2)
 				{
 					auto Name = Segments[0];
-					std::vector<Shader*> Shaders;
+					auto Path = Segments[1];
+
+					ShaderPaths[Name] = Path;
+				}
+				/* SHADER PROGRAM */
+				else if (_state == LoadState::SHADER_PROGRAM && SegmentCount >= 2)
+				{
+					auto Name = Segments[0];
+					std::vector<std::string> filePaths;
 					
 					for (unsigned int i = 1; i < SegmentCount; i++)
 					{
-						if (Shader::CheckAsset(Segments[i]))
-							Shaders.push_back(Shader::GetAsset(Segments[i]));
-						else
+						if (ShaderPaths.find(Segments[i]) == ShaderPaths.end())
+						{
 							Logger.error("Attempting to load non-existing Shader: " + Segments[i]);
+							continue;
+						}
+
+						filePaths.push_back(ShaderPaths[Segments[i]]);
 					}
 					
-					ShaderProgram::Load(Name, Shaders);
+					ShaderProgram::Load(Name, filePaths);
 				}
 				/* TEXTURE */
 				else if (_state == LoadState::TEXTURE && SegmentCount >= 2)

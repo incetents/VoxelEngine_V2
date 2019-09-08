@@ -4,6 +4,7 @@
 
 #include "../utilities/Logger.h"
 #include "../utilities/FileIO.h"
+#include "../utilities/ShaderBuilder.h"
 
 namespace Vxl
 {
@@ -20,6 +21,7 @@ namespace Vxl
 		const char* Source = static_cast<const char *>(source.c_str());
 
 		// Keep backup with line numbers
+#ifdef GLOBAL_SHADER_CODE_BACKUP
 		m_sourceBackup.clear();
 		auto lines = stringUtil::splitStr(source, '\n');
 		int lineNumber = 0;
@@ -27,6 +29,7 @@ namespace Vxl
 		{
 			m_sourceBackup += std::to_string(++lineNumber) + '\t' + line + '\n';
 		}
+#endif
 
 		// Attach Shader and Compile
 		m_hasCompiled = Graphics::Shader::Compile(m_id, m_type, Source);
@@ -49,7 +52,6 @@ namespace Vxl
 		m_errorMessage.clear();
 		m_errorMessage = "Failed to Compile Shader\n\n";
 		m_errorMessage += "Name: " + m_name + "\n";
-		m_errorMessage += "Path: " + m_filePath + "\n";
 
 		switch (m_type)
 		{
@@ -81,28 +83,22 @@ namespace Vxl
 		m_errorMessage += Graphics::Shader::GetError(m_id);
 	}
 
-	bool Shader::load()
+	void Shader::load(const std::string& shaderCode)
 	{
 		// Create Shader ID
 		m_id = Graphics::Shader::Create(m_type);
 		if (m_id == -1)
 		{
 			Logger.error("Unable to create shader: " + m_name);
-			return false;
+			return;
 		}
 
-		// Read file
-		std::string source = IO::readFile(m_filePath);
-		source = IO::addInclude(source, m_filePath);
-
 		// Compile Source
-		if (!compile(source))
-			return false;
+		if (!compile(shaderCode))
+			return;
 
 		// GLName
 		Graphics::SetGLName(ObjectType::SHADER, m_id, "Shader_" + m_name);
-
-		return true;
 	}
 
 	void Shader::unload()
@@ -112,31 +108,9 @@ namespace Vxl
 		m_hasCompiled = false;
 	}
 
-	Shader* Shader::Load(const std::string& name, const std::string& filePath, ShaderType type)
-	{
-		Shader* _shader = new Shader(name, filePath, type);
-
-		AddNamedAsset(name, _shader, AssetMessage::CREATED);
-
-		if (!_shader->HasLoaded())
-		{
-			Logger.error("Shader [" + name + "] failed to load");
-			Logger.error(_shader->m_errorMessage);
-		}
-		else if (!_shader->HasCompiled())
-		{
-			Logger.error("Shader [" + name + "] failed to compile");
-			Logger.error(_shader->m_errorMessage);
-		}
-
-		return _shader;
-	}
-
 	// SHADER PROGRAM //
 
-	//uint32_t ShaderProgram::m_boundID = 0;
-
-	bool ShaderProgram::createProgram()
+	bool ShaderProgram::CreateProgram()
 	{
 		m_id = Graphics::ShaderProgram::Create();
 		if (m_id == -1)
@@ -147,44 +121,23 @@ namespace Vxl
 		return true;
 	}
 
-	void ShaderProgram::destroyProgram()
+	void ShaderProgram::DestroyProgram()
 	{
 		Graphics::ShaderProgram::Delete(m_id);
 		m_id = -1;
 		m_linked = false;
 	}
 
-	void ShaderProgram::attachShaders()
+	void ShaderProgram::AttachShaders()
 	{
 		for (unsigned int i = 0; i < m_shaderCount; i++)
 			Graphics::ShaderProgram::AttachShader(m_id, m_shaders[i]->GetID());
 	}
 
-	void ShaderProgram::detachShaders()
+	void ShaderProgram::DetachShaders()
 	{
 		for (unsigned int i = 0; i < m_shaderCount; i++)
 			Graphics::ShaderProgram::DetachShader(m_id, m_shaders[i]->GetID());
-	}
-
-	ShaderProgram* ShaderProgram::Load(
-		const std::string& name,
-		const std::vector<Shader*>& shaders
-	)
-	{
-		ShaderProgram* _program = new ShaderProgram(name);
-		AddNamedAsset(name, _program, AssetMessage::LOADED);
-
-		_program->m_shaders = shaders;
-		_program->m_shaderCount = _program->m_shaders.size();
-		_program->attachShaders();
-		_program->Link();
-
-		if (!_program->IsLinked())
-		{
-			Logger.error("Shader Program [" + name + "] failed to link");
-		}
-
-		return _program;
 	}
 
 	void ShaderProgram::Link()
@@ -221,6 +174,114 @@ namespace Vxl
 			ProgramsFailed.insert(this);
 			ProgramsFailedSize = (UINT)ProgramsFailed.size();
 		}
+	}
+
+	void ShaderProgram::ReloadShaders()
+	{
+		UnloadShaders();
+		LoadShaders();
+	}
+	void ShaderProgram::LoadShaders()
+	{
+		VXL_ASSERT(!m_linked, "Cannot Load ShaderProgram if already linked, " + m_name);
+
+		// Load Shaders
+		for (const auto& filePath : m_filePaths)
+		{
+			if (FileIO::fileExists(filePath))
+			{
+				std::string extension = FileIO::getExtension(filePath);
+				if (extension.compare("vert") == 0)
+				{
+					auto name = FileIO::getName(filePath) + "_vert";
+					auto file = FileIO::readFile(filePath);
+					file = FileIO::addInclude(file);
+					m_shaders.push_back(new Shader(name, file, ShaderType::VERTEX));
+				}
+				else if (extension.compare("geom") == 0)
+				{
+					auto name = FileIO::getName(filePath) + "_geom";
+					auto file = FileIO::readFile(filePath);
+					file = FileIO::addInclude(file);
+					m_shaders.push_back(new Shader(name, file, ShaderType::GEOMETRY));
+				}
+				else if (extension.compare("frag") == 0)
+				{
+					auto name = FileIO::getName(filePath) + "_frag";
+					auto file = FileIO::readFile(filePath);
+					file = FileIO::addInclude(file);
+					m_shaders.push_back(new Shader(name, file, ShaderType::FRAGMENT));
+				}
+				// Material
+				else if (extension.compare("material") == 0)
+				{
+					ShaderBuilder builder(filePath);
+					if ( builder.Name.empty())
+						 builder.Name = "ShaderProgram(" + std::to_string(m_id) + ')';
+
+					if (!builder.VertexShader.empty())
+					{
+						m_shaders.push_back(new Shader( builder.Name + "_Vert", builder.VertexShader, ShaderType::VERTEX));
+					}
+
+					if (!builder.GeomShader.empty())
+					{
+						m_shaders.push_back(new Shader( builder.Name + "_Geom", builder.GeomShader, ShaderType::GEOMETRY));
+					}
+
+					if (!builder.FragShader.empty())
+					{
+						m_shaders.push_back(new Shader( builder.Name + "_Frag", builder.FragShader, ShaderType::FRAGMENT));
+					}
+					
+				}
+			}
+		}
+
+		m_shaderCount = m_shaders.size();
+		AttachShaders();
+		Link();
+		DetachShaders();
+
+		if (!IsLinked())
+		{
+			Logger.error("Shader Program [" + m_name + "] failed to link");
+		}
+	}
+	void ShaderProgram::UnloadShaders()
+	{
+		for (auto& shader : m_shaders)
+		{
+			delete shader;
+		}
+		m_shaders.clear();
+		m_shaderCount = 0;
+		m_linked = false;
+	}
+
+	ShaderProgram::ShaderProgram(const std::string& name, const std::vector<std::string>& filePaths)
+		: m_name(name), m_filePaths(filePaths)
+	{
+		CreateProgram();
+		LoadShaders();
+	}
+
+	ShaderProgram::~ShaderProgram()
+	{
+		UnloadShaders();
+		DestroyProgram();
+	}
+
+	ShaderProgram* ShaderProgram::Load(
+		const std::string& name,
+		const std::vector<std::string>& filePaths
+	)
+	{
+		ShaderProgram* _program = new ShaderProgram(name, filePaths);
+
+		AddNamedAsset(name, _program, AssetMessage::LOADED);
+
+		return _program;
 	}
 
 	void ShaderProgram::Bind() const

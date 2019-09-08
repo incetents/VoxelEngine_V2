@@ -1,6 +1,6 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
 #version 420 core
-#include "_UBO.glsl"
+#include "./assets/files/_UBO.glsl"
 
 // Input
 layout (location = 0) in vec3 m_position;
@@ -22,7 +22,7 @@ void main()
 {
 	v_data.uv = m_uv;
 	
-	mat4 ModelView = view * VXL_model;
+	mat4 ModelView = UBO_view * VXL_model;
 	
 	// Column 0:
 	ModelView[0][0] = size.x;
@@ -39,5 +39,5 @@ void main()
 	ModelView[2][1] = 0;
 	ModelView[2][2] = 1;
 	
-	gl_Position = projection * ModelView * vec4(m_position, 1);
+	gl_Position = UBO_projection * ModelView * vec4(m_position, 1);
 }

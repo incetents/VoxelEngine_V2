@@ -228,6 +228,12 @@
     <ClCompile Include="engine\utilities\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\utilities\ShaderBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\ShaderCodeViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\input\Input.h">
@@ -480,6 +486,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\utilities\ShaderBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\ShaderCodeViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

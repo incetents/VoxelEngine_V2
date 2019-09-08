@@ -1,6 +1,6 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
 #version 420 core
-#include "_UBO.glsl"
+#include "./assets/files/_UBO.glsl"
 
 // Input
 layout (location = 0) in vec3 m_position;
@@ -57,7 +57,7 @@ void main()
 		v_data.bitangent = m_bitangent;
 	}
 	
-	gl_Position = viewProjection * vec4(v_data.pos, 1); 
+	gl_Position = UBO_viewProjection * vec4(v_data.pos, 1); 
 	
 	// UV
 	v_data.uv = m_uv;

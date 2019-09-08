@@ -26,6 +26,7 @@
     <ClCompile Include="engine\editorGui\Inspector.cpp" />
     <ClCompile Include="engine\editorGui\Performance.cpp" />
     <ClCompile Include="engine\editorGui\ShaderErrors.cpp" />
+    <ClCompile Include="engine\editorGui\ShaderCodeViewer.cpp" />
     <ClCompile Include="engine\editor\Editor.cpp" />
     <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
@@ -58,6 +59,7 @@
     <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Logger.cpp" />
     <ClCompile Include="engine\utilities\Macros.cpp" />
+    <ClCompile Include="engine\utilities\ShaderBuilder.cpp" />
     <ClCompile Include="engine\utilities\Time.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
@@ -134,6 +136,7 @@
     <ClInclude Include="engine\editorGui\Inspector.h" />
     <ClInclude Include="engine\editorGui\Performance.h" />
     <ClInclude Include="engine\editorGui\ShaderErrors.h" />
+    <ClInclude Include="engine\editorGui\ShaderCodeViewer.h" />
     <ClInclude Include="engine\editor\Editor.h" />
     <ClInclude Include="engine\editor\GUIViewport.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
@@ -186,6 +189,7 @@
     <ClInclude Include="engine\utilities\Loader.h" />
     <ClInclude Include="engine\utilities\Logger.h" />
     <ClInclude Include="engine\utilities\Macros.h" />
+    <ClInclude Include="engine\utilities\ShaderBuilder.h" />
     <ClInclude Include="engine\utilities\singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\utilities\Time.h" />

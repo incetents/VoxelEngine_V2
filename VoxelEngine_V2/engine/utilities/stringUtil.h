@@ -23,6 +23,9 @@ namespace Vxl
 		std::string ltrim_copy(std::string s);
 		std::string rtrim_copy(std::string s);
 		std::string trim_copy(std::string s);
+
+		// Removal
+		std::string stripComments(const std::string& str);
 		
 		// Get name from file path
 		std::string nameFromFilepath(const std::string& filePath);
@@ -41,5 +44,6 @@ namespace Vxl
 		// Extract Data Simply
 		std::string extractFirst(const std::string& str, char start, char end);
 		std::string extractNameFromPath(const std::string& str);
+		std::string extractSection(const std::string& str, char start, char end, std::size_t startIndex = 0);
 	}
 }
