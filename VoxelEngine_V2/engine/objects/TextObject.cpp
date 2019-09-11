@@ -171,6 +171,11 @@ namespace Vxl
 	{
 		VXL_RETURN_ON_FAIL(m_font, "Font missing for text: " + m_text);
 		
+		// Get Shader
+		auto material_font = Material::GetAsset("font");
+		if (!material_font->IsValid())
+			return;
+
 		// FBO
 		GlobalRenderText.m_FBO->SetSize(m_renderTextureTargetSize.x, m_renderTextureTargetSize.y);
 		GlobalRenderText.m_FBO->SetClearColor(Color4F(0, 0, 0, 0));
@@ -182,7 +187,6 @@ namespace Vxl
 		//GlobalRenderText.m_FBO->Bind();
 
 		// Shader
-		auto material_font = Material::GetAsset("font");
 		material_font->BindProgram();
 		material_font->BindStates();
 		

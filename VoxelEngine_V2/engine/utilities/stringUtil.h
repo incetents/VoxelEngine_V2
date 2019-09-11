@@ -24,6 +24,10 @@ namespace Vxl
 		std::string rtrim_copy(std::string s);
 		std::string trim_copy(std::string s);
 
+		// To Lower
+		void toLower(std::string& str);
+		std::string toLowerCopy(const std::string& str);
+
 		// Removal
 		std::string stripComments(const std::string& str);
 		

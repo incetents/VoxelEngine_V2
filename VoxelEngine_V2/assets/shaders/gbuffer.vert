@@ -7,7 +7,6 @@ layout (location = 0) in vec3 m_position;
 layout (location = 1) in vec2 m_uv;
 layout (location = 2) in vec3 m_normal;
 layout (location = 6) in vec3 m_tangent;
-layout (location = 7) in vec3 m_bitangent;
 layout (location = 8) in mat4 instanceMatrix;
 
 // Output
@@ -22,9 +21,10 @@ out vertex_data
 } v_data;
 
 // Uniforms
-uniform mat4 VXL_model			= mat4(1.0);
-uniform bool VXL_useInstancing 	= false;
-uniform bool VXL_useModel 		= true;
+uniform bool VXL_useModel 		 = true;
+uniform mat4 VXL_model			 = mat4(1.0);
+uniform mat3 VXL_model_rotation	 = mat3(1.0);
+uniform bool VXL_useInstancing 	 = false;
 
 // Main
 void main()
@@ -41,10 +41,8 @@ void main()
 		// Position
 		v_data.pos = vec3(model * vec4(m_position, 1.0));
 		// Normals
-		mat3 RotScaleModel = mat3(model); // ignores position
-		v_data.normal = RotScaleModel * m_normal;
-		v_data.tangent = RotScaleModel * m_tangent;
-		v_data.bitangent = RotScaleModel * m_bitangent;
+		v_data.normal = VXL_model_rotation * m_normal;
+		v_data.tangent = VXL_model_rotation * m_tangent;
 	}
 	// Passthrough
 	else
@@ -54,12 +52,11 @@ void main()
 		// Normal
 		v_data.normal = m_normal;
 		v_data.tangent = m_tangent;
-		v_data.bitangent = m_bitangent;
 	}
 	
 	gl_Position = UBO_viewProjection * vec4(v_data.pos, 1); 
 	
-	// UV
+	// Constants
 	v_data.uv = m_uv;
-	
+	v_data.bitangent = cross(v_data.normal, v_data.tangent);
 }

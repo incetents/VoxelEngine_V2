@@ -14,15 +14,19 @@ out vertex_data
 } v_data;
 
 // Uniforms
-uniform mat4 VXL_model	= mat4(1.0);
-uniform vec2 size 		= vec2(1.0,1.0);
+uniform bool VXL_useModel 	= true;
+uniform mat4 VXL_model		= mat4(1.0);
+uniform vec2 size 			= vec2(1.0,1.0);
 
 // Main
 void main()
 {
 	v_data.uv = m_uv;
 	
-	mat4 ModelView = UBO_view * VXL_model;
+	mat4 ModelView = UBO_view;
+	
+	if(VXL_useModel)
+		ModelView *= VXL_model;
 	
 	// Column 0:
 	ModelView[0][0] = size.x;

@@ -61,6 +61,7 @@ namespace Vxl
 	{
 		GlobalFiles.LoadFile("_UBO.glsl", "./assets/files/_UBO.glsl");
 		GlobalFiles.LoadFile("_Math.glsl", "./assets/files/_Math.glsl");
+		GlobalFiles.LoadFile("_Uniforms.glsl", "./assets/files/_Uniforms.glsl");
 
 		//ShaderBuilder builder;
 		//builder.Create("");
@@ -791,8 +792,8 @@ namespace Vxl
 				Util::DataConversion::uchars_to_uint(data.start, EditorIndex);
 				data.Deallocate();
 
-				if (EditorIndex > 0)
-					Logger.log("test");
+				//	if (EditorIndex > 0)
+				//		Logger.log("test");
 
 				switch (EditorIndex)
 				{

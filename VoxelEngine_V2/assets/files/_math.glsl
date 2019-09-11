@@ -1,7 +1,9 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
 
-// Math.glsl
+// [Math Constants]
 #define PI (3.14159)
+
+// [Math Functions]
 float rand(vec2 co){
     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }

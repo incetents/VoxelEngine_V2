@@ -35,6 +35,18 @@ namespace Vxl
 			trim(s);
 			return s;
 		}
+		// To Lower
+		void toLower(std::string& str)
+		{
+			std::transform(str.begin(), str.end(), str.begin(),
+				[](unsigned char c){ return std::tolower(c); });
+		}
+		std::string toLowerCopy(const std::string& str)
+		{
+			std::string _str = str;
+			toLower(_str);
+			return _str;
+		}
 		// Removal
 		std::string stripComments(const std::string& str)
 		{

@@ -144,7 +144,6 @@ namespace Vxl
 		m_uvs.setLayout(BufferLayout({ {BufferType::UV, AttributeType::VEC2, false} }));
 		m_normals.setLayout(BufferLayout({ {BufferType::NORMAL, AttributeType::VEC3, false} }));
 		m_tangents.setLayout(BufferLayout({ {BufferType::TANGENT, AttributeType::VEC3, false} }));
-		m_bitangents.setLayout(BufferLayout({ {BufferType::BITANGENT, AttributeType::VEC3, false} }));
 
 		// GL Name
 		if (!glName.empty())
@@ -190,7 +189,6 @@ namespace Vxl
 		m_uvs.set(_model->uvs);
 		m_normals.set(_model->normals);
 		m_tangents.set(_model->tangents);
-		m_bitangents.set(_model->bitangents);
 		m_indices.set(_model->indices);
 
 		Bind();
@@ -504,24 +502,19 @@ namespace Vxl
 
 				float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
 				Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y)*r;
-				Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r;
+				//Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r;
 				Tangents[i + 0] += tangent;
 				Tangents[i + 1] += tangent;
 				Tangents[i + 2] += tangent;
-				Bitangents[i + 0] += bitangent;
-				Bitangents[i + 1] += bitangent;
-				Bitangents[i + 2] += bitangent;
 			}
 		}
 		// Normalize the normals
 		for (uint32_t i = 0; i < _vertCount; i++)
 		{
 			Tangents[i].NormalizeSelf();
-			Bitangents[i].NormalizeSelf();
 		}
 		//
 		m_tangents.set(Tangents);
-		m_bitangents.set(Bitangents);
 	}
 
 	void Mesh::GenerateNormals(bool Smooth)
@@ -539,7 +532,7 @@ namespace Vxl
 	void Mesh::GenerateTangents()
 	{
 		// Generate Missing Tangents
-		if ((m_tangents.IsEmpty() || m_bitangents.IsEmpty()) && !m_positions.IsEmpty() && !m_uvs.IsEmpty())
+		if ((m_tangents.IsEmpty()) && !m_positions.IsEmpty() && !m_uvs.IsEmpty())
 		{
 			GenerateTangents(
 				m_positions.getVertices().data(), m_positions.getVertexCount(),
@@ -590,7 +583,6 @@ namespace Vxl
 		m_uvs.bind();
 		m_normals.bind();
 		m_tangents.bind();
-		m_bitangents.bind();
 		m_instances.bind();
 		m_indices.bind();
 

@@ -11,15 +11,19 @@ namespace Vxl
 
 	void GlobalFiles::LoadFile(const std::string& name, const std::string& filepath)
 	{
+		std::string nameLowercase = stringUtil::toLowerCopy(name);
+
 		if (FileIO::fileExists(filepath))
-			m_files[name] = FileData(filepath, FileIO::readFile(filepath));
+			m_files[nameLowercase] = FileData(filepath, FileIO::readFile(filepath));
 		else
 			VXL_ERROR("Filepath does not exist for GlobalFiles");
 	}
 	void GlobalFiles::UnloadFile(const std::string& name)
 	{
-		if (m_files.find(name) != m_files.end())
-			m_files.erase(name);
+		std::string nameLowercase = stringUtil::toLowerCopy(name);
+
+		if (m_files.find(nameLowercase) != m_files.end())
+			m_files.erase(nameLowercase);
 	}
 	void GlobalFiles::ReloadFiles()
 	{
@@ -34,8 +38,6 @@ namespace Vxl
 		{
 			struct stat buffer;
 			return (stat(filePath.c_str(), &buffer) == 0);
-			//std::ifstream infile(filePath);
-			//return infile.good();
 		}
 		// Interpret file as string
 		std::string readFile(const std::string& filePath)

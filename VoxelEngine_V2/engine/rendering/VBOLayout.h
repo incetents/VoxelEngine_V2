@@ -19,7 +19,6 @@ namespace Vxl
 		SECOND_COLOR = 4,
 		FOG = 5,
 		TANGENT = 6,
-		BITANGENT = 7,
 		UV1 = 8,  INSTANCING_1 = 8,
 		UV2 = 9,  INSTANCING_2 = 9,
 		UV3 = 10, INSTANCING_3 = 10,

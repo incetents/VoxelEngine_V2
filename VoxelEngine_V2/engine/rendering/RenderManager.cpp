@@ -459,15 +459,18 @@ namespace Vxl
 	}
 	void RenderManager::Render(Material* _material, const std::set<GameObject*>& _objects)
 	{
-		VXL_ASSERT(_material, "Material required to render objects");
-		_material->BindProgram();
-		_material->BindStates();
-		_material->BindTextures(); // Only occurs if shared textures is true
-
-		for (auto& ent : _objects)
+		if (_material->IsValid())
 		{
-			if (ent->IsFamilyActive())
-				ent->Draw();
+			VXL_ASSERT(_material, "Material required to render objects");
+			_material->BindProgram();
+			_material->BindStates();
+			_material->BindTextures(); // Only occurs if shared textures is true
+
+			for (auto& ent : _objects)
+			{
+				if (ent->IsFamilyActive())
+					ent->Draw();
+			}
 		}
 	}
 
@@ -503,47 +506,50 @@ namespace Vxl
 	{
 		// Extra Objects for COLOR ID
 		auto gbuffer_mat = Material::GetAsset("gbuffer");
-		gbuffer_mat->BindProgram();
-		gbuffer_mat->BindStates();
-
-		// Force specific fbo draw buffers
-		auto fbo_gbuffer = FramebufferObject::GetAsset("gbuffer");
-		// Store Depth for later usage
-		//auto fbo_colorpicker = FramebufferObject::GetAsset("ColorPicker");
-		
-		// Only render to COLOR ID Texture
-		fbo_gbuffer->DisableAttachment(0);
-		fbo_gbuffer->DisableAttachment(1);
-
-		// Default
-		gbuffer_mat->m_property_useModel.SetProperty(true);
-		gbuffer_mat->m_property_useInstancing.SetProperty(false);
-		gbuffer_mat->m_property_useTexture.SetProperty(false);
-		gbuffer_mat->m_property_tint.SetProperty(Color3F(1,1,1));
-		gbuffer_mat->m_property_color.SetProperty(Color3F(1,1,1));
-		
-		// Render CameraObjects
-		auto Cameras = CameraObject::GetAllNamedAssets();
-		for (auto it = Cameras.begin(); it != Cameras.end(); it++)
+		if (gbuffer_mat->IsValid())
 		{
-			gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
-			gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
+			gbuffer_mat->BindProgram();
+			gbuffer_mat->BindStates();
 
-			Geometry.GetSphere()->Draw();
+			// Force specific fbo draw buffers
+			auto fbo_gbuffer = FramebufferObject::GetAsset("gbuffer");
+			// Store Depth for later usage
+			//auto fbo_colorpicker = FramebufferObject::GetAsset("ColorPicker");
+
+			// Only render to COLOR ID Texture
+			fbo_gbuffer->DisableAttachment(0);
+			fbo_gbuffer->DisableAttachment(1);
+
+			// Default
+			gbuffer_mat->m_property_useModel.SetProperty(true);
+			gbuffer_mat->m_property_useInstancing.SetProperty(false);
+			gbuffer_mat->m_property_useTexture.SetProperty(false);
+			gbuffer_mat->m_property_tint.SetProperty(Color3F(1, 1, 1));
+			gbuffer_mat->m_property_color.SetProperty(Color3F(1, 1, 1));
+
+			// Render CameraObjects
+			auto Cameras = CameraObject::GetAllNamedAssets();
+			for (auto it = Cameras.begin(); it != Cameras.end(); it++)
+			{
+				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
+				gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
+
+				Geometry.GetSphere()->Draw();
+			}
+			// Render LightObjects
+			auto Lights = LightObject::GetAllNamedAssets();
+			for (auto it = Lights.begin(); it != Lights.end(); it++)
+			{
+				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
+				gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
+
+				Geometry.GetSphere()->Draw();
+			}
+
+			// Fix fbo draw buffers
+			fbo_gbuffer->EnableAttachment(0);
+			fbo_gbuffer->EnableAttachment(1);
 		}
-		// Render LightObjects
-		auto Lights = LightObject::GetAllNamedAssets();
-		for (auto it = Lights.begin(); it != Lights.end(); it++)
-		{
-			gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
-			gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
-
-			Geometry.GetSphere()->Draw();
-		}
-
-		// Fix fbo draw buffers
-		fbo_gbuffer->EnableAttachment(0);
-		fbo_gbuffer->EnableAttachment(1);
 	}
 	void RenderManager::RenderEditorObjects()
 	{
@@ -555,83 +561,91 @@ namespace Vxl
 
 		// Draw Lights
 		auto billboard = Material::GetAsset("billboard");
-		billboard->BindProgram();
-		
-		Texture2D* LightTexture = Texture2D::GetAsset("editor_lightbulb");
-		auto AllLights = LightObject::GetAllNamedAssets();
-		for (auto light = AllLights.begin(); light != AllLights.end(); light++)
+		if (billboard->IsValid())
 		{
-			billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getWorldModel(), true);
-		
-			if (LightTexture)
-				LightTexture->Bind(TextureLevel::LEVEL0);
-			else
-				Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
+			billboard->BindProgram();
 
-			Geometry.GetQuadZ()->Draw();
-		}
+			Texture2D* LightTexture = Texture2D::GetAsset("editor_lightbulb");
+			auto AllLights = LightObject::GetAllNamedAssets();
+			for (auto light = AllLights.begin(); light != AllLights.end(); light++)
+			{
+				billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getWorldModel(), true);
 
-		// Draw Cameras
-		Texture2D* CameraTexture = Texture2D::GetAsset("editor_camera");
-		auto AllCameras = CameraObject::GetAllNamedAssets();
-		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
-		{
-			billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getWorldModel(), true);
+				if (LightTexture)
+					LightTexture->Bind(TextureLevel::LEVEL0);
+				else
+					Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
 
-			if (LightTexture)
-				CameraTexture->Bind(TextureLevel::LEVEL0);
-			else
-				Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
+				Geometry.GetQuadZ()->Draw();
+			}
 
-			Geometry.GetQuadZ()->Draw();
+			// Draw Cameras
+			Texture2D* CameraTexture = Texture2D::GetAsset("editor_camera");
+			auto AllCameras = CameraObject::GetAllNamedAssets();
+			for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
+			{
+				billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getWorldModel(), true);
+
+				if (LightTexture)
+					CameraTexture->Bind(TextureLevel::LEVEL0);
+				else
+					Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
+
+				Geometry.GetQuadZ()->Draw();
+			}
 		}
 
 		// Draw Debug Lines
-
 		auto lines = Material::GetAsset("lines");
-		lines->BindProgram();
-		lines->m_property_viewport.SetProperty(Window.GetViewport());
+		if (lines->IsValid())
+		{
+			lines->BindProgram();
+			lines->m_property_viewport.SetProperty(Window.GetViewport());
 
-		lines->SetProperty<bool>("passthrough", false);
+			lines->SetProperty<bool>("passthrough", false);
 
-		Graphics::SetDepthWrite(false);
-		Graphics::SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
+			Graphics::SetDepthWrite(false);
+			Graphics::SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
 
-		Debug.RenderWorldLines();
+			Debug.RenderWorldLines();
 
-		Graphics::SetDepthPassRule(DepthPassRule::GREATER);
-		// ???
+			Graphics::SetDepthPassRule(DepthPassRule::GREATER);
+			// ???
 
-		Graphics::SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
+			Graphics::SetDepthPassRule(DepthPassRule::LESS_OR_EQUAL);
 
-		lines->SetProperty<bool>("passthrough", true);
+			lines->SetProperty<bool>("passthrough", true);
 
-		Debug.RenderScreenLines();
+			Debug.RenderScreenLines();
 
-		Graphics::SetDepthWrite(true);
-
+			Graphics::SetDepthWrite(true);
+		}
 
 
 		// Draw Debug Wireframe Sphere
 		auto passthrough = Material::GetAsset("transparent_passthroughWorld");
-		passthrough->BindProgram();
-		passthrough->m_property_useTexture.SetProperty(false);
-		passthrough->m_property_useModel.SetProperty(true);
-		
-		Graphics::SetWireframeState(true);
-		Graphics::SetCullMode(CullMode::NO_CULL);
-
-		Graphics::SetLineWidth(5.0f);
-		for (const auto& sphere : Debug.m_wireframeSpheres)
+		if (passthrough->IsValid())
 		{
-			passthrough->m_property_color.SetProperty(sphere.color.getRGB());
-			passthrough->m_property_model.SetPropertyMatrix(sphere.model, true);
-			Geometry.GetIcoSphere()->Draw();
-		}
-		Graphics::SetLineWidth(1.0f);
 
-		Graphics::SetWireframeState(false);
-		Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+			passthrough->BindProgram();
+			passthrough->m_property_useTexture.SetProperty(false);
+			passthrough->m_property_useModel.SetProperty(true);
+
+			Graphics::SetWireframeState(true);
+			Graphics::SetCullMode(CullMode::NO_CULL);
+
+			Graphics::SetLineWidth(5.0f);
+			for (const auto& sphere : Debug.m_wireframeSpheres)
+			{
+				passthrough->m_property_color.SetProperty(sphere.color.getRGB());
+				passthrough->m_property_model.SetPropertyMatrix(sphere.model, true);
+				Geometry.GetIcoSphere()->Draw();
+			}
+			Graphics::SetLineWidth(1.0f);
+
+			Graphics::SetWireframeState(false);
+			Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+		}
 
 	}
 
@@ -641,91 +655,95 @@ namespace Vxl
 		if (Editor.HasSelection())
 		{
 			auto simpleLight = Material::GetAsset("simpleLight");
-			simpleLight->BindProgram();
-
-			simpleLight->m_property_useModel.SetProperty(true);
-			simpleLight->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
-
-			// Movement //
-			if (Editor.m_controlMode == Editor.ControlMode::TRANSLATE)
+			if (simpleLight->IsValid())
 			{
-				// X Axis //
-				if (Editor.m_controlAxis == Axis::X)
-					if (Editor.m_controlAxisClicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+
+				simpleLight->BindProgram();
+
+				simpleLight->m_property_useModel.SetProperty(true);
+				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
+
+				// Movement //
+				if (Editor.m_controlMode == Editor.ControlMode::TRANSLATE)
+				{
+					// X Axis //
+					if (Editor.m_controlAxis == Axis::X)
+						if (Editor.m_controlAxisClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::RED);
+						simpleLight->m_property_color.SetProperty(Color3F::RED);
 
-				Geometry.GetArrowX()->Draw();
+					Geometry.GetArrowX()->Draw();
 
-				// Y Axis //
-				if (Editor.m_controlAxis == Axis::Y)
-					if (Editor.m_controlAxisClicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					// Y Axis //
+					if (Editor.m_controlAxis == Axis::Y)
+						if (Editor.m_controlAxisClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::GREEN);
+						simpleLight->m_property_color.SetProperty(Color3F::GREEN);
 
-				Geometry.GetArrowY()->Draw();
+					Geometry.GetArrowY()->Draw();
 
-				// Z Axis //
-				if (Editor.m_controlAxis == Axis::Z)
-					if (Editor.m_controlAxisClicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					// Z Axis //
+					if (Editor.m_controlAxis == Axis::Z)
+						if (Editor.m_controlAxisClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::BLUE);
+						simpleLight->m_property_color.SetProperty(Color3F::BLUE);
 
-				Geometry.GetArrowZ()->Draw();
+					Geometry.GetArrowZ()->Draw();
 
-				// Small cube in the middle //
-				simpleLight->m_property_color.SetProperty(Color3F::WHITE);
-				simpleLight->m_property_alpha.SetProperty(0.85f);
-				Geometry.GetCubeSmall()->Draw();
+					// Small cube in the middle //
+					simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					simpleLight->m_property_alpha.SetProperty(0.85f);
+					Geometry.GetCubeSmall()->Draw();
 
-				Graphics::SetCullMode(CullMode::NO_CULL);
+					Graphics::SetCullMode(CullMode::NO_CULL);
 
-				// X Plane
-				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
-				if (Editor.m_controlPlane == Axis::X)
-					if (Editor.m_controlAxisClicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					// X Plane
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
+					if (Editor.m_controlPlane == Axis::X)
+						if (Editor.m_controlAxisClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::RED);
-				Geometry.GetHalfQuadX()->Draw();
-				
-				// Y Plane
-				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
-				if (Editor.m_controlPlane == Axis::Y)
-					if (Editor.m_controlAxisClicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						simpleLight->m_property_color.SetProperty(Color3F::RED);
+					Geometry.GetHalfQuadX()->Draw();
+
+					// Y Plane
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
+					if (Editor.m_controlPlane == Axis::Y)
+						if (Editor.m_controlAxisClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::GREEN);
-				Geometry.GetHalfQuadY()->Draw();
+						simpleLight->m_property_color.SetProperty(Color3F::GREEN);
+					Geometry.GetHalfQuadY()->Draw();
 
-				// Z Plane
-				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
-				if (Editor.m_controlPlane == Axis::Z)
-					if (Editor.m_controlAxisClicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					// Z Plane
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
+					if (Editor.m_controlPlane == Axis::Z)
+						if (Editor.m_controlAxisClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::BLUE);
-				Geometry.GetHalfQuadZ()->Draw();
+						simpleLight->m_property_color.SetProperty(Color3F::BLUE);
+					Geometry.GetHalfQuadZ()->Draw();
 
-				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+					Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
-				// revert
-				simpleLight->m_property_alpha.SetProperty(1.0f);
+					// revert
+					simpleLight->m_property_alpha.SetProperty(1.0f);
+				}
 			}
 			// TEST //
 

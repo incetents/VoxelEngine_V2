@@ -1,27 +1,27 @@
 
 #Name
 {
-	showNormalsMat
+	name_is_not_used_yet
 }
 
 #Attributes
 {
 	vec3 m_position 	: 0
-	//vec2 m_uv 			: 1;
 	vec3 m_normal 		: 2
 	vec3 m_tangent 		: 6
-	vec3 m_bitangent 	: 7
 }
 
 #Include
 {
-	_UBO.glsl, _Math.glsl
+	_UBO.glsl,
+	_uniforms.glsl,
+	_Math.glsl
 }
 
 #Properties
 {
-	uniform mat4 VXL_model			= mat4(1.0);
-	uniform bool VXL_useModel 		= true;
+	//uniform mat4 VXL_model			= mat4(1.0);
+	//uniform bool VXL_useModel 		= true;
 	uniform float normal_length 	= 1.0;
 }
 
@@ -46,7 +46,7 @@
 	
 		v_data.normal = m_normal;
 		v_data.tangent = m_tangent;
-		v_data.bitangent = m_bitangent;
+		v_data.bitangent = cross(m_normal, m_tangent);
 	}
 }
 

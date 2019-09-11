@@ -221,17 +221,17 @@ namespace Vxl
 
 					if (!builder.VertexShader.empty())
 					{
-						m_shaders.push_back(new Shader( builder.Name + "_Vert", builder.VertexShader, ShaderType::VERTEX));
+						m_shaders.push_back(new Shader( m_name + "_Vert", builder.VertexShader, ShaderType::VERTEX));
 					}
 
 					if (!builder.GeomShader.empty())
 					{
-						m_shaders.push_back(new Shader( builder.Name + "_Geom", builder.GeomShader, ShaderType::GEOMETRY));
+						m_shaders.push_back(new Shader( m_name + "_Geom", builder.GeomShader, ShaderType::GEOMETRY));
 					}
 
 					if (!builder.FragShader.empty())
 					{
-						m_shaders.push_back(new Shader( builder.Name + "_Frag", builder.FragShader, ShaderType::FRAGMENT));
+						m_shaders.push_back(new Shader( m_name + "_Frag", builder.FragShader, ShaderType::FRAGMENT));
 					}
 					
 				}

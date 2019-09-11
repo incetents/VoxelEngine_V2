@@ -62,7 +62,7 @@ namespace Vxl
 
 			if (m_controlAxisLocal)
 			{
-				Matrix3x3 RotationMatrix = m_selectedEntities[0]->m_transform.getWorldRotation().GetMatrix3x3();
+				Matrix3x3 RotationMatrix = m_selectedEntities[0]->m_transform.getWorldRotationMatrix();
 				m_SelectionTransform.Model = Matrix4x4(RotationMatrix * Matrix3x3::GetScale(AxisScale), m_SelectionTransform.WorldPosition);
 				m_SelectionTransform.Forward = m_selectedEntities[0]->m_transform.getForward();
 				m_SelectionTransform.Up = m_selectedEntities[0]->m_transform.getUp();

@@ -59,7 +59,7 @@ namespace Vxl
 
 	void GameObject::Draw()
 	{
-		if (m_mesh)
+		if (m_mesh && m_material->IsValid())
 		{
 			// Bind Textures (ignore if wireframe mode is ON)
 			if (m_material->m_Wireframe == false && !m_material->HasSharedTextures())
@@ -68,13 +68,20 @@ namespace Vxl
 			}
 
 			// ~ Model ~ //
-			if(m_material->m_property_useModel.IsUsed())
+			if (m_material->m_property_useModel.IsUsed())
+			{
 				m_material->m_property_useModel.SetProperty(m_useTransform);
 
-			if (m_useTransform && m_material->m_property_model.IsUsed())
-			{
-				m_material->m_property_model.SetPropertyMatrix(m_transform.getWorldModel(), true);
+				if (m_useTransform)
+				{
+					if(m_material->m_property_model.IsUsed())
+						m_material->m_property_model.SetPropertyMatrix(m_transform.getWorldModel(), true);
+
+					if(m_material->m_property_model_rotation.IsUsed())
+						m_material->m_property_model_rotation.SetPropertyMatrix(m_transform.getWorldRotationMatrix(), true);
+				}
 			}
+
 			// ~ Instancing ~ //
 			if (m_material->m_property_useInstancing.IsUsed())
 			{

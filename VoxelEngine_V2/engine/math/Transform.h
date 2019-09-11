@@ -27,12 +27,13 @@ namespace Vxl
 
 		// Raw Values
 		Vector3		m_worldPosition;	// World Position
-		Vector3		m_position; // Local Position
-		Vector3		m_euler_rotation; // Local Euler
-		Quaternion	m_localrotation; // Local Rotation
-		Quaternion	m_worldrotation; // World Rotation
-		Vector3		m_scale;		// Local Scale
-		Vector3		m_lossyScale;   // World Scale (Not supper accurate)
+		Vector3		m_position;			// Local Position
+		Vector3		m_euler_rotation;	// Local Euler
+		Quaternion	m_local_rotation;	// Local Rotation Quaternion
+		Quaternion	m_world_rotation;	// World Rotation Quaternion
+		Matrix3x3	m_rotation_matrix;  // World Rotation Matrix
+		Vector3		m_scale;			// Local Scale
+		Vector3		m_lossyScale;		// World Scale (Not supper accurate)
 
 		// Direction Space [ World Direction ]
 		Vector3		m_forward	= Vector3::FORWARD;
@@ -551,49 +552,54 @@ namespace Vxl
 		}
 
 		// Getters
-		inline Vector3		getWorldPosition(void)
+		inline const Vector3&		getWorldPosition(void)
 		{
 			updateValues();
 			return m_worldPosition;
 		}
-		inline Vector3		getPosition(void) const
+		inline const Vector3&		getPosition(void) const
 		{
 			return m_position;
 		}
-		inline Vector3		getRotationEuler(void) const
+		inline const Vector3&		getRotationEuler(void) const
 		{
 			return m_euler_rotation;
 		}
-		inline Vector3		getWorldScale(void)
+		inline const Vector3&		getWorldScale(void)
 		{
 			updateValues();
 			return m_lossyScale;
 		}
-		inline Vector3		getScale(void) const
+		inline const Vector3&		getScale(void) const
 		{
 			return m_scale;
 		}
-		inline Quaternion	getLocalRotation(void)
+		inline const Quaternion&	getLocalRotation(void)
 		{
 			updateValues();
-			return m_localrotation;
+			return m_local_rotation;
 		}
-		inline Quaternion	getWorldRotation(void)
+		inline const Quaternion&	getWorldRotation(void)
 		{
 			updateValues();
-			return m_worldrotation;
+			return m_world_rotation;
 		}
-		const Vector3& getForward(void)
+		inline const Matrix3x3&		getWorldRotationMatrix(void)
+		{
+			updateValues();
+			return m_rotation_matrix;
+		}
+		inline const Vector3& getForward(void)
 		{
 			updateValues();
 			return m_forward;
 		}
-		const Vector3& getUp(void)
+		inline const Vector3& getUp(void)
 		{
 			updateValues();
 			return m_up;
 		}
-		const Vector3& getRight(void)
+		inline const Vector3& getRight(void)
 		{
 			updateValues();
 			return m_right;

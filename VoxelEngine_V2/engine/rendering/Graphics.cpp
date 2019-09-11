@@ -1284,22 +1284,22 @@ namespace Vxl
 	template<>
 	void Graphics::Uniform::SendMatrix<Matrix2x2>(Matrix2x2 data, bool transposeMatrix)
 	{
-		glUniformMatrix4fv(location, 1, transposeMatrix, data.GetStartPointer());
+		glUniformMatrix2fv(location, 1, transposeMatrix, data.GetStartPointer());
 	}
 	template<>
 	void Graphics::Uniform::SendMatrix<Matrix2x2&>(Matrix2x2& data, bool transposeMatrix)
 	{
-		glUniformMatrix4fv(location, 1, transposeMatrix, data.GetStartPointer());
+		glUniformMatrix2fv(location, 1, transposeMatrix, data.GetStartPointer());
 	}
 	template<>
 	void Graphics::Uniform::SendMatrix<Matrix3x3>(Matrix3x3 data, bool transposeMatrix)
 	{
-		glUniformMatrix4fv(location, 1, transposeMatrix, data.GetStartPointer());
+		glUniformMatrix3fv(location, 1, transposeMatrix, data.GetStartPointer());
 	}
 	template<>
 	void Graphics::Uniform::SendMatrix<Matrix3x3&>(Matrix3x3& data, bool transposeMatrix)
 	{
-		glUniformMatrix4fv(location, 1, transposeMatrix, data.GetStartPointer());
+		glUniformMatrix3fv(location, 1, transposeMatrix, data.GetStartPointer());
 	}
 	template<>
 	void Graphics::Uniform::SendMatrix<Matrix4x4>(Matrix4x4 data, bool transposeMatrix)

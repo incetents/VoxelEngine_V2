@@ -160,6 +160,10 @@ namespace Vxl
 		}
 
 		// Getters
+		inline bool					IsValid(void) const
+		{
+			return m_shaderProgram->IsLinked();
+		}
 		inline const ShaderProgram* GetShader(void) const
 		{
 			return m_shaderProgram;
@@ -202,15 +206,16 @@ namespace Vxl
 		}
 
 		// Hardcoded Uniforms
-		MaterialProperty<bool>			m_property_useModel		 = MaterialProperty<bool>("VXL_useModel");
-		MaterialProperty<Matrix4x4>		m_property_model		 = MaterialProperty<Matrix4x4>("VXL_model");
-		MaterialProperty<bool>			m_property_useInstancing = MaterialProperty<bool>("VXL_useInstancing");
-		MaterialProperty<bool>			m_property_useTexture	 = MaterialProperty<bool>("VXL_useTexture");
-		MaterialProperty<Color3F>		m_property_color		 = MaterialProperty<Color3F>("VXL_color");
-		MaterialProperty<Color3F>		m_property_tint			 = MaterialProperty<Color3F>("VXL_tint");
-		MaterialProperty<Vector4>		m_property_viewport		 = MaterialProperty<Vector4>("VXL_viewport");
-		MaterialProperty<float>			m_property_alpha		 = MaterialProperty<float>("VXL_alpha");
-		MaterialProperty<Color4F>		m_property_output		 = MaterialProperty<Color4F>("VXL_output");
+		MaterialProperty<bool>			m_property_useModel			= MaterialProperty<bool>("VXL_useModel");
+		MaterialProperty<Matrix4x4>		m_property_model			= MaterialProperty<Matrix4x4>("VXL_model");
+		MaterialProperty<Matrix3x3>		m_property_model_rotation	= MaterialProperty<Matrix3x3>("VXL_model_rotation");
+		MaterialProperty<bool>			m_property_useInstancing	= MaterialProperty<bool>("VXL_useInstancing");
+		MaterialProperty<bool>			m_property_useTexture		= MaterialProperty<bool>("VXL_useTexture");
+		MaterialProperty<Color3F>		m_property_color			= MaterialProperty<Color3F>("VXL_color");
+		MaterialProperty<Color3F>		m_property_tint				= MaterialProperty<Color3F>("VXL_tint");
+		MaterialProperty<Vector4>		m_property_viewport			= MaterialProperty<Vector4>("VXL_viewport");
+		MaterialProperty<float>			m_property_alpha			= MaterialProperty<float>("VXL_alpha");
+		MaterialProperty<Color4F>		m_property_output			= MaterialProperty<Color4F>("VXL_output");
 
 		template<typename Type>
 		void SetProperty(const std::string& _uniformName, Type _data)

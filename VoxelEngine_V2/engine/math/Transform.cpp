@@ -16,28 +16,27 @@ namespace Vxl
 		if (isDirty)
 		{
 			// Acquire Rotation
-			m_localrotation = Quaternion::ToQuaternion_YXZ(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
-			m_worldrotation = m_localrotation;
-			Matrix3x3 RotationMatrix = m_localrotation.GetMatrix3x3();
+			m_local_rotation = Quaternion::ToQuaternion_YXZ(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
+			m_world_rotation = m_local_rotation;
 			
 			// Base Model Matrix
-			m_local_ModelMatrix = Matrix4x4(RotationMatrix * Matrix3x3::GetScale(m_scale), m_position);
+			m_local_ModelMatrix = Matrix4x4(m_local_rotation.GetMatrix3x3() * Matrix3x3::GetScale(m_scale), m_position);
 			m_world_ModelMatrix = m_local_ModelMatrix;
 
 			// Add Rotation / Model Matrix from parent
 			Transform* parent = m_parent;
 			while (parent != nullptr)
 			{
-				m_worldrotation = parent->getLocalRotation() * m_worldrotation;
+				m_world_rotation = parent->getLocalRotation() * m_world_rotation;
 				m_world_ModelMatrix = parent->getLocalModel() * m_world_ModelMatrix;
 				parent = parent->getParent();
 			}
 
 			// Calculate Axis Directions
-			Matrix3x3 FinalRotationMatrix = m_worldrotation.GetMatrix3x3();
-			m_right		= FinalRotationMatrix.GetColumn(0).Normalize();
-			m_up		= FinalRotationMatrix.GetColumn(1).Normalize();
-			m_forward	= FinalRotationMatrix.GetColumn(2).Normalize();
+			m_rotation_matrix = m_world_rotation.GetMatrix3x3();
+			m_right		= m_rotation_matrix.GetColumn(0).Normalize();
+			m_up		= m_rotation_matrix.GetColumn(1).Normalize();
+			m_forward	= m_rotation_matrix.GetColumn(2).Normalize();
 
 			// Update World position
 			m_worldPosition = Vector3(m_world_ModelMatrix.GetColumn(3));

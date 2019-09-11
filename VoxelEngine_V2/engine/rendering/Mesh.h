@@ -63,7 +63,6 @@ namespace Vxl
 		MeshBufferMem<Vector2>	m_uvs;
 		MeshBuffer<Vector3>		m_normals;
 		MeshBuffer<Vector3>		m_tangents;
-		MeshBuffer<Vector3>		m_bitangents;
 		MeshBufferInstancing	m_instances;
 		MeshBufferIndices		m_indices;
 

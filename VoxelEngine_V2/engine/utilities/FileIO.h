@@ -30,12 +30,16 @@ namespace Vxl
 		void ReloadFiles();
 		bool HasFile(const std::string& name)
 		{
-			return m_files.find(name) != m_files.end();
+			std::string nameLowercase = stringUtil::toLowerCopy(name);
+
+			return m_files.find(nameLowercase) != m_files.end();
 		}
 		const std::string& GetFile(const std::string& name)
 		{
-			if (HasFile(name))
-				return m_files[name].file;
+			std::string nameLowercase = stringUtil::toLowerCopy(name);
+
+			if (HasFile(nameLowercase))
+				return m_files[nameLowercase].file;
 			else
 			{
 				static std::string empty;
