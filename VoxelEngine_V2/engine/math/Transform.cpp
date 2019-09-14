@@ -15,35 +15,36 @@ namespace Vxl
 		// If dirty is true, update values
 		if (isDirty)
 		{
-			// Acquire Rotation
-			m_local_rotation = Quaternion::ToQuaternion_YXZ(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
-			m_world_rotation = m_local_rotation;
+			// Acquire Rotation Locally
+			m_worldRotation = Quaternion::ToQuaternion_YXZ(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
 			
 			// Base Model Matrix
-			m_local_ModelMatrix = Matrix4x4(m_local_rotation.GetMatrix3x3() * Matrix3x3::GetScale(m_scale), m_position);
-			m_world_ModelMatrix = m_local_ModelMatrix;
+			m_modelMatrix = Matrix4x4(m_worldRotation.GetMatrix3x3() * Matrix3x3::GetScale(m_scale), m_position);
 
 			// Add Rotation / Model Matrix from parent
 			Transform* parent = m_parent;
 			while (parent != nullptr)
 			{
-				m_world_rotation = parent->getLocalRotation() * m_world_rotation;
-				m_world_ModelMatrix = parent->getLocalModel() * m_world_ModelMatrix;
+				m_worldRotation = parent->getWorldRotation() * m_worldRotation;
+				m_modelMatrix = parent->getModel() * m_modelMatrix;
 				parent = parent->getParent();
 			}
 
+			// Calculate Normal Matrix
+			m_normalMatrix = Matrix3x3(m_modelMatrix).Inverse();
+
 			// Calculate Axis Directions
-			m_rotation_matrix = m_world_rotation.GetMatrix3x3();
+			Matrix3x3 m_rotation_matrix = m_worldRotation.GetMatrix3x3();
 			m_right		= m_rotation_matrix.GetColumn(0).Normalize();
 			m_up		= m_rotation_matrix.GetColumn(1).Normalize();
 			m_forward	= m_rotation_matrix.GetColumn(2).Normalize();
 
 			// Update World position
-			m_worldPosition = Vector3(m_world_ModelMatrix.GetColumn(3));
+			m_worldPosition = Vector3(m_modelMatrix.GetColumn(3));
 			// Update World Scale
-			m_lossyScale.x = Vector3::Length(m_world_ModelMatrix[0], m_world_ModelMatrix[1], m_world_ModelMatrix[2]);
-			m_lossyScale.y = Vector3::Length(m_world_ModelMatrix[4], m_world_ModelMatrix[5], m_world_ModelMatrix[6]);
-			m_lossyScale.z = Vector3::Length(m_world_ModelMatrix[8], m_world_ModelMatrix[9], m_world_ModelMatrix[10]);
+			m_lossyScale.x = Vector3::Length(m_modelMatrix[0], m_modelMatrix[1], m_modelMatrix[2]);
+			m_lossyScale.y = Vector3::Length(m_modelMatrix[4], m_modelMatrix[5], m_modelMatrix[6]);
+			m_lossyScale.z = Vector3::Length(m_modelMatrix[8], m_modelMatrix[9], m_modelMatrix[10]);
 
 			// Clean
 			isDirty = false;
@@ -105,13 +106,13 @@ namespace Vxl
 		updateValues();
 
 		// Get parent matrix
-		Matrix4x4 Model = m_parent->getLocalModel();
+		Matrix4x4 Model = m_parent->getModel();
 		Transform* parent = m_parent->getParent();
 
 		// Additional parents need to stack on current parent matrix
 		while (parent != nullptr)
 		{
-			Model = parent->getLocalModel() * Model;
+			Model = parent->getModel() * Model;
 			parent = parent->getParent();
 		}
 

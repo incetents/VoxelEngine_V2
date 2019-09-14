@@ -53,7 +53,7 @@ void main()
 	if(outputMode == 1)
 	{
 		// normal
-		_texture.rgb = abs(_texture.rgb); // make it visible on both sides
+		_texture.rgb = (_texture.rgb); // make it visible on both sides
 		output_color = _texture;
 	}
 	else if(outputMode == 2)

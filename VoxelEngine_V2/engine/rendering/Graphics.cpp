@@ -524,11 +524,11 @@ namespace Vxl
 		// Acquire Vendor
 		std::string VendorStr = Gpu_Vendor;
 		std::transform(VendorStr.begin(), VendorStr.end(), VendorStr.begin(), ::tolower);
-		if (VendorStr.find("nvidia") != -1)
+		if (VendorStr.find("nvidia") != std::string::npos)
 			Vendor = VendorType::NVIDIA;
-		else if (VendorStr.find("ati") != -1 || VendorStr.find("radeon") != -1)
+		else if (VendorStr.find("ati") != std::string::npos || VendorStr.find("radeon") != std::string::npos)
 			Vendor = VendorType::AMD;
-		else if (VendorStr.find("intel") != -1)
+		else if (VendorStr.find("intel") != std::string::npos)
 			Vendor = VendorType::INTEL;
 
 		// Acquire Restrictions
@@ -538,7 +538,7 @@ namespace Vxl
 		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &GLMaxUniformBindings);
 		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &GLMaxAttributes);
 
-		// VRAM MAximum
+		// VRAM Maximum
 		if (Vendor == VendorType::NVIDIA)
 		{
 			glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &VRAM_Maximum_KB);

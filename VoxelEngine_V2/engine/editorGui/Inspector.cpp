@@ -64,13 +64,17 @@ namespace Vxl
 			ImGui::TextColored(ImGuiColor::Orange, "ID: %d", Entity->GetUniqueID());
 
 			// Color
+			ImGui::TextColored(ImGuiColor::Orange, "Label Color:");
+			ImGui::SameLine();
+
 			float EntityColor[3] = { Entity->GetLabelColor().r, Entity->GetLabelColor().g, Entity->GetLabelColor().b };
 
-			if (ImGui::ColorEdit3("Label Color: ", EntityColor, ImGuiColorEditFlags_NoInputs))
+			if (ImGui::ColorEdit3("Label Color", EntityColor, ImGuiColorEditFlags_NoInputs))
 			{
 				Entity->SetLabelColor(Color3F(EntityColor[0], EntityColor[1], EntityColor[2]));
 			}
-			ImGui::SameLine();
+
+			ImGui::PopItemWidth();
 			if (ImGui::Button("Copy Color"))
 			{
 				LabelColorClipboard.r = EntityColor[0];
@@ -82,6 +86,7 @@ namespace Vxl
 			{
 				Entity->SetLabelColor(LabelColorClipboard);
 			}
+			ImGui::PushItemWidth(-1);
 
 			// Drag Speed
 			static float DragSpeed = 0.1f;

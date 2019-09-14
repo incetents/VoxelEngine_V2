@@ -531,7 +531,7 @@ namespace Vxl
 			auto Cameras = CameraObject::GetAllNamedAssets();
 			for (auto it = Cameras.begin(); it != Cameras.end(); it++)
 			{
-				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
+				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getModel(), true);
 				gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
 
 				Geometry.GetSphere()->Draw();
@@ -540,7 +540,7 @@ namespace Vxl
 			auto Lights = LightObject::GetAllNamedAssets();
 			for (auto it = Lights.begin(); it != Lights.end(); it++)
 			{
-				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getWorldModel(), true);
+				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getModel(), true);
 				gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
 
 				Geometry.GetSphere()->Draw();
@@ -569,7 +569,7 @@ namespace Vxl
 			auto AllLights = LightObject::GetAllNamedAssets();
 			for (auto light = AllLights.begin(); light != AllLights.end(); light++)
 			{
-				billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getWorldModel(), true);
+				billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getModel(), true);
 
 				if (LightTexture)
 					LightTexture->Bind(TextureLevel::LEVEL0);
@@ -584,7 +584,7 @@ namespace Vxl
 			auto AllCameras = CameraObject::GetAllNamedAssets();
 			for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 			{
-				billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getWorldModel(), true);
+				billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getModel(), true);
 
 				if (LightTexture)
 					CameraTexture->Bind(TextureLevel::LEVEL0);

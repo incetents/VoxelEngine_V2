@@ -75,10 +75,10 @@ namespace Vxl
 				if (m_useTransform)
 				{
 					if(m_material->m_property_model.IsUsed())
-						m_material->m_property_model.SetPropertyMatrix(m_transform.getWorldModel(), true);
+						m_material->m_property_model.SetPropertyMatrix(m_transform.getModel(), true);
 
-					if(m_material->m_property_model_rotation.IsUsed())
-						m_material->m_property_model_rotation.SetPropertyMatrix(m_transform.getWorldRotationMatrix(), true);
+					if(m_material->m_property_normalMatrix.IsUsed())
+						m_material->m_property_normalMatrix.SetPropertyMatrix(m_transform.getNormalMatrix(), true);
 				}
 			}
 

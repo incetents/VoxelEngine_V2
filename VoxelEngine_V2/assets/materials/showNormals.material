@@ -20,9 +20,7 @@
 
 #Properties
 {
-	//uniform mat4 VXL_model			= mat4(1.0);
-	//uniform bool VXL_useModel 		= true;
-	uniform float normal_length 	= 1.0;
+	uniform float normal_length 	= 0.75;
 }
 
 #Vertex
@@ -32,7 +30,6 @@
 	{
 		vec3 normal;
 		vec3 tangent;
-		vec3 bitangent;
 		
 	} v_data;
 	
@@ -44,9 +41,8 @@
 		else
 			gl_Position = vec4(m_position, 1);
 	
-		v_data.normal = m_normal;
-		v_data.tangent = m_tangent;
-		v_data.bitangent = cross(m_normal, m_tangent);
+		v_data.normal = VXL_normalMatrix * m_normal;
+		v_data.tangent = VXL_normalMatrix * m_tangent;
 	}
 }
 
@@ -62,7 +58,6 @@
 	{
 		vec3 normal;
 		vec3 tangent;
-		vec3 bitangent;
 
 	} v_data[];
 
@@ -89,9 +84,9 @@
 		for(i=0; i< gl_in.length(); i++)
 		{
 			vec3 P = gl_in[i].gl_Position.xyz;
-			vec3 N = v_data[i].normal;
-			vec3 T = v_data[i].tangent;
-			vec3 B = v_data[i].bitangent;
+			vec3 N = normalize(v_data[i].normal);
+			vec3 T = normalize(v_data[i].tangent);
+			vec3 B = cross(N, T);
 			
 			// Normal
 			drawLine(

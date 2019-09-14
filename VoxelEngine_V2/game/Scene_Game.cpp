@@ -248,7 +248,7 @@ namespace Vxl
 			for (float y = 0; y < 5.0f; y++)
 			{
 				Transform t(Vec3(x * 1.2f, y * 1.2f, 0.0f));
-				m_models.push_back(t.getLocalModel().Transpose());
+				m_models.push_back(t.getModel().Transpose());
 			}
 		}
 		
@@ -581,7 +581,7 @@ namespace Vxl
 						{
 							//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
 							auto Instances = _mesh->m_instances.GetVertices();
-							auto EModel = Entity->m_transform.getWorldModel();
+							auto EModel = Entity->m_transform.getModel();
 							for (Matrix4x4& instanceMatrix : *Instances)
 							{
 								//Vector3 Pos = Vector3(instanceMatrix.Transpose() * Vector4(EntityWorld, 1));

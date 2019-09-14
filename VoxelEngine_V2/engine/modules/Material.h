@@ -208,7 +208,7 @@ namespace Vxl
 		// Hardcoded Uniforms
 		MaterialProperty<bool>			m_property_useModel			= MaterialProperty<bool>("VXL_useModel");
 		MaterialProperty<Matrix4x4>		m_property_model			= MaterialProperty<Matrix4x4>("VXL_model");
-		MaterialProperty<Matrix3x3>		m_property_model_rotation	= MaterialProperty<Matrix3x3>("VXL_model_rotation");
+		MaterialProperty<Matrix3x3>		m_property_normalMatrix		= MaterialProperty<Matrix3x3>("VXL_normalMatrix");
 		MaterialProperty<bool>			m_property_useInstancing	= MaterialProperty<bool>("VXL_useInstancing");
 		MaterialProperty<bool>			m_property_useTexture		= MaterialProperty<bool>("VXL_useTexture");
 		MaterialProperty<Color3F>		m_property_color			= MaterialProperty<Color3F>("VXL_color");

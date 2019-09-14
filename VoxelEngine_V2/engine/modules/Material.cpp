@@ -38,7 +38,7 @@ namespace Vxl
 
 		m_property_useModel.AcquireUniform(*m_shaderProgram);
 		m_property_model.AcquireUniform(*m_shaderProgram);
-		m_property_model_rotation.AcquireUniform(*m_shaderProgram);
+		m_property_normalMatrix.AcquireUniform(*m_shaderProgram);
 		m_property_useInstancing.AcquireUniform(*m_shaderProgram);
 		m_property_useTexture.AcquireUniform(*m_shaderProgram);
 		m_property_color.AcquireUniform(*m_shaderProgram);

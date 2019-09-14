@@ -23,7 +23,7 @@ out vertex_data
 // Uniforms
 uniform bool VXL_useModel 		 = true;
 uniform mat4 VXL_model			 = mat4(1.0);
-uniform mat3 VXL_model_rotation	 = mat3(1.0);
+uniform mat3 VXL_normalMatrix	 = mat3(1.0);
 uniform bool VXL_useInstancing 	 = false;
 
 // Main
@@ -41,8 +41,8 @@ void main()
 		// Position
 		v_data.pos = vec3(model * vec4(m_position, 1.0));
 		// Normals
-		v_data.normal = VXL_model_rotation * m_normal;
-		v_data.tangent = VXL_model_rotation * m_tangent;
+		v_data.normal = VXL_normalMatrix * m_normal;
+		v_data.tangent = VXL_normalMatrix * m_tangent;
 	}
 	// Passthrough
 	else

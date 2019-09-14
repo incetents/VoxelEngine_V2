@@ -22,18 +22,21 @@ namespace Vxl
 		friend class CameraObject;
 	protected:
 		// Model for transformations
-		Matrix4x4	m_local_ModelMatrix; // Row Major
-		Matrix4x4	m_world_ModelMatrix; // Row Major
+		Matrix4x4	m_modelMatrix;  // World Transformations - Row Major
+		// Model for normals
+		Matrix3x3	m_normalMatrix; // Normal Transformations - Row Major
 
-		// Raw Values
-		Vector3		m_worldPosition;	// World Position
+		// Local Space
 		Vector3		m_position;			// Local Position
 		Vector3		m_euler_rotation;	// Local Euler
-		Quaternion	m_local_rotation;	// Local Rotation Quaternion
-		Quaternion	m_world_rotation;	// World Rotation Quaternion
-		Matrix3x3	m_rotation_matrix;  // World Rotation Matrix
 		Vector3		m_scale;			// Local Scale
+		
+		// World Space
+		Vector3		m_worldPosition;	// World Position
+		Quaternion	m_worldRotation;	// World Rotation Quaternion
 		Vector3		m_lossyScale;		// World Scale (Not supper accurate)
+		
+		
 
 		// Direction Space [ World Direction ]
 		Vector3		m_forward	= Vector3::FORWARD;
@@ -389,7 +392,6 @@ namespace Vxl
 			return setForward(-forward);
 		}
 		Transform& setForward(const Vector3& forward);
-
 		Transform& setRotation(const Quaternion& quat);
 
 		// Increasers
@@ -539,19 +541,17 @@ namespace Vxl
 			return increaseRotation(euler_increase);
 		}
 
-		// Turn object into a 4x4 matrix for math
-		inline const Matrix4x4& getLocalModel(void)
-		{
-			updateValues();
-			return m_local_ModelMatrix;
-		}
-		inline const Matrix4x4& getWorldModel(void)
-		{
-			updateValues();
-			return m_world_ModelMatrix;
-		}
-
 		// Getters
+		inline const Matrix4x4&		getModel(void)
+		{
+			updateValues();
+			return m_modelMatrix;
+		}
+		inline const Matrix3x3&		getNormalMatrix(void)
+		{
+			updateValues();
+			return m_normalMatrix;
+		}
 		inline const Vector3&		getWorldPosition(void)
 		{
 			updateValues();
@@ -574,21 +574,11 @@ namespace Vxl
 		{
 			return m_scale;
 		}
-		inline const Quaternion&	getLocalRotation(void)
-		{
-			updateValues();
-			return m_local_rotation;
-		}
 		inline const Quaternion&	getWorldRotation(void)
 		{
 			updateValues();
-			return m_world_rotation;
-		}
-		inline const Matrix3x3&		getWorldRotationMatrix(void)
-		{
-			updateValues();
-			return m_rotation_matrix;
-		}
+			return m_worldRotation;
+		}	
 		inline const Vector3& getForward(void)
 		{
 			updateValues();
