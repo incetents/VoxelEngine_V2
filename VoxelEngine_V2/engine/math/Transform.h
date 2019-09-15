@@ -263,7 +263,7 @@ namespace Vxl
 		{
 			return setWorldPosition(Vector3(x, y, z));
 		}
-		Transform& setWorldPosition(const Vector3& position);
+		Transform&		  setWorldPosition(const Vector3& position);
 
 		inline Transform& setPosition(float x, float y, float z)
 		{
@@ -380,7 +380,7 @@ namespace Vxl
 			increaseWorldPosition(Vector3(x, y, z));
 			return *this;
 		}
-		Transform& increaseWorldPosition(const Vector3& translate);
+		Transform&		  increaseWorldPosition(const Vector3& translate);
 
 		inline Transform& increasePosition(float x, float y, float z)
 		{

@@ -79,7 +79,8 @@ namespace Vxl
 		if (_mesh != nullptr)
 		{
 			// Update OBB
-			Vector3 _scale = _mesh->GetVertexMax() - _mesh->GetVertexMin();
+			Vector3 _worldScale = m_transform.getWorldScale();
+			Vector3 _scale = _worldScale * (_mesh->GetVertexMax() - _mesh->GetVertexMin());
 			Vector3 _right = m_transform.getRight() * _scale.x * 0.5f;
 			Vector3 _up = m_transform.getUp() * _scale.y * 0.5f;
 			Vector3 _forward = m_transform.getForward() * _scale.z * 0.5f;

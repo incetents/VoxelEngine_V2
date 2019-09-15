@@ -41,10 +41,11 @@ namespace Vxl
 
 			// Update World position
 			m_worldPosition = Vector3(m_modelMatrix.GetColumn(3));
+
 			// Update World Scale
-			m_lossyScale.x = Vector3::Length(m_modelMatrix[0], m_modelMatrix[1], m_modelMatrix[2]);
-			m_lossyScale.y = Vector3::Length(m_modelMatrix[4], m_modelMatrix[5], m_modelMatrix[6]);
-			m_lossyScale.z = Vector3::Length(m_modelMatrix[8], m_modelMatrix[9], m_modelMatrix[10]);
+			m_lossyScale.x = Vector3::Length(m_modelMatrix[0], m_modelMatrix[4], m_modelMatrix[8]);
+			m_lossyScale.y = Vector3::Length(m_modelMatrix[1], m_modelMatrix[5], m_modelMatrix[9]);
+			m_lossyScale.z = Vector3::Length(m_modelMatrix[2], m_modelMatrix[6], m_modelMatrix[10]);
 
 			// Clean
 			isDirty = false;
@@ -122,19 +123,10 @@ namespace Vxl
 			return *this;
 		}
 
-		// Make sure axis directions are up to date
-		updateValues();
-
-		// Move position based on current world axis
-		m_position += m_right * translate.x;
-		m_position += m_up * translate.y;
-		m_position += m_forward * translate.z;
-
-		SetDirty();
+		setWorldPosition(getWorldPosition() + translate);
 
 		return *this;
 	}
-
 
 	Transform& Transform::setForward(const Vector3& forward)
 	{
