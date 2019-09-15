@@ -355,7 +355,7 @@ namespace Vxl
 		_crate1->SetMaterial(material_gbuffer);
 		_crate1->SetTexture(_tex_crate, TextureLevel::LEVEL0);
 		_crate1->SetMesh(Geometry.GetCylinderX());
-		_crate1->m_transform.setPosition(1, 0, 0);
+		_crate1->m_transform.setPosition(1, 3, 2);
 		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		
 		
@@ -378,10 +378,10 @@ namespace Vxl
 		_crate3->m_transform.addChild(&_crate2->m_transform);
 		_crate2->m_transform.addChild(&_crate1->m_transform);
 
-		_crate2->m_transform.setRotation(65, 12, 3);
-		_crate3->m_transform.setRotation(45, 12, 3);
+		//_crate2->m_transform.setRotation(65, 12, 3);
+		//_crate3->m_transform.setRotation(45, 12, 3);
 		// World Position
-		_crate1->m_transform.setWorldPosition(-5, 0, 0);
+		_crate1->m_transform.setWorldPosition(-5, -5, 0);
 		
 		GameObject* _octo1 = GameObject::Create("_octo1");
 		_octo1->SetMaterial(material_gbuffer);

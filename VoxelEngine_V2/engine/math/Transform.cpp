@@ -23,11 +23,11 @@ namespace Vxl
 
 			// Add Rotation / Model Matrix from parent
 			Transform* parent = m_parent;
-			while (parent != nullptr)
+			if (parent != nullptr)
 			{
 				m_worldRotation = parent->getWorldRotation() * m_worldRotation;
 				m_modelMatrix = parent->getModel() * m_modelMatrix;
-				parent = parent->getParent();
+				//parent = parent->getParent();
 			}
 
 			// Calculate Normal Matrix
@@ -102,26 +102,39 @@ namespace Vxl
 			return *this;
 		}
 
-		// Make sure parent matrices are correct
-		updateValues();
-
-		// Get parent matrix
-		Matrix4x4 Model = m_parent->getModel();
-		Transform* parent = m_parent->getParent();
-
-		// Additional parents need to stack on current parent matrix
-		while (parent != nullptr)
-		{
-			Model = parent->getModel() * Model;
-			parent = parent->getParent();
-		}
+		// Change local position to zero
+		m_position = Vector3::ZERO;
+		// Make sure it updates model matrix correctly
+		isDirty = true;
 
 		// Apply inverse/transpose on model matrix to figure out correct local position
-		m_position = Model.Inverse() * position;
+		m_position = getModel().Inverse() * position;
 
 		SetDirty();
 		return *this;
 	}
+	Transform& Transform::increaseWorldPosition(const Vector3& translate)
+	{
+		// No parent = increase local instead
+		if (m_parent == nullptr)
+		{
+			increasePosition(translate);
+			return *this;
+		}
+
+		// Make sure axis directions are up to date
+		updateValues();
+
+		// Move position based on current world axis
+		m_position += m_right * translate.x;
+		m_position += m_up * translate.y;
+		m_position += m_forward * translate.z;
+
+		SetDirty();
+
+		return *this;
+	}
+
 
 	Transform& Transform::setForward(const Vector3& forward)
 	{

@@ -263,15 +263,7 @@ namespace Vxl
 		{
 			return setWorldPosition(Vector3(x, y, z));
 		}
-		inline Transform& setWorldPosition(const Vector2& position)
-		{
-			return setWorldPosition(Vector3(position));
-		}
 		Transform& setWorldPosition(const Vector3& position);
-		inline Transform& setWorldPosition(const Vector4& position)
-		{
-			return setWorldPosition(position.GetVector3());
-		}
 
 		inline Transform& setPosition(float x, float y, float z)
 		{
@@ -279,21 +271,9 @@ namespace Vxl
 			SetDirty();
 			return *this;
 		}
-		inline Transform& setPosition(const Vector2& position)
-		{
-			m_position = position;
-			SetDirty();
-			return *this;
-		}
 		inline Transform& setPosition(const Vector3& position)
 		{
 			m_position = position;
-			SetDirty();
-			return *this;
-		}
-		inline Transform& setPosition(const Vector4& position)
-		{
-			m_position = position.GetVector3();
 			SetDirty();
 			return *this;
 		}
@@ -397,24 +377,10 @@ namespace Vxl
 		// Increasers
 		inline Transform& increaseWorldPosition(float x, float y, float z)
 		{
-			setWorldPosition(getWorldPosition() + Vector3(x, y, z));
+			increaseWorldPosition(Vector3(x, y, z));
 			return *this;
 		}
-		inline Transform& increaseWorldPosition(const Vector2& translate)
-		{
-			setWorldPosition(getWorldPosition() + Vector3(translate));
-			return *this;
-		}
-		inline Transform& increaseWorldPosition(const Vector3& translate)
-		{
-			setWorldPosition(getWorldPosition() + translate);
-			return *this;
-		}
-		inline Transform& increaseWorldPosition(const Vector4& translate)
-		{
-			setWorldPosition(getWorldPosition() + translate.GetVector3());
-			return *this;
-		}
+		Transform& increaseWorldPosition(const Vector3& translate);
 
 		inline Transform& increasePosition(float x, float y, float z)
 		{
@@ -422,21 +388,9 @@ namespace Vxl
 			SetDirty();
 			return *this;
 		}
-		inline Transform& increasePosition(const Vector2& translate)
-		{
-			m_position += Vector3(translate);
-			SetDirty();
-			return *this;
-		}
 		inline Transform& increasePosition(const Vector3& translate)
 		{
 			m_position += translate;
-			SetDirty();
-			return *this;
-		}
-		inline Transform& increasePosition(const Vector4& translate)
-		{
-			m_position += translate.GetVector3();
 			SetDirty();
 			return *this;
 		}
