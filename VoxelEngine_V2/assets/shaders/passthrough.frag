@@ -39,7 +39,6 @@ void main()
 	else
 		output_albedo = vec4(VXL_color, VXL_alpha);
 	
-	
 	output_normal = vec4(0,0,1,1);
 	output_colorID = VXL_output;
 }

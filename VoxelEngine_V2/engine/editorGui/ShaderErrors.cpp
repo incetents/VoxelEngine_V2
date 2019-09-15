@@ -53,7 +53,10 @@ namespace Vxl
 						if (Log.second->GetCompiledCode().empty())
 							ImGui::Text("Shader Code Storage Disabled from Macro -> GLOBAL_SHADER_CODE_BACKUP");
 						else
-							ImGui::Text(Log.second->GetCompiledCode().c_str());
+						{
+							size_t size = Log.second->GetCompiledCode().size();
+							ImGui::TextUnformatted(Log.second->GetCompiledCode().c_str(),Log.second->GetCompiledCode().c_str() + size -1);
+						}
 						ImGui::TreePop();
 					}
 					else

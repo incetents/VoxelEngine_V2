@@ -110,9 +110,12 @@ namespace Vxl
 			}
 
 			// ~ Alpha ~ //
-			if (m_material->m_property_alpha.IsUsed() && m_material->GetRenderMode() == MaterialRenderMode::Transparent)
+			if (m_material->m_property_alpha.IsUsed())
 			{
-				m_material->m_property_alpha.SetProperty(m_alpha);
+				if(m_material->GetRenderMode() == MaterialRenderMode::Transparent)
+					m_material->m_property_alpha.SetProperty(m_alpha);
+				else
+					m_material->m_property_alpha.SetProperty(1.0f);
 			}
 
 			// ~ ColorID ~ //

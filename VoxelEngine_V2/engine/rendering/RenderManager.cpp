@@ -228,6 +228,7 @@ namespace Vxl
 		Debug.InitGLResources();
 		GlobalRenderText.InitGLResources();
 		GUIViewport.InitGLResources();
+		Editor.InitGLResources();
 	}
 	void RenderManager::DestroyGlobalGLResources()
 	{
@@ -235,6 +236,7 @@ namespace Vxl
 		Debug.DestroyGLResources();
 		GlobalRenderText.DestoryGLResources();
 		GUIViewport.DestroyGLResources();
+		Editor.DestroyGLResources();
 	}
 
 	//
@@ -513,8 +515,6 @@ namespace Vxl
 
 			// Force specific fbo draw buffers
 			auto fbo_gbuffer = FramebufferObject::GetAsset("gbuffer");
-			// Store Depth for later usage
-			//auto fbo_colorpicker = FramebufferObject::GetAsset("ColorPicker");
 
 			// Only render to COLOR ID Texture
 			fbo_gbuffer->DisableAttachment(0);
@@ -621,7 +621,6 @@ namespace Vxl
 			Graphics::SetDepthWrite(true);
 		}
 
-
 		// Draw Debug Wireframe Sphere
 		auto passthrough = Material::GetAsset("transparent_passthroughWorld");
 		if (passthrough->IsValid())
@@ -648,7 +647,6 @@ namespace Vxl
 		}
 
 	}
-
 	void RenderManager::RenderEditorObjectsPostDepth()
 	{
 		// Draw Editor Arrows (if selection applies)
@@ -661,14 +659,14 @@ namespace Vxl
 				simpleLight->BindProgram();
 
 				simpleLight->m_property_useModel.SetProperty(true);
-				simpleLight->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
+				simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Model, true);
 
 				// Movement //
 				if (Editor.m_controlMode == Editor.ControlMode::TRANSLATE)
 				{
 					// X Axis //
-					if (Editor.m_controlAxis == Axis::X)
-						if (Editor.m_controlAxisClicked)
+					if (Editor.m_GizmoSelectedAxis == Axis::X)
+						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 						else
 							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
@@ -678,8 +676,8 @@ namespace Vxl
 					Geometry.GetArrowX()->Draw();
 
 					// Y Axis //
-					if (Editor.m_controlAxis == Axis::Y)
-						if (Editor.m_controlAxisClicked)
+					if (Editor.m_GizmoSelectedAxis == Axis::Y)
+						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 						else
 							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
@@ -689,8 +687,8 @@ namespace Vxl
 					Geometry.GetArrowY()->Draw();
 
 					// Z Axis //
-					if (Editor.m_controlAxis == Axis::Z)
-						if (Editor.m_controlAxisClicked)
+					if (Editor.m_GizmoSelectedAxis == Axis::Z)
+						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 						else
 							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
@@ -707,9 +705,9 @@ namespace Vxl
 					Graphics::SetCullMode(CullMode::NO_CULL);
 
 					// X Plane
-					simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
-					if (Editor.m_controlPlane == Axis::X)
-						if (Editor.m_controlAxisClicked)
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Xquad_Model, true);
+					if (Editor.m_GizmoSelectedPlane == Axis::X)
+						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 						else
 							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
@@ -718,9 +716,9 @@ namespace Vxl
 					Geometry.GetHalfQuadX()->Draw();
 
 					// Y Plane
-					simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
-					if (Editor.m_controlPlane == Axis::Y)
-						if (Editor.m_controlAxisClicked)
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Yquad_Model, true);
+					if (Editor.m_GizmoSelectedPlane == Axis::Y)
+						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 						else
 							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
@@ -729,9 +727,9 @@ namespace Vxl
 					Geometry.GetHalfQuadY()->Draw();
 
 					// Z Plane
-					simpleLight->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
-					if (Editor.m_controlPlane == Axis::Z)
-						if (Editor.m_controlAxisClicked)
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Zquad_Model, true);
+					if (Editor.m_GizmoSelectedPlane == Axis::Z)
+						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
 						else
 							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);

@@ -32,12 +32,6 @@ uniform float VXL_alpha 	= 1.0;
 //Main
 void main()
 {
-	//gl_FragColor 
-
-	//final_color = vec4(normalize(v_data.normal) * 0.5 + vec3(0.5, 0.5, 0.5), 1);
-	//final_color = vec4(v_data.uv.x,v_data.uv.y,1,1);
-	vec2 uv = v_data.uv;
-	
 	if(VXL_useTexture)
 	{
 		vec4 _tex = texture(albedo_handler, v_data.uv);
@@ -68,13 +62,5 @@ void main()
 	output_reflection = vec4(0,0,0,1);
 	output_colorID = VXL_output;
 	
-	//if(TESTMODE == 1)
-	//output_albedo = vec4(d, 0, 0.2, 1);
-	
-	//output_albedo.r *= red;
-	//output_albedo.g *= green;
-	//output_albedo.b *= blue;
+
 }
-//gbuffer gbuffer_vert gbuffer_frag
-
-

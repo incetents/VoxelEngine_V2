@@ -160,7 +160,7 @@ namespace Vxl
 		template<typename Type>
 		void					SetUniform(const std::string& name, Type data)
 		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
+			//VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
 			m_uniforms[name].Send<Type>(data);
 		}
 		// [Faster] Set uniform (Custom call for matrix)

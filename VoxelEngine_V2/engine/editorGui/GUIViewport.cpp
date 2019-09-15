@@ -28,9 +28,6 @@ namespace Vxl
 		m_fbo->checkFBOStatus();
 		m_fbo->Unbind();
 
-		
-
-		//m_renderTexture = RenderTexture::Create("GUIViewport");
 	}
 	void GUIViewport::DestroyGLResources()
 	{
@@ -40,8 +37,8 @@ namespace Vxl
 		FramebufferObject::DeleteNamedAsset(m_fbo);
 		m_fbo = nullptr;
 
-		//RenderTexture::DeleteNamedAsset(m_renderTexture);
-		//m_renderTexture = nullptr;
+		RenderTexture::DeleteNamedAsset(m_renderTexture);
+		m_renderTexture = nullptr;
 	}
 
 	void GUIViewport::DrawRenderTarget()
@@ -56,6 +53,7 @@ namespace Vxl
 		m_fbo->ClearBuffers();
 
 		m_shader_showRenderTarget->Bind();
+		m_shader_showRenderTarget->SetUniform("channelOutput", (int)m_channelOut);
 		//
 
 		switch (m_renderMode)
@@ -140,13 +138,59 @@ namespace Vxl
 				m_xrayMode = !m_xrayMode;
 			}
 
-			if (ImGui::MenuItem("NONE"))
+			// Select Channel to output
+			std::string menuName_Channels;
+			switch (m_channelOut)
+			{
+			case ChannelOutput::RGBA:
+				menuName_Channels = "Channel [RGBA]";
+				break;
+			case ChannelOutput::RED:
+				menuName_Channels = "Channel [R]";
+				break;
+			case ChannelOutput::GREEN:
+				menuName_Channels = "Channel [G]";
+				break;
+			case ChannelOutput::BLUE:
+				menuName_Channels = "Channel [B]";
+				break;
+			case ChannelOutput::ALPHA:
+				menuName_Channels = "Channel [A]";
+				break;
+			}
+
+			if (ImGui::BeginMenu(menuName_Channels.c_str()))
+			{
+				if (ImGui::MenuItem("RGBA"))
+				{
+					m_channelOut = ChannelOutput::RGBA;
+				}
+				if (ImGui::MenuItem("RED"))
+				{
+					m_channelOut = ChannelOutput::RED;
+				}
+				if (ImGui::MenuItem("GREEN"))
+				{
+					m_channelOut = ChannelOutput::GREEN;
+				}
+				if (ImGui::MenuItem("BLUE"))
+				{
+					m_channelOut = ChannelOutput::BLUE;
+				}
+				if (ImGui::MenuItem("ALPHA"))
+				{
+					m_channelOut = ChannelOutput::ALPHA;
+				}
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::MenuItem("{None}"))
 			{
 				m_renderMode = RenderMode::NONE;
 			}
 
 			// show render targets here
-			if (ImGui::BeginMenu("gbuffer"))
+			if (ImGui::BeginMenu("{Gbuffer}"))
 			{
 				if (ImGui::MenuItem("composite"))
 				{
@@ -175,9 +219,9 @@ namespace Vxl
 
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenuBar();
 
-			// Composite
+			// END
+			ImGui::EndMenuBar();
 		}
 
 		// Render Correct RenderTexture information

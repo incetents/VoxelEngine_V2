@@ -167,26 +167,6 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		//	if (ImGui::CollapsingHeader("FBO Override"))
-		//	{
-		//		const char* fbo_override_choices[] = {
-		//			"[Default]",
-		//			"Albedo",
-		//			"Normal",
-		//			"Depth",
-		//			"Editor",
-		//			"ColorPicker"
-		//		};
-		//		static int fbo_override_current = 0;
-		//		ImGui::ListBox("Select Output", &fbo_override_current, fbo_override_choices, IM_ARRAYSIZE(fbo_override_choices), 6);
-		//	
-		//		Game->FBO_OVERRIDE = fbo_override_current;
-		//	}
-		//	
-		//	ImGui::Separator();
-
-		//ImGui::Text("Dear ImGui, %s", ImGui::GetVersion());
-
 		if (GamePad1.IsConnected())
 			ImGui::Text("CONNECTED");
 		else

@@ -22,6 +22,7 @@ layout (binding = 0) uniform sampler2D texture1;
 layout (binding = 1) uniform sampler2D texture2;
 // Uniforms
 uniform int outputMode = 0;
+uniform int channelOutput = 0;
 //uniform float zNear = 1;
 //uniform float zFar = 1;
 
@@ -53,7 +54,7 @@ void main()
 	if(outputMode == 1)
 	{
 		// normal
-		_texture.rgb = (_texture.rgb); // make it visible on both sides
+		_texture.rgb = abs(_texture.rgb); // make it visible on both sides
 		output_color = _texture;
 	}
 	else if(outputMode == 2)
@@ -78,6 +79,24 @@ void main()
 		// normal
 		output_color = _texture;
 		
+	// Final output specialized
+	if(channelOutput == 1)
+	{
+		output_color.rgb = output_color.rrr;
+	}
+	else if(channelOutput == 2)
+	{
+		output_color.rgb = output_color.ggg;
+	}
+	else if(channelOutput == 3)
+	{
+		output_color.rgb = output_color.bbb;
+	}
+	else if(channelOutput == 4)
+	{
+		output_color.rgb = output_color.aaa;
+	}
+	
 	output_color.a = 1.0;
 }
 

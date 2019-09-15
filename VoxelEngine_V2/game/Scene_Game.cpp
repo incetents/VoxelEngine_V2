@@ -104,7 +104,7 @@ namespace Vxl
 		_fbo_gbuffer->SetAttachment(1, _fbo_gbuffer->CreateRenderTexture("normal", TextureFormat::RGBA16_SNORM));
 		_fbo_gbuffer->SetAttachment(2, _fbo_gbuffer->CreateRenderTexture("reflection", TextureFormat::RGBA8));
 		_fbo_gbuffer->SetAttachment(3, _fbo_gbuffer->CreateRenderTexture("colorID", TextureFormat::RGBA8));
-		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH24_STENCIL8, FBOAttachment::Type::TEXTURE);
+		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::TEXTURE);
 		_fbo_gbuffer->checkFBOStatus();
 		_fbo_gbuffer->Unbind();
 
@@ -112,7 +112,7 @@ namespace Vxl
 		_fbo_editor->SetSizeToWindowSize();
 		_fbo_editor->Bind();
 		_fbo_editor->SetAttachment(0, _fbo_editor->CreateRenderTexture("albedo"));
-		_fbo_editor->SetDepth(TextureDepthFormat::DEPTH24_STENCIL8, FBOAttachment::Type::BUFFER);
+		_fbo_editor->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::BUFFER);
 		_fbo_editor->checkFBOStatus();
 		_fbo_editor->Unbind();
 
@@ -120,7 +120,7 @@ namespace Vxl
 		_fbo_colorpicker->SetSizeToWindowSize();
 		_fbo_colorpicker->Bind();
 		_fbo_colorpicker->SetAttachment(0, _fbo_colorpicker->CreateRenderTexture("color"));
-		_fbo_colorpicker->SetDepth(TextureDepthFormat::DEPTH24_STENCIL8, FBOAttachment::Type::BUFFER);
+		_fbo_colorpicker->SetDepth(TextureDepthFormat::DEPTH16, FBOAttachment::Type::BUFFER);
 		_fbo_colorpicker->checkFBOStatus();
 		_fbo_colorpicker->Unbind();
 
@@ -721,248 +721,252 @@ namespace Vxl
 		//
 		GPUTimer::EndTimer();
 
+		// Selection Data
+		if (RenderManager.GetAllEntities().size() > 0)
+			Editor.UpdateSelectionTransformModel();
 		
-		
-
-		// Editor Axis Objects
-		// ~~ //
-		if (!Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
-		{
-			auto SelectedEntities = Editor.GetSelectedEntities();
-
-			// Highlighting over an Editor Axis not selected
-			if (!Input.getMouseButton(MouseButton::LEFT) && !Editor.m_controlAxisClicked && Editor.HasSelection())
-			{
-				_fbo_colorpicker->Bind();
-				_fbo_colorpicker->ClearBuffers();
-
-				material_colorPicker->BindProgram();
-				material_colorPicker->BindStates();
-
-				material_colorPicker->m_property_useModel.SetProperty(true);
-				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
-
-				Color4F color;
-
-				// Cube (ignored)
-				material_colorPicker->m_property_output.SetProperty(Color4F(0, 0, 0, 0));
-				Geometry.GetCubeSmall()->Draw();
-
-				// X-arrow
-				color = Util::DataConversion::uint_to_color4(1u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetArrowX()->Draw();
-
-				// Y-arrow
-				color = Util::DataConversion::uint_to_color4(2u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetArrowY()->Draw();
-
-				// Z-arrow
-				color = Util::DataConversion::uint_to_color4(3u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetArrowZ()->Draw();
-
-				Graphics::SetCullMode(CullMode::NO_CULL);
-
-				// X Plane
-				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
-				color = Util::DataConversion::uint_to_color4(4u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetHalfQuadX()->Draw();
-
-				// Y Plane
-				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
-				color = Util::DataConversion::uint_to_color4(5u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetHalfQuadY()->Draw();
-
-				// Z Plane
-				material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
-				color = Util::DataConversion::uint_to_color4(6u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetHalfQuadZ()->Draw();
-
-				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+		Editor.UpdateSelectionInfo();
 
 
-				RawArray<uint8_t> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
+		//// Editor Axis Objects
+		//// ~~ //
+		//if (!Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		//{
+		//	auto SelectedEntities = Editor.GetSelectedEntities();
 
-				unsigned int EditorIndex;
-				Util::DataConversion::uchars_to_uint(data.start, EditorIndex);
-				data.Deallocate();
+		//	// Highlighting over an Editor Axis not selected
+		//	if (!Input.getMouseButton(MouseButton::LEFT) && !Editor.m_controlAxisClicked && Editor.HasSelection())
+		//	{
+		//		_fbo_colorpicker->Bind();
+		//		_fbo_colorpicker->ClearBuffers();
 
-				//	if (EditorIndex > 0)
-				//		Logger.log("test");
+		//		material_colorPicker->BindProgram();
+		//		material_colorPicker->BindStates();
 
-				switch (EditorIndex)
-				{
-				case 1u:
-					Editor.m_controlAxis = Axis::X;
-					Editor.m_controlPlane = Axis::NONE;
-					break;
-				case 2u:
-					Editor.m_controlAxis = Axis::Y;
-					Editor.m_controlPlane = Axis::NONE;
-					break;
-				case 3u:
-					Editor.m_controlAxis = Axis::Z;
-					Editor.m_controlPlane = Axis::NONE;
-					break;
-				case 4u:
-					Editor.m_controlAxis = Axis::NONE;
-					Editor.m_controlPlane = Axis::X;
-					break;
-				case 5u:
-					Editor.m_controlAxis = Axis::NONE;
-					Editor.m_controlPlane = Axis::Y;
-					break;
-				case 6u:
-					Editor.m_controlAxis = Axis::NONE;
-					Editor.m_controlPlane = Axis::Z;
-					break;
-				default:
-					Editor.m_controlAxis = Axis::NONE;
-					Editor.m_controlPlane = Axis::NONE;
-				}
-			}
+		//		material_colorPicker->m_property_useModel.SetProperty(true);
+		//		material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetSelectionTransform().Model, true);
 
-			
-			// Drag Editor Axis around
-			if (Input.getMouseButton(MouseButton::LEFT) && (Editor.m_controlAxis != Axis::NONE || Editor.m_controlPlane != Axis::NONE) && Editor.HasSelection())
-			{
-				Vector2 MouseChange = Vector2(
-					(float)+Input.getMouseDragDeltaX(),
-					(float)-Input.getMouseDragDeltaY()
-				);
+		//		Color4F color;
 
-				// Clip space axis should only be calculated on the initial click
-				static Vector2 Axis_ScreenDirection;
-				static Vector2 CenterAxis_ScreenPos;
-				static Vector2 Axis_ScreenPos;
-				static float DragSpeed;
+		//		// Cube (ignored)
+		//		material_colorPicker->m_property_output.SetProperty(Color4F(0, 0, 0, 0));
+		//		Geometry.GetCubeSmall()->Draw();
 
-				if (Editor.m_controlAxisClicked == false)
-				{
-					// Object MVP
-					Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * Editor.GetSelectionTransform().Model;
+		//		// X-arrow
+		//		color = Util::DataConversion::uint_to_color4(1u);
+		//		material_colorPicker->m_property_output.SetProperty(color);
+		//		Geometry.GetArrowX()->Draw();
 
-					// Calculate Center Axis in ClipSpace
-					Vector4 ClipSpaceAxis = MVP * Vector4(0, 0, 0, 1);
-					ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
-					CenterAxis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
+		//		// Y-arrow
+		//		color = Util::DataConversion::uint_to_color4(2u);
+		//		material_colorPicker->m_property_output.SetProperty(color);
+		//		Geometry.GetArrowY()->Draw();
 
-					// Calculate Selected Axis in ClipSpace
-					switch (Editor.m_controlAxis)
-					{
-					case Axis::X:
-						ClipSpaceAxis = MVP * Vector4(1, 0, 0, 1);
-						break;
-					case Axis::Y:
-						ClipSpaceAxis = MVP * Vector4(0, 1, 0, 1);
-						break;
-					case Axis::Z:
-						ClipSpaceAxis = MVP * Vector4(0, 0, 1, 1);
-						break;
-					case Axis::NONE:
-					{
-						switch (Editor.m_controlPlane)
-						{
-						case Axis::X:
-							ClipSpaceAxis = MVP * Vector4(0, 0.577f, 0.577f, 1);
-							break;
-						case Axis::Y:
-							ClipSpaceAxis = MVP * Vector4(0.577f, 0, 0.577f, 1);
-							break;
-						case Axis::Z:
-							ClipSpaceAxis = MVP * Vector4(0.577f, 0.577f, 0, 1);
-							break;
-						}
-					}
-					}
+		//		// Z-arrow
+		//		color = Util::DataConversion::uint_to_color4(3u);
+		//		material_colorPicker->m_property_output.SetProperty(color);
+		//		Geometry.GetArrowZ()->Draw();
 
-					ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
-					Axis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
+		//		Graphics::SetCullMode(CullMode::NO_CULL);
 
-					//std::cout << Axis_ScreenPos << std::endl;
-					//std::cout << CenterAxis_ScreenPos << std::endl;
-					//std::cout << "~~~" << std::endl;
+		//		// X Plane
+		//		material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().X_Model, true);
+		//		color = Util::DataConversion::uint_to_color4(4u);
+		//		material_colorPicker->m_property_output.SetProperty(color);
+		//		Geometry.GetHalfQuadX()->Draw();
 
-					Axis_ScreenDirection = (Axis_ScreenPos - CenterAxis_ScreenPos).Normalize();
+		//		// Y Plane
+		//		material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Y_Model, true);
+		//		color = Util::DataConversion::uint_to_color4(5u);
+		//		material_colorPicker->m_property_output.SetProperty(color);
+		//		Geometry.GetHalfQuadY()->Draw();
 
-					// Update Drag Speed
-					DragSpeed = Editor.GetSelectionTransform().CameraDistance / 3.0f;
-				}
+		//		// Z Plane
+		//		material_colorPicker->m_property_model.SetPropertyMatrix(Editor.GetAxisSelectionTransform().Z_Model, true);
+		//		color = Util::DataConversion::uint_to_color4(6u);
+		//		material_colorPicker->m_property_output.SetProperty(color);
+		//		Geometry.GetHalfQuadZ()->Draw();
 
-				//std::cout << DragSpeed << std::endl;
+		//		Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
-				VXL_ASSERT(Axis_ScreenDirection.LengthSqr() != 0.0f, "Axis_ScreenDirection is zero");
 
-				// Project Mouse Change onto Xaxis in screenspace, now we'll see how far the mouse drags across the axis
-				static float PreviousDragAmount = 0.0f;
-				float DragAmount = MouseChange.ProjectLength(Axis_ScreenDirection) * DragSpeed;
-				// Drag Multiply
+		//		RawArray<uint8_t> data = _fbo_colorpicker->readPixelsFromMouse(0, 1, 1);
 
-				if (Editor.m_controlAxisClicked == false)
-					PreviousDragAmount = DragAmount;
+		//		unsigned int EditorIndex;
+		//		Util::DataConversion::uchars_to_uint(data.start, EditorIndex);
+		//		data.Deallocate();
 
-				// No movement occurs if mouse change is empty
-				if (!MouseChange.Is_Empty())
-				{
-					Vector3 MoveDirection;
+		//		//	if (EditorIndex > 0)
+		//		//		Logger.log("test");
 
-					switch (Editor.m_controlAxis)
-					{
-					case Axis::X:
-						MoveDirection = Editor.GetSelectionTransform().Right;
-						break;
-					case Axis::Y:
-						MoveDirection = Editor.GetSelectionTransform().Up;
-						break;
-					case Axis::Z:
-						MoveDirection = Editor.GetSelectionTransform().Forward;
-						break;
-					case Axis::NONE:
-					{
-						switch (Editor.m_controlPlane)
-						{
-						case Axis::X:
-							MoveDirection = Editor.GetSelectionTransform().Up + Editor.GetSelectionTransform().Forward;
-							break;
-						case Axis::Y:
-							MoveDirection = Editor.GetSelectionTransform().Right + Editor.GetSelectionTransform().Forward;
-							break;
-						case Axis::Z:
-							MoveDirection = Editor.GetSelectionTransform().Right + Editor.GetSelectionTransform().Up;
-							break;
-						}
-					}
-					}
+		//		switch (EditorIndex)
+		//		{
+		//		case 1u:
+		//			Editor.m_controlAxis = Axis::X;
+		//			Editor.m_controlPlane = Axis::NONE;
+		//			break;
+		//		case 2u:
+		//			Editor.m_controlAxis = Axis::Y;
+		//			Editor.m_controlPlane = Axis::NONE;
+		//			break;
+		//		case 3u:
+		//			Editor.m_controlAxis = Axis::Z;
+		//			Editor.m_controlPlane = Axis::NONE;
+		//			break;
+		//		case 4u:
+		//			Editor.m_controlAxis = Axis::NONE;
+		//			Editor.m_controlPlane = Axis::X;
+		//			break;
+		//		case 5u:
+		//			Editor.m_controlAxis = Axis::NONE;
+		//			Editor.m_controlPlane = Axis::Y;
+		//			break;
+		//		case 6u:
+		//			Editor.m_controlAxis = Axis::NONE;
+		//			Editor.m_controlPlane = Axis::Z;
+		//			break;
+		//		default:
+		//			Editor.m_controlAxis = Axis::NONE;
+		//			Editor.m_controlPlane = Axis::NONE;
+		//		}
+		//	}
 
-					for (auto& Entity : SelectedEntities)
-					{
-						Entity->m_transform.increaseWorldPosition(MoveDirection * 0.01f * (DragAmount - PreviousDragAmount));
-					}
-				}
+		//	
+		//	// Drag Editor Axis around
+		//	if (Input.getMouseButton(MouseButton::LEFT) && (Editor.m_controlAxis != Axis::NONE || Editor.m_controlPlane != Axis::NONE) && Editor.HasSelection())
+		//	{
+		//		Vector2 MouseChange = Vector2(
+		//			(float)+Input.getMouseDragDeltaX(),
+		//			(float)-Input.getMouseDragDeltaY()
+		//		);
 
-				
-				//std::cout << (MouseChange) << std::endl;
-				//std::cout << (Axis_ScreenDirection) << std::endl;
-				//std::cout << (DragAmount) << std::endl;
-				//std::cout << (PreviousDragAmount) << std::endl;
-				//std::cout << "~~~" << std::endl;
+		//		// Clip space axis should only be calculated on the initial click
+		//		static Vector2 Axis_ScreenDirection;
+		//		static Vector2 CenterAxis_ScreenPos;
+		//		static Vector2 Axis_ScreenPos;
+		//		static float DragSpeed;
 
-				PreviousDragAmount = DragAmount;
+		//		if (Editor.m_controlAxisClicked == false)
+		//		{
+		//			// Object MVP
+		//			Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * Editor.GetSelectionTransform().Model;
 
-				Editor.m_controlAxisClicked = true;
-			}
-			else
-				Editor.m_controlAxisClicked = false;
-		}
+		//			// Calculate Center Axis in ClipSpace
+		//			Vector4 ClipSpaceAxis = MVP * Vector4(0, 0, 0, 1);
+		//			ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
+		//			CenterAxis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
+
+		//			// Calculate Selected Axis in ClipSpace
+		//			switch (Editor.m_controlAxis)
+		//			{
+		//			case Axis::X:
+		//				ClipSpaceAxis = MVP * Vector4(1, 0, 0, 1);
+		//				break;
+		//			case Axis::Y:
+		//				ClipSpaceAxis = MVP * Vector4(0, 1, 0, 1);
+		//				break;
+		//			case Axis::Z:
+		//				ClipSpaceAxis = MVP * Vector4(0, 0, 1, 1);
+		//				break;
+		//			case Axis::NONE:
+		//			{
+		//				switch (Editor.m_controlPlane)
+		//				{
+		//				case Axis::X:
+		//					ClipSpaceAxis = MVP * Vector4(0, 0.577f, 0.577f, 1);
+		//					break;
+		//				case Axis::Y:
+		//					ClipSpaceAxis = MVP * Vector4(0.577f, 0, 0.577f, 1);
+		//					break;
+		//				case Axis::Z:
+		//					ClipSpaceAxis = MVP * Vector4(0.577f, 0.577f, 0, 1);
+		//					break;
+		//				}
+		//			}
+		//			}
+
+		//			ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
+		//			Axis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
+
+		//			//std::cout << Axis_ScreenPos << std::endl;
+		//			//std::cout << CenterAxis_ScreenPos << std::endl;
+		//			//std::cout << "~~~" << std::endl;
+
+		//			Axis_ScreenDirection = (Axis_ScreenPos - CenterAxis_ScreenPos).Normalize();
+
+		//			// Update Drag Speed
+		//			DragSpeed = Editor.GetSelectionTransform().CameraDistance / 3.0f;
+		//		}
+
+		//		//std::cout << DragSpeed << std::endl;
+
+		//		VXL_ASSERT(Axis_ScreenDirection.LengthSqr() != 0.0f, "Axis_ScreenDirection is zero");
+
+		//		// Project Mouse Change onto Xaxis in screenspace, now we'll see how far the mouse drags across the axis
+		//		static float PreviousDragAmount = 0.0f;
+		//		float DragAmount = MouseChange.ProjectLength(Axis_ScreenDirection) * DragSpeed;
+		//		// Drag Multiply
+
+		//		if (Editor.m_controlAxisClicked == false)
+		//			PreviousDragAmount = DragAmount;
+
+		//		// No movement occurs if mouse change is empty
+		//		if (!MouseChange.Is_Empty())
+		//		{
+		//			Vector3 MoveDirection;
+
+		//			switch (Editor.m_controlAxis)
+		//			{
+		//			case Axis::X:
+		//				MoveDirection = Editor.GetSelectionTransform().Right;
+		//				break;
+		//			case Axis::Y:
+		//				MoveDirection = Editor.GetSelectionTransform().Up;
+		//				break;
+		//			case Axis::Z:
+		//				MoveDirection = Editor.GetSelectionTransform().Forward;
+		//				break;
+		//			case Axis::NONE:
+		//			{
+		//				switch (Editor.m_controlPlane)
+		//				{
+		//				case Axis::X:
+		//					MoveDirection = Editor.GetSelectionTransform().Up + Editor.GetSelectionTransform().Forward;
+		//					break;
+		//				case Axis::Y:
+		//					MoveDirection = Editor.GetSelectionTransform().Right + Editor.GetSelectionTransform().Forward;
+		//					break;
+		//				case Axis::Z:
+		//					MoveDirection = Editor.GetSelectionTransform().Right + Editor.GetSelectionTransform().Up;
+		//					break;
+		//				}
+		//			}
+		//			}
+
+		//			for (auto& Entity : SelectedEntities)
+		//			{
+		//				Entity->m_transform.increaseWorldPosition(MoveDirection * 0.01f * (DragAmount - PreviousDragAmount));
+		//			}
+		//		}
+
+		//		
+		//		//std::cout << (MouseChange) << std::endl;
+		//		//std::cout << (Axis_ScreenDirection) << std::endl;
+		//		//std::cout << (DragAmount) << std::endl;
+		//		//std::cout << (PreviousDragAmount) << std::endl;
+		//		//std::cout << "~~~" << std::endl;
+
+		//		PreviousDragAmount = DragAmount;
+
+		//		Editor.m_controlAxisClicked = true;
+		//	}
+		//	else
+		//		Editor.m_controlAxisClicked = false;
+		//}
 
 		// Select Object in scene
 		// ~~ //
-		if (!Editor.m_controlAxisClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		if (!Editor.m_GizmoSelected && !Editor.m_GizmoClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
 		{
 			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 			{
@@ -978,7 +982,7 @@ namespace Vxl
 				
 				unsigned int EntityIndex;
 				Util::DataConversion::uchars_to_uint(data.start, EntityIndex);
-				std::cout << "Unique ID: " << EntityIndex << std::endl;
+				//std::cout << "Unique ID: " << EntityIndex << std::endl;
 				data.Deallocate();
 
 				Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
@@ -1012,11 +1016,6 @@ namespace Vxl
 
 		// ~~ //
 
-		if (RenderManager.GetAllEntities().size() > 0)
-			Editor.UpdateSelectionTransformModel();
-		
-		// ~~ //
-
 
 		// ~~~~
 		Graphics::SetBlendState(false);
@@ -1030,6 +1029,7 @@ namespace Vxl
 		// Display Final Image
 		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
 		_shader_showRenderTarget->Bind();
+		_shader_showRenderTarget->SetUniform("channelOutput", 0);
 		_shader_showRenderTarget->SetUniform("outputMode", 3);
 
 		_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);

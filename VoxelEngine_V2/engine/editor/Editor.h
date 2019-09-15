@@ -10,37 +10,51 @@
 
 namespace Vxl
 {
+	class FramebufferObject;
 	class Entity;
 
 	static class Editor : public Singleton<class Editor>
 	{
 	private:
-		// Selected Entities
-		std::vector<Entity*> m_selectedEntities;
+		std::vector<Entity*>	m_selectedEntities;
+		FramebufferObject*		m_colorPickerFBO;
+
+		Vector4 m_ScreenSpace_SelectionCenter;
+		Vector4 m_ScreenSpace_Selection1;
+		Vector4 m_ScreenSpace_Selection2;
+
+		Vector2 m_Axis1_Direction;
+		Vector2 m_Axis2_Direction;
+		bool	m_useAxis1 = false;
+		bool	m_useAxis2 = false;
+
+	public:
+
+		float m_GizmoDragSpeed;
+		Axis  m_GizmoSelectedAxis = Axis::NONE;
+		Axis  m_GizmoSelectedPlane = Axis::NONE;
+		bool  m_GizmoSelected = false;
+		bool  m_GizmoClicked = false;
 
 		// Transform Selection
-		struct SelectionTransform
+		struct GizmoTransform
 		{
+			Matrix4x4	Xquad_Model;
+			Matrix4x4	Yquad_Model;
+			Matrix4x4	Zquad_Model;
+
+			float		CameraDistance;
 			Matrix4x4	Model;
 			Vector3		WorldPosition;
 			Vector3		Forward;
 			Vector3		Up;
 			Vector3		Right;
-			float		CameraDistance;
 
-		} m_SelectionTransform;
-		void UpdateSelectionTransformPosition();
+		} m_GizmoTransform;
 
-		// Axis Selection
-		struct AxisSelectionTransform
-		{
-			Matrix4x4 X_Model;
-			Matrix4x4 Y_Model;
-			Matrix4x4 Z_Model;
-
-		} m_AxisSelectionTransform;
-
-	public:
+		// Global GL Resources
+		void InitGLResources();
+		void DestroyGLResources();
 
 		// Selected Entities
 		inline const std::vector<Entity*>& GetSelectedEntities(void) const
@@ -57,16 +71,6 @@ namespace Vxl
 		void AddSelection(Entity* _entity);
 		void ClearSelection();
 
-		// Transform Selection
-		inline const SelectionTransform& GetSelectionTransform(void) const
-		{
-			return m_SelectionTransform;
-		}
-		inline const AxisSelectionTransform& GetAxisSelectionTransform(void) const
-		{
-			return m_AxisSelectionTransform;
-		}
-
 		/* Editor Controls */
 		enum ControlMode
 		{
@@ -75,16 +79,15 @@ namespace Vxl
 			ROTATE
 		};
 		ControlMode m_controlMode = ControlMode::TRANSLATE;
-		Axis m_controlAxis = Axis::NONE;
-		Axis m_controlPlane = Axis::NONE;
-		bool m_controlAxisClicked = false;
+		
 		bool m_controlAxisLocal = true; // Whether Editor axis rotates based on local rotation
 
 		// Update info
+		void UpdateSelectionTransformPosition();
 		void UpdateSelectionTransformModel();
 
 		// Behaviour
-		void Draw() {}
+		void UpdateSelectionInfo();
 
 
 	} SingletonInstance(Editor);

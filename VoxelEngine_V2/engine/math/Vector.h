@@ -38,9 +38,13 @@ namespace Vxl
 		Type x, y;
 
 		// Is Empty
-		inline bool Is_Empty()
+		inline bool IsEmpty()
 		{
-			return !(x && y);
+			return !(x || y);
+		}
+		inline bool IsNotEmpty()
+		{
+			return (x || y);
 		}
 
 		// Common Vector Types
@@ -482,9 +486,13 @@ namespace Vxl
 		Type x, y, z;
 
 		// Is Empty
-		inline bool Is_Empty()
+		inline bool IsEmpty()
 		{
-			return !(x && y && z);
+			return !(x || y || z);
+		}
+		inline bool IsNotEmpty()
+		{
+			return (x || y || z);
 		}
 
 		// Common Vector Types
@@ -1003,9 +1011,13 @@ namespace Vxl
 		Type x, y, z, w;
 
 		// Is Empty
-		inline bool Is_Empty()
+		inline bool IsEmpty()
 		{
-			return !(x && y && z && w);
+			return !(x || y || z || w);
+		}
+		inline bool IsNotEmpty()
+		{
+			return (x || y || z || w);
 		}
 
 		// ~ Copy Constructors ~ //

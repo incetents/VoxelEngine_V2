@@ -40,6 +40,7 @@ font_frag 	./assets/shaders/font.frag
 #SHADERPROGRAM
 // order: [Name] [Shader1] [Shader2] [Shader3] etc... up to 8 shaders
 
+showRenderTarget 	passthrough_vert 			showRenderTarget
 gbuffer				gbuffer_vert				gbuffer_frag
 passthroughWorld 	gbuffer_vert				passthrough_frag
 passthrough 		passthrough_vert			passthrough_frag
@@ -47,7 +48,6 @@ simpleLight 		gbuffer_vert				simpleLight_frag
 skybox				skybox_vert					skybox_frag
 lines 				lines_vert					lines_geom 				lines_frag
 colorPicker 		gbuffer_vert 				colorPicker_frag
-showRenderTarget 	passthrough_vert 			showRenderTarget
 billboard 			billboard_vert				billboard_frag
 font 				font_vert 					font_frag
 showNormals 		showNormals
