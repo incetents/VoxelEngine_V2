@@ -128,18 +128,6 @@ namespace Vxl
 		m_linked = false;
 	}
 
-	void ShaderProgram::AttachShaders()
-	{
-		for (unsigned int i = 0; i < m_shaderCount; i++)
-			Graphics::ShaderProgram::AttachShader(m_id, m_shaders[i]->GetID());
-	}
-
-	void ShaderProgram::DetachShaders()
-	{
-		for (unsigned int i = 0; i < m_shaderCount; i++)
-			Graphics::ShaderProgram::DetachShader(m_id, m_shaders[i]->GetID());
-	}
-
 	void ShaderProgram::Link()
 	{
 		if (m_linked)
@@ -239,9 +227,17 @@ namespace Vxl
 		}
 
 		m_shaderCount = m_shaders.size();
-		AttachShaders();
+		
+		// Attach Shaders to Shader Program
+		for (unsigned int i = 0; i < m_shaderCount; i++)
+			Graphics::ShaderProgram::AttachShader(m_id, m_shaders[i]->GetID());
+
+		// Compile Shader Program
 		Link();
-		DetachShaders();
+		
+		// Detach Shaders from Shader Program [effectively will only actually be removed when program is deleted]
+		for (unsigned int i = 0; i < m_shaderCount; i++)
+			Graphics::ShaderProgram::DetachShader(m_id, m_shaders[i]->GetID());
 
 		if (!IsLinked())
 		{

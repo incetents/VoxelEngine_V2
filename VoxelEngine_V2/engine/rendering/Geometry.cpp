@@ -700,6 +700,46 @@ namespace Vxl
 		_mesh->Bind();
 		return _mesh;
 	}
+	Mesh* Geometry::GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
+	{
+		Mesh* _mesh = Mesh::Create(MeshName);
+
+		float f_vertices = (float)vertices - 1.f;
+		float halfSize = unitSize * 0.5f;
+
+		std::vector<Vector3> positions;
+		std::vector<Vector3> normals;
+		positions.reserve(vertices);
+		normals.reserve(vertices);
+
+		positions.push_back(vec3(0, 0, 0));
+
+		for (uint32_t i = 0; i < vertices; i++)
+		{
+			float t1 = TWO_PI * (float)i / f_vertices;
+			
+			if (axis == Axis::X)
+			{
+				positions.push_back(Vector3(0, cosf(t1) * halfSize, sinf(t1) * halfSize));
+				normals.push_back(Vector3::RIGHT);
+			}
+			else if (axis == Axis::Y)
+			{
+				positions.push_back(Vector3(sinf(t1) * halfSize, 0, cosf(t1) * halfSize));
+				normals.push_back(Vector3::UP);
+			}
+			else if (axis == Axis::Z)
+			{
+				positions.push_back(Vector3(cosf(t1) * halfSize, sinf(t1) * halfSize, 0));
+				normals.push_back(Vector3::FORWARD);
+			}
+		}
+		
+		_mesh->m_positions.set(positions);
+		_mesh->m_normals.set(normals);
+		_mesh->Bind(DrawType::TRIANGLE_FAN);
+		return _mesh;
+	}
 
 	// Creators
 	void Geometry::CreateFullQuad()
@@ -994,5 +1034,12 @@ namespace Vxl
 		m_arrow_x = GenerateArrow("ArrowX", Axis::X, 1.0f, Vector3::ZERO);
 		m_arrow_y = GenerateArrow("ArrowY", Axis::Y, 1.0f, Vector3::ZERO);
 		m_arrow_z = GenerateArrow("ArrowZ", Axis::Z, 1.0f, Vector3::ZERO);
+	}
+
+	void Geometry::CreateCircles()
+	{
+		m_circle_x = GenerateCircle("CircleX", Axis::X, 32u, 1.0f);
+		m_circle_y = GenerateCircle("CircleY", Axis::Y, 32u, 1.0f);
+		m_circle_z = GenerateCircle("CircleZ", Axis::Z, 32u, 1.0f);
 	}
 }

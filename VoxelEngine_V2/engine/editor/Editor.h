@@ -17,7 +17,7 @@ namespace Vxl
 	{
 	private:
 		std::vector<Entity*>	m_selectedEntities;
-		FramebufferObject*		m_colorPickerFBO;
+		FramebufferObject*		m_fbo_colorPicker;
 
 		Vector4 m_ScreenSpace_SelectionCenter;
 		Vector4 m_ScreenSpace_Selection1;
@@ -27,6 +27,10 @@ namespace Vxl
 		Vector2 m_Axis2_Direction;
 		bool	m_useAxis1 = false;
 		bool	m_useAxis2 = false;
+		float	m_totalDrag1 = 0.0f;
+		float	m_totalDrag2 = 0.0f;
+
+		std::vector<float> m_scaleBackups;
 
 	public:
 
@@ -39,9 +43,10 @@ namespace Vxl
 		// Transform Selection
 		struct GizmoTransform
 		{
-			Matrix4x4	Xquad_Model;
-			Matrix4x4	Yquad_Model;
-			Matrix4x4	Zquad_Model;
+			// Multi-purpose offsets
+			Matrix4x4	X_Model;
+			Matrix4x4	Y_Model;
+			Matrix4x4	Z_Model;
 
 			float		CameraDistance;
 			Matrix4x4	Model;
@@ -72,13 +77,13 @@ namespace Vxl
 		void ClearSelection();
 
 		/* Editor Controls */
-		enum ControlMode
+		enum GizmoMode
 		{
 			TRANSLATE,
 			SCALE,
 			ROTATE
 		};
-		ControlMode m_controlMode = ControlMode::TRANSLATE;
+		GizmoMode m_controlMode = GizmoMode::TRANSLATE;
 		
 		bool m_controlAxisLocal = true; // Whether Editor axis rotates based on local rotation
 

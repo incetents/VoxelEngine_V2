@@ -41,43 +41,17 @@ namespace Vxl
 			vec.erase(std::remove(vec.begin(), vec.end(), data));
 		}
 
-		// Data Conversion //
-		class DataConversion
+		namespace Conversion
 		{
-		public:
-			static void uint_to_uchars(unsigned int input, unsigned char& output1, unsigned char& output2, unsigned char& output3, unsigned char& output4)
-			{
-				union Data
-				{
-					unsigned int _input;
-					unsigned char _outputs[4];
-				} data;
-				// Input
-				data._input = input;
-				// Output
-				output1 = data._outputs[0];
-				output2 = data._outputs[1];
-				output3 = data._outputs[2];
-				output4 = data._outputs[3];
-			}
-			static void uchars_to_uint(unsigned char* inputs, unsigned int& output)
-			{
-				union Data
-				{
-					unsigned int _output;
-					unsigned char _inputs[4];
-				} data;
-				// Input
-				for(int i = 0; i < 4; i++)
-					data._inputs[i] = inputs[i];
-				// Output
-				output = data._output;
-			}
-
+			// Breaks uint into 4 uchars
+			void	 uint_to_uchars(uint32_t input, unsigned char& output1, unsigned char& output2, unsigned char& output3, unsigned char& output4);
 			// Breaks uint into 4 uchars that are converted into [0,1] floats
-			static Vector4 uint_to_vec4(unsigned int input);
-			static Color4F uint_to_color4(unsigned int input);
-		};
+			Vector4  uint_to_vec4(uint32_t input);
+			// Breaks uint into 4 uchars that are converted into [0,1] floats
+			Color4F  uint_to_color4(uint32_t input);
+			// Combines 4 uchars into 1 unsigned int
+			uint32_t uchars_to_uint(unsigned char* inputs);
+		}
 
 		// Aspect Ratio //
 		class AspectRatioInfo

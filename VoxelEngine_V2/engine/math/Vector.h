@@ -251,11 +251,11 @@ namespace Vxl
 		{
 			bool denormal = false;
 			if (fabs(v.x) < 1e-30f) {
-				x = 0.0f;
+				v.x = 0.0f;
 				denormal = true;
 			}
 			if (fabs(v.y) < 1e-30f) {
-				y = 0.0f;
+				v.y = 0.0f;
 				denormal = true;
 			}
 			return denormal;
@@ -332,11 +332,11 @@ namespace Vxl
 				);
 		}
 		// Clamp
-		void Clamp(float _min, float _max)
+		_Vector2<Type> Clamp(float _min, float _max)
 		{
 			return Clamp(*this, _min, _max);
 		}
-		void Clamp(const _Vector2<Type>& _min, const _Vector2<Type>& _max)
+		_Vector2<Type> Clamp(const _Vector2<Type>& _min, const _Vector2<Type>& _max)
 		{
 			return Clamp(*this, _min, _max);
 		}
@@ -748,15 +748,15 @@ namespace Vxl
 		{
 			bool denormal = false;
 			if (fabs(v.x) < 1e-30f) {
-				x = 0.0f;
+				v.x = 0.0f;
 				denormal = true;
 			}
 			if (fabs(v.y) < 1e-30f) {
-				y = 0.0f;
+				v.y = 0.0f;
 				denormal = true;
 			}
 			if (fabs(v.z) < 1e-30f) {
-				z = 0.0f;
+				v.z = 0.0f;
 				denormal = true;
 			}
 			return denormal;
@@ -838,11 +838,11 @@ namespace Vxl
 				);
 		}
 		// Clamp
-		void Clamp(float _min, float _max)
+		_Vector3<Type> Clamp(float _min, float _max)
 		{
 			return Clamp(*this, _min, _max);
 		}
-		void Clamp(const _Vector3<Type>& _min, const _Vector3<Type>& _max)
+		_Vector3<Type> Clamp(const _Vector3<Type>& _min, const _Vector3<Type>& _max)
 		{
 			return Clamp(*this, _min, _max);
 		}
@@ -1207,19 +1207,19 @@ namespace Vxl
 		{
 			bool denormal = false;
 			if (fabs(v.x) < 1e-30f) {
-				x = 0.0f;
+				v.x = 0.0f;
 				denormal = true;
 			}
 			if (fabs(v.y) < 1e-30f) {
-				y = 0.0f;
+				v.y = 0.0f;
 				denormal = true;
 			}
 			if (fabs(v.z) < 1e-30f) {
-				z = 0.0f;
+				v.z = 0.0f;
 				denormal = true;
 			}
 			if (fabs(v.w) < 1e-30f) {
-				w = 0.0f;
+				v.w = 0.0f;
 				denormal = true;
 			}
 			return denormal;
@@ -1304,11 +1304,11 @@ namespace Vxl
 				);
 		}
 		// Clamp
-		void Clamp(float _min, float _max)
+		_Vector4<Type> Clamp(float _min, float _max)
 		{
 			return Clamp(*this, _min, _max);
 		}
-		void Clamp(const _Vector4<Type>& _min, const _Vector4<Type>& _max)
+		_Vector4<Type> Clamp(const _Vector4<Type>& _min, const _Vector4<Type>& _max)
 		{
 			return Clamp(*this, _min, _max);
 		}

@@ -124,9 +124,6 @@ namespace Vxl
 		bool CreateProgram();
 		void DestroyProgram();
 
-		void AttachShaders();
-		void DetachShaders();
-
 		void ReloadShaders();
 		void LoadShaders();
 		void UnloadShaders();

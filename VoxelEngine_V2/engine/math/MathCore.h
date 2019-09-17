@@ -56,7 +56,7 @@
 #define MacroMax(a,b) (((a) > (b)) ? (a) : (b))
 #define MacroMin(a,b) (((a) < (b)) ? (a) : (b))
 #define MacroRound(x) (std::ceilf(value * (float)std::pow(10, x)) / (float)pow(10, x))
-#define MacroClamp(n,_min,_max) MacroMax(_min, MacroMin(n, _max))
+#define MacroClamp(value,low,high) (((value)<(low))?(low):(((value)>(high))?(high):(value)))
 #define MacroClamp01(n) MacroClamp(n, 0, 1)
 #define MacroSwap_UNSAFE(a, b)	((a)^=(b),(b)^=(a),(a)^=(b)) /* Doesn't work when a and b are the same object - assigns zero (0) to the object in that case */
 #define MacroSwap(a, b)   ((&(a) == &(b)) ? (a) : ((a)^=(b),(b)^=(a),(a)^=(b))) /* checks that the addresses of a and b are different before XOR-ing */
@@ -68,7 +68,8 @@ namespace Vxl
 		NONE = -1,
 		X = 0,
 		Y = 1,
-		Z = 2
+		Z = 2,
+		ALL = 3
 	};
 
 	template<typename T>
@@ -139,5 +140,19 @@ namespace Vxl
 	static T To_Degrees(T value)
 	{
 		return Rad_To_Deg(value);
+	}
+
+	template<typename T>
+	// Puts any number into the [0->1] range
+	static T Sigmoid(T value)
+	{
+		return (2.0f / (1.0f + pow(EULERS_E, -value))) - 1.0f;
+	}
+
+	// Puts any number into the [-1->+1] range
+	template<typename T>
+	static T SigmoidNormalized(T value)
+	{
+		return 1.0f / (1.0f + pow(EULERS_E, -value));
 	}
 }

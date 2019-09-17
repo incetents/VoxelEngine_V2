@@ -660,9 +660,10 @@ namespace Vxl
 
 				simpleLight->m_property_useModel.SetProperty(true);
 				simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Model, true);
+				simpleLight->m_property_normalMatrix.SetPropertyMatrix(Matrix3x3(Editor.m_GizmoTransform.Model), true);
 
 				// Movement //
-				if (Editor.m_controlMode == Editor.ControlMode::TRANSLATE)
+				if (Editor.m_controlMode == Editor.GizmoMode::TRANSLATE)
 				{
 					// X Axis //
 					if (Editor.m_GizmoSelectedAxis == Axis::X)
@@ -705,7 +706,7 @@ namespace Vxl
 					Graphics::SetCullMode(CullMode::NO_CULL);
 
 					// X Plane
-					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Xquad_Model, true);
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.X_Model, true);
 					if (Editor.m_GizmoSelectedPlane == Axis::X)
 						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
@@ -716,7 +717,7 @@ namespace Vxl
 					Geometry.GetHalfQuadX()->Draw();
 
 					// Y Plane
-					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Yquad_Model, true);
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Y_Model, true);
 					if (Editor.m_GizmoSelectedPlane == Axis::Y)
 						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
@@ -727,7 +728,7 @@ namespace Vxl
 					Geometry.GetHalfQuadY()->Draw();
 
 					// Z Plane
-					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Zquad_Model, true);
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Z_Model, true);
 					if (Editor.m_GizmoSelectedPlane == Axis::Z)
 						if (Editor.m_GizmoClicked)
 							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
@@ -737,10 +738,109 @@ namespace Vxl
 						simpleLight->m_property_color.SetProperty(Color3F::BLUE);
 					Geometry.GetHalfQuadZ()->Draw();
 
+
+					// revert
 					Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+					simpleLight->m_property_alpha.SetProperty(1.0f);
+				}
+				else if (Editor.m_controlMode == Editor.GizmoMode::SCALE)
+				{
+					// X Cube //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.X_Model, true);
+					if (Editor.m_GizmoSelectedAxis == Axis::X)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::RED);
+
+					Geometry.GetCubeSmall()->Draw();
+
+					// Y Cube //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Y_Model, true);
+					if (Editor.m_GizmoSelectedAxis == Axis::Y)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::GREEN);
+
+					Geometry.GetCubeSmall()->Draw();
+
+					// Z Cube //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Z_Model, true);
+					if (Editor.m_GizmoSelectedAxis == Axis::Z)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::BLUE);
+
+					Geometry.GetCubeSmall()->Draw();
+
+					// Small cube in the middle //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Model, true);
+					simpleLight->m_property_alpha.SetProperty(0.85f);
+
+					if (Editor.m_GizmoSelectedAxis == Axis::ALL)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::GREY);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+
+					Geometry.GetCubeSmall()->Draw();
 
 					// revert
 					simpleLight->m_property_alpha.SetProperty(1.0f);
+
+				}
+				else if (Editor.m_controlMode == Editor.GizmoMode::ROTATE)
+				{
+					Graphics::SetCullMode(CullMode::NO_CULL);
+
+					// X Circle //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Model, true);
+					if (Editor.m_GizmoSelectedAxis == Axis::X)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::RED);
+
+					Geometry.GetCircleX()->Draw();
+
+					// Y Circle //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Model, true);
+					if (Editor.m_GizmoSelectedAxis == Axis::Y)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::GREEN);
+
+					Geometry.GetCircleY()->Draw();
+
+					// Z Circle //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Model, true);
+					if (Editor.m_GizmoSelectedAxis == Axis::Z)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::BLUE);
+
+					Geometry.GetCircleZ()->Draw();
+
+					// revert
+					Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 				}
 			}
 			// TEST //

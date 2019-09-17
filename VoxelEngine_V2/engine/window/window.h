@@ -34,7 +34,7 @@ namespace Vxl
 		uint32_t 	 m_size[2]; // Window Size that can change
 		uint32_t 	 m_resolution[2]; // Window Resolution (fbos and cameras will use this)
 		uint32_t 	 m_viewportSize[2]; // Same as Window size except it can be smaller if custom aspect ratio makes the view smaller
-		uint32_t 	 m_viewportOffset[2];
+		int			 m_viewportOffset[2];
 		float		 m_aspectRatio = 1.0f; // Based on Window size (resolution shouldn't affect this)
 		bool		 m_useCustomAspectRatio = false;
 		float		 m_customAspectRatio = 1.0f;
@@ -131,17 +131,17 @@ namespace Vxl
 			return m_viewportSize[1];
 		}
 		// Returns X offset of the rendered viewport
-		uint32_t GetViewportOffsetX(void) const
+		int		 GetViewportOffsetX(void) const
 		{
 			return m_viewportOffset[0];
 		}
 		// Returns Y offset of the rendered viewport
-		uint32_t GetViewportOffsetY(void) const
+		int		 GetViewportOffsetY(void) const
 		{
 			return m_viewportOffset[1];
 		}
 		// Returns Viewport [Screen Offset and Screen Size]
-		Vector4 GetViewport(void) const
+		Vector4  GetViewport(void) const
 		{
 			return Vector4((float)m_viewportOffset[0], (float)m_viewportOffset[1], (float)m_viewportSize[0], (float)m_viewportSize[1]);
 		}

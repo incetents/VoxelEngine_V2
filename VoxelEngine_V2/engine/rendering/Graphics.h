@@ -691,7 +691,7 @@ namespace Vxl
 			void	Delete(VBOID id);
 			void	Bind(VBOID id);
 			void	Unbind(void);
-			void	BindData(__int64 length, void* data, BufferUsage usage);
+			void	BindData(ptrdiff_t length, void* data, BufferUsage usage);
 			void	BindSubData(int OffsetBytes, int SizeBytes, void* data);
 
 			void	SetVertexAttribState(uint32_t bufferIndex, bool state);
@@ -704,7 +704,7 @@ namespace Vxl
 			void	Delete(EBOID id);
 			void	Bind(EBOID id);
 			void	Unbind(void);
-			void	BindData(__int64 length, void* data, BufferUsage usage);
+			void	BindData(ptrdiff_t length, void* data, BufferUsage usage);
 			void	BindSubData(int OffsetBytes, int SizeBytes, void* data);
 		}
 

@@ -33,6 +33,7 @@ namespace Vxl
 		Mesh* GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
 		Mesh* GenerateCube(const std::string& MeshName, float unitSize = 1.0f);
 		Mesh* GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f);
+		Mesh* GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
 
 	private:
 		bool m_isSetup = false;
@@ -62,6 +63,9 @@ namespace Vxl
 		Mesh* m_arrow_x = nullptr;
 		Mesh* m_arrow_y = nullptr;
 		Mesh* m_arrow_z = nullptr;
+		Mesh* m_circle_x = nullptr;
+		Mesh* m_circle_y = nullptr;
+		Mesh* m_circle_z = nullptr;
 
 		void CreateFullQuad();
 		void CreateFullTriangle();
@@ -76,6 +80,7 @@ namespace Vxl
 		void CreateCylinders();
 		void CreateCones();
 		void CreateArrows();
+		void CreateCircles();
 
 	public:
 		void InitGLResources()
@@ -93,6 +98,7 @@ namespace Vxl
 			CreateCylinders();
 			CreateCones();
 			CreateArrows();
+			CreateCircles();
 		}
 
 		// Vertices are from -1 to +1
@@ -212,6 +218,18 @@ namespace Vxl
 		Mesh* GetArrowZ()
 		{
 			return m_arrow_z;
+		}
+		Mesh* GetCircleX()
+		{
+			return m_circle_x;
+		}
+		Mesh* GetCircleY()
+		{
+			return m_circle_y;
+		}
+		Mesh* GetCircleZ()
+		{
+			return m_circle_z;
 		}
 
 	} SingletonInstance(Geometry);

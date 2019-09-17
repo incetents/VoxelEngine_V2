@@ -23,10 +23,12 @@ namespace Vxl
 		m_fbo = FramebufferObject::Create("GUIViewport");
 		m_fbo->SetSizeToWindowSize();
 		m_fbo->Bind();
-		m_renderTexture = m_fbo->CreateRenderTexture("");
-		m_fbo->SetAttachment(0, m_renderTexture);
+		m_fbo->NewAttachment(0, RenderTarget::Type::TEXTURE, "albedo", TextureFormat::RGBA8);
 		m_fbo->checkFBOStatus();
 		m_fbo->Unbind();
+
+		// Store reference of FBO renderTexture
+		m_renderTexture = m_fbo->GetAttachmentRenderTexture(0);
 
 	}
 	void GUIViewport::DestroyGLResources()
@@ -227,16 +229,19 @@ namespace Vxl
 		// Render Correct RenderTexture information
 		DrawRenderTarget();
 
+		// Vertical Window Padding
+		static float WindowVerticalPadding = 38.0f;
+
 		// Get Correct Size for texture
 		ImVec2 size = ImGui::GetWindowSize();
-		size.y -= (40.0f); // Padding from "name bar" and "menu bar"
+		size.y -= (WindowVerticalPadding); // Padding from "name bar" and "menu bar"
 
 		if (m_xrayMode)
 		{
 			ImVec2 guiSize = ImGui::GetWindowSize();
-			guiSize.y -= 40.0f; // Fix padding
+			guiSize.y -= WindowVerticalPadding; // Fix padding
 			ImVec2 guiPos = ImGui::GetWindowPos();
-			guiPos.y += 40.0f; // Offset due to padding
+			guiPos.y += WindowVerticalPadding; // Offset due to padding
 			ImVec2 windowSize = ImVec2((float)Window.GetWindowWidth(), (float)Window.GetWindowHeight());
 
 			ImVec2 uv_x = ImVec2(guiPos.x / windowSize.x, (guiPos.x + guiSize.x) / windowSize.x);

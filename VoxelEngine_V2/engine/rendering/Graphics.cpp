@@ -1801,7 +1801,7 @@ namespace Vxl
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	void Graphics::VBO::BindData(__int64 length, void* data, BufferUsage usage)
+	void Graphics::VBO::BindData(ptrdiff_t length, void* data, BufferUsage usage)
 	{
 		glBufferData(GL_ARRAY_BUFFER, length, data, GL_BufferUsage[(int)usage]);
 	}
@@ -1850,7 +1850,7 @@ namespace Vxl
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-	void Graphics::EBO::BindData(__int64 length, void* data, BufferUsage usage)
+	void Graphics::EBO::BindData(ptrdiff_t length, void* data, BufferUsage usage)
 	{
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, length, data, GL_BufferUsage[(int)usage]);
 	}

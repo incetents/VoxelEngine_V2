@@ -47,7 +47,7 @@ void AssertFail(const std::string& message, const std::string& title);
 #ifdef _DEBUG
 // ~~~ //
 #define VXL_ERROR(message) { Logger.error(message);\
-AssertFail(std::string(message) + "\n\nFile: " + Vxl::stringUtil::extractNameFromPath(__FILE__) + "\n\nFunction: " + std::string(__FUNCSIG__) + "\nLine: " + std::to_string(__LINE__) + "\n\nPath:" + std::string(__FILE__), "Assert Failed"); }
+AssertFail(std::string(message) + "\n\nFile: " + Vxl::stringUtil::extractNameFromPath(__FILE__) + "\nLine: " + std::to_string(__LINE__) + "\n\nFunction: " + std::string(__FUNCSIG__) + "\n\nPath:" + std::string(__FILE__), "Assert Failed"); }
 #define VXL_ASSERT(expression, message) if(!(expression)) { VXL_ERROR(message); }
 #define VXL_RETURN_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return; }
 #define VXL_RETURN_NULLPTR_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return nullptr; }

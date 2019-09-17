@@ -26,15 +26,18 @@ uniform float VXL_alpha = 1.0;
 //
 void main()
 {
-	float d = dot(normalize(v_data.normal), vec3(0.57735, 0.57735, 0.57735)); // -1 to 1 brightness
+	//vec3(0.57735, 0.57735, 0.57735)
+	float d = dot(normalize(v_data.normal), vec3(0.66725, 0.57193, 0.47661)); // -1 to 1 brightness
 	d = d * 0.5 + 0.5; // put into 0-1 range
 	vec3 light = vec3(0.25,0.25,0.25);
-	vec3 dark = vec3(0.5,0.5,0.5);
+	vec3 dark = vec3(0.5,0.5,0.5); 
 		
 	output_albedo.rgb = mix(VXL_color - dark, VXL_color + light, d);
 	output_albedo.a = VXL_alpha;
 
 	output_normal = vec4(normalize(v_data.normal), 1.0); // worldspace Normals
+	
+	//output_albedo.rgb = v_data.normal;
 	
 	//output_albedo.rgb = v_data.normal;
 }

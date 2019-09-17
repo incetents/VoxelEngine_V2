@@ -17,7 +17,7 @@ namespace Vxl
 	class RenderBuffer;
 	class RenderTexture;
 
-	class FBOAttachment
+	class RenderTarget
 	{
 	public:
 		// Type
@@ -115,9 +115,9 @@ namespace Vxl
 		uint32_t			m_height = 0;
 		bool				m_fullscreen = false; // Width/Height will attempt to match screen's resolution
 		// Attachments
-		mutable std::map<uint32_t, FBOAttachment>	m_textures;
+		mutable std::map<uint32_t, RenderTarget>	m_textures;
 		std::vector<uint32_t>				m_attachmentOrder;
-		FBOAttachment						m_depth;
+		RenderTarget						m_depth;
 
 		void updateAttachmentOrder();
 
@@ -160,10 +160,6 @@ namespace Vxl
 		void ClearBuffers();
 		void ClearBuffer(uint32_t attachmentIndex);
 
-		// Creating Attachment Info
-		RenderTexture* CreateRenderTexture(const std::string& name, TextureFormat format = TextureFormat::RGBA8, bool mipmapping = false) const;
-		RenderBuffer* CreateRenderBuffer(const std::string& name, TextureFormat format = TextureFormat::RGBA8) const;
-
 		// Editing Attachment Info
 		void SetAttachment(
 			uint32_t _attachmentIndex,
@@ -172,6 +168,13 @@ namespace Vxl
 		void SetAttachment(
 			uint32_t _attachmentIndex,
 			RenderBuffer* _renderbuffer
+		);
+		void NewAttachment(
+			uint32_t _attachmentIndex,
+			RenderTarget::Type _type,
+			const std::string& _name,
+			TextureFormat _format,
+			bool _mipmapping = false
 		);
 		void RemoveAttachment(
 			uint32_t _attachmentIndex
@@ -207,7 +210,7 @@ namespace Vxl
 		// Editing Depth Info
 		void SetDepth(
 			TextureDepthFormat _depthFormat,
-			FBOAttachment::Type _type
+			RenderTarget::Type _type
 		);
 		void RemoveDepth(void);
 		// Get Depth Info
