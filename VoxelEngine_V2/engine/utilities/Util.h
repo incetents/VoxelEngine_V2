@@ -41,6 +41,7 @@ namespace Vxl
 			vec.erase(std::remove(vec.begin(), vec.end(), data));
 		}
 
+		// Converting Raw Data
 		namespace Conversion
 		{
 			// Breaks uint into 4 uchars
@@ -52,6 +53,8 @@ namespace Vxl
 			// Combines 4 uchars into 1 unsigned int
 			uint32_t uchars_to_uint(unsigned char* inputs);
 		}
+
+
 
 		// Aspect Ratio //
 		class AspectRatioInfo

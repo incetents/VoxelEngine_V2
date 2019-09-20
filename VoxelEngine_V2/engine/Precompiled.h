@@ -31,6 +31,7 @@
 #include "math/Rotation.h"
 #include "math/Transform.h"
 #include "math/Vector.h"
+#include "math/Raycast.h"
 
 #include "modules/Component.h"
 #include "modules/Entity.h"

@@ -72,6 +72,41 @@ namespace Vxl
 		return _entity;
 	}
 
+	// ScreenSpace / WorldSpace conversion
+	Vector4 CameraObject::ScreenSpaceToWorldSpace(const Vector3& screenSpace)
+	{
+		Vector4 Point = m_viewProjectionInverse * Vector4(screenSpace, 1);
+		// Divide all values by its W
+		Point.w = 1.0f / Point.w;
+		Point.x *= Point.w;
+		Point.y *= Point.w;
+		Point.z *= Point.w;
+
+		return Point;
+	}
+	Vector3 CameraObject::ScreenSpaceToDirection(const Vector2& screenSpace)
+	{
+		Vector4 EndPoint = m_viewProjectionInverse * Vector4(screenSpace, 1, 1);
+		// Divide all values by its W
+		EndPoint.w = 1.0f / EndPoint.w;
+		EndPoint.x *= EndPoint.w;
+		EndPoint.y *= EndPoint.w;
+		EndPoint.z *= EndPoint.w;
+
+		return (Vector3(EndPoint) - m_transform.getWorldPosition()).Normalize();
+	}
+	Vector4 CameraObject::WorldSpaceToScreenSpace(const Vector3& worldSpace)
+	{
+		Vector4 Point = m_viewProjection * Vector4(worldSpace, 1);
+		// Divide all values by its W
+		Point.w = 1.0f / Point.w;
+		Point.x *= Point.w;
+		Point.y *= Point.w;
+		Point.z *= Point.w;
+
+		return Point;
+	}
+
 	// Set Type
 	void CameraObject::SetPerspectiveWindowAspect(float _fov)
 	{
@@ -140,10 +175,10 @@ namespace Vxl
 			Vector3 FarPlaneHalfRight = m_transform.getRight() * Wfar * 0.5f;
 
 			// Draw ClosePlane
-			Debug.DrawSquare(ClosePlaneCenter, ClosePlaneHalfUp, ClosePlaneHalfRight, Width, Color);
+			Debug.DrawLineSquare(ClosePlaneCenter, ClosePlaneHalfUp, ClosePlaneHalfRight, Width, Color);
 
 			// Draw FarPlane
-			Debug.DrawSquare(FarPlaneCenter, FarPlaneHalfUp, FarPlaneHalfRight, Width, Color);
+			Debug.DrawLineSquare(FarPlaneCenter, FarPlaneHalfUp, FarPlaneHalfRight, Width, Color);
 
 			// Connect Planes
 			Debug.DrawLine(
@@ -175,7 +210,7 @@ namespace Vxl
 	// Draw
 	void CameraObject::Draw()
 	{
-
+		// Nothing
 	}
 
 	void CameraObject::TransformChanged()

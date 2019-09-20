@@ -12,6 +12,11 @@
 
 namespace Vxl
 {
+	template<typename Type>
+	class _Vector2;
+	template<typename Type>
+	class _Vector3;
+
 	enum class KeyCode
 	{
 		SPACE = 32,
@@ -160,6 +165,7 @@ namespace Vxl
 		int		m_MouseDeltaPos[2] = { 0 }; // Change in position during a frame
 		int		m_MouseDragDeltaPos[2] = { 0 }; // Change in position during a frame while dragging [left click drag]
 		float	m_MousePosViewport[2] = { 0 }; // Mouse position across the render viewport [Range = 0 -> 1 ]
+		float	m_MousePosScreenspace[2] = { 0 }; // Mouse position across the render viewport [Range = -1 -> 1 ]
 		bool	m_MouseButtonsPrev[TotalMouseButtons] = { false };
 		bool	m_MouseButtons[TotalMouseButtons] = { false };
 		double  m_MouseScroll[2] = { 0.0 };
@@ -198,16 +204,19 @@ namespace Vxl
 #endif
 		}
 		// Mouse Data
-		inline int	  getMouseX(void) const { return m_MousePos[0]; }
-		inline int	  getMouseY(void) const { return m_MousePos[1]; }
+		inline int	  getMousePosY(void) const { return m_MousePos[1]; }
+		inline int	  getMousePosX(void) const { return m_MousePos[0]; }
+		inline float  getMousePosViewportX(void) const { return m_MousePosViewport[0]; }
+		inline float  getMousePosViewportY(bool flip = true) const { return flip ? 1.0f-m_MousePosViewport[1] : m_MousePosViewport[1]; }
+		inline float  getMousePosScreenspaceX(void) const { return m_MousePosScreenspace[0]; }
+		inline float  getMousePosScreenspaceY(bool flip = true) const { return flip ? - m_MousePosScreenspace[1] : m_MousePosScreenspace[1]; }
+		_Vector2<float> getMousePos() const;
+		_Vector2<float> getMousePosViewport(bool flipY = true) const;
+		_Vector2<float> getMousePosScreenspace(bool flipY = true) const;
 		inline int	  getMouseDeltaX(void) const { return m_MouseDeltaPos[0]; }
 		inline int	  getMouseDeltaY(void) const { return m_MouseDeltaPos[1]; }
 		inline int	  getMouseDragDeltaX(void) const { return m_MouseDragDeltaPos[0]; }
 		inline int	  getMouseDragDeltaY(void) const { return m_MouseDragDeltaPos[1]; }
-		inline void	  getMousePos(float& x, float& y)  const { x = static_cast<float>(m_MousePos[0]); y = static_cast<float>(m_MousePos[1]); }
-		inline float  getMousePosViewportX(void) const { return m_MousePosViewport[0]; }
-		inline float  getMousePosViewportY(bool flip) const { return flip ? 1.0f-m_MousePosViewport[1] : m_MousePosViewport[1]; }
-		inline void   getMousePosViewport(float& x, float& y, bool flipY) const { x = m_MousePosViewport[0]; y = flipY ? 1.0f - m_MousePosViewport[1] : m_MousePosViewport[1];  }
 		bool		  getMouseButton(MouseButton M) const
 		{
 #ifdef GLOBAL_IMGUI

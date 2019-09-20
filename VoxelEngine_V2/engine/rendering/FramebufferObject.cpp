@@ -499,8 +499,8 @@ namespace Vxl
 		VXL_ASSERT(_HasAttachment, "FBO readpixels: index out of bounds");
 		
 		// Ignore if x,y coordinates are outside FBO range
-		if (x < 0 || y < 0 || !_HasAttachment)
-			return RawArray<uint8_t>();
+		VXL_ASSERT(x >= 0 && y >= 0, "FBO Readpixels, x and/or y out of range");
+		VXL_ASSERT(_HasAttachment, "FBO readpixels, missing attachment to read from");
 
 		if(m_textures[_attachmentIndex].IsRenderTexture())
 			return Graphics::FramebufferObject::ReadPixels(*m_textures[_attachmentIndex].GetRenderTexture(), _attachmentIndex, x, y, w, h);
@@ -509,15 +509,8 @@ namespace Vxl
 	}
 	RawArray<uint8_t> FramebufferObject::readPixelsFromMouse(uint32_t _attachmentIndex, int w, int h)
 	{
-		float px, py;
-		px = Input.getMousePosViewportX();  // [0 -> 1] horizontally across viewport
-		py = Input.getMousePosViewportY(true);  // [0 -> 1] vertically across viewport
-
-		// Move position from [0->1] into [0->width] and [0->height]
-		px *= m_width;
-		py *= m_height;
-
-		return readPixels(_attachmentIndex, (int)px, (int)py, w, h);
+		return readPixels(
+			_attachmentIndex, Input.getMousePosX(), Window.GetWindowHeight() - Input.getMousePosY(), w, h);
 	}
 
 	RawArray<uint8_t> FramebufferObject::readDepthPixels(int x, int y, int w, int h)
@@ -536,14 +529,7 @@ namespace Vxl
 	}
 	RawArray<uint8_t> FramebufferObject::readDepthPixelsFromMouse(int w, int h)
 	{
-		float px, py;
-		px = Input.getMousePosViewportX();  // [0 -> 1] horizontally across viewport
-		py = Input.getMousePosViewportY(true);  // [0 -> 1] vertically across viewport
-
-		// Move position from [0->1] into [0->width] and [0->height]
-		px *= m_width;
-		py *= m_height;
-
-		return readDepthPixels((int)px, (int)py, w, h);
+		return readDepthPixels(
+			Input.getMousePosX(), Window.GetWindowHeight() - Input.getMousePosY(), w, h);
 	}
 }

@@ -2013,6 +2013,23 @@ namespace Vxl
 
 		gl_pixelUnpackAlignment = align;
 	}
+	// Note this is an expensive function, plz use the FBO Readpixels if at all possible, its 50 times cheaper than this
+	RawArray<uint8_t> Graphics::Texture::ReadPixels(const Vxl::BaseTexture& texture, int x, int y, int w, int h)
+	{
+		RawArray<uint8_t> Array;
+		Array.Allocate(w * h * texture.GetChannelCount());
+		glGetTextureSubImage(
+			texture.GetID(), 0,
+			x, y, 0,
+			w, h, 1,
+			GL_TextureChannelType[(int)texture.GetChannelType()],
+			GL_TexturePixelType[(int)texture.GetPixelType()],
+			w * h * texture.GetChannelCount(),
+			Array.start
+		);
+
+		return Array;
+	}
 
 	// ~ Renderbuffer ~ //
 	RenderBufferID Graphics::RenderBuffer::Create(void)

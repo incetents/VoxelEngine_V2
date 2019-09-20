@@ -19,6 +19,12 @@ namespace Vxl
 {
 	class Texture2D;
 
+	struct ColoredModel
+	{
+		Color4F		m_color;
+		Matrix4x4	m_model;
+	};
+
 	static class Debug : public Singleton<class Debug>
 	{
 		friend class RenderManager;
@@ -30,24 +36,17 @@ namespace Vxl
 		class LineSet
 		{
 		public:
-			enum class PositionType
-			{
-				VEC2,
-				VEC3
-			};
-			PositionType		m_type; // Whether position in VBO stride has 2 or 3 values
+			const bool	m_isVec3; // If not, it's a vec2 
+			LineMesh*	m_mesh;
 
-			LineMesh*			m_mesh;
-
-			void InitGLResources(UINT size, PositionType type)
+			LineSet(bool isVec3)
+				: m_isVec3(isVec3)
 			{
-				m_type = type;
-				m_mesh = new LineMesh(type == PositionType::VEC3);
+				m_mesh = new LineMesh(m_isVec3);
 			}
-			void DestroyGLResources()
+			~LineSet()
 			{
 				delete m_mesh;
-				m_mesh = nullptr;
 			}
 
 			void AddLine_Vec3(
@@ -55,7 +54,7 @@ namespace Vxl
 				float Width,
 				const Color4F& C1, const Color4F& C2
 			) {
-				VXL_ASSERT(m_type == PositionType::VEC3, "Invalid LineSet Type for this function");
+				VXL_ASSERT(m_isVec3, "Invalid LineSet Type for this function");
 
 				// Vertices
 				auto& vertices = m_mesh->m_buffer.getVertices();
@@ -96,7 +95,7 @@ namespace Vxl
 				float Width,
 				const Color4F& C1, const Color4F& C2
 			) {
-				VXL_ASSERT(m_type == PositionType::VEC2, "Invalid LineSet Type for this function");
+				VXL_ASSERT(!m_isVec3, "Invalid LineSet Type for this function");
 
 				// Vertices
 				//std::vector<float>& vertices = m_mesh->m_buffer.getVerticesEditing();
@@ -135,69 +134,84 @@ namespace Vxl
 
 	private:
 		// Debug Lines in world space
-		LineSet m_worldLines;
+		LineSet* m_worldLines = nullptr;
 		// Debug Lines in screen space
-		LineSet m_screenLines;
+		LineSet* m_screenLines = nullptr;
 
-		
 		// Debug Wireframe Spheres
-		struct WireframeSphere
-		{
-			Color4F color;
-			Matrix4x4 model;
-			void calcModel(Vector3 center, Vector3 scale)
-			{
-				model = Matrix4x4::GetScale(scale);
-				model.OverrideCenter(center);
-			}
-		};
-		std::vector<WireframeSphere> m_wireframeSpheres;
-		
+		std::vector<ColoredModel> m_wireframeSpheres;
+		// Debug Cubes
+		std::vector<ColoredModel> m_cubes;
+
 		// Debug Textures
-		void CreateDebugTextures();
-		Texture2D*			m_null_texture;
+		void			CreateDebugTextures();
+		Texture2D*		m_null_texture;
 
 	public:
-		// Debug Lines
+		// GL Resources
 		void InitGLResources()
 		{
-			m_worldLines.InitGLResources(VertexIncrementAmount, LineSet::PositionType::VEC3);
-			m_screenLines.InitGLResources(VertexIncrementAmount, LineSet::PositionType::VEC2);
+			m_worldLines  = new LineSet(true);
+			m_screenLines = new LineSet(false);
 
 			CreateDebugTextures();
 		}
 		void DestroyGLResources()
 		{
-			m_worldLines.DestroyGLResources();
-			m_screenLines.DestroyGLResources();
+			delete m_worldLines;
+			delete m_screenLines;
 
 			// Texture auto cleaned up
 		}
 
+		// Line Drawing
 		void DrawLine(
 			const Vector3& P1, const Vector3& P2,
 			float Width,
 			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
 		);
-		void DrawAABB(
+		void DrawLineAABB(
 			const Vector3& Min, const Vector3& Max,
 			const Vector3& OffsetAll = Vector3(0, 0, 0),
 			float Width = 1.0f,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
-		void DrawOBB(
+		void DrawLineOBB(
 			const Entity& entity,
 			const Vector3& OffsetAll,
 			float Width = 1.0f,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
-		void DrawSquare(
+		void DrawLineSquare(
 			const Vector3& position,
 			const Vector3& up,
 			const Vector3& right,
 			float Width = 1.0f,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
+		void DrawLineScreenSpace(
+			const Vector2& P1, const Vector2& P2,
+			float Width,
+			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
+		);
+		void DrawLineSquareScreenSpace(
+			const Vector2& P, const Vector2& Size,
+			float LineWidth,
+			const Color4F& Color = Color4F(1, 1, 1, 1)
+		);
+
+		// Triangle Drawing
+		void DrawCube(
+			const Vector3& position,
+			const Vector3& scale,
+			const Color4F& C = Color4F(1, 1, 1, 1)
+		);
+		void DrawCube(
+			const Matrix4x4& model,
+			const Color4F& C = Color4F(1, 1, 1, 1)
+		);
+
+		// Triangle Wireframe Drawing
 		void DrawWireframeSphere(
 			const Vector3& position,
 			const Vector3& scale,
@@ -207,18 +221,9 @@ namespace Vxl
 			const Matrix4x4& model,
 			const Color4F& C = Color4F(1, 1, 1, 1)
 		);
-		
-		void DrawScreenSpaceLine(
-			const Vector2& P1, const Vector2& P2,
-			float Width,
-			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
-		);
-		void DrawScreenSpaceSquare(
-			const Vector2& P, const Vector2& Size,
-			float LineWidth,
-			const Color4F& Color = Color4F(1, 1, 1, 1)
-		);
 
+		
+		// Rendering
 		void RenderWorldLines();
 		void RenderScreenLines();
 		void End();

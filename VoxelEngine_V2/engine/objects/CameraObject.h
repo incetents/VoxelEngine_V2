@@ -56,13 +56,16 @@ namespace Vxl
 
 	public:
 
-		//void BindUBO();
-
 		// Destructor
 		~CameraObject();
 
 		// Database Creation
 		static CameraObject* Create(const std::string& _name, float _znear, float _zfar);
+
+		// ScreenSpace / WorldSpace conversion
+		Vector4 ScreenSpaceToWorldSpace(const Vector3& screenSpace);
+		Vector3 ScreenSpaceToDirection(const Vector2& screenSpace);
+		Vector4 WorldSpaceToScreenSpace(const Vector3& worldSpace);
 
 		// Zplane
 		void SetZNear(float _znear)

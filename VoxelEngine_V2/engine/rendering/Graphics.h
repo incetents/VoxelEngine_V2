@@ -27,6 +27,7 @@ namespace Vxl
 	class Texture2D;
 	class RenderTexture;
 	class RenderBuffer;
+	class BaseTexture;
 
 	// ~ Vendor Types ~ //
 	enum class VendorType
@@ -738,6 +739,8 @@ namespace Vxl
 			void		SetBorderColor(TextureType type, const Color4F& color);
 			void		SetPixelPackAlignment(PixelAlignment align);
 			void		SetPixelUnpackAlignment(PixelAlignment align);
+
+			RawArray<uint8_t> ReadPixels(const Vxl::BaseTexture& texture, int x, int y, int w, int h);
 		}
 		
 		// ~ Renderbuffer ~ //

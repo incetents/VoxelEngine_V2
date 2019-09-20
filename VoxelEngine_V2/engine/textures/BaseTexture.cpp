@@ -5,6 +5,8 @@
 #include "../rendering/Graphics.h"
 #include "../rendering/RenderBuffer.h"
 #include "../utilities/Macros.h"
+#include "../input/Input.h"
+#include "../window/window.h"
 
 #include <assert.h>
 
@@ -173,5 +175,17 @@ namespace Vxl
 		m_borderColor = color;
 
 		UpdateParameters();
+	}
+
+	RawArray<uint8_t> BaseTexture::readPixels(int x, int y, int w, int h)
+	{
+		// Ignore if x,y coordinates are outside FBO range
+		VXL_ASSERT(x >= 0 && y >= 0, "Tex Readpixels, x and/or y out of range");
+
+		return Graphics::Texture::ReadPixels(*this, x, y, w, h);
+	}
+	RawArray<uint8_t> BaseTexture::readPixelsFromMouse(int w, int h)
+	{
+		return readPixels(Input.getMousePosX(), Window.GetWindowHeight() - Input.getMousePosY(), w, h);
 	}
 }

@@ -493,11 +493,10 @@ namespace Vxl
 				else if (m_controlMode == GizmoMode::ROTATE)
 				{
 					// Get Mouse position in -1 to +1 range of screen
-					Vector2 MouseViewport = Vector2(Input.getMousePosViewportX(), Input.getMousePosViewportY(true));
-					MouseViewport = MouseViewport * 2.0f - 1.0f;// go from [0->1] range to [-1->+1] range
+					Vector2 MouseScreenSpace = Input.getMousePosScreenspace(true);
 						
 					//	m_Axis1_Direction = (MouseViewport - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
-					m_Axis1_Direction = MouseViewport;
+					m_Axis1_Direction = MouseScreenSpace;
 					m_useAxis1 = true;
 				}
 			}
@@ -587,11 +586,12 @@ namespace Vxl
 						if (m_GizmoSelectedAxis == Axis::ALL)
 						{
 							// Get Mouse position in -1 to +1 range of screen
-							Vector2 MouseViewport = Vector2(Input.getMousePosViewportX(), Input.getMousePosViewportY(true));
-							MouseViewport = MouseViewport * 2.0f - 1.0f;// go from [0->1] range to [-1->+1] range
+							Vector2 MouseScreenSpace = Input.getMousePosScreenspace(true);
+
+							std::cout << MouseScreenSpace << std::endl;
 
 							// Distance from mouse to center point of Gizmo
-							Vector2 MouseDelta = MouseViewport - Vector2(m_ScreenSpace_SelectionCenter);
+							Vector2 MouseDelta = MouseScreenSpace - Vector2(m_ScreenSpace_SelectionCenter);
 							float Distance = MouseDelta.x + MouseDelta.y + 1.0f;
 
 							// Scale everything based on distance
@@ -683,137 +683,6 @@ namespace Vxl
 				}
 			}
 
-
-			//	// Drag Editor Axis around
-			//	if (Input.getMouseButton(MouseButton::LEFT) && (m_controlAxis != Axis::NONE || m_controlPlane != Axis::NONE) && HasSelection())
-			//	{
-			//		Vector2 MouseChange = Vector2(
-			//			(float)+Input.getMouseDragDeltaX(),
-			//			(float)-Input.getMouseDragDeltaY()
-			//		);
-			//	
-			//		// Clip space axis should only be calculated on the initial click
-			//		static Vector2 Axis_ScreenDirection;
-			//		static Vector2 CenterAxis_ScreenPos;
-			//		static Vector2 Axis_ScreenPos;
-			//		static float DragSpeed;
-			//	
-			//		if (m_controlAxisClicked == false)
-			//		{
-			//			// Object MVP
-			//			Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * GetSelectionTransform().Model;
-			//	
-			//			// Calculate Center Axis in ClipSpace
-			//			Vector4 ClipSpaceAxis = MVP * Vector4(0, 0, 0, 1);
-			//			ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
-			//			CenterAxis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
-			//	
-			//			// Calculate Selected Axis in ClipSpace
-			//			switch (m_controlAxis)
-			//			{
-			//			case Axis::X:
-			//				ClipSpaceAxis = MVP * Vector4(1, 0, 0, 1);
-			//				break;
-			//			case Axis::Y:
-			//				ClipSpaceAxis = MVP * Vector4(0, 1, 0, 1);
-			//				break;
-			//			case Axis::Z:
-			//				ClipSpaceAxis = MVP * Vector4(0, 0, 1, 1);
-			//				break;
-			//			case Axis::NONE:
-			//			{
-			//				switch (m_controlPlane)
-			//				{
-			//				case Axis::X:
-			//					ClipSpaceAxis = MVP * Vector4(0, 0.577f, 0.577f, 1);
-			//					break;
-			//				case Axis::Y:
-			//					ClipSpaceAxis = MVP * Vector4(0.577f, 0, 0.577f, 1);
-			//					break;
-			//				case Axis::Z:
-			//					ClipSpaceAxis = MVP * Vector4(0.577f, 0.577f, 0, 1);
-			//					break;
-			//				}
-			//			}
-			//			}
-			//	
-			//			ClipSpaceAxis /= ClipSpaceAxis.w; // [-1 to +1] Range
-			//			Axis_ScreenPos = ClipSpaceAxis.GetVector2(0, 1);
-			//	
-			//			//std::cout << Axis_ScreenPos << std::endl;
-			//			//std::cout << CenterAxis_ScreenPos << std::endl;
-			//			//std::cout << "~~~" << std::endl;
-			//	
-			//			Axis_ScreenDirection = (Axis_ScreenPos - CenterAxis_ScreenPos).Normalize();
-			//	
-			//			// Update Drag Speed
-			//			DragSpeed = GetSelectionTransform().CameraDistance / 3.0f;
-			//		}
-			//	
-			//		//std::cout << DragSpeed << std::endl;
-			//	
-			//		VXL_ASSERT(Axis_ScreenDirection.LengthSqr() != 0.0f, "Axis_ScreenDirection is zero");
-			//	
-			//		// Project Mouse Change onto Xaxis in screenspace, now we'll see how far the mouse drags across the axis
-			//		static float PreviousDragAmount = 0.0f;
-			//		float DragAmount = MouseChange.ProjectLength(Axis_ScreenDirection) * DragSpeed;
-			//		// Drag Multiply
-			//	
-			//		if (m_controlAxisClicked == false)
-			//			PreviousDragAmount = DragAmount;
-			//	
-			//		// No movement occurs if mouse change is empty
-			//		if (!MouseChange.Is_Empty())
-			//		{
-			//			Vector3 MoveDirection;
-			//	
-			//			switch (m_controlAxis)
-			//			{
-			//			case Axis::X:
-			//				MoveDirection = GetSelectionTransform().Right;
-			//				break;
-			//			case Axis::Y:
-			//				MoveDirection = GetSelectionTransform().Up;
-			//				break;
-			//			case Axis::Z:
-			//				MoveDirection = GetSelectionTransform().Forward;
-			//				break;
-			//			case Axis::NONE:
-			//			{
-			//				switch (m_controlPlane)
-			//				{
-			//				case Axis::X:
-			//					MoveDirection = GetSelectionTransform().Up + GetSelectionTransform().Forward;
-			//					break;
-			//				case Axis::Y:
-			//					MoveDirection = GetSelectionTransform().Right + GetSelectionTransform().Forward;
-			//					break;
-			//				case Axis::Z:
-			//					MoveDirection = GetSelectionTransform().Right + GetSelectionTransform().Up;
-			//					break;
-			//				}
-			//			}
-			//			}
-			//	
-			//			for (auto& Entity : m_selectedEntities)
-			//			{
-			//				Entity->m_transform.increaseWorldPosition(MoveDirection * 0.01f * (DragAmount - PreviousDragAmount));
-			//			}
-			//		}
-			//	
-			//		
-			//		//std::cout << (MouseChange) << std::endl;
-			//		//std::cout << (Axis_ScreenDirection) << std::endl;
-			//		//std::cout << (DragAmount) << std::endl;
-			//		//std::cout << (PreviousDragAmount) << std::endl;
-			//		//std::cout << "~~~" << std::endl;
-			//	
-			//		PreviousDragAmount = DragAmount;
-			//	
-			//		m_controlAxisClicked = true;
-			//	}
-			//	else
-			//		m_controlAxisClicked = false;
 		}
 
 	}

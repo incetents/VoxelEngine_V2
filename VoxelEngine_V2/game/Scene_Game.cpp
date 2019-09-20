@@ -528,20 +528,6 @@ namespace Vxl
 			_cameraObject->Update();
 		}
 
-		// Debug Lines
-		Debug.DrawLine(
-			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
-			10.0f,
-			Color4F(0, 1, 0, 0.25f), Color4F(1, 0, 1, 1)
-		);
-		static float time = 0.0f;
-		time += 0.2f;
-		Debug.DrawLine(
-			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
-			10.0f,
-			Color4F(1, 1, 0, 0.25f), Color4F(0, 1, 1, 1)
-		);
-
 		// GizmoMode
 		if (Input.getKeyDown(KeyCode::Num_1))
 			Editor.m_controlMode = Editor::GizmoMode::TRANSLATE;
@@ -581,8 +567,8 @@ namespace Vxl
 					{
 						if (_mesh->m_instances.Empty())
 						{
-							Debug.DrawOBB(*Entity, EntityWorld, 3.0f, OBB_Color);
-							Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, EntityWorld, 3.0f, AABB_Color);
+							Debug.DrawLineOBB(*Entity, EntityWorld, 3.0f, OBB_Color);
+							Debug.DrawLineAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, EntityWorld, 3.0f, AABB_Color);
 						}
 						// Draw outline around all instances
 						else
@@ -597,8 +583,8 @@ namespace Vxl
 
 								Vector3 PosWorld = Vector3(EModel * Pos);
 
-								Debug.DrawOBB(*Entity, PosWorld, 3.0f, OBB_Color);
-								Debug.DrawAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, PosWorld, 3.0f, AABB_Color);
+								Debug.DrawLineOBB(*Entity, PosWorld, 3.0f, OBB_Color);
+								Debug.DrawLineAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, PosWorld, 3.0f, AABB_Color);
 							}
 						}
 					}
@@ -628,7 +614,7 @@ namespace Vxl
 							Light_Point* LightPoint = dynamic_cast<Light_Point*>(LObject->GetLight());
 							float lightRadius = LightPoint->m_radius;
 
-							Debug.DrawWireframeSphere(LObject->m_transform.getWorldPosition(), Vector3(lightRadius), Color4F(LightPoint->m_color, 0.45f));
+							Debug.DrawWireframeSphere(LObject->m_transform.getWorldPosition(), Vector3(lightRadius), Color4F(LightPoint->m_color, 0.1f));
 							break;
 						}
 					}
@@ -656,7 +642,28 @@ namespace Vxl
 
 	void Scene_Game::Draw()
 	{
-		ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
+		// Debug Lines
+		Debug.DrawLine(
+			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
+			10.0f,
+			Color4F(0, 1, 0, 0.25f), Color4F(1, 0, 1, 1)
+		);
+		static float time = 0.0f;
+		time += 0.2f;
+		Debug.DrawLine(
+			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
+			10.0f,
+			Color4F(1, 1, 0, 0.25f), Color4F(0, 1, 1, 1)
+		);
+
+		// Mouse pos [-1 to +1]
+		Vector4 clickPoint = RenderManager.GetMainCamera()->ScreenSpaceToWorldSpace(Vector3(Input.getMousePosScreenspaceX(), Input.getMousePosScreenspaceY(true), 0.5f));
+		Debug.DrawCube(clickPoint.GetVector3(), Vector3(0.01f), Color4F(1, 0, 1, 1));
+
+		// Screenspace raycast direction
+		std::cout << RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true)) << std::endl;
+
+		//ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
 		//	
 		//	if(Time.GetFrameCount() % 100 < 50)
@@ -736,6 +743,8 @@ namespace Vxl
 		Editor.UpdateSelectionInfo();
 
 
+		
+
 		// Select Object in scene
 		// ~~ //
 		if (!Editor.m_GizmoSelected && !Editor.m_GizmoClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
@@ -743,15 +752,8 @@ namespace Vxl
 			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 			{
 				_fbo_gbuffer->Bind();
-				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
 
-				//	std::cout <<
-				//	(unsigned int)data[0] << ' ' <<
-				//	(unsigned int)data[1] << ' ' <<
-				//	(unsigned int)data[2] << ' ' <<
-				//	(unsigned int)data[3] << ' ' <<
-				//	std::endl;
-				
+				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
 				unsigned int EntityIndex = Util::Conversion::uchars_to_uint(data.start);
 				//std::cout << "Unique ID: " << EntityIndex << std::endl;
 				data.Deallocate();

@@ -621,29 +621,57 @@ namespace Vxl
 			Graphics::SetDepthWrite(true);
 		}
 
+		// Draw Cubes
+		Graphics::SetCullMode(CullMode::NO_CULL);
+		auto gbuffer = Material::GetAsset("gbuffer");
+		if(gbuffer->IsValid())
+		{
+			gbuffer->BindProgram();
+
+			gbuffer->m_property_useTexture.SetProperty(false);
+			gbuffer->m_property_useModel.SetProperty(true);
+			gbuffer->m_property_useInstancing.SetProperty(false);
+
+			for (const auto& cube : Debug.m_cubes)
+			{
+				gbuffer->m_property_color.SetProperty(cube.m_color.getRGB());
+				gbuffer->m_property_alpha.SetProperty(cube.m_color.a);
+				gbuffer->m_property_model.SetPropertyMatrix(cube.m_model, true);
+
+				Geometry.GetCube()->Draw();
+			}
+		}
+		Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+
 		// Draw Debug Wireframe Sphere
 		auto passthrough = Material::GetAsset("transparent_passthroughWorld");
 		if (passthrough->IsValid())
 		{
-
 			passthrough->BindProgram();
+
 			passthrough->m_property_useTexture.SetProperty(false);
 			passthrough->m_property_useModel.SetProperty(true);
+			passthrough->m_property_useInstancing.SetProperty(false);
 
 			Graphics::SetWireframeState(true);
 			Graphics::SetCullMode(CullMode::NO_CULL);
+			Graphics::SetDepthWrite(false);
+			Graphics::SetBlendMode(BlendSource::ONE, BlendDestination::ONE);
 
-			Graphics::SetLineWidth(5.0f);
+			Graphics::SetLineWidth(3.0f);
 			for (const auto& sphere : Debug.m_wireframeSpheres)
 			{
-				passthrough->m_property_color.SetProperty(sphere.color.getRGB());
-				passthrough->m_property_model.SetPropertyMatrix(sphere.model, true);
+				passthrough->m_property_color.SetProperty(sphere.m_color.getRGB());
+				passthrough->m_property_alpha.SetProperty(sphere.m_color.a);
+				passthrough->m_property_model.SetPropertyMatrix(sphere.m_model, true);
 				Geometry.GetIcoSphere()->Draw();
 			}
 			Graphics::SetLineWidth(1.0f);
 
 			Graphics::SetWireframeState(false);
 			Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+			Graphics::SetDepthWrite(true);
+			Graphics::SetBlendMode(BlendSource::SRC_ALPHA, BlendDestination::ONE_MINUS_SRC_ALPHA);
 		}
 
 	}
