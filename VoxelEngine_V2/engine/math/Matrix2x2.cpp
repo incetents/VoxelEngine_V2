@@ -62,20 +62,16 @@ namespace Vxl
 	}
 
 	// Become Rotation Matrix
-	Matrix2x2 Matrix2x2::Rotation(const Degrees& Deg, RotationDirection Rot)
-	{
-		return Rotation(Radians(Deg), Rot);
-	}
-	Matrix2x2 Matrix2x2::Rotation(const Radians& Rad, RotationDirection Rot)
+	Matrix2x2 Matrix2x2::Rotation(float _radians, bool _CCW)
 	{
 		Matrix2x2 m;
-		float Value = Rad.Get() * (float)Rot;
+		_radians = _CCW ? _radians : -_radians;
 
-		m._Val[0] = +cosf(Value);
-		m._Val[1] = -sinf(Value);
+		m._Val[0] = +cosf(_radians);
+		m._Val[1] = -sinf(_radians);
 
-		m._Val[2] = +sinf(Value);
-		m._Val[3] = +cosf(Value);
+		m._Val[2] = +sinf(_radians);
+		m._Val[3] = +cosf(_radians);
 
 		return m;
 	}

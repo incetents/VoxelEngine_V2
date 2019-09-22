@@ -447,6 +447,8 @@ namespace Vxl
 
 	void Scene_Game::Update()
 	{
+		//	auto _entity5 = GameObject::GetAsset("_entity5");
+		//	_entity5->m_transform.rotateAroundAxis(Vector3(-1,-1,-1), 1);
 
 		CPUTimer::StartTimer("UPDATE");
 
@@ -657,11 +659,12 @@ namespace Vxl
 		);
 
 		// Mouse pos [-1 to +1]
-		Vector4 clickPoint = RenderManager.GetMainCamera()->ScreenSpaceToWorldSpace(Vector3(Input.getMousePosScreenspaceX(), Input.getMousePosScreenspaceY(true), 0.5f));
-		Debug.DrawCube(clickPoint.GetVector3(), Vector3(0.01f), Color4F(1, 0, 1, 1));
-
+		//Vector4 clickPoint = RenderManager.GetMainCamera()->ScreenSpaceToWorldSpace(Vector3(Input.getMousePosScreenspaceX(), Input.getMousePosScreenspaceY(true), 0.5f));
+		//Debug.DrawCube(clickPoint.GetVector3(), Vector3(0.01f), Color4F(1, 0, 1, 1));
 		// Screenspace raycast direction
-		std::cout << RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true)) << std::endl;
+		//std::cout << RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true)) << std::endl;
+		Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_rotateStart * 5.0f, 5.0f);
+		Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_rotateEnd * 5.0f, 5.0f);
 
 		//ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
@@ -754,36 +757,40 @@ namespace Vxl
 				_fbo_gbuffer->Bind();
 
 				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
-				unsigned int EntityIndex = Util::Conversion::uchars_to_uint(data.start);
-				//std::cout << "Unique ID: " << EntityIndex << std::endl;
-				data.Deallocate();
-
-				Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
-
-				// Found an entity
-				if (SelectedEntity)
+				if (!data.IsEmpty())
 				{
-					if (Input.getKey(KeyCode::LEFT_CONTROL))
+
+					unsigned int EntityIndex = Util::Conversion::uchars_to_uint(data.start);
+					//std::cout << "Unique ID: " << EntityIndex << std::endl;
+					data.Deallocate();
+
+					Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
+
+					// Found an entity
+					if (SelectedEntity)
 					{
-						if (!SelectedEntity->IsSelected())
-							Editor.AddSelection(SelectedEntity);
+						if (Input.getKey(KeyCode::LEFT_CONTROL))
+						{
+							if (!SelectedEntity->IsSelected())
+								Editor.AddSelection(SelectedEntity);
+							else
+								Editor.RemoveSelection(SelectedEntity);
+						}
 						else
-							Editor.RemoveSelection(SelectedEntity);
+						{
+							Editor.ClearSelection();
+							Editor.AddSelection(SelectedEntity);
+						}
 					}
 					else
 					{
 						Editor.ClearSelection();
-						Editor.AddSelection(SelectedEntity);
 					}
-				}
-				else
-				{
-					Editor.ClearSelection();
-				}
 
-				//if ()
-				//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
+					//if ()
+					//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
 
+				}
 			}
 		}
 

@@ -11,6 +11,8 @@
 
 #include "../objects/CameraObject.h"
 
+#include "../math/Raycast.h"
+
 #include "../window/window.h"
 #include "../input/Input.h"
 #include "../utilities/Util.h"
@@ -272,6 +274,11 @@ namespace Vxl
 							break;
 						}
 					}
+
+					m_GizmoSelected =
+						(m_GizmoSelectedAxis != Axis::NONE) &&
+						(m_GizmoSelectedPlane != Axis::NONE)
+						;
 				}
 				else if (m_controlMode == GizmoMode::SCALE)
 				{
@@ -326,6 +333,9 @@ namespace Vxl
 							break;
 						}
 					}
+
+					m_GizmoSelected = (m_GizmoSelectedAxis != Axis::NONE);
+					m_GizmoSelectedPlane = Axis::NONE;
 				}
 				else if (m_controlMode == GizmoMode::ROTATE)
 				{
@@ -377,12 +387,11 @@ namespace Vxl
 							break;
 						}
 					}
+
+					m_GizmoSelected = (m_GizmoSelectedAxis != Axis::NONE);
+					m_GizmoSelectedPlane = Axis::NONE;
 				}
 
-				m_GizmoSelected =
-					(m_GizmoSelectedAxis != Axis::NONE) &&
-					(m_GizmoSelectedPlane != Axis::NONE)
-					;
 			}
 			// Store internal information before movement occurs
 			else if (Input.getMouseButtonDown(MouseButton::LEFT) && (m_GizmoSelectedAxis != Axis::NONE || m_GizmoSelectedPlane != Axis::NONE))
@@ -492,11 +501,28 @@ namespace Vxl
 				}
 				else if (m_controlMode == GizmoMode::ROTATE)
 				{
-					// Get Mouse position in -1 to +1 range of screen
-					Vector2 MouseScreenSpace = Input.getMousePosScreenspace(true);
-						
-					//	m_Axis1_Direction = (MouseViewport - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
-					m_Axis1_Direction = MouseScreenSpace;
+					switch (m_GizmoSelectedAxis)
+					{
+					case Axis::X:
+						m_rotationPlane = m_GizmoTransform.Right;
+						break;
+					case Axis::Y:
+						m_rotationPlane = m_GizmoTransform.Up;
+						break;
+					case Axis::Z:
+						m_rotationPlane = m_GizmoTransform.Forward;
+						break;
+					}
+
+					// Make a raycast with the Mouse's ScreenPosition
+					Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+
+					// Calculate where it hits
+					Plane p(m_rotationPlane, m_GizmoTransform.WorldPosition.ProjectLength(m_rotationPlane));
+					Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+					RayHit hit = Intersection(r, p); // Guaranteed intersection
+
+					m_rotateStart = (hit.m_location - m_GizmoTransform.WorldPosition).Normalize();
 					m_useAxis1 = true;
 				}
 			}
@@ -650,35 +676,53 @@ namespace Vxl
 					}
 					else if (m_controlMode == GizmoMode::ROTATE)
 					{
-						// Get Mouse position in -1 to +1 range of screen
-						Vector2 MouseViewport = Vector2(Input.getMousePosViewportX(), Input.getMousePosViewportY(true));
-						MouseViewport = MouseViewport * 2.0f - 1.0f;// go from [0->1] range to [-1->+1] range
+						// Make a raycast with the Mouse's ScreenPosition
+						Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
 
-						// Distance from mouse to center point of Gizmo
-						Vector2 MouseDelta = MouseViewport - m_Axis1_Direction;
-						float Distance = MouseDelta.x + MouseDelta.y;
+						// Calculate where it hits
+						Plane p(m_rotationPlane, m_GizmoTransform.WorldPosition.ProjectLength(m_rotationPlane));
+						Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+						RayHit hit = Intersection(r, p); // Guaranteed intersection
 
-						// Rotate everything based on distance
-						float rotationStrength = 35.0f;
-						uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
-						for (uint32_t i = 0; i < selectionCount; i++)
+						m_rotateEnd = (hit.m_location - m_GizmoTransform.WorldPosition).Normalize();
+
+						// Only rotate if both vectors are not the same
+						if (!m_rotateEnd.CompareFuzzy(m_rotateStart))
 						{
-							switch (m_GizmoSelectedAxis)
+							// Check angle between the two
+							float degrees = Vector3::GetAngleDegrees(m_rotateStart, m_rotateEnd);
+
+							// Check if going in other direction
+							Vector3 c = Vector3::Cross(m_rotateStart, m_rotateEnd);
+							float sign = c.Dot(m_rotationPlane);
+							if (sign > 0)
+								degrees = -degrees;
+
+							uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
+							for (uint32_t i = 0; i < selectionCount; i++)
 							{
-							case Axis::X:
-								m_selectedEntities[i]->m_transform.increaseRotationX(rotationStrength * (Distance - m_totalDrag1));
-								break;
-							case Axis::Y:
-								m_selectedEntities[i]->m_transform.increaseRotationY(rotationStrength * (Distance - m_totalDrag1));
-								break;
-							case Axis::Z:
-								m_selectedEntities[i]->m_transform.increaseRotationZ(rotationStrength * (Distance - m_totalDrag1));
-								break;
+								if (m_controlAxisLocal)
+								{
+									m_selectedEntities[i]->m_transform.rotateAroundAxis(m_rotationPlane, degrees);
+								}
+								else
+									switch (m_GizmoSelectedAxis)
+									{
+									case Axis::X:
+										m_selectedEntities[i]->m_transform.increaseRotationX(degrees);
+										break;
+									case Axis::Y:
+										m_selectedEntities[i]->m_transform.increaseRotationY(degrees);
+										break;
+									case Axis::Z:
+										m_selectedEntities[i]->m_transform.increaseRotationZ(degrees);
+										break;
+									}
 							}
-							
+
+							// Update previous rotation
+							m_rotateStart = m_rotateEnd;
 						}
-						// Use "m_totalDrag1" similar to a "lastTime" value of a timer
-						m_totalDrag1 = Distance;
 					}
 				}
 			}

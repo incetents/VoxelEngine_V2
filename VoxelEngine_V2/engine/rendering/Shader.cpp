@@ -282,9 +282,7 @@ namespace Vxl
 
 	void ShaderProgram::Bind() const
 	{
-		// Don't bind program if it hasn't changed
-		//if (m_boundID != m_id)
-			Graphics::ShaderProgram::Enable(m_id);
+		Graphics::ShaderProgram::Enable(m_id);
 
 		// Bind subroutines
 		if (m_usingSubroutines)
@@ -292,19 +290,11 @@ namespace Vxl
 			for (const auto& s : m_subroutines)
 				s.second.Bind();
 		}
-
-		// update bound program
-		//ShaderProgram::m_boundID = m_id;
 	}
 
 	void ShaderProgram::Unbind()
 	{
-		// Don't bind program if it hasn't changed
-		//if (m_boundID != 0)
-			Graphics::ShaderProgram::Disable();
-
-		// update bound program
-		//ShaderProgram::m_boundID = 0;
+		Graphics::ShaderProgram::Disable();
 	}
 
 }

@@ -31,7 +31,7 @@ namespace Vxl
 	{
 		Vector3 m_location;
 		float	m_distance;
-		bool	m_hit;
+		bool	m_missed;
 	};
 
 	// Formulas

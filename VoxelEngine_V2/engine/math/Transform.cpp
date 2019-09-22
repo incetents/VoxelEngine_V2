@@ -15,9 +15,21 @@ namespace Vxl
 		// If dirty is true, update values
 		if (isDirty)
 		{
-			// Acquire Rotation Locally
-			m_worldRotation = Quaternion::ToQuaternion_YXZ(Degrees(m_euler_rotation.x), Degrees(m_euler_rotation.y), Degrees(m_euler_rotation.z));
-			
+			// Make sure Euler Rotations stay in range of [-360, +360]
+			m_euler_rotation.x = (m_euler_rotation.x > 360.0f) ? std::fmod(m_euler_rotation.x, 360.0f) : m_euler_rotation.x;
+			m_euler_rotation.y = (m_euler_rotation.y > 360.0f) ? std::fmod(m_euler_rotation.y, 360.0f) : m_euler_rotation.y;
+			m_euler_rotation.z = (m_euler_rotation.z > 360.0f) ? std::fmod(m_euler_rotation.z, 360.0f) : m_euler_rotation.z;
+
+			m_euler_rotation.x = (m_euler_rotation.x < -360.0f) ? -std::fmod(-m_euler_rotation.x, 360.0f) : m_euler_rotation.x;
+			m_euler_rotation.y = (m_euler_rotation.y < -360.0f) ? -std::fmod(-m_euler_rotation.y, 360.0f) : m_euler_rotation.y;
+			m_euler_rotation.z = (m_euler_rotation.z < -360.0f) ? -std::fmod(-m_euler_rotation.z, 360.0f) : m_euler_rotation.z;
+
+			// Acquire Rotation
+			if(m_rotationOrder == EulerRotationOrder::ZYX)
+				m_worldRotation = Quaternion::ToQuaternion_ZYX(ToRadians(m_euler_rotation.x), ToRadians(m_euler_rotation.y), ToRadians(m_euler_rotation.z));
+			else
+				m_worldRotation = Quaternion::ToQuaternion_YXZ(ToRadians(m_euler_rotation.x), ToRadians(m_euler_rotation.y), ToRadians(m_euler_rotation.z));
+
 			// Base Model Matrix
 			m_modelMatrix = Matrix4x4(m_worldRotation.GetMatrix3x3() * Matrix3x3::GetScale(m_scale), m_position);
 
@@ -27,7 +39,6 @@ namespace Vxl
 			{
 				m_worldRotation = parent->getWorldRotation() * m_worldRotation;
 				m_modelMatrix = parent->getModel() * m_modelMatrix;
-				//parent = parent->getParent();
 			}
 
 			// Calculate Normal Matrix
@@ -165,12 +176,31 @@ namespace Vxl
 
 	Transform& Transform::setRotation(const Quaternion& quat)
 	{
-		Degrees pitch, yaw, roll;
-		Quaternion::ToEuler(quat, roll, pitch, yaw);
+		float pitch, yaw, roll;
+		VXL_ASSERT(m_rotationOrder == EulerRotationOrder::ZYX, "ToEuler is using incorrect Rotation Order");
+		Quaternion::ToEuler_ZYX(quat, roll, pitch, yaw);
 
-		m_euler_rotation = Vector3(pitch.Get(), yaw.Get(), roll.Get());
+		m_euler_rotation = Vector3(ToDegrees(pitch), ToDegrees(yaw), ToDegrees(roll));
 
 		SetDirty();
+		return *this;
+	}
+
+	Transform& Transform::rotateAroundAxis(const Vector3& axis, float degrees)
+	{
+		// Make sure Rotation is up to date
+		updateValues();
+
+		// Rotation Quaternion too apply
+		Quaternion Rotation(ToRadians(degrees), axis.Normalize());
+
+		// Apply NewRotation on current rotation
+		m_worldRotation = Rotation * m_worldRotation;
+		if (m_parent != nullptr)
+			// Apply inverse of parent to cancel out additional rotation
+			m_worldRotation = m_parent->getWorldRotation().Inverse() * m_worldRotation;
+
+		setRotation(m_worldRotation);
 		return *this;
 	}
 }

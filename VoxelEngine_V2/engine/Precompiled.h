@@ -28,7 +28,6 @@
 #include "math/Model.h"
 #include "math/Quaternion.h"
 #include "math/Random.h"
-#include "math/Rotation.h"
 #include "math/Transform.h"
 #include "math/Vector.h"
 #include "math/Raycast.h"

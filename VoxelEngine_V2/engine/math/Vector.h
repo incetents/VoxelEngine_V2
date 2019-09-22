@@ -3,7 +3,6 @@
 
 #include "../math/MathCore.h"
 #include "../math/Lerp.h"
-#include "../math/Rotation.h"
 #include "../utilities/Macros.h"
 
 #include <string>
@@ -172,46 +171,36 @@ namespace Vxl
 		// NONE //
 
 		// ~ Rotation ~ //
-		_Vector2<Type> Rotate(const Degrees& deg, bool CCW = true)
+		_Vector2<Type> Rotate(float _radians, bool CCW = true)
 		{
-			return Rotate(Radians(deg), CCW);
-		}
-		_Vector2<Type> Rotate(const Radians& rad, bool CCW = true)
-		{
-			float r = rad.Get();
 			// Counter Clockwise Rotation
 			if (CCW)
 			{
 				return _Vector2<Type>(
-					+x * cosf(r) - y * sinf(r),
-					+x * sinf(r) + y * cosf(r)
+					+x * cosf(_radians) - y * sinf(_radians),
+					+x * sinf(_radians) + y * cosf(_radians)
 					);
 			}
 			// Clockwise Rotation
 			return _Vector2<Type>(
-				+x * cosf(r) + y * sinf(r),
-				-x * sinf(r) + y * cosf(r)
+				+x * cosf(_radians) + y * sinf(_radians),
+				-x * sinf(_radians) + y * cosf(_radians)
 				);
 		}
-		static _Vector2<Type> GetRotated(const Degrees& deg, bool CCW = true)
+		static _Vector2<Type> GetRotated(float _radians, bool CCW = true)
 		{
-			return GetRotated(Radians(deg), CCW);
-		}
-		static _Vector2<Type> GetRotated(const Radians& rad, bool CCW = true)
-		{
-			float r = rad.Get();
 			// Counter Clockwise Rotation
 			if (CCW)
 			{
 				return _Vector2<Type>(
-					sinf(r),
-					cosf(r)
+					sinf(_radians),
+					cosf(_radians)
 					);
 			}
 			// Clockwise Rotation
 			return _Vector2<Type>(
-				sinf(r),
-				cosf(r)
+				sinf(_radians),
+				cosf(_radians)
 				);
 		}
 
@@ -656,14 +645,9 @@ namespace Vxl
 		}
 
 		// ~ Rotation ~ //
-		_Vector3<Type> RotateX(const Degrees& deg, bool CCW = true) { return RotateX(Radians(deg), CCW); }
-		_Vector3<Type> RotateY(const Degrees& deg, bool CCW = true) { return RotateY(Radians(deg), CCW); }
-		_Vector3<Type> RotateZ(const Degrees& deg, bool CCW = true) { return RotateZ(Radians(deg), CCW); }
-		_Vector3<Type> Rotate(const Degrees& deg, const _Vector3<Type>& axis, bool CCW = true) { return Rotate(Radians(deg), axis, CCW); }
-
-		_Vector3<Type> RotateX(const Radians& rad, bool CCW = true)
+		_Vector3<Type> RotateX(float _radians, bool CCW = true)
 		{
-			float value = CCW ? rad.Get() : -rad.Get();
+			float value = CCW ? _radians : -_radians;
 
 			return _Vector3<Type>(
 				+x,
@@ -671,9 +655,9 @@ namespace Vxl
 				+z * sinf(value) + z * cosf(value)
 			);
 		}
-		_Vector3<Type> RotateY(const Radians& rad, bool CCW = true)
+		_Vector3<Type> RotateY(float _radians, bool CCW = true)
 		{
-			float value = CCW ? rad.Get() : -rad.Get();
+			float value = CCW ? _radians : -_radians;
 
 			return _Vector3<Type>(
 				+x * cosf(value) + z * sinf(value),
@@ -681,9 +665,9 @@ namespace Vxl
 				-x * sinf(value) + z * cosf(value)
 			);
 		}
-		_Vector3<Type> RotateZ(const Radians& rad, bool CCW = true)
+		_Vector3<Type> RotateZ(float _radians, bool CCW = true)
 		{
-			float value = CCW ? rad.Get() : -rad.Get();
+			float value = CCW ? _radians : -_radians;
 
 			return _Vector3<Type>(
 				+x * cosf(value) - y * sinf(value),
@@ -691,11 +675,11 @@ namespace Vxl
 				+z
 			);
 		}
-		_Vector3<Type> Rotate(const _Vector3<Type>& axis, const Radians& rad, bool CCW = true)
+		_Vector3<Type> Rotate(const _Vector3<Type>& axis, float _radians, bool CCW = true)
 		{
 			_Vector3<Type> a = axis.Normalize();
-			float c = cosf(rad.Get());
-			float s = sinf(rad.Get());
+			float c = cosf(_radians);
+			float s = sinf(_radians);
 			float t = 1 - c;
 
 			return _Vector3<Type>(

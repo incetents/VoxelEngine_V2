@@ -9,10 +9,7 @@ namespace Vxl
 {
 	class Matrix2x2;
 	class Matrix4x4;
-	class Degrees;
-	class Radians;
 	enum class Axis;
-	enum class RotationDirection;
 
 	class Matrix3x3
 	{
@@ -53,16 +50,11 @@ namespace Vxl
 		static  Matrix3x3 GetScale(float x, float y, float z);
 		static  Matrix3x3 GetScale(const Vector3& v);
 
-		// Get Rotation Matrix (Degrees)
-		static	Matrix3x3 GetRotationX(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 GetRotationY(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 GetRotationZ(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 GetRotation(const Degrees&, const Vector3&, RotationDirection = RotationDirection(1));
 		// Get Rotation Matrix (Radians)
-		static	Matrix3x3 GetRotationX(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 GetRotationY(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 GetRotationZ(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix3x3 GetRotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
+		static	Matrix3x3 GetRotationX(float _radians, bool _CCW = true);
+		static	Matrix3x3 GetRotationY(float _radians, bool _CCW = true);
+		static	Matrix3x3 GetRotationZ(float _radians, bool _CCW = true);
+		static	Matrix3x3 GetRotation(float _radians, const Vector3& _axis, bool _CCW = true);
 
 		// Set Horizontal Line
 		Matrix3x3& SetRow(unsigned int index, const Vector3&);

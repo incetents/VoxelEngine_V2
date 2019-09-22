@@ -52,6 +52,9 @@ namespace Vxl
 		: Entity(name, EntityType::CAMERA), m_znear(_znear), m_zfar(_zfar)
 	{
 		RenderManager.AddEntity(this);
+
+		// Better method of rotating a Camera
+		m_transform.m_rotationOrder = EulerRotationOrder::YXZ;
 	}
 
 	CameraObject::~CameraObject()

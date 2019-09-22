@@ -10,7 +10,6 @@
 #include <vector>
 #include <assert.h>
 
-#include "Rotation.h"
 #include "Random.h"
 
 // Matrix Macros
@@ -131,13 +130,13 @@ namespace Vxl
 	}
 
 	template<typename T>
-	static T To_Radians(T value)
+	static T ToRadians(T value)
 	{
 		return Deg_To_Rad(value);
 	}
 
 	template<typename T>
-	static T To_Degrees(T value)
+	static T ToDegrees(T value)
 	{
 		return Rad_To_Deg(value);
 	}

@@ -112,7 +112,6 @@
     <ClCompile Include="engine\math\Matrix4x4.cpp" />
     <ClCompile Include="engine\math\MatrixStack.cpp" />
     <ClCompile Include="engine\math\Quaternion.cpp" />
-    <ClCompile Include="engine\math\Rotation.cpp" />
     <ClCompile Include="engine\math\Transform.cpp" />
     <ClCompile Include="engine\main.cpp" />
     <ClCompile Include="engine\rendering\Mesh.cpp" />
@@ -173,7 +172,6 @@
     <ClInclude Include="engine\math\MatrixStack.h" />
     <ClInclude Include="engine\math\Quaternion.h" />
     <ClInclude Include="engine\math\Random.h" />
-    <ClInclude Include="engine\math\Rotation.h" />
     <ClInclude Include="engine\math\Transform.h" />
     <ClInclude Include="engine\rendering\Mesh.h" />
     <ClInclude Include="engine\rendering\VBOLayout.h" />

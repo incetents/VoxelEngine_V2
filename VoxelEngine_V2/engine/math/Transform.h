@@ -8,7 +8,6 @@
 #include "Matrix4x4.h"
 #include "Vector.h"
 #include "Quaternion.h"
-#include "Rotation.h"
 
 #include <assert.h>
 #include <vector>
@@ -17,6 +16,12 @@
 
 namespace Vxl
 {
+	enum class EulerRotationOrder
+	{
+		YXZ,
+		ZYX
+	};
+
 	class Transform : public Component
 	{
 		friend class CameraObject;
@@ -36,7 +41,8 @@ namespace Vxl
 		Quaternion	m_worldRotation;	// World Rotation Quaternion
 		Vector3		m_lossyScale;		// World Scale (Not supper accurate)
 		
-		
+		// Rotation Order
+		EulerRotationOrder m_rotationOrder = EulerRotationOrder::ZYX;
 
 		// Direction Space [ World Direction ]
 		Vector3		m_forward	= Vector3::FORWARD;
@@ -484,6 +490,8 @@ namespace Vxl
 			SetDirty();
 			return *this;
 		}
+
+		Transform& rotateAroundAxis(const Vector3& axis, float degrees);
 
 		// Alt name
 		inline Transform& translate(const Vector3& translate)

@@ -1,19 +1,12 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Quaternion.h"
-#include "Rotation.h"
 #include "Matrix3x3.h"
 #include "Matrix4x4.h"
 #include "MathCore.h"
 
 #include <iostream>
 #include <assert.h>
-
-#ifdef _DEBUG
-#define OUT_OF_RANGE_INDEX_CHECK(index) VXL_ASSERT(index < Matrix4x4_Length, "Quaternion index out of range")
-#else
-#define OUT_OF_RANGE_INDEX_CHECK(index) __noop
-#endif
 
 namespace Vxl
 {
@@ -26,13 +19,9 @@ namespace Vxl
 		*this = Quaternion::_Identity;
 	}
 	Quaternion::Quaternion(const float _x, const float _y, const float _z, const float _w) : x(_x), y(_y), z(_z), w(_w) {}
-	Quaternion::Quaternion(const Degrees& rotation, const Vector3& axis, RotationDirection direction)
+	Quaternion::Quaternion(float _radians, const Vector3& axis, bool _counterClockWise)
 	{
-		*this = Quaternion::AngleAxis(rotation, axis, direction);
-	}
-	Quaternion::Quaternion(const Radians& rotation, const Vector3& axis, RotationDirection direction)
-	{
-		*this = Quaternion::AngleAxis(rotation, axis, direction);
+		*this = Quaternion::AngleAxis(_radians, axis, _counterClockWise);
 	}
 
 	// Become default empty quaternion
@@ -42,11 +31,7 @@ namespace Vxl
 	}
 
 	// Turn euler rotation into Quaternion
-	Quaternion Quaternion::ToQuaternion_ZYX(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
-	{
-		return Quaternion::ToQuaternion_ZYX(Radians(yaw), Radians(pitch), Radians(roll));
-	}
-	Quaternion Quaternion::ToQuaternion_ZYX(const Radians& yaw, const Radians& pitch, const Radians& roll)
+	Quaternion Quaternion::ToQuaternion_ZYX(float _yaw, float _pitch, float _roll)
 	{
 		// XYZ
 		Quaternion q;
@@ -54,15 +39,15 @@ namespace Vxl
 		// EULER
 		float angle;
 		
-		angle = yaw.Get() * 0.5f;
+		angle = _yaw * 0.5f;
 		const float sr = sinf(angle);
 		const float cr = cosf(angle);
 		
-		angle = pitch.Get() * 0.5f;
+		angle = _pitch * 0.5f;
 		const float sp = sinf(angle);
 		const float cp = cosf(angle);
 		
-		angle = roll.Get() * 0.5f;
+		angle = _roll * 0.5f;
 		const float sy = sinf(angle);
 		const float cy = cosf(angle);
 		
@@ -79,32 +64,16 @@ namespace Vxl
 		return q;// .Normalize();
 	}
 
-	Quaternion Quaternion::ToQuaternion_YXZ(const Degrees& yaw, const Degrees& pitch, const Degrees& roll)
+	Quaternion Quaternion::ToQuaternion_YXZ(float _yaw, float _pitch, float _roll)
 	{
-		return Quaternion::ToQuaternion_YXZ(Radians(yaw), Radians(pitch), Radians(roll));
-	}
-	Quaternion Quaternion::ToQuaternion_YXZ(const Radians& yaw, const Radians& pitch, const Radians& roll)
-	{
-		auto QX = Quaternion::AngleAxis(yaw, Vector3(1, 0, 0));
-		auto QY = Quaternion::AngleAxis(pitch, Vector3(0, 1, 0));
-		auto QZ = Quaternion::AngleAxis(roll, Vector3(0, 0, 1));
+		auto QX = Quaternion::AngleAxis(_yaw, Vector3(1, 0, 0));
+		auto QY = Quaternion::AngleAxis(_pitch, Vector3(0, 1, 0));
+		auto QZ = Quaternion::AngleAxis(_roll, Vector3(0, 0, 1));
 		
 		return QY * QX * QZ;
 	}
 	// Turn Quaternion into euler rotation
-	void Quaternion::ToEuler(const Quaternion& q, Degrees& roll, Degrees& pitch, Degrees& yaw)
-	{
-		Radians r(0);
-		Radians p(0);
-		Radians y(0);
-
-		Quaternion::ToEuler(q, r, p, y);
-
-		roll = r.GetDegrees();
-		pitch = p.GetDegrees();
-		yaw = y.GetDegrees();
-	}
-	void Quaternion::ToEuler(const Quaternion& q, Radians& roll, Radians& pitch, Radians& yaw)
+	void Quaternion::ToEuler_ZYX(const Quaternion& q, float& _roll, float& _pitch, float& _yaw)
 	{
 		// Formula retrieved from wiki link:
 		// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
@@ -112,19 +81,19 @@ namespace Vxl
 		// x-axis
 		float sinr = +2.0f * (q.w * q.x + q.y * q.z);
 		float cosr = +1.0f - 2.0f * (q.x * q.x + q.y * q.y);
-		pitch = atan2f(sinr, cosr);
+		_pitch = atan2f(sinr, cosr);
 
 		// y-axis
 		float sinp = +2.0f * (q.w * q.y - q.z * q.x);
 		if (fabs(sinp) >= 1)
-			yaw = copysignf(PI / 2, sinp); // use 90 degrees if out of range
+			_yaw = copysignf(PI / 2, sinp); // use 90 degrees if out of range
 		else
-			yaw = asinf(sinp);
+			_yaw = asinf(sinp);
 
 		// z-axis
 		float siny = +2.0f * (q.w * q.z + q.x * q.y);
 		float cosy = +1.0f - 2.0f * (q.y * q.y + q.z * q.z);
-		roll = atan2f(siny, cosy);
+		_roll = atan2f(siny, cosy);
 	}
 
 	// Get Matrix (column major)
@@ -165,13 +134,9 @@ namespace Vxl
 
 
 	// Create Angle Axis
-	Quaternion Quaternion::AngleAxis(const Degrees& rotation, const Vector3& axis, RotationDirection direction)
+	Quaternion Quaternion::AngleAxis(float _radians, const Vector3& axis, bool _counterClockWise)
 	{
-		return Quaternion::AngleAxis(Radians(rotation), axis, direction);
-	}
-	Quaternion Quaternion::AngleAxis(const Radians& rotation, const Vector3& axis, RotationDirection direction)
-	{
-		float Half_Rotation = rotation.Get() * 0.5f;
+		float Half_Rotation = _radians * (_counterClockWise ? 0.5f : -0.5f);
 		float SinHR = sinf(Half_Rotation);
 
 		return Quaternion(
@@ -254,12 +219,12 @@ namespace Vxl
 	// Operator Overloads
 	float Quaternion::operator[](const unsigned int index) const
 	{
-		OUT_OF_RANGE_INDEX_CHECK(index);
+		VXL_ASSERT(index < 4, "Quaternion index out of range");
 		return (&x)[index];
 	}
 	float& Quaternion::operator[](const unsigned int index)
 	{
-		OUT_OF_RANGE_INDEX_CHECK(index);
+		VXL_ASSERT(index < 4, "Quaternion index out of range");
 		return (&x)[index];
 	}
 	Quaternion Quaternion::operator-()

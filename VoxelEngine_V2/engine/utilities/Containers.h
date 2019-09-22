@@ -13,6 +13,10 @@ namespace Vxl
 		Type* start = nullptr;
 		unsigned int length = 0;
 
+		bool IsEmpty(void) const
+		{
+			return start == nullptr;
+		}
 		void Allocate(int size)
 		{
 			if (start != nullptr)

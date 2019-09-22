@@ -495,12 +495,11 @@ namespace Vxl
 	// Notice, SNORM TEXTURES CANNOT BE READ
 	RawArray<uint8_t> FramebufferObject::readPixels(uint32_t _attachmentIndex, int x, int y, int w, int h)
 	{
-		bool _HasAttachment = HasAttachment(_attachmentIndex);
-		VXL_ASSERT(_HasAttachment, "FBO readpixels: index out of bounds");
-		
 		// Ignore if x,y coordinates are outside FBO range
-		VXL_ASSERT(x >= 0 && y >= 0, "FBO Readpixels, x and/or y out of range");
-		VXL_ASSERT(_HasAttachment, "FBO readpixels, missing attachment to read from");
+		if (x < 0 || y < 0 || x >= (int)m_width || y >= (int)m_height)
+			return RawArray<uint8_t>();
+
+		VXL_ASSERT(HasAttachment(_attachmentIndex), "FBO readpixels, missing attachment to read from");
 
 		if(m_textures[_attachmentIndex].IsRenderTexture())
 			return Graphics::FramebufferObject::ReadPixels(*m_textures[_attachmentIndex].GetRenderTexture(), _attachmentIndex, x, y, w, h);
@@ -515,11 +514,14 @@ namespace Vxl
 
 	RawArray<uint8_t> FramebufferObject::readDepthPixels(int x, int y, int w, int h)
 	{
-		bool _HasDepth = !m_depth.IsUnused();
-		VXL_ASSERT(_HasDepth, "FBO readpixels: index out of bounds");
-		
 		// Ignore if x,y coordinates are outside FBO range
-		if (x < 0 || y < 0 || !_HasDepth)
+		if (x < 0 || y < 0 || x >= (int)m_width || y >= (int)m_height)
+			return RawArray<uint8_t>();
+
+		VXL_ASSERT(!m_depth.IsUnused(), "FBO readpixels: no depth buffer found");
+
+		// Ignore if x,y coordinates are outside FBO range
+		if (m_depth.IsUnused())
 			return RawArray<uint8_t>();
 
 		if(m_depth.IsRenderTexture())

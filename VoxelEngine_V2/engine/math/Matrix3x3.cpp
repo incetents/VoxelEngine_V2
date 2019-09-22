@@ -131,28 +131,11 @@ namespace Vxl
 		return result.Scale(v.x, v.y, v.z);
 	}
 
-	// Become Rotation Matrix (Degrees)
-	Matrix3x3 Matrix3x3::GetRotationX(const Degrees& deg, RotationDirection rot)
-	{
-		return GetRotationX(Radians(deg), rot);
-	}
-	Matrix3x3 Matrix3x3::GetRotationY(const Degrees& deg, RotationDirection rot)
-	{
-		return GetRotationY(Radians(deg), rot);
-	}
-	Matrix3x3 Matrix3x3::GetRotationZ(const Degrees& deg, RotationDirection rot)
-	{
-		return GetRotationZ(Radians(deg), rot);
-	}
-	Matrix3x3 Matrix3x3::GetRotation(const Degrees& deg, const Vector3& direction, RotationDirection rot)
-	{
-		return GetRotation(Radians(deg), direction, rot);
-	}
 	// Become Rotation Matrix (Radians)
-	Matrix3x3 Matrix3x3::GetRotationX(const Radians& rad, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationX(float _radians, bool _CCW)
 	{
 		// Float Radians
-		float Val = rad.Get() * (float)rot;
+		float Val = _CCW ? _radians : -_radians;
 
 		// Matrix Values
 		return Matrix3x3(
@@ -161,10 +144,10 @@ namespace Vxl
 			Vector3(0.0f, +sinf(Val), +cosf(Val))
 		);
 	}
-	Matrix3x3 Matrix3x3::GetRotationY(const Radians& rad, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationY(float _radians, bool _CCW)
 	{
 		// Float Radians
-		float Val = rad.Get() * (float)rot;
+		float Val = _CCW ? _radians : -_radians;
 
 		// Matrix Values
 		return Matrix3x3(
@@ -173,10 +156,10 @@ namespace Vxl
 			Vector3(-sinf(Val), 0.0f, +cosf(Val))
 		);
 	}
-	Matrix3x3 Matrix3x3::GetRotationZ(const Radians& rad, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotationZ(float _radians, bool _CCW)
 	{
 		// Float Radians
-		float Val = rad.Get() * (float)rot;
+		float Val = _CCW ? _radians : -_radians;
 
 		// Matrix Values
 		return Matrix3x3(
@@ -185,10 +168,10 @@ namespace Vxl
 			Vector3(0.0f, 0.0f, 1.0f)
 		);
 	}
-	Matrix3x3 Matrix3x3::GetRotation(const Radians& rad, const Vector3& direction, RotationDirection rot)
+	Matrix3x3 Matrix3x3::GetRotation(float _radians, const Vector3& direction, bool _CCW)
 	{
 		// Get Rotation Amount
-		float R = rad.Get() * (float)rot;
+		float Val = _CCW ? _radians : -_radians;
 		// Get Direction and normalize it
 		Vector3 V = direction.Normalize();
 
@@ -196,19 +179,19 @@ namespace Vxl
 		float xy = V.x * V.y;
 		float xz = V.x * V.z;
 		float yz = V.y * V.z;
-		float Inv_Cos = 1 - cosf(R);
+		float Inv_Cos = 1 - cosf(Val);
 
 		Matrix3x3 M;
 
-		M._Val[0] = V.x * V.x * (Inv_Cos)+cosf(R);
-		M._Val[1] = xy * (Inv_Cos)-sinf(R) * V.z;
-		M._Val[2] = xz * (Inv_Cos)+sinf(R) * V.y;
-		M._Val[3] = xy * (Inv_Cos)+sinf(R) * V.z;
-		M._Val[4] = V.y * V.y * (Inv_Cos)+cosf(R);
-		M._Val[5] = yz * (Inv_Cos)-sinf(R) * V.x;
-		M._Val[6] = xz * (Inv_Cos)-sinf(R) * V.y;
-		M._Val[7] = yz * (Inv_Cos)+sinf(R) * V.x;
-		M._Val[8] = V.z * V.z * (Inv_Cos)+cosf(R);
+		M._Val[0] = V.x * V.x * (Inv_Cos)+cosf(Val);
+		M._Val[1] = xy * (Inv_Cos)-sinf(Val) * V.z;
+		M._Val[2] = xz * (Inv_Cos)+sinf(Val) * V.y;
+		M._Val[3] = xy * (Inv_Cos)+sinf(Val) * V.z;
+		M._Val[4] = V.y * V.y * (Inv_Cos)+cosf(Val);
+		M._Val[5] = yz * (Inv_Cos)-sinf(Val) * V.x;
+		M._Val[6] = xz * (Inv_Cos)-sinf(Val) * V.y;
+		M._Val[7] = yz * (Inv_Cos)+sinf(Val) * V.x;
+		M._Val[8] = V.z * V.z * (Inv_Cos)+cosf(Val);
 
 		return M;
 	}

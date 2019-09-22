@@ -13,13 +13,13 @@ namespace Vxl
 		{
 			hit.m_distance = _plane.m_normal.Dot(plane_origin - _ray.m_origin) / denom;
 			hit.m_location = _ray.m_origin + _ray.m_direction * hit.m_distance;
-			hit.m_hit = true;
+			hit.m_missed = false;
 		}
 		else
 		{
 			hit.m_distance = 0.0f;
 			hit.m_location = Vector3::ZERO;
-			hit.m_hit = false;
+			hit.m_missed = true;
 		}
 
 		return hit;

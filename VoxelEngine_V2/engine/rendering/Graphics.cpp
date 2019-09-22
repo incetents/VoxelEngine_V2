@@ -61,7 +61,7 @@ namespace Vxl
 
 	
 
-	// Tracking Data //
+	// Tracking GL States //
 	CullMode			gl_cullmode = CullMode::NONE;
 	bool				gl_blendState = false;
 	bool				gl_depthRead = false;
@@ -78,6 +78,7 @@ namespace Vxl
 	TextureLevel		gl_activeTextureLayer = TextureLevel::NONE;
 	FramebufferObjectID gl_activeFBO = 0;
 	ShaderProgramID		gl_activeShaderProgram = 0;
+	VBOID				gl_activeVAO = 0;
 	float				gl_lineWidth = 1.0f;
 	PixelAlignment		gl_pixelPackAlignment = PixelAlignment::ALIGN_4;
 	PixelAlignment		gl_pixelUnpackAlignment = PixelAlignment::ALIGN_4;
@@ -573,6 +574,8 @@ namespace Vxl
 		gl_activeFBO = 0;
 		gl_activeShaderProgram = 0;
 
+		gl_activeVAO = 0;
+
 		gl_pixelPackAlignment = PixelAlignment::NONE;
 		gl_pixelUnpackAlignment = PixelAlignment::NONE;
 
@@ -628,8 +631,17 @@ namespace Vxl
 		// Bool
 		if (name.compare("bool") == 0 && type == GL_BOOL)
 			return true;
+		// Int
+		if (name.compare("int") == 0 && type == GL_INT)
+			return true;
+		// Unsigned Int
+		if (name.compare("unsigned int") == 0 && type == GL_UNSIGNED_INT)
+			return true;
 		// Float
 		if (name.compare("float") == 0 && type == GL_FLOAT)
+			return true;
+		// Double
+		if (name.compare("double") == 0 && type == GL_DOUBLE)
 			return true;
 		// Vec2
 		if (name.compare("class Vxl::_Vector2<float>") == 0 && type == GL_FLOAT_VEC2)
@@ -637,7 +649,7 @@ namespace Vxl
 		// Vec3 - Color3F
 		if ((name.compare("class Vxl::_Vector3<float>") == 0 || name.compare("class Vxl::Color3F") == 0) && type == GL_FLOAT_VEC3)
 			return true;
-		// Vec4
+		// Vec4 - Color4F
 		if ((name.compare("class Vxl::_Vector4<float>") == 0 || name.compare("class Vxl::Color4F") == 0) && type == GL_FLOAT_VEC4)
 			return true;
 		// Mat2
@@ -1770,11 +1782,19 @@ namespace Vxl
 	}
 	void Graphics::VAO::Bind(VAOID id)
 	{
+		if (gl_activeVAO == id)
+			return;
+
 		glBindVertexArray(id);
+		gl_activeVAO = id;
 	}
 	void Graphics::VAO::Unbind(void)
 	{
+		if (gl_activeVAO == 0)
+			return;
+
 		glBindVertexArray(0);
+		gl_activeVAO = 0;
 	}
 
 	// ~ VBO ~ //

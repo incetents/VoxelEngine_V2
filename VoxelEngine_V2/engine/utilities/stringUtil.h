@@ -28,6 +28,9 @@ namespace Vxl
 		void toLower(std::string& str);
 		std::string toLowerCopy(const std::string& str);
 
+		// Replace
+		bool replace(std::string& str, const std::string& from, const std::string& to);
+
 		// Removal
 		std::string stripComments(const std::string& str);
 		

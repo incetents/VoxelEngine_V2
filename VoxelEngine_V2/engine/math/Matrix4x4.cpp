@@ -299,43 +299,26 @@ namespace Vxl
 		M[0xE] = (zfar + znear) / -2.0f;
 	}
 
-	
-	// Become Rotation Matrix (Degrees)
-	Matrix4x4 Matrix4x4::GetRotationX(const Degrees& deg, RotationDirection rot)
-	{
-		return GetRotationX(Radians(deg), rot);
-	}
-	Matrix4x4 Matrix4x4::GetRotationY(const Degrees& deg, RotationDirection rot)
-	{
-		return GetRotationY(Radians(deg), rot);
-	}
-	Matrix4x4 Matrix4x4::GetRotationZ(const Degrees& deg, RotationDirection rot)
-	{
-		return GetRotationZ(Radians(deg), rot);
-	}
-	Matrix4x4 Matrix4x4::GetRotation(const Degrees& deg, const Vector3& direction, RotationDirection rot)
-	{
-		return GetRotation(Radians(deg), direction, rot);
-	}
+
 	// Become Rotation Matrix (Radians)
-	Matrix4x4 Matrix4x4::GetRotationX(const Radians& rad, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationX(float _radians, bool _CCW)
 	{
-		Matrix3x3 m = Matrix3x3::GetRotationX(rad, rot);
+		Matrix3x3 m = Matrix3x3::GetRotationX(_radians, _CCW);
 		return Matrix4x4(m);
 	}
-	Matrix4x4 Matrix4x4::GetRotationY(const Radians& rad, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationY(float _radians, bool _CCW)
 	{
-		Matrix3x3 m = Matrix3x3::GetRotationY(rad, rot);
+		Matrix3x3 m = Matrix3x3::GetRotationY(_radians, _CCW);
 		return Matrix4x4(m);
 	}
-	Matrix4x4 Matrix4x4::GetRotationZ(const Radians& rad, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotationZ(float _radians, bool _CCW)
 	{
-		Matrix3x3 m = Matrix3x3::GetRotationZ(rad, rot);
+		Matrix3x3 m = Matrix3x3::GetRotationZ(_radians, _CCW);
 		return Matrix4x4(m);
 	}
-	Matrix4x4 Matrix4x4::GetRotation(const Radians& rad, const Vector3& direction, RotationDirection rot)
+	Matrix4x4 Matrix4x4::GetRotation(float _radians, const Vector3& _direction, bool _CCW)
 	{
-		Matrix3x3 m = Matrix3x3::GetRotation(rad, direction, rot);
+		Matrix3x3 m = Matrix3x3::GetRotation(_radians, _direction, _CCW);
 		return Matrix4x4(m);
 	}
 

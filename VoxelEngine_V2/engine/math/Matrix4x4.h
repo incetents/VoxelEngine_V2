@@ -9,10 +9,7 @@ namespace Vxl
 {
 	class Matrix2x2;
 	class Matrix3x3;
-	class Degrees;
-	class Radians;
 	enum class Axis;
-	enum class RotationDirection;
 
 	class Matrix4x4
 	{
@@ -86,16 +83,11 @@ namespace Vxl
 		// Become Scale and Translation Matrix
 		static Matrix4x4 GetTranslateScale(const Vector3& center, const Vector3& scale);
 
-		// Become Rotation Matrix (Degrees)
-		static	Matrix4x4 GetRotationX(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 GetRotationY(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 GetRotationZ(const Degrees&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 GetRotation(const Degrees&, const Vector3&, RotationDirection = RotationDirection(1));
 		// Become Rotation Matrix (Radians)
-		static	Matrix4x4 GetRotationX(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 GetRotationY(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 GetRotationZ(const Radians&, RotationDirection = RotationDirection(1));
-		static	Matrix4x4 GetRotation(const Radians&, const Vector3&, RotationDirection = RotationDirection(1));
+		static	Matrix4x4 GetRotationX(float _radians, bool _CCW = true);
+		static	Matrix4x4 GetRotationY(float _radians, bool _CCW = true);
+		static	Matrix4x4 GetRotationZ(float _radians, bool _CCW = true);
+		static	Matrix4x4 GetRotation(float _radians, const Vector3& axis, bool _CCW = true);
 
 		// Set Horizontal Line
 				Matrix4x4& SetRow(unsigned int index, const Vector4&);

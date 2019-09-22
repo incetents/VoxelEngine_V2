@@ -8,10 +8,7 @@
 
 namespace Vxl
 {
-	class Degrees;
-	class Radians;
 	enum class Axis;
-	enum class RotationDirection;
 
 	class Matrix2x2
 	{
@@ -38,8 +35,7 @@ namespace Vxl
 		void BeIdentity();
 
 		// Create Rotation Matrix
-		static	Matrix2x2 Rotation(const Degrees& Deg, RotationDirection Rot = RotationDirection(1));
-		static	Matrix2x2 Rotation(const Radians& Deg, RotationDirection Rot = RotationDirection(1));
+		static	Matrix2x2 Rotation(float _radians, bool _CCW = true);
 
 		// Set Horizontal Line
 		Matrix2x2& SetRow(unsigned int index, const Vector2&);

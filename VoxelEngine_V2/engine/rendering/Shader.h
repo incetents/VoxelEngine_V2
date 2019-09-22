@@ -164,7 +164,7 @@ namespace Vxl
 		template<typename Type>
 		void					SetUniformMatrix(const std::string& name, Type data, bool transpose)
 		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
+			//VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
 			m_uniforms[name].SendMatrix<Type>(data, transpose);
 		}
 		// [Slower] Set uniform, regardless if shader is bound

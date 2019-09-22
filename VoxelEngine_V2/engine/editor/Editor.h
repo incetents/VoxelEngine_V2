@@ -19,6 +19,7 @@ namespace Vxl
 		std::vector<Entity*>	m_selectedEntities;
 		FramebufferObject*		m_fbo_colorPicker;
 
+		// Gizmo Selection Info
 		Vector4 m_ScreenSpace_SelectionCenter;
 		Vector4 m_ScreenSpace_Selection1;
 		Vector4 m_ScreenSpace_Selection2;
@@ -32,7 +33,11 @@ namespace Vxl
 
 		std::vector<float> m_scaleBackups;
 
+		Vector3 m_rotationPlane;
+
 	public:
+		Vector3 m_rotateStart;
+		Vector3 m_rotateEnd;
 
 		float m_GizmoDragSpeed;
 		Axis  m_GizmoSelectedAxis = Axis::NONE;
