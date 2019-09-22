@@ -726,12 +726,10 @@ namespace Vxl
 
 					Geometry.GetArrowZ()->Draw();
 
-					// Small cube in the middle //
-					simpleLight->m_property_color.SetProperty(Color3F::WHITE);
-					simpleLight->m_property_alpha.SetProperty(0.85f);
-					Geometry.GetCubeSmall()->Draw();
-
+					// Cull
 					Graphics::SetCullMode(CullMode::NO_CULL);
+					// Alpha
+					simpleLight->m_property_alpha.SetProperty(0.85f);
 
 					// X Plane
 					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.X_Model, true);
@@ -743,7 +741,7 @@ namespace Vxl
 					else
 						simpleLight->m_property_color.SetProperty(Color3F::RED);
 					Geometry.GetHalfQuadX()->Draw();
-
+					
 					// Y Plane
 					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Y_Model, true);
 					if (Editor.m_GizmoSelectedPlane == Axis::Y)
@@ -754,7 +752,7 @@ namespace Vxl
 					else
 						simpleLight->m_property_color.SetProperty(Color3F::GREEN);
 					Geometry.GetHalfQuadY()->Draw();
-
+					
 					// Z Plane
 					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Z_Model, true);
 					if (Editor.m_GizmoSelectedPlane == Axis::Z)
@@ -766,10 +764,26 @@ namespace Vxl
 						simpleLight->m_property_color.SetProperty(Color3F::BLUE);
 					Geometry.GetHalfQuadZ()->Draw();
 
-
-					// revert
+					// Cull
 					Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
+					// Alpha
 					simpleLight->m_property_alpha.SetProperty(1.0f);
+
+					// Small cube in the middle //
+					simpleLight->m_property_model.SetPropertyMatrix(Editor.m_GizmoTransform.Model, true);
+					if (Editor.m_GizmoSelectedAxis == Axis::ALL)
+						if (Editor.m_GizmoClicked)
+							simpleLight->m_property_color.SetProperty(Color3F::GREY);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
+					else
+						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+					//
+					Geometry.GetCubeSmall()->Draw();
+
+
+					
+					
 				}
 				else if (Editor.m_controlMode == Editor.GizmoMode::SCALE)
 				{

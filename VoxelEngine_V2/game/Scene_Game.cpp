@@ -663,8 +663,8 @@ namespace Vxl
 		//Debug.DrawCube(clickPoint.GetVector3(), Vector3(0.01f), Color4F(1, 0, 1, 1));
 		// Screenspace raycast direction
 		//std::cout << RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true)) << std::endl;
-		Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_rotateStart * 5.0f, 5.0f);
-		Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_rotateEnd * 5.0f, 5.0f);
+		//Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_dragStart * 5.0f, 5.0f);
+		//Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_dragEnd * 5.0f, 5.0f);
 
 		//ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);

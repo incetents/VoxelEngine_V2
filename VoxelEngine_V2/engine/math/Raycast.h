@@ -14,6 +14,9 @@ namespace Vxl
 		Plane(const Vector3& _normal, float _distance)
 			: m_normal(_normal), m_distance(_distance)
 		{}
+		Plane(const Vector3& _normal, const Vector3& _worldPosition)
+			: m_normal(_normal), m_distance(_worldPosition.ProjectLength(_normal))
+		{}
 	};
 
 	class Ray
@@ -21,6 +24,7 @@ namespace Vxl
 	public:
 		Vector3 m_origin;
 		Vector3 m_direction;
+		float   m_t;
 
 		Ray(const Vector3& _origin, const Vector3& _direction)
 			: m_origin(_origin), m_direction(_direction)
@@ -34,9 +38,11 @@ namespace Vxl
 		bool	m_missed;
 	};
 
-	// Formulas
+	// Finds where a Ray hits a plane
 	RayHit Intersection(const Ray& _ray, const Plane& _plane);
-	
+
+	// Finds the shortest distance between two lines
+	float ShortestDistance(Ray& _ray1, Ray& _ray2);
 
 	
 }

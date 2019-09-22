@@ -11,8 +11,6 @@
 
 #include "../objects/CameraObject.h"
 
-#include "../math/Raycast.h"
-
 #include "../window/window.h"
 #include "../input/Input.h"
 #include "../utilities/Util.h"
@@ -146,9 +144,9 @@ namespace Vxl
 				}
 				else
 				{
-					float x = m_GizmoSelectedAxis == Axis::X ? m_totalDrag1 : 1.0f;
-					float y = m_GizmoSelectedAxis == Axis::Y ? m_totalDrag1 : 1.0f;
-					float z = m_GizmoSelectedAxis == Axis::Z ? m_totalDrag1 : 1.0f;
+					float x = m_GizmoSelectedAxis == Axis::X ? m_totalDrag : 1.0f;
+					float y = m_GizmoSelectedAxis == Axis::Y ? m_totalDrag : 1.0f;
+					float z = m_GizmoSelectedAxis == Axis::Z ? m_totalDrag : 1.0f;
 
 					Matrix4x4 Offset = Matrix4x4::GetTranslate(Vector3(x, 0, 0));
 					m_GizmoTransform.X_Model = m_GizmoTransform.Model * Offset;
@@ -172,10 +170,7 @@ namespace Vxl
 			{
 				// Setup flags
 				m_GizmoClicked = false;
-				m_useAxis1 = false;
-				m_useAxis2 = false;
-				m_totalDrag1 = 0.0f;
-				m_totalDrag2 = 0.0f;
+				m_totalDrag = 0.0f;
 
 				m_fbo_colorPicker->Bind();
 				m_fbo_colorPicker->ClearBuffers();
@@ -191,10 +186,6 @@ namespace Vxl
 				if (m_controlMode == GizmoMode::TRANSLATE)
 				{
 					Color4F color;
-
-					// Cube (ignored)
-					material_colorPicker->m_property_output.SetProperty(Color4F(0, 0, 0, 0));
-					Geometry.GetCubeSmall()->Draw();
 
 					// X-arrow
 					color = Util::Conversion::uint_to_color4(1u);
@@ -233,6 +224,11 @@ namespace Vxl
 
 					Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
+					// Cube (ignored)
+					color = Util::Conversion::uint_to_color4(7u);
+					material_colorPicker->m_property_model.SetPropertyMatrix(m_GizmoTransform.Model, true);
+					material_colorPicker->m_property_output.SetProperty(color);
+					Geometry.GetCubeSmall()->Draw();
 
 					RawArray<uint8_t> data = m_fbo_colorPicker->readPixelsFromMouse(0, 1, 1);
 					if (data.start != nullptr)
@@ -266,7 +262,10 @@ namespace Vxl
 						case 6u:
 							m_GizmoSelectedAxis = Axis::NONE;
 							m_GizmoSelectedPlane = Axis::Z;
-
+							break;
+						case 7u:
+							m_GizmoSelectedAxis = Axis::ALL;
+							m_GizmoSelectedPlane = Axis::NONE;
 							break;
 						default:
 							m_GizmoSelectedAxis = Axis::NONE;
@@ -396,9 +395,6 @@ namespace Vxl
 			// Store internal information before movement occurs
 			else if (Input.getMouseButtonDown(MouseButton::LEFT) && (m_GizmoSelectedAxis != Axis::NONE || m_GizmoSelectedPlane != Axis::NONE))
 			{
-				// Init speed
-				m_GizmoDragSpeed = 0.01f * m_GizmoTransform.CameraDistance / 3.0f;
-
 				// Clip Space position for Gizmo
 				Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * m_GizmoTransform.Model;
 
@@ -408,53 +404,110 @@ namespace Vxl
 
 				if (m_controlMode == GizmoMode::TRANSLATE)
 				{
-					Vector4 Selection1;
-					Vector4 Selection2;
-
-					// Check Selections of Gizmo
-					switch (m_GizmoSelectedPlane)
+					// Selecting all axis
+					if (m_GizmoSelectedAxis == Axis::ALL)
 					{
-					case Axis::X:
-						Selection1 = MVP * Vector4(0, 1, 0, 1);
-						Selection2 = MVP * Vector4(0, 0, 1, 1);
-						break;
-					case Axis::Y:
-						Selection1 = MVP * Vector4(1, 0, 0, 1);
-						Selection2 = MVP * Vector4(0, 0, 1, 1);
-						break;
-					case Axis::Z:
-						Selection1 = MVP * Vector4(1, 0, 0, 1);
-						Selection2 = MVP * Vector4(0, 1, 0, 1);
-						break;
-					case Axis::NONE:
+						// Make a raycast with the Mouse's ScreenPosition
+						Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+
+						// Plane Normal
+						m_SelectedPlane = RenderManager.GetMainCamera()->m_transform.getCameraBackwards();
+
+						// Calculate where it hits
+						Plane p(m_SelectedPlane, m_GizmoTransform.WorldPosition);
+						Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+						RayHit hit = Intersection(r, p); // Guaranteed intersection
+
+						m_dragStart = hit.m_location;
+						m_GizmoClicked = true;
+					}
+
+					// Selecing a plane
+					else if (m_GizmoSelectedPlane != Axis::NONE)
+					{
+						// Make a raycast with the Mouse's ScreenPosition
+						Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+
+						// Plane Normal
+						switch (m_GizmoSelectedPlane)
+						{
+						case Axis::X:
+							m_SelectedPlane = m_GizmoTransform.Right;
+							break;
+						case Axis::Y:
+							m_SelectedPlane = m_GizmoTransform.Up;
+							break;
+						case Axis::Z:
+							m_SelectedPlane = m_GizmoTransform.Forward;
+							break;
+						default:
+							VXL_ERROR("Plane Selection Error");
+							break;
+						}
+
+						// Calculate where it hits
+						Plane p(m_SelectedPlane, m_GizmoTransform.WorldPosition);
+						Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+						RayHit hit = Intersection(r, p); // Guaranteed intersection
+
+						m_dragStart = hit.m_location;
+						m_GizmoClicked = true;
+					}
+
+					// Selecting just 1 axis
+					else
+					{
+						Vector3 MoveDirection;
 						switch (m_GizmoSelectedAxis)
 						{
 						case Axis::X:
-							Selection1 = MVP * Vector4(1, 0, 0, 1);
+							MoveDirection = m_GizmoTransform.Right;
 							break;
 						case Axis::Y:
-							Selection1 = MVP * Vector4(0, 1, 0, 1);
+							MoveDirection = m_GizmoTransform.Up;
 							break;
 						case Axis::Z:
-							Selection1 = MVP * Vector4(0, 0, 1, 1);
+							MoveDirection = m_GizmoTransform.Forward;
+							break;
+						case Axis::NONE:
 							break;
 						}
-						break;
+
+						m_dragStart = m_GizmoTransform.WorldPosition;
+
+						// Make a raycast with the Mouse's ScreenPosition
+						Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+						Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+						Ray		DirectionRay(m_dragStart, MoveDirection);
+
+						m_thresholdDrag = ShortestDistance(ViewRay, DirectionRay);
+
+						m_previousDrag = DirectionRay.m_t;
+						
+						// ~~~~
+						
+						//	Vector4 Selection;
+						//	
+						//	switch (m_GizmoSelectedAxis)
+						//	{
+						//	case Axis::X:
+						//		Selection = MVP * Vector4(1, 0, 0, 1);
+						//		break;
+						//	case Axis::Y:
+						//		Selection = MVP * Vector4(0, 1, 0, 1);
+						//		break;
+						//	case Axis::Z:
+						//		Selection = MVP * Vector4(0, 0, 1, 1);
+						//		break;
+						//	}
+						//	
+						//	// Get Screenspace direction of axis
+						//	m_ScreenSpace_Selection = (Selection / Selection.w).GetVector2(); // [-1 to +1] Range for XY
+						//	m_Axis_Direction = (Vector2(m_ScreenSpace_Selection) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
+
+						m_GizmoClicked = true;
 					}
 
-					// Get Screenspace direction of axis
-					m_ScreenSpace_Selection1 = (Selection1 / Selection1.w).GetVector2(); // [-1 to +1] Range for XY
-					m_Axis1_Direction = (Vector2(m_ScreenSpace_Selection1) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
-					m_useAxis1 = true;
-					m_useAxis2 = false;
-
-					if (m_GizmoSelectedPlane != Axis::NONE)
-					{
-						// Get Screenspace direction of secondary axis
-						m_ScreenSpace_Selection2 = (Selection2 / Selection2.w).GetVector2(); // [-1 to +1] Range for XY
-						m_Axis2_Direction = (Vector2(m_ScreenSpace_Selection2) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
-						m_useAxis2 = true;
-					}
 				}
 				else if (m_controlMode == GizmoMode::SCALE)
 				{
@@ -492,25 +545,25 @@ namespace Vxl
 					}
 
 					// Get Screenspace direction of axis
-					m_ScreenSpace_Selection1 = (Selection / Selection.w).GetVector2(); // [-1 to +1] Range for XY
-					m_Axis1_Direction = (Vector2(m_ScreenSpace_Selection1) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
-					m_useAxis1 = true;
+					m_ScreenSpace_Selection = (Selection / Selection.w).GetVector2(); // [-1 to +1] Range for XY
+					m_Axis_Direction = (Vector2(m_ScreenSpace_Selection) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
+					m_GizmoClicked = true;
 
 					// Special State for Scale
-					m_totalDrag1 = 1.0f;
+					m_totalDrag = 1.0f;
 				}
 				else if (m_controlMode == GizmoMode::ROTATE)
 				{
 					switch (m_GizmoSelectedAxis)
 					{
 					case Axis::X:
-						m_rotationPlane = m_GizmoTransform.Right;
+						m_SelectedPlane = m_GizmoTransform.Right;
 						break;
 					case Axis::Y:
-						m_rotationPlane = m_GizmoTransform.Up;
+						m_SelectedPlane = m_GizmoTransform.Up;
 						break;
 					case Axis::Z:
-						m_rotationPlane = m_GizmoTransform.Forward;
+						m_SelectedPlane = m_GizmoTransform.Forward;
 						break;
 					}
 
@@ -518,17 +571,17 @@ namespace Vxl
 					Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
 
 					// Calculate where it hits
-					Plane p(m_rotationPlane, m_GizmoTransform.WorldPosition.ProjectLength(m_rotationPlane));
+					Plane p(m_SelectedPlane, m_GizmoTransform.WorldPosition);
 					Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
 					RayHit hit = Intersection(r, p); // Guaranteed intersection
 
-					m_rotateStart = (hit.m_location - m_GizmoTransform.WorldPosition).Normalize();
-					m_useAxis1 = true;
+					m_dragStart = (hit.m_location - m_GizmoTransform.WorldPosition).Normalize();
+					m_GizmoClicked = true;
 				}
 			}
 
 			// Movement
-			if (Input.getMouseButton(MouseButton::LEFT) && (m_useAxis1 || m_useAxis2))
+			if (Input.getMouseButton(MouseButton::LEFT) && m_GizmoClicked)
 			{
 				// Flags
 				m_GizmoClicked = true;
@@ -542,46 +595,50 @@ namespace Vxl
 				{
 					if (m_controlMode == GizmoMode::TRANSLATE)
 					{
-						float Drag1 = MouseChange.ProjectLength(m_Axis1_Direction);
-						float Drag2 = MouseChange.ProjectLength(m_Axis2_Direction);
-						m_totalDrag1 += Drag1;
-						m_totalDrag2 += Drag2;
-
-						if (m_useAxis2)
+						// Dragging all Axis
+						if (m_GizmoSelectedAxis == Axis::ALL)
 						{
-							Vector3 MoveDirection1;
-							Vector3 MoveDirection2;
+							// Make a raycast with the Mouse's ScreenPosition
+							Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
 
-							switch (m_GizmoSelectedPlane)
-							{
-							case Axis::X:
-								MoveDirection1 = m_GizmoTransform.Up;
-								MoveDirection2 = m_GizmoTransform.Forward;
-								break;
-							case Axis::Y:
-								MoveDirection1 = m_GizmoTransform.Right;
-								MoveDirection2 = m_GizmoTransform.Forward;
-								break;
-							case Axis::Z:
-								MoveDirection1 = m_GizmoTransform.Right;
-								MoveDirection2 = m_GizmoTransform.Up;
-								break;
-							case Axis::NONE:
-								break;
-							}
+							// Calculate where it hits
+							Plane p(m_SelectedPlane, m_GizmoTransform.WorldPosition);
+							Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+							RayHit hit = Intersection(r, p); // Guaranteed intersection
+
+							m_dragEnd = hit.m_location;
 
 							for (auto& Entity : m_selectedEntities)
 							{
-								Entity->m_transform.increaseWorldPosition(
-									MoveDirection1 * (Drag1)* m_GizmoDragSpeed +
-									MoveDirection2 * (Drag2)* m_GizmoDragSpeed
-								);
+								Entity->m_transform.increaseWorldPosition((m_dragEnd - m_dragStart) * 1);
 							}
+
+							m_dragStart = m_dragEnd;
 						}
+						// Dragging a plane
+						else if (m_GizmoSelectedPlane != Axis::NONE)
+						{
+							// Make a raycast with the Mouse's ScreenPosition
+							Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+
+							// Calculate where it hits
+							Plane p(m_SelectedPlane, m_GizmoTransform.WorldPosition);
+							Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+							RayHit hit = Intersection(r, p); // Guaranteed intersection
+
+							m_dragEnd = hit.m_location;
+
+							for (auto& Entity : m_selectedEntities)
+							{
+								Entity->m_transform.increaseWorldPosition((m_dragEnd - m_dragStart) * 1);
+							}
+
+							m_dragStart = m_dragEnd;
+						}
+						// Dragging 1 axis
 						else
 						{
 							Vector3 MoveDirection;
-
 							switch (m_GizmoSelectedAxis)
 							{
 							case Axis::X:
@@ -597,13 +654,21 @@ namespace Vxl
 								break;
 							}
 
+							// Make a raycast with the Mouse's ScreenPosition
+							Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+							Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+							Ray		DirectionRay(m_dragStart, MoveDirection);
+
+							float  NewThreshold = ShortestDistance(ViewRay, DirectionRay);
+
 							for (auto& Entity : m_selectedEntities)
 							{
 								Entity->m_transform.increaseWorldPosition(
-									MoveDirection * (Drag1)* m_GizmoDragSpeed
+									-MoveDirection * (DirectionRay.m_t - m_previousDrag)
 								);
 							}
 
+							m_previousDrag = DirectionRay.m_t;
 						}
 					}
 					else if (m_controlMode == GizmoMode::SCALE)
@@ -614,8 +679,6 @@ namespace Vxl
 							// Get Mouse position in -1 to +1 range of screen
 							Vector2 MouseScreenSpace = Input.getMousePosScreenspace(true);
 
-							std::cout << MouseScreenSpace << std::endl;
-
 							// Distance from mouse to center point of Gizmo
 							Vector2 MouseDelta = MouseScreenSpace - Vector2(m_ScreenSpace_SelectionCenter);
 							float Distance = MouseDelta.x + MouseDelta.y + 1.0f;
@@ -624,21 +687,20 @@ namespace Vxl
 							uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
 							for (uint32_t i = 0; i < selectionCount; i++)
 							{
-								m_selectedEntities[i]->m_transform.increaseScale(Distance - m_totalDrag1);
+								m_selectedEntities[i]->m_transform.increaseScale(Distance - m_totalDrag);
 							}
 							// Use "m_totalDrag1" similar to a "lastTime" value of a timer
-							m_totalDrag1 = Distance;
+							m_totalDrag = Distance;
 						}
 						else
 						{
 							uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
 
 							// Scale objects based on how much dragging the mouse does
-							float Drag = MouseChange.ProjectLength(m_Axis1_Direction) * 0.02f;
+							float Drag = MouseChange.ProjectLength(m_Axis_Direction) * 0.02f;
+							m_totalDrag += Drag;
 
-							m_totalDrag1 += Drag;
-
-							if (m_totalDrag1 != 0.0f)
+							if (m_totalDrag != 0.0f)
 							{
 								Vector3 MoveDirection;
 
@@ -649,7 +711,7 @@ namespace Vxl
 
 									for (uint32_t i = 0; i < selectionCount; i++)
 									{
-										m_selectedEntities[i]->m_transform.setScaleX(m_scaleBackups[i] * m_totalDrag1);
+										m_selectedEntities[i]->m_transform.setScaleX(m_scaleBackups[i] * m_totalDrag);
 									}
 									break;
 								case Axis::Y:
@@ -657,7 +719,7 @@ namespace Vxl
 
 									for (uint32_t i = 0; i < selectionCount; i++)
 									{
-										m_selectedEntities[i]->m_transform.setScaleY(m_scaleBackups[i] * m_totalDrag1);
+										m_selectedEntities[i]->m_transform.setScaleY(m_scaleBackups[i] * m_totalDrag);
 									}
 									break;
 								case Axis::Z:
@@ -665,7 +727,7 @@ namespace Vxl
 
 									for (uint32_t i = 0; i < selectionCount; i++)
 									{
-										m_selectedEntities[i]->m_transform.setScaleZ(m_scaleBackups[i] * m_totalDrag1);
+										m_selectedEntities[i]->m_transform.setScaleZ(m_scaleBackups[i] * m_totalDrag);
 									}
 									break;
 								case Axis::NONE:
@@ -680,21 +742,21 @@ namespace Vxl
 						Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
 
 						// Calculate where it hits
-						Plane p(m_rotationPlane, m_GizmoTransform.WorldPosition.ProjectLength(m_rotationPlane));
+						Plane p(m_SelectedPlane, m_GizmoTransform.WorldPosition);
 						Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
 						RayHit hit = Intersection(r, p); // Guaranteed intersection
 
-						m_rotateEnd = (hit.m_location - m_GizmoTransform.WorldPosition).Normalize();
+						m_dragEnd = (hit.m_location - m_GizmoTransform.WorldPosition).Normalize();
 
 						// Only rotate if both vectors are not the same
-						if (!m_rotateEnd.CompareFuzzy(m_rotateStart))
+						if (!m_dragEnd.CompareFuzzy(m_dragStart))
 						{
 							// Check angle between the two
-							float degrees = Vector3::GetAngleDegrees(m_rotateStart, m_rotateEnd);
+							float degrees = Vector3::GetAngleDegrees(m_dragStart, m_dragEnd);
 
 							// Check if going in other direction
-							Vector3 c = Vector3::Cross(m_rotateStart, m_rotateEnd);
-							float sign = c.Dot(m_rotationPlane);
+							Vector3 c = Vector3::Cross(m_dragStart, m_dragEnd);
+							float sign = c.Dot(m_SelectedPlane);
 							if (sign > 0)
 								degrees = -degrees;
 
@@ -703,7 +765,7 @@ namespace Vxl
 							{
 								if (m_controlAxisLocal)
 								{
-									m_selectedEntities[i]->m_transform.rotateAroundAxis(m_rotationPlane, degrees);
+									m_selectedEntities[i]->m_transform.rotateAroundAxis(m_SelectedPlane, degrees);
 								}
 								else
 									switch (m_GizmoSelectedAxis)
@@ -721,7 +783,7 @@ namespace Vxl
 							}
 
 							// Update previous rotation
-							m_rotateStart = m_rotateEnd;
+							m_dragStart = m_dragEnd;
 						}
 					}
 				}

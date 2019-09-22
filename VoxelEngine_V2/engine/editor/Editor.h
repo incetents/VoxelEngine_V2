@@ -5,6 +5,7 @@
 #include "../math/Vector.h"
 #include "../math/Matrix4x4.h"
 #include "../math/MathCore.h"
+#include "../math/Raycast.h"
 
 #include <vector>
 
@@ -21,25 +22,21 @@ namespace Vxl
 
 		// Gizmo Selection Info
 		Vector4 m_ScreenSpace_SelectionCenter;
-		Vector4 m_ScreenSpace_Selection1;
-		Vector4 m_ScreenSpace_Selection2;
+		Vector4 m_ScreenSpace_Selection;
 
-		Vector2 m_Axis1_Direction;
-		Vector2 m_Axis2_Direction;
-		bool	m_useAxis1 = false;
-		bool	m_useAxis2 = false;
-		float	m_totalDrag1 = 0.0f;
-		float	m_totalDrag2 = 0.0f;
+		// Various Data for Gizmo
+		Vector2 m_Axis_Direction;
+		float	m_totalDrag = 0.0f;
+		Vector3 m_SelectedPlane;
+		std::vector<float> m_scaleBackups; 
+		float m_thresholdDrag;
+		float m_previousDrag;
 
-		std::vector<float> m_scaleBackups;
-
-		Vector3 m_rotationPlane;
+		Vector3 m_dragStart;
+		Vector3 m_dragEnd;
 
 	public:
-		Vector3 m_rotateStart;
-		Vector3 m_rotateEnd;
 
-		float m_GizmoDragSpeed;
 		Axis  m_GizmoSelectedAxis = Axis::NONE;
 		Axis  m_GizmoSelectedPlane = Axis::NONE;
 		bool  m_GizmoSelected = false;
