@@ -734,16 +734,31 @@ namespace Vxl
 		RenderManager.RenderEditorObjects();
 
 		Graphics::ClearBuffer(BufferBit::DEPTH);
-		RenderManager.RenderEditorObjectsPostDepth();
+		//RenderManager.RenderEditorObjectsPostDepth(); // gizmo rn
+
+		static Gizmo gizmo;
+
+		// GizmoMode
+		if (Input.getKeyDown(KeyCode::Num_1))
+			gizmo.m_mode = Gizmo::Mode::TRANSLATE;
+		if (Input.getKeyDown(KeyCode::Num_2))
+			gizmo.m_mode = Gizmo::Mode::SCALE;
+		if (Input.getKeyDown(KeyCode::Num_3))
+			gizmo.m_mode = Gizmo::Mode::ROTATE;
+
+		gizmo.UpdateModel(*GameObject::GetAsset("_crate3"));
+		gizmo.RenderOnScreen();
+		gizmo.RenderIDCapture();
+		gizmo.Update();
 
 		//
 		GPUTimer::EndTimer();
 
 		// Selection Data
-		if (RenderManager.GetAllEntities().size() > 0)
-			Editor.UpdateSelectionTransformModel();
+		//if (RenderManager.GetAllEntities().size() > 0)
+		//	Editor.UpdateSelectionTransformModel();
 		
-		Editor.UpdateSelectionInfo();
+		//Editor.UpdateSelectionInfo();
 
 
 		

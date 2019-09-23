@@ -2,12 +2,8 @@
 #pragma once
 
 #include "../utilities/singleton.h"
-#include "../math/Vector.h"
-#include "../math/Matrix4x4.h"
-#include "../math/MathCore.h"
-#include "../math/Raycast.h"
 
-#include <vector>
+#include "../rendering/Gizmo.h"
 
 namespace Vxl
 {
@@ -49,7 +45,7 @@ namespace Vxl
 			Matrix4x4	Y_Model;
 			Matrix4x4	Z_Model;
 
-			float		CameraDistance;
+			//float		CameraDistance;
 			Matrix4x4	Model;
 			Vector3		WorldPosition;
 			Vector3		Forward;

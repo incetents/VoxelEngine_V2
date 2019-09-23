@@ -44,6 +44,7 @@
     <ClCompile Include="engine\rendering\Debug.cpp" />
     <ClCompile Include="engine\rendering\FramebufferObject.cpp" />
     <ClCompile Include="engine\rendering\Geometry.cpp" />
+    <ClCompile Include="engine\rendering\Gizmo.cpp" />
     <ClCompile Include="engine\rendering\Graphics.cpp" />
     <ClCompile Include="engine\rendering\LineMesh.cpp" />
     <ClCompile Include="engine\rendering\RenderBuffer.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="engine\modules\Scene.h" />
     <ClInclude Include="engine\objects\TextObject.h" />
     <ClInclude Include="engine\rendering\Debug.h" />
+    <ClInclude Include="engine\rendering\Gizmo.h" />
     <ClInclude Include="engine\rendering\Graphics.h" />
     <ClInclude Include="engine\rendering\LineMesh.h" />
     <ClInclude Include="engine\rendering\RenderBuffer.h" />

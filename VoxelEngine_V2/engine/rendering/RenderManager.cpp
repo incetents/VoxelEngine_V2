@@ -23,6 +23,7 @@
 
 #include "../window/window.h"
 #include "../editor/Editor.h"
+#include "../rendering/Gizmo.h"
 
 #include "../objects/GameObject.h"
 #include "../objects/LightObject.h"
@@ -229,6 +230,7 @@ namespace Vxl
 		GlobalRenderText.InitGLResources();
 		GUIViewport.InitGLResources();
 		Editor.InitGLResources();
+		Gizmo::InitGLResources();
 	}
 	void RenderManager::DestroyGlobalGLResources()
 	{
@@ -237,6 +239,7 @@ namespace Vxl
 		GlobalRenderText.DestoryGLResources();
 		GUIViewport.DestroyGLResources();
 		Editor.DestroyGLResources();
+		Gizmo::DestroyGLResources();
 	}
 
 	//
@@ -683,7 +686,6 @@ namespace Vxl
 			auto simpleLight = Material::GetAsset("simpleLight");
 			if (simpleLight->IsValid())
 			{
-
 				simpleLight->BindProgram();
 
 				simpleLight->m_property_useModel.SetProperty(true);
