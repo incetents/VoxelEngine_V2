@@ -781,9 +781,6 @@ namespace Vxl
 					//
 					Geometry.GetCubeSmall()->Draw();
 
-
-					
-					
 				}
 				else if (Editor.m_controlMode == Editor.GizmoMode::SCALE)
 				{

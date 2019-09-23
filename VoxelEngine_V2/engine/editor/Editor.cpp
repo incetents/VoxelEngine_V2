@@ -480,77 +480,92 @@ namespace Vxl
 						Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
 						Ray		DirectionRay(m_dragStart, MoveDirection);
 
-						m_thresholdDrag = ShortestDistance(ViewRay, DirectionRay);
+						ShortestDistance(ViewRay, DirectionRay);
 
 						m_previousDrag = DirectionRay.m_t;
 						
-						// ~~~~
-						
-						//	Vector4 Selection;
-						//	
-						//	switch (m_GizmoSelectedAxis)
-						//	{
-						//	case Axis::X:
-						//		Selection = MVP * Vector4(1, 0, 0, 1);
-						//		break;
-						//	case Axis::Y:
-						//		Selection = MVP * Vector4(0, 1, 0, 1);
-						//		break;
-						//	case Axis::Z:
-						//		Selection = MVP * Vector4(0, 0, 1, 1);
-						//		break;
-						//	}
-						//	
-						//	// Get Screenspace direction of axis
-						//	m_ScreenSpace_Selection = (Selection / Selection.w).GetVector2(); // [-1 to +1] Range for XY
-						//	m_Axis_Direction = (Vector2(m_ScreenSpace_Selection) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
-
 						m_GizmoClicked = true;
 					}
 
 				}
 				else if (m_controlMode == GizmoMode::SCALE)
 				{
-					uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
-					m_scaleBackups.clear();
-
-					Vector4 Selection;
-
-					// Check Selections of Gizmo
-					switch (m_GizmoSelectedAxis)
+					// Selecting Scale Axis
+					if (m_GizmoSelectedAxis != Axis::ALL)
 					{
-					case Axis::X:
-						Selection = MVP * Vector4(1, 0, 0, 1);
+						Vector3 MoveDirection;
+						switch (m_GizmoSelectedAxis)
+						{
+						case Axis::X:
+							MoveDirection = m_GizmoTransform.Right;
+							break;
+						case Axis::Y:
+							MoveDirection = m_GizmoTransform.Up;
+							break;
+						case Axis::Z:
+							MoveDirection = m_GizmoTransform.Forward;
+							break;
+						}
 
-						for (uint32_t i = 0; i < selectionCount; i++)
-							m_scaleBackups.push_back(m_selectedEntities[i]->m_transform.getScale().x);
-						break;
-					case Axis::Y:
-						Selection = MVP * Vector4(0, 1, 0, 1);
+						m_dragStart = m_GizmoTransform.WorldPosition;
 
-						for (uint32_t i = 0; i < selectionCount; i++)
-							m_scaleBackups.push_back(m_selectedEntities[i]->m_transform.getScale().y);
-						break;
-					case Axis::Z:
-						Selection = MVP * Vector4(0, 0, 1, 1);
+						// Make a raycast with the Mouse's ScreenPosition
+						Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+						Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+						Ray		DirectionRay(m_dragStart, MoveDirection);
 
-						for (uint32_t i = 0; i < selectionCount; i++)
-							m_scaleBackups.push_back(m_selectedEntities[i]->m_transform.getScale().z);
-						break;
-					case Axis::ALL:
-						Selection = SelectionCenter;
-						break;
-					case Axis::NONE:
-						break;
+						ShortestDistance(ViewRay, DirectionRay);
+
+						m_previousDrag = DirectionRay.m_t;
+
+						// Start Scale at 1.0f
+						m_totalDrag = 1.0f;
+
+						// Store all original scales to avoid precision loss
+						uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
+						m_scaleBackups.clear();
+
+						switch (m_GizmoSelectedAxis)
+						{
+						case Axis::X:
+							//Selection = MVP * Vector4(1, 0, 0, 1);
+
+							for (uint32_t i = 0; i < selectionCount; i++)
+								m_scaleBackups.push_back(m_selectedEntities[i]->m_transform.getScale().x);
+							break;
+						case Axis::Y:
+							//Selection = MVP * Vector4(0, 1, 0, 1);
+
+							for (uint32_t i = 0; i < selectionCount; i++)
+								m_scaleBackups.push_back(m_selectedEntities[i]->m_transform.getScale().y);
+							break;
+						case Axis::Z:
+							//Selection = MVP * Vector4(0, 0, 1, 1);
+
+							for (uint32_t i = 0; i < selectionCount; i++)
+								m_scaleBackups.push_back(m_selectedEntities[i]->m_transform.getScale().z);
+							break;
+						}
+
 					}
 
-					// Get Screenspace direction of axis
-					m_ScreenSpace_Selection = (Selection / Selection.w).GetVector2(); // [-1 to +1] Range for XY
-					m_Axis_Direction = (Vector2(m_ScreenSpace_Selection) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
+					
 					m_GizmoClicked = true;
 
-					// Special State for Scale
-					m_totalDrag = 1.0f;
+					
+					//	
+					//	Vector4 Selection;
+					//	
+					// Check Selections of Gizmo
+					
+					//	
+					//	// Get Screenspace direction of axis
+					//	m_ScreenSpace_Selection = (Selection / Selection.w).GetVector2(); // [-1 to +1] Range for XY
+					//	m_Axis_Direction = (Vector2(m_ScreenSpace_Selection) - Vector2(m_ScreenSpace_SelectionCenter)).Normalize();
+					//	m_GizmoClicked = true;
+					//	
+					//	
+					
 				}
 				else if (m_controlMode == GizmoMode::ROTATE)
 				{
@@ -659,7 +674,7 @@ namespace Vxl
 							Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
 							Ray		DirectionRay(m_dragStart, MoveDirection);
 
-							float  NewThreshold = ShortestDistance(ViewRay, DirectionRay);
+							ShortestDistance(ViewRay, DirectionRay);
 
 							for (auto& Entity : m_selectedEntities)
 							{
@@ -683,6 +698,8 @@ namespace Vxl
 							Vector2 MouseDelta = MouseScreenSpace - Vector2(m_ScreenSpace_SelectionCenter);
 							float Distance = MouseDelta.x + MouseDelta.y + 1.0f;
 
+							std::cout << Distance << std::endl;
+
 							// Scale everything based on distance
 							uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
 							for (uint32_t i = 0; i < selectionCount; i++)
@@ -694,46 +711,96 @@ namespace Vxl
 						}
 						else
 						{
-							uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
-
-							// Scale objects based on how much dragging the mouse does
-							float Drag = MouseChange.ProjectLength(m_Axis_Direction) * 0.02f;
-							m_totalDrag += Drag;
-
-							if (m_totalDrag != 0.0f)
+							Vector3 MoveDirection;
+							switch (m_GizmoSelectedAxis)
 							{
-								Vector3 MoveDirection;
-
-								switch (m_GizmoSelectedAxis)
-								{
-								case Axis::X:
-									MoveDirection = m_GizmoTransform.Right;
-
-									for (uint32_t i = 0; i < selectionCount; i++)
-									{
-										m_selectedEntities[i]->m_transform.setScaleX(m_scaleBackups[i] * m_totalDrag);
-									}
-									break;
-								case Axis::Y:
-									MoveDirection = m_GizmoTransform.Up;
-
-									for (uint32_t i = 0; i < selectionCount; i++)
-									{
-										m_selectedEntities[i]->m_transform.setScaleY(m_scaleBackups[i] * m_totalDrag);
-									}
-									break;
-								case Axis::Z:
-									MoveDirection = m_GizmoTransform.Forward;
-
-									for (uint32_t i = 0; i < selectionCount; i++)
-									{
-										m_selectedEntities[i]->m_transform.setScaleZ(m_scaleBackups[i] * m_totalDrag);
-									}
-									break;
-								case Axis::NONE:
-									break;
-								}
+							case Axis::X:
+								MoveDirection = m_GizmoTransform.Right;
+								break;
+							case Axis::Y:
+								MoveDirection = m_GizmoTransform.Up;
+								break;
+							case Axis::Z:
+								MoveDirection = m_GizmoTransform.Forward;
+								break;
+							case Axis::NONE:
+								break;
 							}
+
+							// Make a raycast with the Mouse's ScreenPosition
+							Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+							Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+							Ray		DirectionRay(m_dragStart, MoveDirection);
+
+							ShortestDistance(ViewRay, DirectionRay);
+
+							m_totalDrag = -DirectionRay.m_t;
+							
+							uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
+							switch (m_GizmoSelectedAxis)
+							{
+							case Axis::X:
+								for (uint32_t i = 0; i < selectionCount; i++)
+								{
+									m_selectedEntities[i]->m_transform.setScaleX(m_scaleBackups[i] * m_totalDrag);
+								}
+								break;
+							case Axis::Y:
+								for (uint32_t i = 0; i < selectionCount; i++)
+								{
+									m_selectedEntities[i]->m_transform.setScaleY(m_scaleBackups[i] * m_totalDrag);
+								}
+								break;
+							case Axis::Z:
+								for (uint32_t i = 0; i < selectionCount; i++)
+								{
+									m_selectedEntities[i]->m_transform.setScaleZ(m_scaleBackups[i] * m_totalDrag);
+								}
+								break;
+							case Axis::NONE:
+								break;
+							}
+
+							//	uint32_t selectionCount = (uint32_t)m_selectedEntities.size();
+							//	
+							//	// Scale objects based on how much dragging the mouse does
+							//	float Drag = MouseChange.ProjectLength(m_Axis_Direction) * 0.02f;
+							//	m_totalDrag += Drag;
+							//	
+							//	if (m_totalDrag != 0.0f)
+							//	{
+							//		Vector3 MoveDirection;
+							//	
+							//		switch (m_GizmoSelectedAxis)
+							//		{
+							//		case Axis::X:
+							//			MoveDirection = m_GizmoTransform.Right;
+							//	
+							//			for (uint32_t i = 0; i < selectionCount; i++)
+							//			{
+							//				m_selectedEntities[i]->m_transform.setScaleX(m_scaleBackups[i] * m_totalDrag);
+							//			}
+							//			break;
+							//		case Axis::Y:
+							//			MoveDirection = m_GizmoTransform.Up;
+							//	
+							//			for (uint32_t i = 0; i < selectionCount; i++)
+							//			{
+							//				m_selectedEntities[i]->m_transform.setScaleY(m_scaleBackups[i] * m_totalDrag);
+							//			}
+							//			break;
+							//		case Axis::Z:
+							//			MoveDirection = m_GizmoTransform.Forward;
+							//	
+							//			for (uint32_t i = 0; i < selectionCount; i++)
+							//			{
+							//				m_selectedEntities[i]->m_transform.setScaleZ(m_scaleBackups[i] * m_totalDrag);
+							//			}
+							//			break;
+							//		case Axis::NONE:
+							//			break;
+							//		}
+							//	}
 						}
 					}
 					else if (m_controlMode == GizmoMode::ROTATE)

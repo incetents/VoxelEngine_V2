@@ -29,7 +29,6 @@ namespace Vxl
 		float	m_totalDrag = 0.0f;
 		Vector3 m_SelectedPlane;
 		std::vector<float> m_scaleBackups; 
-		float m_thresholdDrag;
 		float m_previousDrag;
 
 		Vector3 m_dragStart;

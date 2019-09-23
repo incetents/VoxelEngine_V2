@@ -24,7 +24,7 @@ namespace Vxl
 	public:
 		Vector3 m_origin;
 		Vector3 m_direction;
-		float   m_t;
+		float   m_t = 0;
 
 		Ray(const Vector3& _origin, const Vector3& _direction)
 			: m_origin(_origin), m_direction(_direction)
