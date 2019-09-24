@@ -135,7 +135,7 @@ namespace Vxl
 
 	void Hierarchy::Draw()
 	{
-		auto Entities = Editor.GetSelectedEntities();
+		auto Entities = Editor.m_selectedEntities;
 
 		ImGui::Text("Scene Graph:\t");
 

@@ -7,89 +7,21 @@
 
 namespace Vxl
 {
-	class FramebufferObject;
 	class Entity;
 
 	static class Editor : public Singleton<class Editor>
 	{
-	private:
-		std::vector<Entity*>	m_selectedEntities;
-		FramebufferObject*		m_fbo_colorPicker;
-
-		// Gizmo Selection Info
-		Vector4 m_ScreenSpace_SelectionCenter;
-		Vector4 m_ScreenSpace_Selection;
-
-		// Various Data for Gizmo
-		Vector2 m_Axis_Direction;
-		float	m_totalDrag = 0.0f;
-		Vector3 m_SelectedPlane;
-		std::vector<float> m_scaleBackups; 
-		float m_previousDrag;
-
-		Vector3 m_dragStart;
-		Vector3 m_dragEnd;
-
 	public:
-
-		Axis  m_GizmoSelectedAxis = Axis::NONE;
-		Axis  m_GizmoSelectedPlane = Axis::NONE;
-		bool  m_GizmoSelected = false;
-		bool  m_GizmoClicked = false;
-
-		// Transform Selection
-		struct GizmoTransform
-		{
-			// Multi-purpose offsets
-			Matrix4x4	X_Model;
-			Matrix4x4	Y_Model;
-			Matrix4x4	Z_Model;
-
-			//float		CameraDistance;
-			Matrix4x4	Model;
-			Vector3		WorldPosition;
-			Vector3		Forward;
-			Vector3		Up;
-			Vector3		Right;
-
-		} m_GizmoTransform;
-
-		// Global GL Resources
-		void InitGLResources();
-		void DestroyGLResources();
-
-		// Selected Entities
-		inline const std::vector<Entity*>& GetSelectedEntities(void) const
-		{
-			return m_selectedEntities;
-		}
+		std::vector<Entity*>	m_selectedEntities;
 		
 		// [true] if at least one object is selected
-		bool HasSelection() const
+		inline bool HasSelection() const
 		{
 			return m_selectedEntities.size() > 0;
 		}
 		void RemoveSelection(Entity* _entity);
 		void AddSelection(Entity* _entity);
 		void ClearSelection();
-
-		/* Editor Controls */
-		enum GizmoMode
-		{
-			TRANSLATE,
-			SCALE,
-			ROTATE
-		};
-		GizmoMode m_controlMode = GizmoMode::TRANSLATE;
-		
-		bool m_controlAxisLocal = true; // Whether Editor axis rotates based on local rotation
-
-		// Update info
-		void UpdateSelectionTransformPosition();
-		void UpdateSelectionTransformModel();
-
-		// Behaviour
-		void UpdateSelectionInfo();
 
 
 	} SingletonInstance(Editor);

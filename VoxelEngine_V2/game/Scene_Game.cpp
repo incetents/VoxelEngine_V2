@@ -378,10 +378,12 @@ namespace Vxl
 		_crate3->m_transform.addChild(&_crate2->m_transform);
 		_crate2->m_transform.addChild(&_crate1->m_transform);
 
-		//_crate2->m_transform.setRotation(65, 12, 3);
-		//_crate3->m_transform.setRotation(45, 12, 3);
+		_crate1->m_transform.setRotation(45, -45, 0);
+		_crate2->m_transform.setRotation(65, 12, 3);
+		_crate3->m_transform.setRotation(45, 12, 3);
 		// World Position
 		_crate1->m_transform.setWorldPosition(-5, -5, 0);
+		_crate1->m_transform.increaseWorldPosition(1, 2, 3);
 		
 		GameObject* _octo1 = GameObject::Create("_octo1");
 		_octo1->SetMaterial(material_gbuffer);
@@ -530,13 +532,6 @@ namespace Vxl
 			_cameraObject->Update();
 		}
 
-		// GizmoMode
-		if (Input.getKeyDown(KeyCode::Num_1))
-			Editor.m_controlMode = Editor::GizmoMode::TRANSLATE;
-		if (Input.getKeyDown(KeyCode::Num_2))
-			Editor.m_controlMode = Editor::GizmoMode::SCALE;
-		if (Input.getKeyDown(KeyCode::Num_3))
-			Editor.m_controlMode = Editor::GizmoMode::ROTATE;
 
 		// Debug Lines (screen space)
 		//	auto t = Time.GetTime() / 2.0;
@@ -547,7 +542,7 @@ namespace Vxl
 		//	);
 
 		// Selection
-		auto SelectedEntities = Editor.GetSelectedEntities();
+		auto SelectedEntities = Editor.m_selectedEntities;
 		for (const auto& Entity : SelectedEntities)
 		{
 			// If appears unorthodox, selection might be disabled [ex: skybox cube]
@@ -658,14 +653,6 @@ namespace Vxl
 			Color4F(1, 1, 0, 0.25f), Color4F(0, 1, 1, 1)
 		);
 
-		// Mouse pos [-1 to +1]
-		//Vector4 clickPoint = RenderManager.GetMainCamera()->ScreenSpaceToWorldSpace(Vector3(Input.getMousePosScreenspaceX(), Input.getMousePosScreenspaceY(true), 0.5f));
-		//Debug.DrawCube(clickPoint.GetVector3(), Vector3(0.01f), Color4F(1, 0, 1, 1));
-		// Screenspace raycast direction
-		//std::cout << RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true)) << std::endl;
-		//Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_dragStart * 5.0f, 5.0f);
-		//Debug.DrawLine(Editor.m_GizmoTransform.WorldPosition, Editor.m_GizmoTransform.WorldPosition + Editor.m_dragEnd * 5.0f, 5.0f);
-
 		//ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
 		//	
@@ -734,9 +721,12 @@ namespace Vxl
 		RenderManager.RenderEditorObjects();
 
 		Graphics::ClearBuffer(BufferBit::DEPTH);
-		//RenderManager.RenderEditorObjectsPostDepth(); // gizmo rn
+		//RenderManager.RenderEditorObjectsPostDepth(); // empty
 
 		static Gizmo gizmo;
+
+		gizmo.m_pivotAxisAligned = DEVCONSOLE_GET_BOOL("PivotAxisAligned", false);
+		gizmo.m_translateSnapping = DEVCONSOLE_GET_BOOL("TranslateSnapping", false);
 
 		// GizmoMode
 		if (Input.getKeyDown(KeyCode::Num_1))
@@ -746,10 +736,16 @@ namespace Vxl
 		if (Input.getKeyDown(KeyCode::Num_3))
 			gizmo.m_mode = Gizmo::Mode::ROTATE;
 
-		gizmo.UpdateModel(*GameObject::GetAsset("_crate3"));
-		gizmo.RenderOnScreen();
-		gizmo.RenderIDCapture();
-		gizmo.Update();
+		if (Editor.m_selectedEntities.size() > 0)
+		{
+			gizmo.UpdateModel(*Editor.m_selectedEntities[0]);
+			gizmo.RenderOnScreen();
+			gizmo.RenderIDCapture();
+			gizmo.Update(Editor.m_selectedEntities);
+		}
+
+		
+
 
 		//
 		GPUTimer::EndTimer();
@@ -765,7 +761,8 @@ namespace Vxl
 
 		// Select Object in scene
 		// ~~ //
-		if (!Editor.m_GizmoSelected && !Editor.m_GizmoClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		//if (!Editor.m_GizmoSelected && !Editor.m_GizmoClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		if (!gizmo.IsSelected() && !gizmo.IsClicked() && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
 		{
 			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 			{

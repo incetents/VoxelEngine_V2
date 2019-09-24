@@ -90,6 +90,11 @@ namespace Vxl
 		{
 			return (*this * Vxl::InverseSqrt<Type>(x * x + y * y));
 		}
+		_Vector2<Type> NormalizeAccurate() const
+		{
+			float _invaLength = 1.0f / Magnitudef();
+			return *this * _invaLength;
+		}
 
 		// ~ Length ~ //
 				Type InverseMagnitude(void) const { return Vxl::InverseSqrt<Type>(MacroDot2(x,y)); }
@@ -318,6 +323,14 @@ namespace Vxl
 			return _Vector2<Type>(
 				max(v1.x, v2.x),
 				max(v1.y, v2.y)
+				);
+		}
+		// Round
+		_Vector2<Type> Round()
+		{
+			return _Vector2<Type>(
+				round(x),
+				round(y)
 				);
 		}
 		// Clamp
@@ -552,6 +565,11 @@ namespace Vxl
 		_Vector3<Type> NormalizeXZ() const
 		{
 			return (_Vector3<Type>(x, 0, z) * Vxl::InverseSqrt<Type>(x * x + z * z));
+		}
+		_Vector3<Type> NormalizeAccurate() const
+		{
+			float _invaLength = 1.0f / Magnitudef();
+			return *this * _invaLength;
 		}
 
 		// ~ Length ~ //
@@ -821,6 +839,15 @@ namespace Vxl
 				max(v1.z, v2.z)
 				);
 		}
+		// Round
+		_Vector3<Type> Round()
+		{
+			return _Vector3<Type>(
+				round(x),
+				round(y),
+				round(z)
+				);
+		}
 		// Clamp
 		_Vector3<Type> Clamp(float _min, float _max)
 		{
@@ -1054,6 +1081,11 @@ namespace Vxl
 		{
 			return (*this * Vxl::InverseSqrt<Type>(x * x + y * y + z * z + w * w));
 		}
+		_Vector4<Type> NormalizeAccurate() const
+		{
+			float _invaLength = 1.0f / Magnitudef();
+			return *this * _invaLength;
+		}
 
 		// ~ Length ~ //
 				Type InverseMagnitude(void) const { return Vxl::InverseSqrt<Type>(MacroDot4(x,y,z,w)); }
@@ -1285,6 +1317,16 @@ namespace Vxl
 				max(v1.x, v2.x),
 				max(v1.y, v2.y),
 				max(v1.z, v2.z)
+				);
+		}
+		// Round
+		_Vector4<Type> Round()
+		{
+			return _Vector4<Type>(
+				round(x),
+				round(y),
+				round(z),
+				round(w)
 				);
 		}
 		// Clamp

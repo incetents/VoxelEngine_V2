@@ -42,9 +42,9 @@ namespace Vxl
 
 	void Inspector::Draw()
 	{
-		if (Editor.GetSelectedEntities().size() == 1)
+		if (Editor.m_selectedEntities.size() == 1)
 		{
-			auto Entity = Editor.GetSelectedEntities()[0];
+			auto Entity = Editor.m_selectedEntities[0];
 
 			// Name
 			static char Name[MAX_ENTITY_NAME_LENGTH];

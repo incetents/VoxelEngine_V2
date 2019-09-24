@@ -78,9 +78,9 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		ImGui::Checkbox("ControlAxisLocal", &Editor.m_controlAxisLocal);
+		//ImGui::Checkbox("Pibot", &Editor.m_controlAxisLocal);
 
-		ImGui::Separator();
+		//ImGui::Separator();
 
 		ImGui::Text("Reload Window = [F5]");
 		ImGui::Text("Reload Fullscreen FBOs = [F6]");

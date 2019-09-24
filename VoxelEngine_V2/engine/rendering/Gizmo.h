@@ -14,13 +14,20 @@ namespace Vxl
 
 	class Gizmo
 	{
-	private:
+	public:
 		// Internal Data
 		static FramebufferObject*	m_fbo;
+		float						m_dragPrev = 0.0f;
 		float						m_dragAmount = 0.0f;
 		Vector3						m_targetNormal;
 		Vector3						m_dragStart;
 		Vector3						m_dragEnd;
+		bool						m_selected = false;
+		bool						m_clicked = false;
+
+		std::vector<Vector3>	m_worldPositionStorage;
+		std::vector<float>		m_worldScaleStorage;
+		float					m_degreeStorage;
 
 		// Utility
 		Vector3 CameraRayHitPlane(const Vector3& normal);
@@ -56,13 +63,26 @@ namespace Vxl
 		// Selection Info
 		Axis  m_selectedAxis = Axis::NONE;
 		Axis  m_selectedPlane = Axis::NONE;
-		bool  m_selected = false;
-		bool  m_clicked = false;
+		
 		bool  m_pivotAxisAligned = false; // Force Gizmo to always be aligned to axis [Doesn't work for scale]
-	
+		bool  m_translateSnapping = false;
+		float m_translateSnapAmount = 1.0f;
+		bool  m_rotateSnapping = false;
+		float m_rotateSnappingAmount = 45.0f;
+
+		// Utility
+		inline bool IsSelected(void) const
+		{
+			return m_selected;
+		}
+		inline bool IsClicked(void) const
+		{
+			return m_clicked;
+		}
+
 		// Update
 		void UpdateModel(Entity& _entity);
-		void Update();
+		void Update(const std::vector<Entity*> _entities);
 
 		// Render
 		void RenderOnScreen(); // Display it Visually

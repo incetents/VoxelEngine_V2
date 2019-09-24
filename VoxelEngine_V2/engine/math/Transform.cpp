@@ -114,13 +114,8 @@ namespace Vxl
 			return *this;
 		}
 
-		// Change local position to zero
-		m_position = Vector3::ZERO;
-		// Make sure it updates model matrix correctly
-		isDirty = true;
-
-		// Apply inverse/transpose on model matrix to figure out correct local position
-		m_position = getModel().Inverse() * position;
+		// Apply inverse of parentmatrix on model matrix to figure out correct local position
+		m_position = m_parent->getModel().Inverse() * position;
 
 		SetDirty();
 		return *this;
@@ -135,7 +130,6 @@ namespace Vxl
 		}
 
 		setWorldPosition(getWorldPosition() + translate);
-
 		return *this;
 	}
 
