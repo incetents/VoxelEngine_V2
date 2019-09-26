@@ -543,36 +543,36 @@ namespace Vxl
 
 		// Selection
 		auto SelectedEntities = Editor.m_selectedEntities;
-		for (const auto& Entity : SelectedEntities)
+		for (const auto& _Entity : SelectedEntities)
 		{
-			// If appears unorthodox, selection might be disabled [ex: skybox cube]
-			if (Entity->IsSelectable())
+			// Ignore editor camera and selection might be disabled [ex: skybox cube]
+			if (_Entity->IsSelectable())
 			{
 				static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
 
-				Color4F AABB_Color = Entity->IsFamilyActive() ? Color4F::YELLOW : Color4F::GREY;
-				Color4F OBB_Color = Entity->IsFamilyActive() ? Color4F::GREEN : Color4F::GREY;
+				Color4F AABB_Color = _Entity->IsFamilyActive() ? Color4F::YELLOW : Color4F::GREY;
+				Color4F OBB_Color = _Entity->IsFamilyActive() ? Color4F::GREEN : Color4F::GREY;
 
 				// Selection for GameObjects
-				if (Entity->GetType() == EntityType::GAMEOBJECT)
+				if (_Entity->GetType() == EntityType::GAMEOBJECT)
 				{
-					Mesh* _mesh = dynamic_cast<GameObject*>(Entity)->GetMesh();
-					Vector3 EntityWorld = Entity->m_transform.getWorldPosition();
+					Mesh* _mesh = dynamic_cast<GameObject*>(_Entity)->GetMesh();
+					Vector3 EntityWorld = _Entity->m_transform.getWorldPosition();
 
 					// Draw Outline around Entity
 					if (_mesh)
 					{
 						if (_mesh->m_instances.Empty())
 						{
-							Debug.DrawLineOBB(*Entity, EntityWorld, 3.0f, OBB_Color);
-							Debug.DrawLineAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, EntityWorld, 3.0f, AABB_Color);
+							Debug.DrawLineOBB(*_Entity, EntityWorld, 3.0f, OBB_Color);
+							Debug.DrawLineAABB(_Entity->GetAABBMin() - Epsilon, _Entity->GetAABBMax() + Epsilon, EntityWorld, 3.0f, AABB_Color);
 						}
 						// Draw outline around all instances
 						else
 						{
 							//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
 							auto Instances = _mesh->m_instances.GetVertices();
-							auto EModel = Entity->m_transform.getModel();
+							auto EModel = _Entity->m_transform.getModel();
 							for (Matrix4x4& instanceMatrix : *Instances)
 							{
 								//Vector3 Pos = Vector3(instanceMatrix.Transpose() * Vector4(EntityWorld, 1));
@@ -580,29 +580,29 @@ namespace Vxl
 
 								Vector3 PosWorld = Vector3(EModel * Pos);
 
-								Debug.DrawLineOBB(*Entity, PosWorld, 3.0f, OBB_Color);
-								Debug.DrawLineAABB(Entity->GetAABBMin() - Epsilon, Entity->GetAABBMax() + Epsilon, PosWorld, 3.0f, AABB_Color);
+								Debug.DrawLineOBB(*_Entity, PosWorld, 3.0f, OBB_Color);
+								Debug.DrawLineAABB(_Entity->GetAABBMin() - Epsilon, _Entity->GetAABBMax() + Epsilon, PosWorld, 3.0f, AABB_Color);
 							}
 						}
 					}
 
 					// Draw Axis Directions
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 8.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 8.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
-					Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 8.0f, 5.0f, Color4F::RED, Color4F::RED);
+					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getForward() * 8.0f, 5.0f, Color4F::BLUE, Color4F::BLUE);
+					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getUp() * 8.0f, 5.0f, Color4F::GREEN, Color4F::GREEN);
+					//	Debug.DrawLine(EntityWorld, EntityWorld + Entity->m_transform.getRight() * 8.0f, 5.0f, Color4F::RED, Color4F::RED);
 				}
 				// Selection for Cameras
-				else if (Entity->GetType() == EntityType::CAMERA)
+				else if (_Entity->GetType() == EntityType::CAMERA)
 				{
 					//Debug.DrawOBB(*Entity, Vector3::ZERO, 5.0f, OBB_Color);
 
-					CameraObject* C = dynamic_cast<CameraObject*>(Entity);
+					CameraObject* C = dynamic_cast<CameraObject*>(_Entity);
 					C->DrawFrustum(5.0f, OBB_Color);
 				}
 				// Selection for Lights
-				else if (Entity->GetType() == EntityType::LIGHT)
+				else if (_Entity->GetType() == EntityType::LIGHT)
 				{
-					LightObject* LObject = dynamic_cast<LightObject*>(Entity);
+					LightObject* LObject = dynamic_cast<LightObject*>(_Entity);
 					
 					switch (LObject->GetLightType())
 					{
@@ -629,6 +629,21 @@ namespace Vxl
 		}
 
 		CPUTimer::EndTimer("UPDATE");
+
+		gizmo.m_pivotAxisAligned = DEVCONSOLE_GET_BOOL("PivotAxisAligned", false);
+		gizmo.m_translateSnapping = DEVCONSOLE_GET_BOOL("TranslateSnapping", false);
+		gizmo.m_rotateSnapping = DEVCONSOLE_GET_BOOL("RotateSnapping", false);
+
+		// GizmoMode
+		if (Input.getKeyDown(KeyCode::Num_1))
+			gizmo.m_mode = Gizmo::Mode::TRANSLATE;
+		if (Input.getKeyDown(KeyCode::Num_2))
+			gizmo.m_mode = Gizmo::Mode::SCALE;
+		if (Input.getKeyDown(KeyCode::Num_3))
+			gizmo.m_mode = Gizmo::Mode::ROTATE;
+
+		// Gizmo
+		gizmo.Update(Editor.m_selectedEntities);
 	}
 
 	// DO NOT DRAW IN HERE //
@@ -702,7 +717,8 @@ namespace Vxl
 		CPUTimer::EndTimer("Gbuffer");
 		GPUTimer::EndTimer();
 
-		
+		// Render GIZMO ID [Changes FBO bound]
+		gizmo.RenderIDCapture();
 
 		_fbo_editor->Bind();
 		_fbo_editor->ClearBuffers();
@@ -718,31 +734,18 @@ namespace Vxl
 		_fbo_gbuffer->GetDepthRenderTexture()->Copy(*_fbo_editor->GetDepthRenderBuffer());
 
 		//Graphics::SetDepthRead(false);
+
 		RenderManager.RenderEditorObjects();
 
 		Graphics::ClearBuffer(BufferBit::DEPTH);
-		//RenderManager.RenderEditorObjectsPostDepth(); // empty
+		
+		gizmo.RenderOnScreen();
 
-		static Gizmo gizmo;
+		RenderManager.RenderEditorObjectsPostDepth();
 
-		gizmo.m_pivotAxisAligned = DEVCONSOLE_GET_BOOL("PivotAxisAligned", false);
-		gizmo.m_translateSnapping = DEVCONSOLE_GET_BOOL("TranslateSnapping", false);
+		
 
-		// GizmoMode
-		if (Input.getKeyDown(KeyCode::Num_1))
-			gizmo.m_mode = Gizmo::Mode::TRANSLATE;
-		if (Input.getKeyDown(KeyCode::Num_2))
-			gizmo.m_mode = Gizmo::Mode::SCALE;
-		if (Input.getKeyDown(KeyCode::Num_3))
-			gizmo.m_mode = Gizmo::Mode::ROTATE;
-
-		if (Editor.m_selectedEntities.size() > 0)
-		{
-			gizmo.UpdateModel(*Editor.m_selectedEntities[0]);
-			gizmo.RenderOnScreen();
-			gizmo.RenderIDCapture();
-			gizmo.Update(Editor.m_selectedEntities);
-		}
+		
 
 		
 
@@ -779,7 +782,7 @@ namespace Vxl
 					Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
 
 					// Found an entity
-					if (SelectedEntity)
+					if (SelectedEntity && SelectedEntity->IsSelectable())
 					{
 						if (Input.getKey(KeyCode::LEFT_CONTROL))
 						{

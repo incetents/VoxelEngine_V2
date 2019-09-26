@@ -1,6 +1,8 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "../utilities/Macros.h"
+
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -8,6 +10,9 @@
 
 namespace Vxl
 {
+	template<typename Type>
+	class _Vector4;
+
 	class Color4F;
 
 	namespace Util
@@ -47,7 +52,7 @@ namespace Vxl
 			// Breaks uint into 4 uchars
 			void	 uint_to_uchars(uint32_t input, unsigned char& output1, unsigned char& output2, unsigned char& output3, unsigned char& output4);
 			// Breaks uint into 4 uchars that are converted into [0,1] floats
-			Vector4  uint_to_vec4(uint32_t input);
+			_Vector4<float>  uint_to_vec4(uint32_t input);
 			// Breaks uint into 4 uchars that are converted into [0,1] floats
 			Color4F  uint_to_color4(uint32_t input);
 			// Combines 4 uchars into 1 unsigned int

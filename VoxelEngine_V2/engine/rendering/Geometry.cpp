@@ -708,11 +708,26 @@ namespace Vxl
 		float halfSize = unitSize * 0.5f;
 
 		std::vector<Vector3> positions;
+		std::vector<Vector2> uvs;
 		std::vector<Vector3> normals;
 		positions.reserve(vertices);
+		uvs.reserve(vertices);
 		normals.reserve(vertices);
 
 		positions.push_back(vec3(0, 0, 0));
+		uvs.push_back(Vector2(0.5f, 0.5f));
+		switch (axis)
+		{
+		case Axis::X:
+			normals.push_back(Vector3::RIGHT);
+			break;
+		case Axis::Y:
+			normals.push_back(Vector3::UP);
+			break;
+		case Axis::Z:
+			normals.push_back(Vector3::FORWARD);
+			break;
+		}
 
 		for (uint32_t i = 0; i < vertices; i++)
 		{
@@ -733,11 +748,155 @@ namespace Vxl
 				positions.push_back(Vector3(cosf(t1) * halfSize, sinf(t1) * halfSize, 0));
 				normals.push_back(Vector3::FORWARD);
 			}
+			uvs.push_back(Vector2(cosf(t1) * 0.5f + 0.5f, sinf(t1) * 0.5f + 0.5f));
 		}
 		
 		_mesh->m_positions.set(positions);
+		_mesh->m_uvs.set(uvs);
 		_mesh->m_normals.set(normals);
 		_mesh->Bind(DrawType::TRIANGLE_FAN);
+		return _mesh;
+	}
+	Mesh* Geometry::GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices, float exteriorUnitSize, float interiorUnitSize)
+	{
+		Mesh* _mesh = Mesh::Create(MeshName);
+
+		float exteriorHalfSize = exteriorUnitSize * 0.5f;
+		float interiorHalfSize = interiorUnitSize * 0.5f;
+
+		float f_vertices = (float)edgeVertices - 1;
+		uint32_t count = edgeVertices - 1;
+
+		std::vector<Vector3> positions;
+		std::vector<Vector2> uvs;
+		std::vector<Vector3> normals;
+		std::vector<uint32_t> indices;
+
+		positions.reserve(count * 4);
+		uvs.reserve(count * 4);
+		normals.reserve(count * 4);
+		indices.reserve(count * 6);
+
+		for (uint32_t i = 0; i < count; i++)
+		{
+			float t1 = TWO_PI * (float)(i + 0.f) / f_vertices;
+			float t2 = TWO_PI * (float)(i + 1.f) / f_vertices;
+
+			float c1_in = cosf(t1) * interiorHalfSize;
+			float s1_in = sinf(t1) * interiorHalfSize;
+			float c1_out = cosf(t1) * exteriorHalfSize;
+			float s1_out = sinf(t1) * exteriorHalfSize;
+
+			float c2_in = cosf(t2) * interiorHalfSize;
+			float s2_in = sinf(t2) * interiorHalfSize;
+			float c2_out = cosf(t2) * exteriorHalfSize;
+			float s2_out = sinf(t2) * exteriorHalfSize;
+
+			switch (axis)
+			{
+			case Axis::X:
+				positions.push_back(Vector3(0, c1_in, s1_in));
+				positions.push_back(Vector3(0, c1_out, s1_out));
+				positions.push_back(Vector3(0, c2_out, s2_out));
+				positions.push_back(Vector3(0, c2_in, s2_in));
+
+				normals.push_back(Vector3(1, 0, 0));
+				normals.push_back(Vector3(1, 0, 0));
+				normals.push_back(Vector3(1, 0, 0));
+				normals.push_back(Vector3(1, 0, 0));
+				break;
+
+			case Axis::Y:
+				positions.push_back(Vector3(c1_in, 0, s1_in));
+				positions.push_back(Vector3(c1_out, 0, s1_out));
+				positions.push_back(Vector3(c2_out, 0, s2_out));
+				positions.push_back(Vector3(c2_in, 0, s2_in));
+
+				normals.push_back(Vector3(0, 1, 0));
+				normals.push_back(Vector3(0, 1, 0));
+				normals.push_back(Vector3(0, 1, 0));
+				normals.push_back(Vector3(0, 1, 0));
+				break;
+
+			case Axis::Z:
+				positions.push_back(Vector3(c1_in, s1_in, 0));
+				positions.push_back(Vector3(c1_out, s1_out, 0));
+				positions.push_back(Vector3(c2_out, s2_out, 0));
+				positions.push_back(Vector3(c2_in, s2_in, 0));
+
+				normals.push_back(Vector3(0, 0, 1));
+				normals.push_back(Vector3(0, 0, 1));
+				normals.push_back(Vector3(0, 0, 1));
+				normals.push_back(Vector3(0, 0, 1));
+				break;
+			}
+
+			uvs.push_back(Vector2(c1_in * 0.5f + 0.5f, s1_in * 0.5f + 0.5f));
+			uvs.push_back(Vector2(c1_out * 0.5f + 0.5f, s1_out * 0.5f + 0.5f));
+			uvs.push_back(Vector2(c2_out * 0.5f + 0.5f, s2_out * 0.5f + 0.5f));
+			uvs.push_back(Vector2(c2_in * 0.5f + 0.5f, s2_in * 0.5f + 0.5f));
+
+			indices.push_back(i * 4 + 0);
+			indices.push_back(i * 4 + 1);
+			indices.push_back(i * 4 + 2);
+			indices.push_back(i * 4 + 0);
+			indices.push_back(i * 4 + 2);
+			indices.push_back(i * 4 + 3);
+		}
+
+		
+
+		//	float f_vertices = (float)vertices - 1.f;
+		//	
+		//	std::vector<Vector3> positions;
+		//	std::vector<Vector2> uvs;
+		//	std::vector<Vector3> normals;
+		//	positions.reserve(vertices);
+		//	uvs.reserve(vertices);
+		//	normals.reserve(vertices);
+
+		//	positions.push_back(vec3(0, 0, 0));
+		//	uvs.push_back(Vector2(0.5f, 0.5f));
+		//	switch (axis)
+		//	{
+		//	case Axis::X:
+		//		normals.push_back(Vector3::RIGHT);
+		//		break;
+		//	case Axis::Y:
+		//		normals.push_back(Vector3::UP);
+		//		break;
+		//	case Axis::Z:
+		//		normals.push_back(Vector3::FORWARD);
+		//		break;
+		//	}
+		//	
+		//	for (uint32_t i = 0; i < vertices; i++)
+		//	{
+		//		float t1 = TWO_PI * (float)i / f_vertices;
+		//	
+		//		if (axis == Axis::X)
+		//		{
+		//			positions.push_back(Vector3(0, cosf(t1) * halfSize, sinf(t1) * halfSize));
+		//			normals.push_back(Vector3::RIGHT);
+		//		}
+		//		else if (axis == Axis::Y)
+		//		{
+		//			positions.push_back(Vector3(sinf(t1) * halfSize, 0, cosf(t1) * halfSize));
+		//			normals.push_back(Vector3::UP);
+		//		}
+		//		else if (axis == Axis::Z)
+		//		{
+		//			positions.push_back(Vector3(cosf(t1) * halfSize, sinf(t1) * halfSize, 0));
+		//			normals.push_back(Vector3::FORWARD);
+		//		}
+		//		uvs.push_back(Vector2(cosf(t1) * 0.5f + 0.5f, sinf(t1) * 0.5f + 0.5f));
+		//	}
+
+		_mesh->m_positions.set(positions);
+		_mesh->m_uvs.set(uvs);
+		_mesh->m_normals.set(normals);
+		_mesh->m_indices.set(indices);
+		_mesh->Bind(DrawType::TRIANGLE_STRIP);
 		return _mesh;
 	}
 
@@ -1038,8 +1197,16 @@ namespace Vxl
 
 	void Geometry::CreateCircles()
 	{
-		m_circle_x = GenerateCircle("CircleX", Axis::X, 32u, 1.0f);
-		m_circle_y = GenerateCircle("CircleY", Axis::Y, 32u, 1.0f);
-		m_circle_z = GenerateCircle("CircleZ", Axis::Z, 32u, 1.0f);
+		m_circleUnit_x = GenerateCircle("CircleUnitX", Axis::X, 32u, 1.0f);
+		m_circleUnit_y = GenerateCircle("CircleUnitY", Axis::Y, 32u, 1.0f);
+		m_circleUnit_z = GenerateCircle("CircleUnitZ", Axis::Z, 32u, 1.0f);
+
+		m_circleDouble_x = GenerateCircle("CircleDoubleX", Axis::X, 32u, 2.0f);
+		m_circleDouble_y = GenerateCircle("CircleDoubleY", Axis::Y, 32u, 2.0f);
+		m_circleDouble_z = GenerateCircle("CircleDoubleZ", Axis::Z, 32u, 2.0f);
+
+		m_doughtnut2D_x = GenerateDoughtnut2D("Doughtnut2DX", Axis::X, 32u, 2.0f, 1.5f);
+		m_doughtnut2D_y = GenerateDoughtnut2D("Doughtnut2DY", Axis::Y, 32u, 2.0f, 1.5f);
+		m_doughtnut2D_z = GenerateDoughtnut2D("Doughtnut2DZ", Axis::Z, 32u, 2.0f, 1.5f);
 	}
 }

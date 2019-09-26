@@ -48,7 +48,7 @@ namespace Vxl
 		// Editor Information
 		Color3F		m_labelColor = Color3F(1, 1, 1); // Inspector
 		bool		m_isSelectable = true; //
-		bool		m_isSelected = false; // 
+		bool		m_isSelected = false; //
 
 		// Unique IDs
 		static uint32_t m_maxUniqueID;

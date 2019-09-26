@@ -678,6 +678,20 @@ namespace Vxl
 	}
 	void RenderManager::RenderEditorObjectsPostDepth()
 	{
+		// Draw Debug Lines
+		auto lines = Material::GetAsset("lines");
+		if (lines->IsValid())
+		{
+			lines->BindProgram();
+			lines->m_property_viewport.SetProperty(Window.GetViewport());
 
+			lines->SetProperty<bool>("passthrough", false);
+
+			Graphics::SetDepthWrite(false);
+
+			Debug.RenderWorldLinesNoDepth();
+
+			Graphics::SetDepthWrite(true);
+		}
 	}
 }

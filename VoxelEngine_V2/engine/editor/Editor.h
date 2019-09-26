@@ -13,12 +13,9 @@ namespace Vxl
 	{
 	public:
 		std::vector<Entity*>	m_selectedEntities;
-		
+
 		// [true] if at least one object is selected
-		inline bool HasSelection() const
-		{
-			return m_selectedEntities.size() > 0;
-		}
+		bool HasSelection(void) const;
 		void RemoveSelection(Entity* _entity);
 		void AddSelection(Entity* _entity);
 		void ClearSelection();

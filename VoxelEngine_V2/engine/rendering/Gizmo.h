@@ -17,6 +17,7 @@ namespace Vxl
 	public:
 		// Internal Data
 		static FramebufferObject*	m_fbo;
+		bool						m_show = false;
 		float						m_dragPrev = 0.0f;
 		float						m_dragAmount = 0.0f;
 		Vector3						m_targetNormal;
@@ -25,9 +26,12 @@ namespace Vxl
 		bool						m_selected = false;
 		bool						m_clicked = false;
 
+		// Axis specific information
 		std::vector<Vector3>	m_worldPositionStorage;
 		std::vector<float>		m_worldScaleStorage;
 		float					m_degreeStorage;
+		Vector3					m_rotationDragStart;
+		bool					m_showScaleGizmo[3];
 
 		// Utility
 		Vector3 CameraRayHitPlane(const Vector3& normal);
@@ -81,7 +85,6 @@ namespace Vxl
 		}
 
 		// Update
-		void UpdateModel(Entity& _entity);
 		void Update(const std::vector<Entity*> _entities);
 
 		// Render

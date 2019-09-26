@@ -21,6 +21,14 @@ namespace Vxl
 	{
 		m_worldLines->AddLine_Vec3(P1, P2, Width, C1, C2);
 	}
+	void Debug::DrawLineNoDepth(
+		const Vector3& P1, const Vector3& P2,
+		float Width,
+		const Color4F& C1, const Color4F& C2
+	)
+	{
+		m_worldLinesNoDepth->AddLine_Vec3(P1, P2, Width, C1, C2);
+	}
 	void Debug::DrawLineAABB(
 		const Vector3& Min, const Vector3& Max,
 		const Vector3& OffsetAll,
@@ -166,6 +174,20 @@ namespace Vxl
 		}
 	}
 
+	void Debug::RenderWorldLinesNoDepth()
+	{
+		// If vertex index is at start, nothing is being drawn anyways
+		if (m_worldLinesNoDepth->m_mesh->m_vertexIndex > 0)
+		{
+			m_worldLinesNoDepth->m_mesh->m_buffer.setVerticesDirty(m_worldLinesNoDepth->m_mesh->m_resizeDirty);
+			m_worldLinesNoDepth->m_mesh->m_resizeDirty = false;
+
+			m_worldLinesNoDepth->m_mesh->Bind();
+
+			m_worldLinesNoDepth->m_mesh->Draw();
+		}
+	}
+
 	void Debug::RenderScreenLines()
 	{
 		// If vertex index is at start, nothing is being drawn anyways
@@ -185,6 +207,9 @@ namespace Vxl
 		// reset index flag
 		m_worldLines->m_mesh->m_vertexIndex = 0;
 		m_worldLines->m_mesh->m_buffer.setZeroes();
+
+		m_worldLinesNoDepth->m_mesh->m_vertexIndex = 0;
+		m_worldLinesNoDepth->m_mesh->m_buffer.setZeroes();
 
 		m_screenLines->m_mesh->m_vertexIndex = 0;
 		m_screenLines->m_mesh->m_buffer.setZeroes();

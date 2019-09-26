@@ -3,6 +3,8 @@
 
 #include "../engine/modules/Scene.h"
 
+#include "../engine/rendering/Gizmo.h"
+
 static int SCREEN_WIDTH = 1600;
 static int SCREEN_HEIGHT = 900;
 
@@ -55,6 +57,8 @@ namespace Vxl
 		Material* material_colorPicker;
 		Material* material_font;
 		Material* material_showNormals;
+
+		Gizmo gizmo;
 
 		bool ShowNormal_DEV = false;
 		bool ShowDepth_DEV = false;

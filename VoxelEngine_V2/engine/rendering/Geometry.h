@@ -34,6 +34,7 @@ namespace Vxl
 		Mesh* GenerateCube(const std::string& MeshName, float unitSize = 1.0f);
 		Mesh* GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f);
 		Mesh* GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
+		Mesh* GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
 
 	private:
 		bool m_isSetup = false;
@@ -63,9 +64,15 @@ namespace Vxl
 		Mesh* m_arrow_x = nullptr;
 		Mesh* m_arrow_y = nullptr;
 		Mesh* m_arrow_z = nullptr;
-		Mesh* m_circle_x = nullptr;
-		Mesh* m_circle_y = nullptr;
-		Mesh* m_circle_z = nullptr;
+		Mesh* m_circleUnit_x = nullptr; // Radius = 0.5f
+		Mesh* m_circleUnit_y = nullptr; // Radius = 0.5f
+		Mesh* m_circleUnit_z = nullptr; // Radius = 0.5f
+		Mesh* m_circleDouble_x = nullptr; // Radius = 1.0f
+		Mesh* m_circleDouble_y = nullptr; // Radius = 1.0f
+		Mesh* m_circleDouble_z = nullptr; // Radius = 1.0f
+		Mesh* m_doughtnut2D_x = nullptr; // Radius = 1.0f
+		Mesh* m_doughtnut2D_y = nullptr; // Radius = 1.0f
+		Mesh* m_doughtnut2D_z = nullptr; // Radius = 1.0f
 
 		void CreateFullQuad();
 		void CreateFullTriangle();
@@ -219,17 +226,41 @@ namespace Vxl
 		{
 			return m_arrow_z;
 		}
-		Mesh* GetCircleX()
+		Mesh* GetCircleX_Unit()
 		{
-			return m_circle_x;
+			return m_circleUnit_x;
 		}
-		Mesh* GetCircleY()
+		Mesh* GetCircleY_Unit()
 		{
-			return m_circle_y;
+			return m_circleUnit_y;
 		}
-		Mesh* GetCircleZ()
+		Mesh* GetCircleZ_Unit()
 		{
-			return m_circle_z;
+			return m_circleUnit_z;
+		}
+		Mesh* GetCircleX_Double()
+		{
+			return m_circleDouble_x;
+		}
+		Mesh* GetCircleY_Double()
+		{
+			return m_circleDouble_y;
+		}
+		Mesh* GetCircleZ_Double()
+		{
+			return m_circleDouble_z;
+		}
+		Mesh* GetDoughtnutX_2D()
+		{
+			return m_doughtnut2D_x;
+		}
+		Mesh* GetDoughtnutY_2D()
+		{
+			return m_doughtnut2D_y;
+		}
+		Mesh* GetDoughtnutZ_2D()
+		{
+			return m_doughtnut2D_z;
 		}
 
 	} SingletonInstance(Geometry);

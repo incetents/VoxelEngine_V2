@@ -42,7 +42,7 @@ namespace Vxl
 
 	void Inspector::Draw()
 	{
-		if (Editor.m_selectedEntities.size() == 1)
+		if (Editor.HasSelection())
 		{
 			auto Entity = Editor.m_selectedEntities[0];
 
@@ -52,13 +52,14 @@ namespace Vxl
 
 			ImGui::Text("Name: "); ImGui::SameLine();
 
+			// ~ Naming Scheme
 			ImGui::PushItemWidth(-1);
+
+			// New Name
 			if (ImGui::InputText("input text", Name, IM_ARRAYSIZE(Name), ImGuiInputTextFlags_EnterReturnsTrue))
 			{
 				Entity->Rename(std::string(Name));
 			}
-
-			//	Entity->SetDisplayName(std::string(Name));
 
 			// ID
 			ImGui::TextColored(ImGuiColor::Orange, "ID: %d", Entity->GetUniqueID());
@@ -74,7 +75,9 @@ namespace Vxl
 				Entity->SetLabelColor(Color3F(EntityColor[0], EntityColor[1], EntityColor[2]));
 			}
 
+			// ~ Naming Scheme
 			ImGui::PopItemWidth();
+
 			if (ImGui::Button("Copy Color"))
 			{
 				LabelColorClipboard.r = EntityColor[0];

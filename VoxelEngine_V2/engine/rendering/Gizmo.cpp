@@ -7,6 +7,7 @@
 #include "../rendering/FramebufferObject.h"
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
+#include "../rendering/Debug.h"
 #include "../objects/CameraObject.h"
 #include "../math/Raycast.h"
 #include "../window/window.h"
@@ -68,13 +69,45 @@ namespace Vxl
 	}
 
 	// Update
-	void Gizmo::UpdateModel(Entity& _entity)
+	void Gizmo::Update(const std::vector<Entity*> _entities)
 	{
-		// Store World Position
-		m_transform.WorldPosition = _entity.m_transform.getWorldPosition();
+		// If only 1 Entity and its the EditorCamera, ignore it
+		if (_entities.size() == 0 || _entities.size() == 1 && _entities[0] == (Entity*)RenderManager.GetMainCamera())
+		{
+			m_show = false;
+			return;
+		}
+
+		// Show
+		m_show = true;
+
+		// Don't move Gizmo while clicking [unless it's translation]
+		if (!m_clicked || m_mode == Mode::TRANSLATE)
+		{
+			// Update Average Selection Position
+			Vector3 AverageSelection = Vector3::ZERO;
+			uint32_t count = _entities.size();
+			for (const auto& _Entity : _entities)
+			{
+				// Don't Account for Editor Camera
+				if (_Entity == (Entity*)RenderManager.GetMainCamera())
+					count--;
+				else
+					AverageSelection += _Entity->m_transform.getWorldPosition();
+			}
+
+			if (count)
+			{
+				float invaTotal = 1.0f / (float)count;
+				AverageSelection *= invaTotal;
+			}
+
+			// Store World Position
+			m_transform.WorldPosition = AverageSelection;// _entity.m_transform.getWorldPosition();
+		}
 
 		// Set Axis-Aligned Pivot
-		if((m_pivotAxisAligned && m_mode != Mode::SCALE) || (m_mode == Mode::TRANSLATE && m_translateSnapping))
+		if ((m_pivotAxisAligned && m_mode != Mode::SCALE) || (m_mode == Mode::TRANSLATE && m_translateSnapping))
 		{
 			m_transform.Model = Matrix4x4::GetTranslate(m_transform.WorldPosition);
 			m_transform.Forward = Vector3::FORWARD;
@@ -85,14 +118,13 @@ namespace Vxl
 		// Set Local Pivot
 		else
 		{
-			Matrix3x3 RotationMatrix = _entity.m_transform.getWorldRotation().GetMatrix3x3();
+			Matrix3x3 RotationMatrix = _entities[0]->m_transform.getWorldRotation().GetMatrix3x3();
 
 			m_transform.Model = Matrix4x4(RotationMatrix, m_transform.WorldPosition);
-			m_transform.Forward = _entity.m_transform.getForward();
-			m_transform.Up = _entity.m_transform.getUp();
-			m_transform.Right = _entity.m_transform.getRight();
+			m_transform.Forward = _entities[0]->m_transform.getForward();
+			m_transform.Up = _entities[0]->m_transform.getUp();
+			m_transform.Right = _entities[0]->m_transform.getRight();
 		}
-		
 
 		// ~~ Visual Displacements based on mode ~~ //
 
@@ -130,9 +162,18 @@ namespace Vxl
 				Z_Offset = m_selectedAxis == Axis::Z ? Vector3(0, 0, m_dragAmount) : Vector3::FORWARD;
 			}
 		}
-	}
-	void Gizmo::Update(const std::vector<Entity*> _entities)
-	{
+		// Rotation, figure out if axis can be seen
+		else
+		{
+			// If Camera can see Axis
+			Vector3 ModelToCamera = (RenderManager.GetMainCamera()->m_transform.getWorldPosition() - m_transform.WorldPosition).Normalize();
+
+			// X Circle //
+			m_showScaleGizmo[0] = (fabs(m_transform.Right.Dot(ModelToCamera)) > 0.05f);
+			m_showScaleGizmo[1] = (fabs(m_transform.Up.Dot(ModelToCamera)) > 0.05f);
+			m_showScaleGizmo[2] = (fabs(m_transform.Forward.Dot(ModelToCamera)) > 0.05f);
+		}
+
 		// No Selection
 		if (!Input.getMouseButton(MouseButton::LEFT))
 		{
@@ -199,12 +240,8 @@ namespace Vxl
 				{
 					m_dragAmount = 1.0f;
 
-					// Clip Space position for Gizmo
-					Matrix4x4 MVP = RenderManager.GetMainCamera()->getViewProjection() * m_transform.Model;
-
-					// Center of Gizmo
-					Vector4 SelectionCenter = MVP.GetColumn(3); // Same as MVP * Vector4(0, 0, 0, 1);
-					m_dragStart = (SelectionCenter / SelectionCenter.w).GetVector3(); // [-1 to +1] Range for XYZ
+					// Get Mouse position in -1 to +1 range of screen
+					m_dragStart = Input.getMousePosScreenspace(true);
 				}
 				// Selecting Axis
 				else if (m_selectedAxis != Axis::NONE)
@@ -239,6 +276,7 @@ namespace Vxl
 				// Direction Click
 				m_targetNormal = GetGizmoDirection(m_selectedPlane);
 				m_dragStart = (CameraRayHitPlane(m_targetNormal) - m_transform.WorldPosition).NormalizeAccurate();
+				m_rotationDragStart = m_dragStart;
 			}
 			break;
 			}
@@ -262,6 +300,10 @@ namespace Vxl
 					uint32_t _entityCount = (uint32_t)_entities.size();
 					for (uint32_t i = 0; i < _entityCount; i++)
 					{
+						// Don't Translate Editor Camera
+						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
+							continue;
+
 						Vector3 Target = m_worldPositionStorage[i] + (m_dragEnd - m_dragStart);
 						_entities[i]->m_transform.setWorldPosition(Target);
 					}
@@ -284,6 +326,10 @@ namespace Vxl
 					uint32_t _entityCount = (uint32_t)_entities.size();
 					for (uint32_t i = 0; i < _entityCount; i++)
 					{
+						// Don't Translate Editor Camera
+						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
+							continue;
+
 						// Target Position
 						Vector3 Target = m_worldPositionStorage[i] -Direction.NormalizeAccurate() * (totalDrag);
 						// Snap to World
@@ -310,8 +356,6 @@ namespace Vxl
 					// Distance from mouse to center point of Gizmo
 					Vector2 MouseDelta = MouseScreenSpace - Vector2(m_dragStart);
 					float Distance = MouseDelta.x + MouseDelta.y + 1.0f;
-
-					std::cout << Distance << std::endl;
 
 					// Scale everything based on distance
 					uint32_t selectionCount = (uint32_t)_entities.size();
@@ -395,6 +439,10 @@ namespace Vxl
 					uint32_t selectionCount = (uint32_t)_entities.size();
 					for (uint32_t i = 0; i < selectionCount; i++)
 					{
+						// Don't Rotate Editor Camera
+						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
+							continue;
+
 						_entities[i]->m_transform.rotateAroundAxis(m_targetNormal, degrees);
 					}
 					// Update previous rotation
@@ -411,6 +459,9 @@ namespace Vxl
 	// Render
 	void Gizmo::RenderOnScreen()
 	{
+		if (!m_show)
+			return;
+
 		auto simpleLight = Material::GetAsset("simpleLight");
 		if (simpleLight->IsValid())
 		{
@@ -423,6 +474,8 @@ namespace Vxl
 			// Movement //
 			if (m_mode == Mode::TRANSLATE)
 			{
+				simpleLight->SetProperty("ignoreLight", false);
+
 				// X Axis //
 				if (m_selectedAxis == Axis::X)
 					if (m_clicked)
@@ -517,6 +570,18 @@ namespace Vxl
 			}
 			else if (m_mode == Mode::SCALE)
 			{
+				simpleLight->SetProperty("ignoreLight", false);
+
+				// Gizmo Additional Debug Lines
+				float XLineLength = (m_clicked && m_selectedAxis == Axis::X) ? m_dragAmount : 1.0f;
+				float YLineLength = (m_clicked && m_selectedAxis == Axis::Y) ? m_dragAmount : 1.0f;
+				float ZLineLength = (m_clicked && m_selectedAxis == Axis::Z) ? m_dragAmount : 1.0f;
+
+				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Right * XLineLength, 5.0f, Color4F::RED, Color4F::RED);
+				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Up * YLineLength, 5.0f, Color4F::GREEN, Color4F::GREEN);
+				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Forward * ZLineLength, 5.0f, Color4F::BLUE, Color4F::BLUE);
+				
+
 				// X Cube //
 				Matrix4x4 X_Model = m_transform.Model * Matrix4x4::GetTranslate(X_Offset);
 				simpleLight->m_property_model.SetPropertyMatrix(X_Model, true);
@@ -576,43 +641,68 @@ namespace Vxl
 			}
 			else if (m_mode == Mode::ROTATE)
 			{
+				simpleLight->SetProperty("ignoreLight", true);
+
+				// Draw Drag Directions
+				if (m_clicked)
+				{
+					Color4F LineColor = Color4F::RED;
+					if (m_selectedPlane == Axis::Y)
+						LineColor = Color4F::GREEN;
+					else if (m_selectedPlane == Axis::Z)
+						LineColor = Color4F::BLUE;
+
+					Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_rotationDragStart * 2.0f, 5.0f, LineColor, LineColor);
+					Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_dragEnd * 2.0f, 5.0f, LineColor, LineColor);
+				}
+
+				//
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
 				// X Circle //
-				simpleLight->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				if (m_selectedPlane == Axis::X)
-					if (m_clicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+				if (m_showScaleGizmo[0])
+				{
+					simpleLight->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+					if (m_selectedPlane == Axis::X)
+						if (m_clicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::RED);
+						simpleLight->m_property_color.SetProperty(Color3F::RED);
 
-				Geometry.GetCircleX()->Draw();
+					Geometry.GetDoughtnutX_2D()->Draw();
+				}
 
 				// Y Circle //
-				simpleLight->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				if (m_selectedPlane == Axis::Y)
-					if (m_clicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+				if (m_showScaleGizmo[1])
+				{
+					simpleLight->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+					if (m_selectedPlane == Axis::Y)
+						if (m_clicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::GREEN);
+						simpleLight->m_property_color.SetProperty(Color3F::GREEN);
 
-				Geometry.GetCircleY()->Draw();
+					Geometry.GetDoughtnutY_2D()->Draw();
+				}
 
 				// Z Circle //
-				simpleLight->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				if (m_selectedPlane == Axis::Z)
-					if (m_clicked)
-						simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+				if (m_showScaleGizmo[2])
+				{
+					simpleLight->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+					if (m_selectedPlane == Axis::Z)
+						if (m_clicked)
+							simpleLight->m_property_color.SetProperty(Color3F::WHITE);
+						else
+							simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
 					else
-						simpleLight->m_property_color.SetProperty(Color3F::YELLOW);
-				else
-					simpleLight->m_property_color.SetProperty(Color3F::BLUE);
+						simpleLight->m_property_color.SetProperty(Color3F::BLUE);
 
-				Geometry.GetCircleZ()->Draw();
+					Geometry.GetDoughtnutZ_2D()->Draw();
+				}
 
 				// revert
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
@@ -621,7 +711,7 @@ namespace Vxl
 	}
 	void Gizmo::RenderIDCapture()
 	{
-		if (m_clicked)
+		if (m_clicked || !m_show)
 			return;
 
 		// Make sure Cursor is available
@@ -805,22 +895,31 @@ namespace Vxl
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
 				// X Circle
-				color = Util::Conversion::uint_to_color4(1u);
-				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetCircleX()->Draw();
+				if (m_showScaleGizmo[0])
+				{
+					color = Util::Conversion::uint_to_color4(1u);
+					material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+					material_colorPicker->m_property_output.SetProperty(color);
+					Geometry.GetDoughtnutX_2D()->Draw();
+				}
 
 				// Y Circle
-				color = Util::Conversion::uint_to_color4(2u);
-				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetCircleY()->Draw();
+				if (m_showScaleGizmo[1])
+				{
+					color = Util::Conversion::uint_to_color4(2u);
+					material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+					material_colorPicker->m_property_output.SetProperty(color);
+					Geometry.GetDoughtnutY_2D()->Draw();
+				}
 
 				// Z Circle
-				color = Util::Conversion::uint_to_color4(3u);
-				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetCircleZ()->Draw();
+				if (m_showScaleGizmo[2])
+				{
+					color = Util::Conversion::uint_to_color4(3u);
+					material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+					material_colorPicker->m_property_output.SetProperty(color);
+					Geometry.GetDoughtnutZ_2D()->Draw();
+				}
 
 				// Revert
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
@@ -847,10 +946,10 @@ namespace Vxl
 						break;
 					}
 				}
-
 				m_selected = (m_selectedPlane != Axis::NONE);
 				m_selectedAxis = Axis::NONE;
 			}
+
 		}
 		// Force no selection
 		else

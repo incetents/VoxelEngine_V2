@@ -3,9 +3,14 @@
 
 #include "Editor.h"
 #include "../modules/Entity.h"
+#include "../rendering/RenderManager.h"
 
 namespace Vxl
 {
+	bool Editor::HasSelection(void) const
+	{
+		return m_selectedEntities.size() > 0;
+	}
 	void Editor::RemoveSelection(Entity* _entity)
 	{
 		Util::RemoveFromVector(m_selectedEntities, _entity);
@@ -15,8 +20,8 @@ namespace Vxl
 	{
 		VXL_ASSERT(_entity, "Adding nullptr in Editor::AddSelection");
 
-		for (auto Entity : m_selectedEntities)
-			if (Entity == _entity)
+		for (const auto& _Entity : m_selectedEntities)
+			if (_Entity == _entity)
 				return;
 
 		m_selectedEntities.push_back(_entity);

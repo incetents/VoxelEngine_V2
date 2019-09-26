@@ -135,6 +135,7 @@ namespace Vxl
 	private:
 		// Debug Lines in world space
 		LineSet* m_worldLines = nullptr;
+		LineSet* m_worldLinesNoDepth = nullptr;
 		// Debug Lines in screen space
 		LineSet* m_screenLines = nullptr;
 
@@ -152,6 +153,7 @@ namespace Vxl
 		void InitGLResources()
 		{
 			m_worldLines  = new LineSet(true);
+			m_worldLinesNoDepth = new LineSet(true);
 			m_screenLines = new LineSet(false);
 
 			CreateDebugTextures();
@@ -159,6 +161,7 @@ namespace Vxl
 		void DestroyGLResources()
 		{
 			delete m_worldLines;
+			delete m_worldLinesNoDepth;
 			delete m_screenLines;
 
 			// Texture auto cleaned up
@@ -166,6 +169,11 @@ namespace Vxl
 
 		// Line Drawing
 		void DrawLine(
+			const Vector3& P1, const Vector3& P2,
+			float Width,
+			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
+		);
+		void DrawLineNoDepth(
 			const Vector3& P1, const Vector3& P2,
 			float Width,
 			const Color4F& C1 = Color4F(1, 1, 1, 1), const Color4F& C2 = Color4F(1, 1, 1, 1)
@@ -225,6 +233,7 @@ namespace Vxl
 		
 		// Rendering
 		void RenderWorldLines();
+		void RenderWorldLinesNoDepth();
 		void RenderScreenLines();
 		void End();
 
