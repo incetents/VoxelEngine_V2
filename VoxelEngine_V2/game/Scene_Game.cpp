@@ -776,7 +776,6 @@ namespace Vxl
 				{
 
 					unsigned int EntityIndex = Util::Conversion::uchars_to_uint(data.start);
-					//std::cout << "Unique ID: " << EntityIndex << std::endl;
 					data.Deallocate();
 
 					Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);

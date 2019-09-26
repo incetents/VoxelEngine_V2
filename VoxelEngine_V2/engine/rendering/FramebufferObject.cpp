@@ -499,6 +499,8 @@ namespace Vxl
 		if (x < 0 || y < 0 || x >= (int)m_width || y >= (int)m_height)
 			return RawArray<uint8_t>();
 
+		//std::cout << x << ' ' << y << std::endl;
+
 		VXL_ASSERT(HasAttachment(_attachmentIndex), "FBO readpixels, missing attachment to read from");
 
 		if(m_textures[_attachmentIndex].IsRenderTexture())
@@ -509,7 +511,7 @@ namespace Vxl
 	RawArray<uint8_t> FramebufferObject::readPixelsFromMouse(uint32_t _attachmentIndex, int w, int h)
 	{
 		return readPixels(
-			_attachmentIndex, Input.getMousePosX(), Window.GetWindowHeight() - Input.getMousePosY(), w, h);
+			_attachmentIndex, Input.getMousePosViewportX() * m_width, Input.getMousePosViewportY() * m_height, w, h);
 	}
 
 	RawArray<uint8_t> FramebufferObject::readDepthPixels(int x, int y, int w, int h)
@@ -532,6 +534,6 @@ namespace Vxl
 	RawArray<uint8_t> FramebufferObject::readDepthPixelsFromMouse(int w, int h)
 	{
 		return readDepthPixels(
-			Input.getMousePosX(), Window.GetWindowHeight() - Input.getMousePosY(), w, h);
+			Input.getMousePosViewportX() * m_width, Input.getMousePosViewportY() * m_height, w, h);
 	}
 }
