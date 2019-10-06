@@ -19,7 +19,8 @@ lines_frag 	./assets/shaders/lines.frag
 
 colorPicker_frag 	./assets/shaders/colorPicker.frag
 
-simpleLight_frag 	./assets/shaders/simpleLight.frag
+gizmo_vert 	./assets/shaders/gizmo.vert
+gizmo_frag 	./assets/shaders/gizmo.frag
 
 showRenderTarget  ./assets/shaders/showRenderTarget.frag
 
@@ -44,7 +45,7 @@ showRenderTarget 	passthrough_vert 			showRenderTarget
 gbuffer				gbuffer_vert				gbuffer_frag
 passthroughWorld 	gbuffer_vert				passthrough_frag
 passthrough 		passthrough_vert			passthrough_frag
-simpleLight 		gbuffer_vert				simpleLight_frag
+gizmo 				gizmo_vert					gizmo_frag
 skybox				skybox_vert					skybox_frag
 lines 				lines_vert					lines_geom 				lines_frag
 colorPicker 		gbuffer_vert 				colorPicker_frag

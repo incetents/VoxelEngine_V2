@@ -188,6 +188,7 @@ namespace Vxl
 
 		// Behaviour
 		virtual void Update(void) = 0;
+		virtual void DrawSelection(void) {}
 		virtual void Draw(void) = 0;
 	protected:
 		virtual void TransformChanged(void) = 0;

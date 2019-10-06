@@ -507,39 +507,39 @@ namespace Vxl
 		_mesh->Bind();
 		return _mesh;
 	}
-	Mesh* Geometry::GenerateCube(const std::string& MeshName, float unitSize)
+	Mesh* Geometry::GenerateCube(const std::string& MeshName, float unitSize, const Vector3& offset)
 	{
 		Vector3 pos[] = {
 			// Front Face
-			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
-			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
-			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
-			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize) + offset,
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize) + offset,
 			//
-			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
-			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize) + offset,
 			//
-			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
-			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize) + offset,
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize) + offset,
 			//
-			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
-			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize) + offset,
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize) + offset,
 			//
-			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
-			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
-			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
-			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize) + offset,
+			Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize) + offset,
 			//
-			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize),
-			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize),
-			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize),
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, -0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.5f * unitSize) + offset,
+			Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.5f * unitSize) + offset,
 		};
 		Vector2 uvs[] = {
 			//
@@ -625,7 +625,7 @@ namespace Vxl
 		_mesh->Bind();
 		return _mesh;
 	}
-	Mesh* Geometry::GenerateQuad(const std::string& MeshName, Axis axis, float unitSize)
+	Mesh* Geometry::GenerateQuad(const std::string& MeshName, Axis axis, float unitSize, const Vector3& offset)
 	{
 		Vector2 uvs[] = {
 			Vector2(0, 0),
@@ -641,10 +641,10 @@ namespace Vxl
 		if (axis == Axis::X)
 		{
 			Vector3 pos[] = {
-				Vector3(+0.0f, -0.5f * unitSize, +0.5f * unitSize),
-				Vector3(+0.0f, -0.5f * unitSize, -0.5f * unitSize),
-				Vector3(+0.0f, +0.5f * unitSize, -0.5f * unitSize),
-				Vector3(+0.0f, +0.5f * unitSize, +0.5f * unitSize)
+				Vector3(+0.0f, -0.5f * unitSize, +0.5f * unitSize) + offset,
+				Vector3(+0.0f, -0.5f * unitSize, -0.5f * unitSize) + offset,
+				Vector3(+0.0f, +0.5f * unitSize, -0.5f * unitSize) + offset,
+				Vector3(+0.0f, +0.5f * unitSize, +0.5f * unitSize) + offset
 			};
 			_mesh->m_positions.set(pos, 4);
 
@@ -659,10 +659,10 @@ namespace Vxl
 		else if (axis == Axis::Y)
 		{
 			Vector3 pos[] = {
-				Vector3(-0.5f * unitSize, 0, +0.5f * unitSize),
-				Vector3(+0.5f * unitSize, 0, +0.5f * unitSize),
-				Vector3(+0.5f * unitSize, 0, -0.5f * unitSize),
-				Vector3(-0.5f * unitSize, 0, -0.5f * unitSize)
+				Vector3(-0.5f * unitSize, 0, +0.5f * unitSize) + offset,
+				Vector3(+0.5f * unitSize, 0, +0.5f * unitSize) + offset,
+				Vector3(+0.5f * unitSize, 0, -0.5f * unitSize) + offset,
+				Vector3(-0.5f * unitSize, 0, -0.5f * unitSize) + offset
 			};
 			_mesh->m_positions.set(pos, 4);
 
@@ -677,10 +677,10 @@ namespace Vxl
 		else if (axis == Axis::Z)
 		{
 			Vector3 pos[] = {
-				Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.0f),
-				Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.0f),
-				Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.0f),
-				Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.0f),
+				Vector3(-0.5f * unitSize, -0.5f * unitSize, +0.0f) + offset,
+				Vector3(+0.5f * unitSize, -0.5f * unitSize, +0.0f) + offset,
+				Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.0f) + offset,
+				Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.0f) + offset,
 			};
 			_mesh->m_positions.set(pos, 4);
 
@@ -843,54 +843,6 @@ namespace Vxl
 			indices.push_back(i * 4 + 2);
 			indices.push_back(i * 4 + 3);
 		}
-
-		
-
-		//	float f_vertices = (float)vertices - 1.f;
-		//	
-		//	std::vector<Vector3> positions;
-		//	std::vector<Vector2> uvs;
-		//	std::vector<Vector3> normals;
-		//	positions.reserve(vertices);
-		//	uvs.reserve(vertices);
-		//	normals.reserve(vertices);
-
-		//	positions.push_back(vec3(0, 0, 0));
-		//	uvs.push_back(Vector2(0.5f, 0.5f));
-		//	switch (axis)
-		//	{
-		//	case Axis::X:
-		//		normals.push_back(Vector3::RIGHT);
-		//		break;
-		//	case Axis::Y:
-		//		normals.push_back(Vector3::UP);
-		//		break;
-		//	case Axis::Z:
-		//		normals.push_back(Vector3::FORWARD);
-		//		break;
-		//	}
-		//	
-		//	for (uint32_t i = 0; i < vertices; i++)
-		//	{
-		//		float t1 = TWO_PI * (float)i / f_vertices;
-		//	
-		//		if (axis == Axis::X)
-		//		{
-		//			positions.push_back(Vector3(0, cosf(t1) * halfSize, sinf(t1) * halfSize));
-		//			normals.push_back(Vector3::RIGHT);
-		//		}
-		//		else if (axis == Axis::Y)
-		//		{
-		//			positions.push_back(Vector3(sinf(t1) * halfSize, 0, cosf(t1) * halfSize));
-		//			normals.push_back(Vector3::UP);
-		//		}
-		//		else if (axis == Axis::Z)
-		//		{
-		//			positions.push_back(Vector3(cosf(t1) * halfSize, sinf(t1) * halfSize, 0));
-		//			normals.push_back(Vector3::FORWARD);
-		//		}
-		//		uvs.push_back(Vector2(cosf(t1) * 0.5f + 0.5f, sinf(t1) * 0.5f + 0.5f));
-		//	}
 
 		_mesh->m_positions.set(positions);
 		_mesh->m_uvs.set(uvs);

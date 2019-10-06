@@ -162,7 +162,10 @@ namespace Vxl
 	{
 		Mesh* _mesh = new Mesh(name);
 
-		AddNamedAsset(name, _mesh, AssetMessage::CREATED);
+		if (name.empty())
+			AddUnnamedAsset(_mesh, AssetMessage::CREATED);
+		else
+			AddNamedAsset(name, _mesh, AssetMessage::CREATED);
 
 		return _mesh;
 	}
@@ -170,7 +173,10 @@ namespace Vxl
 	{
 		Mesh* _mesh = new Mesh(name);
 
-		AddNamedAsset(name, _mesh, AssetMessage::CREATED);
+		if (name.empty())
+			AddUnnamedAsset(_mesh, AssetMessage::CREATED);
+		else
+			AddNamedAsset(name, _mesh, AssetMessage::CREATED);
 
 		_mesh->Set(_model);
 

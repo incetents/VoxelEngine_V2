@@ -5,6 +5,7 @@
 #include "../rendering/RenderManager.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/Geometry.h"
+#include "../rendering/Debug.h"
 
 namespace Vxl
 {
@@ -60,6 +61,19 @@ namespace Vxl
 	void LightObject::Update()
 	{
 
+	}
+
+	void LightObject::DrawSelection()
+	{
+		switch (GetLightType())
+		{
+			case Light::Type::POINT:
+			{
+				Light_Point* _light = (Light_Point*)m_data;
+				Debug.DrawWireframeSphere(m_transform.getWorldPosition(), Vector3(_light->m_radius), Color4F(_light->m_color, 0.1f));
+				break;
+			}
+		}
 	}
 
 	void LightObject::Draw()

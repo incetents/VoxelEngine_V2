@@ -5,8 +5,8 @@
 
 #include "../engine/rendering/Gizmo.h"
 
-static int SCREEN_WIDTH = 1600;
-static int SCREEN_HEIGHT = 900;
+static int SCREEN_WIDTH = 720;
+static int SCREEN_HEIGHT = 480;
 
 namespace Vxl
 {

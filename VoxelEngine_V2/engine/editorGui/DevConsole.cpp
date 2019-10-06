@@ -130,14 +130,14 @@ namespace Vxl
 		{
 			ImGui::BeginChild("Resolutions", ImVec2(0, 150), true);
 			{
-				for (unsigned int i = 0; i < Util::ResolutionInfo::VariationsCount; i++)
+				for (unsigned int i = 0; i < Util::m_commonResolutionsCount; i++)
 				{
-					std::string Name = "Set Size: " + Util::ResolutionInfo::Variations[i].StrFormat;
+					std::string Name = "Set Size: " + std::string(Util::m_commonResolutionsStr[i]);
 					if (ImGui::Button(Name.c_str()))
 					{
 						Window.SetSize(
-							Util::ResolutionInfo::Variations[i].Width,
-							Util::ResolutionInfo::Variations[i].Height
+							Util::m_commonResolutions[i].first,
+							Util::m_commonResolutions[i].second
 						);
 					}
 				}
@@ -154,11 +154,11 @@ namespace Vxl
 					Window.SetCustomAspectRatio(false);
 				}
 
-				for (unsigned int i = 0; i < Util::AspectRatioInfo::VariationsCount; i++)
+				for(uint32_t i = 0; i < Util::m_commonAspectRatiosCount; i++)
 				{
-					if (ImGui::Button(Util::AspectRatioInfo::Variations[i].StrFormat.c_str()))
+					if (ImGui::Button(Util::m_commonAspectRatiosStr[i]))
 					{
-						Window.SetCustomAspectRatio(true, Util::AspectRatioInfo::Variations[i].AspectRatio);
+						Window.SetCustomAspectRatio(true, Util::m_commonAspectRatios[i]);
 					}
 				}
 			}

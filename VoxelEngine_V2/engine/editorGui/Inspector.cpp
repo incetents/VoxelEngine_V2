@@ -163,11 +163,16 @@ namespace Vxl
 
 				ImGui::Separator();
 
-				// World Read Only //
-				ImGui::TextColored(ImGuiColor::Orange, "World: [READ ONLY]");
+				// World Position //
+				ImGui::TextColored(ImGuiColor::Orange, "World:");
 
+				ImGui::Text("Position:");
+				ImGui::SameLine();
+				if (ImGui::DragFloat3("PositionW", pw, DragSpeed))
+					Entity->m_transform.setWorldPosition(Vector3(pw[0], pw[1], pw[2]));
+				
+				// Forward / Scale [READ ONLY]
 				DisableStart();
-				ImGui::Text("Position:"); ImGui::SameLine(); ImGui::DragFloat3("PositionW", pw, DragSpeed);
 				ImGui::Text("Forward: "); ImGui::SameLine(); ImGui::DragFloat3("RotationW", rw, DragSpeed);
 				ImGui::Text("Scale:   "); ImGui::SameLine(); ImGui::DragFloat3("ScaleW", sw, DragSpeed);
 				DisableEnd();

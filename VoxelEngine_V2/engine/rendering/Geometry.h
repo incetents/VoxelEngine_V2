@@ -25,17 +25,6 @@ namespace Vxl
 			const Vector3& offset
 		);
 
-		// Mesh Creation
-		Mesh* GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale = 1.0f);
-		Mesh* GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice);
-		Mesh* GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot);
-		Mesh* GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
-		Mesh* GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
-		Mesh* GenerateCube(const std::string& MeshName, float unitSize = 1.0f);
-		Mesh* GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f);
-		Mesh* GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
-		Mesh* GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
-
 	private:
 		bool m_isSetup = false;
 		Mesh* m_fullQuad = nullptr;
@@ -108,6 +97,17 @@ namespace Vxl
 			CreateCircles();
 		}
 
+		// Generate Custom Meshes
+		Mesh* GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale = 1.0f);
+		Mesh* GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice);
+		Mesh* GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot);
+		Mesh* GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
+		Mesh* GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
+		Mesh* GenerateCube(const std::string& MeshName, float unitSize = 1.0f, const Vector3& offset = Vector3(0, 0, 0));
+		Mesh* GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f, const Vector3& offset = Vector3(0,0,0));
+		Mesh* GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
+		Mesh* GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
+
 		// Vertices are from -1 to +1
 		Mesh* GetFullQuad()
 		{
@@ -152,6 +152,7 @@ namespace Vxl
 		{
 			return m_cube;
 		}
+		// 1/4 the size of a cube [-0.125] to [0.125]
 		Mesh* GetCubeSmall()
 		{
 			return m_cube_small;

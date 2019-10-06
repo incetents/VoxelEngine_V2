@@ -4,11 +4,11 @@
 // Input
 in vertex_data
 {
-	vec3 pos;
-	vec2 uv;
+	//vec3 pos;
+	//vec2 uv;
 	vec3 normal;
-	vec3 tangent;
-	vec3 bitangent;
+	//vec3 tangent;
+	//vec3 bitangent;
 
 } v_data;
 

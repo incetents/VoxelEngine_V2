@@ -184,11 +184,9 @@ namespace Vxl
 			return m_viewProjectionInverse;
 		}
 
-		// [ DEBUG ]
-		void DrawFrustum(float Width, Color4F Color);
-
 		// Behaviour
 		virtual void Update(void) override;
+		virtual void DrawSelection(void) override;
 		virtual void Draw(void) override;
 	public:
 		virtual void TransformChanged(void) override;

@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <utility>
 
 namespace Vxl
 {
@@ -62,38 +63,86 @@ namespace Vxl
 
 
 		// Aspect Ratio //
-		class AspectRatioInfo
+		static const uint32_t m_commonAspectRatiosCount = 4;
+		static float m_commonAspectRatios[m_commonAspectRatiosCount] =
 		{
-		public:
-			static const AspectRatioInfo Variations[];
-			static const unsigned int VariationsCount;
-
-			const float AspectRatio = 0;
-			const std::string StrFormat = "";
-
-			AspectRatioInfo() { }
-			AspectRatioInfo(float Num, float Denom)
-				: AspectRatio(Num / Denom),
-				StrFormat(std::to_string(Num) + '|' + std::to_string(Denom))
-			{}
+			16.f / 9.f,
+			16.f / 10.f,
+			4.f  / 3.f,
+			1.f  / 1.f
+		};
+		static const char* m_commonAspectRatiosStr[m_commonAspectRatiosCount] =
+		{
+			"16/9",
+			"16/10",
+			"4/3",
+			"1/1"
 		};
 
 		// Resolution //
-		class ResolutionInfo
+		static const uint32_t m_commonResolutionsCount = 25;
+		static std::pair<uint32_t, uint32_t> m_commonResolutions[m_commonResolutionsCount] =
 		{
-		public:
-			static const ResolutionInfo Variations[];
-			static const unsigned int VariationsCount;
-
-			const unsigned int Width = 0;
-			const unsigned int Height = 0;
-			const std::string StrFormat = "";
-
-			ResolutionInfo() {}
-			ResolutionInfo(unsigned int W, unsigned int H)
-				: Width(W), Height(H),
-				StrFormat(std::to_string(W) + " x " + std::to_string(H))
-			{}
+			// 16:9
+			{ 1024, 576 },
+			{ 1152, 648 },
+			{ 1280, 720 },
+			{ 1366, 768 },
+			{ 1600, 900 },
+			{ 1920, 1080 },
+			{ 2560, 1440 },
+			{ 3840, 2160 },
+			{ 7680, 4320 },
+			// 16:10
+			{ 1280, 800	 },
+			{ 1440, 900	 },
+			{ 1680, 1050 },
+			{ 1920, 1200 },
+			{ 2560, 1600 },
+			// 4:3
+			{ 640, 480	 },
+			{ 800, 600	 },
+			{ 960, 720	 },
+			{ 1024, 768	 },
+			{ 1280, 960	 },
+			{ 1400, 1050 },
+			{ 1440, 1080 },
+			{ 1600, 1200 },
+			{ 1856, 1392 },
+			{ 1920, 1440 },
+			{ 2048, 1536 }
 		};
+		static const char* m_commonResolutionsStr[m_commonResolutionsCount] =
+		{
+			// 16:9
+			"1024, 576",
+			"1152, 648",
+			"1280, 720",
+			"1366, 768",
+			"1600, 900",
+			"1920, 1080",
+			"2560, 1440",
+			"3840, 2160",
+			"7680, 4320",
+			// 16:10
+			"1280, 800",
+			"1440, 900",
+			"1680, 1050",
+			"1920, 1200",
+			"2560, 1600",
+			// 4:3
+			"640, 480",
+			"800, 600",
+			"960, 720",
+			"1024, 768",
+			"1280, 960",
+			"1400, 1050",
+			"1440, 1080",
+			"1600, 1200",
+			"1856, 1392",
+			"1920, 1440",
+			"2048, 1536"
+		};
+
 	}
 }

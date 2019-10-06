@@ -46,9 +46,9 @@ namespace Vxl
 
 			// Calculate Axis Directions
 			Matrix3x3 m_rotation_matrix = m_worldRotation.GetMatrix3x3();
-			m_right		= m_rotation_matrix.GetColumn(0).Normalize();
-			m_up		= m_rotation_matrix.GetColumn(1).Normalize();
-			m_forward	= m_rotation_matrix.GetColumn(2).Normalize();
+			m_right		= m_rotation_matrix.GetColumn(0).NormalizeAccurate();
+			m_up		= m_rotation_matrix.GetColumn(1).NormalizeAccurate();
+			m_forward	= m_rotation_matrix.GetColumn(2).NormalizeAccurate();
 
 			// Update World position
 			m_worldPosition = Vector3(m_modelMatrix.GetColumn(3));

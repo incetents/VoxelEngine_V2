@@ -511,7 +511,7 @@ namespace Vxl
 	RawArray<uint8_t> FramebufferObject::readPixelsFromMouse(uint32_t _attachmentIndex, int w, int h)
 	{
 		return readPixels(
-			_attachmentIndex, Input.getMousePosViewportX() * m_width, Input.getMousePosViewportY() * m_height, w, h);
+			_attachmentIndex, (int)(Input.getMousePosViewportX() * m_width), (int)(Input.getMousePosViewportY() * m_height), w, h);
 	}
 
 	RawArray<uint8_t> FramebufferObject::readDepthPixels(int x, int y, int w, int h)
@@ -534,6 +534,6 @@ namespace Vxl
 	RawArray<uint8_t> FramebufferObject::readDepthPixelsFromMouse(int w, int h)
 	{
 		return readDepthPixels(
-			Input.getMousePosViewportX() * m_width, Input.getMousePosViewportY() * m_height, w, h);
+			(int)(Input.getMousePosViewportX() * m_width), (int)(Input.getMousePosViewportY() * m_height), w, h);
 	}
 }

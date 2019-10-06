@@ -153,8 +153,11 @@ namespace Vxl
 	}
 
 	// Special
-	void CameraObject::DrawFrustum(float Width, Color4F Color)
+	void CameraObject::DrawSelection(void)
 	{
+		float Width = 5.0f;
+		Color4F Color = IsFamilyActive() ? Color4F::GREEN : Color4F::GREY;;
+
 		// Draw Forward
 		Vector3 Position = m_transform.getWorldPosition();
 		Vector3 Forward = m_transform.getCameraForward();

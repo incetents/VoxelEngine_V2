@@ -52,12 +52,42 @@ namespace Vxl
 	}
 
 	// Behaviour
-	void GameObject::Update()
+	void GameObject::Update(void)
 	{
 
 	}
 
-	void GameObject::Draw()
+	void GameObject::DrawSelection(void)
+	{
+		static Vector3 Epsilon = Vector3(0.01f, 0.01f, 0.01f);
+
+		Color4F AABB_Color = IsFamilyActive() ? Color4F::YELLOW : Color4F::GREY;
+		Color4F OBB_Color = IsFamilyActive() ? Color4F::GREEN : Color4F::GREY;
+
+		if (m_mesh->m_instances.Empty())
+		{
+			Debug.DrawLineOBB(*this, m_transform.getWorldPosition(), 3.0f, OBB_Color);
+			Debug.DrawLineAABB(GetAABBMin() - Epsilon, GetAABBMax() + Epsilon, m_transform.getWorldPosition(), 3.0f, AABB_Color);
+		}
+		// Draw outline around all instances
+		else
+		{
+			//Vector4 WPosition = Vector4(Entity->m_transform.getWorldPosition(), 1);
+			auto Instances = m_mesh->m_instances.GetVertices();
+			auto _model = m_transform.getModel();
+			for (Matrix4x4& instanceMatrix : *Instances)
+			{
+				Vector4 Instance_Pos = Vector4(instanceMatrix[12], instanceMatrix[13], instanceMatrix[14], 1);
+
+				Vector3 PosWorld = Vector3(_model * Instance_Pos);
+
+				Debug.DrawLineOBB(*this, PosWorld, 3.0f, OBB_Color);
+				Debug.DrawLineAABB(GetAABBMin() - Epsilon, GetAABBMax() + Epsilon, PosWorld, 3.0f, AABB_Color);
+			}
+		}
+	}
+
+	void GameObject::Draw(void)
 	{
 		if (m_mesh && m_material->IsValid())
 		{

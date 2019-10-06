@@ -11,10 +11,16 @@ namespace Vxl
 {
 	class FramebufferObject;
 	class Entity;
+	class Mesh;
 
 	class Gizmo
 	{
-	public:
+		friend class RenderManager;
+	private:
+		// Global GL Resources
+		static void InitGLResources();
+		static void DestroyGLResources();
+
 		// Internal Data
 		static FramebufferObject*	m_fbo;
 		bool						m_show = false;
@@ -25,6 +31,18 @@ namespace Vxl
 		Vector3						m_dragEnd;
 		bool						m_selected = false;
 		bool						m_clicked = false;
+		bool						m_camAxisSide[3] = { false, false, false };
+
+		// Custom Meshes
+		static Mesh* m_mesh_HalfQuadAxisX[4];
+		static Mesh* m_mesh_HalfQuadAxisY[4];
+		static Mesh* m_mesh_HalfQuadAxisZ[4];
+		static Mesh* m_mesh_ScaleCube[3];// x,y,z
+
+		// Scale By Distance
+		float m_distanceToCamera;
+		float m_constantScale;
+		Matrix4x4 m_constantScaleMatrix;
 
 		// Axis specific information
 		std::vector<Vector3>	m_worldPositionStorage;
@@ -33,14 +51,12 @@ namespace Vxl
 		Vector3					m_rotationDragStart;
 		bool					m_showScaleGizmo[3];
 
+	public:
 		// Utility
 		Vector3 CameraRayHitPlane(const Vector3& normal);
 		Vector3 GetGizmoDirection(Axis axis);
 
-	public:
-		// Global GL Resources
-		static void InitGLResources();
-		static void DestroyGLResources();
+		
 
 		enum class Mode
 		{
