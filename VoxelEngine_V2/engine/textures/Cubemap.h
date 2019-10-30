@@ -7,8 +7,7 @@ namespace Vxl
 {
 	class Cubemap : public BaseTexture, public Asset<Cubemap>
 	{
-		friend class Loader;
-		friend class RenderManager;
+		friend class Assets;
 	protected:
 		UCHAR**		m_image = new UCHAR*[6];
 

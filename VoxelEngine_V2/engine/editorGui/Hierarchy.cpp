@@ -145,12 +145,10 @@ namespace Vxl
 			{
 				if (Entity->GetType() == EntityType::GAMEOBJECT)
 				{
-					//GameObject::DeleteNamedAsset((GameObject*)Entity);
 					GameObject::DeleteNamedAsset(Entity->GetName());
 				}
-				else if (Entity->GetType() == EntityType::CAMERA)
+				else if (Entity->GetType() == EntityType::CAMERA && Entity != RenderManager.GetMainCamera())
 				{
-					//CameraObject::DeleteNamedAsset((CameraObject*)Entity);
 					CameraObject::DeleteNamedAsset(Entity->GetName());
 				}
 			}

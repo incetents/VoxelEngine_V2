@@ -13,31 +13,21 @@ namespace Vxl
 		{
 			void uint_to_uchars(uint32_t input, unsigned char& output1, unsigned char& output2, unsigned char& output3, unsigned char& output4)
 			{
-				union Data
-				{
-					unsigned int _input;
-					unsigned char _outputs[4];
-				} data;
-				// Input
-				data._input = input;
-				// Output
-				output1 = data._outputs[0];
-				output2 = data._outputs[1];
-				output3 = data._outputs[2];
-				output4 = data._outputs[3];
+				output1 = (input) & 0xFF;
+				output2 = (input >> 8) & 0xFF;
+				output3 = (input >> 16) & 0xFF;
+				output4 = (input >> 24) & 0xFF;
 			}
 			uint32_t uchars_to_uint(unsigned char* inputs)
 			{
-				union Data
-				{
-					uint32_t _output;
-					unsigned char _inputs[4];
-				} data;
-				// Input
-				for (int i = 0; i < 4; i++)
-					data._inputs[i] = inputs[i];
-				// Output
-				return data._output;
+				uint32_t output;
+
+				output = output << 8 | static_cast<unsigned char>(inputs[3]);
+				output = output << 8 | static_cast<unsigned char>(inputs[2]);
+				output = output << 8 | static_cast<unsigned char>(inputs[1]);
+				output = output << 8 | static_cast<unsigned char>(inputs[0]);
+
+				return output;
 			}
 			Vector4 uint_to_vec4(uint32_t input)
 			{

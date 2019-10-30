@@ -7,49 +7,13 @@
 
 namespace Vxl
 {
-	static class GlobalFiles : public Singleton<class GlobalFiles>
+	struct File
 	{
-	private:
-		struct FileData
-		{
-			std::string filepath;
-			std::string file;
+		const std::string filepath;
+		std::string file;
 
-			FileData() {}
-			FileData(const std::string& _filepath, const std::string& _file)
-			{
-				filepath = _filepath;
-				file = _file;
-			}
-		};
-
-		static std::map<std::string, FileData> m_files;
-	public:
-		void LoadFile(const std::string& name, const std::string& filepath);
-		void UnloadFile(const std::string& name);
-		void ReloadFiles();
-		bool HasFile(const std::string& name)
-		{
-			std::string nameLowercase = stringUtil::toLowerCopy(name);
-
-			return m_files.find(nameLowercase) != m_files.end();
-		}
-		const std::string& GetFile(const std::string& name)
-		{
-			std::string nameLowercase = stringUtil::toLowerCopy(name);
-
-			if (HasFile(nameLowercase))
-				return m_files[nameLowercase].file;
-			else
-			{
-				static std::string empty;
-				return empty;
-			}
-		}
-
-
-	} SingletonInstance(GlobalFiles);
-
+		File(const std::string& _filepath);
+	};
 
 	namespace FileIO
 	{
@@ -63,5 +27,10 @@ namespace Vxl
 		std::string getExtension(const std::string& filePath);
 		// Get Name
 		std::string getName(const std::string& filePath);
+
+		// Creates necessary folders for filepath to be true
+		void EnsureDirectory(const std::string& filePath);
+		// If filepath is already taken, attempt to fix name
+		void DuplicateFixer(std::string& filePath);
 	}
 }

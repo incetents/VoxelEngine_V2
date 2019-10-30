@@ -57,8 +57,8 @@ namespace Vxl
 				charInfo.m_texture = nullptr;
 			else
 			{
-				charInfo.m_texture = Texture2D::CreateCustom(
-					"",
+				auto letter_tex = SceneAssets.createTexture2D
+				(
 					(void*)m_face->glyph->bitmap.buffer,
 					(uint32_t)m_face->glyph->bitmap.width,
 					(uint32_t)m_face->glyph->bitmap.rows,
@@ -70,6 +70,8 @@ namespace Vxl
 					TexturePixelType::UNSIGNED_BYTE,
 					AnisotropicMode::NONE
 				);
+
+				charInfo.m_texture = SceneAssets.getTexture2D(letter_tex);
 			}
 			charInfo.m_size = Vector2i(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
 			charInfo.m_bearing = Vector2i(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top);
@@ -182,9 +184,6 @@ namespace Vxl
 		GlobalRenderText.m_FBO->Bind();
 		GlobalRenderText.m_FBO->SetAttachment(0, m_renderTexture);
 		GlobalRenderText.m_FBO->ClearBuffers();
-
-		//GlobalRenderText.m_FBO->Unbind();
-		//GlobalRenderText.m_FBO->Bind();
 
 		// Shader
 		material_font->BindProgram();

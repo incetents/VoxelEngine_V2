@@ -484,8 +484,8 @@ namespace Vxl
 	{
 		// Debug CallBack
 #if defined(GLOBAL_ERROR_CALLBACK) && !defined(GLOBAL_USE_GLNAMES)
-		//GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-		//if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+		GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
 		{
 			UsingErrorCallback = true;
 			glDebugMessageCallback(OpenGLDebugCallback, stderr);

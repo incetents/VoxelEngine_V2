@@ -20,8 +20,14 @@ namespace Vxl
 	typedef std::map<std::string, Graphics::UniformBlock> UniformBlockStorage;
 	typedef std::map<ShaderType, Graphics::UniformSubroutine> SubroutineStorage;
 
+	class _Shader
+	{
+
+	};
+
 	class Shader
 	{
+		DISALLOW_COPY_AND_ASSIGN(Shader);
 		friend class ShaderProgram;
 		friend class RenderManager;
 	private:
@@ -93,9 +99,6 @@ namespace Vxl
 			return m_sourceBackup;
 		}
 
-		// Remove default
-		Shader(const Shader&) = delete;
-		Shader& operator=(const Shader&) = delete;
 	};
 
 	class ShaderProgram : public Asset<ShaderProgram>

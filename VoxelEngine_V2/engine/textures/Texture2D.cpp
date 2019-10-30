@@ -9,7 +9,7 @@
 #include "../utilities/stringUtil.h"
 #include "../math/Color.h"
 #include "../window/window.h"
-#include "../utilities/FileSystem.h"
+#include "../utilities/FileIO.h"
 
 #include <SOIL/SOIL.h>
 
@@ -60,7 +60,6 @@ namespace Vxl
 	}
 	// [ Create Custom ]
 	Texture2D::Texture2D(
-		const std::string& name,
 		std::vector<Color3F> pixels, uint32_t width,
 		bool			UseMipMapping,
 		TextureWrapping		WrapMode,
@@ -99,17 +98,12 @@ namespace Vxl
 
 		UpdateMipmapping();
 
-		// glName
-		if(!name.empty())
-			Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
-
 		// finished
 		Unbind();
 		m_loaded = true;
 	}
 	// Constructor [Create custom]
 	Texture2D::Texture2D(
-		const std::string& name,
 		void* pixels,
 		uint32_t width, uint32_t height,
 		bool				UseMipMapping,
@@ -138,95 +132,9 @@ namespace Vxl
 
 		UpdateMipmapping();
 
-		// glName
-		if(!name.empty())
-			Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
-
 		// finished
 		Unbind();
 		m_loaded = true;
-	}
-
-	Texture2D* Texture2D::Load(
-		const std::string& name,
-		const std::string& filePath,
-		bool			InvertY,
-		bool			UseMipMapping,
-		TextureWrapping		WrapMode,
-		TextureFilter		FilterMode,
-		TextureFormat		FormatType,
-		TexturePixelType	PixelType,
-		AnisotropicMode		AnisotropicMode
-	) {
-		Texture2D* _texture = new Texture2D(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType, AnisotropicMode);
-
-		if (name.empty())
-			AddUnnamedAsset(_texture, AssetMessage::LOADED);
-		else
-			AddNamedAsset(name, _texture, AssetMessage::LOADED);
-
-		if (!_texture->IsLoaded())
-		{
-			Logger.error("Texture [" + name + "] failed to load");
-			return nullptr;
-		}
-
-		return _texture;
-	}
-
-	Texture2D* Texture2D::CreateCustom(
-		const std::string& name,
-		std::vector<Color3F> pixels, uint32_t width,
-		bool			UseMipMapping,
-		TextureWrapping		WrapMode,
-		TextureFilter		FilterMode,
-		TextureFormat		FormatType,
-		TextureChannelType	ChannelType,
-		TexturePixelType	PixelType,
-		AnisotropicMode		AnisotropicMode
-	) {
-		Texture2D* _texture = new Texture2D(name, pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
-
-		if (name.empty())
-			AddUnnamedAsset(_texture, AssetMessage::LOADED);
-		else
-			AddNamedAsset(name, _texture, AssetMessage::LOADED);
-
-		if (!_texture->IsLoaded())
-		{
-			Logger.error("Texture [" + name + "] failed to load");
-			return nullptr;
-		}
-
-		return _texture;
-	}
-	// Create custom texture
-	Texture2D* Texture2D::CreateCustom(
-		const std::string& name,
-		void* pixels, uint32_t width, uint32_t height,
-		bool				UseMipMapping,
-		TextureWrapping		WrapMode,
-		TextureFilter		FilterMode,
-		TextureFormat		FormatType,
-		TextureChannelType	ChannelType,
-		TexturePixelType	PixelType,
-		AnisotropicMode		AnisotropicMode
-	)
-	{
-		Texture2D* _texture = new Texture2D(name, pixels, width, height, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
-
-		if (name.empty())
-			AddUnnamedAsset(_texture, AssetMessage::CREATED);
-		else
-			AddNamedAsset(name, _texture, AssetMessage::CREATED);
-
-		if (!_texture->IsLoaded())
-		{
-			Logger.error("Texture [" + name + "] failed to create");
-			return nullptr;
-		}
-
-		return _texture;
 	}
 
 	// Export Texture
@@ -236,8 +144,8 @@ namespace Vxl
 	{
 		std::string finalFilePath = filePath + ".bmp";
 
-		File::DuplicateFixer(finalFilePath);
-		File::EnsureDirectory(finalFilePath);
+		FileIO::DuplicateFixer(finalFilePath);
+		FileIO::EnsureDirectory(finalFilePath);
 
 		int result = SOIL_save_screenshot
 		(

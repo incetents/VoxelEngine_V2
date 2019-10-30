@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "../utilities/singleton.h"
+#include "../utilities/Asset.h"
 
 #define MAX_LAYERS 32
 
@@ -103,7 +104,7 @@ namespace Vxl
 		void RenderSceneGameObjects_Opaque();
 		void RenderSceneGameObjects_Transparent();
 		void RenderSceneObjectsWithOnlyColorID();
-		void RenderEditorObjects();
+		void RenderEditorObjects(Texture2DIndex tex_light, Texture2DIndex tex_cam);
 		void RenderEditorObjectsPostDepth();
 
 	} SingletonInstance(RenderManager);

@@ -67,16 +67,20 @@ namespace Vxl
 			for (auto& include : includes)
 			{
 				stringUtil::trim(include);
-				std::string file = GlobalFiles.GetFile(include) + '\n';
+				File* _fileStorage = SceneAssets.getFile(include);
+				if (_fileStorage)
+				{
+					std::string file = _fileStorage->file + '\n';
 
-				if(output_vertex.active)
-					output_vertex.include += file;
-				
-				if(output_geometry.active)
-					output_geometry.include += file;
-				
-				if(output_fragment.active)
-					output_fragment.include += file;
+					if (output_vertex.active)
+						output_vertex.include += file;
+
+					if (output_geometry.active)
+						output_geometry.include += file;
+
+					if (output_fragment.active)
+						output_fragment.include += file;
+				}
 			}
 		}
 

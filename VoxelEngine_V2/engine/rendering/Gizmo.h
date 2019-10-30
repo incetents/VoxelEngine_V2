@@ -47,7 +47,6 @@ namespace Vxl
 		// Axis specific information
 		std::vector<Vector3>	m_worldPositionStorage;
 		std::vector<float>		m_worldScaleStorage;
-		float					m_degreeStorage;
 		Vector3					m_rotationDragStart;
 		bool					m_showScaleGizmo[3];
 
@@ -88,7 +87,7 @@ namespace Vxl
 		bool  m_translateSnapping = false;
 		float m_translateSnapAmount = 1.0f;
 		bool  m_rotateSnapping = false;
-		float m_rotateSnappingAmount = 45.0f;
+		float m_rotateSnappingAmount = 15.0f;
 
 		// Utility
 		inline bool IsSelected(void) const

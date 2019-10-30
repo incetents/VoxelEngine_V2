@@ -54,24 +54,6 @@ font 				font_vert 					font_frag
 showNormals 		showNormals
 
 //----------------------------------------
-#TEXTURE
-// order: [Name] [FilePath] [WrapMode =repeat] [FilterMode =linear] [FlipY =true] [MipMapping =true] [Anisotropic =HIGH]
-//
-// [WrapMode] = REPEAT | CLAMP_BORDER | CLAMP_STRETCH | MIRROR_REPEAT |
-// [FilterMode] = NEAREST | LINEAR
-// [FlipY] = YES_FLIP | NO_FLIP
-// [MipMapping] = YES_MIPMAP | NO_MIPMAP
-// [Anisotropic] = NONE | LOW | MEDIUM | HIGH
-
-grid_test			./assets/textures/grid_test.png 
-checkerboard 		./assets/textures/checkerboard.jpg 
-beato				./assets/textures/beato.png
-crate_diffuse		./assets/textures/crate_diffuse.png
-TextureAtlas		./assets/textures/TextureAtlas.png 		CLAMP_STRETCH 	NEAREST
-editor_camera 		./assets/textures/editor_camera.png		CLAMP_STRETCH
-editor_lightbulb 	./assets/textures/editor_lightbulb.png	CLAMP_STRETCH
-
-//----------------------------------------
 #CUBEMAP
 // order: [Name] [FilePath_FT] [FilePath_BK] [FilePath_UP] [FilePath_DN] [FilePath_RT] [FilePath_LT]
 

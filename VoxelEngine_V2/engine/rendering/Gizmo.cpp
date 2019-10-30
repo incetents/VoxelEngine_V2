@@ -114,9 +114,12 @@ namespace Vxl
 		m_show = true;
 
 		// Update Distance from Camera as a matrix4x4
-		m_distanceToCamera = (m_transform.WorldPosition - RenderManager.GetMainCamera()->m_transform.getWorldPosition()).Length();
-		m_constantScale = m_distanceToCamera * 0.5f;
-		m_constantScaleMatrix = Matrix4x4::GetScale(Vector3(m_constantScale));
+		if (!m_clicked)
+		{
+			m_distanceToCamera = (m_transform.WorldPosition - RenderManager.GetMainCamera()->m_transform.getWorldPosition()).Length();
+			m_constantScale = m_distanceToCamera * 0.5f;
+			m_constantScaleMatrix = Matrix4x4::GetScale(Vector3(m_constantScale));
+		}
 
 		// Don't move Gizmo while clicking [unless it's translation]
 		if (!m_clicked || m_mode == Mode::TRANSLATE)
@@ -144,9 +147,9 @@ namespace Vxl
 		}
 
 		// Set Axis-Aligned Pivot
-		if ((m_pivotAxisAligned && m_mode != Mode::SCALE) || (m_mode == Mode::TRANSLATE && m_translateSnapping))
+		if ((m_pivotAxisAligned && m_mode != Mode::SCALE))
 		{
-			m_transform.Model = Matrix4x4::GetTranslate(m_transform.WorldPosition);
+			m_transform.Model = Matrix4x4::GetTranslate(m_transform.WorldPosition) * m_constantScaleMatrix;
 			m_transform.Forward = Vector3::FORWARD;
 			m_transform.Up = Vector3::UP;
 			m_transform.Right = Vector3::RIGHT;
@@ -157,7 +160,7 @@ namespace Vxl
 		{
 			Matrix3x3 RotationMatrix = _entities[0]->m_transform.getWorldRotation().GetMatrix3x3();
 
-			m_transform.Model = Matrix4x4(RotationMatrix, m_transform.WorldPosition);
+			m_transform.Model = Matrix4x4(RotationMatrix, m_transform.WorldPosition) * m_constantScaleMatrix;
 			m_transform.Forward = _entities[0]->m_transform.getForward();
 			m_transform.Up = _entities[0]->m_transform.getUp();
 			m_transform.Right = _entities[0]->m_transform.getRight();
@@ -187,9 +190,9 @@ namespace Vxl
 			// Moving Based on Drag Amount
 			else
 			{
-				X_Offset = m_selectedAxis == Axis::X ? Vector3(m_dragAmount - 1.0f, 0, 0) : Vector3::ZERO;
-				Y_Offset = m_selectedAxis == Axis::Y ? Vector3(0, m_dragAmount - 1.0f, 0) : Vector3::ZERO;
-				Z_Offset = m_selectedAxis == Axis::Z ? Vector3(0, 0, m_dragAmount - 1.0f) : Vector3::ZERO;
+				X_Offset = (m_selectedAxis == Axis::X || m_selectedAxis == Axis::ALL) ? Vector3(m_dragAmount / m_constantScale, 0, 0) : Vector3::ZERO;
+				Y_Offset = (m_selectedAxis == Axis::Y || m_selectedAxis == Axis::ALL) ? Vector3(0, m_dragAmount / m_constantScale, 0) : Vector3::ZERO;
+				Z_Offset = (m_selectedAxis == Axis::Z || m_selectedAxis == Axis::ALL) ? Vector3(0, 0, m_dragAmount / m_constantScale) : Vector3::ZERO;
 			}
 		}
 		// Rotation, figure out if axis can be seen
@@ -224,7 +227,7 @@ namespace Vxl
 				// Translate based on Camera's Forward Plane
 				if (m_selectedPlane == Axis::ALL)
 				{
-					m_targetNormal = RenderManager.GetMainCamera()->m_transform.getCameraBackwards();
+					m_targetNormal = RenderManager.GetMainCamera()->m_transform.getForward();
 					m_dragStart = CameraRayHitPlane(m_targetNormal);
 				}
 				// Translate based on Plane
@@ -351,6 +354,10 @@ namespace Vxl
 					// Check if snapping should happen
 					float totalDrag = DirectionRay.m_t - m_dragAmount;
 
+					// Fix for snapping
+					if(m_translateSnapping)
+						totalDrag = round(totalDrag / m_translateSnapAmount) * m_translateSnapAmount;
+
 					uint32_t _entityCount = (uint32_t)_entities.size();
 					for (uint32_t i = 0; i < _entityCount; i++)
 					{
@@ -358,13 +365,7 @@ namespace Vxl
 						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
 							continue;
 
-						// Target Position
-						Vector3 Target = m_worldPositionStorage[i] -Direction.NormalizeAccurate() * (totalDrag);
-						// Snap to World
-						if (m_translateSnapping)
-							Target = (Target / m_translateSnapAmount).Round() * m_translateSnapAmount;
-
-						_entities[i]->m_transform.setWorldPosition(Target);
+						_entities[i]->m_transform.setWorldPosition(m_worldPositionStorage[i] - Direction.NormalizeAccurate() * totalDrag);
 					}
 				}
 
@@ -405,7 +406,7 @@ namespace Vxl
 
 					// Find shortest distance between Axis and Camera Ray
 					ShortestDistance(ViewRay, DirectionRay);
-					m_dragAmount = -DirectionRay.m_t + m_dragPrev + 1.0f;
+					m_dragAmount = (-DirectionRay.m_t + m_dragPrev);
 
 					uint32_t selectionCount = (uint32_t)_entities.size();
 					switch (m_selectedAxis)
@@ -413,19 +414,19 @@ namespace Vxl
 					case Axis::X:
 						for (uint32_t i = 0; i < selectionCount; i++)
 						{
-							_entities[i]->m_transform.setScaleX(m_worldScaleStorage[i] * m_dragAmount);
+							_entities[i]->m_transform.setScaleX(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
 						}
 						break;
 					case Axis::Y:
 						for (uint32_t i = 0; i < selectionCount; i++)
 						{
-							_entities[i]->m_transform.setScaleY(m_worldScaleStorage[i] * m_dragAmount);
+							_entities[i]->m_transform.setScaleY(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
 						}
 						break;
 					case Axis::Z:
 						for (uint32_t i = 0; i < selectionCount; i++)
 						{
-							_entities[i]->m_transform.setScaleZ(m_worldScaleStorage[i] * m_dragAmount);
+							_entities[i]->m_transform.setScaleZ(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
 						}
 						break;
 					}
@@ -464,17 +465,14 @@ namespace Vxl
 					}
 
 					// Rotate objects around selected axis
-					if (m_pivotAxisAligned)
+					uint32_t selectionCount = (uint32_t)_entities.size();
+					for (uint32_t i = 0; i < selectionCount; i++)
 					{
-						uint32_t selectionCount = (uint32_t)_entities.size();
-						for (uint32_t i = 0; i < selectionCount; i++)
-						{
-							// Don't Rotate Editor Camera
-							if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
-								continue;
+						// Don't Rotate Editor Camera
+						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
+							continue;
 
-							_entities[i]->m_transform.rotateAroundAxis(m_targetNormal, degrees);
-						}
+						_entities[i]->m_transform.rotateAroundAxis(m_targetNormal, degrees);
 					}
 
 					// Update previous rotation
@@ -499,7 +497,7 @@ namespace Vxl
 		{
 			gizmoMaterial->BindProgram();
 
-			gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model * m_constantScaleMatrix, true); // 
+			gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model, true); // 
 			gizmoMaterial->m_property_normalMatrix.SetPropertyMatrix(Matrix3x3(m_transform.Model), true);
 
 			// Movement //
@@ -600,9 +598,9 @@ namespace Vxl
 				gizmoMaterial->SetProperty("ignoreLight", false);
 
 				// Gizmo Additional Debug Lines
-				float XLineLength = (m_clicked && m_selectedAxis == Axis::X) ? m_constantScale + m_dragAmount - 1.0f : m_constantScale;
-				float YLineLength = (m_clicked && m_selectedAxis == Axis::Y) ? m_constantScale + m_dragAmount - 1.0f : m_constantScale;
-				float ZLineLength = (m_clicked && m_selectedAxis == Axis::Z) ? m_constantScale + m_dragAmount - 1.0f : m_constantScale;
+				float XLineLength = (m_clicked && (m_selectedAxis == Axis::X || m_selectedAxis == Axis::ALL)) ? m_constantScale + m_dragAmount - 0.0f : m_constantScale;
+				float YLineLength = (m_clicked && (m_selectedAxis == Axis::Y || m_selectedAxis == Axis::ALL)) ? m_constantScale + m_dragAmount - 0.0f : m_constantScale;
+				float ZLineLength = (m_clicked && (m_selectedAxis == Axis::Z || m_selectedAxis == Axis::ALL)) ? m_constantScale + m_dragAmount - 0.0f : m_constantScale;
 
 				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Right * XLineLength, 5.0f, Color4F::RED, Color4F::RED);
 				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Up * YLineLength, 5.0f, Color4F::GREEN, Color4F::GREEN);
@@ -611,7 +609,7 @@ namespace Vxl
 
 				// X Cube //
 				Matrix4x4 X_Model = m_transform.Model * Matrix4x4::GetTranslate(X_Offset);
-				gizmoMaterial->m_property_model.SetPropertyMatrix(X_Model * m_constantScaleMatrix, true);
+				gizmoMaterial->m_property_model.SetPropertyMatrix(X_Model, true);
 				if (m_selectedAxis == Axis::X)
 					if (m_clicked)
 						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
@@ -624,7 +622,7 @@ namespace Vxl
 
 				// Y Cube //
 				Matrix4x4 Y_Model = m_transform.Model * Matrix4x4::GetTranslate(Y_Offset);
-				gizmoMaterial->m_property_model.SetPropertyMatrix(Y_Model * m_constantScaleMatrix, true);
+				gizmoMaterial->m_property_model.SetPropertyMatrix(Y_Model, true);
 				if (m_selectedAxis == Axis::Y)
 					if (m_clicked)
 						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
@@ -637,7 +635,7 @@ namespace Vxl
 
 				// Z Cube //
 				Matrix4x4 Z_Model = m_transform.Model * Matrix4x4::GetTranslate(Z_Offset);
-				gizmoMaterial->m_property_model.SetPropertyMatrix(Z_Model * m_constantScaleMatrix, true);
+				gizmoMaterial->m_property_model.SetPropertyMatrix(Z_Model, true);
 				if (m_selectedAxis == Axis::Z)
 					if (m_clicked)
 						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
@@ -649,7 +647,7 @@ namespace Vxl
 				m_mesh_ScaleCube[2]->Draw();
 
 				// Small cube in the middle //
-				gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model * m_constantScaleMatrix, true);
+				gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model, true);
 				gizmoMaterial->m_property_alpha.SetProperty(0.85f);
 
 				if (m_selectedAxis == Axis::ALL)
@@ -686,7 +684,7 @@ namespace Vxl
 				//
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
-				gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model * m_constantScaleMatrix, true);
+				gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model, true);
 
 				// X Circle //
 				if (m_showScaleGizmo[0])
@@ -752,7 +750,7 @@ namespace Vxl
 			material_colorPicker->BindStates();
 
 			material_colorPicker->m_property_useModel.SetProperty(true);
-			material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model * m_constantScaleMatrix, true);
+			material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
 
 			if (m_mode == Mode::TRANSLATE)
 			{
@@ -853,27 +851,27 @@ namespace Vxl
 				// X Cube
 				color = Util::Conversion::uint_to_color4(1u);
 				Matrix4x4 X_Model = m_transform.Model * Matrix4x4::GetTranslate(X_Offset);
-				material_colorPicker->m_property_model.SetPropertyMatrix(X_Model * m_constantScaleMatrix, true);
+				material_colorPicker->m_property_model.SetPropertyMatrix(X_Model, true);
 				material_colorPicker->m_property_output.SetProperty(color);
 				m_mesh_ScaleCube[0]->Draw();
 
 				// Y Cube
 				color = Util::Conversion::uint_to_color4(2u);
 				Matrix4x4 Y_Model = m_transform.Model * Matrix4x4::GetTranslate(Y_Offset);
-				material_colorPicker->m_property_model.SetPropertyMatrix(Y_Model * m_constantScaleMatrix, true);
+				material_colorPicker->m_property_model.SetPropertyMatrix(Y_Model, true);
 				material_colorPicker->m_property_output.SetProperty(color);
 				m_mesh_ScaleCube[1]->Draw();
 
 				// Z Cube
 				color = Util::Conversion::uint_to_color4(3u);
 				Matrix4x4 Z_Model = m_transform.Model * Matrix4x4::GetTranslate(Z_Offset);
-				material_colorPicker->m_property_model.SetPropertyMatrix(Z_Model * m_constantScaleMatrix, true);
+				material_colorPicker->m_property_model.SetPropertyMatrix(Z_Model, true);
 				material_colorPicker->m_property_output.SetProperty(color);
 				m_mesh_ScaleCube[2]->Draw();
 
 				// Center Cube
 				color = Util::Conversion::uint_to_color4(4u);
-				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model * m_constantScaleMatrix, true);
+				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
 				material_colorPicker->m_property_output.SetProperty(color);
 				Geometry.GetCubeSmall()->Draw();
 
@@ -913,7 +911,7 @@ namespace Vxl
 				// Draw both sides
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
-				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model * m_constantScaleMatrix, true);
+				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
 
 				// X Circle
 				if (m_showScaleGizmo[0])

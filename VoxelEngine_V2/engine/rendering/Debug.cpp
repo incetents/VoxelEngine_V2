@@ -8,6 +8,7 @@
 #include "../modules/Entity.h"
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {
@@ -244,10 +245,14 @@ namespace Vxl
 		pixels.push_back(Color3F::BLACK);
 		pixels.push_back(Color3F::PURPLE);
 
-		m_null_texture = Texture2D::CreateCustom("NULL", pixels, 4, true,
+		auto null_tex = SceneAssets.createTexture2D(
+			pixels, 4, true,
 			TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
-			TextureFormat::RGB8, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE
+			TextureFormat::RGB8, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode::NONE
 		);
+
+		m_null_texture = SceneAssets.getTexture2D(null_tex);
 
 		VXL_ASSERT(m_null_texture, "Failed to create null texture");
 	}

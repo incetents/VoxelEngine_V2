@@ -40,7 +40,7 @@ namespace Vxl
 		m_resolution[1] = height;
 
 		// ???
-		//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 		// Set OpenGL Version for Context
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_MAJOR);

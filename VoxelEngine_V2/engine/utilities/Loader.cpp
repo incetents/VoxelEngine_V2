@@ -200,41 +200,42 @@ namespace Vxl
 				/* TEXTURE */
 				else if (_state == LoadState::TEXTURE && SegmentCount >= 2)
 				{
-					auto Name = Segments[0];
-					auto filePath = Segments[1];
-					TextureWrapping WM = TextureWrapping::REPEAT;
-					TextureFilter Filter = TextureFilter::LINEAR;
-					AnisotropicMode ANSO = AnisotropicMode::HIGH;
-					bool FlipY = true;
-					bool MipMap = true;
-
-					switch (SegmentCount)
-					{
-					case 7:
-						ANSO = DecipherAnisotropicMode(Segments[6]);
-					case 6:
-						MipMap = DecipherMipMapType(Segments[5]);
-					case 5:
-						FlipY = DecipherFlipType(Segments[4]);
-					case 4:
-						Filter = DecipherFilterMode(Segments[3]);
-					case 3:
-						WM = DecipherWrapMode(Segments[2]);
-						break;
-					}
-
-					Texture2D::Load(Name, filePath, FlipY, MipMap, WM, Filter, TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, ANSO);
+					//	auto Name = Segments[0];
+					//	auto filePath = Segments[1];
+					//	TextureWrapping WM = TextureWrapping::REPEAT;
+					//	TextureFilter Filter = TextureFilter::LINEAR;
+					//	AnisotropicMode ANSO = AnisotropicMode::HIGH;
+					//	bool FlipY = true;
+					//	bool MipMap = true;
+					//	
+					//	switch (SegmentCount)
+					//	{
+					//	case 7:
+					//		ANSO = DecipherAnisotropicMode(Segments[6]);
+					//	case 6:
+					//		MipMap = DecipherMipMapType(Segments[5]);
+					//	case 5:
+					//		FlipY = DecipherFlipType(Segments[4]);
+					//	case 4:
+					//		Filter = DecipherFilterMode(Segments[3]);
+					//	case 3:
+					//		WM = DecipherWrapMode(Segments[2]);
+					//		break;
+					//	}
+					//	
+					//	
+					//Texture2D::Load(Name, filePath, FlipY, MipMap, WM, Filter, TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, ANSO);
 				}
 				/* CUBEMAP */
 				else if (_state == LoadState::CUBEMAP && SegmentCount == 7)
 				{
-					Cubemap::Load(
-						// Name
-						Segments[0],
-						// Filepaths 1-6
-						Segments[1], Segments[2], Segments[3],
-						Segments[4], Segments[5], Segments[6]
-					);	
+					//	Cubemap::Load(
+					//		// Name
+					//		Segments[0],
+					//		// Filepaths 1-6
+					//		Segments[1], Segments[2], Segments[3],
+					//		Segments[4], Segments[5], Segments[6]
+					//	);	
 				}
 				/* MODEL */
 				else if (_state == LoadState::MODEL && SegmentCount >= 2)

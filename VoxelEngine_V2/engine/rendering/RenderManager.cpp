@@ -280,7 +280,7 @@ namespace Vxl
 		ShaderProgram::DeleteAllAssets();
 
 		// Delete Textures
-		Texture2D::DeleteAllAssets();
+		//Texture2D::DeleteAllAssets();
 		Cubemap::DeleteAllAssets();
 		RenderTexture::DeleteAllAssets();
 
@@ -292,6 +292,13 @@ namespace Vxl
 
 		// Delete Meshes
 		Mesh::DeleteAllAssets();
+
+		// Delete All Scene Assets
+		auto& textures = SceneAssets.getAllTexture2D();
+		for (auto& texture : textures)
+			delete texture.second;
+
+		SceneAssets.m_texture2D_storage.EraseAll();
 	}
 	void RenderManager::Update()
 	{
@@ -552,7 +559,7 @@ namespace Vxl
 			fbo_gbuffer->EnableAttachment(1);
 		}
 	}
-	void RenderManager::RenderEditorObjects()
+	void RenderManager::RenderEditorObjects(Texture2DIndex tex_light, Texture2DIndex tex_cam)
 	{
 		Graphics::SetDepthRead(true);
 		Graphics::SetDepthWrite(true);
@@ -566,7 +573,7 @@ namespace Vxl
 		{
 			billboard->BindProgram();
 
-			Texture2D* LightTexture = Texture2D::GetAsset("editor_lightbulb");
+			Texture2D* LightTexture = SceneAssets.getTexture2D(tex_light);
 			auto AllLights = LightObject::GetAllNamedAssets();
 			for (auto light = AllLights.begin(); light != AllLights.end(); light++)
 			{
@@ -581,7 +588,7 @@ namespace Vxl
 			}
 
 			// Draw Cameras
-			Texture2D* CameraTexture = Texture2D::GetAsset("editor_camera");
+			Texture2D* CameraTexture = SceneAssets.getTexture2D(tex_cam);
 			auto AllCameras = CameraObject::GetAllNamedAssets();
 			for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 			{

@@ -5,8 +5,8 @@
 
 #include "../engine/rendering/Gizmo.h"
 
-static int SCREEN_WIDTH = 720;
-static int SCREEN_HEIGHT = 480;
+static int SCREEN_WIDTH = 1280;
+static int SCREEN_HEIGHT = 720;
 
 namespace Vxl
 {
@@ -27,11 +27,16 @@ namespace Vxl
 	class Scene_Game : public Scene
 	{
 	public:
+		// Real Assets
+		Texture2DIndex tex_grid_test;
+		Texture2DIndex tex_checkerboard;
+		Texture2DIndex tex_beato;
+		Texture2DIndex tex_crate_diffuse;
+		Texture2DIndex tex_editor_camera;
+		Texture2DIndex tex_editor_lightbulb;
+		CubemapIndex cubemap_craterlake;
+
 		// Assets Loaded
-		Texture2D* _tex;
-		Texture2D* _tex_crate;
-		Texture2D* _tex_gridtest;
-		Cubemap* _cubemap1;
 
 		// Assets Created
 		Mesh* _mesh;

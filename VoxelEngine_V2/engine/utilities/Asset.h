@@ -6,12 +6,220 @@
 #include <string>
 #include <set>
 #include <map>
+#include <stack>
+#include <vector>
 
+#include "../math/Color.h"
 #include "../utilities/Logger.h"
+#include "../utilities/singleton.h"
 
 // Used as a means of inheriting a unique map of objects //
 namespace Vxl
 {
+	// Forward Declare Classes
+	class Texture2D;
+	class Cubemap;
+	class RenderTexture;
+	struct File;
+	// Forward Declare Enums
+	enum class TextureWrapping;
+	enum class TextureFilter;
+	enum class TextureFormat;
+	enum class TexturePixelType;
+	enum class TextureChannelType;
+	enum class AnisotropicMode;
+
+	using Texture2DIndex = uint32_t;
+	using CubemapIndex = uint32_t;
+
+	template<class Type>
+	class UniqueStorage
+	{
+	public:
+		static uint32_t				m_nextID;
+		std::map<uint32_t, Type*>	m_storage;
+		std::stack<uint32_t>		m_deletedIDs;
+
+		uint32_t	Add(Type* data)
+		{
+			uint32_t NewID;
+
+			// use a spare ID
+			if (m_deletedIDs.size() > 0)
+			{
+				NewID = m_deletedIDs.top();
+				m_deletedIDs.pop();
+			}
+			// create a new ID
+			else
+				NewID = m_nextID++;
+
+			// Store and return ID
+			m_storage[NewID] = data;
+			return NewID;
+		}
+		Type*		Get(uint32_t id)
+		{
+			// return data
+			if (m_storage.find(id) != m_storage.end())
+				return m_storage[id];
+
+			// not found
+			return nullptr;
+		}
+		Type*		Erase(uint32_t id)
+		{
+			if (m_storage.find(id) != m_storage.end())
+			{
+				m_deletedIDs.push(id);
+				Type* data = m_storage[id];
+				m_storage.erase(id);
+				return data;
+			}
+			return nullptr;
+		}
+		void		EraseAll(void)
+		{
+			m_storage.clear();
+		}
+		std::map<uint32_t, Type*>& GetAll(void)
+		{
+			return m_storage;
+		}
+	};
+	
+	template<class Type>
+	uint32_t UniqueStorage<Type>::m_nextID = 0;
+
+	template<class Type>
+	class NamedStorage
+	{
+	public:
+		std::map<std::string, Type*> m_storage;
+
+		void	Add(const std::string& name, Type* data)
+		{
+			m_storage[name] = data;
+		}
+		Type*		Get(const std::string& name)
+		{
+			// return data
+			if (m_storage.find(name) != m_storage.end())
+				return m_storage[name];
+
+			// not found
+			return nullptr;
+		}
+		Type*		Erase(const std::string& name)
+		{
+			if (m_storage.find(name) != m_storage.end())
+			{
+				Type* data = m_storage[name];
+				m_storage.erase(name);
+				return data;
+			}
+			return nullptr;
+		}
+		void		EraseAll(void)
+		{
+			m_storage.clear();
+		}
+		std::map<std::string, Type*>& GetAll(void)
+		{
+			return m_storage;
+		}
+	};
+
+	class Assets
+	{
+		friend class RenderManager;
+	protected:
+		UniqueStorage<Texture2D> m_texture2D_storage;
+		UniqueStorage<Cubemap> m_cubemap_storage;
+		NamedStorage<File> m_file_storage;
+
+		// Protected
+		Assets() {}
+
+	public:
+		// Removers
+		Texture2D*	eraseTexture2D(Texture2DIndex index) { m_texture2D_storage.Erase(index); }
+		Cubemap*	eraseCubemap(CubemapIndex index) { m_cubemap_storage.Erase(index); }
+		File*		eraseFile(const std::string& name) { m_file_storage.Erase(name); }
+
+		// Getters
+		Texture2D*	getTexture2D(Texture2DIndex index) { return m_texture2D_storage.Get(index); }
+		Cubemap*	getCubemap(CubemapIndex index) { return m_cubemap_storage.Get(index); }
+		File*		getFile(const std::string& name) { return m_file_storage.Get(stringUtil::toLowerCopy(name)); }
+
+		// Get All
+		std::map<uint32_t, Texture2D*>& getAllTexture2D() { return m_texture2D_storage.GetAll(); }
+		std::map<uint32_t, Cubemap*>&	getAllCubemap() { return m_cubemap_storage.GetAll(); }
+		std::map<std::string, File*>&		getAllFiles() { return m_file_storage.GetAll(); }
+
+		// Texture Load/create
+		Texture2DIndex loadTexture2D(
+			const std::string& filePath,
+			bool				InvertY,
+			bool				UseMipMapping,
+			TextureWrapping		WrapMode,
+			TextureFilter		FilterMode,
+			TextureFormat		FormatType,
+			TexturePixelType	PixelType,
+			AnisotropicMode		AnisotropicMode
+		);
+		Texture2DIndex createTexture2D(
+			std::vector<Color3F> pixels, uint32_t width,
+			bool				UseMipMapping,
+			TextureWrapping		WrapMode,
+			TextureFilter		FilterMode,
+			TextureFormat		FormatType,
+			TextureChannelType	ChannelType,
+			TexturePixelType	PixelType,
+			AnisotropicMode		AnisotropicMode
+		);
+		Texture2DIndex createTexture2D(
+			void* pixels, uint32_t width, uint32_t height,
+			bool				UseMipMapping,
+			TextureWrapping		WrapMode,
+			TextureFilter		FilterMode,
+			TextureFormat		FormatType,
+			TextureChannelType	ChannelType,
+			TexturePixelType	PixelType,
+			AnisotropicMode		AnisotropicMode
+		);
+		// Cubemap
+		CubemapIndex loadCubemap(
+			const std::string& filePath1, const std::string& filePath2,
+			const std::string& filePath3, const std::string& filePath4,
+			const std::string& filePath5, const std::string& filePath6,
+			bool InvertY,
+			bool UseMipMapping,
+			TextureWrapping		WrapMode,
+			TextureFilter		FilterMode,
+			TextureFormat		FormatType,
+			TexturePixelType	PixelType,
+			AnisotropicMode		AnisotropicMode
+		);
+		// File
+		void loadFile(
+			const std::string& name,
+			const std::string& filepath
+		);
+	};
+
+	static class GlobalAssets : public Assets, public Singleton<class GlobalAssets>
+	{
+	} SingletonInstance(GlobalAssets);
+
+	static class SceneAssets : public Assets, public Singleton<class SceneAssets>
+	{
+	} SingletonInstance(SceneAssets);
+	
+
+
+	// Plan to make obsolete below //
+
 	enum class AssetMessage
 	{
 		NONE,

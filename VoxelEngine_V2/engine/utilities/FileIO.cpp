@@ -5,30 +5,19 @@
 #include "Macros.h"
 #include "Logger.h"
 
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem;
+
 namespace Vxl
 {
-	std::map<std::string, GlobalFiles::FileData> GlobalFiles::m_files;
-
-	void GlobalFiles::LoadFile(const std::string& name, const std::string& filepath)
+	File::File(const std::string& _filepath)
+		: filepath(_filepath)
 	{
-		std::string nameLowercase = stringUtil::toLowerCopy(name);
-
 		if (FileIO::fileExists(filepath))
-			m_files[nameLowercase] = FileData(filepath, FileIO::readFile(filepath));
+			file = FileIO::readFile(filepath);
 		else
-			VXL_ERROR("Filepath does not exist for GlobalFiles");
-	}
-	void GlobalFiles::UnloadFile(const std::string& name)
-	{
-		std::string nameLowercase = stringUtil::toLowerCopy(name);
-
-		if (m_files.find(nameLowercase) != m_files.end())
-			m_files.erase(nameLowercase);
-	}
-	void GlobalFiles::ReloadFiles()
-	{
-		for (auto& filepath : m_files)
-			LoadFile(filepath.first, filepath.second.filepath);
+			VXL_ERROR("Filepath does not exist:" + _filepath);
 	}
 
 	namespace FileIO
@@ -106,6 +95,44 @@ namespace Vxl
 				return filePath.substr(dir + 1);
 
 			return filePath.substr(dir + 1, dot - dir - 1);
+		}
+
+		// Creates necessary folders for filepath to be true
+		void EnsureDirectory(const std::string& filePath)
+		{
+			fs::path _path(filePath);
+			std::vector<fs::path> _parentPaths;
+
+			while (_path.has_parent_path())
+			{
+				_path = _path.parent_path();
+				_parentPaths.push_back(_path);
+			}
+
+			int totalParentPathsCount = (int)_parentPaths.size() - 1;
+			for (int i = totalParentPathsCount; i >= 0; i--)
+			{
+				if (!fs::is_directory(_parentPaths[i]))
+					fs::create_directory(_parentPaths[i]);
+			}
+		}
+		// If filepath is already taken, attempt to fix name
+		void DuplicateFixer(std::string& filePath)
+		{
+			fs::path _path(filePath);
+
+			// no duplicates
+			if (!fs::exists(_path))
+				return;
+
+			uint32_t suffix = 0;
+			std::string stem = _path.stem().string();
+			while (fs::exists(_path))
+			{
+				_path = _path.parent_path().string() + '\\' + stem + '(' + std::to_string(suffix) + ')' + _path.extension().string();
+				suffix++;
+			}
+			filePath = _path.string();
 		}
 	}
 }

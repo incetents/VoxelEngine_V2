@@ -7,10 +7,9 @@ namespace Vxl
 {
 	class Color3F;
 
-	class Texture2D : public BaseTexture, public Asset<Texture2D>
+	class Texture2D : public BaseTexture
 	{
-		friend class Loader;
-		friend class RenderManager;
+		friend class Assets;
 	protected:
 		uint8_t* m_image = nullptr;
 
@@ -22,13 +21,11 @@ namespace Vxl
 			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
 			TextureFilter		FilterMode = TextureFilter::LINEAR,
 			TextureFormat		FormatType = TextureFormat::RGBA8,
-			//TextureChannelType	ChannelType = TextureChannelType::RGBA,
 			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode		AnistropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom]
 		Texture2D(
-			const std::string& name,
 			std::vector<Color3F> pixels, uint32_t width,
 			bool				UseMipMapping = true,
 			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
@@ -40,7 +37,6 @@ namespace Vxl
 		);
 		// Constructor [Create custom]
 		Texture2D(
-			const std::string& name,
 			void* pixels,
 			uint32_t width, uint32_t height,
 			bool				UseMipMapping = true,
@@ -53,52 +49,15 @@ namespace Vxl
 		);
 
 	public:
-		// Load Texture
-		static Texture2D* Load(
-			const std::string& name,
-			const std::string& filePath,
-			bool				InvertY = true,
-			bool				UseMipMapping = true,
-			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
-			TextureFilter		FilterMode = TextureFilter::LINEAR,
-			TextureFormat		FormatType = TextureFormat::RGBA8,
-			//TextureChannelType	ChannelType = TextureChannelType::RGBA,
-			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
-		);
-		// Create custom texture
-		static Texture2D* CreateCustom(
-			const std::string& name,
-			std::vector<Color3F> pixels, uint32_t width,
-			bool				UseMipMapping = true,
-			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
-			TextureFilter		FilterMode = TextureFilter::LINEAR,
-			TextureFormat		FormatType = TextureFormat::RGBA8,
-			TextureChannelType	ChannelType = TextureChannelType::RGBA,
-			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
-		);
-		// Create custom texture
-		static Texture2D* CreateCustom(
-			const std::string& name,
-			void* pixels, uint32_t width, uint32_t height,
-			bool				UseMipMapping = true,
-			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
-			TextureFilter		FilterMode = TextureFilter::LINEAR,
-			TextureFormat		FormatType = TextureFormat::RGBA8,
-			TextureChannelType	ChannelType = TextureChannelType::RGBA,
-			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
-		);
+
+		Texture2D(const Texture2D&) = delete;
+		~Texture2D();
+
 		// Export Texture
 		static void ScreenshotBMP(
 			const std::string& filePath
 		);
 		
-
-		Texture2D(const Texture2D&) = delete;
-		~Texture2D();
-
 		inline bool IsLoaded(void) const override
 		{
 			return m_loaded;

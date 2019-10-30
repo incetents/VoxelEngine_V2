@@ -176,6 +176,10 @@ namespace Vxl
 
 		UpdateParameters();
 	}
+	void BaseTexture::setGLName(const std::string& glName)
+	{
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, glName);
+	}
 
 	RawArray<uint8_t> BaseTexture::readPixels(int x, int y, int w, int h)
 	{
