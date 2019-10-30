@@ -13,7 +13,7 @@
 
 // Target OPENGL Version for context
 #define OPENGL_MAJOR 4
-#define OPENGL_MINOR 5
+#define OPENGL_MINOR 2
 
 namespace Vxl
 {
@@ -740,7 +740,7 @@ namespace Vxl
 			void		SetPixelPackAlignment(PixelAlignment align);
 			void		SetPixelUnpackAlignment(PixelAlignment align);
 
-			RawArray<uint8_t> ReadPixels(const Vxl::BaseTexture& texture, int x, int y, int w, int h);
+			//RawArray<uint8_t> ReadPixels(const Vxl::BaseTexture& texture, int x, int y, int w, int h);
 		}
 		
 		// ~ Renderbuffer ~ //

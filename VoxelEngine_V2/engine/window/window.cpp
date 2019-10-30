@@ -6,7 +6,6 @@
 
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
-#include "../utilities/FileSystem.h"
 #include "../rendering/RenderManager.h"
 
 #include <GLFW/glfw3.h>

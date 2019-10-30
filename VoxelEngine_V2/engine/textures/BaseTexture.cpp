@@ -181,15 +181,4 @@ namespace Vxl
 		Graphics::SetGLName(ObjectType::TEXTURE, m_id, glName);
 	}
 
-	RawArray<uint8_t> BaseTexture::readPixels(int x, int y, int w, int h)
-	{
-		// Ignore if x,y coordinates are outside FBO range
-		VXL_ASSERT(x >= 0 && y >= 0, "Tex Readpixels, x and/or y out of range");
-
-		return Graphics::Texture::ReadPixels(*this, x, y, w, h);
-	}
-	RawArray<uint8_t> BaseTexture::readPixelsFromMouse(int w, int h)
-	{
-		return readPixels(Input.getMousePosX(), Window.GetWindowHeight() - Input.getMousePosY(), w, h);
-	}
 }

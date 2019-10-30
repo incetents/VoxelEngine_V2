@@ -73,9 +73,6 @@ namespace Vxl
 
 		void setGLName(const std::string& glName);
 
-		RawArray<uint8_t> readPixels(int x, int y, int w, int h);
-		RawArray<uint8_t> readPixelsFromMouse(int w, int h);
-
 		inline TextureID	GetID(void) const
 		{
 			return m_id;
