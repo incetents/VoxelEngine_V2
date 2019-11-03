@@ -3,14 +3,17 @@
 
 #include "Graphics.h"
 #include "../utilities/Asset.h"
+#include "../utilities/Macros.h"
 
 namespace Vxl
 {
 	class BaseTexture;
 
-	class RenderBuffer : public Asset<RenderBuffer>
+	class RenderBuffer
 	{
-	private:
+		DISALLOW_COPY_AND_ASSIGN(RenderBuffer);
+		friend class Assets;
+	protected:
 		// Data
 		uint32_t			m_id = -1;
 		int					m_width;
@@ -19,29 +22,20 @@ namespace Vxl
 		TextureChannelType	m_channelType;
 		TexturePixelType	m_pixelType;
 		int					m_channelCount;
-		const std::string	m_name;
 
 		RenderBuffer(
-			std::string name,
-			int Width, int Height,
+			int Width,
+			int Height,
 			TextureFormat FormatType = TextureFormat::RGBA8,
 			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
 		);
 		void UpdateStorage();
 
 	public:
-		RenderBuffer(const RenderBuffer&) = delete;
-
-		static RenderBuffer* Create(
-			std::string name,
-			int Width, int Height,
-			TextureFormat FormatType = TextureFormat::RGBA8,
-			TexturePixelType PixelType = TexturePixelType::UNSIGNED_BYTE
-		);
-		
 		~RenderBuffer();
 
 		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format);
+		void setGLName(const std::string& name);
 
 		void Bind(void) const;
 		static void Unbind(void);
@@ -77,10 +71,23 @@ namespace Vxl
 		{
 			return m_channelCount;
 		}
-		inline std::string			GetName(void) const
-		{
-			return m_name;
-		}
+
 	};
 
+	class RenderBufferDepth : public RenderBuffer
+	{
+		DISALLOW_COPY_AND_ASSIGN(RenderBufferDepth);
+		friend class Assets;
+	protected:
+		// Created using only depth format
+		RenderBufferDepth(
+			int Width,
+			int Height,
+			TextureDepthFormat FormatType
+		);
+
+	public:
+		// Additional Data
+		const TextureDepthFormat m_depthFormat;
+	};
 }

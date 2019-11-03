@@ -5,8 +5,9 @@
 
 namespace Vxl
 {
-	class Cubemap : public BaseTexture, public Asset<Cubemap>
+	class Cubemap : public BaseTexture
 	{
+		DISALLOW_COPY_AND_ASSIGN(Cubemap);
 		friend class Assets;
 	protected:
 		UCHAR**		m_image = new UCHAR*[6];
@@ -29,20 +30,6 @@ namespace Vxl
 		);
 	public:
 
-		// Load Cubemap
-		static Cubemap* Load(
-			const std::string& name,
-			const std::string& filePath1, const std::string& filePath2, const std::string& filePath3, const std::string& filePath4, const std::string& filePath5, const std::string& filePath6,
-			bool InvertY = false,
-			bool UseMipMapping = true,
-			TextureWrapping		WrapMode = TextureWrapping::CLAMP_STRETCH,
-			TextureFilter		FilterMode = TextureFilter::LINEAR,
-			TextureFormat		FormatType = TextureFormat::RGBA8,
-			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
-		);
-
-		Cubemap(const Cubemap&) = delete;
 		~Cubemap();
 
 		void SetStorageCubemap(CubemapFace face, const void* pixels);

@@ -100,26 +100,6 @@ namespace Vxl
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
-		tex_editor_camera = SceneAssets.loadTexture2D(
-			"./assets/textures/editor_camera.png",
-			true,
-			true,
-			TextureWrapping::REPEAT,
-			TextureFilter::LINEAR,
-			TextureFormat::RGBA8,
-			TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode::NONE
-		);
-		tex_editor_lightbulb = SceneAssets.loadTexture2D(
-			"./assets/textures/editor_lightbulb.png",
-			true,
-			true,
-			TextureWrapping::REPEAT,
-			TextureFilter::LINEAR,
-			TextureFormat::RGBA8,
-			TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode::NONE
-		);
 		cubemap_craterlake = SceneAssets.loadCubemap(
 			"./assets/cubemaps/craterlake_ft.tga",
 			"./assets/cubemaps/craterlake_bk.tga",
@@ -170,46 +150,103 @@ namespace Vxl
 		//_camera->SetMain();
 
 
-		// FBO
+
+		// FBO Gbuffer
 		_fbo_gbuffer = FramebufferObject::Create("gbuffer");
 		_fbo_gbuffer->SetClearColor(Color4F(-1, -1, 0, 1));
 		_fbo_gbuffer->SetSizeToWindowSize();
 		_fbo_gbuffer->Bind();
-		_fbo_gbuffer->NewAttachment(0, RenderTarget::Type::TEXTURE, "albedo", TextureFormat::RGBA8);
-		_fbo_gbuffer->NewAttachment(1, RenderTarget::Type::TEXTURE, "normal", TextureFormat::RGBA16_SNORM);
-		_fbo_gbuffer->NewAttachment(2, RenderTarget::Type::TEXTURE, "reflection", TextureFormat::RGBA8);
-		_fbo_gbuffer->NewAttachment(3, RenderTarget::Type::TEXTURE, "colorID", TextureFormat::RGBA8);
-		_fbo_gbuffer->SetDepth(TextureDepthFormat::DEPTH32, RenderTarget::Type::TEXTURE);
+
+		fbotex_gbuffer_albedo = SceneAssets.createRenderTexture(
+			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+
+		fbotex_gbuffer_normal = SceneAssets.createRenderTexture(
+			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			TextureFormat::RGBA16_SNORM, TexturePixelType::UNSIGNED_BYTE, false);
+
+		fbotex_gbuffer_reflection = SceneAssets.createRenderTexture(
+			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+
+		fbotex_gbuffer_colorID = SceneAssets.createRenderTexture(
+			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+
+		fbotex_gbuffer_depth = SceneAssets.createRenderTextureDepth(
+			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			TextureDepthFormat::DEPTH32
+		);
+
+		_fbo_gbuffer->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_gbuffer_albedo));
+		_fbo_gbuffer->SetAttachment(1, SceneAssets.getRenderTexture(fbotex_gbuffer_normal));
+		_fbo_gbuffer->SetAttachment(2, SceneAssets.getRenderTexture(fbotex_gbuffer_reflection));
+		_fbo_gbuffer->SetAttachment(3, SceneAssets.getRenderTexture(fbotex_gbuffer_colorID));
+		_fbo_gbuffer->SetDepth(SceneAssets.getRenderTextureDepth(fbotex_gbuffer_depth));
 		_fbo_gbuffer->checkFBOStatus();
 		_fbo_gbuffer->Unbind();
 
+		// FBO Editor Post
 		_fbo_editor = FramebufferObject::Create("EditorPost");
 		_fbo_editor->SetSizeToWindowSize();
 		_fbo_editor->Bind();
-		_fbo_editor->NewAttachment(0, RenderTarget::Type::TEXTURE, "albedo", TextureFormat::RGBA8);
-		_fbo_editor->SetDepth(TextureDepthFormat::DEPTH32, RenderTarget::Type::BUFFER);
+
+		fbotex_editor_albedo = SceneAssets.createRenderTexture(
+			_fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+
+		fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
+			_fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
+			TextureDepthFormat::DEPTH32
+		);
+
+		_fbo_editor->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_editor_albedo));
+		_fbo_editor->SetDepth(SceneAssets.getRenderBufferDepth(fbotex_editor_depth));
 		_fbo_editor->checkFBOStatus();
 		_fbo_editor->Unbind();
 
+		// FBO Color Picker
 		_fbo_colorpicker = FramebufferObject::Create("ColorPicker");
 		_fbo_colorpicker->SetSizeToWindowSize();
 		_fbo_colorpicker->Bind();
-		_fbo_colorpicker->NewAttachment(0, RenderTarget::Type::TEXTURE, "color", TextureFormat::RGBA8);
-		_fbo_colorpicker->SetDepth(TextureDepthFormat::DEPTH32, RenderTarget::Type::BUFFER);
+
+		fbotex_colorPicker_albedo = SceneAssets.createRenderTexture(
+			_fbo_colorpicker->GetWidth(), _fbo_colorpicker->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+
+		fbotex_colorPicker_depth = SceneAssets.createRenderBufferDepth(
+			_fbo_colorpicker->GetWidth(), _fbo_colorpicker->GetHeight(),
+			TextureDepthFormat::DEPTH32
+		);
+
+		_fbo_colorpicker->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_colorPicker_albedo));
+		_fbo_colorpicker->SetDepth(SceneAssets.getRenderBufferDepth(fbotex_colorPicker_depth));
 		_fbo_colorpicker->checkFBOStatus();
 		_fbo_colorpicker->Unbind();
 
+		// FBO Composite
 		_fbo_composite = FramebufferObject::Create("composite");
 		_fbo_composite->SetSizeToWindowSize();
 		_fbo_composite->Bind();
-		_fbo_composite->NewAttachment(0, RenderTarget::Type::TEXTURE, "albedo", TextureFormat::RGBA8);
+
+		fbotex_composite_albedo = SceneAssets.createRenderTexture(
+			_fbo_composite->GetWidth(), _fbo_composite->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+
+		_fbo_composite->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_composite_albedo));
 		_fbo_composite->checkFBOStatus();
 		_fbo_composite->Unbind();
 
+		// FBO Show Render Target
 		_fbo_showRenderTarget = FramebufferObject::Create("showRenderTarget");
 		_fbo_showRenderTarget->SetSizeToWindowSize();
 		_fbo_showRenderTarget->Bind();
-		_fbo_showRenderTarget->NewAttachment(0, RenderTarget::Type::TEXTURE, "albedo", TextureFormat::RGBA8);
+
+		fbotex_showRenderTarget_albedo = SceneAssets.createRenderTexture(
+			_fbo_composite->GetWidth(), _fbo_composite->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+
+		_fbo_showRenderTarget->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_showRenderTarget_albedo));
 		_fbo_showRenderTarget->checkFBOStatus();
 		_fbo_showRenderTarget->Unbind();
 
@@ -746,7 +783,7 @@ namespace Vxl
 
 		//Graphics::SetDepthRead(false);
 
-		RenderManager.RenderEditorObjects(tex_editor_lightbulb, tex_editor_camera);
+		RenderManager.RenderEditorObjects();
 
 		Graphics::ClearBuffer(BufferBit::DEPTH);
 		

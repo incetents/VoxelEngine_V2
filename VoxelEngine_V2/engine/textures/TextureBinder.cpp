@@ -3,6 +3,7 @@
 #include "TextureBinder.h"
 
 #include "../rendering/Debug.h"
+#include "../modules/GlobalData.h"
 
 #include "Texture2D.h"
 
@@ -14,7 +15,7 @@ namespace Vxl
 		if (m_textures.empty())
 		{
 			// Bind null texture on first active layer
-			Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
+			GlobalData.tex_nullImage->Bind(TextureLevel::LEVEL0);
 		}
 		else
 		{
@@ -26,7 +27,7 @@ namespace Vxl
 				// Bind Null texture if texture isn't loaded
 				if (_tex == nullptr || !_tex->IsLoaded())
 				{
-					Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
+					GlobalData.tex_nullImage->Bind(TextureLevel::LEVEL0);
 				}
 				// Bind texture normally
 				else

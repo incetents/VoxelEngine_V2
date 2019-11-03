@@ -9,6 +9,7 @@ namespace Vxl
 
 	class Texture2D : public BaseTexture
 	{
+		DISALLOW_COPY_AND_ASSIGN(Texture2D);
 		friend class Assets;
 	protected:
 		uint8_t* m_image = nullptr;
@@ -26,7 +27,8 @@ namespace Vxl
 		);
 		// Constructor [Create custom]
 		Texture2D(
-			std::vector<Color3F> pixels, uint32_t width,
+			std::vector<Color3F>pixels,
+			uint32_t			width,
 			bool				UseMipMapping = true,
 			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
 			TextureFilter		FilterMode = TextureFilter::LINEAR,
@@ -50,7 +52,6 @@ namespace Vxl
 
 	public:
 
-		Texture2D(const Texture2D&) = delete;
 		~Texture2D();
 
 		// Export Texture

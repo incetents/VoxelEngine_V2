@@ -17,8 +17,6 @@
 using namespace Vxl;
 using namespace std;
 
-Scene_Game* _scene = new Scene_Game();
-
 #ifdef GLOBAL_OUTPUT_CONSOLE
 int main()
 #else
@@ -38,6 +36,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	/* Initial Call */
 	RenderManager.InitImGui();
 	RenderManager.InitGlobalGLResources();
+	Scene_Game* _scene = new Scene_Game();
 	RenderManager.SetNewScene(_scene);
 
 	/* ~ */

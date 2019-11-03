@@ -82,6 +82,7 @@ namespace Vxl
 		void SetCursor(CursorMode mode);
 		void SetCursorPosition(double x, double y);
 		void SetIcon(const std::string& filePath);
+		void SetMaximized(bool state);
 
 		bool IsCursorOnImguiWindow();
 

@@ -21,6 +21,10 @@ namespace Vxl
 	class Cubemap;
 	class RenderTexture;
 	struct File;
+	class RenderTexture;
+	class RenderTextureDepth;
+	class RenderBuffer;
+	class RenderBufferDepth;
 	// Forward Declare Enums
 	enum class TextureWrapping;
 	enum class TextureFilter;
@@ -28,12 +32,17 @@ namespace Vxl
 	enum class TexturePixelType;
 	enum class TextureChannelType;
 	enum class AnisotropicMode;
+	enum class TextureDepthFormat;
 
 	using Texture2DIndex = uint32_t;
 	using CubemapIndex = uint32_t;
+	using RenderTextureIndex = uint32_t;
+	using RenderTextureDepthIndex = uint32_t;
+	using RenderBufferIndex = uint32_t;
+	using RenderBufferDepthIndex = uint32_t;
 
 	template<class Type>
-	class UniqueStorage
+	class IDStorage
 	{
 	public:
 		static uint32_t				m_nextID;
@@ -80,6 +89,9 @@ namespace Vxl
 		}
 		void		EraseAll(void)
 		{
+			for (auto& data : m_storage)
+				m_deletedIDs.push(data.first);
+
 			m_storage.clear();
 		}
 		std::map<uint32_t, Type*>& GetAll(void)
@@ -87,9 +99,9 @@ namespace Vxl
 			return m_storage;
 		}
 	};
-	
+
 	template<class Type>
-	uint32_t UniqueStorage<Type>::m_nextID = 0;
+	uint32_t IDStorage<Type>::m_nextID = 0;
 
 	template<class Type>
 	class NamedStorage
@@ -134,28 +146,50 @@ namespace Vxl
 	{
 		friend class RenderManager;
 	protected:
-		UniqueStorage<Texture2D> m_texture2D_storage;
-		UniqueStorage<Cubemap> m_cubemap_storage;
+		IDStorage<Texture2D> m_texture2D_storage;
+		IDStorage<Cubemap> m_cubemap_storage;
 		NamedStorage<File> m_file_storage;
+		// Shader
+		// Mesh
+		IDStorage<RenderTexture> m_renderTexture_storage;
+		IDStorage<RenderTextureDepth> m_renderTextureDepth_storage;
+		// FBO
+		IDStorage<RenderBuffer> m_renderBuffer_storage;
+		IDStorage<RenderBufferDepth> m_renderBufferDepth_storage;
+		// Entity
 
 		// Protected
 		Assets() {}
 
+		void DestroyAndEraseAll();
+
 	public:
 		// Removers
-		Texture2D*	eraseTexture2D(Texture2DIndex index) { m_texture2D_storage.Erase(index); }
-		Cubemap*	eraseCubemap(CubemapIndex index) { m_cubemap_storage.Erase(index); }
-		File*		eraseFile(const std::string& name) { m_file_storage.Erase(name); }
+		Texture2D*			eraseTexture2D(Texture2DIndex index) { m_texture2D_storage.Erase(index); }
+		Cubemap*			eraseCubemap(CubemapIndex index) { m_cubemap_storage.Erase(index); }
+		File*				eraseFile(const std::string& name) { m_file_storage.Erase(name); }
+		RenderTexture*		eraseRenderTexture(RenderTextureIndex index) { m_renderTexture_storage.Erase(index); }
+		RenderTextureDepth*	eraseRenderTextureDepth(RenderTextureDepthIndex index) { m_renderTextureDepth_storage.Erase(index); }
+		RenderBuffer*		eraseRenderBuffer(RenderBufferIndex index) { m_renderBuffer_storage.Erase(index); }
+		RenderBufferDepth*	eraseRenderBufferDepth(RenderBufferDepthIndex index) { m_renderBufferDepth_storage.Erase(index); }
 
 		// Getters
-		Texture2D*	getTexture2D(Texture2DIndex index) { return m_texture2D_storage.Get(index); }
-		Cubemap*	getCubemap(CubemapIndex index) { return m_cubemap_storage.Get(index); }
-		File*		getFile(const std::string& name) { return m_file_storage.Get(stringUtil::toLowerCopy(name)); }
+		Texture2D*			getTexture2D(Texture2DIndex index) { return m_texture2D_storage.Get(index); }
+		Cubemap*			getCubemap(CubemapIndex index) { return m_cubemap_storage.Get(index); }
+		File*				getFile(const std::string& name) { return m_file_storage.Get(stringUtil::toLowerCopy(name)); }
+		RenderTexture*		getRenderTexture(RenderTextureIndex index) { return m_renderTexture_storage.Get(index); }
+		RenderTextureDepth*	getRenderTextureDepth(RenderTextureDepthIndex index) { return m_renderTextureDepth_storage.Get(index); }
+		RenderBuffer*		getRenderBuffer(RenderBufferIndex index) { return m_renderBuffer_storage.Get(index); }
+		RenderBufferDepth*	getRenderBufferDepth(RenderBufferDepthIndex index) { return m_renderBufferDepth_storage.Get(index); }
 
 		// Get All
-		std::map<uint32_t, Texture2D*>& getAllTexture2D() { return m_texture2D_storage.GetAll(); }
-		std::map<uint32_t, Cubemap*>&	getAllCubemap() { return m_cubemap_storage.GetAll(); }
-		std::map<std::string, File*>&		getAllFiles() { return m_file_storage.GetAll(); }
+		std::map<uint32_t, Texture2D*>&			getAllTexture2D() { return m_texture2D_storage.GetAll(); }
+		std::map<uint32_t, Cubemap*>&			getAllCubemap() { return m_cubemap_storage.GetAll(); }
+		std::map<std::string, File*>&			getAllFiles() { return m_file_storage.GetAll(); }
+		std::map<uint32_t, RenderTexture*>&		getAllRenderTexture() { return m_renderTexture_storage.GetAll(); }
+		std::map<uint32_t, RenderTextureDepth*>&getAllRenderTextureDepth() { return m_renderTextureDepth_storage.GetAll(); }
+		std::map<uint32_t, RenderBuffer*>&		getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(); }
+		std::map<uint32_t, RenderBufferDepth*>&	getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(); }
 
 		// Texture Load/create
 		Texture2DIndex loadTexture2D(
@@ -205,6 +239,33 @@ namespace Vxl
 		void loadFile(
 			const std::string& name,
 			const std::string& filepath
+		);
+		// Render Texture
+		RenderTextureIndex createRenderTexture(
+			int Width,
+			int Height,
+			TextureFormat FormatType,
+			TexturePixelType PixelType,
+			bool MipMapping
+		);
+		// Render Texture Depth
+		RenderTextureDepthIndex createRenderTextureDepth(
+			int Width,
+			int Height,
+			TextureDepthFormat FormatType
+		);
+		// Render Buffer
+		RenderBufferIndex createRenderBuffer(
+			int Width,
+			int Height,
+			TextureFormat FormatType,
+			TexturePixelType PixelType
+		);
+		// Render Buffer Depth
+		RenderBufferDepthIndex createRenderBufferDepth(
+			int Width,
+			int Height,
+			TextureDepthFormat FormatType
 		);
 	};
 

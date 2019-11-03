@@ -164,10 +164,15 @@ namespace Vxl
 		m_renderTextureTargetSize.x = (uint32_t)MaxWidth;
 		m_renderTextureTargetSize.y = (uint32_t)(m_font->m_fontHeight * m_scale * m_lineCount);
 
-		if (m_renderTexture)
-			RenderTexture::DeleteUnnamedAsset(m_renderTexture);
+		//if (m_renderTexture)
+		//	RenderTexture::DeleteUnnamedAsset(m_renderTexture);
 
-		m_renderTexture = RenderTexture::Create("", m_renderTextureTargetSize.x, m_renderTextureTargetSize.y);
+		RenderTextureIndex id = SceneAssets.createRenderTexture(
+			m_renderTextureTargetSize.x, m_renderTextureTargetSize.y,
+			TextureFormat::RGB8, TexturePixelType::UNSIGNED_BYTE, true);
+		m_renderTexture = SceneAssets.getRenderTexture(id);
+
+		//m_renderTexture = RenderTexture::Create("", m_renderTextureTargetSize.x, m_renderTextureTargetSize.y);
 	}
 	void RenderText::UpdateRenderTexture()
 	{

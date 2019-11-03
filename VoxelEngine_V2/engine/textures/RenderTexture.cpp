@@ -5,53 +5,21 @@
 namespace Vxl
 {
 	RenderTexture::RenderTexture(
-		std::string name,
-		int Width, int Height,
+		int Width,
+		int Height,
 		TextureFormat FormatType,
 		TexturePixelType PixelType,
 		bool MipMapping
 	)
-		: m_name(name), BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
+		: BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
 			FormatType, Graphics::GetChannelType(FormatType), PixelType, AnisotropicMode::NONE, MipMapping)
 	{
 		m_width = Width;
 		m_height = Height;
 
-		if(!m_name.empty())
-			Graphics::SetGLName(ObjectType::TEXTURE, m_id, m_name);
-
 		// Storage
 		CreateStorage();
 		Unbind();
-	}
-
-	// Asset Creation
-	RenderTexture* RenderTexture::Create(
-		std::string name,
-		int Width, int Height,
-		TextureFormat FormatType,
-		TexturePixelType PixelType,
-		bool MipMapping
-	)
-	{
-		RenderTexture* _texture = new RenderTexture(name, Width, Height, FormatType, PixelType, MipMapping);
-
-		if(name.empty())
-			AddUnnamedAsset(_texture, AssetMessage::CREATED);
-		else
-			AddNamedAsset(name, _texture, AssetMessage::CREATED);
-
-		if (!_texture->IsLoaded())
-		{
-			Logger.error("Render Texture failed to create");
-			return nullptr;
-		}
-
-		return _texture;
-	}
-
-	RenderTexture::~RenderTexture()
-	{
 	}
 
 	// Utility
@@ -60,10 +28,6 @@ namespace Vxl
 		// Texture is immutable, destroy it and create a new one
 		unload();
 		load();
-
-		// Fix name
-		if(!m_name.empty())
-			Graphics::SetGLName(ObjectType::TEXTURE, m_id, m_name);
 
 		// Fix values
 		m_width = (int)width;
@@ -81,4 +45,16 @@ namespace Vxl
 		VXL_ASSERT(m_mipMapping, "Cannot update RenderTexture mipmaps because it needs to be created with the mipmap flag");
 		BaseTexture::UpdateMipmapping();
 	}
+	void RenderTexture::setGLName(const std::string& name)
+	{
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, name);
+	}
+
+	RenderTextureDepth::RenderTextureDepth(
+		int Width,
+		int Height,
+		TextureDepthFormat FormatType
+	)
+		: RenderTexture(Width, Height, Graphics::GetFormat(FormatType), Graphics::GetPixelData(FormatType)), m_depthFormat(FormatType)
+	{}
 }

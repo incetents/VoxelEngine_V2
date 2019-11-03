@@ -23,7 +23,13 @@ namespace Vxl
 		m_fbo = FramebufferObject::Create("GUIViewport");
 		m_fbo->SetSizeToWindowSize();
 		m_fbo->Bind();
-		m_fbo->NewAttachment(0, RenderTarget::Type::TEXTURE, "albedo", TextureFormat::RGBA8);
+
+		RenderTextureIndex id = SceneAssets.createRenderTexture(
+			m_fbo->GetWidth(), m_fbo->GetHeight(),
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
+		);
+		m_fbo->SetAttachment(0, SceneAssets.getRenderTexture(id));
+
 		m_fbo->checkFBOStatus();
 		m_fbo->Unbind();
 
@@ -33,13 +39,13 @@ namespace Vxl
 	}
 	void GUIViewport::DestroyGLResources()
 	{
-		RenderTexture::DeleteUnnamedAsset(m_renderTexture);
+		//RenderTexture::DeleteUnnamedAsset(m_renderTexture);
 		m_renderTexture = nullptr;
 
 		FramebufferObject::DeleteNamedAsset(m_fbo);
 		m_fbo = nullptr;
 
-		RenderTexture::DeleteNamedAsset(m_renderTexture);
+		//RenderTexture::DeleteNamedAsset(m_renderTexture);
 		m_renderTexture = nullptr;
 	}
 

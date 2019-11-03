@@ -26,19 +26,6 @@ namespace Vxl
 			return 0;
 		}
 	}
-	std::string RenderTarget::GetName(void) const
-	{
-		switch (m_type)
-		{
-		case Type::BUFFER:
-			return m_renderBuffer->GetName();
-		case Type::TEXTURE:
-			return m_renderTexture->GetName();
-		default:
-			VXL_ASSERT(false, "Cannot get name of empty FBO attachment");
-			return "";
-		}
-	}
 
 	TextureFormat RenderTarget::GetFormatType(void) const
 	{
@@ -78,6 +65,23 @@ namespace Vxl
 		int i = 0;
 		for (const auto& tex : m_textures)
 			m_attachmentOrder[i++] = tex.first;
+	}
+	void FramebufferObject::updateClearMode(TextureDepthFormat format)
+	{
+		// Update clear mode
+		switch (format)
+		{
+		case TextureDepthFormat::STENCIL8:
+			m_clearMode = ClearMode::COLOR_STENCIL;
+			break;
+		case TextureDepthFormat::DEPTH24_STENCIL8:
+		case TextureDepthFormat::DEPTH32F_STENCIL8:
+			m_clearMode = ClearMode::COLOR_DEPTH_STENCIL;
+			break;
+		default:
+			m_clearMode = ClearMode::COLOR_DEPTH;
+			break;
+		}
 	}
 
 	void FramebufferObject::load()
@@ -179,45 +183,6 @@ namespace Vxl
 		Graphics::FramebufferObject::AttachRenderBuffer(*_renderbuffer, _attachmentIndex);
 		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
-	void FramebufferObject::NewAttachment(
-		uint32_t _attachmentIndex,
-		RenderTarget::Type _type,
-		const std::string& _name,
-		TextureFormat _format,
-		bool _mipmapping
-	)
-	{
-		if (m_textures.find(_attachmentIndex) != m_textures.end())
-		{
-			Logger.error("err");
-		}
-
-		VXL_ASSERT(m_textures.find(_attachmentIndex) == m_textures.end(), "FBO: cannot create new attachment when one already exists");
-		VXL_ASSERT(_type != RenderTarget::Type::NONE, "FBO NewAttachment: Type is not specified");
-
-		if (_type == RenderTarget::Type::TEXTURE)
-		{
-			SetAttachment(
-				_attachmentIndex,
-				RenderTexture::Create(
-					"FBO_" + m_name + "_Tex_" + _name, m_width, m_height,
-					_format, TexturePixelType::UNSIGNED_BYTE, _mipmapping
-				)
-			);
-		}
-		else if (_type == RenderTarget::Type::BUFFER)
-		{
-			VXL_ASSERT(!_mipmapping, "FBO New Attachment: Renderbuffer cannot take mipmap parameter");
-
-			SetAttachment(
-				_attachmentIndex,
-				RenderBuffer::Create(
-					"FBO_" + m_name + "_Tex_" + _name, m_width, m_height,
-					_format, TexturePixelType::UNSIGNED_BYTE
-				)
-			);
-		}
-	}
 	void FramebufferObject::RemoveAttachment(
 		uint32_t _attachmentIndex
 	)
@@ -299,12 +264,6 @@ namespace Vxl
 	{
 		return m_textures[_attachmentIndex].GetID();
 	}
-	std::string FramebufferObject::GetAttachmentName(
-		uint32_t _attachmentIndex
-	)
-	{
-		return m_textures[_attachmentIndex].GetName();
-	}
 	void FramebufferObject::DisableAttachment(
 		uint32_t _attachmentIndex
 	)
@@ -346,67 +305,86 @@ namespace Vxl
 		}
 	}
 
-	void FramebufferObject::SetDepth(
-		TextureDepthFormat _depthFormat,
-		RenderTarget::Type _type
-	)
+	void FramebufferObject::SetDepth(RenderTextureDepth* _depth)
 	{
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
-		VXL_ASSERT(_type != RenderTarget::Type::NONE, "Incorrect Enum value");
+		VXL_ASSERT(_depth, "RenderTextureDepth is nullptr");
+		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
 
-		// If depth already exists, delete it first
-		if (!m_depth.IsUnused())
-			RemoveDepth();
+		m_depth.Set(_depth);
+		updateClearMode(_depth->m_depthFormat);
 
-		if (_type == RenderTarget::Type::TEXTURE)
-		{
-			RenderTexture* _renderTexture = RenderTexture::Create(
-				"FBO_" + m_name + "_Depth",
-				m_width, m_height,
-				Graphics::GetFormat(_depthFormat),
-				Graphics::GetPixelData(_depthFormat)
-			);
-
-			m_depth.Set(_renderTexture);
-
-			VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
-			Graphics::FramebufferObject::AttachRenderTextureAsDepth(*_renderTexture);
-
-			Graphics::SetGLName(ObjectType::TEXTURE, _renderTexture->GetID(), "FBO_" + m_name + "_Depth");
-		}
-		else
-		{
-			RenderBuffer* _renderBuffer = RenderBuffer::Create(
-				"FBO_" + m_name + "_Depth",
-				m_width, m_height,
-				Graphics::GetFormat(_depthFormat),
-				Graphics::GetPixelData(_depthFormat)
-			);
-
-			m_depth.Set(_renderBuffer);
-
-			VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
-			Graphics::FramebufferObject::AttachRenderBufferAsDepth(*_renderBuffer);
-
-			Graphics::SetGLName(ObjectType::TEXTURE, _renderBuffer->GetID(), "FBO_" + m_name + "_Depth");
-		}
-
-		// Update clear mode
-		if (_depthFormat == TextureDepthFormat::STENCIL8)
-			m_clearMode = ClearMode::COLOR_STENCIL;
-		else if (_depthFormat == TextureDepthFormat::DEPTH24_STENCIL8 || _depthFormat == TextureDepthFormat::DEPTH32F_STENCIL8)
-			m_clearMode = ClearMode::COLOR_DEPTH_STENCIL;
-		else
-			m_clearMode = ClearMode::COLOR_DEPTH;
-
+		Graphics::FramebufferObject::AttachRenderTextureAsDepth(*_depth);
 	}
+	void FramebufferObject::SetDepth(RenderBufferDepth* _depth)
+	{
+		VXL_ASSERT(m_id != -1, "FBO not initialized");
+		VXL_ASSERT(_depth, "RenderTextureDepth is nullptr");
+		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
+
+		m_depth.Set(_depth);
+		updateClearMode(_depth->m_depthFormat);
+
+		Graphics::FramebufferObject::AttachRenderBufferAsDepth(*_depth);
+	}
+
+	//	void FramebufferObject::SetDepth(
+	//		TextureDepthFormat _depthFormat,
+	//		RenderTarget::Type _type
+	//	)
+	//	{
+	//		VXL_ASSERT(m_id != -1, "FBO not initialized");
+	//		VXL_ASSERT(_type != RenderTarget::Type::NONE, "Incorrect Enum value");
+	//	
+	//		// If depth already exists, delete it first
+	//		if (!m_depth.IsUnused())
+	//			RemoveDepth();
+	//	
+	//		if (_type == RenderTarget::Type::TEXTURE)
+	//		{
+	//			RenderTextureIndex id = SceneAssets.createRenderTexture(
+	//				m_width, m_height,
+	//				Graphics::GetFormat(_depthFormat),
+	//				Graphics::GetPixelData(_depthFormat),
+	//				false
+	//			);
+	//			RenderTexture* rt = SceneAssets.getRenderTexture(id);
+	//	
+	//			m_depth.Set(rt);
+	//	
+	//			VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
+	//			Graphics::FramebufferObject::AttachRenderTextureAsDepth(*rt);
+	//	
+	//			Graphics::SetGLName(ObjectType::TEXTURE, rt->GetID(), "FBO_" + m_name + "_Depth");
+	//		}
+	//		else
+	//		{
+	//			RenderBufferIndex id = SceneAssets.createRenderBuffer(
+	//				m_width, m_height,
+	//				Graphics::GetFormat(_depthFormat),
+	//				Graphics::GetPixelData(_depthFormat)
+	//			);
+	//			RenderBuffer* rb = SceneAssets.getRenderBuffer(id);
+	//	
+	//			m_depth.Set(rb);
+	//	
+	//			VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
+	//			Graphics::FramebufferObject::AttachRenderBufferAsDepth(*rb);
+	//	
+	//			Graphics::SetGLName(ObjectType::TEXTURE, rb->GetID(), "FBO_" + m_name + "_Depth");
+	//		}
+	//	
+	//		// Update clear mode
+	//		if (_depthFormat == TextureDepthFormat::STENCIL8)
+	//			m_clearMode = ClearMode::COLOR_STENCIL;
+	//		else if (_depthFormat == TextureDepthFormat::DEPTH24_STENCIL8 || _depthFormat == TextureDepthFormat::DEPTH32F_STENCIL8)
+	//			m_clearMode = ClearMode::COLOR_DEPTH_STENCIL;
+	//		else
+	//			m_clearMode = ClearMode::COLOR_DEPTH;
+	//	
+	//	}
 	void FramebufferObject::RemoveDepth(void)
 	{
-		if (m_depth.IsRenderTexture())
-			RenderTexture::DeleteNamedAsset(m_depth.GetName());
-		else if (m_depth.IsRenderBuffer())
-			RenderBuffer::DeleteNamedAsset(m_depth.GetName());
-
 		m_depth.Remove();
 		m_clearMode = ClearMode::COLOR;
 	}
@@ -423,10 +401,6 @@ namespace Vxl
 	uint32_t FramebufferObject::GetDepthTextureID()
 	{
 		return m_depth.GetID();
-	}
-	std::string FramebufferObject::GetDepthtName()
-	{
-		return m_depth.GetName();
 	}
 	bool FramebufferObject::checkFBOStatus()
 	{

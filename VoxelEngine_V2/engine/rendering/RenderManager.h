@@ -104,7 +104,7 @@ namespace Vxl
 		void RenderSceneGameObjects_Opaque();
 		void RenderSceneGameObjects_Transparent();
 		void RenderSceneObjectsWithOnlyColorID();
-		void RenderEditorObjects(Texture2DIndex tex_light, Texture2DIndex tex_cam);
+		void RenderEditorObjects();
 		void RenderEditorObjectsPostDepth();
 
 	} SingletonInstance(RenderManager);

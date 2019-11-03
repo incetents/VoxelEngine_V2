@@ -81,8 +81,17 @@ namespace Vxl
 		m_fbo->SetSizeToWindowSize();
 		m_fbo->Bind();
 		//
-		m_fbo->NewAttachment(0, RenderTarget::Type::BUFFER, "color", TextureFormat::RGBA8);
-		m_fbo->SetDepth(TextureDepthFormat::DEPTH16, RenderTarget::Type::BUFFER);
+		auto id = SceneAssets.createRenderTexture(
+			m_fbo->GetWidth(), m_fbo->GetHeight(), 
+			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
+		);
+		auto id_depth = SceneAssets.createRenderBufferDepth(
+			m_fbo->GetWidth(), m_fbo->GetHeight(),
+			TextureDepthFormat::DEPTH16
+		);
+
+		m_fbo->SetAttachment(0, SceneAssets.getRenderTexture(id));
+		m_fbo->SetDepth(SceneAssets.getRenderBufferDepth(id_depth));
 		//
 		m_fbo->checkFBOStatus();
 		m_fbo->Unbind();
@@ -269,7 +278,7 @@ namespace Vxl
 				// Global Scale
 				if (m_selectedAxis == Axis::ALL)
 				{
-					m_dragAmount = 1.0f;
+					m_dragAmount = 0.0f;
 
 					// Get Mouse position in -1 to +1 range of screen
 					m_dragStart = Input.getMousePosScreenspace(true);
@@ -384,7 +393,7 @@ namespace Vxl
 
 					// Distance from mouse to center point of Gizmo
 					Vector2 MouseDelta = MouseScreenSpace - Vector2(m_dragStart);
-					float Distance = MouseDelta.x + MouseDelta.y + 1.0f;
+					float Distance = MouseDelta.x + MouseDelta.y + 0.0f;
 
 					// Scale everything based on distance
 					uint32_t selectionCount = (uint32_t)_entities.size();

@@ -51,8 +51,8 @@ namespace Vxl
 
 		// glName
 		auto name = stringUtil::nameFromFilepath(filePath);
-		if(!name.empty())
-			Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Tex_" + name);
+		if (!name.empty())
+			setGLName("Tex_" + name);
 
 		// finished
 		Unbind();
@@ -60,8 +60,9 @@ namespace Vxl
 	}
 	// [ Create Custom ]
 	Texture2D::Texture2D(
-		std::vector<Color3F> pixels, uint32_t width,
-		bool			UseMipMapping,
+		std::vector<Color3F>pixels,
+		uint32_t			width,
+		bool				UseMipMapping,
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
 		TextureFormat		FormatType,

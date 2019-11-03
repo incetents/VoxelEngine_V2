@@ -73,27 +73,4 @@ namespace Vxl
 		Graphics::Texture::SetStorage(face, m_width, m_height, m_channelType, m_pixelType, pixels);
 	}
 
-	Cubemap* Cubemap::Load(
-		const std::string& name,
-		const std::string& filePath1, const std::string& filePath2, const std::string& filePath3, const std::string& filePath4, const std::string& filePath5, const std::string& filePath6,
-		bool InvertY,
-		bool UseMipMapping,
-		TextureWrapping WrapMode,
-		TextureFilter FilterMode,
-		TextureFormat	FormatType,
-		TexturePixelType PixelType,
-		AnisotropicMode AnisotropicMode
-	) {
-		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType);
-
-		AddNamedAsset(name, _cubemap, AssetMessage::LOADED);
-
-		if (!_cubemap->IsLoaded())
-		{
-			Logger.error("Cubemap [" + name + "] failed to load");
-			return nullptr;
-		}
-
-		return _cubemap;
-	}
 }

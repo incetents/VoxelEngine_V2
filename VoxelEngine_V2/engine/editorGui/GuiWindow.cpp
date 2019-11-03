@@ -14,7 +14,14 @@ namespace Vxl
 		if(!m_padding)
 			 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
 
-		bool begin = ImGui::Begin(m_name.c_str(), &m_open, ImVec2(m_size.x, m_size.y), m_alpha, m_flags);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+		ImGui::SetNextWindowSize(ImVec2(m_size.x, m_size.y), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowBgAlpha(m_alpha);
+		bool begin = ImGui::Begin(m_name.c_str(), &m_open, m_flags);
+
+		ImGui::PopStyleVar(2);
 
 		if(!m_padding)
 			ImGui::PopStyleVar();

@@ -38,7 +38,7 @@ namespace Vxl
 		m_resolution[0] = width;
 		m_resolution[1] = height;
 
-		// ???
+		// Debug Context
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 		// Set OpenGL Version for Context
@@ -84,17 +84,23 @@ namespace Vxl
 		// IMGUI Setup
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-
-		ImGui_ImplGlfw_InitForOpenGL(GetContext(), true);
-		ImGui_ImplOpenGL3_Init("#version 450");
-
+		// Settings
 		ImGui::StyleColorsDark();
+		auto& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigDockingWithShift = false;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 #endif
 
 		// Graphics Setup
 		if(!Graphics::Setup())
 			VXL_ASSERT(false, "Glew failed to initialized");
 		Graphics::initHints();
+
+#ifdef GLOBAL_IMGUI
+		ImGui_ImplGlfw_InitForOpenGL(GetContext(), true);
+		ImGui_ImplOpenGL3_Init("#version 420 core");
+#endif
 
 		// Get version info
 		Logger.log("~~~~~~~~~~~~~~~~~~");
@@ -190,6 +196,14 @@ namespace Vxl
 	{
 #ifdef GLOBAL_IMGUI
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		auto& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
 #endif
 		Update();
 	}
@@ -250,6 +264,14 @@ namespace Vxl
 		
 		glfwSetWindowIcon(m_window, 1, icons);
 		SOIL_free_image_data(icons[0].pixels);
+	}
+
+	void Window::SetMaximized(bool state)
+	{
+		if (state)
+			glfwMaximizeWindow(m_window);
+		else
+			glfwRestoreWindow(m_window);
 	}
 
 	bool Window::IsCursorOnImguiWindow()

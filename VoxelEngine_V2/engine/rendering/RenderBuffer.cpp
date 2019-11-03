@@ -8,21 +8,17 @@
 namespace Vxl
 {
 	RenderBuffer::RenderBuffer(
-		std::string name,
 		int Width, int Height,
 		TextureFormat FormatType,
 		TexturePixelType PixelType
 	)
-		: m_name(name), m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(Graphics::GetChannelType(FormatType)), m_pixelType(PixelType)
+		: m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(Graphics::GetChannelType(FormatType)), m_pixelType(PixelType)
 	{
 		m_channelCount = Graphics::GetChannelCount(FormatType);
 		if (m_channelCount == -1)
 			m_channelCount = Graphics::GetChannelCount(FormatType);
 
 		m_id = Graphics::RenderBuffer::Create();
-
-		if(!m_name.empty())
-			Graphics::SetGLName(ObjectType::TEXTURE, m_id, name); // or GL_BUFFER ???
 
 		// Storage
 		Bind();
@@ -32,29 +28,6 @@ namespace Vxl
 	void RenderBuffer::UpdateStorage()
 	{
 		Graphics::RenderBuffer::SetStorage(m_formatType, m_width, m_height);
-	}
-
-	RenderBuffer* RenderBuffer::Create(
-		std::string name,
-		int Width, int Height,
-		TextureFormat FormatType,
-		TexturePixelType PixelType
-	)
-	{
-		RenderBuffer* _buffer = new RenderBuffer(name, Width, Height, FormatType, PixelType);
-
-		if(name.empty())
-			AddUnnamedAsset(_buffer, AssetMessage::CREATED);
-		else
-			AddNamedAsset(name, _buffer, AssetMessage::CREATED);
-
-		if (_buffer->GetID() == -1)
-		{
-			Logger.error("RenderBuffer failed to create");
-			return nullptr;
-		}
-
-		return _buffer;
 	}
 
 	RenderBuffer::~RenderBuffer()
@@ -79,6 +52,10 @@ namespace Vxl
 		// Update gl values
 		UpdateStorage();
 		Unbind();
+	}
+	void RenderBuffer::setGLName(const std::string& name)
+	{
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, name);
 	}
 
 	void RenderBuffer::Bind(void) const
@@ -116,4 +93,12 @@ namespace Vxl
 			m_width, m_height
 		);
 	}
+
+	RenderBufferDepth::RenderBufferDepth(
+		int Width,
+		int Height,
+		TextureDepthFormat FormatType
+	)
+		: RenderBuffer(Width, Height, Graphics::GetFormat(FormatType), Graphics::GetPixelData(FormatType)), m_depthFormat(FormatType)
+	{}
 }

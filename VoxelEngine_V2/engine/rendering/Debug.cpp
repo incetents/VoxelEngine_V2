@@ -2,12 +2,13 @@
 #include "Precompiled.h"
 #include "Debug.h"
 
-#include "../textures/Texture2D.h"
 #include "../math/Color.h"
-#include "../utilities/Loader.h"
 #include "../modules/Entity.h"
+#include "../modules/GlobalData.h"
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
+#include "../textures/Texture2D.h"
+#include "../utilities/Loader.h"
 #include "../utilities/Asset.h"
 
 namespace Vxl
@@ -218,42 +219,5 @@ namespace Vxl
 		// reset ColoredModels
 		m_wireframeSpheres.clear();
 		m_cubes.clear();
-	}
-
-	void Debug::CreateDebugTextures()
-	{
-		std::vector<Color3F> pixels;
-		pixels.reserve(16);
-
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F::BLACK);
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F::BLACK);
-
-		pixels.push_back(Color3F::BLACK);
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F::BLACK);
-		pixels.push_back(Color3F::PURPLE);
-
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F::BLACK);
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F::BLACK);
-
-		pixels.push_back(Color3F::BLACK);
-		pixels.push_back(Color3F::PURPLE);
-		pixels.push_back(Color3F::BLACK);
-		pixels.push_back(Color3F::PURPLE);
-
-		auto null_tex = SceneAssets.createTexture2D(
-			pixels, 4, true,
-			TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
-			TextureFormat::RGB8, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode::NONE
-		);
-
-		m_null_texture = SceneAssets.getTexture2D(null_tex);
-
-		VXL_ASSERT(m_null_texture, "Failed to create null texture");
 	}
 }

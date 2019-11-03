@@ -144,10 +144,6 @@ namespace Vxl
 		// Debug Cubes
 		std::vector<ColoredModel> m_cubes;
 
-		// Debug Textures
-		void			CreateDebugTextures();
-		Texture2D*		m_null_texture;
-
 	public:
 		// GL Resources
 		void InitGLResources()
@@ -155,16 +151,12 @@ namespace Vxl
 			m_worldLines  = new LineSet(true);
 			m_worldLinesNoDepth = new LineSet(true);
 			m_screenLines = new LineSet(false);
-
-			CreateDebugTextures();
 		}
 		void DestroyGLResources()
 		{
 			delete m_worldLines;
 			delete m_worldLinesNoDepth;
 			delete m_screenLines;
-
-			// Texture auto cleaned up
 		}
 
 		// Line Drawing
@@ -236,12 +228,6 @@ namespace Vxl
 		void RenderWorldLinesNoDepth();
 		void RenderScreenLines();
 		void End();
-
-		// Debug Texture
-		Texture2D* GetNullTexture(void) const
-		{
-			return m_null_texture;
-		}
 
 	} SingletonInstance(Debug);
 }

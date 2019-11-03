@@ -69,7 +69,6 @@ namespace Vxl
 			return m_renderBuffer;
 		}
 		uint32_t GetID(void) const;
-		std::string GetName(void) const;
 
 		TextureFormat GetFormatType(void) const;
 
@@ -93,6 +92,7 @@ namespace Vxl
 
 	class FramebufferObject : public Asset<FramebufferObject>
 	{
+		DISALLOW_COPY_AND_ASSIGN(FramebufferObject);
 		friend class RenderManager;
 	private:
 		
@@ -120,6 +120,7 @@ namespace Vxl
 		RenderTarget						m_depth;
 
 		void updateAttachmentOrder();
+		void updateClearMode(TextureDepthFormat format);
 
 		void load();
 		void unload();
@@ -169,13 +170,6 @@ namespace Vxl
 			uint32_t _attachmentIndex,
 			RenderBuffer* _renderbuffer
 		);
-		void NewAttachment(
-			uint32_t _attachmentIndex,
-			RenderTarget::Type _type,
-			const std::string& _name,
-			TextureFormat _format,
-			bool _mipmapping = false
-		);
 		void RemoveAttachment(
 			uint32_t _attachmentIndex
 		);
@@ -192,9 +186,6 @@ namespace Vxl
 		uint32_t GetAttachmentTextureID(
 			uint32_t _attachmentIndex
 		);
-		std::string GetAttachmentName(
-			uint32_t _attachmentIndex
-		);
 		inline std::vector<uint32_t> GetAttachmentIndices()
 		{
 			return m_attachmentOrder;
@@ -209,15 +200,16 @@ namespace Vxl
 
 		// Editing Depth Info
 		void SetDepth(
-			TextureDepthFormat _depthFormat,
-			RenderTarget::Type _type
+			RenderTextureDepth* _depth
+		);
+		void SetDepth(
+			RenderBufferDepth* _depth
 		);
 		void RemoveDepth(void);
 		// Get Depth Info
 		RenderTexture* GetDepthRenderTexture();
 		RenderBuffer* GetDepthRenderBuffer();
 		uint32_t GetDepthTextureID();
-		std::string GetDepthtName();
 
 		// Utility //
 		bool checkFBOStatus();

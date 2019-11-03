@@ -12,6 +12,7 @@
 #include "../modules/Scene.h"
 #include "../modules/Layer.h"
 #include "../modules/Material.h"
+#include "../modules/GlobalData.h"
 
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
@@ -230,6 +231,8 @@ namespace Vxl
 		GlobalRenderText.InitGLResources();
 		GUIViewport.InitGLResources();
 		Gizmo::InitGLResources();
+
+		GlobalData.InitGLResources();
 	}
 	void RenderManager::DestroyGlobalGLResources()
 	{
@@ -238,6 +241,8 @@ namespace Vxl
 		GlobalRenderText.DestoryGLResources();
 		GUIViewport.DestroyGLResources();
 		Gizmo::DestroyGLResources();
+
+		GlobalAssets.DestroyAndEraseAll();
 	}
 
 	//
@@ -281,11 +286,11 @@ namespace Vxl
 
 		// Delete Textures
 		//Texture2D::DeleteAllAssets();
-		Cubemap::DeleteAllAssets();
-		RenderTexture::DeleteAllAssets();
+		//Cubemap::DeleteAllAssets();
+		//RenderTexture::DeleteAllAssets();
 
 		// Delete extra buffers
-		RenderBuffer::DeleteAllAssets();
+		//RenderBuffer::DeleteAllAssets();
 
 		// Delete Framebuffers
 		FramebufferObject::DeleteAllAssets();
@@ -294,11 +299,7 @@ namespace Vxl
 		Mesh::DeleteAllAssets();
 
 		// Delete All Scene Assets
-		auto& textures = SceneAssets.getAllTexture2D();
-		for (auto& texture : textures)
-			delete texture.second;
-
-		SceneAssets.m_texture2D_storage.EraseAll();
+		SceneAssets.DestroyAndEraseAll();
 	}
 	void RenderManager::Update()
 	{
@@ -559,7 +560,7 @@ namespace Vxl
 			fbo_gbuffer->EnableAttachment(1);
 		}
 	}
-	void RenderManager::RenderEditorObjects(Texture2DIndex tex_light, Texture2DIndex tex_cam)
+	void RenderManager::RenderEditorObjects()
 	{
 		Graphics::SetDepthRead(true);
 		Graphics::SetDepthWrite(true);
@@ -573,31 +574,23 @@ namespace Vxl
 		{
 			billboard->BindProgram();
 
-			Texture2D* LightTexture = SceneAssets.getTexture2D(tex_light);
 			auto AllLights = LightObject::GetAllNamedAssets();
 			for (auto light = AllLights.begin(); light != AllLights.end(); light++)
 			{
 				billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getModel(), true);
-
-				if (LightTexture)
-					LightTexture->Bind(TextureLevel::LEVEL0);
-				else
-					Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
+				
+				GlobalData.tex_editor_light->Bind(TextureLevel::LEVEL0);
 
 				Geometry.GetQuadZ()->Draw();
 			}
 
 			// Draw Cameras
-			Texture2D* CameraTexture = SceneAssets.getTexture2D(tex_cam);
 			auto AllCameras = CameraObject::GetAllNamedAssets();
 			for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 			{
 				billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getModel(), true);
-
-				if (LightTexture)
-					CameraTexture->Bind(TextureLevel::LEVEL0);
-				else
-					Debug.GetNullTexture()->Bind(TextureLevel::LEVEL0);
+				
+				GlobalData.tex_editor_camera->Bind(TextureLevel::LEVEL0);
 
 				Geometry.GetQuadZ()->Draw();
 			}
