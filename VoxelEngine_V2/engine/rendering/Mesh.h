@@ -6,6 +6,7 @@
 #include "Graphics.h"
 
 #include "../utilities/Asset.h"
+#include "../utilities/Macros.h"
 
 #include <Windows.h>
 #include <vector>
@@ -14,27 +15,21 @@ namespace Vxl
 {
 	class Model;
 
-	class Mesh : public Asset<Mesh>
+	class Mesh
 	{
+		DISALLOW_COPY_AND_ASSIGN(Mesh);
+		friend class Assets;
 	private:
 		VAO m_VAO;
 
-		DrawType m_type; // Triangles = Default
-		DrawSubType m_subtype; //
-		DrawMode m_mode; // Array = Default
-		uint32_t m_drawCount = 0;	// Vertices Drawn
-		uint32_t m_faces = 0;		// Triangles Drawn
-		uint32_t m_lines = 0;		// Lines Drawn
-
-		Vector3 m_min; // smallest vertices of mesh
-		Vector3 m_max; // largest vertices of mesh
-		
-		void (Mesh::*Draw_Function)(void) = &Mesh::DrawArray;
-
-		void DrawArray();
-		void DrawIndexed();
-		void DrawArrayInstances();
-		void DrawIndexedInstances();
+		DrawType	m_type; // Triangles = Default
+		DrawSubType m_subtype; // points, lines, or triangles
+		DrawMode	m_mode; // Array = Default
+		uint32_t	m_drawCount = 0;	// Vertices Drawn
+		uint32_t	m_faces = 0;		// Triangles Drawn
+		uint32_t	m_lines = 0;		// Lines Drawn
+		Vector3		m_min; // smallest vertices of mesh
+		Vector3		m_max; // largest vertices of mesh
 
 		void UpdateDrawInfo();
 
@@ -51,13 +46,10 @@ namespace Vxl
 			const uint32_t* _indices = nullptr, uint32_t _indexCount = 0
 		);
 
-		Mesh(const std::string& glName = "");
+		Mesh();
 	public:
-		// Stores Mesh in Database optionally
-		static Mesh* Create();
-		static Mesh* Create(const std::string& name);
-		static Mesh* Create(const std::string& name, Model* model);
-		virtual ~Mesh();
+
+		virtual ~Mesh() {}
 
 		MeshBufferMem<Vector3>	m_positions;
 		MeshBufferMem<Vector2>	m_uvs;
@@ -67,7 +59,8 @@ namespace Vxl
 		MeshBufferIndices		m_indices;
 
 		// Update all data from model
-		void Set(Model* _model);
+		void Set(const Model& _model);
+		void setGLName(const std::string& name);
 
 		inline uint32_t		GetDrawCount(void)	 const
 		{

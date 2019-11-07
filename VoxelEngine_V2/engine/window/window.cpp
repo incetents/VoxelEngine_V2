@@ -54,7 +54,7 @@ namespace Vxl
 			return;
 		}
 		// default position
-		SetPosition(50, 50);
+		SetPosition(393, 296);
 		// default cursor
 		SetCursor(CursorMode::NORMAL);
 

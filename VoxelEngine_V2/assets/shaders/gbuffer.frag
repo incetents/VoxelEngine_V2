@@ -23,24 +23,25 @@ layout (location = 3) out vec4 output_colorID;
 // Uniform Textures
 layout (binding = 0) uniform sampler2D albedo_handler;
 // Uniforms
-uniform bool VXL_useTexture = false;
-uniform vec3 VXL_color 		= vec3(1,1,1);
-uniform vec3 VXL_tint 		= vec3(1,1,1);
-uniform vec4 VXL_output 	= vec4(0,0,0,0); // used for color ID
+uniform bool  VXL_useTexture = false;
+uniform vec3  VXL_color 	= vec3(0,0,0);
+uniform vec3  VXL_tint 		= vec3(1,1,1);
+uniform vec4  VXL_output 	= vec4(0,0,0,0); // used for color ID
 uniform float VXL_alpha 	= 1.0;
 
 //Main
 void main()
 {
+	output_albedo = vec4(0,0,0,VXL_alpha);
+
 	if(VXL_useTexture)
 	{
 		vec4 _tex = texture(albedo_handler, v_data.uv);
 		output_albedo.rgb = _tex.rgb * VXL_tint;
 	}
-	else
-	{
-		output_albedo.rgb = VXL_color * VXL_tint;
-	}
+
+	output_albedo.rgb += VXL_color
+	output_albedo.rgb *= VXL_tint;
 		
 	// output UV for testing reasons
 	//output_albedo = vec4(v_data.uv, 0, 1);
@@ -54,7 +55,7 @@ void main()
 	//	if(TESTMODE == 3)
 	//		output_albedo = vec4(normalize(v_data.bitangent), 1.0);
 	
-	output_albedo.a = VXL_alpha;
+	//output_albedo.a = VXL_alpha;
 
 	//float d = dot(-getCameraForwad(), normalize(v_data.normal));	
 	//output_test = vec4(d, 0, 0.2, 1);

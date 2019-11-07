@@ -36,7 +36,7 @@
 #include "../engine/math/Model.h"
 
 #include "../engine/objects/LightObject.h"
-#include "../engine/objects/CameraObject.h"
+#include "../engine/objects/Camera.h"
 #include "../engine/objects/GameObject.h"
 #include "../engine/objects/TextObject.h"
 
@@ -44,14 +44,14 @@
 
 #include "../engine/window/window.h"
 
+#include "../engine/editorGui/GUIViewport.h"
+
 #include "../engine/editor/Editor.h"
 #include "../engine/editorGui/ShaderErrors.h"
 #include "../engine/editorGui/DevConsole.h"
 #include "../engine/editorGui/Hierarchy.h"
 #include "../engine/editorGui/Inspector.h"
 #include "../engine/editorGui/Performance.h"
-
-#include "../game/terrain/TerrainManager.h"
 
 
 
@@ -120,205 +120,322 @@ namespace Vxl
 		SceneAssets.loadFile("_Math.glsl", "./assets/files/_Math.glsl");
 		SceneAssets.loadFile("_Uniforms.glsl", "./assets/files/_Uniforms.glsl");
 
-		//ShaderBuilder builder;
-		//builder.Create("");
-
-
-		Loader::LoadScript_ImportFiles("./assets/scripts/ImportFiles.txt");
-
-		//_camera = Camera::Create("main", Vector3(3.5f, 2.8f, 0.3f), Vector3(-0.5f, -0.38f, -0.72f), 0.01f, 50.0f);
-
-		_cameraObject = CameraObject::Create("_camera_editor", 0.01f, 5000.0f);
-		_cameraObject->m_transform.setPosition(3.5f, 2.8f, 0.3f);
-		_cameraObject->m_transform.setCameraForward(Vector3(-1, 0, -1));
-		_cameraObject->SetPerspectiveWindowAspect(110.0f);
-
-		//_cameraObject->TransformChanged();
-
-		CameraObject* _c2 = CameraObject::Create("_camera2", 0.5f, 10.0f);
-		_c2->m_transform.setPosition(2.9f, 2.1f, -2.5f);
-		_c2->m_transform.setForward(Vector3(0, 0, 1));
-		_c2->SetPerspectiveWindowAspect(140.0f);
-
-
-		RenderManager.SetMainCamera(_cameraObject);
-
-		//_camera->setOrthographic(-15, 15, -15, 15);
-		//_camera->setPerspective(110.0f, 1.0f);
-		//_camera->setPerspectiveWindowAspectLock(110.0f);
-		//_camera->update();
-		//_camera->SetMain();
-
-
 
 		// FBO Gbuffer
-		_fbo_gbuffer = FramebufferObject::Create("gbuffer");
-		_fbo_gbuffer->SetClearColor(Color4F(-1, -1, 0, 1));
-		_fbo_gbuffer->SetSizeToWindowSize();
-		_fbo_gbuffer->Bind();
+		fboIndex_gbuffer = SceneAssets.createFramebuffer();
+		FramebufferObject* fbo_gbuffer_ptr = SceneAssets.getFramebufferObject(fboIndex_gbuffer);
+		fbo_gbuffer_ptr->setSizeToViewportSize();
 
+		// render targets
 		fbotex_gbuffer_albedo = SceneAssets.createRenderTexture(
-			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_normal = SceneAssets.createRenderTexture(
-			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA16_SNORM, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_reflection = SceneAssets.createRenderTexture(
-			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_colorID = SceneAssets.createRenderTexture(
-			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_depth = SceneAssets.createRenderTextureDepth(
-			_fbo_gbuffer->GetWidth(), _fbo_gbuffer->GetHeight(),
+			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureDepthFormat::DEPTH32
 		);
 
-		_fbo_gbuffer->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_gbuffer_albedo));
-		_fbo_gbuffer->SetAttachment(1, SceneAssets.getRenderTexture(fbotex_gbuffer_normal));
-		_fbo_gbuffer->SetAttachment(2, SceneAssets.getRenderTexture(fbotex_gbuffer_reflection));
-		_fbo_gbuffer->SetAttachment(3, SceneAssets.getRenderTexture(fbotex_gbuffer_colorID));
-		_fbo_gbuffer->SetDepth(SceneAssets.getRenderTextureDepth(fbotex_gbuffer_depth));
-		_fbo_gbuffer->checkFBOStatus();
-		_fbo_gbuffer->Unbind();
+		fbo_gbuffer_ptr->setClearColor(Color4F(0.2f, 0.2f, 0.2f, 1));
+		fbo_gbuffer_ptr->bind();
+		fbo_gbuffer_ptr->setAttachment(0, SceneAssets.getRenderTexture(fbotex_gbuffer_albedo));
+		fbo_gbuffer_ptr->setAttachment(1, SceneAssets.getRenderTexture(fbotex_gbuffer_normal));
+		fbo_gbuffer_ptr->setAttachment(2, SceneAssets.getRenderTexture(fbotex_gbuffer_reflection));
+		fbo_gbuffer_ptr->setAttachment(3, SceneAssets.getRenderTexture(fbotex_gbuffer_colorID));
+		fbo_gbuffer_ptr->setDepth(SceneAssets.getRenderTextureDepth(fbotex_gbuffer_depth));
+		fbo_gbuffer_ptr->checkFBOStatus();
+		fbo_gbuffer_ptr->unbind();
 
 		// FBO Editor Post
-		_fbo_editor = FramebufferObject::Create("EditorPost");
-		_fbo_editor->SetSizeToWindowSize();
-		_fbo_editor->Bind();
+		fboIndex_editor = SceneAssets.createFramebuffer();
+		FramebufferObject* fbo_editor_ptr = SceneAssets.getFramebufferObject(fboIndex_editor);
+		fbo_editor_ptr->setSizeToViewportSize();
 
+		// render targets
 		fbotex_editor_albedo = SceneAssets.createRenderTexture(
-			_fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
+			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
-			_fbo_editor->GetWidth(), _fbo_editor->GetHeight(),
+			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
 			TextureDepthFormat::DEPTH32
 		);
 
-		_fbo_editor->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_editor_albedo));
-		_fbo_editor->SetDepth(SceneAssets.getRenderBufferDepth(fbotex_editor_depth));
-		_fbo_editor->checkFBOStatus();
-		_fbo_editor->Unbind();
+		fbo_editor_ptr->bind();
+		fbo_editor_ptr->setAttachment(0, SceneAssets.getRenderTexture(fbotex_editor_albedo));
+		fbo_editor_ptr->setDepth(SceneAssets.getRenderBufferDepth(fbotex_editor_depth));
+		fbo_editor_ptr->checkFBOStatus();
+		fbo_editor_ptr->unbind();
 
 		// FBO Color Picker
-		_fbo_colorpicker = FramebufferObject::Create("ColorPicker");
-		_fbo_colorpicker->SetSizeToWindowSize();
-		_fbo_colorpicker->Bind();
+		fboIndex_colorpicker = SceneAssets.createFramebuffer();
+		FramebufferObject* fbo_colorPicker_ptr = SceneAssets.getFramebufferObject(fboIndex_colorpicker);
+		fbo_colorPicker_ptr->setSizeToViewportSize();
 
+		// render targets
 		fbotex_colorPicker_albedo = SceneAssets.createRenderTexture(
-			_fbo_colorpicker->GetWidth(), _fbo_colorpicker->GetHeight(),
+			fbo_colorPicker_ptr->getWidth(), fbo_colorPicker_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_colorPicker_depth = SceneAssets.createRenderBufferDepth(
-			_fbo_colorpicker->GetWidth(), _fbo_colorpicker->GetHeight(),
+			fbo_colorPicker_ptr->getWidth(), fbo_colorPicker_ptr->getHeight(),
 			TextureDepthFormat::DEPTH32
 		);
 
-		_fbo_colorpicker->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_colorPicker_albedo));
-		_fbo_colorpicker->SetDepth(SceneAssets.getRenderBufferDepth(fbotex_colorPicker_depth));
-		_fbo_colorpicker->checkFBOStatus();
-		_fbo_colorpicker->Unbind();
+		fbo_colorPicker_ptr->bind();
+		fbo_colorPicker_ptr->setAttachment(0, SceneAssets.getRenderTexture(fbotex_colorPicker_albedo));
+		fbo_colorPicker_ptr->setDepth(SceneAssets.getRenderBufferDepth(fbotex_colorPicker_depth));
+		fbo_colorPicker_ptr->checkFBOStatus();
+		fbo_colorPicker_ptr->unbind();
 
 		// FBO Composite
-		_fbo_composite = FramebufferObject::Create("composite");
-		_fbo_composite->SetSizeToWindowSize();
-		_fbo_composite->Bind();
+		fboIndex_composite = SceneAssets.createFramebuffer();
+		FramebufferObject* fbo_composite_ptr = SceneAssets.getFramebufferObject(fboIndex_composite);
+		fbo_composite_ptr->setSizeToViewportSize();
 
+		// render targets
 		fbotex_composite_albedo = SceneAssets.createRenderTexture(
-			_fbo_composite->GetWidth(), _fbo_composite->GetHeight(),
+			fbo_composite_ptr->getWidth(), fbo_composite_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
-		_fbo_composite->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_composite_albedo));
-		_fbo_composite->checkFBOStatus();
-		_fbo_composite->Unbind();
+		fbo_composite_ptr->bind();
+		fbo_composite_ptr->setAttachment(0, SceneAssets.getRenderTexture(fbotex_composite_albedo));
+		fbo_composite_ptr->checkFBOStatus();
+		fbo_composite_ptr->unbind();
 
 		// FBO Show Render Target
-		_fbo_showRenderTarget = FramebufferObject::Create("showRenderTarget");
-		_fbo_showRenderTarget->SetSizeToWindowSize();
-		_fbo_showRenderTarget->Bind();
+		fboIndex_showRenderTarget = SceneAssets.createFramebuffer();
+		FramebufferObject* fbo_showRenderTarget_ptr = SceneAssets.getFramebufferObject(fboIndex_showRenderTarget);
+		fbo_showRenderTarget_ptr->setSizeToViewportSize();
 
+		// render targets
 		fbotex_showRenderTarget_albedo = SceneAssets.createRenderTexture(
-			_fbo_composite->GetWidth(), _fbo_composite->GetHeight(),
+			fbo_showRenderTarget_ptr->getWidth(), fbo_showRenderTarget_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
-		_fbo_showRenderTarget->SetAttachment(0, SceneAssets.getRenderTexture(fbotex_showRenderTarget_albedo));
-		_fbo_showRenderTarget->checkFBOStatus();
-		_fbo_showRenderTarget->Unbind();
+		fbo_showRenderTarget_ptr->bind();
+		fbo_showRenderTarget_ptr->setAttachment(0, SceneAssets.getRenderTexture(fbotex_showRenderTarget_albedo));
+		fbo_showRenderTarget_ptr->checkFBOStatus();
+		fbo_showRenderTarget_ptr->unbind();
 
+		// Shaders
+		gbuffer_vert = SceneAssets.createShader("gbuffer_vert", "./assets/shaders/gbuffer.vert", ShaderType::VERTEX);
+		gbuffer_frag = SceneAssets.createShader("gbuffer_vert", "./assets/shaders/gbuffer.frag", ShaderType::FRAGMENT);
 
-		ShaderProgram* _shader_skybox			= ShaderProgram::GetAsset("skybox");
-		ShaderProgram* _shader_gbuffer			= ShaderProgram::GetAsset("gbuffer");
-		ShaderProgram* _shader_lines			= ShaderProgram::GetAsset("lines");
-		ShaderProgram* _shader_passthroughWorld	= ShaderProgram::GetAsset("passthroughWorld");
-		ShaderProgram* _shader_colorPicker		= ShaderProgram::GetAsset("colorPicker");
-		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
-		ShaderProgram* _shader_billboard		= ShaderProgram::GetAsset("billboard");
-		ShaderProgram* _shader_gizmo			= ShaderProgram::GetAsset("gizmo");
-		ShaderProgram* _shader_font				= ShaderProgram::GetAsset("font");
-		ShaderProgram* _shader_showNormals		= ShaderProgram::GetAsset("showNormals");
+		passthrough_vert = SceneAssets.createShader("passthrough_vert", "./assets/shaders/passthrough.vert", ShaderType::VERTEX);
+		passthrough_frag = SceneAssets.createShader("passthrough_frag", "./assets/shaders/passthrough.frag", ShaderType::FRAGMENT);
 
+		skybox_vert = SceneAssets.createShader("skybox_vert", "./assets/shaders/skybox.vert", ShaderType::VERTEX);
+		skybox_frag = SceneAssets.createShader("skybox_frag", "./assets/shaders/skybox.frag", ShaderType::FRAGMENT);
 
-		material_skybox = Material::Create("skybox", 0);
-		material_skybox->SetProgram(*_shader_skybox);
+		lines_vert = SceneAssets.createShader("lines_vert", "./assets/shaders/lines.vert", ShaderType::VERTEX);
+		lines_geom = SceneAssets.createShader("lines_geom", "./assets/shaders/lines.geom", ShaderType::VERTEX);
+		lines_frag = SceneAssets.createShader("lines_frag", "./assets/shaders/lines.frag", ShaderType::FRAGMENT);
+
+		colorPicker_frag = SceneAssets.createShader("colorPicker_frag", "./assets/shaders/colorPicker.vert", ShaderType::FRAGMENT);
+
+		gizmo_vert = SceneAssets.createShader("gizmo_vert", "./assets/shaders/gizmo.vert", ShaderType::VERTEX);
+		gizmo_frag = SceneAssets.createShader("gizmo_frag", "./assets/shaders/gizmo.frag", ShaderType::FRAGMENT);
+
+		showRenderTarget = SceneAssets.createShader("showRenderTarget", "./assets/shaders/showRenderTarget.vert", ShaderType::VERTEX);
+
+		billboard_vert = SceneAssets.createShader("billboard_vert", "./assets/shaders/billboard.vert", ShaderType::VERTEX);
+		billboard_frag = SceneAssets.createShader("billboard_frag", "./assets/shaders/billboard.frag", ShaderType::FRAGMENT);
+
+		font_vert = SceneAssets.createShader("font_vert", "./assets/shaders/font.vert", ShaderType::VERTEX);
+		font_frag = SceneAssets.createShader("font_frag", "./assets/shaders/font.frag", ShaderType::FRAGMENT);
+
+		// Shader Programs
+		shader_gbuffer = SceneAssets.createShaderProgram("gbuffer", {
+			SceneAssets.getShader(gbuffer_vert),
+			SceneAssets.getShader(gbuffer_frag)
+			});
+
+		shader_passthroughWorld = SceneAssets.createShaderProgram("passthroughWorld", {
+			SceneAssets.getShader(passthrough_vert),
+			SceneAssets.getShader(passthrough_frag)
+			});
+
+		shader_skybox = SceneAssets.createShaderProgram("skybox", {
+			SceneAssets.getShader(skybox_vert),
+			SceneAssets.getShader(skybox_frag)
+			});
+
+		shader_lines = SceneAssets.createShaderProgram("lines", {
+			SceneAssets.getShader(lines_vert),
+			SceneAssets.getShader(lines_geom),
+			SceneAssets.getShader(lines_frag)
+			});
+
+		shader_colorPicker = SceneAssets.createShaderProgram("colorPicker", {
+			SceneAssets.getShader(gbuffer_vert),
+			SceneAssets.getShader(colorPicker_frag)
+			});
+
+		shader_gizmo = SceneAssets.createShaderProgram("gizmo", {
+			SceneAssets.getShader(gizmo_vert),
+			SceneAssets.getShader(gizmo_frag)
+			});
+
+		shader_showRenderTarget = SceneAssets.createShaderProgram("showRenderTarget", {
+			SceneAssets.getShader(passthrough_vert),
+			SceneAssets.getShader(showRenderTarget)
+			});
+
+		shader_billboard = SceneAssets.createShaderProgram("billboard", {
+			SceneAssets.getShader(billboard_vert),
+			SceneAssets.getShader(billboard_frag)
+			});
+
+		shader_font = SceneAssets.createShaderProgram("font", {
+			SceneAssets.getShader(font_vert),
+			SceneAssets.getShader(font_frag)
+			});
+
+		// Materials
+		material_gbuffer = SceneAssets.createMaterial("gbuffer");
+		{
+			auto mat = SceneAssets.getMaterial(material_gbuffer);
+			mat->setSceneShader(shader_gbuffer);
+			mat->setSequenceID(2);
+		}
+		material_gbuffer_transparent = SceneAssets.createMaterial("gbuffer_transparent");
+		{
+			auto mat = SceneAssets.getMaterial(material_gbuffer_transparent);
+			mat->setSceneShader(shader_gbuffer);
+			mat->m_renderMode = MaterialRenderMode::Transparent;
+			mat->m_depthWrite = false;
+			mat->m_blendFunc.source = BlendSource::ONE;
+			mat->m_blendFunc.destination = BlendDestination::ONE;
+			// ignore color ID layer
+			mat->m_blendFuncAttachments[TextureLevel::LEVEL2].source = BlendSource::ONE;
+			mat->m_blendFuncAttachments[TextureLevel::LEVEL2].destination = BlendDestination::ONE;
+		}
+		material_passthroughWorld = SceneAssets.createMaterial("passthrough");
+		{
+			auto mat = SceneAssets.getMaterial(material_passthroughWorld);
+			mat->setSceneShader(shader_passthroughWorld);
+			mat->m_blendState = false;
+		}
+		material_passthroughWorld_transparent = SceneAssets.createMaterial("passthrough_transparent");
+		{
+			auto mat = SceneAssets.getMaterial(material_passthroughWorld_transparent);
+			mat->setSceneShader(shader_passthroughWorld);
+			mat->m_depthWrite = false;
+			mat->m_blendFunc.source = BlendSource::ONE;
+			mat->m_blendFunc.destination = BlendDestination::ONE;
+			mat->m_renderMode = MaterialRenderMode::Transparent;
+
+		}
+		material_skybox = SceneAssets.createMaterial("skybox");
+		{
+			auto mat = SceneAssets.getMaterial(material_skybox);
+			mat->setSceneShader(shader_skybox);
+			mat->setTexture(SceneAssets.getCubemap(cubemap_craterlake), TextureLevel::LEVEL0);
+			mat->setSequenceID(1);
+		}
+		material_lines = SceneAssets.createMaterial("lines");
+		{
+			auto mat = SceneAssets.getMaterial(material_lines);
+			mat->setSceneShader(shader_lines);
+		}
+		material_colorPicker = SceneAssets.createMaterial("colorPicker");
+		{
+			auto mat = SceneAssets.getMaterial(material_colorPicker);
+			mat->setSceneShader(shader_colorPicker);
+		}
+		material_gizmo = SceneAssets.createMaterial("gizmo");
+		{
+			auto mat = SceneAssets.getMaterial(material_gizmo);
+			mat->setSceneShader(shader_gizmo);
+		}
+		material_showRenderTarget = SceneAssets.createMaterial("showRenderTarget");
+		{
+			auto mat = SceneAssets.getMaterial(material_showRenderTarget);
+			mat->setSceneShader(shader_showRenderTarget);
+		}
+		material_billboard = SceneAssets.createMaterial("billboard");
+		{
+			auto mat = SceneAssets.getMaterial(material_billboard);
+			mat->setSceneShader(shader_billboard);
+			mat->m_blendState = false;
+		}
+		material_font = SceneAssets.createMaterial("font");
+		{
+			auto mat = SceneAssets.getMaterial(material_font);
+			mat->setSceneShader(shader_font);
+			mat->m_depthRead = false;
+			mat->m_depthWrite = false;
+		}
+
+		//material_skybox = Material::Create("skybox", 0);
+		//material_skybox->SetProgram(*_shader_skybox);
 
 		// Gbuffer Materials [Should not do any blending]
 
-		material_gbuffer = Material::Create("gbuffer", 1);
-		material_gbuffer->SetProgram(*_shader_gbuffer);
-		material_gbuffer->m_BlendState = false;
-
-		material_transparent_gbuffer = Material::Create("transparent_gbuffer", 1000);
-		material_transparent_gbuffer->SetProgram(*_shader_gbuffer);
-		material_transparent_gbuffer->SetRenderMode(MaterialRenderMode::Transparent);
-		material_transparent_gbuffer->m_DepthWrite = false;
-		material_transparent_gbuffer->m_BlendFunc.source = BlendSource::ONE;
-		material_transparent_gbuffer->m_BlendFunc.destination = BlendDestination::ONE;
-		// Color ID still passes normally by ignoring blend mode
-		material_transparent_gbuffer->SetBlendFuncAttachment(3, BlendSource::ONE, BlendDestination::ZERO);
-
-		material_opaque_passthroughWorld = Material::Create("opaque_passthroughWorld", 2);
-		material_opaque_passthroughWorld->SetProgram(*_shader_passthroughWorld);
-		material_opaque_passthroughWorld->m_BlendState = false;
-
-		material_opaque_billboard = Material::Create("opaque_billboard", 3);
-		material_opaque_billboard->SetProgram(*_shader_billboard);
-		material_opaque_billboard->m_BlendState = false;
-
-		material_passthroughWorld = Material::Create("transparent_passthroughWorld", 1001);
-		material_passthroughWorld->SetProgram(*_shader_passthroughWorld);
-		material_passthroughWorld->SetRenderMode(MaterialRenderMode::Transparent);
-		material_passthroughWorld->m_DepthWrite = false;
-		material_passthroughWorld->m_BlendFunc.source = BlendSource::ONE;
-		material_passthroughWorld->m_BlendFunc.destination = BlendDestination::ONE;
-		// Color ID still passes normally by ignoring blend mode
-		material_passthroughWorld->SetBlendFuncAttachment(3, BlendSource::ONE, BlendDestination::ZERO);
-
-		material_billboard = Material::Create("billboard", 3);
-		material_billboard->SetProgram(*_shader_billboard);
-
-		material_lines = Material::Create("lines", 4);
-		material_lines->SetProgram(*_shader_lines);
-
-		material_simpleLight = Material::Create("gizmo", 5);
-		material_simpleLight->SetProgram(*_shader_gizmo);
-
-		material_colorPicker = Material::Create("colorPicker", 6);
-		material_colorPicker->SetProgram(*_shader_colorPicker);
-		material_colorPicker->m_BlendState = false;
-
-		material_showNormals = Material::Create("showNormals", 20);
-		material_showNormals->SetProgram(*_shader_showNormals);
-		material_showNormals->m_BlendState = false;
-
-		material_font = Material::Create("font", 100);
-		material_font->SetProgram(*_shader_font);
-		material_font->m_DepthRead = false;
-		material_font->m_DepthWrite = false;
+		//	material_gbuffer = Material::Create("gbuffer", 1);
+		//	material_gbuffer->SetProgram(*_shader_gbuffer);
+		//	material_gbuffer->m_BlendState = false;
+		//	
+		//	material_transparent_gbuffer = Material::Create("transparent_gbuffer", 1000);
+		//	material_transparent_gbuffer->SetProgram(*_shader_gbuffer);
+		//	material_transparent_gbuffer->SetRenderMode(MaterialRenderMode::Transparent);
+		//	material_transparent_gbuffer->m_DepthWrite = false;
+		//	material_transparent_gbuffer->m_BlendFunc.source = BlendSource::ONE;
+		//	material_transparent_gbuffer->m_BlendFunc.destination = BlendDestination::ONE;
+		//	// Color ID still passes normally by ignoring blend mode
+		//	material_transparent_gbuffer->SetBlendFuncAttachment(3, BlendSource::ONE, BlendDestination::ZERO);
+		//	
+		//	material_opaque_passthroughWorld = Material::Create("opaque_passthroughWorld", 2);
+		//	material_opaque_passthroughWorld->SetProgram(*_shader_passthroughWorld);
+		//	material_opaque_passthroughWorld->m_BlendState = false;
+		//	
+		//	material_opaque_billboard = Material::Create("opaque_billboard", 3);
+		//	material_opaque_billboard->SetProgram(*_shader_billboard);
+		//	material_opaque_billboard->m_BlendState = false;
+		//	
+		//	material_passthroughWorld = Material::Create("transparent_passthroughWorld", 1001);
+		//	material_passthroughWorld->SetProgram(*_shader_passthroughWorld);
+		//	material_passthroughWorld->SetRenderMode(MaterialRenderMode::Transparent);
+		//	material_passthroughWorld->m_DepthWrite = false;
+		//	material_passthroughWorld->m_BlendFunc.source = BlendSource::ONE;
+		//	material_passthroughWorld->m_BlendFunc.destination = BlendDestination::ONE;
+		//	// Color ID still passes normally by ignoring blend mode
+		//	material_passthroughWorld->SetBlendFuncAttachment(3, BlendSource::ONE, BlendDestination::ZERO);
+		//	
+		//	material_billboard = Material::Create("billboard", 3);
+		//	material_billboard->SetProgram(*_shader_billboard);
+		//	
+		//	material_lines = Material::Create("lines", 4);
+		//	material_lines->SetProgram(*_shader_lines);
+		//	
+		//	material_simpleLight = Material::Create("gizmo", 5);
+		//	material_simpleLight->SetProgram(*_shader_gizmo);
+		//	
+		//	material_colorPicker = Material::Create("colorPicker", 6);
+		//	material_colorPicker->SetProgram(*_shader_colorPicker);
+		//	material_colorPicker->m_BlendState = false;
+		//	
+		//	material_showNormals = Material::Create("showNormals", 20);
+		//	material_showNormals->SetProgram(*_shader_showNormals);
+		//	material_showNormals->m_BlendState = false;
+		//	
+		//	material_font = Material::Create("font", 100);
+		//	material_font->SetProgram(*_shader_font);
+		//	material_font->m_DepthRead = false;
+		//	material_font->m_DepthWrite = false;
 
 		// Voxel Stuff
 		//BlockAtlas.Set(Texture::Get("TextureAtlas"), 16); // texture of all blocks
@@ -326,7 +443,11 @@ namespace Vxl
 		//TerrainManager.Setup(); // keeps track of terrain info
 		//
 
-		_mesh = Mesh::Create("test1");
+		// Import Mesh
+		mesh_jiggy = Model::LoadMesh("jiggy", "./assets/models/jiggy.obj", true, 0.2f);
+
+		mesh_manyQuads = SceneAssets.createMesh();
+		auto* _mesh = SceneAssets.getMesh(mesh_manyQuads);
 		
 		Vector3 pos[] = {
 			Vector3(-0.5f, -0.5f, 0.0f),
@@ -362,207 +483,240 @@ namespace Vxl
 		
 		_mesh->Bind();
 		
-		
+		// Camera
+		camera_main = SceneAssets.createCamera("_camera_editor", 0.01f, 5000.0f);
+		{
+			Camera* camera_ptr = SceneAssets.getCamera(camera_main);
+			camera_ptr->m_transform.setPosition(3.5f, 2.8f, 0.3f);
+			camera_ptr->m_transform.setCameraForward(Vector3(-1, 0, -1));
+			camera_ptr->SetPerspectiveWindowAspect(110.0f);
+			camera_ptr->update();
+		}
+		camera_side = SceneAssets.createCamera("_camera_side", 0.5, 10.0f);
+		{
+			Camera* camera_ptr = SceneAssets.getCamera(camera_side);
+			camera_ptr->m_transform.setPosition(2.9f, 2.1f, -2.5f);
+			camera_ptr->m_transform.setForward(Vector3(0, 0, 1));
+			camera_ptr->SetPerspectiveWindowAspect(140.0f);
+			camera_ptr->update();
+		}
+
 		// Entities
-		GameObject* _skybox = GameObject::Create("_skybox");
-		_skybox->SetMaterial(material_skybox);
-		_skybox->SetTexture(SceneAssets.getCubemap(cubemap_craterlake), TextureLevel::LEVEL0);
-		_skybox->SetMesh(Geometry.GetInverseCube());
-		_skybox->m_useTransform = false;
-		_skybox->SetSelectable(false);
+		entity_skybox = SceneAssets.createEntity("_skybox");
+		{
+			Entity* entity_ptr = SceneAssets.getEntity(entity_skybox);
+			entity_ptr->setMaterial(material_skybox);
+			entity_ptr->setMesh(Geometry.GetInverseCube());
+			entity_ptr->m_useTransform = false;
+			entity_ptr->m_isSelectable = false;
+		}
+		entity_error_cube = SceneAssets.createEntity("_errorCube");
+		{
+			Entity* entity_ptr = SceneAssets.getEntity(entity_skybox);
+			entity_ptr->setMaterial(material_gbuffer);
+			entity_ptr->setMaterial(Geometry.GetCube());
+		}
 
-		GameObject* _errorCube = GameObject::Create("_errorCube");
-		_errorCube->SetMaterial(material_gbuffer);
-		//_errorCube->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
-		//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
-		_errorCube->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
-		_errorCube->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
-		//_errorCube->SetColor(Color3F(1, 1, 0));
-
-		GameObject* _errorCube2 = GameObject::Create("_errorCube");
-		_errorCube2->SetMaterial(material_gbuffer);
-		//_errorCube->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
-		//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
-		_errorCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
-		_errorCube2->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
-		//_errorCube->SetColor(Color3F(1, 1, 0));
-
-		_errorCube2->m_transform.setParent(&_errorCube->m_transform);
-
-		GameObject* _entity1 = GameObject::Create("_entity1");
-		_entity1->SetMaterial(material_gbuffer);
-		_entity1->SetTexture(SceneAssets.getTexture2D(tex_beato), TextureLevel::LEVEL0);
-		_entity1->SetMesh(_mesh);
-		_entity1->m_transform.setScale(1.0f);
-		_entity1->m_transform.setPositionZ(-7.0f);
-		
-		//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
-		Mesh* jiggyMesh = Mesh::GetAsset("jiggy");
-		
-		GameObject* _entity2 = GameObject::Create("_entity2");
-		_entity2->SetMaterial(material_gbuffer);
-		//_entity2->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
-		_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
-		_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
-		_entity2->SetColor(Color3F(1, 1, 0));
-		
-		
-		
-		GameObject* _alphaCube1 = GameObject::Create("_alphaCube1");
-		_alphaCube1->SetMaterial(material_transparent_gbuffer);
-		_alphaCube1->SetColor(Color3F(1, 0, 0));
-		_alphaCube1->SetAlpha(0.5f);
-		_alphaCube1->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
-		_alphaCube1->m_transform.setPosition(Vector3(-0.5f, -2, -3.0f));
-		
-		GameObject* _alphaCube2 = GameObject::Create("_alphaCube2");
-		_alphaCube2->SetMaterial(material_transparent_gbuffer);
-		_alphaCube2->SetColor(Color3F(0, 1, 0));
-		_alphaCube2->SetAlpha(0.5f);
-		_alphaCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
-		_alphaCube2->m_transform.setPosition(Vector3(-1.5f, -2, -3.0f));
-		
-		GameObject* _alphaCube3 = GameObject::Create("_alphaCube3");
-		_alphaCube3->SetMaterial(material_transparent_gbuffer);
-		_alphaCube3->SetColor(Color3F(0, 0, 1));
-		_alphaCube3->SetAlpha(0.5f);
-		_alphaCube3->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
-		_alphaCube3->m_transform.setPosition(Vector3(-2.5f, -2, -3.0f));
-		
-		
-		GameObject* _entity3 = GameObject::Create("_entity3");
-		_entity3->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
-		_entity3->SetMaterial(material_gbuffer);
-		_entity3->SetMesh(Geometry.GetIcosahedron());
-		_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
-		
-		
-		
-		GameObject* _entity5 = GameObject::Create("_entity5");
-		_entity5->SetMaterial(material_gbuffer);
-		_entity5->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		_entity5->SetMesh(Geometry.GetSphereUV_Good());
-		_entity5->m_transform.setPosition(Vector3(0, -4, 0));
-		
-		GameObject* _entity6 = GameObject::Create("_entity6");
-		_entity6->SetMaterial(material_gbuffer);
-		_entity6->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		_entity6->SetMesh(Geometry.GetCube());
-		_entity6->m_transform.setPosition(Vector3(5, -4, 0));
-		
-		GameObject* _entity6_b = GameObject::Create("_entity6_normals");
-		_entity6_b->SetMaterial(material_showNormals);
-		_entity6_b->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		_entity6_b->SetMesh(Geometry.GetCube());
-		_entity6_b->m_transform.setPosition(Vector3(5, -4, 0));
-		
-		
-		GameObject* _entity7 = GameObject::Create("_entity7");
-		_entity7->SetMaterial(material_gbuffer);
-		_entity7->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		_entity7->SetMesh(Geometry.GetQuadY());
-		_entity7->m_transform.setPosition(Vector3(0, -10, 0));
-		_entity7->m_transform.setScale(Vector3(20, 1, 20));
-		//_entity5->SetColor(Color3F(1, 1, 1));
-		
-		
-		
-		
-		//
-		GameObject* _crate1 = GameObject::Create("_crate1");
-		_crate1->SetMaterial(material_gbuffer);
-		_crate1->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
-		_crate1->SetMesh(Geometry.GetCylinderX());
-		_crate1->m_transform.setPosition(1, 3, 2);
-		_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
-		
-		
-		GameObject* _crate2 = GameObject::Create("_crate2");
-		_crate2->SetMaterial(material_gbuffer);
-		_crate2->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
-		_crate2->SetMesh(Geometry.GetCylinderY());
-		//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
-		_crate2->m_transform.setPosition(0, 2, 0);
-		
-		
-		GameObject* _crate3 = GameObject::Create("_crate3");
-		_crate3->SetMaterial(material_gbuffer);
-		_crate3->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
-		_crate3->SetMesh(Geometry.GetCylinderZ());
-		//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
-		_crate3->m_transform.setPosition(1, 2, 0);
-		
-		// Parent Test
-		_crate3->m_transform.addChild(&_crate2->m_transform);
-		_crate2->m_transform.addChild(&_crate1->m_transform);
-		
-		_crate1->m_transform.setRotation(45, -45, 0);
-		_crate2->m_transform.setRotation(65, 12, 3);
-		_crate3->m_transform.setRotation(45, 12, 3);
-		// World Position
-		_crate1->m_transform.setWorldPosition(-5, -5, 0);
-		_crate1->m_transform.increaseWorldPosition(1, 2, 3);
-		
-		GameObject* _octo1 = GameObject::Create("_octo1");
-		_octo1->SetMaterial(material_gbuffer);
-		_octo1->SetMesh(Geometry.GetOctahedron());
-		_octo1->m_transform.setPosition(0, 0, 0);
-		_octo1->m_transform.setScale(0.5f);
-		_octo1->SetColor(Color3F(1, 1, 1));
-		
-		GameObject* _octo2 = GameObject::Create("_octo2");
-		_octo2->SetMaterial(material_gbuffer);
-		_octo2->SetMesh(Geometry.GetOctahedron());
-		_octo2->m_transform.setPosition(1, 0, 0);
-		_octo2->m_transform.setScale(0.5f);
-		_octo2->SetColor(Color3F(1, 0, 0));
-		
-		GameObject* _octo3 = GameObject::Create("_octo3");
-		_octo3->SetMaterial(material_gbuffer);
-		_octo3->SetMesh(Geometry.GetOctahedron());
-		_octo3->m_transform.setPosition(0, 1, 0);
-		_octo3->m_transform.setScale(0.5f);
-		_octo3->SetColor(Color3F(0, 1, 0));
-		
-		GameObject* _octo4 = GameObject::Create("_octo4");
-		_octo4->SetMaterial(material_gbuffer);
-		_octo4->SetMesh(Geometry.GetOctahedron());
-		_octo4->m_transform.setPosition(0, 0, 1);
-		_octo4->m_transform.setScale(0.5f);
-		_octo4->SetColor(Color3F(0, 0, 1));
-		
-		LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
-		_light1->m_transform.setPosition(5, 0, 0);
-		
-		GameObject* _billboard1 = GameObject::Create("_quad1");
-		_billboard1->SetMaterial(material_opaque_billboard);
-		_billboard1->SetTexture(SceneAssets.getTexture2D(tex_beato), TextureLevel::LEVEL0);
-		_billboard1->SetMesh(Geometry.GetQuadZ());
-		_billboard1->m_transform.setPosition(7, 3, -3);
-		
-		TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
-		
-		TextObject* _text1 = TextObject::Create("_text1");
-		_text1->m_transform.setPosition(-2, -3, 0);
-		_text1->SetFont("arial");
-		_text1->SetText("abcdefghijkl\nmnopqrstuvwxyz\nquick brown fox jumped over the moon\n12345678900987654321");
-		
-		//_text1->SetTexture(Texture::GetAsset("beato"), TextureLevel::LEVEL0);
-
-		//material_gbuffer
-		//material_billboard
-
-		//GameObject::Delete(_entity5);
-		//GameObject::Delete("_octo3");
-		
-		//_light1 = LightObject::Create("light1");
+		//			// Entities
+		//			GameObject* _skybox = GameObject::Create("_skybox");
+		//			_skybox->SetMaterial(material_skybox);
+		//			//_skybox->SetTexture(SceneAssets.getCubemap(cubemap_craterlake), TextureLevel::LEVEL0);
+		//			_skybox->SetMesh(Geometry.GetInverseCube());
+		//			_skybox->m_useTransform = false;
+		//			_skybox->SetSelectable(false);
+		//			
+		//			GameObject* _errorCube = GameObject::Create("_errorCube");
+		//			_errorCube->SetMaterial(material_gbuffer);
+		//			//_errorCube->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
+		//			//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
+		//			_errorCube->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_errorCube->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
+		//			//_errorCube->SetColor(Color3F(1, 1, 0));
+		//			
+		//			GameObject* _errorCube2 = GameObject::Create("_errorCube");
+		//			_errorCube2->SetMaterial(material_gbuffer);
+		//			//_errorCube->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
+		//			//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
+		//			_errorCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_errorCube2->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
+		//			//_errorCube->SetColor(Color3F(1, 1, 0));
+		//			
+		//			_errorCube2->m_transform.setParent(&_errorCube->m_transform);
+		//			
+		//			GameObject* _entity1 = GameObject::Create("_entity1");
+		//			_entity1->SetMaterial(material_gbuffer);
+		//			_entity1->SetTexture(SceneAssets.getTexture2D(tex_beato), TextureLevel::LEVEL0);
+		//			_entity1->SetMesh(_mesh);
+		//			_entity1->m_transform.setScale(1.0f);
+		//			_entity1->m_transform.setPositionZ(-7.0f);
+		//			
+		//			//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
+		//			Mesh* jiggyMesh = SceneAssets.getMesh(mesh_jiggy);
+		//			
+		//			GameObject* _entity2 = GameObject::Create("_entity2");
+		//			_entity2->SetMaterial(material_gbuffer);
+		//			//_entity2->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
+		//			_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
+		//			_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
+		//			_entity2->SetColor(Color3F(1, 1, 0));
+		//			
+		//			
+		//			
+		//			GameObject* _alphaCube1 = GameObject::Create("_alphaCube1");
+		//			_alphaCube1->SetMaterial(material_transparent_gbuffer);
+		//			_alphaCube1->SetColor(Color3F(1, 0, 0));
+		//			_alphaCube1->SetAlpha(0.5f);
+		//			_alphaCube1->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_alphaCube1->m_transform.setPosition(Vector3(-0.5f, -2, -3.0f));
+		//			
+		//			GameObject* _alphaCube2 = GameObject::Create("_alphaCube2");
+		//			_alphaCube2->SetMaterial(material_transparent_gbuffer);
+		//			_alphaCube2->SetColor(Color3F(0, 1, 0));
+		//			_alphaCube2->SetAlpha(0.5f);
+		//			_alphaCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_alphaCube2->m_transform.setPosition(Vector3(-1.5f, -2, -3.0f));
+		//			
+		//			GameObject* _alphaCube3 = GameObject::Create("_alphaCube3");
+		//			_alphaCube3->SetMaterial(material_transparent_gbuffer);
+		//			_alphaCube3->SetColor(Color3F(0, 0, 1));
+		//			_alphaCube3->SetAlpha(0.5f);
+		//			_alphaCube3->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_alphaCube3->m_transform.setPosition(Vector3(-2.5f, -2, -3.0f));
+		//			
+		//			
+		//			GameObject* _entity3 = GameObject::Create("_entity3");
+		//			_entity3->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_entity3->SetMaterial(material_gbuffer);
+		//			_entity3->SetMesh(Geometry.GetIcosahedron());
+		//			_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
+		//			
+		//			
+		//			
+		//			GameObject* _entity5 = GameObject::Create("_entity5");
+		//			_entity5->SetMaterial(material_gbuffer);
+		//			_entity5->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity5->SetMesh(Geometry.GetSphereUV_Good());
+		//			_entity5->m_transform.setPosition(Vector3(0, -4, 0));
+		//			
+		//			GameObject* _entity6 = GameObject::Create("_entity6");
+		//			_entity6->SetMaterial(material_gbuffer);
+		//			_entity6->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity6->SetMesh(Geometry.GetCube());
+		//			_entity6->m_transform.setPosition(Vector3(5, -4, 0));
+		//			
+		//			GameObject* _entity6_b = GameObject::Create("_entity6_normals");
+		//			_entity6_b->SetMaterial(material_showNormals);
+		//			_entity6_b->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity6_b->SetMesh(Geometry.GetCube());
+		//			_entity6_b->m_transform.setPosition(Vector3(5, -4, 0));
+		//			
+		//			
+		//			GameObject* _entity7 = GameObject::Create("_entity7");
+		//			_entity7->SetMaterial(material_gbuffer);
+		//			_entity7->SetTexture(SceneAssets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity7->SetMesh(Geometry.GetQuadY());
+		//			_entity7->m_transform.setPosition(Vector3(0, -10, 0));
+		//			_entity7->m_transform.setScale(Vector3(20, 1, 20));
+		//			//_entity5->SetColor(Color3F(1, 1, 1));
+		//			
+		//			
+		//			
+		//			
+		//			//
+		//			GameObject* _crate1 = GameObject::Create("_crate1");
+		//			_crate1->SetMaterial(material_gbuffer);
+		//			_crate1->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_crate1->SetMesh(Geometry.GetCylinderX());
+		//			_crate1->m_transform.setPosition(1, 3, 2);
+		//			_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
+		//			
+		//			
+		//			GameObject* _crate2 = GameObject::Create("_crate2");
+		//			_crate2->SetMaterial(material_gbuffer);
+		//			_crate2->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_crate2->SetMesh(Geometry.GetCylinderY());
+		//			//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
+		//			_crate2->m_transform.setPosition(0, 2, 0);
+		//			
+		//			
+		//			GameObject* _crate3 = GameObject::Create("_crate3");
+		//			_crate3->SetMaterial(material_gbuffer);
+		//			_crate3->SetTexture(SceneAssets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_crate3->SetMesh(Geometry.GetCylinderZ());
+		//			//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
+		//			_crate3->m_transform.setPosition(1, 2, 0);
+		//			
+		//			// Parent Test
+		//			_crate3->m_transform.addChild(&_crate2->m_transform);
+		//			_crate2->m_transform.addChild(&_crate1->m_transform);
+		//			
+		//			_crate1->m_transform.setRotation(45, -45, 0);
+		//			_crate2->m_transform.setRotation(65, 12, 3);
+		//			_crate3->m_transform.setRotation(45, 12, 3);
+		//			// World Position
+		//			_crate1->m_transform.setWorldPosition(-5, -5, 0);
+		//			_crate1->m_transform.increaseWorldPosition(1, 2, 3);
+		//			
+		//			GameObject* _octo1 = GameObject::Create("_octo1");
+		//			_octo1->SetMaterial(material_gbuffer);
+		//			_octo1->SetMesh(Geometry.GetOctahedron());
+		//			_octo1->m_transform.setPosition(0, 0, 0);
+		//			_octo1->m_transform.setScale(0.5f);
+		//			_octo1->SetColor(Color3F(1, 1, 1));
+		//			
+		//			GameObject* _octo2 = GameObject::Create("_octo2");
+		//			_octo2->SetMaterial(material_gbuffer);
+		//			_octo2->SetMesh(Geometry.GetOctahedron());
+		//			_octo2->m_transform.setPosition(1, 0, 0);
+		//			_octo2->m_transform.setScale(0.5f);
+		//			_octo2->SetColor(Color3F(1, 0, 0));
+		//			
+		//			GameObject* _octo3 = GameObject::Create("_octo3");
+		//			_octo3->SetMaterial(material_gbuffer);
+		//			_octo3->SetMesh(Geometry.GetOctahedron());
+		//			_octo3->m_transform.setPosition(0, 1, 0);
+		//			_octo3->m_transform.setScale(0.5f);
+		//			_octo3->SetColor(Color3F(0, 1, 0));
+		//			
+		//			GameObject* _octo4 = GameObject::Create("_octo4");
+		//			_octo4->SetMaterial(material_gbuffer);
+		//			_octo4->SetMesh(Geometry.GetOctahedron());
+		//			_octo4->m_transform.setPosition(0, 0, 1);
+		//			_octo4->m_transform.setScale(0.5f);
+		//			_octo4->SetColor(Color3F(0, 0, 1));
+		//			
+		//			LightObject* _light1 = LightObject::Create("_light1", Light::Type::POINT);
+		//			_light1->m_transform.setPosition(5, 0, 0);
+		//			
+		//			GameObject* _billboard1 = GameObject::Create("_quad1");
+		//			_billboard1->SetMaterial(material_opaque_billboard);
+		//			_billboard1->SetTexture(SceneAssets.getTexture2D(tex_beato), TextureLevel::LEVEL0);
+		//			_billboard1->SetMesh(Geometry.GetQuadZ());
+		//			_billboard1->m_transform.setPosition(7, 3, -3);
+		//			
+		//			TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
+		//			
+		//			TextObject* _text1 = TextObject::Create("_text1");
+		//			_text1->m_transform.setPosition(-2, -3, 0);
+		//			_text1->SetFont("arial");
+		//			_text1->SetText("abcdefghijkl\nmnopqrstuvwxyz\nquick brown fox jumped over the moon\n12345678900987654321");
+		//			
+		//			//_text1->SetTexture(Texture::GetAsset("beato"), TextureLevel::LEVEL0);
+		//			
+		//			//material_gbuffer
+		//			//material_billboard
+		//			
+		//			//GameObject::Delete(_entity5);
+		//			//GameObject::Delete("_octo3");
+		//			
+		//			//_light1 = LightObject::Create("light1");
 
 
 		
 	}
 	void Scene_Game::Destroy()
 	{
-		TerrainManager.Destroy();
+		//TerrainManager.Destroy();
 	}
 
 	void Scene_Game::Update()
@@ -580,6 +734,8 @@ namespace Vxl
 			// Camera Movement
 			Vector3 CamMove;
 			float CamSpeed = 0.1f;
+
+			Camera* _cameraObject = Assets::getCamera(camera_main);
 
 			if (Input.getKey(KeyCode::W))
 				CamMove += _cameraObject->m_transform.getCameraForward();
@@ -647,7 +803,7 @@ namespace Vxl
 			//
 
 			// Update Cam
-			_cameraObject->Update();
+			_cameraObject->update();
 		}
 
 
@@ -659,22 +815,22 @@ namespace Vxl
 		//		Color4F::RED, Color4F::BLUE
 		//	);
 
-		// Selection
-		auto SelectedEntities = Editor.m_selectedEntities;
-		for (const auto& _Entity : SelectedEntities)
-		{
-			if (_Entity->IsSelectable())
-				_Entity->DrawSelection();
-		}
+		//	// Selection
+		//	auto SelectedEntities = Editor.m_selectedEntities;
+		//	for (const auto& _Entity : SelectedEntities)
+		//	{
+		//		if (_Entity->m_isSelectable)
+		//			_Entity->DrawSelection();
+		//	}
 
 		// End Frame Updates
 		XGamePadManager.Update();
 
 		// Imgui Specials
-		if (material_gbuffer)
-		{
-			material_gbuffer->m_Wireframe = DEVCONSOLE_GET_BOOL("Gbuffer Wireframe", false);
-		}
+		//	if (material_gbuffer)
+		//	{
+		//		material_gbuffer->m_Wireframe = DEVCONSOLE_GET_BOOL("Gbuffer Wireframe", false);
+		//	}
 
 		CPUTimer::EndTimer("UPDATE");
 
@@ -691,7 +847,14 @@ namespace Vxl
 			gizmo.m_mode = Gizmo::Mode::ROTATE;
 
 		// Gizmo
-		gizmo.Update(Editor.m_selectedEntities);
+		std::vector<Entity*> selectedEntities;
+		selectedEntities.reserve(Editor.m_selectedEntities.size());
+		for (const auto& id : Editor.m_selectedEntities)
+		{
+			selectedEntities.push_back(Assets::getEntity(id));
+		}
+
+		gizmo.Update(selectedEntities);
 	}
 
 	// DO NOT DRAW IN HERE //
@@ -702,19 +865,19 @@ namespace Vxl
 
 	void Scene_Game::Draw()
 	{
-		//	// Debug Lines
-		//	Debug.DrawLine(
-		//		Vector3(-1, -1, -1), Vector3(+1, +1, -1),
-		//		10.0f,
-		//		Color4F(0, 1, 0, 0.25f), Color4F(1, 0, 1, 1)
-		//	);
-		//	static float time = 0.0f;
-		//	time += 0.2f;
-		//	Debug.DrawLine(
-		//		Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
-		//		10.0f,
-		//		Color4F(1, 1, 0, 0.25f), Color4F(0, 1, 1, 1)
-		//	);
+		// Debug Lines
+		Debug.DrawLine(
+			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
+			10.0f,
+			Color4F(0, 1, 0, 0.25f), Color4F(1, 0, 1, 1)
+		);
+		static float time = 0.0f;
+		time += 0.2f;
+		Debug.DrawLine(
+			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
+			10.0f,
+			Color4F(1, 1, 0, 0.25f), Color4F(0, 1, 1, 1)
+		);
 
 		//ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
@@ -725,71 +888,97 @@ namespace Vxl
 		//		sub.Connect("Colour1", "ColorGreen");
 		//	
 
+		// FBOS
+		auto* fbo_gbuffer = SceneAssets.getFramebufferObject(fboIndex_gbuffer);
+		auto* fbo_editor = SceneAssets.getFramebufferObject(fboIndex_editor);
+		auto* fbo_colorPicker = SceneAssets.getFramebufferObject(fboIndex_colorpicker);
+		auto* fbo_composite = SceneAssets.getFramebufferObject(fboIndex_composite);
+		auto* fbo_showRenderTarget = SceneAssets.getFramebufferObject(fboIndex_showRenderTarget);
+		
+		// GUI Setup [needs to be changed]
+		GUIViewport.fboIndex_gbuffer = this->fboIndex_gbuffer;
+		GUIViewport.fboIndex_editor = this->fboIndex_editor;
+
 		// UBO BINDING per frame
-		UBOManager.BindCamera(*RenderManager.GetMainCamera());
+		RenderManager.m_mainCamera = camera_main;
+		auto _cameraObject = Assets::getCamera(camera_main);
+
+		UBOManager.BindCamera(*_cameraObject);
 		UBOManager.BindTime();
 
-		_fbo_gbuffer->Bind();
-		_fbo_gbuffer->ClearBuffers();
+		fbo_gbuffer->bind();
+		fbo_gbuffer->clearBuffers();
 		//
 		GPUTimer::StartTimer("Gbuffer");
 		CPUTimer::StartTimer("Gbuffer");
 		//
-		RenderManager.RenderSceneGameObjects_Opaque();
-
-		// Remember Depth gbuffer depth
-		_fbo_gbuffer->GetDepthRenderTexture()->Copy(*_fbo_colorpicker->GetDepthRenderBuffer());
-
-		RenderManager.RenderSceneGameObjects_Transparent();
-		RenderManager.RenderSceneObjectsWithOnlyColorID();
-
-		// Revert Gbuffer Depth [Opaque only depth]
-		_fbo_colorpicker->GetDepthRenderBuffer()->Copy(*_fbo_gbuffer->GetDepthRenderTexture());
-
-
-		//	if (Input.getKeyDown(KeyCode::K))
-		//	{
-		//		RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
-		//		std::cout << (uint32_t)test[0] << std::endl;
-		//		std::cout << (uint32_t)test[1] << std::endl;
-		//		std::cout << "~~~" << std::endl;
-		//		test.Deallocate();
-		//	}
-
-		//Graphics::SetBlendState(false);
-
-		// FONT TEST END
-		
-
+		// Sort Objects
+		RenderManager.sortEntities();
 		//
+		//RenderManager.RenderSceneGameObjects_Opaque();
+
+		//	// Remember Depth gbuffer depth
+		//	fbo_gbuffer->GetDepthRenderTexture()->Copy(*fbo_colorPicker->GetDepthRenderBuffer());
+		//	
+		//	// RENDER
+		//	fbo_gbuffer->DisableAttachment(1);
+		//	RenderManager.RenderSceneGameObjects_Transparent();
+		//	fbo_gbuffer->EnableAttachment(1);
+		//	
+		//	// RENDER
+		//	fbo_gbuffer->DisableAttachment(0);
+		//	fbo_gbuffer->DisableAttachment(1);
+		//	RenderManager.RenderSceneObjectsWithOnlyColorID();
+		//	fbo_gbuffer->EnableAttachment(0);
+		//	fbo_gbuffer->EnableAttachment(1);
+		//	
+		//	// Revert Gbuffer Depth [Opaque only depth]
+		//	fbo_colorPicker->GetDepthRenderBuffer()->Copy(*fbo_gbuffer->GetDepthRenderTexture());
+		//	
+		//	
+		//	//	if (Input.getKeyDown(KeyCode::K))
+		//	//	{
+		//	//		RawArray<uint8_t> test = _fbo_gbuffer->readDepthPixelsFromMouse(1, 1);
+		//	//		std::cout << (uint32_t)test[0] << std::endl;
+		//	//		std::cout << (uint32_t)test[1] << std::endl;
+		//	//		std::cout << "~~~" << std::endl;
+		//	//		test.Deallocate();
+		//	//	}
+		//	
+		//	//Graphics::SetBlendState(false);
+		//	
+		//	// FONT TEST END
+		//	
+		//	
+		//	//
 		CPUTimer::EndTimer("Gbuffer");
 		GPUTimer::EndTimer();
-
-		// Render GIZMO ID [Changes FBO bound]
-		gizmo.RenderIDCapture();
-
-		_fbo_editor->Bind();
-		_fbo_editor->ClearBuffers();
-
-
-		//
-		GPUTimer::StartTimer("EditorObjects");
-		//
-
-		
-		// Editor objects needs gbuffer depth for proper overlay
-		//_fbo_gbuffer->blitDepth(*_fbo_editor);
-		_fbo_gbuffer->GetDepthRenderTexture()->Copy(*_fbo_editor->GetDepthRenderBuffer());
-
-		//Graphics::SetDepthRead(false);
-
-		RenderManager.RenderEditorObjects();
-
-		Graphics::ClearBuffer(BufferBit::DEPTH);
-		
-		gizmo.RenderOnScreen();
-
-		RenderManager.RenderEditorObjectsPostDepth();
+		//	
+		//	// Render GIZMO ID [Changes FBO bound]
+		//	gizmo.RenderIDCapture();
+		//	
+		//	fbo_editor->Bind();
+		//	fbo_editor->ClearBuffers();
+		//	
+		//	
+		//	//
+		//	GPUTimer::StartTimer("EditorObjects");
+		//	//
+		//	
+		//	
+		//	// Editor objects needs gbuffer depth for proper overlay
+		//	//_fbo_gbuffer->blitDepth(*_fbo_editor);
+		//	fbo_gbuffer->GetDepthRenderTexture()->Copy(*fbo_editor->GetDepthRenderBuffer());
+		//	
+		//	//Graphics::SetDepthRead(false);
+		//	
+		//	RenderManager.RenderEditorObjects();
+		//	
+		//	Graphics::ClearBuffer(BufferBit::DEPTH);
+		//	
+		//	gizmo.RenderOnScreen();
+		//	
+		//	RenderManager.RenderEditorObjectsPostDepth();
 
 		
 
@@ -813,48 +1002,48 @@ namespace Vxl
 		// Select Object in scene
 		// ~~ //
 		//if (!Editor.m_GizmoSelected && !Editor.m_GizmoClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
-		if (!gizmo.IsSelected() && !gizmo.IsClicked() && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
-		{
-			if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
-			{
-				_fbo_gbuffer->Bind();
-
-				RawArray<uint8_t> data = _fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
-				if (!data.IsEmpty())
-				{
-
-					unsigned int EntityIndex = Util::Conversion::uchars_to_uint(data.start);
-					data.Deallocate();
-
-					Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
-
-					// Found an entity
-					if (SelectedEntity && SelectedEntity->IsSelectable())
-					{
-						if (Input.getKey(KeyCode::LEFT_CONTROL))
-						{
-							if (!SelectedEntity->IsSelected())
-								Editor.AddSelection(SelectedEntity);
-							else
-								Editor.RemoveSelection(SelectedEntity);
-						}
-						else
-						{
-							Editor.ClearSelection();
-							Editor.AddSelection(SelectedEntity);
-						}
-					}
-					else
-					{
-						Editor.ClearSelection();
-					}
-
-					//if ()
-					//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
-
-				}
-			}
-		}
+		//	if (!gizmo.IsSelected() && !gizmo.IsClicked() && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		//	{
+		//		if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
+		//		{
+		//			fbo_gbuffer->Bind();
+		//	
+		//			RawArray<uint8_t> data = fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
+		//			if (!data.IsEmpty())
+		//			{
+		//	
+		//				unsigned int EntityIndex = Util::Conversion::uchars_to_uint(data.start);
+		//				data.Deallocate();
+		//	
+		//				Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
+		//	
+		//				// Found an entity
+		//				if (SelectedEntity && SelectedEntity->IsSelectable())
+		//				{
+		//					if (Input.getKey(KeyCode::LEFT_CONTROL))
+		//					{
+		//						if (!SelectedEntity->IsSelected())
+		//							Editor.AddSelection(SelectedEntity);
+		//						else
+		//							Editor.RemoveSelection(SelectedEntity);
+		//					}
+		//					else
+		//					{
+		//						Editor.ClearSelection();
+		//						Editor.AddSelection(SelectedEntity);
+		//					}
+		//				}
+		//				else
+		//				{
+		//					Editor.ClearSelection();
+		//				}
+		//	
+		//				//if ()
+		//				//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
+		//	
+		//			}
+		//		}
+		//	}
 
 		// ~~ //
 
@@ -865,17 +1054,17 @@ namespace Vxl
 		Graphics::SetDepthPassRule(DepthPassRule::ALWAYS);
 
 		//////////////////////
-		_fbo_composite->Bind();
-		_fbo_composite->ClearBuffers();
+		fbo_composite->bind();
+		fbo_composite->clearBuffers();
 
 		// Display Final Image
-		ShaderProgram* _shader_showRenderTarget = ShaderProgram::GetAsset("showRenderTarget");
-		_shader_showRenderTarget->Bind();
-		_shader_showRenderTarget->SetUniform("channelOutput", 0);
-		_shader_showRenderTarget->SetUniform("outputMode", 3);
+		_ShaderProgram* _shader_showRenderTarget = SceneAssets.getShaderProgram(shader_showRenderTarget);
+		_shader_showRenderTarget->bind();
+		_shader_showRenderTarget->sendUniform("channelOutput", 0);
+		_shader_showRenderTarget->sendUniform("outputMode", 3);
 
-		_fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
-		_fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
+		fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
+		fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
 		
 		RenderManager.RenderFullScreen();
 		//////////////////////
@@ -885,7 +1074,7 @@ namespace Vxl
 
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		// Display to backbuffer
-		FramebufferObject::Unbind();
+		FramebufferObject::unbind();
 
 		Window.BindWindowViewport();
 
@@ -896,7 +1085,7 @@ namespace Vxl
 		Graphics::SetClearColor(0, 0, 0, 0);
 		Graphics::ClearAllBuffers();
 
-		_fbo_composite->bindTexture(0, TextureLevel::LEVEL0);
+		fbo_composite->bindTexture(0, TextureLevel::LEVEL0);
 		RenderManager.RenderFullScreen();
 
 		// Screenshot

@@ -11,7 +11,7 @@
 #include "../modules/Material.h"
 
 #include "../objects/GameObject.h"
-#include "../objects/CameraObject.h"
+#include "../objects/Camera.h"
 #include "../objects/LightObject.h"
 
 #include "../rendering/Geometry.h"
@@ -26,30 +26,33 @@
 
 namespace Vxl
 {
-	void Hierarchy::DisplayEntity(Entity* _entity, int _depth)
+	void Hierarchy::DisplayEntity(EntityIndex _entity, int _depth)
 	{
+		Entity* entity = Assets::getEntity(_entity);
+		VXL_ASSERT(entity, "Missing Entity");
+
 		// Display entity
 		//	-> Collapsing if it has children
 		//	-> Text if it has no children
-		auto ChildCount = _entity->m_transform.getChildCount();
+		auto ChildCount = entity->m_transform.getChildCount();
 		if (ChildCount == 0)
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog;
-			if (_entity->IsSelected())
+			if (entity->IsSelected())
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
-			if (!_entity->IsFamilyActive())
+			if (!entity->IsFamilyActive())
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
 			else
 			{
-				Color3F c = _entity->GetLabelColor();
+				Color3F c = entity->m_labelColor;
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b, 1));
 			}
 
 			// Node + Name
-			std::string Name = _entity->GetName();
+			std::string Name = entity->m_name;
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -60,7 +63,7 @@ namespace Vxl
 			{
 				if (Input.getKey(KeyCode::LEFT_CONTROL))
 				{
-					if (!_entity->IsSelected())
+					if (!entity->IsSelected())
 						Editor.AddSelection(_entity);
 					else
 						Editor.RemoveSelection(_entity);
@@ -79,20 +82,20 @@ namespace Vxl
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
-			if (_entity->IsSelected())
+			if (entity->IsSelected())
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
-			if (!_entity->IsFamilyActive())
+			if (!entity->IsFamilyActive())
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
 			else
 			{
-				Color3F c = _entity->GetLabelColor();
+				Color3F c = entity->m_labelColor;
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b, 1));
 			}
 
 			// Node + Name
-			std::string Name = _entity->GetName();
+			std::string Name = entity->m_name;
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -103,7 +106,7 @@ namespace Vxl
 			{
 				if (Input.getKey(KeyCode::LEFT_CONTROL))
 				{
-					if (!_entity->IsSelected())
+					if (!entity->IsSelected())
 						Editor.AddSelection(_entity);
 					else
 						Editor.RemoveSelection(_entity);
@@ -122,10 +125,10 @@ namespace Vxl
 			if (node_open)
 			{
 				ImGui::Indent();
-				auto children = _entity->m_transform.getChildren();
+				auto children = entity->m_transform.getChildren();
 				for (auto it = children.begin(); it != children.end(); it++)
 				{
-					DisplayEntity((*it)->GetOwner(), _depth + 1);
+					DisplayEntity((*it)->m_owner, _depth + 1);
 				}
 				ImGui::Unindent();
 			}
@@ -143,111 +146,101 @@ namespace Vxl
 		{
 			for (auto Entity : Entities)
 			{
-				if (Entity->GetType() == EntityType::GAMEOBJECT)
-				{
-					GameObject::DeleteNamedAsset(Entity->GetName());
-				}
-				else if (Entity->GetType() == EntityType::CAMERA && Entity != RenderManager.GetMainCamera())
-				{
-					CameraObject::DeleteNamedAsset(Entity->GetName());
-				}
+				Assets::deleteEntity(Entity);
 			}
 			Editor.ClearSelection();
 		}
-		ImGui::SameLine();
-		if (ImGui::Button("Add Sphere"))
-		{
-			auto object = GameObject::Create("Generic Object");
-			object->SetMesh(Geometry.GetSphereUV_Good());
-			object->SetMaterial(Material::GetAsset("gbuffer"));
-			object->SetColor(Color3F(1, 0, 0));
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Duplicate GameObject(s)"))
-		{
-			for (auto Entity : Entities)
-			{
-				if (Entity->GetType() == EntityType::GAMEOBJECT)
-				{
-					auto GEntity = dynamic_cast<GameObject*>(Entity);
-
-					auto object = GameObject::Create(GEntity->GetName());
-					object->SetMesh(GEntity->GetMesh());
-					object->SetMaterial(GEntity->GetMaterial());
-					object->SetColor(GEntity->GetColor());
-					object->m_useTransform = GEntity->m_useTransform;
-					object->m_isActive = GEntity->m_isActive;
-					object->m_isColoredObject = GEntity->m_isColoredObject;
-					object->SetSelectable(GEntity->IsSelectable());
-					object->m_transform.setWorldPosition(GEntity->m_transform.getWorldPosition());
-					object->m_transform.setRotation(GEntity->m_transform.getRotationEuler());
-					object->m_transform.setScale(GEntity->m_transform.getScale());
-					object->m_transform.setParent(GEntity->m_transform.getParent());
-				}
-			}
-		}
+		//	ImGui::SameLine();
+		//	if (ImGui::Button("Add Sphere"))
+		//	{
+		//		auto object = GameObject::Create("Generic Object");
+		//		object->SetMesh(Geometry.GetSphereUV_Good());
+		//		object->SetMaterial(Material::GetAsset("gbuffer"));
+		//		object->SetColor(Color3F(1, 0, 0));
+		//	}
+		//	ImGui::SameLine();
+		//	if (ImGui::Button("Duplicate GameObject(s)"))
+		//	{
+		//		for (auto Entity : Entities)
+		//		{
+		//			if (Entity->GetType() == EntityType::GAMEOBJECT)
+		//			{
+		//				auto GEntity = dynamic_cast<GameObject*>(Entity);
+		//	
+		//				auto object = GameObject::Create(GEntity->GetName());
+		//				object->SetMesh(GEntity->GetMesh());
+		//				object->SetMaterial(GEntity->GetMaterial());
+		//				object->SetColor(GEntity->GetColor());
+		//				object->m_useTransform = GEntity->m_useTransform;
+		//				object->m_isActive = GEntity->m_isActive;
+		//				object->m_isColoredObject = GEntity->m_isColoredObject;
+		//				object->SetSelectable(GEntity->IsSelectable());
+		//				object->m_transform.setWorldPosition(GEntity->m_transform.getWorldPosition());
+		//				object->m_transform.setRotation(GEntity->m_transform.getRotationEuler());
+		//				object->m_transform.setScale(GEntity->m_transform.getScale());
+		//				object->m_transform.setParent(GEntity->m_transform.getParent());
+		//			}
+		//		}
+		//	}
 
 		// Display Hierarchy with selected entities
-		auto AllEntities = RenderManager.m_allEntities;
-		int EntityCount = (int)AllEntities.size();
-		for (int i = 0; i < EntityCount; i++)
+		auto& entities = Assets::getAllEntity();
+		for (auto& entity : entities)
 		{
-			auto Entity = AllEntities[i];
-
-			if (Entity->m_transform.getParent() == nullptr)
-				DisplayEntity(Entity, 0);
+			if (entity.second->m_transform.getParent() == nullptr)
+				DisplayEntity(entity.first, 0);
 		}
 		//
 
-		// Move Selection
-		if (ImGui::IsWindowFocused())
-		{
-			if (Input.getKeyDown(KeyCode::DOWN))
-			{
-				if (Entities.size() == 1)
-				{
-					for (int i = 0; i < EntityCount; i++)
-					{
-						if (AllEntities[i] == Entities[0])
-						{
-							Editor.ClearSelection();
-							auto Entity = AllEntities[(i + 1) % EntityCount];
-
-							// Check for children
-							if (Entity->m_transform.getChildCount() > 0)
-							{
-
-							}
-							else
-							{
-
-							}
-
-
-							// Get Next Entity
-
-							Editor.AddSelection(Entity);
-							break;
-						}
-					}
-				}
-			}
-			else if (Input.getKeyDown(KeyCode::UP))
-			{
-				if (Entities.size() == 1)
-				{
-					for (int i = 0; i < EntityCount; i++)
-					{
-						if (AllEntities[i] == Entities[0])
-						{
-							Editor.ClearSelection();
-							Editor.AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i - 1]);
-							break;
-						}
-					}
-				}
-			}
-		}
+		//	// Move Selection
+		//	if (ImGui::IsWindowFocused())
+		//	{
+		//		if (Input.getKeyDown(KeyCode::DOWN))
+		//		{
+		//			if (Entities.size() == 1)
+		//			{
+		//				for (int i = 0; i < EntityCount; i++)
+		//				{
+		//					if (AllEntities[i] == Entities[0])
+		//					{
+		//						Editor.ClearSelection();
+		//						auto Entity = AllEntities[(i + 1) % EntityCount];
+		//	
+		//						// Check for children
+		//						if (Entity->m_transform.getChildCount() > 0)
+		//						{
+		//	
+		//						}
+		//						else
+		//						{
+		//	
+		//						}
+		//	
+		//	
+		//						// Get Next Entity
+		//	
+		//						Editor.AddSelection(Entity);
+		//						break;
+		//					}
+		//				}
+		//			}
+		//		}
+		//		else if (Input.getKeyDown(KeyCode::UP))
+		//		{
+		//			if (Entities.size() == 1)
+		//			{
+		//				for (int i = 0; i < EntityCount; i++)
+		//				{
+		//					if (AllEntities[i] == Entities[0])
+		//					{
+		//						Editor.ClearSelection();
+		//						Editor.AddSelection(AllEntities[(i - 1) < 0 ? EntityCount - 1 : i - 1]);
+		//						break;
+		//					}
+		//				}
+		//			}
+		//		}
+		//	}
 	}
 }
 #endif

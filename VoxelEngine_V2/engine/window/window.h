@@ -108,7 +108,7 @@ namespace Vxl
 		// Confusion Awareness:
 		// WindowSize = Resizeable window for context
 		// ScreenSize = Viewport that is being rendered (can change if aspect ratio is locked and blackbars are on the sides)
-		// ResolutionSize = FBO buffer/back buffer render size. If smaller/bigger than screen size, it gets scaled
+		// ResolutionSize = FBO buffer/back buffer render size. If smaller/bigger than screen size, it'll have to be scaled
 
 		// Returns Width of the entire window
 		uint32_t GetWindowWidth(void) const

@@ -12,7 +12,7 @@
 
 namespace Vxl
 {
-	class LineMesh : public Asset<LineMesh>
+	class LineMesh //: public Asset<LineMesh>
 	{
 	private:
 		VAO m_VAO;

@@ -5,6 +5,7 @@
 
 #include "../utilities/singleton.h"
 #include "../utilities/Macros.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {
@@ -16,7 +17,7 @@ namespace Vxl
 		friend class Inspector;
 	private:
 		// Utility
-		void DisplayEntity(Entity* _ent, int _depth);
+		void DisplayEntity(EntityIndex _entity, int _depth);
 	public:
 
 		// Behaviour

@@ -11,12 +11,13 @@ namespace Vxl
 	{
 		return m_selectedEntities.size() > 0;
 	}
-	void Editor::RemoveSelection(Entity* _entity)
+	void Editor::RemoveSelection(EntityIndex _entity)
 	{
 		Util::RemoveFromVector(m_selectedEntities, _entity);
-		_entity->m_isSelected = false;
+		Entity* entity = Assets::getEntity(_entity);
+		entity->m_isSelected = false;
 	}
-	void Editor::AddSelection(Entity* _entity)
+	void Editor::AddSelection(EntityIndex _entity)
 	{
 		VXL_ASSERT(_entity, "Adding nullptr in Editor::AddSelection");
 
@@ -25,12 +26,16 @@ namespace Vxl
 				return;
 
 		m_selectedEntities.push_back(_entity);
-		_entity->m_isSelected = true;
+		Entity* entity = Assets::getEntity(_entity);
+		entity->m_isSelected = true;
 	}
 	void Editor::ClearSelection()
 	{
-		for (auto Entity : m_selectedEntities)
-			Entity->m_isSelected = false;
+		for (auto _entity : m_selectedEntities)
+		{
+			Entity* entity = Assets::getEntity(_entity);
+			entity->m_isSelected = false;
+		}
 		m_selectedEntities.clear();
 	}
 

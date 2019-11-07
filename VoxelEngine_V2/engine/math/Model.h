@@ -39,11 +39,17 @@ namespace Vxl
 		unsigned int indexCount = 0;
 
 	public:
-		// Load
-		static std::vector<Mesh*> Load(
+		// Load all meshes from a file
+		static std::vector<MeshIndex> LoadMeshes(
 			const std::string& name,
 			const std::string& filePath,
-			bool mergeMeshes,
+			bool normalize,
+			float normalizeScale = 1.0f
+		);
+		// Load all meshes and combine them into one mesh
+		static MeshIndex LoadMesh(
+			const std::string& name,
+			const std::string& filePath,
 			bool normalize,
 			float normalizeScale = 1.0f
 		);
@@ -56,7 +62,6 @@ namespace Vxl
 			Util::MergeVectors(normals, other.normals);
 			Util::MergeVectors(tangents, other.tangents);
 			Util::MergeVectors(bitangents, other.bitangents);
-			//Util::MergeVectors(colors, other.colors);
 			Util::MergeVectors(indices, other.indices);
 
 			vertexCount += other.vertexCount;

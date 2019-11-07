@@ -27,41 +27,41 @@ namespace Vxl
 
 	private:
 		bool m_isSetup = false;
-		Mesh* m_fullQuad = nullptr;
-		Mesh* m_fullTriangle = nullptr;
-		Mesh* m_quad_x = nullptr;
-		Mesh* m_quad_y = nullptr;
-		Mesh* m_quad_z = nullptr;
-		Mesh* m_halfquad_x = nullptr;
-		Mesh* m_halfquad_y = nullptr;
-		Mesh* m_halfquad_z = nullptr;
-		Mesh* m_cube = nullptr;
-		Mesh* m_cube_small = nullptr; // (1/4)size
-		Mesh* m_inverseCube = nullptr;
-		Mesh* m_octahedron = nullptr;
-		Mesh* m_icosahedron = nullptr;
-		Mesh* m_icoSphere = nullptr;
-		Mesh* m_sphere = nullptr; // made from icosahedron subdivded
-		Mesh* m_sphereUV_16 = nullptr;
-		Mesh* m_sphereUV_64 = nullptr;
-		Mesh* m_cylinder_x = nullptr; //
-		Mesh* m_cylinder_y = nullptr; //
-		Mesh* m_cylinder_z = nullptr; //
-		Mesh* m_cone_x = nullptr; //
-		Mesh* m_cone_y = nullptr; //
-		Mesh* m_cone_z = nullptr; //
-		Mesh* m_arrow_x = nullptr;
-		Mesh* m_arrow_y = nullptr;
-		Mesh* m_arrow_z = nullptr;
-		Mesh* m_circleUnit_x = nullptr; // Radius = 0.5f
-		Mesh* m_circleUnit_y = nullptr; // Radius = 0.5f
-		Mesh* m_circleUnit_z = nullptr; // Radius = 0.5f
-		Mesh* m_circleDouble_x = nullptr; // Radius = 1.0f
-		Mesh* m_circleDouble_y = nullptr; // Radius = 1.0f
-		Mesh* m_circleDouble_z = nullptr; // Radius = 1.0f
-		Mesh* m_doughtnut2D_x = nullptr; // Radius = 1.0f
-		Mesh* m_doughtnut2D_y = nullptr; // Radius = 1.0f
-		Mesh* m_doughtnut2D_z = nullptr; // Radius = 1.0f
+		MeshIndex m_fullQuad;
+		MeshIndex m_fullTriangle;
+		MeshIndex m_quad_x;
+		MeshIndex m_quad_y;
+		MeshIndex m_quad_z;
+		MeshIndex m_halfquad_x;
+		MeshIndex m_halfquad_y;
+		MeshIndex m_halfquad_z;
+		MeshIndex m_cube;
+		MeshIndex m_cube_small; // (1/4)size
+		MeshIndex m_inverseCube;
+		MeshIndex m_octahedron;
+		MeshIndex m_icosahedron;
+		MeshIndex m_icoSphere;
+		MeshIndex m_sphere; // made from icosahedron subdivded
+		MeshIndex m_sphereUV_16;
+		MeshIndex m_sphereUV_64;
+		MeshIndex m_cylinder_x; //
+		MeshIndex m_cylinder_y; //
+		MeshIndex m_cylinder_z; //
+		MeshIndex m_cone_x; //
+		MeshIndex m_cone_y; //
+		MeshIndex m_cone_z; //
+		MeshIndex m_arrow_x;
+		MeshIndex m_arrow_y;
+		MeshIndex m_arrow_z;
+		MeshIndex m_circleUnit_x; // Radius = 0.5f
+		MeshIndex m_circleUnit_y; // Radius = 0.5f
+		MeshIndex m_circleUnit_z; // Radius = 0.5f
+		MeshIndex m_circleDouble_x; // Radius = 1.0f
+		MeshIndex m_circleDouble_y; // Radius = 1.0f
+		MeshIndex m_circleDouble_z; // Radius = 1.0f
+		MeshIndex m_doughtnut2D_x; // Radius = 1.0f
+		MeshIndex m_doughtnut2D_y; // Radius = 1.0f
+		MeshIndex m_doughtnut2D_z; // Radius = 1.0f
 
 		void CreateFullQuad();
 		void CreateFullTriangle();
@@ -98,171 +98,66 @@ namespace Vxl
 		}
 
 		// Generate Custom Meshes
-		Mesh* GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale = 1.0f);
-		Mesh* GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice);
-		Mesh* GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot);
-		Mesh* GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
-		Mesh* GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
-		Mesh* GenerateCube(const std::string& MeshName, float unitSize = 1.0f, const Vector3& offset = Vector3(0, 0, 0));
-		Mesh* GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f, const Vector3& offset = Vector3(0,0,0));
-		Mesh* GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
-		Mesh* GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
+		MeshIndex GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale = 1.0f);
+		MeshIndex GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice);
+		MeshIndex GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot);
+		MeshIndex GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
+		MeshIndex GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
+		MeshIndex GenerateCube(const std::string& MeshName, float unitSize = 1.0f, const Vector3& offset = Vector3(0, 0, 0));
+		MeshIndex GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f, const Vector3& offset = Vector3(0,0,0));
+		MeshIndex GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
+		MeshIndex GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
 
 		// Vertices are from -1 to +1
-		Mesh* GetFullQuad()
-		{
-			return m_fullQuad;
-		}
-		Mesh* GetFullTriangle()
-		{
-			return m_fullTriangle;
-		}
+		inline MeshIndex GetFullQuad() const { return m_fullQuad; }
+		inline MeshIndex GetFullTriangle() const { return m_fullTriangle; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetQuadX()
-		{
-			return m_quad_x;
-		}
+		inline MeshIndex GetQuadX() const { return m_quad_x; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetQuadY()
-		{
-			return m_quad_y;
-		}
+		inline MeshIndex GetQuadY() const { return m_quad_y; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetQuadZ()
-		{
-			return m_quad_z;
-		}
+		inline MeshIndex GetQuadZ() const { return m_quad_z; }
 		// Vertices are from -0.25 to +0.25
-		Mesh* GetHalfQuadX()
-		{
-			return m_halfquad_x;
-		}
+		inline MeshIndex GetHalfQuadX() const { return m_halfquad_x; }
 		// Vertices are from -0.25 to +0.25
-		Mesh* GetHalfQuadY()
-		{
-			return m_halfquad_y;
-		}
+		inline MeshIndex GetHalfQuadY() const { return m_halfquad_y; }
 		// Vertices are from -0.25 to +0.25
-		Mesh* GetHalfQuadZ()
-		{
-			return m_halfquad_z;
-		}
+		inline MeshIndex GetHalfQuadZ() const { return m_halfquad_z; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetCube()
-		{
-			return m_cube;
-		}
+		inline MeshIndex GetCube() const { return m_cube; }
 		// 1/4 the size of a cube [-0.125] to [0.125]
-		Mesh* GetCubeSmall()
-		{
-			return m_cube_small;
-		}
+		inline MeshIndex GetCubeSmall() const { return m_cube_small; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetInverseCube()
-		{
-			return m_inverseCube;
-		}
-		Mesh* GetOctahedron()
-		{
-			return m_octahedron;
-		}
+		inline MeshIndex GetInverseCube() const { return m_inverseCube; }
+		inline MeshIndex GetOctahedron() const { return m_octahedron; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetIcosahedron()
-		{
-			return m_icosahedron;
-		}
+		inline MeshIndex GetIcosahedron() const { return m_icosahedron; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetIcoSphere()
-		{
-			return m_icoSphere;
-		}
+		inline MeshIndex GetIcoSphere() const { return m_icoSphere; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetSphere()
-		{
-			return m_sphere;
-		}
+		inline MeshIndex GetSphere() const { return m_sphere; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetSphereUV_Cheap()
-		{
-			return m_sphereUV_16;
-		}
+		inline MeshIndex GetSphereUV_Cheap() const { return m_sphereUV_16; }
 		// Vertices are from -0.5 to +0.5
-		Mesh* GetSphereUV_Good()
-		{
-			return m_sphereUV_64;
-		}
-		Mesh* GetCylinderX()
-		{
-			return m_cylinder_x;
-		}
-		Mesh* GetCylinderY()
-		{
-			return m_cylinder_y;
-		}
-		Mesh* GetCylinderZ()
-		{
-			return m_cylinder_z;
-		}
-		Mesh* GetConeX()
-		{
-			return m_cone_x;
-		}
-		Mesh* GetConeY()
-		{
-			return m_cone_y;
-		}
-		Mesh* GetConeZ()
-		{
-			return m_cone_z;
-		}
-		Mesh* GetArrowX()
-		{
-			return m_arrow_x;
-		}
-		Mesh* GetArrowY()
-		{
-			return m_arrow_y;
-		}
-		Mesh* GetArrowZ()
-		{
-			return m_arrow_z;
-		}
-		Mesh* GetCircleX_Unit()
-		{
-			return m_circleUnit_x;
-		}
-		Mesh* GetCircleY_Unit()
-		{
-			return m_circleUnit_y;
-		}
-		Mesh* GetCircleZ_Unit()
-		{
-			return m_circleUnit_z;
-		}
-		Mesh* GetCircleX_Double()
-		{
-			return m_circleDouble_x;
-		}
-		Mesh* GetCircleY_Double()
-		{
-			return m_circleDouble_y;
-		}
-		Mesh* GetCircleZ_Double()
-		{
-			return m_circleDouble_z;
-		}
-		Mesh* GetDoughtnutX_2D()
-		{
-			return m_doughtnut2D_x;
-		}
-		Mesh* GetDoughtnutY_2D()
-		{
-			return m_doughtnut2D_y;
-		}
-		Mesh* GetDoughtnutZ_2D()
-		{
-			return m_doughtnut2D_z;
-		}
+		inline MeshIndex GetSphereUV_Good() const { return m_sphereUV_64; }
+		inline MeshIndex GetCylinderX() const { return m_cylinder_x; }
+		inline MeshIndex GetCylinderY() const { return m_cylinder_y; }
+		inline MeshIndex GetCylinderZ() const { return m_cylinder_z; }
+		inline MeshIndex GetConeX() const { return m_cone_x; }
+		inline MeshIndex GetConeY() const { return m_cone_y; }
+		inline MeshIndex GetConeZ() const { return m_cone_z; }
+		inline MeshIndex GetArrowX() const { return m_arrow_x; }
+		inline MeshIndex GetArrowY() const { return m_arrow_y; }
+		inline MeshIndex GetArrowZ() const { return m_arrow_z; }
+		inline MeshIndex GetCircleX_Unit() const { return m_circleUnit_x; }
+		inline MeshIndex GetCircleY_Unit() const { return m_circleUnit_y; }
+		inline MeshIndex GetCircleZ_Unit() const { return m_circleUnit_z; }
+		inline MeshIndex GetCircleX_Double() const { return m_circleDouble_x; }
+		inline MeshIndex GetCircleY_Double() const { return m_circleDouble_y; }
+		inline MeshIndex GetCircleZ_Double() const { return m_circleDouble_z; }
+		inline MeshIndex GetDoughtnutX_2D() const { return m_doughtnut2D_x; }
+		inline MeshIndex GetDoughtnutY_2D() const { return m_doughtnut2D_y; }
+		inline MeshIndex GetDoughtnutZ_2D() const { return m_doughtnut2D_z; }
 
 	} SingletonInstance(Geometry);
 }

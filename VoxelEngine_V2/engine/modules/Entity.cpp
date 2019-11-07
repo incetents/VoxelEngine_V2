@@ -4,7 +4,7 @@
 
 #include "../objects/GameObject.h"
 #include "../objects/LightObject.h"
-#include "../objects/CameraObject.h"
+#include "../objects/Camera.h"
 
 #include "../rendering/Mesh.h"
 #include "../rendering/RenderManager.h"
@@ -16,63 +16,30 @@
 namespace Vxl
 {
 	// Unique IDs
-	uint32_t Entity::m_maxUniqueID = 0;
-	std::stack<uint32_t> Entity::m_discardedUniqueIDs;
-	std::map<uint32_t, Entity*> Entity::m_EntitiesByID;
 
-	Entity::Entity(const std::string& name, EntityType type)
-		: m_type(type)
+	Entity::Entity(const std::string& name)
+		: m_name(name)
 	{
-		m_name = name;
-		AddComponent(&m_transform, this);
-
-		// Check if there are discarded IDs to use
-		if (!m_discardedUniqueIDs.empty())
-		{
-			m_uniqueID = m_discardedUniqueIDs.top();
-			m_discardedUniqueIDs.pop();
-		}
-		// Generate new ID
-		else
-		{
-			m_uniqueID = (++m_maxUniqueID);
-		}
-
-		// Store Self by ID
-		m_EntitiesByID[m_uniqueID] = this;
-		// Create ColorID
-		m_colorID = Util::Conversion::uint_to_color4(m_uniqueID);
-
-		VXL_ASSERT(m_maxUniqueID != -1, "You've reached the maximum unique ID's for Entities (that's 2.1 billion ._.')");
 	}
 	Entity::~Entity()
 	{
-		// Remove self by ID
-		m_EntitiesByID.erase(m_uniqueID);
-		// Remove Unique ID
-		m_discardedUniqueIDs.push(m_uniqueID);
 	}
 
-	// Rename Entity
-	void Entity::Rename(const std::string& newName)
+	// Mesh
+	void Entity::setMesh(MeshIndex index)
 	{
-		switch (m_type)
-		{
-		case EntityType::GAMEOBJECT:
-			m_name = ((GameObject*)this)->RenameAsset(m_name, newName);
-			break;
-		case EntityType::LIGHT:
-			m_name = ((LightObject*)this)->RenameAsset(m_name, newName);
-			break;
-		case EntityType::CAMERA:
-			m_name = ((CameraObject*)this)->RenameAsset(m_name, newName);
-			break;
-		}
+		m_mesh = index;
+	}
+	// Material
+	void Entity::setMaterial(MaterialIndex index)
+	{
+		m_material = index;
 	}
 
 	// Update Bounding Box from Mesh
-	void Entity::UpdateBoundingBoxCheap(Mesh* _mesh)
+	void Entity::UpdateBoundingBoxCheap()
 	{
+		Mesh* _mesh = SceneAssets.getMesh(m_mesh);
 		VXL_ASSERT(_mesh, "Cannot update bounding box without mesh");
 
 		// Update Bounding Box information

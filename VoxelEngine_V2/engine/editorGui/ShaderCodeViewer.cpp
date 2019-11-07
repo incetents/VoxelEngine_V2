@@ -10,22 +10,22 @@ namespace Vxl
 {
 	void ShaderCodeViewer::Draw()
 	{
-		auto _ShaderPrograms = ShaderProgram::GetAllNamedAssets();
+		auto _ShaderPrograms = Assets::getAllShaderProgram();
 		for (const auto& _Program : _ShaderPrograms)
 		{
-			if (ImGui::CollapsingHeader(_Program.first.c_str()))
+			if (ImGui::CollapsingHeader(_Program.second->m_name.c_str()))
 			{
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 0, 1));
 
-				auto _Shaders = _Program.second->GetShaders();
+				auto& _Shaders = _Program.second->m_shaders;
 				for (const auto& _Shader : _Shaders)
 				{
-					if (ImGui::TreeNode(_Shader->GetName().c_str()))
+					if (ImGui::TreeNode(_Shader->m_name.c_str()))
 					{
-						if (_Shader->GetCompiledCode().empty())
+						if (_Shader->m_source.empty())
 							ImGui::TextColored(ImVec4(1, 0.4f, 0.3f, 1), "Shader Code Not Stored");
 						else
-							ImGui::TextColored(ImVec4(1,1,1,1), _Shader->GetCompiledCode().c_str());
+							ImGui::TextColored(ImVec4(1,1,1,1), _Shader->m_source.c_str());
 						ImGui::TreePop();
 					}
 				}

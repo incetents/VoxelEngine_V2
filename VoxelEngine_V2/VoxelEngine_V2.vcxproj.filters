@@ -69,18 +69,6 @@
     <ClCompile Include="engine\input\XGamePad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\terrain\Block.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\terrain\Chunk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\terrain\TerrainManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\terrain\ChunkMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\modules\Layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -106,9 +94,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\objects\GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\objects\CameraObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\textures\BaseTexture.cpp">
@@ -201,9 +186,6 @@
     <ClCompile Include="engine\utilities\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\utilities\ShaderBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\editorGui\ShaderCodeViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -238,6 +220,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\implement\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\utilities\ShaderBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\objects\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -305,18 +293,6 @@
     <ClInclude Include="engine\input\XGamePad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\terrain\Block.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\terrain\Chunk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\terrain\TerrainManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\terrain\ChunkMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\modules\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -345,9 +321,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\objects\GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\objects\CameraObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\editor\Inspector.h">
@@ -461,9 +434,6 @@
     <ClInclude Include="engine\utilities\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\utilities\ShaderBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\editorGui\ShaderCodeViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -501,6 +471,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\implement\imgui_impl_opengl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\utilities\ShaderBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\objects\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

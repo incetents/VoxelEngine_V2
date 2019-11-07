@@ -37,20 +37,9 @@ namespace Vxl
 		return TextureFormat::NONE;
 	}
 
-	FramebufferObject::FramebufferObject(const std::string& name)
-		: m_name(name)
+	FramebufferObject::FramebufferObject()
 	{
 		load();
-	}
-
-	FramebufferObject* FramebufferObject::Create(
-		const std::string& name
-	){
-		FramebufferObject* _FBO = new FramebufferObject(name);
-
-		AddNamedAsset(name, _FBO, AssetMessage::CREATED);
-
-		return _FBO;
 	}
 
 	FramebufferObject::~FramebufferObject()
@@ -90,7 +79,6 @@ namespace Vxl
 		m_id = Graphics::FramebufferObject::Create();
 		
 		Graphics::FramebufferObject::Bind(m_id);
-		Graphics::SetGLName(ObjectType::FRAMEBUFFER, m_id, "FBO_" + m_name);
 		Graphics::FramebufferObject::Unbind();
 	}
 	void FramebufferObject::unload()
@@ -99,14 +87,19 @@ namespace Vxl
 		m_id = -1;
 	}
 
-	void FramebufferObject::SetSizeToWindowSize()
+	void FramebufferObject::setGLName(const std::string& name)
+	{
+		Graphics::SetGLName(ObjectType::FRAMEBUFFER, m_id, "FBO_" + name);
+	}
+
+	void FramebufferObject::setSizeToViewportSize()
 	{
 		m_width = Window.GetViewportWidth();
 		m_height = Window.GetViewportHeight();
 		m_fullscreen = true;
 	}
 
-	void FramebufferObject::Bind()
+	void FramebufferObject::bind()
 	{
 		Graphics::FramebufferObject::Bind(m_id);
 
@@ -116,17 +109,16 @@ namespace Vxl
 
 		UBOManager.BindFBOSize(*this);
 	}
-	void FramebufferObject::SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-	{
-		Graphics::SetViewport(x, y, w, h);
-	}
-	void FramebufferObject::Unbind()
+	//void FramebufferObject::SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+	//{
+	//	Graphics::SetViewport(x, y, w, h);
+	//}
+	void FramebufferObject::unbind()
 	{
 		Graphics::FramebufferObject::Bind(0);
 	}
 
-
-	void FramebufferObject::ClearBuffers()
+	void FramebufferObject::clearBuffers()
 	{
 		Graphics::SetClearColor(m_clearColor);
 
@@ -149,13 +141,13 @@ namespace Vxl
 		}
 
 	}
-	void FramebufferObject::ClearBuffer(uint32_t _attachmentIndex)
+	void FramebufferObject::clearBuffer(uint32_t _attachmentIndex)
 	{
-		VXL_ASSERT(HasAttachment(_attachmentIndex), "FBO, Index out of bounds");
+		VXL_ASSERT(hasAttachment(_attachmentIndex), "FBO, Index out of bounds");
 		Graphics::ClearBufferFBOAttachment(_attachmentIndex, m_clearColor);
 	}
 
-	void FramebufferObject::SetAttachment(
+	void FramebufferObject::setAttachment(
 		uint32_t _attachmentIndex,
 		RenderTexture* _renderTexture
 	)
@@ -169,7 +161,7 @@ namespace Vxl
 		Graphics::FramebufferObject::AttachRenderTexture(*_renderTexture, _attachmentIndex);
 		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
-	void FramebufferObject::SetAttachment(
+	void FramebufferObject::setAttachment(
 		uint32_t _attachmentIndex,
 		RenderBuffer* _renderbuffer
 	)
@@ -183,7 +175,7 @@ namespace Vxl
 		Graphics::FramebufferObject::AttachRenderBuffer(*_renderbuffer, _attachmentIndex);
 		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
-	void FramebufferObject::RemoveAttachment(
+	void FramebufferObject::removeAttachment(
 		uint32_t _attachmentIndex
 	)
 	{
@@ -191,7 +183,7 @@ namespace Vxl
 		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit attachments");
 
 		// Disconnect attachment from FBO
-		DisableAttachment(_attachmentIndex);
+		disableAttachment(_attachmentIndex);
 		// Remove reference to attachment
 		m_textures.erase(_attachmentIndex);
 
@@ -199,31 +191,31 @@ namespace Vxl
 		updateAttachmentOrder();
 		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
-	void FramebufferObject::ReloadAttachments()
+	void FramebufferObject::reloadAttachments()
 	{
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
 		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to reload attachments");
 
-		for (auto& texture : m_textures)
+		for (const auto& texture : m_textures)
 		{
 			if (texture.second.IsRenderTexture())
 			{
 				auto render = texture.second.GetRenderTexture();
-				render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType(), render->GetPixelType());
+				render->RecreateStorage(getWidth(), getHeight(), render->GetFormatType(), render->GetPixelType());
 
 				Graphics::FramebufferObject::AttachRenderTexture(*texture.second.GetRenderTexture(), texture.first);
 			}
 			else if (texture.second.IsRenderBuffer())
 			{
 				auto render = texture.second.GetRenderBuffer();
-				render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType());
+				render->RecreateStorage(getWidth(), getHeight(), render->GetFormatType());
 
 				Graphics::FramebufferObject::AttachRenderBuffer(*texture.second.GetRenderBuffer(), texture.first);
 			}
 		}
 		Graphics::FramebufferObject::DrawBuffers(m_attachmentOrder);
 	}
-	void FramebufferObject::ReloadDepth()
+	void FramebufferObject::reloadDepth()
 	{
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
 		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to reload attachments");
@@ -231,40 +223,40 @@ namespace Vxl
 		if (m_depth.IsRenderTexture())
 		{
 			auto render = m_depth.GetRenderTexture();
-			render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType(), render->GetPixelType());
+			render->RecreateStorage(getWidth(), getHeight(), render->GetFormatType(), render->GetPixelType());
 
 			Graphics::FramebufferObject::AttachRenderTextureAsDepth(*m_depth.GetRenderTexture());
 		}
 		else if (m_depth.IsRenderBuffer())
 		{
 			auto render = m_depth.GetRenderBuffer();
-			render->RecreateStorage(GetWidth(), GetHeight(), render->GetFormatType());
+			render->RecreateStorage(getWidth(), getHeight(), render->GetFormatType());
 
 			Graphics::FramebufferObject::AttachRenderBufferAsDepth(*m_depth.GetRenderBuffer());
 		}
 	}
-	RenderTexture* FramebufferObject::GetAttachmentRenderTexture(
+	RenderTexture* FramebufferObject::getAttachmentRenderTexture(
 		uint32_t _attachmentIndex
 	)
 	{
-		VXL_RETURN_NULLPTR_ON_FAIL(HasAttachment(_attachmentIndex), "Missing Attachment");
+		VXL_RETURN_NULLPTR_ON_FAIL(hasAttachment(_attachmentIndex), "Missing Attachment");
 		VXL_RETURN_NULLPTR_ON_FAIL(m_textures[_attachmentIndex].GetType() == RenderTarget::Type::TEXTURE, "Incorrect Attachment Info");
 		return m_textures[_attachmentIndex].GetRenderTexture();
 	}
-	RenderBuffer* FramebufferObject::GetAttachmentRenderBuffer(
+	RenderBuffer* FramebufferObject::getAttachmentRenderBuffer(
 		uint32_t _attachmentIndex
 	)
 	{
 		VXL_RETURN_NULLPTR_ON_FAIL(m_textures[_attachmentIndex].GetType() == RenderTarget::Type::BUFFER, "Incorrect Attachment Info");
 		return m_textures[_attachmentIndex].GetRenderBuffer();
 	}
-	uint32_t FramebufferObject::GetAttachmentTextureID(
+	uint32_t FramebufferObject::getAttachmentTextureID(
 		uint32_t _attachmentIndex
 	)
 	{
 		return m_textures[_attachmentIndex].GetID();
 	}
-	void FramebufferObject::DisableAttachment(
+	void FramebufferObject::disableAttachment(
 		uint32_t _attachmentIndex
 	)
 	{
@@ -284,7 +276,7 @@ namespace Vxl
 			return;
 		}
 	}
-	void FramebufferObject::EnableAttachment(
+	void FramebufferObject::enableAttachment(
 		uint32_t _attachmentIndex
 	)
 	{
@@ -305,7 +297,7 @@ namespace Vxl
 		}
 	}
 
-	void FramebufferObject::SetDepth(RenderTextureDepth* _depth)
+	void FramebufferObject::setDepth(RenderTextureDepth* _depth)
 	{
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
 		VXL_ASSERT(_depth, "RenderTextureDepth is nullptr");
@@ -316,7 +308,7 @@ namespace Vxl
 
 		Graphics::FramebufferObject::AttachRenderTextureAsDepth(*_depth);
 	}
-	void FramebufferObject::SetDepth(RenderBufferDepth* _depth)
+	void FramebufferObject::setDepth(RenderBufferDepth* _depth)
 	{
 		VXL_ASSERT(m_id != -1, "FBO not initialized");
 		VXL_ASSERT(_depth, "RenderTextureDepth is nullptr");
@@ -327,78 +319,22 @@ namespace Vxl
 
 		Graphics::FramebufferObject::AttachRenderBufferAsDepth(*_depth);
 	}
-
-	//	void FramebufferObject::SetDepth(
-	//		TextureDepthFormat _depthFormat,
-	//		RenderTarget::Type _type
-	//	)
-	//	{
-	//		VXL_ASSERT(m_id != -1, "FBO not initialized");
-	//		VXL_ASSERT(_type != RenderTarget::Type::NONE, "Incorrect Enum value");
-	//	
-	//		// If depth already exists, delete it first
-	//		if (!m_depth.IsUnused())
-	//			RemoveDepth();
-	//	
-	//		if (_type == RenderTarget::Type::TEXTURE)
-	//		{
-	//			RenderTextureIndex id = SceneAssets.createRenderTexture(
-	//				m_width, m_height,
-	//				Graphics::GetFormat(_depthFormat),
-	//				Graphics::GetPixelData(_depthFormat),
-	//				false
-	//			);
-	//			RenderTexture* rt = SceneAssets.getRenderTexture(id);
-	//	
-	//			m_depth.Set(rt);
-	//	
-	//			VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
-	//			Graphics::FramebufferObject::AttachRenderTextureAsDepth(*rt);
-	//	
-	//			Graphics::SetGLName(ObjectType::TEXTURE, rt->GetID(), "FBO_" + m_name + "_Depth");
-	//		}
-	//		else
-	//		{
-	//			RenderBufferIndex id = SceneAssets.createRenderBuffer(
-	//				m_width, m_height,
-	//				Graphics::GetFormat(_depthFormat),
-	//				Graphics::GetPixelData(_depthFormat)
-	//			);
-	//			RenderBuffer* rb = SceneAssets.getRenderBuffer(id);
-	//	
-	//			m_depth.Set(rb);
-	//	
-	//			VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be bound to edit depth");
-	//			Graphics::FramebufferObject::AttachRenderBufferAsDepth(*rb);
-	//	
-	//			Graphics::SetGLName(ObjectType::TEXTURE, rb->GetID(), "FBO_" + m_name + "_Depth");
-	//		}
-	//	
-	//		// Update clear mode
-	//		if (_depthFormat == TextureDepthFormat::STENCIL8)
-	//			m_clearMode = ClearMode::COLOR_STENCIL;
-	//		else if (_depthFormat == TextureDepthFormat::DEPTH24_STENCIL8 || _depthFormat == TextureDepthFormat::DEPTH32F_STENCIL8)
-	//			m_clearMode = ClearMode::COLOR_DEPTH_STENCIL;
-	//		else
-	//			m_clearMode = ClearMode::COLOR_DEPTH;
-	//	
-	//	}
-	void FramebufferObject::RemoveDepth(void)
+	void FramebufferObject::removeDepth(void)
 	{
 		m_depth.Remove();
 		m_clearMode = ClearMode::COLOR;
 	}
-	RenderTexture* FramebufferObject::GetDepthRenderTexture()
+	RenderTexture* FramebufferObject::getDepthRenderTexture()
 	{
 		VXL_RETURN_NULLPTR_ON_FAIL(m_depth.GetType() == RenderTarget::Type::TEXTURE, "Incorrect Depth Info");
 		return m_depth.GetRenderTexture();
 	}
-	RenderBuffer* FramebufferObject::GetDepthRenderBuffer()
+	RenderBuffer* FramebufferObject::getDepthRenderBuffer()
 	{
 		VXL_RETURN_NULLPTR_ON_FAIL(m_depth.GetType() == RenderTarget::Type::BUFFER, "Incorrect Depth Info");
 		return m_depth.GetRenderBuffer();
 	}
-	uint32_t FramebufferObject::GetDepthTextureID()
+	uint32_t FramebufferObject::getDepthTextureID()
 	{
 		return m_depth.GetID();
 	}
@@ -408,7 +344,7 @@ namespace Vxl
 
 		if (!Graphics::FramebufferObject::CheckStatus())
 		{
-			Logger.error("Failed to create FBO: " + m_name);
+			Logger.error("Failed to create FBO");
 			return false;
 		}
 		return true;
@@ -416,7 +352,7 @@ namespace Vxl
 
 	void FramebufferObject::bindTexture(uint32_t index, TextureLevel layer)
 	{
-		VXL_ASSERT(HasAttachment(index), "FBO, bindTexture index out of bounds");
+		VXL_ASSERT(hasAttachment(index), "FBO, bindTexture index out of bounds");
 		VXL_ASSERT(m_textures[index].IsRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
 		Graphics::Texture::SetActiveLevel(layer);
@@ -433,8 +369,8 @@ namespace Vxl
 	void FramebufferObject::blitColor(const FramebufferObject& destFBO, uint32_t srcAttachment, uint32_t destAttachment)
 	{
 		// Both fbos must have attachments
-		VXL_ASSERT(HasAttachment(srcAttachment), "SrcAttachment Not Found for blitColor()");
-		VXL_ASSERT(destFBO.HasAttachment(destAttachment), "SrcAttachment Not Found for blitColor()");
+		VXL_ASSERT(hasAttachment(srcAttachment), "SrcAttachment Not Found for blitColor()");
+		VXL_ASSERT(destFBO.hasAttachment(destAttachment), "SrcAttachment Not Found for blitColor()");
 		// Must have matching formats
 		VXL_ASSERT(m_textures[srcAttachment].GetFormatType() == destFBO.m_textures[destAttachment].GetFormatType(), "FBO, blitColor doesn't have matching formats");
 		// Must have matching sizes
@@ -458,7 +394,7 @@ namespace Vxl
 	// Generates mipmap of current texture
 	void FramebufferObject::updateMipmaps(uint32_t _attachmentIndex)
 	{
-		VXL_ASSERT(HasAttachment(_attachmentIndex), "FBO, index out of bounds");
+		VXL_ASSERT(hasAttachment(_attachmentIndex), "FBO, index out of bounds");
 		VXL_ASSERT(Graphics::FramebufferObject::GetCurrentlyBound() == m_id, "FBO must be found before generating mipmaps");
 		VXL_ASSERT(m_textures[_attachmentIndex].IsRenderTexture(), "FBO, bindTexture is not RenderTexture");
 
@@ -475,7 +411,7 @@ namespace Vxl
 
 		//std::cout << x << ' ' << y << std::endl;
 
-		VXL_ASSERT(HasAttachment(_attachmentIndex), "FBO readpixels, missing attachment to read from");
+		VXL_ASSERT(hasAttachment(_attachmentIndex), "FBO readpixels, missing attachment to read from");
 
 		if(m_textures[_attachmentIndex].IsRenderTexture())
 			return Graphics::FramebufferObject::ReadPixels(*m_textures[_attachmentIndex].GetRenderTexture(), _attachmentIndex, x, y, w, h);

@@ -173,29 +173,29 @@ namespace Vxl
 				/* SHADER */
 				if (_state == LoadState::SHADER && SegmentCount == 2)
 				{
-					auto Name = Segments[0];
-					auto Path = Segments[1];
-
-					ShaderPaths[Name] = Path;
+					//	auto Name = Segments[0];
+					//	auto Path = Segments[1];
+					//	
+					//	ShaderPaths[Name] = Path;
 				}
 				/* SHADER PROGRAM */
 				else if (_state == LoadState::SHADER_PROGRAM && SegmentCount >= 2)
 				{
-					auto Name = Segments[0];
-					std::vector<std::string> filePaths;
-					
-					for (unsigned int i = 1; i < SegmentCount; i++)
-					{
-						if (ShaderPaths.find(Segments[i]) == ShaderPaths.end())
-						{
-							Logger.error("Attempting to load non-existing Shader: " + Segments[i]);
-							continue;
-						}
-
-						filePaths.push_back(ShaderPaths[Segments[i]]);
-					}
-					
-					ShaderProgram::Load(Name, filePaths);
+					//	auto Name = Segments[0];
+					//	std::vector<std::string> filePaths;
+					//	
+					//	for (unsigned int i = 1; i < SegmentCount; i++)
+					//	{
+					//		if (ShaderPaths.find(Segments[i]) == ShaderPaths.end())
+					//		{
+					//			Logger.error("Attempting to load non-existing Shader: " + Segments[i]);
+					//			continue;
+					//		}
+					//	
+					//		filePaths.push_back(ShaderPaths[Segments[i]]);
+					//	}
+					//	
+					//	ShaderProgram::Load(Name, filePaths);
 				}
 				/* TEXTURE */
 				else if (_state == LoadState::TEXTURE && SegmentCount >= 2)
@@ -240,24 +240,24 @@ namespace Vxl
 				/* MODEL */
 				else if (_state == LoadState::MODEL && SegmentCount >= 2)
 				{
-					auto Name = Segments[0];
-					auto FilePath = Segments[1];
-					bool Merge = false;
-					bool Normalize = false;
-					float scale = 1.0f;
-
-					switch (SegmentCount)
-					{
-					case 5:
-						scale = std::stof(stringUtil::extractFirst(Segments[4], '[', ']'));
-					case 4:
-						Normalize = Segments[3].compare(TAG_NORMALIZE) == 0;
-					case 3:
-						Merge = Segments[2].compare(TAG_MERGE) == 0;
-						break;
-					}
-
-					Model::Load(Name, FilePath, Merge, Normalize, scale);
+					//	auto Name = Segments[0];
+					//	auto FilePath = Segments[1];
+					//	bool Merge = false;
+					//	bool Normalize = false;
+					//	float scale = 1.0f;
+					//	
+					//	switch (SegmentCount)
+					//	{
+					//	case 5:
+					//		scale = std::stof(stringUtil::extractFirst(Segments[4], '[', ']'));
+					//	case 4:
+					//		Normalize = Segments[3].compare(TAG_NORMALIZE) == 0;
+					//	case 3:
+					//		Merge = Segments[2].compare(TAG_MERGE) == 0;
+					//		break;
+					//	}
+					//	
+					//	Model::Load(Name, FilePath, Merge, Normalize, scale);
 				}
 			}
 		}

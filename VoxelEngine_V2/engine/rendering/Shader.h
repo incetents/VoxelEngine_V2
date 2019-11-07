@@ -22,234 +22,352 @@ namespace Vxl
 
 	class _Shader
 	{
-
-	};
-
-	class Shader
-	{
-		DISALLOW_COPY_AND_ASSIGN(Shader);
-		friend class ShaderProgram;
-		friend class RenderManager;
+		DISALLOW_COPY_AND_ASSIGN(_Shader);
+		friend class Assets;
+		friend class ShaderErrors;
+		friend class ShaderCodeViewer;
 	private:
-		bool				m_hasCompiled = false;
-		ShaderID			m_id = -1;
+		ShaderID			m_id;
 		const std::string   m_name;
-		std::string			m_sourceBackup; // has line numbers appended
-		std::string			m_errorMessage;
+		bool				m_compiled;
 		const ShaderType	m_type;
-		
-		bool compile(const std::string& source);
-		void updateErrorMessage();
+		std::string			m_source;
+		std::string			m_errorMessage;
+		static std::map<ShaderID, _Shader*> m_brokenShaders;
 
-		void load(const std::string& shaderCode);
-		void unload();
-
+		_Shader(const std::string& name, const std::string& shaderCode, ShaderType type);
 	public:
+		~_Shader();
 
-		// Constructor
-		Shader(const std::string& name, const std::string& shaderCode, ShaderType type)
-			: m_name(name + '[' + Graphics::Shader::GetName(type) + ']'), m_type(type)
+		// Utility
+		void setGLName(const std::string& name);
+
+		// Getters
+		inline bool				isCompiled(void) const
 		{
-			load(shaderCode);
-
-			if (!HasCompiled())
-			{
-				Logger.error("Shader [" + name + "] failed to compile");
-				Logger.error(m_errorMessage);
-			}
+			return m_compiled;
 		}
-
-		~Shader()
-		{
-			unload();
-		}
-		
-		// Current log of all shaders with compilation errors
-		static std::unordered_map<std::string, const Shader*> ShaderErrorLog;
-		static UINT ShaderErrorLogSize;
-
-		void Reload(const std::string& shaderCode)
-		{
-			unload();
-			load(shaderCode);
-		}
-
-		inline bool					HasCompiled(void) const
-		{
-			return m_hasCompiled;
-		}
-		inline uint32_t				GetID(void) const
+		inline uint32_t			getID(void) const
 		{
 			return m_id;
 		}
-		inline ShaderType			GetType(void) const
+		inline ShaderType		getType(void) const
 		{
 			return m_type;
 		}
-		inline const std::string&	GetName(void) const
-		{
-			return m_name;
-		}
-		inline const std::string&	GetErrorMessage(void) const
+		inline std::string_view	getErrorMessage(void) const
 		{
 			return m_errorMessage;
 		}
-		inline const std::string&	GetCompiledCode(void) const
+		inline std::string_view	getSourceCode(void) const
 		{
-			return m_sourceBackup;
+			return m_source;
 		}
-
 	};
 
-	class ShaderProgram : public Asset<ShaderProgram>
+	class _ShaderProgram
 	{
-		DISALLOW_COPY_AND_ASSIGN(ShaderProgram);
-		friend class RenderManager;
+		DISALLOW_COPY_AND_ASSIGN(_ShaderProgram);
+		friend class Assets;
+		friend class ShaderErrors;
+		friend class ShaderCodeViewer;
+		friend class _Material;
 	private:
-		// Program //
-		const std::string    m_name;
-		ShaderProgramID		 m_id = -1;
-		bool				 m_linked = false;
-		BYTE				 m_shaderCount : 3; // 3 bits, val is 8 max
-		std::vector<Shader*> m_shaders;
-		std::vector<std::string> m_filePaths;
-		// Attributes //
-		AttributeStorage	 m_attributes;
-		// Uniforms //
-		UniformStorage		 m_uniforms;
-		UniformBlockStorage  m_uniformBlocks;
-		SubroutineStorage    m_subroutines;
-		bool				 m_usingSubroutines;
-		// Error //			 
-		std::string			 m_errorMessage;
+		ShaderProgramID				m_id;
+		const std::string			m_name;
+		bool						m_linked;
+		std::vector<_Shader*>		m_shaders;
+		AttributeStorage			m_attributes;
+		UniformStorage				m_uniforms;
+		UniformBlockStorage			m_uniformBlocks;
+		SubroutineStorage			m_subroutines;
+		std::string					m_errorMessage;
+		static std::map<ShaderProgramID, _ShaderProgram*> m_brokenShaderPrograms;
+
+		_ShaderProgram(const std::string& name, const std::vector<_Shader*>& _shaders);
+	public:
+		~_ShaderProgram();
+
+		//
+		void bind(void) const;
+		static void unbind(void);
 
 		// Utility
-		bool CreateProgram();
-		void DestroyProgram();
+		void setGLName(const std::string& name);
 
-		void ReloadShaders();
-		void LoadShaders();
-		void UnloadShaders();
-
-		void Link();
-
-		// Constructor
-		ShaderProgram(
-			const std::string& name,
-			const std::vector<std::string>& filePaths
-		);
-
-	public:
-		// Load
-		static ShaderProgram* Load(
-			const std::string& name,
-			const std::vector<std::string>& filePaths
-		);
-
-		~ShaderProgram();
-
-		static std::set<const ShaderProgram*> ProgramsFailed;
-		static UINT ProgramsFailedSize;
-
-		void Bind(void) const;
-		static void Unbind(void);
-
-		// Uniform
-
-		// [Faster] Set uniform
+		// Uniforms
 		template<typename Type>
-		void					SetUniform(const std::string& name, Type data)
+		void sendUniform(const std::string& name, Type data)
 		{
-			//VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
-			m_uniforms[name].Send<Type>(data);
+			auto it = m_uniforms.find(name);
+			if (it != m_uniforms.end()) {
+				it->second.send(data);
+			}
 		}
-		// [Faster] Set uniform (Custom call for matrix)
 		template<typename Type>
-		void					SetUniformMatrix(const std::string& name, Type data, bool transpose)
+		void sendUniformMatrix(const std::string& name, Type data, bool transpose)
 		{
-			//VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
-			m_uniforms[name].SendMatrix<Type>(data, transpose);
-		}
-		// [Slower] Set uniform, regardless if shader is bound
-		template<typename Type>
-		void					SetProgramUniform(const std::string& name, Type data)
-		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
-			m_uniforms[name].Send<Type>(m_id, data);
-		}
-		// [Slower] Set uniform, regardless if shader is bound (Custom call for matrix)
-		template<typename Type>
-		void					SetProgramUniformMatrix(const std::string& name, Type data, bool transpose)
-		{
-			VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
-			m_uniforms[name].SendMatrix<Type>(m_id, data, transpose);
-		}
-		
-		inline const Graphics::Uniform& GetUniform(const std::string& name) const
-		{
-			VXL_ASSERT(CheckUniform(name), "Uniform does not exist for this shader: " + name);
-			return m_uniforms.at(name);
-		}
-		inline bool				CheckUniform(const std::string& name) const
-		{
-			return (m_uniforms.find(name) != m_uniforms.end());
-		}
-		inline uint32_t			GetUniformCount(void) const
-		{
-			return (uint32_t)m_uniforms.size();
-		}
-		const UniformStorage	GetAllUniforms(void) const
-		{
-			return m_uniforms;
+			auto it = m_uniforms.find(name);
+			if (it != m_uniforms.end()) {
+				it->second.sendMatrix(data);
+			}
 		}
 
-
-		// Uniform Blocks
-		inline const Graphics::UniformBlock& GetUniformBlock(const std::string& name) const
-		{
-			VXL_ASSERT(m_uniformBlocks.find(name) != m_uniformBlocks.end(), "Uniform block does not exist");
-			return m_uniformBlocks.at(name);
-		}
-		inline uint32_t			GetUniformBlockCount(void) const
-		{
-			return (uint32_t)m_uniformBlocks.size();
-		}
-
-		// Subroutines
-		inline Graphics::UniformSubroutine&	GetSubroutine(ShaderType type)
-		{
-			VXL_ASSERT(m_subroutines.find(type) != m_subroutines.end(), "Uniform subroutine does not exist");
-			return m_subroutines[type];
-		}
-		inline uint32_t			GetSubroutineCount(void) const
-		{
-			return (uint32_t)m_subroutines.size();
-		}
-
-		// Misc
-		inline bool		IsLinked(void) const
+		// Getters
+		inline bool						isLinked(void) const
 		{
 			return m_linked;
 		}
-		inline uint32_t	GetID(void) const
+		inline uint32_t					getID(void) const
 		{
 			return m_id;
 		}
-		inline const std::string& GetName(void) const
+		inline const std::string&		getName(void) const
 		{
 			return m_name;
 		}
-		inline std::string GetErrorMessage(void) const
+		inline std::string_view			getErrorMessage(void) const
 		{
 			return m_errorMessage;
 		}
-
-		// Acquire Shaders
-		inline std::vector<Shader*> GetShaders(void) const
+		inline std::vector<_Shader*>	getShaders(void) const
 		{
 			return m_shaders;
 		}
-
 	};
+
+	//	class Shader
+	//	{
+	//		DISALLOW_COPY_AND_ASSIGN(Shader);
+	//		friend class ShaderProgram;
+	//		friend class RenderManager;
+	//	private:
+	//		bool				m_hasCompiled = false;
+	//		ShaderID			m_id = -1;
+	//		const std::string   m_name;
+	//		std::string			m_sourceBackup; // has line numbers appended
+	//		std::string			m_errorMessage;
+	//		const ShaderType	m_type;
+	//		
+	//		bool compile(const std::string& source);
+	//		void updateErrorMessage();
+	//	
+	//		void load(const std::string& shaderCode);
+	//		void unload();
+	//	
+	//	public:
+	//	
+	//		// Constructor
+	//		Shader(const std::string& name, const std::string& shaderCode, ShaderType type)
+	//			: m_name(name + '[' + Graphics::Shader::GetName(type) + ']'), m_type(type)
+	//		{
+	//			load(shaderCode);
+	//	
+	//			if (!m_hasCompiled)
+	//			{
+	//				Logger.error("Shader [" + name + "] failed to compile");
+	//				Logger.error(m_errorMessage);
+	//			}
+	//		}
+	//	
+	//		~Shader()
+	//		{
+	//			unload();
+	//		}
+	//		
+	//		// Current log of all shaders with compilation errors
+	//		static std::unordered_map<std::string, const Shader*> ShaderErrorLog;
+	//		static UINT ShaderErrorLogSize;
+	//	
+	//		void Reload(const std::string& shaderCode)
+	//		{
+	//			unload();
+	//			load(shaderCode);
+	//	
+	//			if (!m_hasCompiled)
+	//			{
+	//				Logger.error("Shader failed to compile");
+	//				Logger.error(m_errorMessage);
+	//			}
+	//		}
+	//	
+	//		inline bool					HasCompiled(void) const
+	//		{
+	//			return m_hasCompiled;
+	//		}
+	//		inline uint32_t				GetID(void) const
+	//		{
+	//			return m_id;
+	//		}
+	//		inline ShaderType			GetType(void) const
+	//		{
+	//			return m_type;
+	//		}
+	//		inline const std::string&	GetName(void) const
+	//		{
+	//			return m_name;
+	//		}
+	//		inline const std::string&	GetErrorMessage(void) const
+	//		{
+	//			return m_errorMessage;
+	//		}
+	//		inline const std::string&	GetCompiledCode(void) const
+	//		{
+	//			return m_sourceBackup;
+	//		}
+	//	
+	//	};
+
+	//class ShaderProgram //: public Asset<ShaderProgram>
+	//{
+	//	DISALLOW_COPY_AND_ASSIGN(ShaderProgram);
+	//	friend class Assets;
+	//	friend class RenderManager;
+	//private:
+	//	// Program //
+	//	const std::string    m_name;
+	//	ShaderProgramID		 m_id = -1;
+	//	bool				 m_linked = false;
+	//	BYTE				 m_shaderCount : 3; // 3 bits, val is 8 max
+	//	std::vector<Shader*> m_shaders;
+	//	std::vector<std::string> m_filePaths;
+	//	// Attributes //
+	//	AttributeStorage	 m_attributes;
+	//	// Uniforms //
+	//	UniformStorage		 m_uniforms;
+	//	UniformBlockStorage  m_uniformBlocks;
+	//	SubroutineStorage    m_subroutines;
+	//	bool				 m_usingSubroutines;
+	//	// Error //			 
+	//	std::string			 m_errorMessage;
+
+	//	// Utility
+	//	bool CreateProgram();
+	//	void DestroyProgram();
+
+	//	void ReloadShaders();
+	//	void LoadShaders();
+	//	void UnloadShaders();
+
+	//	void Link();
+
+	//	// Constructor
+	//	ShaderProgram(
+	//		const std::string& name,
+	//		const std::vector<std::string>& filePaths
+	//	);
+
+	//public:
+	//	// Load
+	//	//	static ShaderProgram* Load(
+	//	//		const std::string& name,
+	//	//		const std::vector<std::string>& filePaths
+	//	//	);
+
+	//	~ShaderProgram();
+
+	//	static std::set<const ShaderProgram*> ProgramsFailed;
+	//	static UINT ProgramsFailedSize;
+
+	//	void Bind(void) const;
+	//	static void Unbind(void);
+
+	//	// Uniform
+
+	//	// [Faster] Set uniform
+	//	template<typename Type>
+	//	void					SetUniform(const std::string& name, Type data)
+	//	{
+	//		//VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
+	//		m_uniforms[name].Send<Type>(data);
+	//	}
+	//	// [Faster] Set uniform (Custom call for matrix)
+	//	template<typename Type>
+	//	void					SetUniformMatrix(const std::string& name, Type data, bool transpose)
+	//	{
+	//		//VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
+	//		m_uniforms[name].SendMatrix<Type>(data, transpose);
+	//	}
+	//	// [Slower] Set uniform, regardless if shader is bound
+	//	template<typename Type>
+	//	void					SetProgramUniform(const std::string& name, Type data)
+	//	{
+	//		VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
+	//		m_uniforms[name].Send<Type>(m_id, data);
+	//	}
+	//	// [Slower] Set uniform, regardless if shader is bound (Custom call for matrix)
+	//	template<typename Type>
+	//	void					SetProgramUniformMatrix(const std::string& name, Type data, bool transpose)
+	//	{
+	//		VXL_RETURN_ON_FAIL(m_uniforms.find(name) != m_uniforms.end(), "Uniform does not exist: " + name);
+	//		m_uniforms[name].SendMatrix<Type>(m_id, data, transpose);
+	//	}
+	//	
+	//	inline const Graphics::Uniform& GetUniform(const std::string& name) const
+	//	{
+	//		VXL_ASSERT(CheckUniform(name), "Uniform does not exist for this shader: " + name);
+	//		return m_uniforms.at(name);
+	//	}
+	//	inline bool				CheckUniform(const std::string& name) const
+	//	{
+	//		return (m_uniforms.find(name) != m_uniforms.end());
+	//	}
+	//	inline uint32_t			GetUniformCount(void) const
+	//	{
+	//		return (uint32_t)m_uniforms.size();
+	//	}
+	//	const UniformStorage	GetAllUniforms(void) const
+	//	{
+	//		return m_uniforms;
+	//	}
+
+
+	//	// Uniform Blocks
+	//	inline const Graphics::UniformBlock& GetUniformBlock(const std::string& name) const
+	//	{
+	//		VXL_ASSERT(m_uniformBlocks.find(name) != m_uniformBlocks.end(), "Uniform block does not exist");
+	//		return m_uniformBlocks.at(name);
+	//	}
+	//	inline uint32_t			GetUniformBlockCount(void) const
+	//	{
+	//		return (uint32_t)m_uniformBlocks.size();
+	//	}
+
+	//	// Subroutines
+	//	inline Graphics::UniformSubroutine&	GetSubroutine(ShaderType type)
+	//	{
+	//		VXL_ASSERT(m_subroutines.find(type) != m_subroutines.end(), "Uniform subroutine does not exist");
+	//		return m_subroutines[type];
+	//	}
+	//	inline uint32_t			GetSubroutineCount(void) const
+	//	{
+	//		return (uint32_t)m_subroutines.size();
+	//	}
+
+	//	// Misc
+	//	inline bool		IsLinked(void) const
+	//	{
+	//		return m_linked;
+	//	}
+	//	inline uint32_t	GetID(void) const
+	//	{
+	//		return m_id;
+	//	}
+	//	inline const std::string& GetName(void) const
+	//	{
+	//		return m_name;
+	//	}
+	//	inline std::string GetErrorMessage(void) const
+	//	{
+	//		return m_errorMessage;
+	//	}
+
+	//	// Acquire Shaders
+	//	inline std::vector<Shader*> GetShaders(void) const
+	//	{
+	//		return m_shaders;
+	//	}
+
+	//};
 }
 

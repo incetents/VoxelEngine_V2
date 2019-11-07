@@ -44,11 +44,12 @@ namespace Vxl
 	{
 		if (Editor.HasSelection())
 		{
-			auto Entity = Editor.m_selectedEntities[0];
+			EntityIndex index = Editor.m_selectedEntities[0];
+			Entity* entity = Assets::getEntity(index);
 
 			// Name
 			static char Name[MAX_ENTITY_NAME_LENGTH];
-			strcpy_s(Name, Entity->GetName().c_str());
+			strcpy_s(Name, entity->m_name.c_str());
 
 			ImGui::Text("Name: "); ImGui::SameLine();
 
@@ -58,21 +59,21 @@ namespace Vxl
 			// New Name
 			if (ImGui::InputText("input text", Name, IM_ARRAYSIZE(Name), ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				Entity->Rename(std::string(Name));
+				entity->m_name = std::string(Name);
 			}
 
 			// ID
-			ImGui::TextColored(ImGuiColor::Orange, "ID: %d", Entity->GetUniqueID());
+			ImGui::TextColored(ImGuiColor::Orange, "ID: %d", entity->getUniqueID());
 
 			// Color
 			ImGui::TextColored(ImGuiColor::Orange, "Label Color:");
 			ImGui::SameLine();
 
-			float EntityColor[3] = { Entity->GetLabelColor().r, Entity->GetLabelColor().g, Entity->GetLabelColor().b };
+			float EntityColor[3] = { entity->m_labelColor.r, entity->m_labelColor.g, entity->m_labelColor.b };
 
 			if (ImGui::ColorEdit3("Label Color", EntityColor, ImGuiColorEditFlags_NoInputs))
 			{
-				Entity->SetLabelColor(Color3F(EntityColor[0], EntityColor[1], EntityColor[2]));
+				entity->m_labelColor = Color3F(EntityColor[0], EntityColor[1], EntityColor[2]);
 			}
 
 			// ~ Naming Scheme
@@ -87,7 +88,7 @@ namespace Vxl
 			ImGui::SameLine();
 			if (ImGui::Button("Paste Color"))
 			{
-				Entity->SetLabelColor(LabelColorClipboard);
+				entity->m_labelColor = LabelColorClipboard;
 			}
 			ImGui::PushItemWidth(-1);
 
@@ -99,66 +100,66 @@ namespace Vxl
 			ImGui::Separator();
 
 			// Active
-			ImGui::Checkbox("Active", &Entity->m_isActive);
+			ImGui::Checkbox("Active", &entity->m_isActive);
 
 			// Transform
 			if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				float p[3] = { Entity->m_transform.getPosition().x, Entity->m_transform.getPosition().y, Entity->m_transform.getPosition().z };
-				float r[3] = { Entity->m_transform.getRotationEuler().x, Entity->m_transform.getRotationEuler().y, Entity->m_transform.getRotationEuler().z };
-				float s[3] = { Entity->m_transform.getScale().x, Entity->m_transform.getScale().y, Entity->m_transform.getScale().z };
+				float p[3] = { entity->m_transform.getPosition().x, entity->m_transform.getPosition().y, entity->m_transform.getPosition().z };
+				float r[3] = { entity->m_transform.getRotationEuler().x, entity->m_transform.getRotationEuler().y, entity->m_transform.getRotationEuler().z };
+				float s[3] = { entity->m_transform.getScale().x, entity->m_transform.getScale().y, entity->m_transform.getScale().z };
 
-				float pw[3] = { Entity->m_transform.getWorldPosition().x, Entity->m_transform.getWorldPosition().y, Entity->m_transform.getWorldPosition().z };
-				float rw[3] = { Entity->m_transform.getForward().x, Entity->m_transform.getForward().y, Entity->m_transform.getForward().z };
-				float sw[3] = { Entity->m_transform.getWorldScale().x, Entity->m_transform.getWorldScale().y, Entity->m_transform.getWorldScale().z };
+				float pw[3] = { entity->m_transform.getWorldPosition().x, entity->m_transform.getWorldPosition().y, entity->m_transform.getWorldPosition().z };
+				float rw[3] = { entity->m_transform.getForward().x, entity->m_transform.getForward().y, entity->m_transform.getForward().z };
+				float sw[3] = { entity->m_transform.getWorldScale().x, entity->m_transform.getWorldScale().y, entity->m_transform.getWorldScale().z };
 
-				// Camera has reversed forward
-				if (Entity->GetType() == EntityType::CAMERA)
-				{
-					rw[0] = -rw[0];
-					rw[1] = -rw[1];
-					rw[2] = -rw[2];
-				}
+				//	// Camera has reversed forward
+				//	if (entity->GetType() == EntityType::CAMERA)
+				//	{
+				//		rw[0] = -rw[0];
+				//		rw[1] = -rw[1];
+				//		rw[2] = -rw[2];
+				//	}
 
 				ImGui::PushItemWidth(-1);
 
-				ImGui::TextColored(ImGuiColor::Orange, Entity->m_useTransform ? "Local:" : "Local: [LOCKED]");
+				ImGui::TextColored(ImGuiColor::Orange, entity->m_useTransform ? "Local:" : "Local: [LOCKED]");
 
 				// Lock if transform is not used
-				if (!Entity->m_useTransform)
+				if (!entity->m_useTransform)
 					DisableStart();
 
 				ImGui::Text("Position:"); ImGui::SameLine();
 				if (ImGui::DragFloat3("Position", p, DragSpeed))
-					Entity->m_transform.setPosition(p[0], p[1], p[2]);
+					entity->m_transform.setPosition(p[0], p[1], p[2]);
 
 				// NO LOCAL EFFECT
-				if (Entity->GetType() == EntityType::LIGHT)
-					ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
+				//if (entity->GetType() == EntityType::LIGHT)
+				//	ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
 
 				ImGui::Text("Rotation:"); ImGui::SameLine();
 				if (ImGui::DragFloat3("Rotation", r, DragSpeed))
-					Entity->m_transform.setRotation(r[0], r[1], r[2]);
+					entity->m_transform.setRotation(r[0], r[1], r[2]);
 
 				// ~~~
-				if (Entity->GetType() == EntityType::LIGHT)
-					ImGui::PopStyleColor();
+				//if (entity->GetType() == EntityType::LIGHT)
+				//	ImGui::PopStyleColor();
 
 
 				// NO LOCAL EFFECT
-				if (Entity->GetType() == EntityType::LIGHT || Entity->GetType() == EntityType::CAMERA)
-					ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
+				//if (entity->GetType() == EntityType::LIGHT || Entity->GetType() == EntityType::CAMERA)
+				//	ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
 
 				ImGui::Text("Scale:   "); ImGui::SameLine();
 				if (ImGui::DragFloat3("Scale", s, DragSpeed))
-					Entity->m_transform.setScale(s[0], s[1], s[2]);
+					entity->m_transform.setScale(s[0], s[1], s[2]);
 
 				// ~~~
-				if (Entity->GetType() == EntityType::LIGHT || Entity->GetType() == EntityType::CAMERA)
-					ImGui::PopStyleColor();
+				//if (entity->GetType() == EntityType::LIGHT || Entity->GetType() == EntityType::CAMERA)
+				//	ImGui::PopStyleColor();
 
 				// Lock if transform is not used
-				if (!Entity->m_useTransform)
+				if (!entity->m_useTransform)
 					DisableEnd();
 
 				ImGui::Separator();
@@ -169,7 +170,7 @@ namespace Vxl
 				ImGui::Text("Position:");
 				ImGui::SameLine();
 				if (ImGui::DragFloat3("PositionW", pw, DragSpeed))
-					Entity->m_transform.setWorldPosition(Vector3(pw[0], pw[1], pw[2]));
+					entity->m_transform.setWorldPosition(Vector3(pw[0], pw[1], pw[2]));
 				
 				// Forward / Scale [READ ONLY]
 				DisableStart();

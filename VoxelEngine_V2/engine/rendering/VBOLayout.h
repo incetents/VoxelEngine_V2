@@ -45,7 +45,7 @@ namespace Vxl
 		uint32_t		m_divisor = 0;
 
 	public:
-		BufferElement(BufferType bufferType, AttributeType shaderDataType, bool normalized, uint32_t divisor = 0)
+		BufferElement(BufferType bufferType, AttributeType shaderDataType, bool normalized = false, uint32_t divisor = 0)
 			: m_bufferType(bufferType), m_shaderDataType(shaderDataType), m_normalized(normalized), m_divisor(divisor)
 		{
 			m_valueCount	= Graphics::GetValueCount(shaderDataType);

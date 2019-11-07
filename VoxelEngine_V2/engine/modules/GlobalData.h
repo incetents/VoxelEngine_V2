@@ -11,9 +11,11 @@ namespace Vxl
 	private:
 		void InitGLResources();
 
+		// Textures
 		Texture2DIndex texID_nullImage;
 		Texture2DIndex texID_editor_camera;
 		Texture2DIndex texID_editor_light;
+
 	public:
 		Texture2D* tex_nullImage = nullptr;
 		Texture2D* tex_editor_camera = nullptr;

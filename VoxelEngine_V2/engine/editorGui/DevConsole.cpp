@@ -15,7 +15,7 @@
 #include "../rendering/RenderManager.h"
 #include "../modules/Entity.h"
 
-#include "../objects/CameraObject.h"
+#include "../objects/Camera.h"
 
 #include "../input/Input.h"
 #include "../input/XGamePad.h"
@@ -78,9 +78,7 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		//ImGui::Checkbox("Pibot", &Editor.m_controlAxisLocal);
-
-		//ImGui::Separator();
+		ImGui::Text("Window Position: X=%d, Y=%d", Window.GetPositionX(), Window.GetPositionY());
 
 		ImGui::Text("Reload Window = [F5]");
 		ImGui::Text("Reload Fullscreen FBOs = [F6]");
@@ -100,25 +98,27 @@ namespace Vxl
 
 		if (ImGui::CollapsingHeader("Camera"))
 		{
-			if (Game->_cameraObject)
+			Camera* camera = Assets::getCamera(Game->camera_main);
+
+			if (camera)
 			{
-				Vector3 CamPos = Game->_cameraObject->m_transform.getPosition();
-				Vector3 CamForward = Game->_cameraObject->m_transform.getForward();
+				Vector3 CamPos = camera->m_transform.getPosition();
+				Vector3 CamForward = camera->m_transform.getForward();
 				ImGui::Text("CamPos: %f %f %f", CamPos.x, CamPos.y, CamPos.z);
 				ImGui::Text("CamForward: %f %f %f", CamForward.x, CamForward.y, CamForward.z);
 
-				float cameraFOV = Game->_cameraObject->getFOV();
-				float cameraZNear = Game->_cameraObject->getZnear();
-				float cameraZFar = Game->_cameraObject->getZfar();
+				float cameraFOV = camera->getFOV();
+				float cameraZNear = camera->getZnear();
+				float cameraZFar = camera->getZfar();
 
 				if (ImGui::SliderFloat("FOV", &cameraFOV, 60.0f, 180.0f))
-					Game->_cameraObject->SetPerspective(cameraFOV, Game->_cameraObject->getAspect());
+					camera->SetPerspective(cameraFOV, camera->getAspect());
 
 				if (ImGui::SliderFloat("ZNEAR", &cameraZNear, 0.01f, 5.0f))
-					Game->_cameraObject->SetZNear(cameraZNear);
+					camera->SetZNear(cameraZNear);
 
 				if (ImGui::SliderFloat("ZFAR", &cameraZFar, 1.0f, 50.0f))
-					Game->_cameraObject->SetZFar(cameraZFar);
+					camera->SetZFar(cameraZFar);
 
 				ImGui::Separator();
 			}

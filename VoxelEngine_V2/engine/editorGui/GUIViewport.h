@@ -5,12 +5,12 @@
 
 #include "../utilities/singleton.h"
 #include "../utilities/Macros.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {
 	class FramebufferObject;
 	class RenderTexture;
-	class ShaderProgram;
 
 	static class GUIViewport : public Singleton<class GUIViewport>, public GuiWindow
 	{
@@ -41,15 +41,20 @@ namespace Vxl
 		ChannelOutput m_channelOut = ChannelOutput::RGBA;
 
 		// Gl Resources
-		FramebufferObject*	m_fbo = nullptr;
-		RenderTexture*		m_renderTexture = nullptr;
-		ShaderProgram*		m_shader_showRenderTarget = nullptr;
+		//FramebufferObjectIndex	m_fbo;
+		//RenderTextureIndex		m_renderTexture;
+		//ShaderProgram*		m_shader_showRenderTarget = nullptr;
 
 		void InitGLResources();
 		void DestroyGLResources();
 		// Render showrendertarget
 		void DrawRenderTarget();
 	public:
+
+		// Scene Data
+		FramebufferObjectIndex fboIndex_gbuffer;
+		FramebufferObjectIndex fboIndex_editor;
+
 		// Behaviour
 		void Draw() override;
 #else

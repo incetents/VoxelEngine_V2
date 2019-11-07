@@ -17,11 +17,13 @@ namespace Vxl
 		CUSTOM
 	};
 
-	class CameraObject : public Entity, public Asset<CameraObject>
+	class Camera //: public Entity //, public Asset<Camera>
 	{
+		DISALLOW_COPY_AND_ASSIGN(Camera);
+		friend class Assets;
 		friend class RenderManager;
 	private:
-		CameraObject(const std::string& name, float _znear, float _zfar);
+		Camera(const std::string& name, float _znear, float _zfar);
 
 		// Data
 		CameraType		m_type = CameraType::NONE;
@@ -57,10 +59,15 @@ namespace Vxl
 	public:
 
 		// Destructor
-		~CameraObject();
+		~Camera();
+
+		// Data
+		Transform		m_transform;
+
+		void update();
 
 		// Database Creation
-		static CameraObject* Create(const std::string& _name, float _znear, float _zfar);
+		//static Camera* Create(const std::string& _name, float _znear, float _zfar);
 
 		// ScreenSpace / WorldSpace conversion
 		Vector4 ScreenSpaceToWorldSpace(const Vector3& screenSpace);
@@ -185,10 +192,10 @@ namespace Vxl
 		}
 
 		// Behaviour
-		virtual void Update(void) override;
-		virtual void DrawSelection(void) override;
-		virtual void Draw(void) override;
-	public:
-		virtual void TransformChanged(void) override;
+		//virtual void Update(void) override;
+		//virtual void DrawSelection(void) override;
+		//virtual void Draw(void) override;
+	//public:
+		//virtual void TransformChanged(void) override;
 	};
 }

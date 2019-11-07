@@ -34,7 +34,7 @@
     <ClCompile Include="engine\math\Model.cpp" />
     <ClCompile Include="engine\math\Raycast.cpp" />
     <ClCompile Include="engine\modules\GlobalData.cpp" />
-    <ClCompile Include="engine\objects\CameraObject.cpp" />
+    <ClCompile Include="engine\objects\Camera.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
     <ClCompile Include="engine\objects\GameObject.cpp" />
     <ClCompile Include="engine\modules\Layer.cpp" />
@@ -66,10 +66,6 @@
     <ClCompile Include="engine\utilities\Time.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
-    <ClCompile Include="game\terrain\Block.cpp" />
-    <ClCompile Include="game\terrain\Chunk.cpp" />
-    <ClCompile Include="game\terrain\ChunkMesh.cpp" />
-    <ClCompile Include="game\terrain\TerrainManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -155,7 +151,7 @@
     <ClInclude Include="engine\math\Raycast.h" />
     <ClInclude Include="engine\math\Vector.h" />
     <ClInclude Include="engine\modules\GlobalData.h" />
-    <ClInclude Include="engine\objects\CameraObject.h" />
+    <ClInclude Include="engine\objects\Camera.h" />
     <ClInclude Include="engine\objects\LightObject.h" />
     <ClInclude Include="engine\math\Model.h" />
     <ClInclude Include="engine\modules\Component.h" />
@@ -214,10 +210,6 @@
     <ClInclude Include="engine\editor\ShaderErrors.h" />
     <ClInclude Include="engine\window\window.h" />
     <ClInclude Include="game\Scene_Game.h" />
-    <ClInclude Include="game\terrain\Block.h" />
-    <ClInclude Include="game\terrain\Chunk.h" />
-    <ClInclude Include="game\terrain\ChunkMesh.h" />
-    <ClInclude Include="game\terrain\TerrainManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_colors.h" />

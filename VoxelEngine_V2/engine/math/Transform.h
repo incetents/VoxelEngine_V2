@@ -24,7 +24,7 @@ namespace Vxl
 
 	class Transform : public Component
 	{
-		friend class CameraObject;
+		friend class Camera;
 	protected:
 		// Model for transformations
 		Matrix4x4	m_modelMatrix;  // World Transformations - Row Major

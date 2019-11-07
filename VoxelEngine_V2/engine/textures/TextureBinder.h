@@ -10,10 +10,9 @@ namespace Vxl
 	// Stores set of textures for binding purposes
 	class TextureBinder
 	{
-	private:
+	protected:
 		std::map<TextureLevel, BaseTexture*> m_textures;
 
-	protected:
 		// Binds all textures to active layers
 		void BindTextures();
 

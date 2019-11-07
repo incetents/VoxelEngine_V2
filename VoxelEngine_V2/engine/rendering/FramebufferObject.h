@@ -90,10 +90,10 @@ namespace Vxl
 		}
 	};
 
-	class FramebufferObject : public Asset<FramebufferObject>
+	class FramebufferObject
 	{
 		DISALLOW_COPY_AND_ASSIGN(FramebufferObject);
-		friend class RenderManager;
+		friend class Assets;
 	private:
 		
 		enum class ClearMode
@@ -107,18 +107,18 @@ namespace Vxl
 	private:
 
 		// Fbo
-		const std::string	m_name;
 		FramebufferObjectID	m_id = -1;
 		Color4F				m_clearColor = Color4F(0,0,0,0);
 		ClearMode			m_clearMode = ClearMode::COLOR;
-		uint32_t			m_width = 0;
-		uint32_t			m_height = 0;
+		uint32_t			m_width = 1;
+		uint32_t			m_height = 1;
 		bool				m_fullscreen = false; // Width/Height will attempt to match screen's resolution
 		// Attachments
 		mutable std::map<uint32_t, RenderTarget>	m_textures;
 		std::vector<uint32_t>				m_attachmentOrder;
 		RenderTarget						m_depth;
 
+		// Utility
 		void updateAttachmentOrder();
 		void updateClearMode(TextureDepthFormat format);
 
@@ -126,93 +126,92 @@ namespace Vxl
 		void unload();
 
 		// Constructor
-		FramebufferObject(const std::string& name);
-	public:
-		// Creator
-		static FramebufferObject* Create(const std::string& name);
+		FramebufferObject();
 
+	public:
+		// ~
 		~FramebufferObject();
 
-		// Sizing
-		inline void SetClearColor(Color4F c)
+		// Utility
+		inline void setClearColor(Color4F c)
 		{
 			m_clearColor = c;
 		}
-		inline void SetSize(unsigned int Width, unsigned int Height)
+		inline void setSize(unsigned int Width, unsigned int Height)
 		{
 			m_width = Width;
 			m_height = Height;
 			m_fullscreen = false;
 		}
-		void		SetSizeToWindowSize(); // Size will copy Window's resolution
-
-		// Utility
-		bool HasAttachment(uint32_t _attachmentIndex) const
+		void		setSizeToViewportSize(); // Size will copy Window's resolution
+		void		setGLName(const std::string& name);
+		bool		hasAttachment(uint32_t _attachmentIndex) const
 		{
 			return m_textures.find(_attachmentIndex) != m_textures.end();
 		}
 
 		// Binding related
-		void Bind();
-		void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-		static void Unbind();
+		void bind();
+		//void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+		static void unbind();
 
 		// Clears the color from an entire Texture
-		void ClearBuffers();
-		void ClearBuffer(uint32_t attachmentIndex);
+		void clearBuffers();
+		void clearBuffer(uint32_t attachmentIndex);
 
 		// Editing Attachment Info
-		void SetAttachment(
+		void setAttachment(
 			uint32_t _attachmentIndex,
 			RenderTexture* _renderTexture
 		);
-		void SetAttachment(
+		void setAttachment(
 			uint32_t _attachmentIndex,
 			RenderBuffer* _renderbuffer
 		);
-		void RemoveAttachment(
+		void removeAttachment(
 			uint32_t _attachmentIndex
 		);
 		// Re-attaches all textures/buffers back to current FBO
-		void ReloadAttachments();
-		void ReloadDepth();
+		void reloadAttachments();
+		void reloadDepth();
 		// Get Attachment Info
-		RenderTexture* GetAttachmentRenderTexture(
+		RenderTexture* getAttachmentRenderTexture(
 			uint32_t _attachmentIndex
 		);
-		RenderBuffer* GetAttachmentRenderBuffer(
+		RenderBuffer* getAttachmentRenderBuffer(
 			uint32_t _attachmentIndex
 		);
-		uint32_t GetAttachmentTextureID(
+		uint32_t getAttachmentTextureID(
 			uint32_t _attachmentIndex
 		);
-		inline std::vector<uint32_t> GetAttachmentIndices()
+		inline const std::vector<uint32_t>& getAttachmentIndices()
 		{
 			return m_attachmentOrder;
 		}
 		// Attachment is still part of FBO class, it just doesn't get drawn to
-		void DisableAttachment(
+		void disableAttachment(
 			uint32_t _attachmentIndex
 		);
-		void EnableAttachment(
+		void enableAttachment(
 			uint32_t _attachmentIndex
 		);
 
 		// Editing Depth Info
-		void SetDepth(
+		void setDepth(
 			RenderTextureDepth* _depth
 		);
-		void SetDepth(
+		void setDepth(
 			RenderBufferDepth* _depth
 		);
-		void RemoveDepth(void);
+		void removeDepth(void);
 		// Get Depth Info
-		RenderTexture* GetDepthRenderTexture();
-		RenderBuffer* GetDepthRenderBuffer();
-		uint32_t GetDepthTextureID();
+		RenderTexture* getDepthRenderTexture();
+		RenderBuffer* getDepthRenderBuffer();
+		uint32_t getDepthTextureID();
 
 		// Utility //
 		bool checkFBOStatus();
+		inline bool isFullscreen(void) const { return m_fullscreen; }
 
 		void bindTexture(uint32_t index, TextureLevel layer);
 		void bindDepth(TextureLevel layer);
@@ -229,15 +228,15 @@ namespace Vxl
 		RawArray<uint8_t> readDepthPixelsFromMouse(int w, int h);
 
 		// Getters
-		inline uint32_t GetID(void) const
+		inline uint32_t getID(void) const
 		{
 			return m_id;
 		}
-		inline uint32_t GetWidth(void) const
+		inline uint32_t getWidth(void) const
 		{
 			return m_width;
 		}
-		inline uint32_t GetHeight(void) const
+		inline uint32_t getHeight(void) const
 		{
 			return m_height;
 		}

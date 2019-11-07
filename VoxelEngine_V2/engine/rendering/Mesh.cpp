@@ -14,57 +14,29 @@
 
 namespace Vxl
 {
-	void Mesh::DrawArray()
-	{
-		Graphics::Draw::Array(m_type, m_drawCount);
-	}
-	void Mesh::DrawIndexed()
-	{
-		Graphics::Draw::Indexed(m_type, m_drawCount);
-	}
-	void Mesh::DrawArrayInstances()
-	{
-		Graphics::Draw::ArrayInstanced(m_type, m_drawCount, m_instances.GetDrawCount());
-	}
-	void Mesh::DrawIndexedInstances()
-	{
-		Graphics::Draw::IndexedInstanced(m_type, m_drawCount, m_instances.GetDrawCount());
-	}
-
 	void Mesh::UpdateDrawInfo()
 	{
-		// Set Mode
+		// Set Base Mode
 		m_mode = (m_indices.GetDrawCount() == 0) ? DrawMode::ARRAY : DrawMode::INDEXED;
+		
+		// Set Draw Count
+		if (m_mode == DrawMode::ARRAY)
+		{
+			m_drawCount = m_positions.GetDrawCount();
+		}
+		else
+		{
+			m_drawCount = m_indices.GetDrawCount();
+		}
+
+		// Instance
 		if (m_instances.GetDrawCount() > 1)
+		{
 			if (m_mode == DrawMode::ARRAY)
 				m_mode = DrawMode::ARRAY_INSTANCED;
 			else
 				m_mode = DrawMode::INDEXED_INSTANCED;
-
-		// Set Draw Data
-		if (m_mode == DrawMode::ARRAY)
-		{
-			Draw_Function = &Mesh::DrawArray;
-			m_drawCount = m_positions.GetDrawCount();
 		}
-		else if (m_mode == DrawMode::ARRAY_INSTANCED)
-		{
-			Draw_Function = &Mesh::DrawArrayInstances;
-			m_drawCount = m_positions.GetDrawCount();
-
-		}
-		else if (m_mode == DrawMode::INDEXED)
-		{
-			Draw_Function = &Mesh::DrawIndexed;
-			m_drawCount = m_indices.GetDrawCount();
-		}
-		else if (m_mode == DrawMode::INDEXED_INSTANCED)
-		{
-			Draw_Function = &Mesh::DrawIndexedInstances;
-			m_drawCount = m_indices.GetDrawCount();
-		}
-		else
-			VXL_ASSERT(false, "ERROR MESH MODE");
 
 		// Update Special Data
 		switch (m_type)
@@ -137,67 +109,29 @@ namespace Vxl
 		
 	}
 
-	Mesh::Mesh(const std::string& glName)
+	Mesh::Mesh()
 	{
 		// Default Buffer Layouts
-		m_positions.setLayout(BufferLayout({ {BufferType::POSITION, AttributeType::VEC3, false} }));
-		m_uvs.setLayout(BufferLayout({ {BufferType::UV, AttributeType::VEC2, false} }));
-		m_normals.setLayout(BufferLayout({ {BufferType::NORMAL, AttributeType::VEC3, false} }));
-		m_tangents.setLayout(BufferLayout({ {BufferType::TANGENT, AttributeType::VEC3, false} }));
-
-		// GL Name
-		if (!glName.empty())
-			Graphics::SetGLName(ObjectType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + glName);
+		m_positions.setLayout(BufferLayout({ {BufferType::POSITION, AttributeType::VEC3} }));
+		m_uvs.setLayout(BufferLayout({ {BufferType::UV, AttributeType::VEC2} }));
+		m_normals.setLayout(BufferLayout({ {BufferType::NORMAL, AttributeType::VEC3} }));
+		m_tangents.setLayout(BufferLayout({ {BufferType::TANGENT, AttributeType::VEC3} }));
 	}
 
-	Mesh* Mesh::Create()
+	void Mesh::Set(const Model& _model)
 	{
-		Mesh* _mesh = new Mesh();
-
-		AddUnnamedAsset(_mesh, AssetMessage::CREATED);
-
-		return _mesh;
-	}
-	Mesh* Mesh::Create(const std::string& name)
-	{
-		Mesh* _mesh = new Mesh(name);
-
-		if (name.empty())
-			AddUnnamedAsset(_mesh, AssetMessage::CREATED);
-		else
-			AddNamedAsset(name, _mesh, AssetMessage::CREATED);
-
-		return _mesh;
-	}
-	Mesh* Mesh::Create(const std::string& name, Model* _model)
-	{
-		Mesh* _mesh = new Mesh(name);
-
-		if (name.empty())
-			AddUnnamedAsset(_mesh, AssetMessage::CREATED);
-		else
-			AddNamedAsset(name, _mesh, AssetMessage::CREATED);
-
-		_mesh->Set(_model);
-
-		return _mesh;
-	}
-
-	Mesh::~Mesh()
-	{
-		
-	}
-
-	void Mesh::Set(Model* _model)
-	{
-		VXL_ASSERT(_model, "Model is nullptr");
-		m_positions.set(_model->positions);
-		m_uvs.set(_model->uvs);
-		m_normals.set(_model->normals);
-		m_tangents.set(_model->tangents);
-		m_indices.set(_model->indices);
+		m_positions.set(_model.positions);
+		m_uvs.set(_model.uvs);
+		m_normals.set(_model.normals);
+		m_tangents.set(_model.tangents);
+		m_indices.set(_model.indices);
 
 		Bind();
+	}
+
+	void Mesh::setGLName(const std::string& name)
+	{
+		Graphics::SetGLName(ObjectType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + name);
 	}
 
 	void Mesh::GenerateNormals(
@@ -345,31 +279,8 @@ namespace Vxl
 						if (Vector3::Distance(P, Q) < 0.01f)
 						{
 							WNormals[i] += Normals[j];
-							//neighbors.push_back(Normals[j]);
 						}
 					}
-					//	
-					//	// No smoothing occurs
-					//	if (neighbors.size() == 1)
-					//		continue;
-					//	
-					//	// Smooth vertices in similar space
-					//	float neighborCount = (float)neighbors.size() + 1;
-					//	
-					//	//Normals[i] /= neighborCount;
-					//	for (auto& n : neighbors)
-					//		Normals[i] += n;// / neighborCount;
-					//	
-					//	Normals[i] /= neighborCount;
-					//	
-					//	//Normals[i] /= (neighborCount + 1);
-					//	//Normals[i].NormalizeSelf();
-					//	
-					//	if (isinf(Normals[i].x))
-					//	{
-					//		float a = 10.0f;
-					//	}
-						//assert(false);
 				}
 
 				for (uint32_t i = 0; i < _vertCount; i++)
@@ -617,6 +528,21 @@ namespace Vxl
 	{
 		m_VAO.bind();
 
-		(*this.*Draw_Function)();
+		switch (m_mode)
+		{
+		case DrawMode::ARRAY:
+			Graphics::Draw::Array(m_type, m_drawCount);
+			break;
+		case DrawMode::ARRAY_INSTANCED:
+			Graphics::Draw::ArrayInstanced(m_type, m_drawCount, m_instances.GetDrawCount());
+			break;
+
+		case DrawMode::INDEXED:
+			Graphics::Draw::Indexed(m_type, m_drawCount);
+			break;
+		case DrawMode::INDEXED_INSTANCED:
+			Graphics::Draw::IndexedInstanced(m_type, m_drawCount, m_instances.GetDrawCount());
+			break;
+		}
 	}
 }

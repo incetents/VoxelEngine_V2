@@ -4,6 +4,7 @@
 #include "../math/Vector.h"
 #include "../math/Matrix4x4.h"
 #include "../math/MathCore.h"
+#include "../utilities/Asset.h"
 
 #include <vector>
 
@@ -34,10 +35,10 @@ namespace Vxl
 		bool						m_camAxisSide[3] = { false, false, false };
 
 		// Custom Meshes
-		static Mesh* m_mesh_HalfQuadAxisX[4];
-		static Mesh* m_mesh_HalfQuadAxisY[4];
-		static Mesh* m_mesh_HalfQuadAxisZ[4];
-		static Mesh* m_mesh_ScaleCube[3];// x,y,z
+		static MeshIndex m_mesh_HalfQuadAxisX[4];
+		static MeshIndex m_mesh_HalfQuadAxisY[4];
+		static MeshIndex m_mesh_HalfQuadAxisZ[4];
+		static MeshIndex m_mesh_ScaleCube[3];// x,y,z
 
 		// Scale By Distance
 		float m_distanceToCamera;
@@ -103,7 +104,7 @@ namespace Vxl
 		void Update(const std::vector<Entity*> _entities);
 
 		// Render
-		void RenderOnScreen(); // Display it Visually
-		void RenderIDCapture(); // Render it in FBO to catch which gizmo part is selected
+		void RenderOnScreen(MaterialIndex _gizmoMaterial); // Display it Visually
+		void RenderIDCapture(MaterialIndex _colorPickerMaterial); // Render it in FBO to catch which gizmo part is selected
 	};
 }

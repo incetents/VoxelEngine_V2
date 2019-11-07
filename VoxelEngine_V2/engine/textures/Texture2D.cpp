@@ -52,7 +52,7 @@ namespace Vxl
 		// glName
 		auto name = stringUtil::nameFromFilepath(filePath);
 		if (!name.empty())
-			setGLName("Tex_" + name);
+			setGLName("Tex2D_" + name);
 
 		// finished
 		Unbind();

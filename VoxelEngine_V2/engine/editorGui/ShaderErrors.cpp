@@ -8,27 +8,28 @@
 
 namespace Vxl
 {
+	auto& shaders = Assets::getAllShader();
+
 	bool ShaderErrors::HasErrors()
 	{
-		return (Shader::ShaderErrorLogSize > 0 || ShaderProgram::ProgramsFailedSize > 0);
+		return _Shader::m_brokenShaders.size() > 0 || _ShaderProgram::m_brokenShaderPrograms.size() > 0;
 	}
 
 	void ShaderErrors::Draw()
 	{
-		if (Shader::ShaderErrorLogSize == 0 && ShaderProgram::ProgramsFailedSize == 0)
+		if (_Shader::m_brokenShaders.size() == 0 && _ShaderProgram::m_brokenShaderPrograms.size() == 0)
 		{
 			ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "No Shader Errors");
 		}
 		else
 		{
-
-			if (Shader::ShaderErrorLogSize > 0)
+			if (_Shader::m_brokenShaders.size() > 0)
 				ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "Shader Compilation Failures:");
 
 			// Shader Compilation Errors
-			for (auto Log : Shader::ShaderErrorLog)
+			for (auto brokenShader : _Shader::m_brokenShaders)
 			{
-				if (ImGui::TreeNode(Log.first.c_str()))
+				if (ImGui::TreeNode(brokenShader.second->m_name.c_str()))
 				{
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 0.5f, 0.f, 1.f));
 					if (ImGui::TreeNode("Error"))
@@ -37,7 +38,7 @@ namespace Vxl
 
 						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.f, 1.f));
 
-						ImGui::Text(Log.second->GetErrorMessage().c_str());
+						ImGui::Text(brokenShader.second->m_errorMessage.c_str());
 						ImGui::TreePop();
 
 						ImGui::PopStyleColor();
@@ -50,12 +51,12 @@ namespace Vxl
 					{
 						ImGui::PopStyleColor();
 
-						if (Log.second->GetCompiledCode().empty())
+						if (brokenShader.second->m_source.empty())
 							ImGui::Text("Shader Code Storage Disabled from Macro -> GLOBAL_SHADER_CODE_BACKUP");
 						else
 						{
-							size_t size = Log.second->GetCompiledCode().size();
-							ImGui::TextUnformatted(Log.second->GetCompiledCode().c_str(),Log.second->GetCompiledCode().c_str() + size -1);
+							size_t size = brokenShader.second->m_source.size();
+							ImGui::TextUnformatted(brokenShader.second->m_source.c_str(), brokenShader.second->m_source.c_str() + size -1);
 						}
 						ImGui::TreePop();
 					}
@@ -69,20 +70,18 @@ namespace Vxl
 				ImGui::Separator();
 			}
 
-			if (ShaderProgram::ProgramsFailedSize > 0)
+			if (_ShaderProgram::m_brokenShaderPrograms.size() > 0)
 				ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "Program Link Failures:");
 
 			// Program Linking Errors
-			for (auto Program : ShaderProgram::ProgramsFailed)
+			for (auto brokenProgram : _ShaderProgram::m_brokenShaderPrograms)
 			{
-				if (ImGui::TreeNode(Program->GetName().c_str()))
+				if (ImGui::TreeNode(brokenProgram.second->m_name.c_str()))
 				{
-					auto errorMessage = Program->GetErrorMessage();
-
-					if (errorMessage.empty())
+					if (brokenProgram.second->m_errorMessage.empty())
 						ImGui::TextColored(ImVec4(1.f, 0.5f, 0.f, 1.f), "Could not retrieve program compilation log");
 					else
-						ImGui::TextColored(ImVec4(1.f, 0.5f, 0.f, 1.f), errorMessage.c_str());
+						ImGui::TextColored(ImVec4(1.f, 0.5f, 0.f, 1.f), brokenProgram.second->m_errorMessage.c_str());
 
 					ImGui::TreePop();
 				}

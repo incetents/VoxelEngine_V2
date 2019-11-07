@@ -10,30 +10,68 @@ static int SCREEN_HEIGHT = 720;
 
 namespace Vxl
 {
-	class ShaderProgram;
-	class FramebufferObject;
-	class Mesh;
-	class Transform;
 	class XGamePad;
-	class Texture2D;
-	class Cubemap;
-	class Material;
 	class Clock;
-	class GameObject;
-	class LightObject;
-	class CameraObject;
-	class SkyboxObject;
 
 	class Scene_Game : public Scene
 	{
 	public:
-		// Real Assets
+		// Shader Assets
+		ShaderIndex gbuffer_vert;
+		ShaderIndex gbuffer_frag;
+		ShaderIndex passthrough_vert;
+		ShaderIndex passthrough_frag;
+		ShaderIndex skybox_vert;
+		ShaderIndex skybox_frag;
+		ShaderIndex lines_vert;
+		ShaderIndex lines_geom;
+		ShaderIndex lines_frag;
+		ShaderIndex colorPicker_frag;
+		ShaderIndex gizmo_vert;
+		ShaderIndex gizmo_frag;
+		ShaderIndex showRenderTarget;
+		ShaderIndex billboard_vert;
+		ShaderIndex billboard_frag;
+		ShaderIndex font_vert;
+		ShaderIndex font_frag;
+		// Shader Program Assets
+		ShaderProgramIndex shader_gbuffer;
+		ShaderProgramIndex shader_passthroughWorld;
+		ShaderProgramIndex shader_skybox;
+		ShaderProgramIndex shader_lines;
+		ShaderProgramIndex shader_colorPicker;
+		ShaderProgramIndex shader_gizmo;
+		ShaderProgramIndex shader_showRenderTarget;
+		ShaderProgramIndex shader_billboard;
+		ShaderProgramIndex shader_font;
+
+		// Materials
+		MaterialIndex material_gbuffer;
+		MaterialIndex material_gbuffer_transparent;
+		MaterialIndex material_passthroughWorld;
+		MaterialIndex material_passthroughWorld_transparent;
+		MaterialIndex material_skybox;
+		MaterialIndex material_lines;
+		MaterialIndex material_colorPicker;
+		MaterialIndex material_gizmo;
+		MaterialIndex material_showRenderTarget;
+		MaterialIndex material_billboard;
+		MaterialIndex material_font;
+		//MaterialIndex material_showNormals;
+
+		// Textures
 		Texture2DIndex tex_grid_test;
 		Texture2DIndex tex_checkerboard;
 		Texture2DIndex tex_beato;
 		Texture2DIndex tex_crate_diffuse;
 		CubemapIndex cubemap_craterlake;
-
+		// FBOS
+		FramebufferObjectIndex fboIndex_gbuffer;
+		FramebufferObjectIndex fboIndex_editor;
+		FramebufferObjectIndex fboIndex_colorpicker;
+		FramebufferObjectIndex fboIndex_composite;
+		FramebufferObjectIndex fboIndex_showRenderTarget;
+		// Render Textures/Bufers
 		RenderTextureIndex fbotex_gbuffer_albedo;
 		RenderTextureIndex fbotex_gbuffer_normal;
 		RenderTextureIndex fbotex_gbuffer_reflection;
@@ -41,41 +79,36 @@ namespace Vxl
 		RenderTextureDepthIndex fbotex_gbuffer_depth;
 
 		RenderTextureIndex fbotex_editor_albedo;
-		RenderTextureDepthIndex fbotex_editor_depth;
+		RenderBufferDepthIndex fbotex_editor_depth;
 
 		RenderTextureIndex fbotex_colorPicker_albedo;
-		RenderTextureDepthIndex fbotex_colorPicker_depth;
+		RenderBufferDepthIndex fbotex_colorPicker_depth;
 
 		RenderTextureIndex fbotex_composite_albedo;
 
 		RenderTextureIndex fbotex_showRenderTarget_albedo;
 
-		// Assets Loaded
+		// Cameras
+		CameraIndex camera_main;
+		CameraIndex camera_side;
+		// Entities
+		EntityIndex entity_skybox;
+		EntityIndex entity_error_cube;
 
 		// Assets Created
-		Mesh* _mesh;
+		MeshIndex mesh_manyQuads;
+		MeshIndex mesh_jiggy;
 
-		// Assets Automated
-		CameraObject* _cameraObject;
+		// Assets ?
+		//Camera* _cameraObject;
 
-		FramebufferObject* _fbo_gbuffer;
-		FramebufferObject* _fbo_editor;
-		FramebufferObject* _fbo_colorpicker;
-		FramebufferObject* _fbo_composite;
-		FramebufferObject* _fbo_showRenderTarget;
+		
 
-		Material* material_skybox;
-		Material* material_gbuffer;
-		Material* material_transparent_gbuffer;
-		Material* material_opaque_passthroughWorld;
-		Material* material_opaque_billboard;
-		Material* material_passthroughWorld;
-		Material* material_billboard;
-		Material* material_lines;
-		Material* material_simpleLight;
-		Material* material_colorPicker;
-		Material* material_font;
-		Material* material_showNormals;
+		//FramebufferObject* _fbo_gbuffer;
+		//FramebufferObject* _fbo_editor;
+		//FramebufferObject* _fbo_colorpicker;
+		//FramebufferObject* _fbo_composite;
+		//FramebufferObject* _fbo_showRenderTarget;
 
 		Gizmo gizmo;
 

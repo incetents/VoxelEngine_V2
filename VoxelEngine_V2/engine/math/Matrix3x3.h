@@ -96,7 +96,7 @@ namespace Vxl
 		bool Compare(const Matrix3x3&) const;
 		static	bool Compare(const Matrix3x3&, const Matrix3x3&);
 
-		inline const float* GetStartPointer()
+		inline const float* GetStartPointer() const
 		{
 			return &_Val[0];
 		}

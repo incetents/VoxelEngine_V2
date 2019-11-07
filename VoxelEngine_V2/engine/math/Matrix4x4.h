@@ -126,7 +126,7 @@ namespace Vxl
 		static	bool Compare(const Matrix4x4&, const Matrix4x4&);
 
 		// Get Start Pointer
-		inline const float* GetStartPointer()
+		inline const float* GetStartPointer() const
 		{
 			return &_Val[0];
 		}

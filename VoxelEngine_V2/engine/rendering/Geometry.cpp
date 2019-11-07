@@ -179,7 +179,7 @@ namespace Vxl
 	}
 
 	// Generators
-	Mesh* Geometry::GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale)
+	MeshIndex Geometry::GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale)
 	{
 		float t = (1.0f + sqrt(5.0f)) / 2.0f;
 
@@ -346,17 +346,20 @@ namespace Vxl
 			uvs.push_back(UVs[2]);
 		}
 
-		Mesh* NewMesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
+		NewMesh->setGLName(MeshName);
 		NewMesh->m_positions.set(vertices);
 		NewMesh->m_uvs.set(uvs);
 		NewMesh->GenerateNormals(true);
 		NewMesh->GenerateTangents();
 		//
 		NewMesh->Bind();
-		return NewMesh;
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice)
+	MeshIndex Geometry::GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice)
 	{
 		std::vector<Vector3> positions;
 		positions.reserve(xSlice * ySlice * 6);
@@ -433,51 +436,61 @@ namespace Vxl
 			normals.push_back(p.Normalize());
 		}
 
-		Mesh* _mesh = Mesh::Create(MeshName);
+
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
-		_mesh->m_positions.set(positions);
-		_mesh->m_uvs.set(uvs);
-		_mesh->m_normals.set(normals);
-		_mesh->GenerateTangents();
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions.set(positions);
+		NewMesh->m_uvs.set(uvs);
+		NewMesh->m_normals.set(normals);
+		NewMesh->GenerateTangents();
 		//
-		_mesh->Bind();
-		return _mesh;
+		NewMesh->Bind();
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot)
+	MeshIndex Geometry::GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot)
 	{
 		std::vector<Vector3> positions;
 		std::vector<Vector2> uvs;
 
 		CreateCylinder(positions, uvs, axis, slices, height, radius_top, radius_bot, Vector3::ZERO);
 
-		Mesh* _mesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
-		_mesh->m_positions.set(positions);
-		_mesh->m_uvs.set(uvs);
-		_mesh->GenerateNormals(true);
-		_mesh->GenerateTangents();
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions.set(positions);
+		NewMesh->m_uvs.set(uvs);
+		NewMesh->GenerateNormals(true);
+		NewMesh->GenerateTangents();
 		//
-		_mesh->Bind();
-		return _mesh;
+		NewMesh->Bind();
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius)
+	MeshIndex Geometry::GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius)
 	{
 		std::vector<Vector3> positions;
 		std::vector<Vector2> uvs;
 
 		CreateCone(positions, uvs, axis, slices, height, radius, Vector3::ZERO);
 
-		Mesh* _mesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
-		_mesh->m_positions.set(positions);
-		_mesh->m_uvs.set(uvs);
-		_mesh->GenerateNormals(true);
-		_mesh->GenerateTangents();
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions.set(positions);
+		NewMesh->m_uvs.set(uvs);
+		NewMesh->GenerateNormals(true);
+		NewMesh->GenerateTangents();
 		//
-		_mesh->Bind();
-		return _mesh;
+		NewMesh->Bind();
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset)
+	MeshIndex Geometry::GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset)
 	{
 		std::vector<Vector3> positions;
 		std::vector<Vector3> positions2;
@@ -497,17 +510,20 @@ namespace Vxl
 		positions.insert(positions.end(), positions2.begin(), positions2.end());
 		uvs.insert(uvs.end(), uvs2.begin(), uvs2.end());
 
-		Mesh* _mesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
-		_mesh->m_positions.set(positions);
-		_mesh->m_uvs.set(uvs);
-		_mesh->GenerateNormals(true);
-		_mesh->GenerateTangents();
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions.set(positions);
+		NewMesh->m_uvs.set(uvs);
+		NewMesh->GenerateNormals(true);
+		NewMesh->GenerateTangents();
 		//
-		_mesh->Bind();
-		return _mesh;
+		NewMesh->Bind();
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateCube(const std::string& MeshName, float unitSize, const Vector3& offset)
+	MeshIndex Geometry::GenerateCube(const std::string& MeshName, float unitSize, const Vector3& offset)
 	{
 		Vector3 pos[] = {
 			// Front Face
@@ -614,18 +630,21 @@ namespace Vxl
 			21, 22, 20, 22, 23, 20
 		};
 
-		Mesh* _mesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
-		_mesh->m_positions.set(pos, 24);
-		_mesh->m_uvs.set(uvs, 24);
-		_mesh->m_normals.set(normals, 24);
-		_mesh->m_indices.set(indices, 36);
-		_mesh->GenerateTangents();
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions.set(pos, 24);
+		NewMesh->m_uvs.set(uvs, 24);
+		NewMesh->m_normals.set(normals, 24);
+		NewMesh->m_indices.set(indices, 36);
+		NewMesh->GenerateTangents();
 		//
-		_mesh->Bind();
-		return _mesh;
+		NewMesh->Bind();
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateQuad(const std::string& MeshName, Axis axis, float unitSize, const Vector3& offset)
+	MeshIndex Geometry::GenerateQuad(const std::string& MeshName, Axis axis, float unitSize, const Vector3& offset)
 	{
 		Vector2 uvs[] = {
 			Vector2(0, 0),
@@ -636,7 +655,8 @@ namespace Vxl
 
 		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
-		Mesh* _mesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		if (axis == Axis::X)
 		{
@@ -646,7 +666,7 @@ namespace Vxl
 				Vector3(+0.0f, +0.5f * unitSize, -0.5f * unitSize) + offset,
 				Vector3(+0.0f, +0.5f * unitSize, +0.5f * unitSize) + offset
 			};
-			_mesh->m_positions.set(pos, 4);
+			NewMesh->m_positions.set(pos, 4);
 
 			Vector3 normals[] = {
 				Vector3(+1, 0, 0),
@@ -654,7 +674,7 @@ namespace Vxl
 				Vector3(+1, 0, 0),
 				Vector3(+1, 0, 0)
 			};
-			_mesh->m_normals.set(normals, 4);
+			NewMesh->m_normals.set(normals, 4);
 		}
 		else if (axis == Axis::Y)
 		{
@@ -664,7 +684,7 @@ namespace Vxl
 				Vector3(+0.5f * unitSize, 0, -0.5f * unitSize) + offset,
 				Vector3(-0.5f * unitSize, 0, -0.5f * unitSize) + offset
 			};
-			_mesh->m_positions.set(pos, 4);
+			NewMesh->m_positions.set(pos, 4);
 
 			Vector3 normals[] = {
 				Vector3(0, +1, 0),
@@ -672,7 +692,7 @@ namespace Vxl
 				Vector3(0, +1, 0),
 				Vector3(0, +1, 0)
 			};
-			_mesh->m_normals.set(normals, 4);
+			NewMesh->m_normals.set(normals, 4);
 		}
 		else if (axis == Axis::Z)
 		{
@@ -682,7 +702,7 @@ namespace Vxl
 				Vector3(+0.5f * unitSize, +0.5f * unitSize, +0.0f) + offset,
 				Vector3(-0.5f * unitSize, +0.5f * unitSize, +0.0f) + offset,
 			};
-			_mesh->m_positions.set(pos, 4);
+			NewMesh->m_positions.set(pos, 4);
 
 			Vector3 normals[] = {
 				Vector3(0, 0, +1),
@@ -690,19 +710,22 @@ namespace Vxl
 				Vector3(0, 0, +1),
 				Vector3(0, 0, +1)
 			};
-			_mesh->m_normals.set(normals, 4);
+			NewMesh->m_normals.set(normals, 4);
 		}
 
-		_mesh->m_uvs.set(uvs, 4);
-		_mesh->m_indices.set(indices, 6);
-		_mesh->GenerateTangents();
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_uvs.set(uvs, 4);
+		NewMesh->m_indices.set(indices, 6);
+		NewMesh->GenerateTangents();
 		//
-		_mesh->Bind();
-		return _mesh;
+		NewMesh->Bind();
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
+	MeshIndex Geometry::GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
 	{
-		Mesh* _mesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 
 		float f_vertices = (float)vertices - 1.f;
 		float halfSize = unitSize * 0.5f;
@@ -751,15 +774,18 @@ namespace Vxl
 			uvs.push_back(Vector2(cosf(t1) * 0.5f + 0.5f, sinf(t1) * 0.5f + 0.5f));
 		}
 		
-		_mesh->m_positions.set(positions);
-		_mesh->m_uvs.set(uvs);
-		_mesh->m_normals.set(normals);
-		_mesh->Bind(DrawType::TRIANGLE_FAN);
-		return _mesh;
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions.set(positions);
+		NewMesh->m_uvs.set(uvs);
+		NewMesh->m_normals.set(normals);
+		NewMesh->Bind(DrawType::TRIANGLE_FAN);
+		//
+		return NewMeshIndex;
 	}
-	Mesh* Geometry::GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices, float exteriorUnitSize, float interiorUnitSize)
+	MeshIndex Geometry::GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices, float exteriorUnitSize, float interiorUnitSize)
 	{
-		Mesh* _mesh = Mesh::Create(MeshName);
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 
 		float exteriorHalfSize = exteriorUnitSize * 0.5f;
 		float interiorHalfSize = interiorUnitSize * 0.5f;
@@ -844,12 +870,14 @@ namespace Vxl
 			indices.push_back(i * 4 + 3);
 		}
 
-		_mesh->m_positions.set(positions);
-		_mesh->m_uvs.set(uvs);
-		_mesh->m_normals.set(normals);
-		_mesh->m_indices.set(indices);
-		_mesh->Bind(DrawType::TRIANGLE_STRIP);
-		return _mesh;
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions.set(positions);
+		NewMesh->m_uvs.set(uvs);
+		NewMesh->m_normals.set(normals);
+		NewMesh->m_indices.set(indices);
+		NewMesh->Bind(DrawType::TRIANGLE_STRIP);
+		//
+		return NewMeshIndex;
 	}
 
 	// Creators
@@ -875,14 +903,16 @@ namespace Vxl
 		//};
 		uint32_t indices[] = {0, 1, 2, 0, 2, 3};
 
-		m_fullQuad = Mesh::Create("FullQuad");
+
+		m_fullQuad = GlobalAssets.createMesh();
+		auto* fullQuad = GlobalAssets.getMesh(m_fullQuad);
 		//
-		m_fullQuad->m_positions.set(pos, 4);
-		m_fullQuad->m_uvs.set(uvs, 4);
+		fullQuad->m_positions.set(pos, 4);
+		fullQuad->m_uvs.set(uvs, 4);
 		//m_fullQuad->m_normals.set(normals, 4);
-		m_fullQuad->m_indices.set(indices, 6);
+		fullQuad->m_indices.set(indices, 6);
 		//
-		m_fullQuad->Bind();
+		fullQuad->Bind();
 	}
 	void Geometry::CreateFullTriangle()
 	{
@@ -903,14 +933,15 @@ namespace Vxl
 		//};
 		uint32_t indices[] = { 0, 1, 2 };
 
-		m_fullTriangle = Mesh::Create("FullTriangle");
+		m_fullTriangle = GlobalAssets.createMesh();
+		auto* fullTriangle = GlobalAssets.getMesh(m_fullTriangle);
 		//
-		m_fullTriangle->m_positions.set(pos, 3);
-		m_fullTriangle->m_uvs.set(uvs, 3);
+		fullTriangle->m_positions.set(pos, 3);
+		fullTriangle->m_uvs.set(uvs, 3);
 		//m_fullTriangle->m_normals.set(normals, 3);
-		m_fullTriangle->m_indices.set(indices, 6);
+		fullTriangle->m_indices.set(indices, 6);
 		//
-		m_fullTriangle->Bind();
+		fullTriangle->Bind();
 	}
 
 	void Geometry::CreateQuad()
@@ -1037,15 +1068,16 @@ namespace Vxl
 			22, 21, 20, 23, 22, 20
 		};
 
-		m_inverseCube = Mesh::Create("InverseCube");
+		m_inverseCube = GlobalAssets.createMesh();
+		auto* inverseCube = GlobalAssets.getMesh(m_inverseCube);
 		//
-		m_inverseCube->m_positions.set(pos, 24);
-		m_inverseCube->m_uvs.set(uvs, 24);
-		m_inverseCube->m_normals.set(normals, 24);
-		m_inverseCube->m_indices.set(indices, 36);
-		m_inverseCube->GenerateTangents();
+		inverseCube->m_positions.set(pos, 24);
+		inverseCube->m_uvs.set(uvs, 24);
+		inverseCube->m_normals.set(normals, 24);
+		inverseCube->m_indices.set(indices, 36);
+		inverseCube->GenerateTangents();
 		//
-		m_inverseCube->Bind();
+		inverseCube->Bind();
 	}
 
 	void Geometry::CreateOctahedron()
@@ -1090,15 +1122,16 @@ namespace Vxl
 			0, 5, 3
 		};
 
-		m_octahedron = Mesh::Create("Octahedron");
+		m_octahedron = GlobalAssets.createMesh();
+		auto* octahedron = GlobalAssets.getMesh(m_octahedron);
 		//
-		m_octahedron->m_positions.set(pos, 6);
-		m_octahedron->m_uvs.set(uvs, 6);
-		m_octahedron->m_normals.set(normals, 6);
-		m_octahedron->m_indices.set(indices, 24);
-		m_octahedron->GenerateTangents();
+		octahedron->m_positions.set(pos, 6);
+		octahedron->m_uvs.set(uvs, 6);
+		octahedron->m_normals.set(normals, 6);
+		octahedron->m_indices.set(indices, 24);
+		octahedron->GenerateTangents();
 		//
-		m_octahedron->Bind();
+		octahedron->Bind();
 	}
 
 	void Geometry::CreateIcosahedron()

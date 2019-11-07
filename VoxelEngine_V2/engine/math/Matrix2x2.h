@@ -77,7 +77,7 @@ namespace Vxl
 		bool Compare(const Matrix2x2&) const;
 		static	bool Compare(const Matrix2x2&, const Matrix2x2&);
 
-		inline const float* GetStartPointer()
+		inline const float* GetStartPointer() const
 		{
 			return &_Val[0];
 		}

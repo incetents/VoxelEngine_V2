@@ -8,7 +8,7 @@
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/Debug.h"
-#include "../objects/CameraObject.h"
+#include "../objects/Camera.h"
 #include "../math/Raycast.h"
 #include "../window/window.h"
 #include "../input/Input.h"
@@ -18,20 +18,24 @@ namespace Vxl
 {
 	// Static
 	FramebufferObject*	Gizmo::m_fbo;
-	Mesh*				Gizmo::m_mesh_HalfQuadAxisX[4];
-	Mesh*				Gizmo::m_mesh_HalfQuadAxisY[4];
-	Mesh*				Gizmo::m_mesh_HalfQuadAxisZ[4];
-	Mesh*				Gizmo::m_mesh_ScaleCube[3];
+	MeshIndex			Gizmo::m_mesh_HalfQuadAxisX[4];
+	MeshIndex			Gizmo::m_mesh_HalfQuadAxisY[4];
+	MeshIndex			Gizmo::m_mesh_HalfQuadAxisZ[4];
+	MeshIndex			Gizmo::m_mesh_ScaleCube[3];
 
 	// Utility
 	Vector3 Gizmo::CameraRayHitPlane(const Vector3& normal)
 	{
+		// Main Camera
+		Camera* mainCamera = Assets::getCamera(RenderManager.m_mainCamera);
+		VXL_ASSERT(mainCamera, "missing camera");
+
 		// Make a raycast with the Mouse's ScreenPosition
-		Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+		Vector3 ScreenAim = mainCamera->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
 
 		// Calculate where it hits
 		Plane p(normal, m_transform.WorldPosition);
-		Ray r(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+		Ray r(mainCamera->m_transform.getWorldPosition(), ScreenAim);
 		
 		// Return hit location // Guaranteed intersection
 		RayHit hit = Intersection(r, p); 
@@ -77,43 +81,41 @@ namespace Vxl
 		m_mesh_ScaleCube[2] = Geometry.GenerateCube("", 0.25f, Vector3(0, 0, 1));
 
 		// FBO
-		m_fbo = FramebufferObject::Create("GizmoColorPicker");
-		m_fbo->SetSizeToWindowSize();
-		m_fbo->Bind();
+		auto fbo_id = GlobalAssets.createFramebuffer();
+		m_fbo = GlobalAssets.getFramebufferObject(fbo_id);
+		m_fbo->setSizeToViewportSize();
+		m_fbo->bind();
 		//
 		auto id = SceneAssets.createRenderTexture(
-			m_fbo->GetWidth(), m_fbo->GetHeight(), 
+			m_fbo->getWidth(), m_fbo->getHeight(), 
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
 		);
 		auto id_depth = SceneAssets.createRenderBufferDepth(
-			m_fbo->GetWidth(), m_fbo->GetHeight(),
+			m_fbo->getWidth(), m_fbo->getHeight(),
 			TextureDepthFormat::DEPTH16
 		);
 
-		m_fbo->SetAttachment(0, SceneAssets.getRenderTexture(id));
-		m_fbo->SetDepth(SceneAssets.getRenderBufferDepth(id_depth));
+		m_fbo->setAttachment(0, SceneAssets.getRenderTexture(id));
+		m_fbo->setDepth(SceneAssets.getRenderBufferDepth(id_depth));
 		//
 		m_fbo->checkFBOStatus();
-		m_fbo->Unbind();
+		m_fbo->unbind();
 	}
 	void Gizmo::DestroyGLResources()
 	{
-		for (int i = 0; i < 4; i++)
-		{
-			m_mesh_HalfQuadAxisX[i] = nullptr;
-			m_mesh_HalfQuadAxisY[i] = nullptr;
-			m_mesh_HalfQuadAxisZ[i] = nullptr;
-		}
 
-		FramebufferObject::DeleteNamedAsset(m_fbo);
+		//FramebufferObject::DeleteNamedAsset(m_fbo);
 		m_fbo = nullptr;
 	}
 
 	// Update
 	void Gizmo::Update(const std::vector<Entity*> _entities)
 	{
+		Camera* mainCamera = Assets::getCamera(RenderManager.m_mainCamera);
+		VXL_ASSERT(mainCamera, "Missing camera for Gizmo");
+
 		// If only 1 Entity and its the EditorCamera, ignore it
-		if (_entities.size() == 0 || _entities.size() == 1 && _entities[0] == (Entity*)RenderManager.GetMainCamera())
+		if (_entities.size() == 0)
 		{
 			m_show = false;
 			return;
@@ -125,7 +127,7 @@ namespace Vxl
 		// Update Distance from Camera as a matrix4x4
 		if (!m_clicked)
 		{
-			m_distanceToCamera = (m_transform.WorldPosition - RenderManager.GetMainCamera()->m_transform.getWorldPosition()).Length();
+			m_distanceToCamera = (m_transform.WorldPosition - mainCamera->m_transform.getWorldPosition()).Length();
 			m_constantScale = m_distanceToCamera * 0.5f;
 			m_constantScaleMatrix = Matrix4x4::GetScale(Vector3(m_constantScale));
 		}
@@ -138,11 +140,7 @@ namespace Vxl
 			uint32_t count = (uint32_t)_entities.size();
 			for (const auto& _Entity : _entities)
 			{
-				// Don't Account for Editor Camera
-				if (_Entity == (Entity*)RenderManager.GetMainCamera())
-					count--;
-				else
-					AverageSelection += _Entity->m_transform.getWorldPosition();
+				AverageSelection += _Entity->m_transform.getWorldPosition();
 			}
 
 			if (count)
@@ -178,7 +176,6 @@ namespace Vxl
 		// Translate XYZ Planes to be in correct position
 		if (m_mode == Mode::TRANSLATE)
 		{
-			CameraObject* mainCamera = RenderManager.GetMainCamera();
 			Vector3 SelectionTransformToCamera = (mainCamera->m_transform.getWorldPosition() - m_transform.WorldPosition);
 
 			// Which side of the axis is the camera on
@@ -208,7 +205,7 @@ namespace Vxl
 		else
 		{
 			// If Camera can see Axis
-			Vector3 ModelToCamera = (RenderManager.GetMainCamera()->m_transform.getWorldPosition() - m_transform.WorldPosition).Normalize();
+			Vector3 ModelToCamera = (mainCamera->m_transform.getWorldPosition() - m_transform.WorldPosition).Normalize();
 
 			// X Circle //
 			m_showScaleGizmo[0] = (fabs(m_transform.Right.Dot(ModelToCamera)) > 0.05f);
@@ -236,7 +233,7 @@ namespace Vxl
 				// Translate based on Camera's Forward Plane
 				if (m_selectedPlane == Axis::ALL)
 				{
-					m_targetNormal = RenderManager.GetMainCamera()->m_transform.getForward();
+					m_targetNormal = mainCamera->m_transform.getForward();
 					m_dragStart = CameraRayHitPlane(m_targetNormal);
 				}
 				// Translate based on Plane
@@ -251,8 +248,8 @@ namespace Vxl
 					m_dragStart = m_transform.WorldPosition;
 					Vector3 Direction = GetGizmoDirection(m_selectedAxis);
 					// Make a raycast with the Mouse's ScreenPosition
-					Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
-					Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+					Vector3 ScreenAim = mainCamera->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+					Ray		ViewRay(mainCamera->m_transform.getWorldPosition(), ScreenAim);
 					Ray		DirectionRay(m_dragStart, Direction);
 
 					// Find shortest distance between Axis and Camera Ray
@@ -290,8 +287,8 @@ namespace Vxl
 
 					Vector3 Direction = GetGizmoDirection(m_selectedAxis);
 					// Make a raycast with the Mouse's ScreenPosition
-					Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
-					Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+					Vector3 ScreenAim = mainCamera->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+					Ray		ViewRay(mainCamera->m_transform.getWorldPosition(), ScreenAim);
 					Ray		DirectionRay(m_dragStart, Direction);
 					
 					// Find shortest distance between Axis and Camera Ray
@@ -340,10 +337,6 @@ namespace Vxl
 					uint32_t _entityCount = (uint32_t)_entities.size();
 					for (uint32_t i = 0; i < _entityCount; i++)
 					{
-						// Don't Translate Editor Camera
-						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
-							continue;
-
 						Vector3 Target = m_worldPositionStorage[i] + (m_dragEnd - m_dragStart);
 						_entities[i]->m_transform.setWorldPosition(Target);
 					}
@@ -353,8 +346,8 @@ namespace Vxl
 				{
 					Vector3 Direction = GetGizmoDirection(m_selectedAxis);
 					// Make a raycast with the Mouse's ScreenPosition
-					Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
-					Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+					Vector3 ScreenAim = mainCamera->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+					Ray		ViewRay(mainCamera->m_transform.getWorldPosition(), ScreenAim);
 					Ray		DirectionRay(m_dragStart, Direction);
 
 					// Find shortest distance between Axis and Camera Ray
@@ -370,10 +363,6 @@ namespace Vxl
 					uint32_t _entityCount = (uint32_t)_entities.size();
 					for (uint32_t i = 0; i < _entityCount; i++)
 					{
-						// Don't Translate Editor Camera
-						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
-							continue;
-
 						_entities[i]->m_transform.setWorldPosition(m_worldPositionStorage[i] - Direction.NormalizeAccurate() * totalDrag);
 					}
 				}
@@ -393,7 +382,7 @@ namespace Vxl
 
 					// Distance from mouse to center point of Gizmo
 					Vector2 MouseDelta = MouseScreenSpace - Vector2(m_dragStart);
-					float Distance = MouseDelta.x + MouseDelta.y + 0.0f;
+					float Distance = MouseDelta.x + MouseDelta.y;
 
 					// Scale everything based on distance
 					uint32_t selectionCount = (uint32_t)_entities.size();
@@ -409,8 +398,8 @@ namespace Vxl
 				{
 					Vector3 Direction = GetGizmoDirection(m_selectedAxis);
 					// Make a raycast with the Mouse's ScreenPosition
-					Vector3 ScreenAim = RenderManager.GetMainCamera()->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
-					Ray		ViewRay(RenderManager.GetMainCamera()->m_transform.getWorldPosition(), ScreenAim);
+					Vector3 ScreenAim = mainCamera->ScreenSpaceToDirection(Input.getMousePosScreenspace(true));
+					Ray		ViewRay(mainCamera->m_transform.getWorldPosition(), ScreenAim);
 					Ray		DirectionRay(m_dragStart, Direction);
 
 					// Find shortest distance between Axis and Camera Ray
@@ -477,10 +466,6 @@ namespace Vxl
 					uint32_t selectionCount = (uint32_t)_entities.size();
 					for (uint32_t i = 0; i < selectionCount; i++)
 					{
-						// Don't Rotate Editor Camera
-						if (_entities[i] == (Entity*)RenderManager.GetMainCamera())
-							continue;
-
 						_entities[i]->m_transform.rotateAroundAxis(m_targetNormal, degrees);
 					}
 
@@ -496,115 +481,125 @@ namespace Vxl
 	}
 
 	// Render
-	void Gizmo::RenderOnScreen()
+	void Gizmo::RenderOnScreen(MaterialIndex _gizmoMaterial)
 	{
 		if (!m_show)
 			return;
 
-		auto gizmoMaterial = Material::GetAsset("gizmo");
-		if (gizmoMaterial->IsValid())
+		_Material* gizmoMaterial = Assets::getMaterial(_gizmoMaterial);
+		if (gizmoMaterial)
 		{
-			gizmoMaterial->BindProgram();
+			gizmoMaterial->bindProgram();
 
-			gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model, true); // 
-			gizmoMaterial->m_property_normalMatrix.SetPropertyMatrix(Matrix3x3(m_transform.Model), true);
+			Graphics::Uniform uniform_useModel = gizmoMaterial->getUniform("VXL_useModel");
+			Graphics::Uniform uniform_model = gizmoMaterial->getUniform("VXL_model");
+			Graphics::Uniform uniform_normalMatrix = gizmoMaterial->getUniform("VXL_normalMatrix");
+			Graphics::Uniform uniform_color = gizmoMaterial->getUniform("VXL_color");
+			Graphics::Uniform uniform_alpha = gizmoMaterial->getUniform("VXL_alpha");
+
+			uniform_useModel.send(true);
+			uniform_model.sendMatrix(m_transform.Model, true);
+			uniform_normalMatrix.sendMatrix(Matrix3x3(m_transform.Model), true);
 
 			// Movement //
 			if (m_mode == Mode::TRANSLATE)
 			{
-				gizmoMaterial->SetProperty("ignoreLight", false);
+				gizmoMaterial->sendUniform("ignoreLight", false);
 
 				// X Axis //
 				if (m_selectedAxis == Axis::X)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::RED);
+					uniform_color.send(Color3F::RED);
 
-				Geometry.GetArrowX()->Draw();
+				Assets::getMesh(Geometry.GetArrowX())->Draw();
 
 				// Y Axis //
 				if (m_selectedAxis == Axis::Y)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::GREEN);
+					uniform_color.send(Color3F::GREEN);
 
-				Geometry.GetArrowY()->Draw();
+				Assets::getMesh(Geometry.GetArrowY())->Draw();
 
 				// Z Axis //
 				if (m_selectedAxis == Axis::Z)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::BLUE);
+					uniform_color.send(Color3F::BLUE);
 
-				Geometry.GetArrowZ()->Draw();
+				Assets::getMesh(Geometry.GetArrowZ())->Draw();
 
 				// Cull
 				Graphics::SetCullMode(CullMode::NO_CULL);
 				// Alpha
-				gizmoMaterial->m_property_alpha.SetProperty(0.85f);
+				uniform_alpha.send(0.85f);
 
 				// X Plane
 				if (m_selectedPlane == Axis::X)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::RED);
+					uniform_color.send(Color3F::RED);
 
-				m_mesh_HalfQuadAxisX[(m_camAxisSide[1] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]->Draw();
+				Mesh* mesh_HalfQuadAxisX = Assets::getMesh(m_mesh_HalfQuadAxisX[(m_camAxisSide[1] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]);
+				mesh_HalfQuadAxisX->Draw();
 				
 				// Y Plane
 				if (m_selectedPlane == Axis::Y)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::GREEN);
+					uniform_color.send(Color3F::GREEN);
 
-				m_mesh_HalfQuadAxisY[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]->Draw();
+				Mesh* mesh_HalfQuadAxisY = Assets::getMesh(m_mesh_HalfQuadAxisY[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]);
+				mesh_HalfQuadAxisY->Draw();
 
 				// Z Plane
 				if (m_selectedPlane == Axis::Z)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::BLUE);
+					uniform_color.send(Color3F::BLUE);
 
-				m_mesh_HalfQuadAxisZ[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[1] ? 2 : 0)]->Draw();
+				Mesh* mesh_HalfQuadAxisZ = Assets::getMesh(m_mesh_HalfQuadAxisZ[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[1] ? 2 : 0)]);
+				mesh_HalfQuadAxisZ->Draw();
 
 				// Cull
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 				// Alpha
-				gizmoMaterial->m_property_alpha.SetProperty(1.0f);
+				uniform_alpha.send(1.0f);
 
 				// Small cube in the middle //
 				if (m_selectedPlane == Axis::ALL)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::GREY);
+						uniform_color.send(Color3F::GREY);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+					uniform_color.send(Color3F::WHITE);
 				//
-				Geometry.GetCubeSmall()->Draw();
+				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
 
 			}
 			else if (m_mode == Mode::SCALE)
 			{
-				gizmoMaterial->SetProperty("ignoreLight", false);
+				gizmoMaterial->sendUniform("ignoreLight", false);
 
 				// Gizmo Additional Debug Lines
 				float XLineLength = (m_clicked && (m_selectedAxis == Axis::X || m_selectedAxis == Axis::ALL)) ? m_constantScale + m_dragAmount - 0.0f : m_constantScale;
@@ -618,64 +613,64 @@ namespace Vxl
 
 				// X Cube //
 				Matrix4x4 X_Model = m_transform.Model * Matrix4x4::GetTranslate(X_Offset);
-				gizmoMaterial->m_property_model.SetPropertyMatrix(X_Model, true);
+				uniform_model.sendMatrix(X_Model, true);
 				if (m_selectedAxis == Axis::X)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::RED);
+					uniform_color.send(Color3F::RED);
 
-				m_mesh_ScaleCube[0]->Draw();
+				Assets::getMesh(m_mesh_ScaleCube[0])->Draw();
 
 				// Y Cube //
 				Matrix4x4 Y_Model = m_transform.Model * Matrix4x4::GetTranslate(Y_Offset);
-				gizmoMaterial->m_property_model.SetPropertyMatrix(Y_Model, true);
+				uniform_model.sendMatrix(Y_Model, true);
 				if (m_selectedAxis == Axis::Y)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::GREEN);
+					uniform_color.send(Color3F::GREEN);
 
-				m_mesh_ScaleCube[1]->Draw();
+				Assets::getMesh(m_mesh_ScaleCube[1])->Draw();
 
 				// Z Cube //
 				Matrix4x4 Z_Model = m_transform.Model * Matrix4x4::GetTranslate(Z_Offset);
-				gizmoMaterial->m_property_model.SetPropertyMatrix(Z_Model, true);
+				uniform_model.sendMatrix(Z_Model, true);
 				if (m_selectedAxis == Axis::Z)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+						uniform_color.send(Color3F::WHITE);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::BLUE);
+					uniform_color.send(Color3F::BLUE);
 
-				m_mesh_ScaleCube[2]->Draw();
+				Assets::getMesh(m_mesh_ScaleCube[2])->Draw();
 
 				// Small cube in the middle //
-				gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				gizmoMaterial->m_property_alpha.SetProperty(0.85f);
+				uniform_model.sendMatrix(m_transform.Model, true);
+				uniform_alpha.send(0.85f);
 
 				if (m_selectedAxis == Axis::ALL)
 					if (m_clicked)
-						gizmoMaterial->m_property_color.SetProperty(Color3F::GREY);
+						uniform_color.send(Color3F::GREY);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+						uniform_color.send(Color3F::YELLOW);
 				else
-					gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+					uniform_color.send(Color3F::WHITE);
 
-				Geometry.GetCubeSmall()->Draw();
+				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
 
 				// revert
-				gizmoMaterial->m_property_alpha.SetProperty(1.0f);
+				uniform_alpha.send(1.0f);
 
 			}
 			else if (m_mode == Mode::ROTATE)
 			{
-				gizmoMaterial->SetProperty("ignoreLight", true);
+				gizmoMaterial->sendUniform("ignoreLight", true);
 
 				// Draw Drag Directions
 				if (m_clicked)
@@ -693,20 +688,20 @@ namespace Vxl
 				//
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
-				gizmoMaterial->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+				uniform_model.sendMatrix(m_transform.Model, true);
 
 				// X Circle //
 				if (m_showScaleGizmo[0])
 				{
 					if (m_selectedPlane == Axis::X)
 						if (m_clicked)
-							gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+							uniform_color.send(Color3F::WHITE);
 						else
-							gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+							uniform_color.send(Color3F::YELLOW);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::RED);
+						uniform_color.send(Color3F::RED);
 
-					Geometry.GetDoughtnutX_2D()->Draw();
+					Assets::getMesh(Geometry.GetDoughtnutX_2D())->Draw();
 				}
 
 				// Y Circle //
@@ -714,13 +709,13 @@ namespace Vxl
 				{
 					if (m_selectedPlane == Axis::Y)
 						if (m_clicked)
-							gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+							uniform_color.send(Color3F::WHITE);
 						else
-							gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+							uniform_color.send(Color3F::YELLOW);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::GREEN);
+						uniform_color.send(Color3F::GREEN);
 
-					Geometry.GetDoughtnutY_2D()->Draw();
+					Assets::getMesh(Geometry.GetDoughtnutY_2D())->Draw();
 				}
 
 				// Z Circle //
@@ -728,13 +723,13 @@ namespace Vxl
 				{
 					if (m_selectedPlane == Axis::Z)
 						if (m_clicked)
-							gizmoMaterial->m_property_color.SetProperty(Color3F::WHITE);
+							uniform_color.send(Color3F::WHITE);
 						else
-							gizmoMaterial->m_property_color.SetProperty(Color3F::YELLOW);
+							uniform_color.send(Color3F::YELLOW);
 					else
-						gizmoMaterial->m_property_color.SetProperty(Color3F::BLUE);
+						uniform_color.send(Color3F::BLUE);
 
-					Geometry.GetDoughtnutZ_2D()->Draw();
+					Assets::getMesh(Geometry.GetDoughtnutZ_2D())->Draw();
 				}
 
 				// revert
@@ -742,7 +737,7 @@ namespace Vxl
 			}
 		}
 	}
-	void Gizmo::RenderIDCapture()
+	void Gizmo::RenderIDCapture(MaterialIndex _colorPickerMaterial)
 	{
 		if (m_clicked || !m_show)
 			return;
@@ -750,16 +745,20 @@ namespace Vxl
 		// Make sure Cursor is available
 		if (!Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
 		{
-			m_fbo->Bind();
-			m_fbo->ClearBuffers();
+			m_fbo->bind();
+			m_fbo->clearBuffers();
 
-			Material* material_colorPicker = Material::GetAsset("colorPicker");
+			_Material* material_colorPicker = Assets::getMaterial(_colorPickerMaterial);
 
-			material_colorPicker->BindProgram();
-			material_colorPicker->BindStates();
+			material_colorPicker->bindProgram();
+			material_colorPicker->bindStates();
 
-			material_colorPicker->m_property_useModel.SetProperty(true);
-			material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+			Graphics::Uniform uniform_useModel = material_colorPicker->getUniform("VXL_useModel");
+			Graphics::Uniform uniform_model = material_colorPicker->getUniform("VXL_model");
+			Graphics::Uniform uniform_output = material_colorPicker->getUniform("VXL_output");
+
+			uniform_useModel.send(true);
+			uniform_model.sendMatrix(m_transform.Model, true);
 
 			if (m_mode == Mode::TRANSLATE)
 			{
@@ -767,42 +766,42 @@ namespace Vxl
 
 				// X-arrow
 				color = Util::Conversion::uint_to_color4(1u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetArrowX()->Draw();
+				uniform_output.send(color);
+				Assets::getMesh(Geometry.GetArrowX())->Draw();
 
 				// Y-arrow
 				color = Util::Conversion::uint_to_color4(2u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetArrowY()->Draw();
+				uniform_output.send(color);
+				Assets::getMesh(Geometry.GetArrowY())->Draw();
 
 				// Z-arrow
 				color = Util::Conversion::uint_to_color4(3u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetArrowZ()->Draw();
+				uniform_output.send(color);
+				Assets::getMesh(Geometry.GetArrowZ())->Draw();
 
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
 				// X Plane
 				color = Util::Conversion::uint_to_color4(4u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				m_mesh_HalfQuadAxisX[(m_camAxisSide[1] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]->Draw();
+				uniform_output.send(color);
+				Assets::getMesh(m_mesh_HalfQuadAxisX[(m_camAxisSide[1] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)])->Draw();
 
 				// Y Plane
 				color = Util::Conversion::uint_to_color4(5u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				m_mesh_HalfQuadAxisY[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]->Draw();
+				uniform_output.send(color);
+				Assets::getMesh(m_mesh_HalfQuadAxisY[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)])->Draw();
 
 				// Z Plane
 				color = Util::Conversion::uint_to_color4(6u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				m_mesh_HalfQuadAxisZ[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[1] ? 2 : 0)]->Draw();
+				uniform_output.send(color);
+				Assets::getMesh(m_mesh_HalfQuadAxisZ[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[1] ? 2 : 0)])->Draw();
 
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
 				// Cube (ignored)
 				color = Util::Conversion::uint_to_color4(7u);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetCubeSmall()->Draw();
+				uniform_output.send(color);
+				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
 
 				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
@@ -860,29 +859,29 @@ namespace Vxl
 				// X Cube
 				color = Util::Conversion::uint_to_color4(1u);
 				Matrix4x4 X_Model = m_transform.Model * Matrix4x4::GetTranslate(X_Offset);
-				material_colorPicker->m_property_model.SetPropertyMatrix(X_Model, true);
-				material_colorPicker->m_property_output.SetProperty(color);
-				m_mesh_ScaleCube[0]->Draw();
+				uniform_model.sendMatrix(X_Model, true);
+				uniform_output.send(color);
+				Assets::getMesh(m_mesh_ScaleCube[0])->Draw();
 
 				// Y Cube
 				color = Util::Conversion::uint_to_color4(2u);
 				Matrix4x4 Y_Model = m_transform.Model * Matrix4x4::GetTranslate(Y_Offset);
-				material_colorPicker->m_property_model.SetPropertyMatrix(Y_Model, true);
-				material_colorPicker->m_property_output.SetProperty(color);
-				m_mesh_ScaleCube[1]->Draw();
+				uniform_model.sendMatrix(Y_Model, true);
+				uniform_output.send(color);
+				Assets::getMesh(m_mesh_ScaleCube[1])->Draw();
 
 				// Z Cube
 				color = Util::Conversion::uint_to_color4(3u);
 				Matrix4x4 Z_Model = m_transform.Model * Matrix4x4::GetTranslate(Z_Offset);
-				material_colorPicker->m_property_model.SetPropertyMatrix(Z_Model, true);
-				material_colorPicker->m_property_output.SetProperty(color);
-				m_mesh_ScaleCube[2]->Draw();
+				uniform_model.sendMatrix(Z_Model, true);
+				uniform_output.send(color);
+				Assets::getMesh(m_mesh_ScaleCube[2])->Draw();
 
 				// Center Cube
 				color = Util::Conversion::uint_to_color4(4u);
-				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
-				material_colorPicker->m_property_output.SetProperty(color);
-				Geometry.GetCubeSmall()->Draw();
+				uniform_model.sendMatrix(m_transform.Model, true);
+				uniform_output.send(color);
+				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
 
 				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
@@ -920,30 +919,30 @@ namespace Vxl
 				// Draw both sides
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
-				material_colorPicker->m_property_model.SetPropertyMatrix(m_transform.Model, true);
+				uniform_model.sendMatrix(m_transform.Model, true);
 
 				// X Circle
 				if (m_showScaleGizmo[0])
 				{
 					color = Util::Conversion::uint_to_color4(1u);
-					material_colorPicker->m_property_output.SetProperty(color);
-					Geometry.GetDoughtnutX_2D()->Draw();
+					uniform_output.send(color);
+					Assets::getMesh(Geometry.GetDoughtnutX_2D())->Draw();
 				}
 
 				// Y Circle
 				if (m_showScaleGizmo[1])
 				{
 					color = Util::Conversion::uint_to_color4(2u);
-					material_colorPicker->m_property_output.SetProperty(color);
-					Geometry.GetDoughtnutY_2D()->Draw();
+					uniform_output.send(color);
+					Assets::getMesh(Geometry.GetDoughtnutY_2D())->Draw();
 				}
 
 				// Z Circle
 				if (m_showScaleGizmo[2])
 				{
 					color = Util::Conversion::uint_to_color4(3u);
-					material_colorPicker->m_property_output.SetProperty(color);
-					Geometry.GetDoughtnutZ_2D()->Draw();
+					uniform_output.send(color);
+					Assets::getMesh(Geometry.GetDoughtnutZ_2D())->Draw();
 				}
 
 				// Revert

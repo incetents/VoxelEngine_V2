@@ -55,7 +55,7 @@ namespace Vxl
 	}
 	void RenderBuffer::setGLName(const std::string& name)
 	{
-		Graphics::SetGLName(ObjectType::TEXTURE, m_id, name);
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Renderbuffer_" + name);
 	}
 
 	void RenderBuffer::Bind(void) const

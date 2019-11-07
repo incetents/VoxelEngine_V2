@@ -40,7 +40,7 @@ namespace Vxl
 		{
 			// Error
 			auto Name = stringUtil::nameFromFilepath(filePath);
-			Logger.error("Unable to load Mode: " + Name);
+			Logger.error("Unable to load Model: " + Name);
 			return std::vector<Model*>();
 		}
 
@@ -150,30 +150,56 @@ namespace Vxl
 		return _models;
 	}
 
-	std::vector<Mesh*> Model::Load(const std::string& name, const std::string& filePath,
-		bool mergeMeshes, bool normalize, float normalizeScale
+	std::vector<MeshIndex> Model::LoadMeshes(
+		const std::string& name,
+		const std::string& filePath,
+		bool normalize,
+		float normalizeScale
 	) {
-		std::vector<Model*> Models = Model::LoadFromAssimp(filePath, mergeMeshes, normalize, normalizeScale);
-		UINT ModelCount = (UINT)Models.size();
+		std::vector<MeshIndex> _meshes;
+		std::vector<Model*> Models = Model::LoadFromAssimp(filePath, false, normalize, normalizeScale);
+		UINT _modelCount = (UINT)Models.size();
 
-		if (ModelCount == 0)
+		if (_modelCount == 0)
 		{
 			Logger.error("Unable to Load Model: " + name);
-			return std::vector<Mesh*>();
+			return _meshes;
 		}
 
-		std::vector<Mesh*> _meshes;
-		for (UINT i = 0; i < ModelCount; i++)
+		for (UINT i = 0; i < _modelCount; i++)
 		{
 			std::string _name = name;
-			if (ModelCount > 1)
+			if (_modelCount > 1)
 				_name += " (" + std::to_string(i) + ')';
 
-			
-			Mesh* _mesh = Mesh::Create(_name, Models[i]);
-			_meshes.push_back(_mesh);
+			// Index
+			MeshIndex NewMeshIndex = SceneAssets.createMesh();
+			_meshes.push_back(NewMeshIndex);
+
+			// Mesh Data
+			Mesh* _mesh = SceneAssets.getMesh(NewMeshIndex);
+			_mesh->Set(*Models[i]);
+			_mesh->setGLName(_name);
 		}
 
 		return _meshes;
+	}
+	MeshIndex Model::LoadMesh(
+		const std::string& name,
+		const std::string& filePath,
+		bool normalize,
+		float normalizeScale
+	)
+	{
+		std::vector<Model*> Models = Model::LoadFromAssimp(filePath, false, normalize, normalizeScale);
+		if (Models.size() == 0)
+			return -1;
+
+		MeshIndex NewMeshIndex = SceneAssets.createMesh();
+		Mesh* _mesh = SceneAssets.getMesh(NewMeshIndex);
+		_mesh->Set(*Models[0]);
+		_mesh->setGLName(name);
+
+		return NewMeshIndex;
 	}
 }

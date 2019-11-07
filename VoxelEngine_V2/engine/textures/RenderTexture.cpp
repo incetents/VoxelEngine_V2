@@ -47,7 +47,7 @@ namespace Vxl
 	}
 	void RenderTexture::setGLName(const std::string& name)
 	{
-		Graphics::SetGLName(ObjectType::TEXTURE, m_id, name);
+		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "RenderTexture_" + name);
 	}
 
 	RenderTextureDepth::RenderTextureDepth(

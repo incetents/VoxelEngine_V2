@@ -1217,7 +1217,159 @@ namespace Vxl
 	}
 
 	// ~ Sends Uniforms to Shader ~ //
-	template<>
+	void Graphics::Uniform::send(bool data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform1i(location, (int)data);
+	}
+	void Graphics::Uniform::send(int data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform1i(location, data);
+	}
+	void Graphics::Uniform::send(uint32_t data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform1ui(location, data);
+	}
+	void Graphics::Uniform::send(float data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform1f(location, data);
+	}
+	void Graphics::Uniform::send(double data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform1d(location, data);
+	}
+
+	//void Graphics::Uniform::send(const Vector2 data) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniform2f(location, data.x, data.y);
+	//}
+	//void Graphics::Uniform::send(const Vector3 data) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniform3f(location, data.x, data.y, data.z);
+	//}
+	//void Graphics::Uniform::send(const Vector4 data) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniform4f(location, data.x, data.y, data.z, data.w);
+	//}
+	//void Graphics::Uniform::send(const Color3F data) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniform3f(location, data.r, data.g, data.b);
+	//}
+	//void Graphics::Uniform::send(const Color4F data) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniform4f(location, data.r, data.g, data.b, data.a);
+	//}
+
+	void Graphics::Uniform::send(const Vector2& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform2f(location, data.x, data.y);
+	}
+	void Graphics::Uniform::send(const Vector3& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform3f(location, data.x, data.y, data.z);
+	}
+	void Graphics::Uniform::send(const Vector4& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform4f(location, data.x, data.y, data.z, data.w);
+	}
+	void Graphics::Uniform::send(const Color3F& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform3f(location, data.r, data.g, data.b);
+	}
+	void Graphics::Uniform::send(const Color4F& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform4f(location, data.r, data.g, data.b, data.a);
+	}
+
+	//void Graphics::Uniform::sendMatrix(const Matrix2x2 data, bool transpose) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniformMatrix2fv(location, 1, transpose, data.GetStartPointer());
+	//}
+	//void Graphics::Uniform::sendMatrix(const Matrix3x3 data, bool transpose) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniformMatrix3fv(location, 1, transpose, data.GetStartPointer());
+	//}
+	//void Graphics::Uniform::sendMatrix(const Matrix4x4 data, bool transpose) const
+	//{
+	//	if (location == -1)
+	//		return;
+
+	//	glUniformMatrix4fv(location, 1, transpose, data.GetStartPointer());
+	//}
+
+	void Graphics::Uniform::sendMatrix(const Matrix2x2& data, bool transpose) const
+	{
+		if (location == -1)
+			return;
+
+		glUniformMatrix2fv(location, 1, transpose, data.GetStartPointer());
+	}
+	void Graphics::Uniform::sendMatrix(const Matrix3x3& data, bool transpose) const
+	{
+		if (location == -1)
+			return;
+
+		glUniformMatrix3fv(location, 1, transpose, data.GetStartPointer());
+	}
+	void Graphics::Uniform::sendMatrix(const Matrix4x4& data, bool transpose) const
+	{
+		if (location == -1)
+			return;
+
+		glUniformMatrix4fv(location, 1, transpose, data.GetStartPointer());
+	}
+
+	/*template<>
 	void Graphics::Uniform::Send<bool>(bool data)
 	{
 		glUniform1i(location, (int)data);
@@ -1429,7 +1581,7 @@ namespace Vxl
 	void Graphics::Uniform::SendMatrix<Matrix4x4&>(ShaderProgramID id, Matrix4x4& data, bool transposeMatrix)
 	{
 		glProgramUniformMatrix4fv(id, location, 1, transposeMatrix, data.GetStartPointer());
-	}
+	}*/
 
 	// ~ Subroutine Functions ~ //
 	void Graphics::UniformSubroutine::Connect(const std::string& UniformName, const std::string& FunctionName)
@@ -1678,7 +1830,7 @@ namespace Vxl
 		return uniformBlocks;
 	}
 
-	std::map<ShaderType, Graphics::UniformSubroutine> Graphics::ShaderProgram::AcquireUniformSubroutines(ShaderProgramID id, std::vector<Vxl::Shader*> shaders)
+	std::map<ShaderType, Graphics::UniformSubroutine> Graphics::ShaderProgram::AcquireUniformSubroutines(ShaderProgramID id, const std::vector<ShaderType>& shaders)
 	{
 		std::map<ShaderType, Graphics::UniformSubroutine> subroutines;
 
@@ -1688,13 +1840,13 @@ namespace Vxl
 		for (uint32_t s = 0; s < shaderCount; s++)
 		{
 			int subroutineCount;
-			GLenum type = GL_ShaderType[(int)shaders[s]->GetType()];
+			GLenum type = GL_ShaderType[(int)shaders[s]];
 
 			glGetProgramStageiv(id, type, GL_ACTIVE_SUBROUTINE_UNIFORMS, &subroutineCount);
 
 			if (subroutineCount > 0)
 			{
-				auto& Subroutine = subroutines[shaders[s]->GetType()];
+				auto& Subroutine = subroutines[shaders[s]];
 				Subroutine = UniformSubroutine();
 				Subroutine.shaderType = type;
 				Subroutine.indices.resize(subroutineCount);
@@ -1724,7 +1876,7 @@ namespace Vxl
 				}
 
 				// Add to result
-				subroutines[shaders[s]->GetType()] = Subroutine;
+				subroutines[shaders[s]] = Subroutine;
 			}
 		}
 

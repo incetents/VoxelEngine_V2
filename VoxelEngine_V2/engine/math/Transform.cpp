@@ -62,8 +62,8 @@ namespace Vxl
 			isDirty = false;
 
 			// Call entity about change in transform class
-			if (m_owner != nullptr)
-				m_owner->TransformChanged();
+			Entity* owner = Assets::getEntity(m_owner);
+			owner->TransformChanged();
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace Vxl
 		for (auto child : m_children)
 		{
 			child->simpleRemoveParent();
-			child->m_owner->TransformChanged();
+			Assets::getEntity(child->m_owner)->TransformChanged();
 			// Check for new parent for current children/soon-to-be orphans
 			if (m_parent)
 			{
@@ -101,7 +101,7 @@ namespace Vxl
 		if (m_parent)
 		{
 			m_parent->SimpleRemoveChild(this);
-			m_parent->m_owner->TransformChanged();
+			Assets::getEntity(m_parent->m_owner)->TransformChanged();
 		}
 	}
 

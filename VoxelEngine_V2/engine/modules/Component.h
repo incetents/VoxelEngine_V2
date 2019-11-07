@@ -1,6 +1,8 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "../utilities/Asset.h"
+
 #include <typeinfo>
 #include <unordered_map>
 
@@ -11,13 +13,8 @@ namespace Vxl
 	class Component
 	{
 		friend class ComponentHandler;
-	protected:
-		Entity* m_owner;
 	public:
-		Entity* GetOwner(void) const
-		{
-			return m_owner;
-		}
+		EntityIndex m_owner = -1;
 	};
 
 	class ComponentHandler
@@ -35,7 +32,7 @@ namespace Vxl
 
 		// Add Component
 		template <typename T = Component *>
-		T* AddComponent(T* a_component, Entity* owner)
+		T* AddComponent(T* a_component, EntityIndex owner)
 		{
 			if (a_component != nullptr && m_components.count(&typeid(*a_component)) == 0)
 			{
@@ -49,7 +46,7 @@ namespace Vxl
 
 		// Add Component (new)
 		template <typename T = Component * >
-		T* AddComponent(Entity* owner)
+		T* AddComponent(EntityIndex owner)
 		{
 			T* _data = new T();
 			return AddComponent(_data, owner);

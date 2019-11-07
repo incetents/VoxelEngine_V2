@@ -15,96 +15,78 @@
 namespace Vxl
 {
 	class Mesh;
-	class ShaderProgram;
 
-	enum class EntityType
+	class Entity //: public ComponentHandler
 	{
-		GAMEOBJECT,
-		LIGHT,
-		CAMERA
-	};
-
-	class Entity : public ComponentHandler
-	{
+		DISALLOW_COPY_AND_ASSIGN(Entity);
+		friend class Assets;
 		friend class RenderManager;
 		friend class GameObject;
 		friend class Transform;
 		friend class Editor;
 	protected:
 		// Locked Constructor
-		Entity(const std::string& name, EntityType type);
+		Entity(const std::string& name);
 
-		// Core Data
-		uint32_t	m_uniqueID;
-		Color4F		m_colorID;
-		EntityType  m_type;
-		std::string	m_name;			// Used for storage with Asset class [Never modified]
-		Color3F		m_Color = Color3F(1, 1, 1);
-		Color3F		m_Tint	= Color3F(1, 1, 1);
-		float		m_alpha = 1.0f;
+		// Hidden Data
+		uint32_t		m_uniqueID;
+		Color4F			m_colorID;
+		MeshIndex		m_mesh = -1;
+		MaterialIndex	m_material = -1;
+		
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
 		Vector3		m_AABB[2]; // AABB based on OBB
 
 		// Editor Information
-		Color3F		m_labelColor = Color3F(1, 1, 1); // Inspector
-		bool		m_isSelectable = true; //
 		bool		m_isSelected = false; //
 
-		// Unique IDs
-		static uint32_t m_maxUniqueID;
-		static std::stack<uint32_t> m_discardedUniqueIDs;
-		static std::map<uint32_t, Entity*> m_EntitiesByID;
+		// Utility
+		void UpdateBoundingBoxCheap();
+		void TransformChanged()
+		{
+			UpdateBoundingBoxCheap();
+		}
 
 	public:
 		// Destructor
 		virtual ~Entity();
 
 		// Data
-		Transform			m_transform;
-		bool				m_useTransform = true;
-		bool				m_isActive = true;
-		bool				m_isColoredObject = false;
+		std::string	m_name;
+		Transform	m_transform;
+		Color3F		m_labelColor	= Color3F(1, 1, 1); // Inspector
+		Color3F		m_Color			= Color3F(1, 1, 1);
+		Color3F		m_Tint			= Color3F(1, 1, 1);
+		float		m_alpha			= 1.0f;
+		bool		m_useTransform	= true;
+		bool		m_isActive		= true;
+		bool		m_isSelectable	= true; // for editor
+		//bool		m_isColoredObject = false;
 		
-		// ID
-		inline uint64_t GetUniqueID(void) const
+		// Mesh
+		void setMesh(MeshIndex index);
+		inline MeshIndex getMesh(void) const
 		{
-			return m_uniqueID;
+			return m_mesh;
 		}
-		static Entity* GetEntityByID(uint32_t id)
+		// Material
+		void setMaterial(MaterialIndex index);
+		inline MaterialIndex getMaterial(void) const
 		{
-			if (m_EntitiesByID.find(id) == m_EntitiesByID.end())
-				return nullptr;
-
-			return m_EntitiesByID[id];
+			return m_material;
 		}
 
 		// Editor Information
-		inline void SetSelectable(bool state)
-		{
-			m_isSelectable = state;
-		}
-		inline bool IsSelectable(void) const
-		{
-			return m_isSelectable;
-		}
 		inline bool IsSelected(void) const
 		{
 			return m_isSelected;
 		}
 
-		// Type
-		EntityType GetType(void) const
+		inline uint32_t getUniqueID(void) const
 		{
-			return m_type;
+			return m_uniqueID;
 		}
-		
-		// Name
-		void Rename(const std::string& newName);
-		inline std::string GetName(void) const
-		{
-			return m_name;
-		}
-		
+
 		// check if all parents are active
 		bool IsFamilyActive()
 		{
@@ -120,11 +102,13 @@ namespace Vxl
 			// iterate through all parents
 			while (parent != nullptr)
 			{
-				if (!parent->GetOwner()->m_isActive)
+				Entity* owner = Assets::getEntity(parent->m_owner);
+				VXL_ASSERT(owner, "Component not attached to entity");
+				if (!owner->m_isActive)
 					return false;
 				// Acquire new parent
 				else
-					parent = parent->GetOwner()->m_transform.getParent();
+					parent = owner->m_transform.getParent();
 			}
 			// If no parents failed, that means it's all good
 			return true;
@@ -143,55 +127,6 @@ namespace Vxl
 		{
 			return m_AABB[1];
 		}
-
-		// Color
-		inline void SetLabelColor(Color3F color)
-		{
-			m_labelColor = color;
-		}
-		inline Color3F& GetLabelColor(void)
-		{
-			return m_labelColor;
-		}
-
-		inline void SetColor(Color3F color, bool colorOverTexture = true)
-		{
-			m_Color = color;
-			m_isColoredObject = colorOverTexture;
-		}
-		inline Color3F& GetColor(void)
-		{
-			return m_Color;
-		}
-
-		inline void SetTint(Color3F tint)
-		{
-			m_Tint = tint;
-		}
-		inline Color3F GetTint(void)
-		{
-			return m_Tint;
-		}
-
-		// Warning, alpha only does anything if material is transparent
-		inline void SetAlpha(float a)
-		{
-			m_alpha = a;
-		}
-		inline float GetAlpha(void) const
-		{
-			return m_alpha;
-		}
-
-		// Update Bounding Box from Mesh
-		void UpdateBoundingBoxCheap(Mesh* _mesh);
-
-		// Behaviour
-		virtual void Update(void) = 0;
-		virtual void DrawSelection(void) {}
-		virtual void Draw(void) = 0;
-	protected:
-		virtual void TransformChanged(void) = 0;
 	};
 }
 

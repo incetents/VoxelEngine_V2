@@ -8,7 +8,7 @@
 #include "../math/Matrix2x2.h"
 #include "../math/Matrix3x3.h"
 #include "../math/Matrix4x4.h"
-#include "../objects/CameraObject.h"
+#include "../objects/Camera.h"
 #include "../rendering/FramebufferObject.h"
 
 #include "../utilities/Time.h"
@@ -16,7 +16,7 @@
 namespace Vxl
 {
 	// UBOManager //
-	void UBOManager::BindCamera(const CameraObject& _camera)
+	void UBOManager::BindCamera(const Camera& _camera)
 	{
 		// Transpose Matrices so that they are Column Major
 		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getViewProjection().Transpose(), 0);
@@ -35,8 +35,8 @@ namespace Vxl
 	}
 	void UBOManager::BindFBOSize(const FramebufferObject& _fbo)
 	{
-		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2((float)_fbo.GetWidth(), (float)_fbo.GetHeight()), 0);
-		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(1.0f / (float)_fbo.GetWidth(), 1.0f / (float)_fbo.GetHeight()), 8);
+		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2((float)_fbo.getWidth(), (float)_fbo.getHeight()), 0);
+		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(1.0f / (float)_fbo.getWidth(), 1.0f / (float)_fbo.getHeight()), 8);
 		m_ubos[UBOID::FBO_SIZE]->Bind();
 	}
 

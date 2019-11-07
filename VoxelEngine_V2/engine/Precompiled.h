@@ -39,7 +39,7 @@
 #include "rendering/RenderManager.h"
 #include "modules/Scene.h"
 
-#include "objects/CameraObject.h"
+#include "objects/Camera.h"
 #include "objects/GameObject.h"
 #include "objects/LightObject.h"
 #include "objects/TextObject.h"

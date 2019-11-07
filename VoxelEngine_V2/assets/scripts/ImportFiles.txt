@@ -54,12 +54,6 @@ font 				font_vert 					font_frag
 showNormals 		showNormals
 
 //----------------------------------------
-#CUBEMAP
-// order: [Name] [FilePath_FT] [FilePath_BK] [FilePath_UP] [FilePath_DN] [FilePath_RT] [FilePath_LT]
-
-craterlake		./assets/cubemaps/craterlake_ft.tga ./assets/cubemaps/craterlake_bk.tga ./assets/cubemaps/craterlake_up.tga ./assets/cubemaps/craterlake_dn.tga ./assets/cubemaps/craterlake_rt.tga ./assets/cubemaps/craterlake_lf.tga
-
-//----------------------------------------
 #MODEL
 // order: [Name] [FilePath] [NORMALIZE] [SCALE[#]]
 //
@@ -68,7 +62,6 @@ craterlake		./assets/cubemaps/craterlake_ft.tga ./assets/cubemaps/craterlake_bk.
 // [SCALE[#]] = "value to scale all vertices, # = decimal number"
 
 jiggy 	./assets/models/jiggy.obj 	NO_MERGE	NORMALIZE 	SCALE[0.2]
-camera 	./assets/models/camera_fixed.obj 	NO_MERGE	NORMALIZE	SCALE[0.25]
 
 
 

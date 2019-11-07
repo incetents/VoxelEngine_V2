@@ -8,6 +8,14 @@
 
 namespace Vxl
 {
+	const std::string SECTION_NAME = "#Name";
+	const std::string SECTION_INCLUDE = "#Include";
+	const std::string SECTION_PROPERTIES = "#Properties";
+	const std::string SECTION_ATTRIBUTE = "#Attributes";
+	const std::string SECTION_VERTEX = "#Vertex";
+	const std::string SECTION_GEOMETRY = "#Geometry";
+	const std::string SECTION_FRAGMENT = "#Fragment";
+
 	ShaderBuilder::ShaderBuilder(const std::string& filepath)
 	{
 		std::string file = FileIO::readFile(filepath);

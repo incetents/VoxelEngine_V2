@@ -14,7 +14,7 @@ namespace Vxl
 	class Matrix2x2;
 	class Matrix3x3;
 	class Matrix4x4;
-	class CameraObject;
+	class Camera;
 	class FramebufferObject;
 
 	class UniformBufferObject
@@ -94,7 +94,7 @@ namespace Vxl
 				delete[] m_ubos;
 		}
 
-		void BindCamera(const CameraObject& _camera);
+		void BindCamera(const Camera& _camera);
 		void BindTime();
 		void BindFBOSize(const FramebufferObject& _fbo);
 	
