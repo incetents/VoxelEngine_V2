@@ -45,9 +45,6 @@ namespace Vxl
 
 		void UpdateSizes(uint32_t width, uint32_t height);
 		void UpdateViewport();
-
-		void Destroy();
-		void Update();
 	public:
 
 		Window() {}

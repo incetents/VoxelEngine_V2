@@ -349,6 +349,7 @@ namespace Vxl
 	{
 		// Create New Data
 		Camera* object = new Camera(name, znear, zfar);
+		object->m_transform.m_rotationOrder = EulerRotationOrder::YXZ;
 		// Store Data and Return index
 		return m_camera_storage.Add(object, m_creationType);
 	}

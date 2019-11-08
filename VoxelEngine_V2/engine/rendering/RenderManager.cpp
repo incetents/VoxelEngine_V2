@@ -106,10 +106,10 @@ namespace Vxl
 	}
 	void RenderManager::ReloadWindow()
 	{
-		Graphics::initHints(); // Newer version
+		//Graphics::initHints(); // Newer version
 
-		DestroyGlobalGLResources();
-		DestroySceneGLResources();
+		//DestroyGlobalGLResources();
+		//DestroySceneGLResources();
 
 		Window.Reload();
 
@@ -143,7 +143,10 @@ namespace Vxl
 		UBOManager.InitGLResources();
 		Debug.InitGLResources();
 		//GlobalRenderText.InitGLResources();
+#ifdef GLOBAL_IMGUI
 		GUIViewport.InitGLResources();
+#endif
+
 		Gizmo::InitGLResources();
 		
 		Geometry.InitGLResources();
@@ -155,7 +158,11 @@ namespace Vxl
 		UBOManager.DestroyGLResources();
 		Debug.DestroyGLResources();
 		//GlobalRenderText.DestoryGLResources();
+
+#ifdef GLOBAL_IMGUI
 		GUIViewport.DestroyGLResources();
+#endif
+
 		Gizmo::DestroyGLResources();
 
 		GlobalAssets.DestroyAndEraseAll();
@@ -244,6 +251,7 @@ namespace Vxl
 	}
 	void RenderManager::InitImGui()
 	{
+#ifdef GLOBAL_IMGUI
 		// Imgui Initial Values
 		DevConsole.Init("DevConsole", Vector2(280.f, 380.f), 0.9f, ImGuiWindowFlags_MenuBar);
 		ShaderErrors.Init("ShaderErrors", Vector2(700.f, 400.f), 0.9f);
@@ -264,9 +272,12 @@ namespace Vxl
 		m_guiWindows.push_back(&Performance.instanceRef);
 		m_guiWindows.push_back(&GUIViewport.instanceRef);
 		m_guiWindows.push_back(&ShaderCodeViewer.instanceRef);
+#endif
 	}
 	void RenderManager::DrawImGui()
 	{
+		
+
 #ifdef GLOBAL_IMGUI
 		ImGui::NewFrame();
 
@@ -398,6 +409,32 @@ namespace Vxl
 						mesh->Draw();
 					}
 				}
+			}
+		}
+	}
+	void RenderManager::renderOpaque()
+	{
+		// Check all materials in order
+		for (const auto& data : m_materialSequence)
+		{
+			MaterialIndex _materialIndex = data.second;
+			// Render all associated entities tied to that material
+			if (m_renderlist_opaque.find(_materialIndex) != m_renderlist_opaque.end())
+			{
+				render(_materialIndex, m_renderlist_opaque[_materialIndex]);
+			}
+		}
+	}
+	void RenderManager::renderTransparent()
+	{
+		// Check all materials in order
+		for (const auto& data : m_materialSequence)
+		{
+			MaterialIndex _materialIndex = data.second;
+			// Render all associated entities tied to that material
+			if (m_renderlist_transparent.find(_materialIndex) != m_renderlist_transparent.end())
+			{
+				render(_materialIndex, m_renderlist_transparent[_materialIndex]);
 			}
 		}
 	}

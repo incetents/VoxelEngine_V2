@@ -33,16 +33,14 @@ uniform float VXL_alpha 	= 1.0;
 void main()
 {
 	output_albedo = vec4(0,0,0,VXL_alpha);
-
+	
 	if(VXL_useTexture)
 	{
-		vec4 _tex = texture(albedo_handler, v_data.uv);
-		output_albedo.rgb = _tex.rgb * VXL_tint;
+		output_albedo.rgb = texture(albedo_handler, v_data.uv).rgb;
 	}
-
-	output_albedo.rgb += VXL_color
-	output_albedo.rgb *= VXL_tint;
-		
+	
+	output_albedo.rgb = output_albedo.rgb * VXL_tint + VXL_color;
+	
 	// output UV for testing reasons
 	//output_albedo = vec4(v_data.uv, 0, 1);
 	

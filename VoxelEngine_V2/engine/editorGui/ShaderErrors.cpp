@@ -4,6 +4,7 @@
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
+#include "../imgui/imgui_colors.h"
 #include "../engine/rendering/Shader.h"
 
 namespace Vxl
@@ -24,7 +25,11 @@ namespace Vxl
 		else
 		{
 			if (_Shader::m_brokenShaders.size() > 0)
+			{
 				ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "Shader Compilation Failures:");
+				ImGui::Separator();
+			}
+
 
 			// Shader Compilation Errors
 			for (auto brokenShader : _Shader::m_brokenShaders)
@@ -38,7 +43,10 @@ namespace Vxl
 
 						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.f, 1.f));
 
+						ImGui::Separator();
 						ImGui::Text(brokenShader.second->m_errorMessage.c_str());
+						ImGui::Separator();
+
 						ImGui::TreePop();
 
 						ImGui::PopStyleColor();
@@ -55,8 +63,26 @@ namespace Vxl
 							ImGui::Text("Shader Code Storage Disabled from Macro -> GLOBAL_SHADER_CODE_BACKUP");
 						else
 						{
-							size_t size = brokenShader.second->m_source.size();
-							ImGui::TextUnformatted(brokenShader.second->m_source.c_str(), brokenShader.second->m_source.c_str() + size -1);
+							//
+							ImGui::Columns(2, "ShaderCode", false);
+							ImGui::SetColumnWidth(0, 40);
+							
+							ImGui::Separator();
+
+							size_t size = brokenShader.second->m_sourceLines.size();
+							ImGui::TextColored(ImGuiColor::Orange, brokenShader.second->m_sourceLines.c_str(), brokenShader.second->m_sourceLines.c_str() + size);
+
+							ImGui::NextColumn();
+
+							size = brokenShader.second->m_source.size();
+							ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1,1,1,1));
+							ImGui::TextUnformatted(brokenShader.second->m_source.c_str(), brokenShader.second->m_source.c_str() + size);
+							ImGui::PopStyleColor();
+							ImGui::NextColumn();
+
+							ImGui::Columns(1);
+							ImGui::Separator();
+							//
 						}
 						ImGui::TreePop();
 					}
@@ -71,7 +97,10 @@ namespace Vxl
 			}
 
 			if (_ShaderProgram::m_brokenShaderPrograms.size() > 0)
+			{
 				ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "Program Link Failures:");
+				ImGui::Separator();
+			}
 
 			// Program Linking Errors
 			for (auto brokenProgram : _ShaderProgram::m_brokenShaderPrograms)

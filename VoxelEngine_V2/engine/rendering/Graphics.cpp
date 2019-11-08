@@ -1646,7 +1646,7 @@ namespace Vxl
 		glGetShaderInfoLog(id, length, &length, &error[0]);
 
 		// End
-		return std::string(error.begin(), error.end());
+		return std::string(error.begin(), error.end() - 1);
 	}
 	std::string Graphics::Shader::GetName(ShaderType shaderType)
 	{
@@ -1740,7 +1740,7 @@ namespace Vxl
 			glGetProgramInfoLog(id, length, &length, &error[0]);
 
 			// End
-			return std::string(error.begin(), error.end());
+			return std::string(error.begin(), error.end() - 1);
 		}
 	}
 	std::map<std::string, Graphics::Uniform> Graphics::ShaderProgram::AcquireUniforms(ShaderProgramID id)

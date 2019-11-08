@@ -22,6 +22,14 @@ namespace Vxl
 			return;
 		}
 
+		// Fix includes
+		m_source = FileIO::addInclude(m_source);
+
+		// Lines for source
+		uint32_t lineCount = stringUtil::countChar(m_source, '\n') + 1;
+		for (uint32_t i = 1; i <= lineCount; i++)
+			m_sourceLines += std::to_string(i) + '\n';
+
 		// Convert file to const char
 		const char* Source = static_cast<const char *>(m_source.c_str());
 
@@ -31,7 +39,7 @@ namespace Vxl
 		// Error
 		if (!m_compiled)
 		{
-			m_errorMessage = "Failed to Compile Shader\n\n";
+			m_errorMessage = "Failed to Compile Shader\n";
 			m_errorMessage += "Name: " + m_name + "\n";
 
 			switch (m_type)
@@ -58,15 +66,13 @@ namespace Vxl
 				m_errorMessage += ("Type: UNKNOWN SHADER\n");
 				break;
 			}
-			m_errorMessage += ("\nERROR:\n");
-
-			// Output Error Message
+			m_errorMessage += "Error:\n";
 			m_errorMessage += Graphics::Shader::GetError(m_id);
+			m_errorMessage += "~~~~~~~~~~\n";
 			m_errorMessage.shrink_to_fit();
 
 			m_brokenShaders[m_id] = this;
 
-			Logger.error(m_errorMessage);
 		}
 	}
 	_Shader::~_Shader()
@@ -93,6 +99,16 @@ namespace Vxl
 
 		uint32_t shaderCount = (uint32_t)m_shaders.size();
 
+		// Auto fail if any shaders aren't compiled
+		for (unsigned int i = 0; i < shaderCount; i++)
+		{
+			if (!m_shaders[i]->isCompiled())
+			{
+				m_linked = false;
+				return;
+			}
+		}
+
 		// Attach Shaders to Shader Program
 		for (unsigned int i = 0; i < shaderCount; i++)
 			Graphics::ShaderProgram::AttachShader(m_id, m_shaders[i]->getID());
@@ -103,6 +119,7 @@ namespace Vxl
 #if _DEBUG
 		// Validation
 		m_linked &= Graphics::ShaderProgram::Validate(m_id);
+#endif
 
 		if (m_linked)
 		{
@@ -123,11 +140,10 @@ namespace Vxl
 		{
 			m_errorMessage = Graphics::ShaderProgram::GetError(m_id);
 
-			m_brokenShaderPrograms[m_id] = this;
-
 			Logger.error(m_errorMessage);
+
+			m_brokenShaderPrograms[m_id] = this;
 		}
-#endif
 
 		// Detach Shaders from Shader Program
 		for (unsigned int i = 0; i < shaderCount; i++)
@@ -142,13 +158,16 @@ namespace Vxl
 	}
 	void _ShaderProgram::bind() const
 	{
-		Graphics::ShaderProgram::Enable(m_id);
-
-		// Bind subroutines
-		if (!m_subroutines.empty())
+		if (m_linked)
 		{
-			for (const auto& s : m_subroutines)
-				s.second.Bind();
+			Graphics::ShaderProgram::Enable(m_id);
+
+			// Bind subroutines
+			if (!m_subroutines.empty())
+			{
+				for (const auto& s : m_subroutines)
+					s.second.Bind();
+			}
 		}
 	}
 	void _ShaderProgram::unbind()

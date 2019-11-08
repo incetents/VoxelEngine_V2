@@ -62,8 +62,17 @@ namespace Vxl
 		{}
 
 	public:
+		~_Material()
+		{
+			if(m_sequenceNumber != -1)
+				m_allSequenceNumbers.erase(m_sequenceNumber);
+		}
+
 		bool setSequenceID(uint32_t sequence)
 		{
+			if (sequence == -1)
+				return false;
+
 			// check if number is free
 			if (m_allSequenceNumbers.find(sequence) == m_allSequenceNumbers.end())
 			{

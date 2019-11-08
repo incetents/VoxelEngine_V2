@@ -231,31 +231,31 @@ namespace Vxl
 		fbo_showRenderTarget_ptr->unbind();
 
 		// Shaders
-		gbuffer_vert = SceneAssets.createShader("gbuffer_vert", "./assets/shaders/gbuffer.vert", ShaderType::VERTEX);
-		gbuffer_frag = SceneAssets.createShader("gbuffer_vert", "./assets/shaders/gbuffer.frag", ShaderType::FRAGMENT);
+		gbuffer_vert = SceneAssets.createShader("gbuffer_vert", FileIO::readFile("./assets/shaders/gbuffer.vert"), ShaderType::VERTEX);
+		gbuffer_frag = SceneAssets.createShader("gbuffer_frag", FileIO::readFile("./assets/shaders/gbuffer.frag"), ShaderType::FRAGMENT);
 
-		passthrough_vert = SceneAssets.createShader("passthrough_vert", "./assets/shaders/passthrough.vert", ShaderType::VERTEX);
-		passthrough_frag = SceneAssets.createShader("passthrough_frag", "./assets/shaders/passthrough.frag", ShaderType::FRAGMENT);
+		passthrough_vert = SceneAssets.createShader("passthrough_vert", FileIO::readFile("./assets/shaders/passthrough.vert"), ShaderType::VERTEX);
+		passthrough_frag = SceneAssets.createShader("passthrough_frag", FileIO::readFile("./assets/shaders/passthrough.frag"), ShaderType::FRAGMENT);
 
-		skybox_vert = SceneAssets.createShader("skybox_vert", "./assets/shaders/skybox.vert", ShaderType::VERTEX);
-		skybox_frag = SceneAssets.createShader("skybox_frag", "./assets/shaders/skybox.frag", ShaderType::FRAGMENT);
+		skybox_vert = SceneAssets.createShader("skybox_vert", FileIO::readFile("./assets/shaders/skybox.vert"), ShaderType::VERTEX);
+		skybox_frag = SceneAssets.createShader("skybox_frag", FileIO::readFile("./assets/shaders/skybox.frag"), ShaderType::FRAGMENT);
 
-		lines_vert = SceneAssets.createShader("lines_vert", "./assets/shaders/lines.vert", ShaderType::VERTEX);
-		lines_geom = SceneAssets.createShader("lines_geom", "./assets/shaders/lines.geom", ShaderType::VERTEX);
-		lines_frag = SceneAssets.createShader("lines_frag", "./assets/shaders/lines.frag", ShaderType::FRAGMENT);
+		lines_vert = SceneAssets.createShader("lines_vert", FileIO::readFile("./assets/shaders/lines.vert"), ShaderType::VERTEX);
+		lines_geom = SceneAssets.createShader("lines_geom", FileIO::readFile("./assets/shaders/lines.geom"), ShaderType::GEOMETRY);
+		lines_frag = SceneAssets.createShader("lines_frag", FileIO::readFile("./assets/shaders/lines.frag"), ShaderType::FRAGMENT);
 
-		colorPicker_frag = SceneAssets.createShader("colorPicker_frag", "./assets/shaders/colorPicker.vert", ShaderType::FRAGMENT);
+		colorPicker_frag = SceneAssets.createShader("colorPicker_frag", FileIO::readFile("./assets/shaders/colorPicker.frag"), ShaderType::FRAGMENT);
 
-		gizmo_vert = SceneAssets.createShader("gizmo_vert", "./assets/shaders/gizmo.vert", ShaderType::VERTEX);
-		gizmo_frag = SceneAssets.createShader("gizmo_frag", "./assets/shaders/gizmo.frag", ShaderType::FRAGMENT);
+		gizmo_vert = SceneAssets.createShader("gizmo_vert", FileIO::readFile("./assets/shaders/gizmo.vert"), ShaderType::VERTEX);
+		gizmo_frag = SceneAssets.createShader("gizmo_frag", FileIO::readFile("./assets/shaders/gizmo.frag"), ShaderType::FRAGMENT);
 
-		showRenderTarget = SceneAssets.createShader("showRenderTarget", "./assets/shaders/showRenderTarget.vert", ShaderType::VERTEX);
+		showRenderTarget = SceneAssets.createShader("showRenderTarget", FileIO::readFile("./assets/shaders/showRenderTarget.frag"), ShaderType::FRAGMENT);
 
-		billboard_vert = SceneAssets.createShader("billboard_vert", "./assets/shaders/billboard.vert", ShaderType::VERTEX);
-		billboard_frag = SceneAssets.createShader("billboard_frag", "./assets/shaders/billboard.frag", ShaderType::FRAGMENT);
+		billboard_vert = SceneAssets.createShader("billboard_vert", FileIO::readFile("./assets/shaders/billboard.vert"), ShaderType::VERTEX);
+		billboard_frag = SceneAssets.createShader("billboard_frag", FileIO::readFile("./assets/shaders/billboard.frag"), ShaderType::FRAGMENT);
 
-		font_vert = SceneAssets.createShader("font_vert", "./assets/shaders/font.vert", ShaderType::VERTEX);
-		font_frag = SceneAssets.createShader("font_frag", "./assets/shaders/font.frag", ShaderType::FRAGMENT);
+		font_vert = SceneAssets.createShader("font_vert", FileIO::readFile("./assets/shaders/font.vert"), ShaderType::VERTEX);
+		font_frag = SceneAssets.createShader("font_frag", FileIO::readFile("./assets/shaders/font.frag"), ShaderType::FRAGMENT);
 
 		// Shader Programs
 		shader_gbuffer = SceneAssets.createShaderProgram("gbuffer", {
@@ -309,36 +309,38 @@ namespace Vxl
 		{
 			auto mat = SceneAssets.getMaterial(material_gbuffer);
 			mat->setSceneShader(shader_gbuffer);
+			mat->setTexture(Assets::getTexture2D(tex_beato), TextureLevel::LEVEL0);
 			mat->setSequenceID(2);
+			mat->m_cullType = CullMode::NO_CULL;
 		}
-		material_gbuffer_transparent = SceneAssets.createMaterial("gbuffer_transparent");
-		{
-			auto mat = SceneAssets.getMaterial(material_gbuffer_transparent);
-			mat->setSceneShader(shader_gbuffer);
-			mat->m_renderMode = MaterialRenderMode::Transparent;
-			mat->m_depthWrite = false;
-			mat->m_blendFunc.source = BlendSource::ONE;
-			mat->m_blendFunc.destination = BlendDestination::ONE;
-			// ignore color ID layer
-			mat->m_blendFuncAttachments[TextureLevel::LEVEL2].source = BlendSource::ONE;
-			mat->m_blendFuncAttachments[TextureLevel::LEVEL2].destination = BlendDestination::ONE;
-		}
-		material_passthroughWorld = SceneAssets.createMaterial("passthrough");
-		{
-			auto mat = SceneAssets.getMaterial(material_passthroughWorld);
-			mat->setSceneShader(shader_passthroughWorld);
-			mat->m_blendState = false;
-		}
-		material_passthroughWorld_transparent = SceneAssets.createMaterial("passthrough_transparent");
-		{
-			auto mat = SceneAssets.getMaterial(material_passthroughWorld_transparent);
-			mat->setSceneShader(shader_passthroughWorld);
-			mat->m_depthWrite = false;
-			mat->m_blendFunc.source = BlendSource::ONE;
-			mat->m_blendFunc.destination = BlendDestination::ONE;
-			mat->m_renderMode = MaterialRenderMode::Transparent;
-
-		}
+		//	material_gbuffer_transparent = SceneAssets.createMaterial("gbuffer_transparent");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_gbuffer_transparent);
+		//		mat->setSceneShader(shader_gbuffer);
+		//		mat->m_renderMode = MaterialRenderMode::Transparent;
+		//		mat->m_depthWrite = false;
+		//		mat->m_blendFunc.source = BlendSource::ONE;
+		//		mat->m_blendFunc.destination = BlendDestination::ONE;
+		//		// ignore color ID layer
+		//		mat->m_blendFuncAttachments[TextureLevel::LEVEL2].source = BlendSource::ONE;
+		//		mat->m_blendFuncAttachments[TextureLevel::LEVEL2].destination = BlendDestination::ONE;
+		//	}
+		//	material_passthroughWorld = SceneAssets.createMaterial("passthrough");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_passthroughWorld);
+		//		mat->setSceneShader(shader_passthroughWorld);
+		//		mat->m_blendState = false;
+		//	}
+		//	material_passthroughWorld_transparent = SceneAssets.createMaterial("passthrough_transparent");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_passthroughWorld_transparent);
+		//		mat->setSceneShader(shader_passthroughWorld);
+		//		mat->m_depthWrite = false;
+		//		mat->m_blendFunc.source = BlendSource::ONE;
+		//		mat->m_blendFunc.destination = BlendDestination::ONE;
+		//		mat->m_renderMode = MaterialRenderMode::Transparent;
+		//	
+		//	}
 		material_skybox = SceneAssets.createMaterial("skybox");
 		{
 			auto mat = SceneAssets.getMaterial(material_skybox);
@@ -346,39 +348,39 @@ namespace Vxl
 			mat->setTexture(SceneAssets.getCubemap(cubemap_craterlake), TextureLevel::LEVEL0);
 			mat->setSequenceID(1);
 		}
-		material_lines = SceneAssets.createMaterial("lines");
-		{
-			auto mat = SceneAssets.getMaterial(material_lines);
-			mat->setSceneShader(shader_lines);
-		}
-		material_colorPicker = SceneAssets.createMaterial("colorPicker");
-		{
-			auto mat = SceneAssets.getMaterial(material_colorPicker);
-			mat->setSceneShader(shader_colorPicker);
-		}
-		material_gizmo = SceneAssets.createMaterial("gizmo");
-		{
-			auto mat = SceneAssets.getMaterial(material_gizmo);
-			mat->setSceneShader(shader_gizmo);
-		}
-		material_showRenderTarget = SceneAssets.createMaterial("showRenderTarget");
-		{
-			auto mat = SceneAssets.getMaterial(material_showRenderTarget);
-			mat->setSceneShader(shader_showRenderTarget);
-		}
-		material_billboard = SceneAssets.createMaterial("billboard");
-		{
-			auto mat = SceneAssets.getMaterial(material_billboard);
-			mat->setSceneShader(shader_billboard);
-			mat->m_blendState = false;
-		}
-		material_font = SceneAssets.createMaterial("font");
-		{
-			auto mat = SceneAssets.getMaterial(material_font);
-			mat->setSceneShader(shader_font);
-			mat->m_depthRead = false;
-			mat->m_depthWrite = false;
-		}
+		//	material_lines = SceneAssets.createMaterial("lines");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_lines);
+		//		mat->setSceneShader(shader_lines);
+		//	}
+		//	material_colorPicker = SceneAssets.createMaterial("colorPicker");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_colorPicker);
+		//		mat->setSceneShader(shader_colorPicker);
+		//	}
+		//	material_gizmo = SceneAssets.createMaterial("gizmo");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_gizmo);
+		//		mat->setSceneShader(shader_gizmo);
+		//	}
+		//	material_showRenderTarget = SceneAssets.createMaterial("showRenderTarget");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_showRenderTarget);
+		//		mat->setSceneShader(shader_showRenderTarget);
+		//	}
+		//	material_billboard = SceneAssets.createMaterial("billboard");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_billboard);
+		//		mat->setSceneShader(shader_billboard);
+		//		mat->m_blendState = false;
+		//	}
+		//	material_font = SceneAssets.createMaterial("font");
+		//	{
+		//		auto mat = SceneAssets.getMaterial(material_font);
+		//		mat->setSceneShader(shader_font);
+		//		mat->m_depthRead = false;
+		//		mat->m_depthWrite = false;
+		//	}
 
 		//material_skybox = Material::Create("skybox", 0);
 		//material_skybox->SetProgram(*_shader_skybox);
@@ -487,8 +489,10 @@ namespace Vxl
 		camera_main = SceneAssets.createCamera("_camera_editor", 0.01f, 5000.0f);
 		{
 			Camera* camera_ptr = SceneAssets.getCamera(camera_main);
-			camera_ptr->m_transform.setPosition(3.5f, 2.8f, 0.3f);
-			camera_ptr->m_transform.setCameraForward(Vector3(-1, 0, -1));
+			//camera_ptr->m_transform.setPosition(3.5f, 2.8f, 0.3f);
+			//camera_ptr->m_transform.setCameraForward(Vector3(-1, 0, -1));
+			camera_ptr->m_transform.setPosition(0, 0, 0);
+			camera_ptr->m_transform.setCameraForward(Vector3(0, 0, -1));
 			camera_ptr->SetPerspectiveWindowAspect(110.0f);
 			camera_ptr->update();
 		}
@@ -501,6 +505,9 @@ namespace Vxl
 			camera_ptr->update();
 		}
 
+		// Main Camera
+		RenderManager.m_mainCamera = camera_main;
+
 		// Entities
 		entity_skybox = SceneAssets.createEntity("_skybox");
 		{
@@ -512,10 +519,12 @@ namespace Vxl
 		}
 		entity_error_cube = SceneAssets.createEntity("_errorCube");
 		{
-			Entity* entity_ptr = SceneAssets.getEntity(entity_skybox);
+			Entity* entity_ptr = SceneAssets.getEntity(entity_error_cube);
 			entity_ptr->setMaterial(material_gbuffer);
-			entity_ptr->setMaterial(Geometry.GetCube());
+			entity_ptr->setMesh(Geometry.GetCube());
+			entity_ptr->m_transform.setPosition(Vector3(0, 0, 0));
 		}
+
 
 		//			// Entities
 		//			GameObject* _skybox = GameObject::Create("_skybox");
@@ -896,11 +905,12 @@ namespace Vxl
 		auto* fbo_showRenderTarget = SceneAssets.getFramebufferObject(fboIndex_showRenderTarget);
 		
 		// GUI Setup [needs to be changed]
+#ifdef GLOBAL_IMGUI
 		GUIViewport.fboIndex_gbuffer = this->fboIndex_gbuffer;
 		GUIViewport.fboIndex_editor = this->fboIndex_editor;
+#endif
 
 		// UBO BINDING per frame
-		RenderManager.m_mainCamera = camera_main;
 		auto _cameraObject = Assets::getCamera(camera_main);
 
 		UBOManager.BindCamera(*_cameraObject);
@@ -915,6 +925,8 @@ namespace Vxl
 		// Sort Objects
 		RenderManager.sortEntities();
 		//
+		RenderManager.renderOpaque();
+		RenderManager.renderTransparent();
 		//RenderManager.RenderSceneGameObjects_Opaque();
 
 		//	// Remember Depth gbuffer depth
@@ -988,7 +1000,7 @@ namespace Vxl
 
 
 		//
-		GPUTimer::EndTimer();
+		//GPUTimer::EndTimer();
 
 		// Selection Data
 		//if (RenderManager.GetAllEntities().size() > 0)

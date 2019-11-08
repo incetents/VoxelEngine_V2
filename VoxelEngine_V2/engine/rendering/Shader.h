@@ -32,6 +32,7 @@ namespace Vxl
 		bool				m_compiled;
 		const ShaderType	m_type;
 		std::string			m_source;
+		std::string			m_sourceLines;
 		std::string			m_errorMessage;
 		static std::map<ShaderID, _Shader*> m_brokenShaders;
 

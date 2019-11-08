@@ -63,7 +63,8 @@ namespace Vxl
 
 			// Call entity about change in transform class
 			Entity* owner = Assets::getEntity(m_owner);
-			owner->TransformChanged();
+			if(owner)
+				owner->TransformChanged();
 		}
 	}
 

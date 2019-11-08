@@ -68,6 +68,8 @@ namespace Vxl
 		// Utility
 		void sortEntities();
 		void render(MaterialIndex _material, const std::vector<Entity*>& _entities);
+		void renderOpaque();
+		void renderTransparent();
 
 		// Utility
 		void SetNewScene(Scene* _scene);

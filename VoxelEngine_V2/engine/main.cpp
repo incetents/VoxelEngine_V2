@@ -24,10 +24,6 @@ int main()
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 #endif
 {
-	// GLFW Setup
-	if (!Window.InitGLFW())
-		return -1;
-
 	// Window
 	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
 	//Window.SetCustomAspectRatio(true, 1.0f);
@@ -74,13 +70,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 		// End of frame update
 		Input.Update();
+
 		Window.EndFrame();
+
+		//Window.test();
+
 		TimeController.EndFrame();
+
 
 		// Special
 #if _DEBUG
 		Graphics::GetRuntimeGLValues();
 #endif
+
+		
 	}
 
 	// Cleanup

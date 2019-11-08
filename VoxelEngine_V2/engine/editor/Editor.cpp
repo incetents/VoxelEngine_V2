@@ -19,8 +19,6 @@ namespace Vxl
 	}
 	void Editor::AddSelection(EntityIndex _entity)
 	{
-		VXL_ASSERT(_entity, "Adding nullptr in Editor::AddSelection");
-
 		for (const auto& _Entity : m_selectedEntities)
 			if (_Entity == _entity)
 				return;
@@ -34,7 +32,8 @@ namespace Vxl
 		for (auto _entity : m_selectedEntities)
 		{
 			Entity* entity = Assets::getEntity(_entity);
-			entity->m_isSelected = false;
+			if(entity)
+				entity->m_isSelected = false;
 		}
 		m_selectedEntities.clear();
 	}

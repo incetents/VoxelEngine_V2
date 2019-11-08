@@ -55,7 +55,7 @@ namespace Vxl
 		std::string	m_name;
 		Transform	m_transform;
 		Color3F		m_labelColor	= Color3F(1, 1, 1); // Inspector
-		Color3F		m_Color			= Color3F(1, 1, 1);
+		Color3F		m_Color			= Color3F(0, 0, 0);
 		Color3F		m_Tint			= Color3F(1, 1, 1);
 		float		m_alpha			= 1.0f;
 		bool		m_useTransform	= true;

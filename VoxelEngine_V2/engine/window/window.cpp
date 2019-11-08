@@ -33,6 +33,9 @@ namespace Vxl
 		if (m_setup)
 			return;
 
+		if (!InitGLFW())
+			return;
+
 		m_name = name;
 		UpdateSizes(width, height);
 		m_resolution[0] = width;
@@ -53,6 +56,8 @@ namespace Vxl
 			Logger.error("Glfw could not create a new window: " + m_name);
 			return;
 		}
+		glfwMakeContextCurrent(m_window);
+
 		// default position
 		SetPosition(393, 296);
 		// default cursor
@@ -63,8 +68,6 @@ namespace Vxl
 		glfwGetWindowPos(m_window, &posx, &posy);
 		m_position[0] = (uint32_t)posx;
 		m_position[1] = (uint32_t)posy;
-
-		glfwMakeContextCurrent(m_window);
 
 		// Setup callbacks
 		glfwSetKeyCallback				(m_window, glfwCallbacks::Keyboard);
@@ -79,6 +82,19 @@ namespace Vxl
 		glfwSetDropCallback				(m_window, glfwCallbacks::Drag_File);
 		glfwSetErrorCallback			(glfwCallbacks::Error);
 		
+		// Graphics Setup
+		if(!Graphics::Setup())
+			VXL_ASSERT(false, "Glew failed to initialized");
+		Graphics::initHints();
+
+		// Get version info
+		Logger.log("~~~~~~~~~~~~~~~~~~");
+		Logger.log("Renderer: " + Graphics::Gpu_Renderer);
+		Logger.log("OpenGL version supported: " + Graphics::Gpu_OpenGLVersion);
+		Logger.log("Vendor: " + Graphics::Gpu_Vendor);
+		Logger.log("~~~~~~~~~~~~~~~~~~");
+
+		
 
 #ifdef GLOBAL_IMGUI
 		// IMGUI Setup
@@ -89,29 +105,16 @@ namespace Vxl
 		auto& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigDockingWithShift = false;
+		static bool once = true;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-#endif
 
-		// Graphics Setup
-		if(!Graphics::Setup())
-			VXL_ASSERT(false, "Glew failed to initialized");
-		Graphics::initHints();
-
-#ifdef GLOBAL_IMGUI
 		ImGui_ImplGlfw_InitForOpenGL(GetContext(), true);
 		ImGui_ImplOpenGL3_Init("#version 420 core");
 #endif
-
-		// Get version info
-		Logger.log("~~~~~~~~~~~~~~~~~~");
-		Logger.log("Renderer: " + Graphics::Gpu_Renderer);
-		Logger.log("OpenGL version supported: " + Graphics::Gpu_OpenGLVersion);
-		Logger.log("Vendor: " + Graphics::Gpu_Vendor);
-		Logger.log("~~~~~~~~~~~~~~~~~~");
-
 		// Create first frame empty
 		// (so it can create all gl assets necesary here without interfering with opengl error callback)
 		StartFrame();
+
 #ifdef GLOBAL_IMGUI
 		ImGui::NewFrame();
 		ImGui::Render();
@@ -119,13 +122,13 @@ namespace Vxl
 		EndFrame();
 
 		// opengl error callback
-		Graphics::InitOpenGLDebugCallback();
+		//Graphics::InitOpenGLDebugCallback();
 
 		m_setup = true;
 	}
 	void Window::Reload()
 	{
-		Destroy();
+		Shutdown();
 		m_setup = false;
 		Setup(m_name, m_size[0], m_size[1]);
 	}
@@ -175,16 +178,7 @@ namespace Vxl
 			}
 		}
 	}
-	void Window::Destroy()
-	{
-		glfwDestroyWindow(m_window);
 
-#ifdef GLOBAL_IMGUI
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-#endif
-	}
 	void Window::StartFrame()
 	{
 #ifdef GLOBAL_IMGUI
@@ -199,13 +193,15 @@ namespace Vxl
 
 		auto& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			//GLFWwindow* backup_current_context = m_window;
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
+			glfwMakeContextCurrent(m_window);
 		}
 #endif
-		Update();
+
+		glfwSwapBuffers(m_window);
+		glfwPollEvents();
 	}
 
 	void Window::SetPosition(uint32_t x, uint32_t y)
@@ -292,12 +288,6 @@ namespace Vxl
 			Graphics::SetViewport(0, 0, m_size[0], m_size[1]);
 	}
 
-	void Window::Update()
-	{
-		glfwSwapBuffers(m_window);
-		glfwPollEvents();
-	}
-
 	void Window::Shutdown()
 	{
 #ifdef GLOBAL_IMGUI
@@ -305,7 +295,8 @@ namespace Vxl
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 #endif
-
 		glfwDestroyWindow(m_window);
+		glfwTerminate();
+		m_window = nullptr;
 	}
 }

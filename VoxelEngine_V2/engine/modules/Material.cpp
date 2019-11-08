@@ -102,7 +102,7 @@ namespace Vxl
 	}
 	void _Material::bindTextures()
 	{
-		if (!m_wireframe)
+		if (m_wireframe)
 			return;
 
 		// Null Texture if no textures are used
@@ -179,7 +179,7 @@ namespace Vxl
 			if (m_renderMode == MaterialRenderMode::Transparent)
 				m_uniform_alpha.value().send(_entity->m_alpha);
 			else
-				m_uniform_alpha.value().send(0.0f);
+				m_uniform_alpha.value().send(1.0f);
 		}
 		
 		// ~ ColorID ~ //
