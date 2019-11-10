@@ -8,18 +8,21 @@
 
 #include "../rendering/Mesh.h"
 #include "../rendering/RenderManager.h"
+
 #include "../utilities/Time.h"
 #include "../utilities/Logger.h"
+#include "../utilities/Asset.h"
 
+#include <algorithm>
 #include <limits>
 
 namespace Vxl
 {
 	// Unique IDs
-
 	Entity::Entity(const std::string& name)
 		: m_name(name)
 	{
+		addComponent(&m_transform);
 	}
 	Entity::~Entity()
 	{
@@ -34,6 +37,32 @@ namespace Vxl
 	void Entity::setMaterial(MaterialIndex index)
 	{
 		m_material = index;
+	}
+
+	bool Entity::IsFamilyActive()
+	{
+		// if no parent, check normal active state
+		Transform* parent = m_transform.getParent();
+		if (parent == nullptr)
+			return m_isActive;
+
+		// auto fail if off
+		if (!m_isActive)
+			return false;
+
+		// iterate through all parents
+		while (parent != nullptr)
+		{
+			Entity* owner = Assets::getEntity(parent->m_owner);
+			VXL_ASSERT(owner, "Component not attached to entity");
+			if (!owner->m_isActive)
+				return false;
+			// Acquire new parent
+			else
+				parent = owner->m_transform.getParent();
+		}
+		// If no parents failed, that means it's all good
+		return true;
 	}
 
 	// Update Bounding Box from Mesh

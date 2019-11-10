@@ -163,7 +163,6 @@ namespace Vxl
 
 		void BindWindowViewport();
 		
-		bool InitGLFW();
 		void Setup(
 			const std::string& name,
 			uint32_t width,

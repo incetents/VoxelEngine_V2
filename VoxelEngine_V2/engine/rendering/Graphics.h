@@ -377,6 +377,8 @@ namespace Vxl
 		LEVEL6,
 		LEVEL7,
 		LEVEL8,
+
+		TOTAL
 	};
 	enum class AnisotropicMode
 	{

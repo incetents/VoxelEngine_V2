@@ -139,13 +139,24 @@ namespace Vxl
 		}
 		std::string extractNameFromPath(const std::string& str)
 		{
-			size_t loc1 = str.find_last_of('\\');
+			// Extract final directory
+			size_t location1 = str.find_last_of('\\');
 
-			// Nothing found
-			if (loc1 == std::string::npos)
+			if (location1 == std::string::npos)
+				location1 = str.find_last_of('/');
+
+			if (location1 == std::string::npos)
 				return std::string();
 
-			return str.substr(loc1 + 1, str.length() - loc1 - 1);
+			// Extract extension
+			size_t location2 = str.find_last_of('.');
+
+			// No extension
+			if(location2 == std::string::npos)
+				return str.substr(location1 + 1, str.length() - location1 - 1);
+
+			//
+			return str.substr(location1 + 1, location2 - location1 - 1);
 		}
 		std::string extractSection(const std::string& str, char start, char end, std::size_t startIndex)
 		{

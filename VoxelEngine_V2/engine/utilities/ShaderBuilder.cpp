@@ -5,6 +5,7 @@
 #include "stringUtil.h"
 #include "FileIO.h"
 #include "../rendering/Shader.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {

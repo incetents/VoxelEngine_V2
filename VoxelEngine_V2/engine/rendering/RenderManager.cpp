@@ -40,6 +40,8 @@
 #include "../editorGui/ShaderErrors.h"
 #include "../editorGui/ShaderCodeViewer.h"
 
+#include "../utilities/Asset.h"
+
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
@@ -106,10 +108,10 @@ namespace Vxl
 	}
 	void RenderManager::ReloadWindow()
 	{
-		//Graphics::initHints(); // Newer version
+		Graphics::initHints(); // Newer version
 
-		//DestroyGlobalGLResources();
-		//DestroySceneGLResources();
+		DestroyGlobalGLResources();
+		DestroySceneGLResources();
 
 		Window.Reload();
 
@@ -151,7 +153,7 @@ namespace Vxl
 		
 		Geometry.InitGLResources();
 
-		GlobalData.InitGLResources();
+		GlobalAssets.InitGLResources();
 	}
 	void RenderManager::DestroyGlobalGLResources()
 	{

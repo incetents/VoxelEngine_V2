@@ -8,7 +8,8 @@
 #include <map>
 #include <stack>
 #include <vector>
-//#include <algorithm>
+
+#include "Types.h"
 
 #include "../math/Color.h"
 #include "../utilities/Logger.h"
@@ -44,20 +45,6 @@ namespace Vxl
 	enum class TextureDepthFormat;
 	enum class ShaderType;
 
-	using Texture2DIndex = uint32_t;
-	using CubemapIndex = uint32_t;
-	using FramebufferObjectIndex = uint32_t;
-	using RenderTextureIndex = uint32_t;
-	using RenderTextureDepthIndex = uint32_t;
-	using RenderBufferIndex = uint32_t;
-	using RenderBufferDepthIndex = uint32_t;
-	using MeshIndex = uint32_t;
-	using ShaderIndex = uint32_t;
-	using ShaderProgramIndex = uint32_t;
-	using MaterialIndex = uint32_t;
-	using EntityIndex = uint32_t;
-	using CameraIndex = uint32_t;
-
 	enum class AssetType
 	{
 		GLOBAL,
@@ -67,7 +54,10 @@ namespace Vxl
 	template<class Type>
 	class IDStorage
 	{
+		DISALLOW_COPY_AND_ASSIGN(IDStorage);
 	public:
+		IDStorage() {}
+
 		static uint32_t				m_nextID;
 		std::stack<uint32_t>		m_deletedIDs;
 		std::map<uint32_t, Type*>	m_storage;
@@ -174,7 +164,10 @@ namespace Vxl
 	template<class Type>
 	class NamedStorage
 	{
+		DISALLOW_COPY_AND_ASSIGN(NamedStorage);
 	public:
+		NamedStorage() {}
+
 		std::map<std::string, Type*> m_storage;
 		std::map<std::string, Type*> m_storage_typeGlobal;
 		std::map<std::string, Type*> m_storage_typeScene;
@@ -316,20 +309,20 @@ namespace Vxl
 		static Camera*				getCamera(CameraIndex index) { return m_camera_storage.Get(index); }
 
 		// Get All
-		static std::map<uint32_t, Texture2D*>&			getAllTexture2D() { return m_texture2D_storage.GetAll(); }
-		static std::map<uint32_t, Cubemap*>&			getAllCubemap() { return m_cubemap_storage.GetAll(); }
-		static std::map<std::string, File*>&			getAllFiles() { return m_file_storage.GetAll(); }
-		static std::map<uint32_t, FramebufferObject*>&	getAllFramebufferObject() { return m_framebufferObject_storage.GetAll(); }
-		static std::map<uint32_t, RenderTexture*>&		getAllRenderTexture() { return m_renderTexture_storage.GetAll(); }
-		static std::map<uint32_t, RenderTextureDepth*>& getAllRenderTextureDepth() { return m_renderTextureDepth_storage.GetAll(); }
-		static std::map<uint32_t, RenderBuffer*>&		getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(); }
-		static std::map<uint32_t, RenderBufferDepth*>&	getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(); }
-		static std::map<uint32_t, Mesh*>&				getAllMesh() { return m_mesh_storage.GetAll(); }
-		static std::map<uint32_t, _Shader*>&			getAllShader() { return m_shader_storage.GetAll(); }
-		static std::map<uint32_t, _ShaderProgram*>&		getAllShaderProgram() { return m_shaderProgram_storage.GetAll(); }
-		static std::map<uint32_t, _Material*>&			getAllMaterial() { return m_material_storage.GetAll(); }
-		static std::map<uint32_t, Entity*>&				getAllEntity() { return m_entity_storage.GetAll(); }
-		static std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(); }
+		static std::map<uint32_t, Texture2D*>&				getAllTexture2D() { return m_texture2D_storage.GetAll(); }
+		static std::map<uint32_t, Cubemap*>&				getAllCubemap() { return m_cubemap_storage.GetAll(); }
+		static std::map<std::string, File*>&				getAllFiles() { return m_file_storage.GetAll(); }
+		static std::map<uint32_t, FramebufferObject*>&		getAllFramebufferObject() { return m_framebufferObject_storage.GetAll(); }
+		static std::map<uint32_t, RenderTexture*>&			getAllRenderTexture() { return m_renderTexture_storage.GetAll(); }
+		static std::map<uint32_t, RenderTextureDepth*>&		getAllRenderTextureDepth() { return m_renderTextureDepth_storage.GetAll(); }
+		static std::map<uint32_t, RenderBuffer*>&			getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(); }
+		static std::map<uint32_t, RenderBufferDepth*>&		getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(); }
+		static std::map<uint32_t, Mesh*>&					getAllMesh() { return m_mesh_storage.GetAll(); }
+		static std::map<uint32_t, _Shader*>&				getAllShader() { return m_shader_storage.GetAll(); }
+		static std::map<uint32_t, _ShaderProgram*>&			getAllShaderProgram() { return m_shaderProgram_storage.GetAll(); }
+		static std::map<uint32_t, _Material*>&				getAllMaterial() { return m_material_storage.GetAll(); }
+		static std::map<uint32_t, Entity*>&					getAllEntity() { return m_entity_storage.GetAll(); }
+		static std::map<uint32_t, Camera*>&					getAllCamera() { return m_camera_storage.GetAll(); }
 
 		//
 		Texture2DIndex loadTexture2D(
@@ -348,8 +341,6 @@ namespace Vxl
 			TextureWrapping		WrapMode,
 			TextureFilter		FilterMode,
 			TextureFormat		FormatType,
-			TextureChannelType	ChannelType,
-			TexturePixelType	PixelType,
 			AnisotropicMode		AnisotropicMode
 		);
 		Texture2DIndex createTexture2D(
@@ -418,6 +409,7 @@ namespace Vxl
 		ShaderProgramIndex createShaderProgram(const std::string& name, std::initializer_list<_Shader*> _shaders);
 		// 
 		MaterialIndex createMaterial(const std::string& name);
+		MaterialIndex createMaterialFromFile(const std::string& filePath);
 		//
 		EntityIndex createEntity(const std::string& name);
 		//
@@ -428,6 +420,7 @@ namespace Vxl
 	
 	static class SceneAssets : public Assets, public Singleton<class SceneAssets>
 	{
+		DISALLOW_COPY_AND_ASSIGN(SceneAssets);
 	public:
 		SceneAssets()
 		{
@@ -454,10 +447,21 @@ namespace Vxl
 
 	static class GlobalAssets : public Assets, public Singleton<class GlobalAssets>
 	{
+		DISALLOW_COPY_AND_ASSIGN(GlobalAssets);
+
+		friend class RenderManager;
+		void InitGLResources();
+
+		// Generic Global Data
+		Texture2DIndex texID_nullImageCheckerboard;
+		Texture2DIndex texID_nullImageBlack;
+		Texture2DIndex texID_editor_camera;
+		Texture2DIndex texID_editor_light;
+
 	public:
 		GlobalAssets()
 		{
-			m_creationType = AssetType::SCENE;
+			m_creationType = AssetType::GLOBAL;
 		}
 
 		// Get All
@@ -476,186 +480,13 @@ namespace Vxl
 		static std::map<uint32_t, Entity*>&				getAllEntity() { return m_entity_storage.GetAll(AssetType::GLOBAL); }
 		static std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(AssetType::GLOBAL); }
 
+		// Get Specific Global Data
+		Texture2D* getTex2DNullImageCheckerboard() { return m_texture2D_storage.Get(texID_nullImageCheckerboard); }
+		Texture2D* getTex2DNullImageBlack() { return m_texture2D_storage.Get(texID_nullImageBlack); }
+		Texture2D* getTex2DEditorCamera() { return m_texture2D_storage.Get(texID_editor_camera); }
+		Texture2D* getTex2DEditorLight() { return m_texture2D_storage.Get(texID_editor_light); }
+		
+
 	} SingletonInstance(GlobalAssets);
 
-	//// Plan to make obsolete below //
-
-	//enum class AssetMessage
-	//{
-	//	NONE,
-	//	CREATED,
-	//	LOADED
-	//};
-
-	//// Storage for objects with names
-	//template<class Type>
-	//class Asset
-	//{
-	//	using UNNAMED_ASSETS = std::set<Type*>;
-	//	using NAMED_ASSETS = std::map<std::string, Type*>;
-	//protected:
-	//	// Protect Construction
-	//	Asset() {}
-
-	//	// No copy
-	//	Asset(const Asset&) = delete;
-	//	Asset<Type>& operator=(const Asset&) = delete;
-	//	
-	//	// Database
-	//	static UNNAMED_ASSETS m_unnamed_assets;
-	//	static NAMED_ASSETS m_named_assets;
-	//	
-	//	// If name already exists, append additional info on it to make it unique
-	//	static std::string FixNameDuplicate(const std::string& name)
-	//	{
-	//		std::string Finalname = name;
-	//		int DuplicateCounter = 0;
-	//		// Add to name if duplicate found
-	//		while (m_named_assets.find(Finalname) != m_named_assets.end())
-	//			Finalname = name + " (" + std::to_string(DuplicateCounter++) + ')';
-	//		// Return
-	//		return Finalname;
-	//	}
-	//	// Add
-	//	static void AddNamedAsset(const std::string& name, Type* object, AssetMessage message)
-	//	{
-	//		// Delete object with the same name
-	//		if (m_named_assets.find(name) != m_named_assets.end())
-	//		{
-	//			Logger.error("Duplicate [" + name + "]\t\t object: " + std::string(typeid(Type).name()));
-	//			delete m_named_assets[name];
-	//		}
-
-	//		// Message
-	//		switch (message)
-	//		{
-	//		case AssetMessage::CREATED:
-	//			Logger.log("Created [" + name + "]\t\t object: " + std::string(typeid(Type).name()));
-	//			break;
-	//		case AssetMessage::LOADED:
-	//			Logger.log("Loaded [" + name + "]\t\t object: " + std::string(typeid(Type).name()));
-	//			break;
-	//		}
-
-	//		// Store
-	//		m_named_assets[name] = object;
-	//	}
-	//	static void AddUnnamedAsset(Type* object, AssetMessage message)
-	//	{
-	//		std::ostringstream address;
-	//		address << (void const *)object;
-	//		std::string name = address.str();
-
-	//		// Message
-	//		switch (message)
-	//		{
-	//		case AssetMessage::CREATED:
-	//		{
-	//			Logger.log("Created Object, Ptr = " + name + "\t\t object: " + std::string(typeid(Type).name()));
-	//			break;
-	//		}
-	//		case AssetMessage::LOADED:
-	//			Logger.log("Loaded Object, Ptr = " + name + "]\t\t object: " + std::string(typeid(Type).name()));
-	//			break;
-	//		}
-
-	//		// Check for duplicate
-	//		if(m_unnamed_assets.find(object) != m_unnamed_assets.end())
-	//			Logger.error("Duplicate Object, Ptr = " + name + "]\t\t object: " + std::string(typeid(Type).name()));
-
-	//		// Store
-	//		m_unnamed_assets.insert(object);
-	//	}
-	//public:
-
-	//	// ~ Utility ~ //
-	//	static bool CheckAsset(const std::string& name)
-	//	{
-	//		return (m_named_assets.find(name) != m_named_assets.end());
-	//	}
-	//	// Returns newName [ in case it had to modified such as "newName(0)" ]
-	//	static std::string RenameAsset(const std::string& _oldName, const std::string& _newName)
-	//	{
-	//		VXL_ASSERT(CheckAsset(_oldName), "No Asset with name: " + _oldName);
-
-	//		Type* _asset = m_named_assets[_oldName];
-	//		m_named_assets.erase(_oldName);
-
-	//		std::string newName = FixNameDuplicate(_newName);
-	//		m_named_assets[newName] = _asset;
-	//		return newName;
-	//	}
-
-	//	// ~ Asset Deletion ~ //
-	//	static void DeleteNamedAsset(const std::string& name)
-	//	{
-	//		// Delete object if exists
-	//		if (m_named_assets.find(name) != m_named_assets.end())
-	//		{
-	//			auto object = m_named_assets[name];
-	//			m_named_assets.erase(name);
-	//			delete object;
-	//		}
-	//	}
-	//	static void DeleteNamedAsset(Type* object)
-	//	{
-	//		if (!object)
-	//			return;
-
-	//		for (auto it = m_named_assets.begin(); it != m_named_assets.end(); it++)
-	//		{
-	//			if (it->second == object)
-	//			{
-	//				m_named_assets.erase(it->first);
-	//				break;
-	//			}
-	//		}
-	//		delete object;
-	//	}
-	//	static void DeleteUnnamedAsset(Type* object)
-	//	{
-	//		if (!object)
-	//			return;
-
-	//		if (m_unnamed_assets.find(object) != m_unnamed_assets.end())
-	//		{
-	//			m_unnamed_assets.erase(object);
-	//			delete object;
-	//		}
-	//	}
-	//	static void DeleteAllAssets(void)
-	//	{
-	//		for (auto it = m_named_assets.begin(); it != m_named_assets.end(); it++)
-	//			delete it->second;
-
-	//		for (auto it = m_unnamed_assets.begin(); it != m_unnamed_assets.end(); it++)
-	//			delete *it;
-
-	//		m_named_assets.clear();
-	//		m_unnamed_assets.clear();
-	//	}
-
-	//	// ~ Get Asset Info ~ //
-	//	static Type* GetAsset(const std::string name)
-	//	{
-	//		if (m_named_assets.find(name) != m_named_assets.end())
-	//		{
-	//			return m_named_assets[name];
-	//		}
-	//		return nullptr;
-	//	}
-	//	static NAMED_ASSETS GetAllNamedAssets(void)
-	//	{
-	//		return m_named_assets;
-	//	}
-	//	static size_t GetAssetCount(void)
-	//	{
-	//		return m_named_assets.size();
-	//	}
-	//};
-
-	//template<class Type>
-	//std::set<Type*> Asset<Type>::m_unnamed_assets;
-	//template<class Type>
-	//std::map<std::string, Type*> Asset<Type>::m_named_assets;
 }

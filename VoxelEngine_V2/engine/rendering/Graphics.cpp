@@ -73,7 +73,7 @@ namespace Vxl
 	BlendEquation		gl_blendequation = BlendEquation::NONE;
 	DepthPassRule		gl_depthpassrule = DepthPassRule::NONE;
 	GLsizei				gl_viewport[4] = { -1, -1, -1, -1 };
-	TextureID			gl_activeTextureId = 0;
+	std::map<TextureLevel, TextureID> gl_activeTextureIds;
 	RenderBufferID		gl_activeBufferId = 0;
 	TextureLevel		gl_activeTextureLayer = TextureLevel::NONE;
 	FramebufferObjectID gl_activeFBO = 0;
@@ -566,7 +566,11 @@ namespace Vxl
 			gl_viewport[i] = -1;
 		gl_lineWidth = 1.0f;
 
-		gl_activeTextureId = 0;
+		gl_activeTextureIds.clear();
+		for (int i = 1; i < (int)TextureLevel::TOTAL; i++)
+		{
+			gl_activeTextureIds[(TextureLevel)i] = 0;
+		}
 		gl_activeTextureLayer = TextureLevel::NONE;
 
 		gl_activeBufferId = 0;
@@ -2067,23 +2071,23 @@ namespace Vxl
 	}
 	void Graphics::Texture::Bind(TextureType type, TextureID textureID)
 	{
-		if (gl_activeTextureId == textureID)
+		if(gl_activeTextureIds[gl_activeTextureLayer] == textureID)
 			return;
 
 		glBindTexture(GL_TextureType[(int)type], textureID);
-		gl_activeTextureId = textureID;
+		gl_activeTextureIds[gl_activeTextureLayer] = textureID;
 	}
 	void Graphics::Texture::Unbind(TextureType type)
 	{
-		if (gl_activeTextureId == 0)
+		if (gl_activeTextureIds[gl_activeTextureLayer] == 0)
 			return;
 
 		glBindTexture(GL_TextureType[(int)type], 0);
-		gl_activeTextureId = 0;
+		gl_activeTextureIds[gl_activeTextureLayer] = 0;
 	}
 	TextureID Graphics::Texture::GetCurrentlyBound(void)
 	{
-		return gl_activeTextureId;
+		return gl_activeTextureIds[gl_activeTextureLayer];
 	}
 	void Graphics::Texture::SetActiveLevel(TextureLevel level)
 	{

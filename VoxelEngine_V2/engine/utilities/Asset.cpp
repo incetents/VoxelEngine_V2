@@ -31,69 +31,133 @@ namespace Vxl
 	IDStorage<Entity>			  Assets::m_entity_storage;
 	IDStorage<Camera>			  Assets::m_camera_storage;
 
+	void GlobalAssets::InitGLResources()
+	{
+		// Editor Textures
+		texID_editor_camera = loadTexture2D(
+			"./assets/textures/editor_camera.png",
+			true,
+			true,
+			TextureWrapping::REPEAT,
+			TextureFilter::LINEAR,
+			TextureFormat::RGBA8,
+			TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode::NONE
+		);
+
+		//
+		texID_editor_light = loadTexture2D(
+			"./assets/textures/editor_lightbulb.png",
+			true,
+			true,
+			TextureWrapping::REPEAT,
+			TextureFilter::LINEAR,
+			TextureFormat::RGBA8,
+			TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode::NONE
+		);
+
+		// Debug Texture - checkerboard
+		{
+			std::vector<Color3F> pixels;
+			pixels.reserve(16);
+
+			pixels.push_back(Color3F::PURPLE);
+			pixels.push_back(Color3F::BLACK);
+			pixels.push_back(Color3F::PURPLE);
+			pixels.push_back(Color3F::BLACK);
+
+			pixels.push_back(Color3F::BLACK);
+			pixels.push_back(Color3F::PURPLE);
+			pixels.push_back(Color3F::BLACK);
+			pixels.push_back(Color3F::PURPLE);
+
+			pixels.push_back(Color3F::PURPLE);
+			pixels.push_back(Color3F::BLACK);
+			pixels.push_back(Color3F::PURPLE);
+			pixels.push_back(Color3F::BLACK);
+
+			pixels.push_back(Color3F::BLACK);
+			pixels.push_back(Color3F::PURPLE);
+			pixels.push_back(Color3F::BLACK);
+			pixels.push_back(Color3F::PURPLE);
+
+			texID_nullImageCheckerboard = createTexture2D(
+				pixels, 4, true,
+				TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
+				TextureFormat::RGB8, AnisotropicMode::NONE
+			);
+		}
+		// Debug texture - black
+		{
+			std::vector<Color3F> pixels;
+		}
+
+	}
+
 	void Assets::DestroyAndEraseAll()
 	{
 		// Delete All Assets
-		auto& textures = getAllTexture2D();
+		auto& textures = m_texture2D_storage.GetAll(m_creationType);
 		for (auto& texture : textures)
 			delete texture.second;
 
-		auto& cubemaps = getAllCubemap();
+		auto& cubemaps = m_cubemap_storage.GetAll(m_creationType);
 		for (auto& cubemap : cubemaps)
 			delete cubemap.second;
 
-		auto& files = getAllFiles();
+		auto& files = m_file_storage.GetAll(m_creationType);
 		for (auto& file : files)
 			delete file.second;
 
-		auto& fbos = getAllFramebufferObject();
+		auto& fbos = m_framebufferObject_storage.GetAll(m_creationType);
 		for (auto& fbo : fbos)
 			delete fbo.second;
 
-		auto& renderTexture = getAllRenderTexture();
+		auto& renderTexture = m_renderTexture_storage.GetAll(m_creationType);
 		for (auto& rt : renderTexture)
 			delete rt.second;
 
-		auto& renderTextureDepth = getAllRenderTextureDepth();
+		auto& renderTextureDepth = m_renderTextureDepth_storage.GetAll(m_creationType);
 		for (auto& rtd : renderTextureDepth)
 			delete rtd.second;
 
-		auto& renderBuffer = getAllRenderBuffer();
+		auto& renderBuffer = m_renderBuffer_storage.GetAll(m_creationType);
 		for (auto& rb : renderBuffer)
 			delete rb.second;
 
-		auto& renderBufferDepth = getAllRenderBufferDepth();
+		auto& renderBufferDepth = m_renderBufferDepth_storage.GetAll(m_creationType);
 		for (auto& rbd : renderBufferDepth)
 			delete rbd.second;
 
-		auto& meshes = getAllMesh();
+		auto& meshes = m_mesh_storage.GetAll(m_creationType);
 		for (auto& mesh : meshes)
 			delete mesh.second;
 
-		auto& shaders = getAllShader();
+		auto& shaders = m_shader_storage.GetAll(m_creationType);
 		for (auto& shader : shaders)
 			delete shader.second;
 
-		auto& shaderPrograms = getAllShaderProgram();
+		auto& shaderPrograms = m_shaderProgram_storage.GetAll(m_creationType);
 		for (auto& sp : shaderPrograms)
 			delete sp.second;
 
-		auto& materials = getAllMaterial();
+		auto& materials = m_material_storage.GetAll(m_creationType);
 		for (auto& mat : materials)
 			delete mat.second;
 
-		auto& entities = getAllEntity();
+		auto& entities = m_entity_storage.GetAll(m_creationType);
 		for (auto& entity : entities)
 			delete entity.second;
 
-		auto& cameras = getAllCamera();
+		auto& cameras = m_camera_storage.GetAll(m_creationType);
 		for (auto& cam : cameras)
 			delete cam.second;
 
 		// erase All Assets
 		m_texture2D_storage.EraseAll(m_creationType);
 		m_cubemap_storage.EraseAll(m_creationType);
-		m_file_storage.EraseAll();
+		m_file_storage.EraseAll(m_creationType);
 		m_framebufferObject_storage.EraseAll(m_creationType);
 		m_renderTexture_storage.EraseAll(m_creationType);
 		m_renderTextureDepth_storage.EraseAll(m_creationType);
@@ -187,13 +251,11 @@ namespace Vxl
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
 		TextureFormat		FormatType,
-		TextureChannelType	ChannelType,
-		TexturePixelType	PixelType,
 		AnisotropicMode		AnisotropicMode
 	)
 	{
 		// Create New Data
-		Texture2D* _texture = new Texture2D(pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
+		Texture2D* _texture = new Texture2D(pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, AnisotropicMode);
 		// Store Data and Return index
 		return m_texture2D_storage.Add(_texture, m_creationType);
 	}
@@ -340,10 +402,12 @@ namespace Vxl
 	{
 		// Create New Data
 		Entity* object = new Entity(name);
-		object->m_uniqueID = 0;
-		object->m_colorID = Util::Conversion::uint_to_color4(object->m_uniqueID);
-		// Store Data and Return index
-		return m_entity_storage.Add(object, m_creationType);
+		// Store Data
+		EntityIndex index	= m_entity_storage.Add(object, m_creationType);
+		object->m_uniqueID	= index;
+		object->m_colorID	= Util::Conversion::uint_to_color4(object->m_uniqueID);
+		// Return index
+		return index;
 	}
 	CameraIndex Assets::createCamera(const std::string& name, float znear, float zfar)
 	{
@@ -358,16 +422,17 @@ namespace Vxl
 	const char* SECTION_NAME = "#Name";
 	const char* SECTION_INCLUDE = "#Include";
 	const char* SECTION_PROPERTIES = "#Properties";
+	const char* SECTION_SAMPLERS = "#Samplers";
 	const char* SECTION_ATTRIBUTE = "#Attributes";
 	const char* SECTION_VERTEX = "#Vertex";
 	const char* SECTION_GEOMETRY = "#Geometry";
 	const char* SECTION_FRAGMENT = "#Fragment";
 
-	void MaterialMaker(const std::string& filepath)
+	MaterialIndex Assets::createMaterialFromFile(const std::string& filePath)
 	{
-		std::string file = FileIO::readFile(filepath);
+		std::string file = FileIO::readFile(filePath);
 		if (file.empty())
-			return;
+			return -1;
 
 		std::string VertexShaderCode;
 		std::string GeometryShaderCode;
@@ -392,6 +457,7 @@ namespace Vxl
 			std::size_t name;
 			std::size_t include;
 			std::size_t properties;
+			std::size_t samplers;
 			std::size_t attributes;
 			std::size_t vertex;
 			std::size_t geometry;
@@ -401,6 +467,7 @@ namespace Vxl
 		locations.name = file.find(SECTION_NAME);
 		locations.include = file.find(SECTION_INCLUDE);
 		locations.properties = file.find(SECTION_PROPERTIES);
+		locations.samplers = file.find(SECTION_SAMPLERS);
 		locations.attributes = file.find(SECTION_ATTRIBUTE);
 		locations.vertex = file.find(SECTION_VERTEX);
 		locations.geometry = file.find(SECTION_GEOMETRY);
@@ -411,14 +478,17 @@ namespace Vxl
 		output_geometry.active = (locations.geometry != std::string::npos);
 		output_fragment.active = (locations.fragment != std::string::npos);
 
-		/*
 		// Name
+		std::string name;
 		if (locations.name != std::string::npos)
 		{
-			Name = stringUtil::extractSection(file, '{', '}', locations.name);
-			stringUtil::trim(Name);
+			name = stringUtil::extractSection(file, '{', '}', locations.name);
+			stringUtil::trim(name);
 		}
-		*/
+		else
+		{
+			name = stringUtil::extractNameFromPath(filePath);
+		}
 
 		// Include
 		if (locations.include != std::string::npos)
@@ -448,7 +518,7 @@ namespace Vxl
 		// Properties
 		if (locations.properties != std::string::npos)
 		{
-			std::string section = stringUtil::extractSection(file, '{', '}', locations.properties);
+			std::string section = stringUtil::extractSection(file, '{', '}', locations.properties) + '\n';
 
 			if (output_vertex.active)
 				output_vertex.include += section;
@@ -458,6 +528,40 @@ namespace Vxl
 
 			if (output_fragment.active)
 				output_fragment.include += section;
+		}
+
+		// Samplers
+		if (locations.samplers != std::string::npos)
+		{
+			std::string section = stringUtil::extractSection(file, '{', '}', locations.samplers) + '\n';
+			std::vector<std::string> lines = stringUtil::splitStr(section, '\n');
+
+			std::string sampler_info;
+
+			for (auto& line : lines)
+			{
+				line = stringUtil::stripComments(line);
+				if (line.empty())
+					continue;
+
+				std::vector<std::string> property = stringUtil::splitStr(line, ':');
+				if (property.size() == 2)
+				{
+					stringUtil::trim(property[0]);
+					stringUtil::trim(property[1]);
+
+					sampler_info += "layout (binding = " + property[1] + ") uniform " + property[0] + ';';
+				}
+			}
+
+			if (output_vertex.active)
+				output_vertex.include += sampler_info;
+
+			if (output_geometry.active)
+				output_geometry.include += sampler_info;
+
+			if (output_fragment.active)
+				output_fragment.include += sampler_info;
 		}
 
 		// Attributes
@@ -526,13 +630,34 @@ namespace Vxl
 		// Create Shaders
 		std::vector<_Shader*> shaders;
 
-		//	if (!VertexShaderCode.empty())
-		//		shaders.push_back(new _Shader("", VertexShaderCode, ShaderType::VERTEX));
-		//	
-		//	if (!GeometryShaderCode.empty())
-		//		shaders.push_back(new _Shader("", GeometryShaderCode, ShaderType::GEOMETRY));
-		//	
-		//	if (!FragmentShaderCode.empty())
-		//		shaders.push_back(new _Shader("", FragmentShaderCode, ShaderType::FRAGMENT));
+		if (!VertexShaderCode.empty())
+		{
+			ShaderIndex _ShaderIndex = createShader(name + "_vert", VertexShaderCode, ShaderType::VERTEX);
+			shaders.push_back(Assets::getShader(_ShaderIndex));
+		}
+		if (!GeometryShaderCode.empty())
+		{
+			ShaderIndex _ShaderIndex = createShader(name + "_geom", GeometryShaderCode, ShaderType::GEOMETRY);
+			shaders.push_back(Assets::getShader(_ShaderIndex));
+		}
+		if (!FragmentShaderCode.empty())
+		{
+			ShaderIndex _ShaderIndex = createShader(name + "_frag", FragmentShaderCode, ShaderType::FRAGMENT);
+			shaders.push_back(Assets::getShader(_ShaderIndex));
+		}
+
+		if (shaders.empty())
+			return -1;
+
+		// Create Program
+		ShaderProgramIndex _ShaderProgramIndex = createShaderProgram(name + "_program", shaders);
+
+		// Create Material with Program
+		MaterialIndex _MaterialIndex = createMaterial(name + "_material");
+		_Material* _Mat = Assets::getMaterial(_MaterialIndex);
+		_Mat->setShader(_ShaderProgramIndex);
+
+		// Result
+		return _MaterialIndex;
 	}
 }

@@ -6,7 +6,7 @@
 #include "Graphics.h"
 
 #include "../rendering/MeshBuffer.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 
 #include <vector>
 

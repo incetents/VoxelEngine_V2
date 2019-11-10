@@ -31,9 +31,9 @@ namespace Vxl
 			uniform = std::nullopt;
 	}
 
-	void _Material::setSceneShader(ShaderProgramIndex index)
+	void _Material::setShader(ShaderProgramIndex index)
 	{
-		_ShaderProgram* program = SceneAssets.getShaderProgram(index);
+		_ShaderProgram* program = Assets::getShaderProgram(index);
 		// Check if valid
 		if (program)
 		{
@@ -105,29 +105,19 @@ namespace Vxl
 		if (m_wireframe)
 			return;
 
-		// Null Texture if no textures are used
-		if (m_textures.empty())
+		for (const auto& level : m_targetLevels)
 		{
-			// Bind null texture on first active layer
-			GlobalData.tex_nullImage->Bind(TextureLevel::LEVEL0);
-		}
-		else
-		{
-			for (auto it = m_textures.begin(); it != m_textures.end(); it++)
-			{
-				TextureLevel _level = it->first;
-				BaseTexture* _tex = m_textures[it->first];
+			BaseTexture* _tex = m_textures[level];
 
-				// Bind Null texture if texture isn't loaded
-				if (_tex == nullptr || !_tex->IsLoaded())
-				{
-					GlobalData.tex_nullImage->Bind(_level);
-				}
-				// Bind texture normally
-				else
-				{
-					_tex->Bind(it->first);
-				}
+			// Bind error texture
+			if (_tex == nullptr || !_tex->IsLoaded())
+			{
+				GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+			}
+			// Bind texture normally
+			else
+			{
+				_tex->Bind(level);
 			}
 		}
 	}

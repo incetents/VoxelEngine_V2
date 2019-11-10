@@ -3,6 +3,7 @@
 
 #include "Editor.h"
 #include "../modules/Entity.h"
+#include "../utilities/Asset.h"
 #include "../rendering/RenderManager.h"
 
 namespace Vxl

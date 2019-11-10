@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../utilities/singleton.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 
 #include "../rendering/Gizmo.h"
 

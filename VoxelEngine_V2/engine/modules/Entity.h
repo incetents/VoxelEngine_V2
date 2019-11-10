@@ -4,11 +4,12 @@
 #include "Component.h"
 #include "../math/Transform.h"
 #include "../math/Color.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 #include "../utilities/Util.h"
 
 #include <map>
 #include <stack>
+#include <typeinfo>
 
 #define MAX_ENTITY_NAME_LENGTH 256
 
@@ -16,7 +17,7 @@ namespace Vxl
 {
 	class Mesh;
 
-	class Entity //: public ComponentHandler
+	class Entity
 	{
 		DISALLOW_COPY_AND_ASSIGN(Entity);
 		friend class Assets;
@@ -34,11 +35,15 @@ namespace Vxl
 		MeshIndex		m_mesh = -1;
 		MaterialIndex	m_material = -1;
 		
+		// Editor Information
+		bool		m_isSelected = false;
+		
+		// Bounding Boxes
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
 		Vector3		m_AABB[2]; // AABB based on OBB
 
-		// Editor Information
-		bool		m_isSelected = false; //
+		// Component
+		std::map<const std::type_info*, Component*> m_components;
 
 		// Utility
 		void UpdateBoundingBoxCheap();
@@ -61,7 +66,6 @@ namespace Vxl
 		bool		m_useTransform	= true;
 		bool		m_isActive		= true;
 		bool		m_isSelectable	= true; // for editor
-		//bool		m_isColoredObject = false;
 		
 		// Mesh
 		void setMesh(MeshIndex index);
@@ -76,43 +80,83 @@ namespace Vxl
 			return m_material;
 		}
 
-		// Editor Information
-		inline bool IsSelected(void) const
+		// Components
+		template <typename Type = Component * >
+		bool hasComponent()
 		{
-			return m_isSelected;
+			return m_components.count(&typeid(Type)) != 0;
+		}
+		
+		template <typename Type = Component * >
+		Type* addComponent(Type* a_component)
+		{
+			if (a_component != nullptr && m_components.count(&typeid(*a_component)) == 0)
+			{
+				m_components[&typeid(*a_component)] = (a_component);
+				m_components[&typeid(*a_component)]->m_owner = m_uniqueID;
+
+				ComponentMaster<Type>::allComponents.push_back(a_component);
+
+				return a_component;
+			}
+			return nullptr;
+		}
+		
+		template <typename Type = Component * >
+		Type* getComponent()
+		{
+			if (m_components.count(&typeid(Type)) != 0)
+			{
+				return static_cast<Type*>(m_components[&typeid(Type)]);
+			}
+			return nullptr;
 		}
 
+		template <typename Type = Component * >
+		Type* eraseComponent()
+		{
+			if (m_components.count(&typeid(Type)) > 0)
+			{
+				Type* data = static_cast<Type*>(m_components[&typeid(Type)]);
+
+				m_components.erase(&typeid(Type));
+
+				// Normal Erase
+				//	ComponentMaster<Type>::allComponents.erase(
+				//		std::remove(
+				//			ComponentMaster<Type>::allComponents.begin(), ComponentMaster<Type>::allComponents.end(), data
+				//		)
+				//	);
+
+				// Swap element with last element + erase last element
+				auto it = std::find(ComponentMaster<Type>::allComponents.begin(), ComponentMaster<Type>::allComponents.end(), &m_transform);
+
+				if (it != ComponentMaster<Type>::allComponents.end())
+				{
+					std::iter_swap(it, ComponentMaster<Type>::allComponents.end() - 1);
+
+					ComponentMaster<Type>::allComponents.pop_back();
+				}
+
+				return data;
+			}
+			return nullptr;
+		}
+
+		//
 		inline uint32_t getUniqueID(void) const
 		{
 			return m_uniqueID;
 		}
 
-		// check if all parents are active
-		bool IsFamilyActive()
+		// Check if Editor can see this
+		inline bool IsSelected(void) const
 		{
-			// if no parent, check normal active state
-			Transform* parent = m_transform.getParent();
-			if (parent == nullptr)
-				return m_isActive;
-
-			// auto fail if off
-			if (!m_isActive)
-				return false;
-
-			// iterate through all parents
-			while (parent != nullptr)
-			{
-				Entity* owner = Assets::getEntity(parent->m_owner);
-				VXL_ASSERT(owner, "Component not attached to entity");
-				if (!owner->m_isActive)
-					return false;
-				// Acquire new parent
-				else
-					parent = owner->m_transform.getParent();
-			}
-			// If no parents failed, that means it's all good
-			return true;
+			return m_isSelected;
 		}
+
+		// check if all parents are active
+		bool IsFamilyActive();
 
 		// Bounding Box
 		std::vector<Vector3> GetOBB(void) const

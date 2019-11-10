@@ -49,6 +49,7 @@ namespace Vxl
 	}
 
 	Camera::Camera(const std::string& name, float _znear, float _zfar)
+		: m_znear(_znear), m_zfar(_zfar)
 	{
 		//RenderManager.AddEntity(this);
 

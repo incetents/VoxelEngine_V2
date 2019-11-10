@@ -13,6 +13,7 @@
 #include "../engine/utilities/stringUtil.h"
 #include "../engine/utilities/Time.h"
 #include "../engine/utilities/FileIO.h"
+#include "../engine/utilities/Asset.h"
 
 #include "../engine/rendering/FramebufferObject.h"
 #include "../engine/rendering/Geometry.h"
@@ -305,14 +306,15 @@ namespace Vxl
 			});
 
 		// Materials
-		material_gbuffer = SceneAssets.createMaterial("gbuffer");
+		material_gbuffer = SceneAssets.createMaterialFromFile("./assets/materials/gbuffer.material");
 		{
 			auto mat = SceneAssets.getMaterial(material_gbuffer);
-			mat->setSceneShader(shader_gbuffer);
 			mat->setTexture(Assets::getTexture2D(tex_beato), TextureLevel::LEVEL0);
+			mat->setTextureLevelTargets({ TextureLevel::LEVEL0 });
+
 			mat->setSequenceID(2);
-			mat->m_cullType = CullMode::NO_CULL;
 		}
+
 		//	material_gbuffer_transparent = SceneAssets.createMaterial("gbuffer_transparent");
 		//	{
 		//		auto mat = SceneAssets.getMaterial(material_gbuffer_transparent);
@@ -344,8 +346,10 @@ namespace Vxl
 		material_skybox = SceneAssets.createMaterial("skybox");
 		{
 			auto mat = SceneAssets.getMaterial(material_skybox);
-			mat->setSceneShader(shader_skybox);
+			mat->setShader(shader_skybox);
 			mat->setTexture(SceneAssets.getCubemap(cubemap_craterlake), TextureLevel::LEVEL0);
+			mat->setTextureLevelTargets({ TextureLevel::LEVEL0 });
+
 			mat->setSequenceID(1);
 		}
 		//	material_lines = SceneAssets.createMaterial("lines");
@@ -489,10 +493,8 @@ namespace Vxl
 		camera_main = SceneAssets.createCamera("_camera_editor", 0.01f, 5000.0f);
 		{
 			Camera* camera_ptr = SceneAssets.getCamera(camera_main);
-			//camera_ptr->m_transform.setPosition(3.5f, 2.8f, 0.3f);
-			//camera_ptr->m_transform.setCameraForward(Vector3(-1, 0, -1));
-			camera_ptr->m_transform.setPosition(0, 0, 0);
-			camera_ptr->m_transform.setCameraForward(Vector3(0, 0, -1));
+			camera_ptr->m_transform.setPosition(3.5f, 2.8f, 0.3f);
+			camera_ptr->m_transform.setCameraForward(Vector3(-1, 0, -1));
 			camera_ptr->SetPerspectiveWindowAspect(110.0f);
 			camera_ptr->update();
 		}

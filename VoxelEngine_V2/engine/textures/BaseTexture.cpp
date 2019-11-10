@@ -2,10 +2,14 @@
 #include "Precompiled.h"
 #include "BaseTexture.h"
 
+#include "../input/Input.h"
+
 #include "../rendering/Graphics.h"
 #include "../rendering/RenderBuffer.h"
+
 #include "../utilities/Macros.h"
-#include "../input/Input.h"
+#include "../utilities/Asset.h"
+
 #include "../window/window.h"
 
 #include <assert.h>

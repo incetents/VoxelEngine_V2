@@ -1,7 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 #include "../utilities/Util.h"
 
 #include "Vector.h"

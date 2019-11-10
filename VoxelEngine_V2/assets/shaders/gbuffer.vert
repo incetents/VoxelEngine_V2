@@ -54,9 +54,7 @@ void main()
 		v_data.tangent = m_tangent;
 	}
 	
-	//gl_Position = UBO_viewProjection * vec4(v_data.pos, 1); 
-	gl_Position = UBO_view * vec4(v_data.pos, 1); 
-	//gl_Position = mat4(1.0) * vec4(v_data.pos, 1); 
+	gl_Position = UBO_viewProjection * vec4(v_data.pos, 1); 
 	
 	// Constants
 	v_data.uv = m_uv;

@@ -46,7 +46,10 @@ namespace Vxl
 		ShaderProgramIndex shader_font;
 
 		// Materials
-		MaterialIndex material_gbuffer;
+		MaterialIndex material_gbuffer = -1;
+		MaterialIndex material_gbuffer2 = -1;
+
+
 		MaterialIndex material_gbuffer_transparent;
 		MaterialIndex material_passthroughWorld;
 		MaterialIndex material_passthroughWorld_transparent;

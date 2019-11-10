@@ -7,11 +7,12 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
-#include "../textures/Texture2D.h"
 #include "../rendering/FramebufferObject.h"
 #include "../rendering/Shader.h"
 #include "../rendering/RenderManager.h"
+#include "../textures/Texture2D.h"
 #include "../textures/RenderTexture.h"
+#include "../utilities/Types.h"
 #include "../window/window.h"
 
 #include "../game/Scene_Game.h"

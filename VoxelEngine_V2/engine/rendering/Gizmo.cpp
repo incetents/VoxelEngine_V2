@@ -2,16 +2,17 @@
 #include "Precompiled.h"
 #include "Gizmo.h"
 
+#include "../input/Input.h"
+#include "../math/Raycast.h"
 #include "../modules/Entity.h"
 #include "../modules/Material.h"
+#include "../objects/Camera.h"
 #include "../rendering/FramebufferObject.h"
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/Debug.h"
-#include "../objects/Camera.h"
-#include "../math/Raycast.h"
+#include "../utilities/Asset.h"
 #include "../window/window.h"
-#include "../input/Input.h"
 #include "RenderManager.h"
 
 namespace Vxl

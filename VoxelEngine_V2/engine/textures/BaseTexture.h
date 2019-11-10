@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../rendering/Graphics.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 #include "../math/Color.h"
 
 #include <map>

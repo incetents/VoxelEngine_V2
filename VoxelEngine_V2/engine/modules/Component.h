@@ -1,69 +1,36 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../utilities/Asset.h"
-
-#include <typeinfo>
-#include <unordered_map>
+#include "../utilities/Types.h"
 
 namespace Vxl
 {
-	class Entity;
-
 	class Component
 	{
-		friend class ComponentHandler;
 	public:
 		EntityIndex m_owner = -1;
 	};
 
-	class ComponentHandler
+	template<typename Type = Component*>
+	class ComponentMaster
 	{
-	protected:
-		std::unordered_map<const std::type_info*, Component*> m_components;
 	public:
-
-		// Check for component
-		template <typename T>
-		bool CheckComponentExists()
+		static std::vector<Component*> allComponents;
+		static std::vector<Type*> getAll()
 		{
-			return m_components.count(&typeid(T)) != 0;
-		}
+			std::vector<Type*> result;
 
-		// Add Component
-		template <typename T = Component *>
-		T* AddComponent(T* a_component, EntityIndex owner)
-		{
-			if (a_component != nullptr && m_components.count(&typeid(*a_component)) == 0)
-			{
-				m_components[&typeid(*a_component)] = (a_component);
-				m_components[&typeid(*a_component)]->m_owner = owner;
+			std::transform(
+				allComponents.begin(), allComponents.end(),
+				back_inserter(result),
+				[](Component* c) { return static_cast<Type*>(c); }
+			);
 
-				return a_component;
-			}
-			return nullptr;
-		}
-
-		// Add Component (new)
-		template <typename T = Component * >
-		T* AddComponent(EntityIndex owner)
-		{
-			T* _data = new T();
-			return AddComponent(_data, owner);
-		}
-
-		// Get Component
-		template <typename T>
-		T* GetComponent()
-		{
-			if (m_components.count(&typeid(T)) != 0)
-			{
-				return static_cast<T*>(m_components[&typeid(T)]);
-			}
-			return nullptr;
+			return result;
 		}
 	};
 
-	
+	template<typename Type>
+	std::vector<Component*> ComponentMaster<Type>::allComponents;
 }
 

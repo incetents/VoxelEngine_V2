@@ -4,6 +4,7 @@
 
 #include "../rendering/Graphics.h"
 #include "../textures/BaseTexture.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {

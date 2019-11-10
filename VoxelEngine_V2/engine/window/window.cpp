@@ -21,10 +21,6 @@
 
 namespace Vxl
 {
-	bool Window::InitGLFW()
-	{
-		return glfwInit();
-	}
 	void Window::Setup(
 		const std::string& name,
 		uint32_t width,
@@ -33,7 +29,7 @@ namespace Vxl
 		if (m_setup)
 			return;
 
-		if (!InitGLFW())
+		if (!glfwInit())
 			return;
 
 		m_name = name;

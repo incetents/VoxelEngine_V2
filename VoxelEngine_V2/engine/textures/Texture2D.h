@@ -25,7 +25,17 @@ namespace Vxl
 			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode		AnistropicMode = AnisotropicMode::NONE
 		);
-		// Constructor [Create custom]
+		// Constructor [Create custom] // 1 Channel
+		Texture2D(
+			std::vector<float>  pixels,
+			uint32_t			width,
+			bool				UseMipMapping = true,
+			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
+			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
+		);
+		// Constructor [Create custom] // 3 Channels
 		Texture2D(
 			std::vector<Color3F>pixels,
 			uint32_t			width,
@@ -33,8 +43,16 @@ namespace Vxl
 			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
 			TextureFilter		FilterMode = TextureFilter::LINEAR,
 			TextureFormat		FormatType = TextureFormat::RGBA8,
-			TextureChannelType	ChannelType = TextureChannelType::RGBA,
-			TexturePixelType	PixelType = TexturePixelType::UNSIGNED_BYTE,
+			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
+		);
+		// Constructor [Create custom] // 4 Channels
+		Texture2D(
+			std::vector<Color4F>pixels,
+			uint32_t			width,
+			bool				UseMipMapping = true,
+			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
+			TextureFilter		FilterMode = TextureFilter::LINEAR,
+			TextureFormat		FormatType = TextureFormat::RGBA8,
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom]

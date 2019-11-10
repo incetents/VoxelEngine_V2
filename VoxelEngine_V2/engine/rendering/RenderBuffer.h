@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Graphics.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 #include "../utilities/Macros.h"
 
 namespace Vxl

@@ -8,6 +8,7 @@
 
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
+#include "../utilities/Asset.h"
 
 #include <assert.h>
 #include <iostream>

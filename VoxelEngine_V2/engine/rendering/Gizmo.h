@@ -4,7 +4,7 @@
 #include "../math/Vector.h"
 #include "../math/Matrix4x4.h"
 #include "../math/MathCore.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 
 #include <vector>
 

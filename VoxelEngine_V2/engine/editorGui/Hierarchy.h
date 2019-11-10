@@ -5,7 +5,7 @@
 
 #include "../utilities/singleton.h"
 #include "../utilities/Macros.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 
 namespace Vxl
 {

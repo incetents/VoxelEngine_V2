@@ -4,7 +4,7 @@
 #include "Graphics.h"
 
 #include "../math/Color.h"
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 #include "../utilities/Util.h"
 #include "../utilities/Containers.h"
 #include "../utilities/Macros.h"
@@ -15,7 +15,9 @@
 namespace Vxl
 {
 	class RenderBuffer;
+	class RenderBufferDepth;
 	class RenderTexture;
+	class RenderTextureDepth;
 
 	class RenderTarget
 	{

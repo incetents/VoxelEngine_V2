@@ -8,6 +8,7 @@
 #include "../textures/RenderTexture.h"
 #include "../rendering/UBO.h"
 #include "../utilities/Logger.h"
+#include "../utilities/Asset.h"
 #include "../window/window.h"
 #include "../input/Input.h"
 

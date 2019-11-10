@@ -1,13 +1,13 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../rendering/Graphics.h"
+#include "Component.h"
 
-#include "../utilities/Asset.h"
+#include "../rendering/Graphics.h"
 
 #include "../textures/TextureBinder.h"
 
-#include "Component.h"
+#include "../utilities/Types.h"
 
 #include <unordered_map>
 #include <vector>
@@ -21,6 +21,7 @@
 
 namespace Vxl
 {
+	class _ShaderProgram;
 	class BaseTexture;
 	class Entity;
 
@@ -36,11 +37,12 @@ namespace Vxl
 		friend class Assets;
 	private:
 		// Data
-		std::string			m_name;
-		ShaderProgramIndex	m_shader = -1;
-		uint32_t			m_sequenceNumber = -1;
-		static std::set<uint32_t> m_allSequenceNumbers;
+		std::string					m_name;
+		ShaderProgramIndex			m_shader = -1;
+		uint32_t					m_sequenceNumber = -1;
+		static std::set<uint32_t>	m_allSequenceNumbers;
 		std::map<TextureLevel, BaseTexture*> m_textures;
+		std::vector<TextureLevel> m_targetLevels; // What the shader is expecting for textures
 
 		// Common Uniforms
 		void setupCommonUniform(const _ShaderProgram& program, const std::string& name, std::optional<Graphics::Uniform>& uniform);
@@ -121,14 +123,20 @@ namespace Vxl
 		bool				m_depthWrite = true;
 		bool				m_wireframe = false;
 
+		// Set TextureLevelTarget
+		void setTextureLevelTargets(const std::initializer_list<TextureLevel>& levels)
+		{
+			m_targetLevels = levels;
+		}
+
 		// Set Shader
-		void setSceneShader(ShaderProgramIndex index);
+		void setShader(ShaderProgramIndex index);
 
 		// Set Uniform
 		template<typename Type>
 		void sendUniform(const std::string& name, Type data) const
 		{
-			_ShaderProgram* program = SceneAssets.getShaderProgram(m_shader);
+			_ShaderProgram* program = Assets::getShaderProgram(m_shader);
 			if (program)
 			{
 				auto it = program->m_uniforms.find(name);
@@ -141,7 +149,7 @@ namespace Vxl
 		template<typename Type>
 		void sendUniformMatrix(const std::string& name, Type data, bool transpose) const
 		{
-			_ShaderProgram* program = SceneAssets.getShaderProgram(m_shader);
+			_ShaderProgram* program = Assets::getShaderProgram(m_shader);
 			if (program)
 			{
 				auto it = program->m_uniforms.find(name);

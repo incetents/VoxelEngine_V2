@@ -193,13 +193,14 @@
     <ClInclude Include="engine\Precompiled.h" />
     <ClInclude Include="engine\textures\TextureBinder.h" />
     <ClInclude Include="engine\utilities\Asset.h" />
+    <ClInclude Include="engine\utilities\Types.h" />
     <ClInclude Include="engine\utilities\Containers.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />
     <ClInclude Include="engine\utilities\Loader.h" />
     <ClInclude Include="engine\utilities\Logger.h" />
     <ClInclude Include="engine\utilities\Macros.h" />
     <ClInclude Include="engine\utilities\ShaderBuilder.h" />
-    <ClInclude Include="engine\utilities\singleton.h" />
+    <ClInclude Include="engine\utilities\Singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\utilities\Time.h" />
     <ClInclude Include="engine\utilities\Util.h" />

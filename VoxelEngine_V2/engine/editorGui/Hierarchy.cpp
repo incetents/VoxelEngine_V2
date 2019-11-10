@@ -19,6 +19,7 @@
 #include "../input/Input.h"
 
 #include "../utilities/Util.h"
+#include "../utilities/Asset.h"
 
 #include "../editor/Editor.h"
 
@@ -184,7 +185,7 @@ namespace Vxl
 		//	}
 
 		// Display Hierarchy with selected entities
-		auto& entities = Assets::getAllEntity();
+		auto& entities = SceneAssets.getAllEntity();
 		for (auto& entity : entities)
 		{
 			if (entity.second->m_transform.getParent() == nullptr)

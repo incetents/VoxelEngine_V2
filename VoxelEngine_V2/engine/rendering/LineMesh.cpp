@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "LineMesh.h"
 
+#include "../utilities/Asset.h"
+
 namespace Vxl
 {
 	LineMesh::LineMesh(bool isVec3)

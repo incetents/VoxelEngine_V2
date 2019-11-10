@@ -5,7 +5,7 @@
 #include "VBO.h"
 #include "Graphics.h"
 
-#include "../utilities/Asset.h"
+#include "../utilities/Types.h"
 #include "../utilities/Macros.h"
 
 #include <Windows.h>

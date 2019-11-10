@@ -58,7 +58,48 @@ namespace Vxl
 		Unbind();
 		m_loaded = true;
 	}
-	// [ Create Custom ]
+	// [ Create Custom ] // 1 Channel
+	Texture2D::Texture2D(
+		std::vector<float>pixels,
+		uint32_t			width,
+		bool				UseMipMapping,
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		AnisotropicMode		AnisotropicMode
+	)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::R, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
+	{
+		// GL State
+		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
+
+		// Convert Pixels to image
+		UINT pixelsCount = (UINT)pixels.size();
+		m_width = width;
+		m_height = pixelsCount / width;
+		m_channelCount = 1;
+
+		std::vector<UCHAR> fixed_pixels;
+		fixed_pixels.reserve(pixelsCount);
+
+		for (UINT i = 0; i < pixelsCount; i++)
+		{
+			fixed_pixels.push_back((UCHAR)(pixels[i] * 255.0f));
+		}
+
+		m_image = new UCHAR[pixelsCount];
+		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
+
+		// Storage
+		CreateStorage();
+		SetStorage(&m_image[0]);
+		UpdateMipmapping();
+
+		// finished
+		Unbind();
+		m_loaded = true;
+	}
+	// [ Create Custom ] // 3 Channels
 	Texture2D::Texture2D(
 		std::vector<Color3F>pixels,
 		uint32_t			width,
@@ -66,13 +107,14 @@ namespace Vxl
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
 		TextureFormat		FormatType,
-		TextureChannelType	ChannelType,
-		TexturePixelType	PixelType,
 		AnisotropicMode		AnisotropicMode
 	) 
-		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode, UseMipMapping)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
 	{
+		// GL State
+		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
 
+		// Convert Pixels to image
 		UINT pixelsCount = (UINT)pixels.size();
 		m_width = width;
 		m_height = pixelsCount / width;
@@ -90,19 +132,61 @@ namespace Vxl
 
 		m_image = new UCHAR[pixelsCount * m_channelCount];
 		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
-
+		
 		// Storage
-		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
-
 		CreateStorage();
 		SetStorage(&m_image[0]);
-
 		UpdateMipmapping();
 
 		// finished
 		Unbind();
 		m_loaded = true;
 	}
+	// [ Create Custom ] // 4 Channels
+	Texture2D::Texture2D(
+		std::vector<Color4F>pixels,
+		uint32_t			width,
+		bool				UseMipMapping,
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		TextureFormat		FormatType,
+		AnisotropicMode		AnisotropicMode
+	)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::RGBA, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
+	{
+
+		// GL State
+		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
+
+		// Convert Pixels to image
+		UINT pixelsCount = (UINT)pixels.size();
+		m_width = width;
+		m_height = pixelsCount / width;
+		m_channelCount = 4;
+
+		std::vector<UCHAR> fixed_pixels;
+		fixed_pixels.reserve(pixelsCount * m_channelCount);
+
+		for (UINT i = 0; i < pixelsCount; i++)
+		{
+			fixed_pixels.push_back((UCHAR)(pixels[i].r * 255.0f));
+			fixed_pixels.push_back((UCHAR)(pixels[i].g * 255.0f));
+			fixed_pixels.push_back((UCHAR)(pixels[i].b * 255.0f));
+		}
+
+		m_image = new UCHAR[pixelsCount * m_channelCount];
+		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
+
+		// Storage
+		CreateStorage();
+		SetStorage(&m_image[0]);
+		UpdateMipmapping();
+
+		// finished
+		Unbind();
+		m_loaded = true;
+	}
+
 	// Constructor [Create custom]
 	Texture2D::Texture2D(
 		void* pixels,
@@ -130,7 +214,6 @@ namespace Vxl
 
 		CreateStorage();
 		SetStorage(&m_image[0]);
-
 		UpdateMipmapping();
 
 		// finished
