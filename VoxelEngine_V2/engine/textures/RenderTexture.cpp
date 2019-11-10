@@ -26,8 +26,13 @@ namespace Vxl
 	void RenderTexture::RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType)
 	{
 		// Texture is immutable, destroy it and create a new one
-		unload();
-		load();
+		Unbind();
+		{
+			auto newID = Graphics::Texture::Create();
+			Graphics::Texture::Delete(m_id);
+			m_id = newID;
+		}
+		Bind();
 
 		// Fix values
 		m_width = (int)width;

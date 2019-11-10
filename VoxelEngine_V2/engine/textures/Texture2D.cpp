@@ -65,10 +65,9 @@ namespace Vxl
 		bool				UseMipMapping,
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
-		TextureFormat		FormatType,
 		AnisotropicMode		AnisotropicMode
 	)
-		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::R, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, TextureFormat::R8, TextureChannelType::R, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
 	{
 		// GL State
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
@@ -106,10 +105,9 @@ namespace Vxl
 		bool				UseMipMapping,
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
-		TextureFormat		FormatType,
 		AnisotropicMode		AnisotropicMode
 	) 
-		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, TextureFormat::RGB8, TextureChannelType::RGB, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
 	{
 		// GL State
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_1);
@@ -149,10 +147,9 @@ namespace Vxl
 		bool				UseMipMapping,
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
-		TextureFormat		FormatType,
 		AnisotropicMode		AnisotropicMode
 	)
-		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, FormatType, TextureChannelType::RGBA, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
+		: BaseTexture(TextureType::TEX_2D, WrapMode, FilterMode, TextureFormat::RGBA8, TextureChannelType::RGBA, TexturePixelType::UNSIGNED_BYTE, AnisotropicMode, UseMipMapping)
 	{
 
 		// GL State

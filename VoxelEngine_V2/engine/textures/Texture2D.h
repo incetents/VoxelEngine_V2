@@ -32,7 +32,6 @@ namespace Vxl
 			bool				UseMipMapping = true,
 			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
 			TextureFilter		FilterMode = TextureFilter::LINEAR,
-			TextureFormat		FormatType = TextureFormat::RGBA8,
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom] // 3 Channels
@@ -42,7 +41,6 @@ namespace Vxl
 			bool				UseMipMapping = true,
 			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
 			TextureFilter		FilterMode = TextureFilter::LINEAR,
-			TextureFormat		FormatType = TextureFormat::RGBA8,
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom] // 4 Channels
@@ -52,7 +50,6 @@ namespace Vxl
 			bool				UseMipMapping = true,
 			TextureWrapping		WrapMode = TextureWrapping::REPEAT,
 			TextureFilter		FilterMode = TextureFilter::LINEAR,
-			TextureFormat		FormatType = TextureFormat::RGBA8,
 			AnisotropicMode		AnisotropicMode = AnisotropicMode::NONE
 		);
 		// Constructor [Create custom]

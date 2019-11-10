@@ -16,6 +16,7 @@ namespace Vxl
 	const Color3F Color3F::PURPLE	= Color3F(145.f / 255.f, 30.f / 255.f, 180.f / 255.f);
 	const Color3F Color3F::CYAN		= Color3F(70.f / 255.f, 240.f / 255.f, 240.f / 255.f);
 	const Color3F Color3F::GREY		= Color3F(0.5f, 0.5f, 0.5f);
+	const Color3F Color3F::PINK		= Color3F(1, 0, 1);
 
 	// Color3f Overloads
 	Color3F Color3F::operator+(const Color3F& c) const
@@ -169,6 +170,7 @@ namespace Vxl
 	const Color4F Color4F::PURPLE	= Color4F(145.f / 255.f, 30.f / 255.f, 180.f / 255.f, 1);
 	const Color4F Color4F::CYAN		= Color4F(70.f / 255.f, 240.f / 255.f, 240.f / 255.f, 1);
 	const Color4F Color4F::GREY		= Color4F(0.5f, 0.5f, 0.5f, 1);
+	const Color4F Color4F::PINK		= Color4F(1, 0, 1, 1);
 
 	// Color4f Overloads
 	Color4F Color4F::operator+(const Color4F& c) const

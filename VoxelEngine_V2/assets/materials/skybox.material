@@ -1,0 +1,71 @@
+
+#Name { skybox }
+
+#Attributes
+{
+	vec3 m_position : 0
+}
+
+#Include
+{
+	_UBO.glsl
+}
+
+#Samplers
+{
+	// Uniform Textures
+	samplerCube skybox_handler : 0
+}
+
+#Uniforms
+{
+	// No uniforms here
+}
+
+#Vertex
+{
+	// Output
+	out vertex_data
+	{
+		vec3 uvw;
+	
+	} v_data;
+
+	// Main
+	void main()
+	{
+		v_data.uvw = m_position;
+		
+		// Remove position from view matrix since skybox doesn't move
+		mat4 viewStill = UBO_view;
+		viewStill[3][0] = 0;
+		viewStill[3][1] = 0;
+		viewStill[3][2] = 0;
+		
+		vec4 pos = UBO_projection * viewStill * vec4(m_position, 1.0);
+
+		gl_Position = pos.xyww;
+	}
+}
+
+#Fragment
+{
+	// Input
+	in vertex_data
+	{
+		vec3 uvw;
+
+	} v_data;
+
+	// Output
+	layout (location = 0) out vec4 output_albedo;
+	layout (location = 1) out vec4 output_normal;
+
+		//Main
+	void main()
+	{
+		//output_color = vec4(v_data.uvw * 0.5 + 0.5, 1);
+		output_albedo = texture(skybox_handler, v_data.uvw);
+		output_normal = vec4(0,0,1,1); // worldspace Normals
+	}
+}

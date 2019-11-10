@@ -6,6 +6,7 @@
 #include "../math/Color.h"
 #include "../utilities/Types.h"
 #include "../utilities/Util.h"
+#include "../modules/Material.h"
 
 #include <map>
 #include <stack>
@@ -22,9 +23,9 @@ namespace Vxl
 		DISALLOW_COPY_AND_ASSIGN(Entity);
 		friend class Assets;
 		friend class RenderManager;
-		friend class GameObject;
 		friend class Transform;
 		friend class Editor;
+		friend class Material;
 	protected:
 		// Locked Constructor
 		Entity(const std::string& name);
@@ -34,6 +35,7 @@ namespace Vxl
 		Color4F			m_colorID;
 		MeshIndex		m_mesh = -1;
 		MaterialIndex	m_material = -1;
+		std::map<TextureLevel, TextureIndex> m_textures;
 		
 		// Editor Information
 		bool		m_isSelected = false;
@@ -78,6 +80,26 @@ namespace Vxl
 		inline MaterialIndex getMaterial(void) const
 		{
 			return m_material;
+		}
+
+		// Textures
+		void setTexture(TextureIndex tex, TextureLevel level)
+		{
+			m_textures[level] = tex;
+		}
+		TextureIndex eraseTexture(TextureLevel level)
+		{
+			auto it = m_textures.find(level);
+			if (it == m_textures.end())
+				return -1;
+
+			TextureIndex index = m_textures[level];
+			m_textures.erase(level);
+			return index;
+		}
+		void eraseAllTextures(void)
+		{
+			m_textures.clear();
 		}
 
 		// Components

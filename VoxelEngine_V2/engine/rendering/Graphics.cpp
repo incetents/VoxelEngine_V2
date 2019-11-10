@@ -476,6 +476,7 @@ namespace Vxl
 		}
 		else
 		{
+			Logger.error(message);
 			// For some reason it hates how im storing my VBOs/EBOs
 			//Logger.log(message);
 		}

@@ -12,7 +12,6 @@
 #include "../modules/Scene.h"
 #include "../modules/Layer.h"
 #include "../modules/Material.h"
-#include "../modules/GlobalData.h"
 
 #include "../utilities/Util.h"
 #include "../utilities/Time.h"
@@ -67,11 +66,10 @@ namespace Vxl
 			DestroySceneGLResources();
 		}
 
-		InitSceneGLResources();
-
 		m_currentScene = _scene;
 
-		m_currentScene->Setup();
+		if(m_currentScene)
+			m_currentScene->Setup();
 	}
 	//	const Layer& RenderManager::GetLayer(uint32_t index)
 	//	{
@@ -116,7 +114,6 @@ namespace Vxl
 		Window.Reload();
 
 		InitGlobalGLResources();
-		InitSceneGLResources();
 
 		if (m_currentScene)
 			m_currentScene->Reload();
@@ -171,10 +168,6 @@ namespace Vxl
 	}
 
 	//
-	void RenderManager::InitSceneGLResources()
-	{
-		
-	}
 	void RenderManager::DestroySceneGLResources()
 	{
 		// Remove selected entity
@@ -380,7 +373,7 @@ namespace Vxl
 		// Fill Slots
 		for (const auto& entity : entities)
 		{
-			_Material* mat = Assets::getMaterial(entity.second->m_material);
+			Material* mat = Assets::getMaterial(entity.second->m_material);
 			MaterialRenderMode mode = mat->m_renderMode;
 
 			if (mode == MaterialRenderMode::Opaque)
@@ -393,12 +386,22 @@ namespace Vxl
 
 	void RenderManager::render(MaterialIndex _material, const std::vector<Entity*>& _entities)
 	{
-		_Material* material = Assets::getMaterial(_material);
+		Material* material = Assets::getMaterial(_material);
+
+		// If material program didn't link, use error material instead
 		if (material)
 		{
-			material->bindProgram();
+			if (!material->bindProgram())
+			{
+				material = GlobalAssets.getMaterialError();
+				if (!material->bindProgram())
+					VXL_ERROR("Material used for Error doesn't work");
+			}
+
 			material->bindStates();
-			material->bindTextures();
+
+			if(material->m_sharedTextures)
+				material->bindTextures();
 			
 			for (auto& ent : _entities)
 			{
@@ -407,6 +410,9 @@ namespace Vxl
 					Mesh* mesh = Assets::getMesh(ent->m_mesh);
 					if (mesh)
 					{
+						if (!material->m_sharedTextures)
+							material->bindTextures(ent);
+
 						material->bindCommonUniforms(ent);
 						mesh->Draw();
 					}

@@ -4,7 +4,6 @@
 #include "window/window.h"
 #include "input/Input.h"
 
-#include "utilities/Loader.h"
 #include "utilities/Logger.h"
 #include "utilities/Time.h"
 #include "utilities/Macros.h"
@@ -70,24 +69,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 		// End of frame update
 		Input.Update();
-
 		Window.EndFrame();
-
-		//Window.test();
-
 		TimeController.EndFrame();
-
 
 		// Special
 #if _DEBUG
 		Graphics::GetRuntimeGLValues();
 #endif
-
 		
 	}
 
 	// Cleanup
-	RenderManager.m_currentScene->Destroy();
+	RenderManager.SetNewScene(nullptr);
 	RenderManager.DestroyGlobalGLResources();
 	RenderManager.DestroySceneGLResources();
 	Window.Shutdown();

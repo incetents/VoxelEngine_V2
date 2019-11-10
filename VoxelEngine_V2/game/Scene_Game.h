@@ -47,13 +47,12 @@ namespace Vxl
 
 		// Materials
 		MaterialIndex material_gbuffer = -1;
-		MaterialIndex material_gbuffer2 = -1;
+		MaterialIndex material_skybox = -1;
 
 
 		MaterialIndex material_gbuffer_transparent;
 		MaterialIndex material_passthroughWorld;
 		MaterialIndex material_passthroughWorld_transparent;
-		MaterialIndex material_skybox;
 		MaterialIndex material_lines;
 		MaterialIndex material_colorPicker;
 		MaterialIndex material_gizmo;
@@ -63,14 +62,15 @@ namespace Vxl
 		//MaterialIndex material_showNormals;
 
 		// Textures
-		Texture2DIndex tex_grid_test;
-		Texture2DIndex tex_checkerboard;
-		Texture2DIndex tex_beato;
-		Texture2DIndex tex_crate_diffuse;
-		CubemapIndex cubemap_craterlake;
+		TextureIndex tex_grid_test;
+		TextureIndex tex_checkerboard;
+		TextureIndex tex_beato;
+		TextureIndex tex_crate_diffuse;
+		TextureIndex cubemap_craterlake;
 		// FBOS
 		FramebufferObjectIndex fboIndex_gbuffer;
 		FramebufferObjectIndex fboIndex_editor;
+		FramebufferObjectIndex fboIndex_editor2;
 		FramebufferObjectIndex fboIndex_colorpicker;
 		FramebufferObjectIndex fboIndex_composite;
 		FramebufferObjectIndex fboIndex_showRenderTarget;
@@ -97,6 +97,8 @@ namespace Vxl
 		// Entities
 		EntityIndex entity_skybox;
 		EntityIndex entity_error_cube;
+		EntityIndex entity_beato_cube;
+		EntityIndex entity_jiggy;
 
 		// Assets Created
 		MeshIndex mesh_manyQuads;

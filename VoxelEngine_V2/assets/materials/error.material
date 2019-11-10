@@ -1,0 +1,67 @@
+
+#Name { error }
+
+#Attributes
+{
+	vec3 m_position : 0
+	mat4 instanceMatrix : 8
+}
+
+#Include
+{
+	_UBO.glsl,
+	_Uniforms.glsl
+}
+
+#Vertex
+{
+	// Output
+	out vertex_data
+	{
+		vec3 pos;
+		
+	} v_data;
+
+	// Main
+	void main()
+	{
+		// Model
+		if(VXL_useModel)
+		{
+			mat4 model = VXL_model;
+			
+			// Instance matrix occurs before model matrix (if applicable)
+			if(VXL_useInstancing)
+				model *= instanceMatrix;
+
+			// Position
+			v_data.pos = vec3(model * vec4(m_position, 1.0));
+		}
+		// Passthrough
+		else
+		{
+			v_data.pos = m_position;
+		}
+		
+		gl_Position = UBO_viewProjection * vec4(v_data.pos, 1); 
+	}
+}
+
+#Fragment
+{
+	// Input
+	in vertex_data
+	{
+		vec3 pos;
+
+	} v_data;
+
+	// Output
+	layout (location = 0) out vec4 output_albedo;
+
+	//Main
+	void main()
+	{
+		output_albedo = vec4(1,0,1,1);
+	}
+}

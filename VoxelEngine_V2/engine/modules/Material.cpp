@@ -16,13 +16,12 @@
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
 #include "../utilities/Asset.h"
-#include "../modules/GlobalData.h"
 
 namespace Vxl
 {
-	std::set<uint32_t> _Material::m_allSequenceNumbers;
+	std::set<uint32_t> Material::m_allSequenceNumbers;
 
-	void _Material::setupCommonUniform(const _ShaderProgram& program, const std::string& name, std::optional<Graphics::Uniform>& uniform)
+	void Material::setupCommonUniform(const ShaderProgram& program, const std::string& name, std::optional<Graphics::Uniform>& uniform)
 	{
 		auto useModel = program.m_uniforms.find(name);
 		if (useModel != program.m_uniforms.end())
@@ -31,9 +30,9 @@ namespace Vxl
 			uniform = std::nullopt;
 	}
 
-	void _Material::setShader(ShaderProgramIndex index)
+	void Material::setShader(ShaderProgramIndex index)
 	{
-		_ShaderProgram* program = Assets::getShaderProgram(index);
+		ShaderProgram* program = Assets::getShaderProgram(index);
 		// Check if valid
 		if (program)
 		{
@@ -54,9 +53,9 @@ namespace Vxl
 			m_shader = -1;
 	}
 
-	Graphics::Uniform _Material::getUniform(const std::string& name)
+	Graphics::Uniform Material::getUniform(const std::string& name)
 	{
-		_ShaderProgram* program = SceneAssets.getShaderProgram(m_shader);
+		ShaderProgram* program = Assets::getShaderProgram(m_shader);
 		// Check if valid
 		if (program)
 		{
@@ -74,13 +73,17 @@ namespace Vxl
 		return empty_uni;
 	}
 
-	void _Material::bindProgram()
+	bool Material::bindProgram()
 	{
-		_ShaderProgram* program = SceneAssets.getShaderProgram(m_shader);
-		if (program)
+		ShaderProgram* program = Assets::getShaderProgram(m_shader);
+		if (program && program->isLinked())
+		{
 			program->bind();
+			return true;
+		}
+		return false;
 	}
-	void _Material::bindStates()
+	void Material::bindStates()
 	{
 		// Bind Modes
 		Graphics::SetCullMode(m_cullType);
@@ -100,19 +103,23 @@ namespace Vxl
 		Graphics::SetDepthWrite(m_depthWrite);
 		Graphics::SetWireframeState(m_wireframe);
 	}
-	void _Material::bindTextures()
+	void Material::bindTextures()
 	{
 		if (m_wireframe)
 			return;
 
 		for (const auto& level : m_targetLevels)
 		{
-			BaseTexture* _tex = m_textures[level];
+			TextureIndex index = m_textures[level];
+			BaseTexture* _tex = Assets::getBaseTexture(index);
 
 			// Bind error texture
 			if (_tex == nullptr || !_tex->IsLoaded())
 			{
-				GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+				if(level == TextureLevel::LEVEL0)
+					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+				else
+					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
 			}
 			// Bind texture normally
 			else
@@ -121,7 +128,32 @@ namespace Vxl
 			}
 		}
 	}
-	void _Material::bindCommonUniforms(Entity* _entity)
+	void Material::bindTextures(Entity* _entity)
+	{
+		if (m_wireframe)
+			return;
+
+		for (const auto& level : m_targetLevels)
+		{
+			TextureIndex index = _entity->m_textures[level];
+			BaseTexture* _tex = Assets::getBaseTexture(index);
+
+			// Bind error texture
+			if (_tex == nullptr || !_tex->IsLoaded())
+			{
+				if (level == TextureLevel::LEVEL0)
+					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+				else
+					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
+			}
+			// Bind texture normally
+			else
+			{
+				_tex->Bind(level);
+			}
+		}
+	}
+	void Material::bindCommonUniforms(Entity* _entity)
 	{
 		// ~ Model ~ //
 		if (m_uniform_useModel.has_value())
@@ -149,7 +181,10 @@ namespace Vxl
 		// ~ Texture ~ //
 		if (m_uniform_useTexture.has_value())
 		{
-			m_uniform_useTexture.value().send(m_textures.find(TextureLevel::LEVEL0) != m_textures.end());
+			if(m_sharedTextures)
+				m_uniform_useTexture.value().send(m_textures.find(TextureLevel::LEVEL0) != m_textures.end());
+			else
+				m_uniform_useTexture.value().send(_entity->m_textures.find(TextureLevel::LEVEL0) != _entity->m_textures.end());
 		}
 		
 		// ~ Colors ~ //
@@ -181,87 +216,4 @@ namespace Vxl
 		//	}
 		
 	}
-
-
-
-
-
-
-
-	// Static
-	//std::map<UINT, Material*> Material::m_masterOrder;
-	//bool Material::m_masterOrderDirty = false;
-
-	// Database Creation
-	//	Material* Material::Create(const std::string& _name, UINT _order)
-	//	{
-	//		Material* _material = new Material(_name, _order);
-	//	
-	//		AddNamedAsset(_name, _material, AssetMessage::CREATED);
-	//	
-	//		return _material;
-	//	}
-
-	//void Material::UpdateProperties()
-	//{
-	//	VXL_ASSERT(m_shaderProgram, "Material has no Program");
-
-	//	m_property_useModel.AcquireUniform(*m_shaderProgram);
-	//	m_property_model.AcquireUniform(*m_shaderProgram);
-	//	m_property_normalMatrix.AcquireUniform(*m_shaderProgram);
-	//	m_property_useInstancing.AcquireUniform(*m_shaderProgram);
-	//	m_property_useTexture.AcquireUniform(*m_shaderProgram);
-	//	m_property_color.AcquireUniform(*m_shaderProgram);
-	//	m_property_tint.AcquireUniform(*m_shaderProgram);
-	//	m_property_viewport.AcquireUniform(*m_shaderProgram);
-	//	m_property_alpha.AcquireUniform(*m_shaderProgram);
-	//	m_property_output.AcquireUniform(*m_shaderProgram);
-	//}
-
-	//// Setters
-	//void Material::SetProgram(const ShaderProgram& _program)
-	//{
-	//	m_shaderProgram = &_program;
-
-	//	UpdateProperties();
-	//}
-
-	//// Bind
-	//void Material::BindProgram()
-	//{
-	//	VXL_ASSERT(m_shaderProgram, "Material missing Shader Program");
-
-	//	// Bind Shader
-	//	m_shaderProgram->Bind();
-	//	
-	//}
-	//void Material::BindStates()
-	//{
-	//	// Bind Modes
-	//	Graphics::SetCullMode(m_CullType);
-	//	Graphics::SetBlendState(m_BlendState);
-	//	if (m_BlendState)
-	//	{
-	//		// Normal Blend modes
-	//		Graphics::SetBlendMode(m_BlendFunc.source, m_BlendFunc.destination);
-	//		// Special Blend modes
-	//		for (auto& blendAttach : m_BlendFuncAttachments)
-	//			Graphics::SetBlendMode(blendAttach.first, blendAttach.second.source, blendAttach.second.destination);
-
-	//		Graphics::SetBlendEquation(m_BlendEq);
-	//	}
-	//	Graphics::SetDepthPassRule(m_DepthFunc);
-	//	Graphics::SetDepthRead(m_DepthRead);
-	//	Graphics::SetDepthWrite(m_DepthWrite);
-	//	Graphics::SetWireframeState(m_Wireframe);
-	//}
-	//void Material::BindTextures()
-	//{
-	//	// Bind Textures (ignore if wireframe mode is ON)
-	//	if (m_Wireframe == false && m_sharedTextures)
-	//	{
-	//		TextureBinder::BindTextures();
-	//	}
-	//}
-
 }

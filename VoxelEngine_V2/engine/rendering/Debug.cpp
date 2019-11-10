@@ -4,11 +4,9 @@
 
 #include "../math/Color.h"
 #include "../modules/Entity.h"
-#include "../modules/GlobalData.h"
 #include "../rendering/Geometry.h"
 #include "../rendering/Mesh.h"
 #include "../textures/Texture2D.h"
-#include "../utilities/Loader.h"
 #include "../utilities/Asset.h"
 
 namespace Vxl

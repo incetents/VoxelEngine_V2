@@ -41,8 +41,11 @@ namespace Vxl
 	{
 		// Texture is immutable, destroy it and create a new one
 		Unbind();
-		Graphics::RenderBuffer::Delete(m_id);
-		m_id = Graphics::RenderBuffer::Create();
+		{
+			auto newID = Graphics::RenderBuffer::Create();
+			Graphics::RenderBuffer::Delete(m_id);
+			m_id = newID;
+		}
 		Bind();
 
 		// Fix values

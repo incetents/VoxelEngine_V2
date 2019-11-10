@@ -16,6 +16,7 @@
 
 namespace Vxl
 {
+	IDStorage<BaseTexture>		  Assets::m_baseTexture_storage;
 	IDStorage<Texture2D>		  Assets::m_texture2D_storage;
 	IDStorage<Cubemap>			  Assets::m_cubemap_storage;
 	NamedStorage<File>			  Assets::m_file_storage;
@@ -25,14 +26,19 @@ namespace Vxl
 	IDStorage<RenderBuffer>		  Assets::m_renderBuffer_storage;
 	IDStorage<RenderBufferDepth>  Assets::m_renderBufferDepth_storage;
 	IDStorage<Mesh>				  Assets::m_mesh_storage;
-	IDStorage<_Shader>			  Assets::m_shader_storage;
-	IDStorage<_ShaderProgram>	  Assets::m_shaderProgram_storage;
-	IDStorage<_Material>		  Assets::m_material_storage;
+	IDStorage<Shader>			  Assets::m_shader_storage;
+	IDStorage<ShaderProgram>	  Assets::m_shaderProgram_storage;
+	IDStorage<Material>		  Assets::m_material_storage;
 	IDStorage<Entity>			  Assets::m_entity_storage;
 	IDStorage<Camera>			  Assets::m_camera_storage;
 
 	void GlobalAssets::InitGLResources()
 	{
+		// Load files
+		loadFile("_UBO.glsl", "./assets/files/_UBO.glsl");
+		loadFile("_Math.glsl", "./assets/files/_Math.glsl");
+		loadFile("_Uniforms.glsl", "./assets/files/_Uniforms.glsl");
+
 		// Editor Textures
 		texID_editor_camera = loadTexture2D(
 			"./assets/textures/editor_camera.png",
@@ -59,52 +65,101 @@ namespace Vxl
 
 		// Debug Texture - checkerboard
 		{
-			std::vector<Color3F> pixels;
-			pixels.reserve(16);
+			const std::vector<Color3F> pixels = {
+				Color3F::PURPLE,
+				Color3F::BLACK,
+				Color3F::PURPLE,
+				Color3F::BLACK,
 
-			pixels.push_back(Color3F::PURPLE);
-			pixels.push_back(Color3F::BLACK);
-			pixels.push_back(Color3F::PURPLE);
-			pixels.push_back(Color3F::BLACK);
+				Color3F::BLACK,
+				Color3F::PURPLE,
+				Color3F::BLACK,
+				Color3F::PURPLE,
 
-			pixels.push_back(Color3F::BLACK);
-			pixels.push_back(Color3F::PURPLE);
-			pixels.push_back(Color3F::BLACK);
-			pixels.push_back(Color3F::PURPLE);
+				Color3F::PURPLE,
+				Color3F::BLACK,
+				Color3F::PURPLE,
+				Color3F::BLACK,
 
-			pixels.push_back(Color3F::PURPLE);
-			pixels.push_back(Color3F::BLACK);
-			pixels.push_back(Color3F::PURPLE);
-			pixels.push_back(Color3F::BLACK);
-
-			pixels.push_back(Color3F::BLACK);
-			pixels.push_back(Color3F::PURPLE);
-			pixels.push_back(Color3F::BLACK);
-			pixels.push_back(Color3F::PURPLE);
+				Color3F::BLACK,
+				Color3F::PURPLE,
+				Color3F::BLACK,
+				Color3F::PURPLE
+			};
 
 			texID_nullImageCheckerboard = createTexture2D(
 				pixels, 4, true,
-				TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
-				TextureFormat::RGB8, AnisotropicMode::NONE
+				TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST, AnisotropicMode::NONE
 			);
 		}
 		// Debug texture - black
 		{
-			std::vector<Color3F> pixels;
-		}
+			const std::vector<Color3F> pixels = {
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK,
+				Color3F::BLACK
+			};
 
+			texID_nullImageBlack = createTexture2D(
+				pixels, 4, false,
+				TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST, AnisotropicMode::NONE
+			);
+		}
+		// Debug textures - magenta
+		{
+			const std::vector<Color3F> pixels = {
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK,
+				Color3F::PINK
+			};
+
+			texID_nullImagePink = createTexture2D(
+				pixels, 4, false,
+				TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST, AnisotropicMode::NONE
+			);
+		}
+		// Error Material
+		{
+			material_error = SceneAssets.createMaterialFromFile("./assets/materials/error.material");
+			{
+				auto mat = Assets::getMaterial(material_error);
+				mat->setSequenceID(999999u);
+			}
+		}
 	}
 
 	void Assets::DestroyAndEraseAll()
 	{
-		// Delete All Assets
-		auto& textures = m_texture2D_storage.GetAll(m_creationType);
+		// Delete All Textures Here
+		auto& textures = m_baseTexture_storage.GetAll(m_creationType);
 		for (auto& texture : textures)
 			delete texture.second;
-
-		auto& cubemaps = m_cubemap_storage.GetAll(m_creationType);
-		for (auto& cubemap : cubemaps)
-			delete cubemap.second;
 
 		auto& files = m_file_storage.GetAll(m_creationType);
 		for (auto& file : files)
@@ -155,6 +210,7 @@ namespace Vxl
 			delete cam.second;
 
 		// erase All Assets
+		m_baseTexture_storage.EraseAll(m_creationType);
 		m_texture2D_storage.EraseAll(m_creationType);
 		m_cubemap_storage.EraseAll(m_creationType);
 		m_file_storage.EraseAll(m_creationType);
@@ -171,12 +227,30 @@ namespace Vxl
 		m_camera_storage.EraseAll(m_creationType);
 	}
 	// Deletion
-	void Assets::deleteTexture2D(Texture2DIndex index)
+	BaseTexture* Assets::eraseBaseTexture(TextureIndex index)
 	{
+		// Attempt to erase the texture index from all texture slots
+		m_texture2D_storage.Erase(index);
+		m_cubemap_storage.Erase(index);
+
+		return m_baseTexture_storage.Erase(index);
+	}
+	void Assets::deleteBaseTexture(TextureIndex index)
+	{
+		// Attempt to erase the texture index from all texture slots
+		m_texture2D_storage.Erase(index);
+		m_cubemap_storage.Erase(index);
+
+		delete m_baseTexture_storage.Erase(index);
+	}
+	void Assets::deleteTexture2D(TextureIndex index)
+	{
+		delete m_baseTexture_storage.Erase(index);
 		delete m_texture2D_storage.Erase(index);
 	}
-	void Assets::deleteCubemap(CubemapIndex index)
+	void Assets::deleteCubemap(TextureIndex index)
 	{
+		delete m_baseTexture_storage.Erase(index);
 		delete m_cubemap_storage.Erase(index);
 	}
 	void Assets::deleteFile(const std::string& name)
@@ -229,7 +303,7 @@ namespace Vxl
 	}
 
 	// Creation
-	Texture2DIndex Assets::loadTexture2D(
+	TextureIndex Assets::loadTexture2D(
 		const std::string& filePath,
 		bool				InvertY,
 		bool				UseMipMapping,
@@ -242,24 +316,64 @@ namespace Vxl
 	{
 		// Create New Data
 		Texture2D* _texture = new Texture2D(filePath, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType, AnisotropicMode);
-		// Store Data and Return index
-		return m_texture2D_storage.Add(_texture, m_creationType);
+		// Store Data
+		TextureIndex index = m_baseTexture_storage.Add(_texture, m_creationType);
+		m_texture2D_storage.AddCustom(_texture, m_creationType, index);
+		// Return index
+		return index;
 	}
-	Texture2DIndex Assets::createTexture2D(
+	TextureIndex Assets::createTexture2D(
+		std::vector<float> pixels, uint32_t width,
+		bool				UseMipMapping,
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		AnisotropicMode		AnisotropicMode
+	)
+	{
+		//VXL_ASSERT(pixels.size() >= 16, "Custom Texture must be at least 4x4 in size");
+		// Create New Data
+		Texture2D* _texture = new Texture2D(pixels, width, UseMipMapping, WrapMode, FilterMode, AnisotropicMode);
+		// Store Data
+		TextureIndex index = m_baseTexture_storage.Add(_texture, m_creationType);
+		m_texture2D_storage.AddCustom(_texture, m_creationType, index);
+		// Return index
+		return index;
+	}
+	TextureIndex Assets::createTexture2D(
 		std::vector<Color3F> pixels, uint32_t width,
 		bool				UseMipMapping,
 		TextureWrapping		WrapMode,
 		TextureFilter		FilterMode,
-		TextureFormat		FormatType,
 		AnisotropicMode		AnisotropicMode
 	)
 	{
+		VXL_ASSERT(pixels.size() >= 16, "Custom Texture must be at least 4x4 in size");
 		// Create New Data
-		Texture2D* _texture = new Texture2D(pixels, width, UseMipMapping, WrapMode, FilterMode, FormatType, AnisotropicMode);
-		// Store Data and Return index
-		return m_texture2D_storage.Add(_texture, m_creationType);
+		Texture2D* _texture = new Texture2D(pixels, width, UseMipMapping, WrapMode, FilterMode, AnisotropicMode);
+		// Store Data
+		TextureIndex index = m_baseTexture_storage.Add(_texture, m_creationType);
+		m_texture2D_storage.AddCustom(_texture, m_creationType, index);
+		// Return index
+		return index;
 	}
-	Texture2DIndex Assets::createTexture2D(
+	TextureIndex Assets::createTexture2D(
+		std::vector<Color4F> pixels, uint32_t width,
+		bool				UseMipMapping,
+		TextureWrapping		WrapMode,
+		TextureFilter		FilterMode,
+		AnisotropicMode		AnisotropicMode
+	)
+	{
+		VXL_ASSERT(pixels.size() >= 16, "Custom Texture must be at least 4x4 in size");
+		// Create New Data
+		Texture2D* _texture = new Texture2D(pixels, width, UseMipMapping, WrapMode, FilterMode, AnisotropicMode);
+		// Store Data
+		TextureIndex index = m_baseTexture_storage.Add(_texture, m_creationType);
+		m_texture2D_storage.AddCustom(_texture, m_creationType, index);
+		// Return index
+		return index;
+	}
+	TextureIndex Assets::createTexture2D(
 		void* pixels, uint32_t width, uint32_t height,
 		bool				UseMipMapping,
 		TextureWrapping		WrapMode,
@@ -272,10 +386,13 @@ namespace Vxl
 	{
 		// Create New Data
 		Texture2D* _texture = new Texture2D(pixels, width, height, UseMipMapping, WrapMode, FilterMode, FormatType, ChannelType, PixelType, AnisotropicMode);
-		// Store Data and Return index
-		return m_texture2D_storage.Add(_texture, m_creationType);
+		// Store Data
+		TextureIndex index = m_baseTexture_storage.Add(_texture, m_creationType);
+		m_texture2D_storage.AddCustom(_texture, m_creationType, index);
+		// Return index
+		return index;
 	}
-	CubemapIndex Assets::loadCubemap(
+	TextureIndex Assets::loadCubemap(
 		const std::string& filePath1, const std::string& filePath2,
 		const std::string& filePath3, const std::string& filePath4,
 		const std::string& filePath5, const std::string& filePath6,
@@ -288,10 +405,13 @@ namespace Vxl
 		AnisotropicMode		AnisotropicMode
 	)
 	{
-		// Create New DAta
+		// Create New Data
 		Cubemap* _cubemap = new Cubemap(filePath1, filePath2, filePath3, filePath4, filePath5, filePath6, InvertY, UseMipMapping, WrapMode, FilterMode, FormatType, PixelType, AnisotropicMode);
-		// Store Data and Return index
-		return m_cubemap_storage.Add(_cubemap, m_creationType);
+		// Store Data
+		TextureIndex index = m_baseTexture_storage.Add(_cubemap, m_creationType);
+		m_cubemap_storage.AddCustom(_cubemap, m_creationType, index);
+		// Return index
+		return index;
 	}
 	void Assets::loadFile(
 		const std::string& name,
@@ -368,21 +488,21 @@ namespace Vxl
 	ShaderIndex Assets::createShader(const std::string& name, const std::string& sourceCode, ShaderType type)
 	{
 		// Create New Data
-		_Shader* _shader = new _Shader(name, sourceCode, type);
+		Shader* _shader = new Shader(name, sourceCode, type);
 		// Store Data and Return index
 		return m_shader_storage.Add(_shader, m_creationType);
 	}
-	ShaderProgramIndex Assets::createShaderProgram(const std::string& name, const std::vector<_Shader*>& _shaders)
+	ShaderProgramIndex Assets::createShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders)
 	{
 		// Create New Data
-		_ShaderProgram* _program = new _ShaderProgram(name, _shaders);
+		ShaderProgram* _program = new ShaderProgram(name, _shaders);
 		// Store Data and Return index
 		return m_shaderProgram_storage.Add(_program, m_creationType);
 	}
-	ShaderProgramIndex Assets::createShaderProgram(const std::string& name, std::initializer_list<_Shader*> _shaders)
+	ShaderProgramIndex Assets::createShaderProgram(const std::string& name, std::initializer_list<Shader*> _shaders)
 	{
 		// Create New Data
-		_ShaderProgram* _program = new _ShaderProgram(name, _shaders);
+		ShaderProgram* _program = new ShaderProgram(name, _shaders);
 		// Store Data and Return index
 		return m_shaderProgram_storage.Add(_program, m_creationType);
 	}
@@ -390,7 +510,7 @@ namespace Vxl
 	MaterialIndex Assets::createMaterial(const std::string& name)
 	{
 		// Create New Data
-		_Material* material = new _Material(name);
+		Material* material = new Material(name);
 		// Store Data and Return index
 		MaterialIndex materialIndex = m_material_storage.Add(material, m_creationType);
 
@@ -421,7 +541,7 @@ namespace Vxl
 
 	const char* SECTION_NAME = "#Name";
 	const char* SECTION_INCLUDE = "#Include";
-	const char* SECTION_PROPERTIES = "#Properties";
+	const char* SECTION_UNIFORMS = "#Uniforms";
 	const char* SECTION_SAMPLERS = "#Samplers";
 	const char* SECTION_ATTRIBUTE = "#Attributes";
 	const char* SECTION_VERTEX = "#Vertex";
@@ -466,7 +586,7 @@ namespace Vxl
 
 		locations.name = file.find(SECTION_NAME);
 		locations.include = file.find(SECTION_INCLUDE);
-		locations.properties = file.find(SECTION_PROPERTIES);
+		locations.properties = file.find(SECTION_UNIFORMS);
 		locations.samplers = file.find(SECTION_SAMPLERS);
 		locations.attributes = file.find(SECTION_ATTRIBUTE);
 		locations.vertex = file.find(SECTION_VERTEX);
@@ -531,6 +651,7 @@ namespace Vxl
 		}
 
 		// Samplers
+		std::vector<TextureLevel> targetLevels;
 		if (locations.samplers != std::string::npos)
 		{
 			std::string section = stringUtil::extractSection(file, '{', '}', locations.samplers) + '\n';
@@ -550,7 +671,12 @@ namespace Vxl
 					stringUtil::trim(property[0]);
 					stringUtil::trim(property[1]);
 
-					sampler_info += "layout (binding = " + property[1] + ") uniform " + property[0] + ';';
+					if (stringUtil::isNumber(property[1]))
+					{
+						sampler_info += "layout (binding = " + property[1] + ") uniform " + property[0] + ';';
+
+						targetLevels.push_back((TextureLevel)(std::stoi(property[1]) + 1));
+					}
 				}
 			}
 
@@ -628,7 +754,7 @@ namespace Vxl
 		}
 
 		// Create Shaders
-		std::vector<_Shader*> shaders;
+		std::vector<Shader*> shaders;
 
 		if (!VertexShaderCode.empty())
 		{
@@ -654,8 +780,9 @@ namespace Vxl
 
 		// Create Material with Program
 		MaterialIndex _MaterialIndex = createMaterial(name + "_material");
-		_Material* _Mat = Assets::getMaterial(_MaterialIndex);
+		Material* _Mat = Assets::getMaterial(_MaterialIndex);
 		_Mat->setShader(_ShaderProgramIndex);
+		_Mat->m_targetLevels = targetLevels;
 
 		// Result
 		return _MaterialIndex;

@@ -3,8 +3,9 @@
 
 namespace Vxl
 {
-	using Texture2DIndex = uint32_t;
-	using CubemapIndex = uint32_t;
+	using TextureIndex = uint32_t;
+	//using Texture2DIndex = uint32_t;
+	//using CubemapIndex = uint32_t;
 	using FramebufferObjectIndex = uint32_t;
 	using RenderTextureIndex = uint32_t;
 	using RenderTextureDepthIndex = uint32_t;

@@ -8,10 +8,10 @@
 
 namespace Vxl
 {
-	std::map<ShaderID, _Shader*> _Shader::m_brokenShaders;
-	std::map<ShaderProgramID, _ShaderProgram*> _ShaderProgram::m_brokenShaderPrograms;
+	std::map<ShaderID, Shader*> Shader::m_brokenShaders;
+	std::map<ShaderProgramID, ShaderProgram*> ShaderProgram::m_brokenShaderPrograms;
 
-	_Shader::_Shader(const std::string& name, const std::string& shaderCode, ShaderType type)
+	Shader::Shader(const std::string& name, const std::string& shaderCode, ShaderType type)
 		: m_name(name), m_source(shaderCode), m_type(type)
 	{
 		// Create
@@ -75,19 +75,19 @@ namespace Vxl
 
 		}
 	}
-	_Shader::~_Shader()
+	Shader::~Shader()
 	{
 		m_brokenShaders.erase(m_id);
 
 		if (m_id != -1)
 			Graphics::Shader::Delete(m_id);
 	}
-	void _Shader::setGLName(const std::string& name)
+	void Shader::setGLName(const std::string& name)
 	{
 		Graphics::SetGLName(ObjectType::SHADER, m_id, "Shader_" + name);
 	}
 
-	_ShaderProgram::_ShaderProgram(const std::string& name, const std::vector<_Shader*>& _shaders)
+	ShaderProgram::ShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders)
 		: m_name(name), m_shaders(_shaders)
 	{
 		m_id = Graphics::ShaderProgram::Create();
@@ -150,13 +150,13 @@ namespace Vxl
 			Graphics::ShaderProgram::DetachShader(m_id, m_shaders[i]->getID());
 
 	}
-	_ShaderProgram::~_ShaderProgram()
+	ShaderProgram::~ShaderProgram()
 	{
 		m_brokenShaderPrograms.erase(m_id);
 
 		Graphics::ShaderProgram::Delete(m_id);
 	}
-	void _ShaderProgram::bind() const
+	void ShaderProgram::bind() const
 	{
 		if (m_linked)
 		{
@@ -170,11 +170,11 @@ namespace Vxl
 			}
 		}
 	}
-	void _ShaderProgram::unbind()
+	void ShaderProgram::unbind()
 	{
 		Graphics::ShaderProgram::Disable();
 	}
-	void _ShaderProgram::setGLName(const std::string& name)
+	void ShaderProgram::setGLName(const std::string& name)
 	{
 		Graphics::SetGLName(ObjectType::PROGRAM, m_id, "Program_" + name);
 	}

@@ -487,7 +487,7 @@ namespace Vxl
 		if (!m_show)
 			return;
 
-		_Material* gizmoMaterial = Assets::getMaterial(_gizmoMaterial);
+		Material* gizmoMaterial = Assets::getMaterial(_gizmoMaterial);
 		if (gizmoMaterial)
 		{
 			gizmoMaterial->bindProgram();
@@ -749,7 +749,7 @@ namespace Vxl
 			m_fbo->bind();
 			m_fbo->clearBuffers();
 
-			_Material* material_colorPicker = Assets::getMaterial(_colorPickerMaterial);
+			Material* material_colorPicker = Assets::getMaterial(_colorPickerMaterial);
 
 			material_colorPicker->bindProgram();
 			material_colorPicker->bindStates();

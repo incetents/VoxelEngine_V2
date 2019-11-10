@@ -22,7 +22,7 @@
 	sampler2D albedo_handler : 0
 }
 
-#Properties
+#Uniforms
 {
 	// No uniforms here
 }

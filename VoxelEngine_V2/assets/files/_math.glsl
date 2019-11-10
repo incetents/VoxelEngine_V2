@@ -37,3 +37,27 @@ vec3 HSV_TO_RGB(float h, float s, float v)
 		return vec3(v,p,q);
     }
 }
+
+// Converts sRGB value in the range [0, 1] to a linear value in the range [0, 1] 
+float srgb_to_linear(float srgb)
+{
+	float linear = srgb;// / 255.0f;
+	if (linear <= 0.04045) {
+		linear = linear / 12.92;
+	} else {
+		linear = pow((linear + 0.055) / 1.055, 2.4);
+	}
+	return linear;
+}
+
+// Converts a linear value in the range [0, 1] to an sRGB value in the range [0, 1].
+float linear_to_srgb(float linear)
+{
+	float srgb;
+	if (linear <= 0.0031308) {
+		srgb = linear * 12.92;
+	} else {
+		srgb = 1.055 * pow(linear, 1.0 / 2.4) - 0.055;
+	}
+	return srgb;// * 255;
+}

@@ -54,9 +54,6 @@
     <ClCompile Include="engine\Precompiled.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\utilities\Loader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\math\MathCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -106,9 +103,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\utilities\Macros.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\textures\TextureBinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\input\Input.cpp">
@@ -198,9 +192,6 @@
     <ClCompile Include="engine\utilities\Asset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\modules\GlobalData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -220,9 +211,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\implement\imgui_impl_opengl3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\utilities\ShaderBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\objects\Camera.cpp">
@@ -273,9 +261,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Precompiled.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\utilities\Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\modules\Component.h">
@@ -345,9 +330,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Macros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\textures\TextureBinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\rendering\Debug.h">
@@ -440,9 +422,6 @@
     <ClInclude Include="engine\rendering\Gizmo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\modules\GlobalData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -468,9 +447,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\implement\imgui_impl_opengl3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\utilities\ShaderBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\objects\Camera.h">

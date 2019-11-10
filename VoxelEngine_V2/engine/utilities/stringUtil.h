@@ -52,5 +52,8 @@ namespace Vxl
 		std::string extractFirst(const std::string& str, char start, char end);
 		std::string extractNameFromPath(const std::string& str);
 		std::string extractSection(const std::string& str, char start, char end, std::size_t startIndex = 0);
+
+		// Check if string is number
+		bool isNumber(const std::string& str);
 	}
 }

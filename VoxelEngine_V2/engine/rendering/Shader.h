@@ -20,9 +20,9 @@ namespace Vxl
 	typedef std::map<std::string, Graphics::UniformBlock> UniformBlockStorage;
 	typedef std::map<ShaderType, Graphics::UniformSubroutine> SubroutineStorage;
 
-	class _Shader
+	class Shader
 	{
-		DISALLOW_COPY_AND_ASSIGN(_Shader);
+		DISALLOW_COPY_AND_ASSIGN(Shader);
 		friend class Assets;
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
@@ -34,11 +34,11 @@ namespace Vxl
 		std::string			m_source;
 		std::string			m_sourceLines;
 		std::string			m_errorMessage;
-		static std::map<ShaderID, _Shader*> m_brokenShaders;
+		static std::map<ShaderID, Shader*> m_brokenShaders;
 
-		_Shader(const std::string& name, const std::string& shaderCode, ShaderType type);
+		Shader(const std::string& name, const std::string& shaderCode, ShaderType type);
 	public:
-		~_Shader();
+		~Shader();
 
 		// Utility
 		void setGLName(const std::string& name);
@@ -66,28 +66,28 @@ namespace Vxl
 		}
 	};
 
-	class _ShaderProgram
+	class ShaderProgram
 	{
-		DISALLOW_COPY_AND_ASSIGN(_ShaderProgram);
+		DISALLOW_COPY_AND_ASSIGN(ShaderProgram);
 		friend class Assets;
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
-		friend class _Material;
+		friend class Material;
 	private:
 		ShaderProgramID				m_id;
 		const std::string			m_name;
 		bool						m_linked;
-		std::vector<_Shader*>		m_shaders;
+		std::vector<Shader*>		m_shaders;
 		AttributeStorage			m_attributes;
 		UniformStorage				m_uniforms;
 		UniformBlockStorage			m_uniformBlocks;
 		SubroutineStorage			m_subroutines;
 		std::string					m_errorMessage;
-		static std::map<ShaderProgramID, _ShaderProgram*> m_brokenShaderPrograms;
+		static std::map<ShaderProgramID, ShaderProgram*> m_brokenShaderPrograms;
 
-		_ShaderProgram(const std::string& name, const std::vector<_Shader*>& _shaders);
+		ShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders);
 	public:
-		~_ShaderProgram();
+		~ShaderProgram();
 
 		//
 		void bind(void) const;
@@ -131,7 +131,7 @@ namespace Vxl
 		{
 			return m_errorMessage;
 		}
-		inline std::vector<_Shader*>	getShaders(void) const
+		inline std::vector<Shader*>	getShaders(void) const
 		{
 			return m_shaders;
 		}

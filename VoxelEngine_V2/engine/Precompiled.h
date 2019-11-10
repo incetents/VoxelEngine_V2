@@ -62,13 +62,11 @@
 #include "textures/Texture2D.h"
 #include "textures/Cubemap.h"
 #include "textures/RenderTexture.h"
-#include "textures/TextureBinder.h"
 
 #include "utilities/Asset.h"
 #include "utilities/Types.h"
 #include "utilities/FileIO.h"
 #include "utilities/Macros.h"
-#include "utilities/Loader.h"
 #include "utilities/Logger.h"
 #include "utilities/Macros.h"
 #include "utilities/singleton.h"

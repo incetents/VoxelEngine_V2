@@ -33,7 +33,6 @@
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
     <ClCompile Include="engine\math\Raycast.cpp" />
-    <ClCompile Include="engine\modules\GlobalData.cpp" />
     <ClCompile Include="engine\objects\Camera.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
     <ClCompile Include="engine\objects\GameObject.cpp" />
@@ -56,13 +55,10 @@
     <ClCompile Include="engine\textures\Cubemap.cpp" />
     <ClCompile Include="engine\textures\RenderTexture.cpp" />
     <ClCompile Include="engine\textures\Texture2D.cpp" />
-    <ClCompile Include="engine\textures\TextureBinder.cpp" />
     <ClCompile Include="engine\utilities\Asset.cpp" />
     <ClCompile Include="engine\utilities\FileIO.cpp" />
-    <ClCompile Include="engine\utilities\Loader.cpp" />
     <ClCompile Include="engine\utilities\Logger.cpp" />
     <ClCompile Include="engine\utilities\Macros.cpp" />
-    <ClCompile Include="engine\utilities\ShaderBuilder.cpp" />
     <ClCompile Include="engine\utilities\Time.cpp" />
     <ClCompile Include="engine\utilities\Util.cpp" />
     <ClCompile Include="game\Scene_Game.cpp" />
@@ -150,7 +146,6 @@
     <ClInclude Include="engine\input\XGamePad.h" />
     <ClInclude Include="engine\math\Raycast.h" />
     <ClInclude Include="engine\math\Vector.h" />
-    <ClInclude Include="engine\modules\GlobalData.h" />
     <ClInclude Include="engine\objects\Camera.h" />
     <ClInclude Include="engine\objects\LightObject.h" />
     <ClInclude Include="engine\math\Model.h" />
@@ -191,15 +186,12 @@
     <ClInclude Include="engine\textures\Texture2D.h" />
     <ClInclude Include="engine\rendering\Uniform.h" />
     <ClInclude Include="engine\Precompiled.h" />
-    <ClInclude Include="engine\textures\TextureBinder.h" />
     <ClInclude Include="engine\utilities\Asset.h" />
     <ClInclude Include="engine\utilities\Types.h" />
     <ClInclude Include="engine\utilities\Containers.h" />
     <ClInclude Include="engine\utilities\FileIO.h" />
-    <ClInclude Include="engine\utilities\Loader.h" />
     <ClInclude Include="engine\utilities\Logger.h" />
     <ClInclude Include="engine\utilities\Macros.h" />
-    <ClInclude Include="engine\utilities\ShaderBuilder.h" />
     <ClInclude Include="engine\utilities\Singleton.h" />
     <ClInclude Include="engine\utilities\stringUtil.h" />
     <ClInclude Include="engine\utilities\Time.h" />

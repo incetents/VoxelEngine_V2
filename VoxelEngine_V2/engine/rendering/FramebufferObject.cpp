@@ -201,7 +201,7 @@ namespace Vxl
 		{
 			if (texture.second.IsRenderTexture())
 			{
-				auto render = texture.second.GetRenderTexture();
+				RenderTexture* render = texture.second.GetRenderTexture();
 				render->RecreateStorage(getWidth(), getHeight(), render->GetFormatType(), render->GetPixelType());
 
 				Graphics::FramebufferObject::AttachRenderTexture(*texture.second.GetRenderTexture(), texture.first);

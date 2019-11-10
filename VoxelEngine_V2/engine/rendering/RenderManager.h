@@ -27,7 +27,6 @@ namespace Vxl
 		DISALLOW_COPY_AND_ASSIGN(RenderManager);
 		friend class Hierarchy;
 	private:
-	public: // TEMP PUBLIC
 		Scene* m_currentScene = nullptr;
 	private:
 
@@ -39,22 +38,6 @@ namespace Vxl
 		// Associate entities to materials
 		std::map<MaterialIndex, std::vector<Entity*>> m_renderlist_opaque;
 		std::map<MaterialIndex, std::vector<Entity*>> m_renderlist_transparent;
-		
-
-		//Layer* m_layers;
-		//uint32_t m_layerToRender = ~0;
-
-		// Masterlist of entities
-		//std::vector<Entity*> m_allEntities;
-
-		// GameObjects per Material
-
-		//	std::map<Material*, std::set<GameObject*>*> m_gameObjectsPerMaterial;
-		//	// All Materials with their gameobjects, sorted by their OrderID
-		//	std::map<uint32_t, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted_Opaque;
-		//	std::map<uint32_t, std::pair< Material*, std::set<GameObject*>* >> m_gameObjectsSorted_Transparent;
-		//	void SortGameObjects();
-		//	void Render(Material* _material, const std::set<GameObject*>& _objects);
 
 		// Imgui render window
 		std::vector<GuiWindow*> m_guiWindows;
@@ -83,8 +66,6 @@ namespace Vxl
 		void ReloadFBOS();
 
 		// Behaviour
-		void InitSceneGLResources();
-		void DestroySceneGLResources();
 		void Update();
 		void UpdateFixed();
 		void Draw();
@@ -93,6 +74,7 @@ namespace Vxl
 		// Special Resources allocated untraditionally
 		void InitGlobalGLResources();
 		void DestroyGlobalGLResources();
+		void DestroySceneGLResources();
 
 		// Render
 		void RenderFullScreen();

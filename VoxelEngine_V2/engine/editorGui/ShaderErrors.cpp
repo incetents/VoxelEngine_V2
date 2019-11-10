@@ -13,18 +13,18 @@ namespace Vxl
 
 	bool ShaderErrors::HasErrors()
 	{
-		return _Shader::m_brokenShaders.size() > 0 || _ShaderProgram::m_brokenShaderPrograms.size() > 0;
+		return Shader::m_brokenShaders.size() > 0 || ShaderProgram::m_brokenShaderPrograms.size() > 0;
 	}
 
 	void ShaderErrors::Draw()
 	{
-		if (_Shader::m_brokenShaders.size() == 0 && _ShaderProgram::m_brokenShaderPrograms.size() == 0)
+		if (Shader::m_brokenShaders.size() == 0 && ShaderProgram::m_brokenShaderPrograms.size() == 0)
 		{
 			ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "No Shader Errors");
 		}
 		else
 		{
-			if (_Shader::m_brokenShaders.size() > 0)
+			if (Shader::m_brokenShaders.size() > 0)
 			{
 				ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "Shader Compilation Failures:");
 				ImGui::Separator();
@@ -32,7 +32,7 @@ namespace Vxl
 
 
 			// Shader Compilation Errors
-			for (auto brokenShader : _Shader::m_brokenShaders)
+			for (auto brokenShader : Shader::m_brokenShaders)
 			{
 				if (ImGui::TreeNode(brokenShader.second->m_name.c_str()))
 				{
@@ -96,14 +96,14 @@ namespace Vxl
 				ImGui::Separator();
 			}
 
-			if (_ShaderProgram::m_brokenShaderPrograms.size() > 0)
+			if (ShaderProgram::m_brokenShaderPrograms.size() > 0)
 			{
 				ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.f, 1.f), "Program Link Failures:");
 				ImGui::Separator();
 			}
 
 			// Program Linking Errors
-			for (auto brokenProgram : _ShaderProgram::m_brokenShaderPrograms)
+			for (auto brokenProgram : ShaderProgram::m_brokenShaderPrograms)
 			{
 				if (ImGui::TreeNode(brokenProgram.second->m_name.c_str()))
 				{
