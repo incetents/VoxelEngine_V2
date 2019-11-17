@@ -50,7 +50,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		// FBO Rest
 		if (Input.getKeyDown(KeyCode::F6))
 		{
-			RenderManager.ReloadFBOS();
+			RenderManager.ReloadViewportFBOS();
 		}
 
 		// Before Frame

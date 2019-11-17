@@ -16,49 +16,54 @@ namespace Vxl
 	class Scene_Game : public Scene
 	{
 	public:
-		// Shader Assets
-		ShaderIndex gbuffer_vert;
-		ShaderIndex gbuffer_frag;
-		ShaderIndex passthrough_vert;
-		ShaderIndex passthrough_frag;
-		ShaderIndex skybox_vert;
-		ShaderIndex skybox_frag;
-		ShaderIndex lines_vert;
-		ShaderIndex lines_geom;
-		ShaderIndex lines_frag;
-		ShaderIndex colorPicker_frag;
-		ShaderIndex gizmo_vert;
-		ShaderIndex gizmo_frag;
-		ShaderIndex showRenderTarget;
-		ShaderIndex billboard_vert;
-		ShaderIndex billboard_frag;
-		ShaderIndex font_vert;
-		ShaderIndex font_frag;
-		// Shader Program Assets
-		ShaderProgramIndex shader_gbuffer;
-		ShaderProgramIndex shader_passthroughWorld;
-		ShaderProgramIndex shader_skybox;
-		ShaderProgramIndex shader_lines;
-		ShaderProgramIndex shader_colorPicker;
-		ShaderProgramIndex shader_gizmo;
-		ShaderProgramIndex shader_showRenderTarget;
-		ShaderProgramIndex shader_billboard;
-		ShaderProgramIndex shader_font;
+		//	// Shader Assets
+		//	ShaderIndex gbuffer_vert;
+		//	ShaderIndex gbuffer_frag;
+		//	ShaderIndex passthrough_vert;
+		//	ShaderIndex passthrough_frag;
+		//	ShaderIndex skybox_vert;
+		//	ShaderIndex skybox_frag;
+		//	ShaderIndex lines_vert;
+		//	ShaderIndex lines_geom;
+		//	ShaderIndex lines_frag;
+		//	ShaderIndex colorPicker_frag;
+		//	ShaderIndex gizmo_vert;
+		//	ShaderIndex gizmo_frag;
+		//	ShaderIndex showRenderTarget;
+		//	ShaderIndex billboard_vert;
+		//	ShaderIndex billboard_frag;
+		//	ShaderIndex font_vert;
+		//	ShaderIndex font_frag;
+		//	// Shader Program Assets
+		//	ShaderProgramIndex shader_gbuffer;
+		//	ShaderProgramIndex shader_passthroughWorld;
+		//	ShaderProgramIndex shader_skybox;
+		//	ShaderProgramIndex shader_lines;
+		//	ShaderProgramIndex shader_colorPicker;
+		//	ShaderProgramIndex shader_gizmo;
+		//	ShaderProgramIndex shader_showRenderTarget;
+		//	ShaderProgramIndex shader_billboard;
+		//	ShaderProgramIndex shader_font;
+		// Shader Material Assets
+		ShaderMaterialIndex sMat_gbuffer;
+		ShaderMaterialIndex sMat_skybox;
+		ShaderMaterialIndex sMat_displayRenderTarget;
 
 		// Materials
 		MaterialIndex material_gbuffer = -1;
 		MaterialIndex material_skybox = -1;
+		MaterialIndex material_displayRenderTarget = -1;
 
 
-		MaterialIndex material_gbuffer_transparent;
-		MaterialIndex material_passthroughWorld;
-		MaterialIndex material_passthroughWorld_transparent;
-		MaterialIndex material_lines;
-		MaterialIndex material_colorPicker;
-		MaterialIndex material_gizmo;
-		MaterialIndex material_showRenderTarget;
-		MaterialIndex material_billboard;
-		MaterialIndex material_font;
+		//	MaterialIndex material_gbuffer_transparent;
+		//	MaterialIndex material_passthroughWorld;
+		//	MaterialIndex material_passthroughWorld_transparent;
+		//	MaterialIndex material_lines;
+		//	MaterialIndex material_colorPicker;
+		//	MaterialIndex material_gizmo;
+		//	MaterialIndex material_showRenderTarget;
+		//	MaterialIndex material_billboard;
+		//	MaterialIndex material_font;
 		//MaterialIndex material_showNormals;
 
 		// Textures
@@ -78,7 +83,6 @@ namespace Vxl
 		RenderTextureIndex fbotex_gbuffer_albedo;
 		RenderTextureIndex fbotex_gbuffer_normal;
 		RenderTextureIndex fbotex_gbuffer_reflection;
-		RenderTextureIndex fbotex_gbuffer_colorID;
 		RenderTextureDepthIndex fbotex_gbuffer_depth;
 
 		RenderTextureIndex fbotex_editor_albedo;

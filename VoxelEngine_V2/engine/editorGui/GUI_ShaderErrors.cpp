@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "ShaderErrors.h"
+#include "GUI_ShaderErrors.h"
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
@@ -9,8 +9,6 @@
 
 namespace Vxl
 {
-	auto& shaders = Assets::getAllShader();
-
 	bool ShaderErrors::HasErrors()
 	{
 		return Shader::m_brokenShaders.size() > 0 || ShaderProgram::m_brokenShaderPrograms.size() > 0;

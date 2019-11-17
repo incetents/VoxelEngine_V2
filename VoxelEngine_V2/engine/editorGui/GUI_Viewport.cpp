@@ -1,6 +1,6 @@
 // Copyright(c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "GUIViewport.h"
+#include "GUI_Viewport.h"
 
 #ifdef GLOBAL_IMGUI
 
@@ -19,7 +19,7 @@
 
 namespace Vxl
 {
-	void GUIViewport::InitGLResources()
+	void GUI_Viewport::InitGLResources()
 	{
 		//	m_fbo = GlobalAssets.createFramebuffer();
 		//	FramebufferObject* fbo = GlobalAssets.getFramebufferObject(m_fbo);
@@ -39,7 +39,7 @@ namespace Vxl
 		//	m_renderTexture = GlobalAssets.getRenderTexture(m_renderTexture);
 
 	}
-	void GUIViewport::DestroyGLResources()
+	void GUI_Viewport::DestroyGLResources()
 	{
 		//	//RenderTexture::DeleteUnnamedAsset(m_renderTexture);
 		//	m_renderTexture = nullptr;
@@ -51,7 +51,7 @@ namespace Vxl
 		//	m_renderTexture = nullptr;
 	}
 
-	void GUIViewport::DrawRenderTarget()
+	void GUI_Viewport::DrawRenderTarget()
 	{
 		//	// Begin
 		//	FramebufferObject* fbo_gbuffer = SceneAssets.getFramebufferObject(fboIndex_gbuffer);
@@ -137,7 +137,7 @@ namespace Vxl
 		//	m_fbo->Unbind();
 	}
 
-	void GUIViewport::Draw()
+	void GUI_Viewport::Draw()
 	{
 		// Menu
 		if (ImGui::BeginMenuBar())

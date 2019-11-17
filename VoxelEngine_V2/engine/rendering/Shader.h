@@ -1,17 +1,15 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
-//#include "Enums.h"
 
 #include "../utilities/Types.h"
 #include "../utilities/Macros.h"
-
-//#include <GL/gl3w.h>
 
 #include "Uniform.h"
 
 #include <string>
 #include <vector>
 #include <map>
+#include <optional>
 
 namespace Vxl
 {
@@ -20,10 +18,13 @@ namespace Vxl
 	typedef std::map<std::string, Graphics::UniformBlock> UniformBlockStorage;
 	typedef std::map<ShaderType, Graphics::UniformSubroutine> SubroutineStorage;
 
+	class Entity;
+
 	class Shader
 	{
 		DISALLOW_COPY_AND_ASSIGN(Shader);
 		friend class Assets;
+		friend class ShaderMaterial;
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
 	private:
@@ -74,6 +75,7 @@ namespace Vxl
 		friend class ShaderCodeViewer;
 		friend class Material;
 	private:
+		// Core Data
 		ShaderProgramID				m_id;
 		const std::string			m_name;
 		bool						m_linked;
@@ -84,6 +86,8 @@ namespace Vxl
 		SubroutineStorage			m_subroutines;
 		std::string					m_errorMessage;
 		static std::map<ShaderProgramID, ShaderProgram*> m_brokenShaderPrograms;
+
+		void setupCommonUniform(const std::string& name, std::optional<Graphics::Uniform>& uniform);
 
 		ShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders);
 	public:
@@ -114,6 +118,22 @@ namespace Vxl
 			}
 		}
 
+		// Common Uniforms
+		std::optional<Graphics::Uniform> m_uniform_useModel = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_model = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_mvp = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_normalMatrix = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_useInstancing = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_useTexture = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_color = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_tint = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_viewport = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_alpha = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_output = std::nullopt;
+
+		// Binding Common Uniforms
+		void bindCommonUniforms(EntityIndex _entity);
+
 		// Getters
 		inline bool						isLinked(void) const
 		{
@@ -131,11 +151,26 @@ namespace Vxl
 		{
 			return m_errorMessage;
 		}
-		inline std::vector<Shader*>	getShaders(void) const
+		inline std::vector<Shader*>		getShaders(void) const
 		{
 			return m_shaders;
 		}
 	};
 
+	class ShaderMaterial
+	{
+		DISALLOW_COPY_AND_ASSIGN(ShaderMaterial);
+		friend class Assets;
+		friend class RenderManager;
+	private:
+		ShaderMaterial(const std::string& filePath);
+		void reload();
+	public:
+		const std::string			m_filePath;			// File used to load
+		std::vector<TextureLevel>	m_targetLevels;		// Textures used in program
+		ShaderProgramIndex			m_coreProgram;		// Main Program used for rendering
+		ShaderProgramIndex			m_colorIDProgram;	// Alternate program used only for ColorID output
+		ShaderProgramIndex			m_depthOnlyProgram;	// Alternate program only outputting depth
+	};
 }
 

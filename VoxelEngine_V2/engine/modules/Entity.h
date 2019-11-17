@@ -26,6 +26,7 @@ namespace Vxl
 		friend class Transform;
 		friend class Editor;
 		friend class Material;
+		friend class ShaderProgram;
 	protected:
 		// Locked Constructor
 		Entity(const std::string& name);
@@ -54,6 +55,8 @@ namespace Vxl
 			UpdateBoundingBoxCheap();
 		}
 
+		bool operator< (const Entity& other) const;
+
 	public:
 		// Destructor
 		virtual ~Entity();
@@ -65,10 +68,11 @@ namespace Vxl
 		Color3F		m_Color			= Color3F(0, 0, 0);
 		Color3F		m_Tint			= Color3F(1, 1, 1);
 		float		m_alpha			= 1.0f;
+		bool		m_useTextures	= true; // Only checks if material doesn't use shared textures
 		bool		m_useTransform	= true;
 		bool		m_isActive		= true;
 		bool		m_isSelectable	= true; // for editor
-		
+
 		// Mesh
 		void setMesh(MeshIndex index);
 		inline MeshIndex getMesh(void) const

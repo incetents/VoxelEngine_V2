@@ -490,13 +490,15 @@ namespace Vxl
 		Material* gizmoMaterial = Assets::getMaterial(_gizmoMaterial);
 		if (gizmoMaterial)
 		{
-			gizmoMaterial->bindProgram();
+			gizmoMaterial->bindCoreProgram();
+			gizmoMaterial->bindStates();
 
-			Graphics::Uniform uniform_useModel = gizmoMaterial->getUniform("VXL_useModel");
-			Graphics::Uniform uniform_model = gizmoMaterial->getUniform("VXL_model");
-			Graphics::Uniform uniform_normalMatrix = gizmoMaterial->getUniform("VXL_normalMatrix");
-			Graphics::Uniform uniform_color = gizmoMaterial->getUniform("VXL_color");
-			Graphics::Uniform uniform_alpha = gizmoMaterial->getUniform("VXL_alpha");
+			ShaderProgram* program_colorPicker = gizmoMaterial->getCoreProgram();
+			Graphics::Uniform uniform_useModel = program_colorPicker->m_uniform_useModel.value();
+			Graphics::Uniform uniform_model = program_colorPicker->m_uniform_model.value();
+			Graphics::Uniform uniform_normalMatrix = program_colorPicker->m_uniform_normalMatrix.value();
+			Graphics::Uniform uniform_color = program_colorPicker->m_uniform_color.value();
+			Graphics::Uniform uniform_alpha = program_colorPicker->m_uniform_alpha.value();
 
 			uniform_useModel.send(true);
 			uniform_model.sendMatrix(m_transform.Model, true);
@@ -750,13 +752,16 @@ namespace Vxl
 			m_fbo->clearBuffers();
 
 			Material* material_colorPicker = Assets::getMaterial(_colorPickerMaterial);
+			if (!material_colorPicker)
+				return;
 
-			material_colorPicker->bindProgram();
+			material_colorPicker->bindCoreProgram();
 			material_colorPicker->bindStates();
 
-			Graphics::Uniform uniform_useModel = material_colorPicker->getUniform("VXL_useModel");
-			Graphics::Uniform uniform_model = material_colorPicker->getUniform("VXL_model");
-			Graphics::Uniform uniform_output = material_colorPicker->getUniform("VXL_output");
+			ShaderProgram* program_colorPicker = material_colorPicker->getCoreProgram();
+			Graphics::Uniform uniform_useModel = program_colorPicker->m_uniform_useModel.value();
+			Graphics::Uniform uniform_model = program_colorPicker->m_uniform_model.value();
+			Graphics::Uniform uniform_output = program_colorPicker->m_uniform_output.value();
 
 			uniform_useModel.send(true);
 			uniform_model.sendMatrix(m_transform.Model, true);

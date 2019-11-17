@@ -1,11 +1,12 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "ShaderCodeViewer.h"
+#include "GUI_ShaderCodeViewer.h"
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 #include "../engine/rendering/Shader.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {
@@ -39,7 +40,9 @@ namespace Vxl
 							ImGui::NextColumn();
 
 							size = _Shader->m_source.size();
+							ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::White);
 							ImGui::TextUnformatted(_Shader->m_source.c_str(), _Shader->m_source.c_str() + size);
+							ImGui::PopStyleColor();
 							ImGui::NextColumn();
 
 							ImGui::Columns(1);

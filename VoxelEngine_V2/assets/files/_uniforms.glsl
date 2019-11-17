@@ -3,6 +3,7 @@
 // [ Core Uniforms for Materials ]
 uniform bool  VXL_useModel 			= false;
 uniform mat4  VXL_model 			= mat4(1.0);
+uniform mat4  VXL_mvp 				= mat4(1.0);
 uniform mat3  VXL_normalMatrix	 	= mat3(1.0);
 uniform bool  VXL_useInstancing 	= false;
 uniform bool  VXL_useTexture 		= false;

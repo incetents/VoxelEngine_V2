@@ -86,6 +86,10 @@ namespace Vxl
 		{
 			return m_max;
 		}
+		inline VAOID		GetVAOID(void) const
+		{
+			return m_VAO.GetID();
+		}
 
 		void GenerateNormals(bool Smooth);
 		void GenerateTangents();

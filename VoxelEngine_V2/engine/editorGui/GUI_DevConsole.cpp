@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "DevConsole.h"
+#include "GUI_DevConsole.h"
 
 #ifdef GLOBAL_IMGUI
 

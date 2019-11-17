@@ -44,14 +44,14 @@
 
 #include "../engine/window/window.h"
 
-#include "../engine/editorGui/GUIViewport.h"
+#include "../engine/editorGui/GUI_Viewport.h"
 
 #include "../engine/editor/Editor.h"
-#include "../engine/editorGui/ShaderErrors.h"
-#include "../engine/editorGui/DevConsole.h"
-#include "../engine/editorGui/Hierarchy.h"
-#include "../engine/editorGui/Inspector.h"
-#include "../engine/editorGui/Performance.h"
+#include "../engine/editorGui/GUI_ShaderErrors.h"
+#include "../engine/editorGui/GUI_DevConsole.h"
+#include "../engine/editorGui/GUI_Hierarchy.h"
+#include "../engine/editorGui/GUI_Inspector.h"
+#include "../engine/editorGui/GUI_Performance.h"
 
 
 
@@ -66,7 +66,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::RGBA8,
+			TextureFormat::SRGBA8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 			);
@@ -76,7 +76,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::RGBA8,
+			TextureFormat::SRGBA8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -86,7 +86,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::RGBA8,
+			TextureFormat::SRGBA8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -97,7 +97,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::RGBA8,
+			TextureFormat::SRGBA8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -111,7 +111,7 @@ namespace Vxl
 			false, true,
 			TextureWrapping::CLAMP_STRETCH,
 			TextureFilter::LINEAR,
-			TextureFormat::RGBA8,
+			TextureFormat::SRGBA8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -124,17 +124,13 @@ namespace Vxl
 		// render targets
 		fbotex_gbuffer_albedo = SceneAssets.createRenderTexture(
 			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
-			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			TextureFormat::SRGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_normal = SceneAssets.createRenderTexture(
 			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA16_SNORM, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_reflection = SceneAssets.createRenderTexture(
-			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
-			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
-
-		fbotex_gbuffer_colorID = SceneAssets.createRenderTexture(
 			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
@@ -148,7 +144,6 @@ namespace Vxl
 		fbo_gbuffer_ptr->setAttachment(0, Assets::getRenderTexture(fbotex_gbuffer_albedo));
 		fbo_gbuffer_ptr->setAttachment(1, Assets::getRenderTexture(fbotex_gbuffer_normal));
 		fbo_gbuffer_ptr->setAttachment(2, Assets::getRenderTexture(fbotex_gbuffer_reflection));
-		fbo_gbuffer_ptr->setAttachment(3, Assets::getRenderTexture(fbotex_gbuffer_colorID));
 		fbo_gbuffer_ptr->setDepth(Assets::getRenderTextureDepth(fbotex_gbuffer_depth));
 		fbo_gbuffer_ptr->checkFBOStatus();
 		fbo_gbuffer_ptr->unbind();
@@ -260,86 +255,111 @@ namespace Vxl
 		fbo_showRenderTarget_ptr->checkFBOStatus();
 		fbo_showRenderTarget_ptr->unbind();
 
-		// Shaders
-		gbuffer_vert = SceneAssets.createShader("gbuffer_vert", FileIO::readFile("./assets/shaders/gbuffer.vert"), ShaderType::VERTEX);
-		gbuffer_frag = SceneAssets.createShader("gbuffer_frag", FileIO::readFile("./assets/shaders/gbuffer.frag"), ShaderType::FRAGMENT);
+		//	// Shaders
+		//	gbuffer_vert = SceneAssets.createShader("gbuffer_vert", FileIO::readFile("./assets/shaders/gbuffer.vert"), ShaderType::VERTEX);
+		//	gbuffer_frag = SceneAssets.createShader("gbuffer_frag", FileIO::readFile("./assets/shaders/gbuffer.frag"), ShaderType::FRAGMENT);
+		//	
+		//	passthrough_vert = SceneAssets.createShader("passthrough_vert", FileIO::readFile("./assets/shaders/passthrough.vert"), ShaderType::VERTEX);
+		//	passthrough_frag = SceneAssets.createShader("passthrough_frag", FileIO::readFile("./assets/shaders/passthrough.frag"), ShaderType::FRAGMENT);
+		//	
+		//	skybox_vert = SceneAssets.createShader("skybox_vert", FileIO::readFile("./assets/shaders/skybox.vert"), ShaderType::VERTEX);
+		//	skybox_frag = SceneAssets.createShader("skybox_frag", FileIO::readFile("./assets/shaders/skybox.frag"), ShaderType::FRAGMENT);
+		//	
+		//	lines_vert = SceneAssets.createShader("lines_vert", FileIO::readFile("./assets/shaders/lines.vert"), ShaderType::VERTEX);
+		//	lines_geom = SceneAssets.createShader("lines_geom", FileIO::readFile("./assets/shaders/lines.geom"), ShaderType::GEOMETRY);
+		//	lines_frag = SceneAssets.createShader("lines_frag", FileIO::readFile("./assets/shaders/lines.frag"), ShaderType::FRAGMENT);
+		//	
+		//	colorPicker_frag = SceneAssets.createShader("colorPicker_frag", FileIO::readFile("./assets/shaders/colorPicker.frag"), ShaderType::FRAGMENT);
+		//	
+		//	gizmo_vert = SceneAssets.createShader("gizmo_vert", FileIO::readFile("./assets/shaders/gizmo.vert"), ShaderType::VERTEX);
+		//	gizmo_frag = SceneAssets.createShader("gizmo_frag", FileIO::readFile("./assets/shaders/gizmo.frag"), ShaderType::FRAGMENT);
+		//	
+		//	showRenderTarget = SceneAssets.createShader("showRenderTarget", FileIO::readFile("./assets/shaders/showRenderTarget.frag"), ShaderType::FRAGMENT);
+		//	
+		//	billboard_vert = SceneAssets.createShader("billboard_vert", FileIO::readFile("./assets/shaders/billboard.vert"), ShaderType::VERTEX);
+		//	billboard_frag = SceneAssets.createShader("billboard_frag", FileIO::readFile("./assets/shaders/billboard.frag"), ShaderType::FRAGMENT);
+		//	
+		//	font_vert = SceneAssets.createShader("font_vert", FileIO::readFile("./assets/shaders/font.vert"), ShaderType::VERTEX);
+		//	font_frag = SceneAssets.createShader("font_frag", FileIO::readFile("./assets/shaders/font.frag"), ShaderType::FRAGMENT);
+		//	
+		//	// Shader Programs
+		//	shader_gbuffer = SceneAssets.createShaderProgram("gbuffer", {
+		//		Assets::getShader(gbuffer_vert),
+		//		Assets::getShader(gbuffer_frag)
+		//		});
+		//	
+		//	shader_passthroughWorld = SceneAssets.createShaderProgram("passthroughWorld", {
+		//		Assets::getShader(passthrough_vert),
+		//		Assets::getShader(passthrough_frag)
+		//		});
+		//	
+		//	shader_skybox = SceneAssets.createShaderProgram("skybox", {
+		//		Assets::getShader(skybox_vert),
+		//		Assets::getShader(skybox_frag)
+		//		});
+		//	
+		//	shader_lines = SceneAssets.createShaderProgram("lines", {
+		//		Assets::getShader(lines_vert),
+		//		Assets::getShader(lines_geom),
+		//		Assets::getShader(lines_frag)
+		//		});
+		//	
+		//	shader_colorPicker = SceneAssets.createShaderProgram("colorPicker", {
+		//		Assets::getShader(gbuffer_vert),
+		//		Assets::getShader(colorPicker_frag)
+		//		});
+		//	
+		//	shader_gizmo = SceneAssets.createShaderProgram("gizmo", {
+		//		Assets::getShader(gizmo_vert),
+		//		Assets::getShader(gizmo_frag)
+		//		});
+		//	
+		//	shader_showRenderTarget = SceneAssets.createShaderProgram("showRenderTarget", {
+		//		Assets::getShader(passthrough_vert),
+		//		Assets::getShader(showRenderTarget)
+		//		});
+		//	
+		//	shader_billboard = SceneAssets.createShaderProgram("billboard", {
+		//		Assets::getShader(billboard_vert),
+		//		Assets::getShader(billboard_frag)
+		//		});
+		//	
+		//	shader_font = SceneAssets.createShaderProgram("font", {
+		//		Assets::getShader(font_vert),
+		//		Assets::getShader(font_frag)
+		//		});
 
-		passthrough_vert = SceneAssets.createShader("passthrough_vert", FileIO::readFile("./assets/shaders/passthrough.vert"), ShaderType::VERTEX);
-		passthrough_frag = SceneAssets.createShader("passthrough_frag", FileIO::readFile("./assets/shaders/passthrough.frag"), ShaderType::FRAGMENT);
-
-		skybox_vert = SceneAssets.createShader("skybox_vert", FileIO::readFile("./assets/shaders/skybox.vert"), ShaderType::VERTEX);
-		skybox_frag = SceneAssets.createShader("skybox_frag", FileIO::readFile("./assets/shaders/skybox.frag"), ShaderType::FRAGMENT);
-
-		lines_vert = SceneAssets.createShader("lines_vert", FileIO::readFile("./assets/shaders/lines.vert"), ShaderType::VERTEX);
-		lines_geom = SceneAssets.createShader("lines_geom", FileIO::readFile("./assets/shaders/lines.geom"), ShaderType::GEOMETRY);
-		lines_frag = SceneAssets.createShader("lines_frag", FileIO::readFile("./assets/shaders/lines.frag"), ShaderType::FRAGMENT);
-
-		colorPicker_frag = SceneAssets.createShader("colorPicker_frag", FileIO::readFile("./assets/shaders/colorPicker.frag"), ShaderType::FRAGMENT);
-
-		gizmo_vert = SceneAssets.createShader("gizmo_vert", FileIO::readFile("./assets/shaders/gizmo.vert"), ShaderType::VERTEX);
-		gizmo_frag = SceneAssets.createShader("gizmo_frag", FileIO::readFile("./assets/shaders/gizmo.frag"), ShaderType::FRAGMENT);
-
-		showRenderTarget = SceneAssets.createShader("showRenderTarget", FileIO::readFile("./assets/shaders/showRenderTarget.frag"), ShaderType::FRAGMENT);
-
-		billboard_vert = SceneAssets.createShader("billboard_vert", FileIO::readFile("./assets/shaders/billboard.vert"), ShaderType::VERTEX);
-		billboard_frag = SceneAssets.createShader("billboard_frag", FileIO::readFile("./assets/shaders/billboard.frag"), ShaderType::FRAGMENT);
-
-		font_vert = SceneAssets.createShader("font_vert", FileIO::readFile("./assets/shaders/font.vert"), ShaderType::VERTEX);
-		font_frag = SceneAssets.createShader("font_frag", FileIO::readFile("./assets/shaders/font.frag"), ShaderType::FRAGMENT);
-
-		// Shader Programs
-		shader_gbuffer = SceneAssets.createShaderProgram("gbuffer", {
-			Assets::getShader(gbuffer_vert),
-			Assets::getShader(gbuffer_frag)
-			});
-
-		shader_passthroughWorld = SceneAssets.createShaderProgram("passthroughWorld", {
-			Assets::getShader(passthrough_vert),
-			Assets::getShader(passthrough_frag)
-			});
-
-		shader_skybox = SceneAssets.createShaderProgram("skybox", {
-			Assets::getShader(skybox_vert),
-			Assets::getShader(skybox_frag)
-			});
-
-		shader_lines = SceneAssets.createShaderProgram("lines", {
-			Assets::getShader(lines_vert),
-			Assets::getShader(lines_geom),
-			Assets::getShader(lines_frag)
-			});
-
-		shader_colorPicker = SceneAssets.createShaderProgram("colorPicker", {
-			Assets::getShader(gbuffer_vert),
-			Assets::getShader(colorPicker_frag)
-			});
-
-		shader_gizmo = SceneAssets.createShaderProgram("gizmo", {
-			Assets::getShader(gizmo_vert),
-			Assets::getShader(gizmo_frag)
-			});
-
-		shader_showRenderTarget = SceneAssets.createShaderProgram("showRenderTarget", {
-			Assets::getShader(passthrough_vert),
-			Assets::getShader(showRenderTarget)
-			});
-
-		shader_billboard = SceneAssets.createShaderProgram("billboard", {
-			Assets::getShader(billboard_vert),
-			Assets::getShader(billboard_frag)
-			});
-
-		shader_font = SceneAssets.createShaderProgram("font", {
-			Assets::getShader(font_vert),
-			Assets::getShader(font_frag)
-			});
+		// Shader Materials
+		sMat_skybox = SceneAssets.createShaderMaterial("./assets/materials/skybox.material");
+		sMat_gbuffer = SceneAssets.createShaderMaterial("./assets/materials/gbuffer.material");
+		sMat_displayRenderTarget = SceneAssets.createShaderMaterial("./assets/materials/displayRenderTarget.material");
 
 		// Materials
-		material_gbuffer = SceneAssets.createMaterialFromFile("./assets/materials/gbuffer.material");
+		material_skybox = SceneAssets.createMaterial("skybox");
+		{
+			auto mat = Assets::getMaterial(material_skybox);
+			mat->setShaderMaterial(sMat_skybox);
+			mat->setTexture(cubemap_craterlake, TextureLevel::LEVEL0);
+			mat->setSequenceID(1);
+			mat->m_blendFunc.source = BlendSource::ONE;
+			mat->m_blendFunc.destination = BlendDestination::ZERO;
+		}
+		material_gbuffer = SceneAssets.createMaterial("gbuffer");
 		{
 			auto mat = Assets::getMaterial(material_gbuffer);
+			mat->setShaderMaterial(sMat_gbuffer);
 			mat->m_sharedTextures = false;
 			mat->setSequenceID(2);
+			mat->m_blendFunc.source = BlendSource::ONE;
+			mat->m_blendFunc.destination = BlendDestination::ZERO;
+		}
+		material_displayRenderTarget = SceneAssets.createMaterial("displayRenderTarget");
+		{
+			auto mat = Assets::getMaterial(material_displayRenderTarget);
+			mat->setShaderMaterial(sMat_displayRenderTarget);
+			mat->setSequenceID(10000);
+			mat->m_blendFunc.source = BlendSource::ONE;
+			mat->m_blendFunc.destination = BlendDestination::ZERO;
 		}
 
 		//	material_gbuffer_transparent = SceneAssets.createMaterial("gbuffer_transparent");
@@ -370,13 +390,7 @@ namespace Vxl
 		//		mat->m_renderMode = MaterialRenderMode::Transparent;
 		//	
 		//	}
-		material_skybox = SceneAssets.createMaterialFromFile("./assets/materials/skybox.material");
-		{
-			auto mat = Assets::getMaterial(material_skybox);
-			mat->setShader(shader_skybox);
-			mat->setTexture(cubemap_craterlake, TextureLevel::LEVEL0);
-			mat->setSequenceID(1);
-		}
+		
 		//	material_lines = SceneAssets.createMaterial("lines");
 		//	{
 		//		auto mat = Assets::getMaterial(material_lines);
@@ -550,7 +564,6 @@ namespace Vxl
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(Geometry.GetCube());
 			entity_ptr->m_transform.setPosition(Vector3(0, 0, 0));
-			//entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 		}
 		entity_beato_cube = SceneAssets.createEntity("_beato_cube");
 		{
@@ -560,32 +573,16 @@ namespace Vxl
 			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 		}
+		entity_jiggy = SceneAssets.createEntity("_jiggy");
+		{
+			Entity* entity_ptr = Assets::getEntity(entity_jiggy);
+			entity_ptr->setMaterial(material_gbuffer);
+			entity_ptr->setMesh(mesh_jiggy);
+			entity_ptr->m_Color = Color3F(1, 1, 0);
+			entity_ptr->m_useTextures = false;
+			entity_ptr->m_transform.setPosition(Vector3(0, 0, -7));
+		}
 
-
-		//			// Entities
-		//			GameObject* _skybox = GameObject::Create("_skybox");
-		//			_skybox->SetMaterial(material_skybox);
-		//			//_skybox->SetTexture(Assets::getCubemap(cubemap_craterlake), TextureLevel::LEVEL0);
-		//			_skybox->SetMesh(Geometry.GetInverseCube());
-		//			_skybox->m_useTransform = false;
-		//			_skybox->SetSelectable(false);
-		//			
-		//			GameObject* _errorCube = GameObject::Create("_errorCube");
-		//			_errorCube->SetMaterial(material_gbuffer);
-		//			//_errorCube->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
-		//			//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
-		//			_errorCube->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
-		//			_errorCube->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
-		//			//_errorCube->SetColor(Color3F(1, 1, 0));
-		//			
-		//			GameObject* _errorCube2 = GameObject::Create("_errorCube");
-		//			_errorCube2->SetMaterial(material_gbuffer);
-		//			//_errorCube->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
-		//			//_errorCube->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
-		//			_errorCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
-		//			_errorCube2->m_transform.setPosition(Vector3(-0.5f, 0, -3.0f));
-		//			//_errorCube->SetColor(Color3F(1, 1, 0));
-		//			
 		//			_errorCube2->m_transform.setParent(&_errorCube->m_transform);
 		//			
 		//			GameObject* _entity1 = GameObject::Create("_entity1");
@@ -942,18 +939,17 @@ namespace Vxl
 
 		// GUI Setup [needs to be changed]
 #ifdef GLOBAL_IMGUI
-		GUIViewport.fboIndex_gbuffer = this->fboIndex_gbuffer;
-		GUIViewport.fboIndex_editor = this->fboIndex_editor;
+		GUI_Viewport.fboIndex_gbuffer = this->fboIndex_gbuffer;
+		GUI_Viewport.fboIndex_editor = this->fboIndex_editor;
 #endif
 
 		// UBO BINDING per frame
-		auto _cameraObject = Assets::getCamera(camera_main);
+		auto _cameraObject = Assets::getCamera(RenderManager.m_mainCamera);
 
-		UBOManager.BindCamera(*_cameraObject);
+		if(_cameraObject)
+			UBOManager.BindCamera(*_cameraObject);
+
 		UBOManager.BindTime();
-
-		fbo_editor->bind();
-		fbo_editor->clearBuffers();
 
 		fbo_gbuffer->bind();
 		fbo_gbuffer->clearBuffers();
@@ -962,11 +958,16 @@ namespace Vxl
 		CPUTimer::StartTimer("Gbuffer");
 		//
 		// Sort Objects
+		RenderManager.sortMaterials();
 		RenderManager.sortEntities();
 		//
 		RenderManager.renderOpaque();
 		RenderManager.renderTransparent();
 		//RenderManager.RenderSceneGameObjects_Opaque();
+
+		// Editor 
+		fbo_editor->bind();
+		fbo_editor->clearBuffers();
 
 		//	// Remember Depth gbuffer depth
 		//	fbo_gbuffer->GetDepthRenderTexture()->Copy(*fbo_colorPicker->GetDepthRenderBuffer());
@@ -1109,10 +1110,10 @@ namespace Vxl
 		fbo_composite->clearBuffers();
 
 		// Display Final Image
-		ShaderProgram* _shader_showRenderTarget = Assets::getShaderProgram(shader_showRenderTarget);
-		_shader_showRenderTarget->bind();
-		_shader_showRenderTarget->sendUniform("channelOutput", 0);
-		_shader_showRenderTarget->sendUniform("outputMode", 3);
+		Material* mat_displayRenderTarget = Assets::getMaterial(material_displayRenderTarget);
+		mat_displayRenderTarget->bindCoreProgram();
+		mat_displayRenderTarget->sendUniform("channelOutput", 0);
+		mat_displayRenderTarget->sendUniform("outputMode", 0);
 
 		fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
 		fbo_editor->bindTexture(0, TextureLevel::LEVEL1);

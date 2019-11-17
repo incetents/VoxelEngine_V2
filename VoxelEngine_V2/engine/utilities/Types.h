@@ -12,8 +12,9 @@ namespace Vxl
 	using RenderBufferIndex = uint32_t;
 	using RenderBufferDepthIndex = uint32_t;
 	using MeshIndex = uint32_t;
-	using ShaderIndex = uint32_t;
+	//using ShaderIndex = uint32_t;
 	using ShaderProgramIndex = uint32_t;
+	using ShaderMaterialIndex = uint32_t;
 	using MaterialIndex = uint32_t;
 	using EntityIndex = uint32_t;
 	using CameraIndex = uint32_t;

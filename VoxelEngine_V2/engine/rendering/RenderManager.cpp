@@ -31,13 +31,13 @@
 #include "../objects/Camera.h"
 #include "../objects/TextObject.h"
 
-#include "../editorGui/DevConsole.h"
-#include "../editorGui/GUIViewport.h"
-#include "../editorGui/Hierarchy.h"
-#include "../editorGui/Inspector.h"
-#include "../editorGui/Performance.h"
-#include "../editorGui/ShaderErrors.h"
-#include "../editorGui/ShaderCodeViewer.h"
+#include "../editorGui/GUI_DevConsole.h"
+#include "../editorGui/GUI_Viewport.h"
+#include "../editorGui/GUI_Hierarchy.h"
+#include "../editorGui/GUI_Inspector.h"
+#include "../editorGui/GUI_Performance.h"
+#include "../editorGui/GUI_ShaderErrors.h"
+#include "../editorGui/GUI_ShaderCodeViewer.h"
 
 #include "../utilities/Asset.h"
 
@@ -94,15 +94,13 @@ namespace Vxl
 	// Reload Shader System
 	void RenderManager::ReloadShaders()
 	{
-		//	auto& Programs = Assets::getAllShaderProgram();
-		//	for (auto& Program : Programs)
-		//	{
-		//		Program.second->ReloadShaders();
-		//	}
+		Assets::deleteAllShaderProgram();
 
-		//	auto Materials = Material::GetAllNamedAssets();
-		//	for (auto Mat : Materials)
-		//		Mat.second->UpdateProperties();
+		const auto& shaderMaterials = Assets::getAllShaderMaterial();
+		for (auto& shaderMaterial : shaderMaterials)
+		{
+			shaderMaterial.second->reload();
+		}
 	}
 	void RenderManager::ReloadWindow()
 	{
@@ -118,7 +116,7 @@ namespace Vxl
 		if (m_currentScene)
 			m_currentScene->Reload();
 	}
-	void RenderManager::ReloadFBOS()
+	void RenderManager::ReloadViewportFBOS()
 	{
 		auto fbos = SceneAssets.getAllFramebufferObject();
 		for (auto& fbo : fbos)
@@ -143,7 +141,7 @@ namespace Vxl
 		Debug.InitGLResources();
 		//GlobalRenderText.InitGLResources();
 #ifdef GLOBAL_IMGUI
-		GUIViewport.InitGLResources();
+		GUI_Viewport.InitGLResources();
 #endif
 
 		Gizmo::InitGLResources();
@@ -159,7 +157,7 @@ namespace Vxl
 		//GlobalRenderText.DestoryGLResources();
 
 #ifdef GLOBAL_IMGUI
-		GUIViewport.DestroyGLResources();
+		GUI_Viewport.DestroyGLResources();
 #endif
 
 		Gizmo::DestroyGLResources();
@@ -175,46 +173,6 @@ namespace Vxl
 
 		// Delete special
 		GPUTimer::DestroyTimers();
-
-		// Destroy all Entities
-		//GameObject::DeleteAllAssets();
-		//LightObject::DeleteAllAssets();
-		//Camera::DeleteAllAssets();
-
-		// Delete Materials
-		//Material::DeleteAllAssets();
-
-		//Material::m_masterOrder.clear();
-		//Material::m_masterOrderDirty = true;
-
-		// Clear Render List
-		//m_allEntities.clear();
-
-		//m_gameObjectsPerMaterial.clear();
-		//m_gameObjectsSorted_Opaque.clear();
-		//m_gameObjectsSorted_Transparent.clear();
-
-		// Clear Shader Error Log
-		//Shader::ShaderErrorLog.clear();
-		//Shader::ShaderErrorLogSize = 0;
-		//ShaderProgram::ProgramsFailed.clear();
-		//ShaderProgram::ProgramsFailedSize = 0;
-		// Delete Shaders
-		//ShaderProgram::DeleteAllAssets();
-
-		// Delete Textures
-		//Texture2D::DeleteAllAssets();
-		//Cubemap::DeleteAllAssets();
-		//RenderTexture::DeleteAllAssets();
-
-		// Delete extra buffers
-		//RenderBuffer::DeleteAllAssets();
-
-		// Delete Framebuffers
-		//FramebufferObject::DeleteAllAssets();
-
-		// Delete Meshes
-		//Mesh::DeleteAllAssets();
 
 		// Delete All Scene Assets
 		SceneAssets.DestroyAndEraseAll();
@@ -254,9 +212,9 @@ namespace Vxl
 		Inspector.Init("Inspector", Vector2(380, 280), 0.9f);
 		Hierarchy.Init("Hierarchy", Vector2(280, 380), 0.9f);
 		Performance.Init("Performance", Vector2(280, 680), 0.9f);
-		GUIViewport.Init("Viewport", Vector2(500, 500), 0.9f, ImGuiWindowFlags_MenuBar);
-		GUIViewport.SetPadding(false);
-		GUIViewport.SetOpen(false);
+		GUI_Viewport.Init("Viewport", Vector2(500, 500), 0.9f, ImGuiWindowFlags_MenuBar);
+		GUI_Viewport.SetPadding(false);
+		GUI_Viewport.SetOpen(false);
 		ShaderCodeViewer.Init("ShaderCodeViewer", Vector2(700, 400), 0.9f);
 		ShaderCodeViewer.SetOpen(false);
 
@@ -265,7 +223,7 @@ namespace Vxl
 		m_guiWindows.push_back(&Inspector.instanceRef);
 		m_guiWindows.push_back(&Hierarchy.instanceRef);
 		m_guiWindows.push_back(&Performance.instanceRef);
-		m_guiWindows.push_back(&GUIViewport.instanceRef);
+		m_guiWindows.push_back(&GUI_Viewport.instanceRef);
 		m_guiWindows.push_back(&ShaderCodeViewer.instanceRef);
 #endif
 	}
@@ -337,24 +295,48 @@ namespace Vxl
 
 	void RenderManager::RenderFullScreen()
 	{
-		if(m_FSQMode)
-			Assets::getMesh(Geometry.GetFullQuad())->Draw();
-		else
+#define FULLSCREEN_TRIANGLE
+
+#ifdef FULLSCREEN_TRIANGLE
 			Assets::getMesh(Geometry.GetFullTriangle())->Draw();
+#else
+			Assets::getMesh(Geometry.GetFullQuad())->Draw();
+#endif
+	
 	}
 
-	void RenderManager::sortEntities()
+	void RenderManager::sortMaterials()
 	{
+		if (!m_materialSequenceDirty)
+			return;
+
+		m_materialSequenceDirty = false;
+
 		// Data
 		const auto& materials = Assets::getAllMaterial();
-		const auto& entities = Assets::getAllEntity();
 
 		// Material Sequence
 		m_materialSequence.clear();
 		for (const auto& material : materials)
 		{
-			m_materialSequence[material.second->getSequenceID()] = material.first;
+			uint32_t SequenceID = material.second->getSequenceID();
+			if (SequenceID == -1)
+				continue;
+
+			m_materialSequence[SequenceID] = material.first;
 		}
+	}
+
+	void RenderManager::sortEntities()
+	{
+		if (!m_renderlistDirty)
+			return;
+
+		m_renderlistDirty = false;
+
+		// Data
+		const auto& materials = Assets::getAllMaterial();
+		const auto& entities = Assets::getAllEntity();
 
 		// Material/Entity match
 		m_renderlist_opaque.clear();
@@ -367,12 +349,14 @@ namespace Vxl
 				m_renderlist_opaque[material.first] = std::vector<Entity*>();
 			else
 				m_renderlist_transparent[material.first] = std::vector<Entity*>();
-
 		}
 
 		// Fill Slots
 		for (const auto& entity : entities)
 		{
+			if (entity.second->getMaterial() == -1)
+				continue;
+
 			Material* mat = Assets::getMaterial(entity.second->m_material);
 			MaterialRenderMode mode = mat->m_renderMode;
 
@@ -381,6 +365,16 @@ namespace Vxl
 			else
 				m_renderlist_transparent[entity.second->m_material].push_back(entity.second);
 
+		}
+
+		// Sort each Material/Entity slots based on their VAO Id to make sure similar meshes render one after another
+		for (auto& set : m_renderlist_opaque)
+		{
+			std::sort(set.second.begin(), set.second.end());
+		}
+		for (auto& set : m_renderlist_transparent)
+		{
+			std::sort(set.second.begin(), set.second.end());
 		}
 	}
 
@@ -391,10 +385,10 @@ namespace Vxl
 		// If material program didn't link, use error material instead
 		if (material)
 		{
-			if (!material->bindProgram())
+			if (!material->bindCoreProgram())
 			{
 				material = GlobalAssets.getMaterialError();
-				if (!material->bindProgram())
+				if (!material->bindCoreProgram())
 					VXL_ERROR("Material used for Error doesn't work");
 			}
 
@@ -413,7 +407,8 @@ namespace Vxl
 						if (!material->m_sharedTextures)
 							material->bindTextures(ent);
 
-						material->bindCommonUniforms(ent);
+						material->bindCoreProgramCommonUniforms(ent->m_uniqueID);
+
 						mesh->Draw();
 					}
 				}

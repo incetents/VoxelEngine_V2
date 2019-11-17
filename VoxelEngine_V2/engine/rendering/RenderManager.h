@@ -26,18 +26,19 @@ namespace Vxl
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderManager);
 		friend class Hierarchy;
+		friend class Material;
+		friend class Entity;
 	private:
 		Scene* m_currentScene = nullptr;
 	private:
 
-		// [True = FullQuad] or [False = Fulltriangle]
-		bool m_FSQMode = false;
-
 		// Associate Materials with rendering sequence
 		std::map<uint32_t, MaterialIndex> m_materialSequence;
-		// Associate entities to materials
+		bool m_materialSequenceDirty = false;
+		// Associate entities to materials [internal map sorts by VAO ID to make sure similar meshes render one after another]1
 		std::map<MaterialIndex, std::vector<Entity*>> m_renderlist_opaque;
 		std::map<MaterialIndex, std::vector<Entity*>> m_renderlist_transparent;
+		bool m_renderlistDirty = false;
 
 		// Imgui render window
 		std::vector<GuiWindow*> m_guiWindows;
@@ -49,11 +50,13 @@ namespace Vxl
 		CameraIndex m_mainCamera = -1;
 
 		// Utility
+		void sortMaterials();
 		void sortEntities();
+
 		void render(MaterialIndex _material, const std::vector<Entity*>& _entities);
 		void renderOpaque();
 		void renderTransparent();
-
+		
 		// Utility
 		void SetNewScene(Scene* _scene);
 		//const Layer& GetLayer(uint32_t index);
@@ -63,7 +66,7 @@ namespace Vxl
 		// Reload Systems
 		void ReloadShaders();
 		void ReloadWindow();
-		void ReloadFBOS();
+		void ReloadViewportFBOS();
 
 		// Behaviour
 		void Update();

@@ -26,9 +26,9 @@ namespace Vxl
 	IDStorage<RenderBuffer>		  Assets::m_renderBuffer_storage;
 	IDStorage<RenderBufferDepth>  Assets::m_renderBufferDepth_storage;
 	IDStorage<Mesh>				  Assets::m_mesh_storage;
-	IDStorage<Shader>			  Assets::m_shader_storage;
 	IDStorage<ShaderProgram>	  Assets::m_shaderProgram_storage;
-	IDStorage<Material>		  Assets::m_material_storage;
+	IDStorage<ShaderMaterial>	  Assets::m_shaderMaterial_storage;
+	IDStorage<Material>			  Assets::m_material_storage;
 	IDStorage<Entity>			  Assets::m_entity_storage;
 	IDStorage<Camera>			  Assets::m_camera_storage;
 
@@ -146,9 +146,11 @@ namespace Vxl
 		}
 		// Error Material
 		{
-			material_error = SceneAssets.createMaterialFromFile("./assets/materials/error.material");
+			shader_error = createShaderMaterial("./assets/materials/error.material");
+			material_error = createMaterial("error");
 			{
 				auto mat = Assets::getMaterial(material_error);
+				mat->setShaderMaterial(shader_error);
 				mat->setSequenceID(999999u);
 			}
 		}
@@ -189,13 +191,13 @@ namespace Vxl
 		for (auto& mesh : meshes)
 			delete mesh.second;
 
-		auto& shaders = m_shader_storage.GetAll(m_creationType);
-		for (auto& shader : shaders)
-			delete shader.second;
-
 		auto& shaderPrograms = m_shaderProgram_storage.GetAll(m_creationType);
 		for (auto& sp : shaderPrograms)
 			delete sp.second;
+
+		auto& shaderMaterials = m_shaderMaterial_storage.GetAll(m_creationType);
+		for (auto& sm : shaderMaterials)
+			delete sm.second;
 
 		auto& materials = m_material_storage.GetAll(m_creationType);
 		for (auto& mat : materials)
@@ -220,8 +222,8 @@ namespace Vxl
 		m_renderBuffer_storage.EraseAll(m_creationType);
 		m_renderBufferDepth_storage.EraseAll(m_creationType);
 		m_mesh_storage.EraseAll(m_creationType);
-		m_shader_storage.EraseAll(m_creationType);
 		m_shaderProgram_storage.EraseAll(m_creationType);
+		m_shaderMaterial_storage.EraseAll(m_creationType);
 		m_material_storage.EraseAll(m_creationType);
 		m_entity_storage.EraseAll(m_creationType);
 		m_camera_storage.EraseAll(m_creationType);
@@ -235,6 +237,7 @@ namespace Vxl
 
 		return m_baseTexture_storage.Erase(index);
 	}
+
 	void Assets::deleteBaseTexture(TextureIndex index)
 	{
 		// Attempt to erase the texture index from all texture slots
@@ -281,13 +284,13 @@ namespace Vxl
 	{
 		delete m_mesh_storage.Erase(index);
 	}
-	void Assets::deleteShader(ShaderIndex index)
-	{
-		delete m_shader_storage.Erase(index);
-	}
 	void Assets::deleteShaderProgram(ShaderProgramIndex index)
 	{
 		delete m_shaderProgram_storage.Erase(index);
+	}
+	void Assets::deleteShaderMaterial(ShaderMaterialIndex index)
+	{
+		delete m_shaderMaterial_storage.Erase(index);
 	}
 	void Assets::deleteMaterial(MaterialIndex index)
 	{
@@ -300,6 +303,112 @@ namespace Vxl
 	void Assets::deleteCamera(CameraIndex index)
 	{
 		delete m_camera_storage.Erase(index);
+	}
+
+	void Assets::deleteAllTextures()
+	{
+		auto& textures = m_baseTexture_storage.GetAll();
+		for (auto& texture : textures)
+			delete texture.second;
+		m_baseTexture_storage.EraseAll();
+		m_texture2D_storage.EraseAll();
+		m_cubemap_storage.EraseAll();
+	}
+	void Assets::deleteAllFile()
+	{
+		auto& files = m_file_storage.GetAll();
+		for (auto& file : files)
+			delete file.second;
+
+		m_file_storage.EraseAll();
+	}
+	void Assets::deleteAllFramebufferObject()
+	{
+		auto& fbos = m_framebufferObject_storage.GetAll();
+		for (auto& fbo : fbos)
+			delete fbo.second;
+
+		m_framebufferObject_storage.EraseAll();
+	}
+	void Assets::deleteAllRenderTexture()
+	{
+		auto& rts = m_renderTexture_storage.GetAll();
+		for (auto& rt : rts)
+			delete rt.second;
+
+		m_renderTexture_storage.EraseAll();
+	}
+	void Assets::deleteAllRenderTextureDepth()
+	{
+		auto& rts = m_renderTextureDepth_storage.GetAll();
+		for (auto& rt : rts)
+			delete rt.second;
+
+		m_renderTextureDepth_storage.EraseAll();
+	}
+	void Assets::deleteAllRenderBuffer()
+	{
+		auto& rbs = m_renderBuffer_storage.GetAll();
+		for (auto& rb : rbs)
+			delete rb.second;
+
+		m_renderBuffer_storage.EraseAll();
+	}
+	void Assets::deleteAllRenderBufferDepth()
+	{
+		auto& rbs = m_renderBufferDepth_storage.GetAll();
+		for (auto& rb : rbs)
+			delete rb.second;
+
+		m_renderBufferDepth_storage.EraseAll();
+	}
+	void Assets::deleteAllMesh()
+	{
+		auto& Meshes = m_mesh_storage.GetAll();
+		for (auto& mesh : Meshes)
+			delete mesh.second;
+
+		m_mesh_storage.EraseAll();
+	}
+	void Assets::deleteAllShaderProgram()
+	{
+		auto& shaderPrograms = m_shaderProgram_storage.GetAll();
+		for (auto& sp : shaderPrograms)
+			delete sp.second;
+
+		m_shaderProgram_storage.EraseAll();
+	}
+	void Assets::deleteAllShaderMaterial()
+	{
+		auto& shaderMaterials = m_shaderMaterial_storage.GetAll();
+		for (auto& sm : shaderMaterials)
+			delete sm.second;
+
+		m_shaderMaterial_storage.EraseAll();
+	}
+	void Assets::deleteAllMaterial()
+	{
+		auto& materials = m_material_storage.GetAll();
+		for (auto& mat : materials)
+			delete mat.second;
+
+		m_material_storage.EraseAll();
+	}
+	void Assets::deleteAllEntity()
+	{
+		auto& entities = m_entity_storage.GetAll();
+		for (auto& ent : entities)
+			delete ent.second;
+
+		m_material_storage.EraseAll();
+	}
+	void Assets::deleteAllCamera()
+	{
+		auto& cameras = m_camera_storage.GetAll();
+		for (auto& cam : cameras)
+			delete cam.second;
+
+		m_camera_storage.EraseAll();
 	}
 
 	// Creation
@@ -485,13 +594,6 @@ namespace Vxl
 		return m_mesh_storage.Add(_mesh, m_creationType);
 	}
 
-	ShaderIndex Assets::createShader(const std::string& name, const std::string& sourceCode, ShaderType type)
-	{
-		// Create New Data
-		Shader* _shader = new Shader(name, sourceCode, type);
-		// Store Data and Return index
-		return m_shader_storage.Add(_shader, m_creationType);
-	}
 	ShaderProgramIndex Assets::createShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders)
 	{
 		// Create New Data
@@ -538,253 +640,11 @@ namespace Vxl
 		return m_camera_storage.Add(object, m_creationType);
 	}
 	
-
-	const char* SECTION_NAME = "#Name";
-	const char* SECTION_INCLUDE = "#Include";
-	const char* SECTION_UNIFORMS = "#Uniforms";
-	const char* SECTION_SAMPLERS = "#Samplers";
-	const char* SECTION_ATTRIBUTE = "#Attributes";
-	const char* SECTION_VERTEX = "#Vertex";
-	const char* SECTION_GEOMETRY = "#Geometry";
-	const char* SECTION_FRAGMENT = "#Fragment";
-
-	MaterialIndex Assets::createMaterialFromFile(const std::string& filePath)
+	ShaderMaterialIndex Assets::createShaderMaterial(const std::string& filePath)
 	{
-		std::string file = FileIO::readFile(filePath);
-		if (file.empty())
-			return -1;
-
-		std::string VertexShaderCode;
-		std::string GeometryShaderCode;
-		std::string FragmentShaderCode;
-
-		struct OUTPUT
-		{
-			bool active;
-			std::string version = "#version 420 core";
-			std::string include;
-			std::string input;
-			std::string output;
-			std::string behaviour;
-		};
-
-		OUTPUT output_vertex;
-		OUTPUT output_geometry;
-		OUTPUT output_fragment;
-
-		struct SECTION
-		{
-			std::size_t name;
-			std::size_t include;
-			std::size_t properties;
-			std::size_t samplers;
-			std::size_t attributes;
-			std::size_t vertex;
-			std::size_t geometry;
-			std::size_t fragment;
-		} locations;
-
-		locations.name = file.find(SECTION_NAME);
-		locations.include = file.find(SECTION_INCLUDE);
-		locations.properties = file.find(SECTION_UNIFORMS);
-		locations.samplers = file.find(SECTION_SAMPLERS);
-		locations.attributes = file.find(SECTION_ATTRIBUTE);
-		locations.vertex = file.find(SECTION_VERTEX);
-		locations.geometry = file.find(SECTION_GEOMETRY);
-		locations.fragment = file.find(SECTION_FRAGMENT);
-
-		// Quick active state check
-		output_vertex.active = (locations.vertex != std::string::npos);
-		output_geometry.active = (locations.geometry != std::string::npos);
-		output_fragment.active = (locations.fragment != std::string::npos);
-
-		// Name
-		std::string name;
-		if (locations.name != std::string::npos)
-		{
-			name = stringUtil::extractSection(file, '{', '}', locations.name);
-			stringUtil::trim(name);
-		}
-		else
-		{
-			name = stringUtil::extractNameFromPath(filePath);
-		}
-
-		// Include
-		if (locations.include != std::string::npos)
-		{
-			std::string section = stringUtil::extractSection(file, '{', '}', locations.include);
-			std::vector<std::string> includes = stringUtil::splitStr(section, ',');
-			for (auto& include : includes)
-			{
-				stringUtil::trim(include);
-				File* _fileStorage = Assets::getFile(include);
-				if (_fileStorage)
-				{
-					std::string file = _fileStorage->file + '\n';
-
-					if (output_vertex.active)
-						output_vertex.include += file;
-
-					if (output_geometry.active)
-						output_geometry.include += file;
-
-					if (output_fragment.active)
-						output_fragment.include += file;
-				}
-			}
-		}
-
-		// Properties
-		if (locations.properties != std::string::npos)
-		{
-			std::string section = stringUtil::extractSection(file, '{', '}', locations.properties) + '\n';
-
-			if (output_vertex.active)
-				output_vertex.include += section;
-
-			if (output_geometry.active)
-				output_geometry.include += section;
-
-			if (output_fragment.active)
-				output_fragment.include += section;
-		}
-
-		// Samplers
-		std::vector<TextureLevel> targetLevels;
-		if (locations.samplers != std::string::npos)
-		{
-			std::string section = stringUtil::extractSection(file, '{', '}', locations.samplers) + '\n';
-			std::vector<std::string> lines = stringUtil::splitStr(section, '\n');
-
-			std::string sampler_info;
-
-			for (auto& line : lines)
-			{
-				line = stringUtil::stripComments(line);
-				if (line.empty())
-					continue;
-
-				std::vector<std::string> property = stringUtil::splitStr(line, ':');
-				if (property.size() == 2)
-				{
-					stringUtil::trim(property[0]);
-					stringUtil::trim(property[1]);
-
-					if (stringUtil::isNumber(property[1]))
-					{
-						sampler_info += "layout (binding = " + property[1] + ") uniform " + property[0] + ';';
-
-						targetLevels.push_back((TextureLevel)(std::stoi(property[1]) + 1));
-					}
-				}
-			}
-
-			if (output_vertex.active)
-				output_vertex.include += sampler_info;
-
-			if (output_geometry.active)
-				output_geometry.include += sampler_info;
-
-			if (output_fragment.active)
-				output_fragment.include += sampler_info;
-		}
-
-		// Attributes
-		if (locations.attributes != std::string::npos)
-		{
-			output_vertex.input = "// Attributes\n";
-
-			// Acquire all
-			std::string section = stringUtil::extractSection(file, '{', '}', locations.attributes);
-			std::vector<std::string> lines = stringUtil::splitStr(section, '\n');
-			for (auto& line : lines)
-			{
-				line = stringUtil::stripComments(line);
-				if (line.empty())
-					continue;
-
-				// [ First Section : Second Section ]
-				std::vector<std::string> property = stringUtil::splitStr(line, ':');
-				if (property.size() != 2)
-					continue;
-
-				stringUtil::trim(property[0]);
-				stringUtil::trim(property[1]);
-
-				// Add attribute information
-				output_vertex.input += std::string("layout (location = " + property[1] + ") in " + property[0] + ";\n");
-			}
-		}
-		// Vertex
-		if (output_vertex.active)
-		{
-			output_vertex.behaviour = stringUtil::extractSection(file, '{', '}', locations.vertex);
-
-			VertexShaderCode =
-				output_vertex.version + '\n' +
-				output_vertex.include + '\n' +
-				output_vertex.input + '\n' +
-				output_vertex.output + '\n' +
-				output_vertex.behaviour;
-		}
-		// Geometry
-		if (output_geometry.active)
-		{
-			output_geometry.behaviour = stringUtil::extractSection(file, '{', '}', locations.geometry);
-
-			GeometryShaderCode =
-				output_geometry.version + '\n' +
-				output_geometry.include + '\n' +
-				output_geometry.input + '\n' +
-				output_geometry.output + '\n' +
-				output_geometry.behaviour;
-		}
-		// Fragment
-		if (output_fragment.active)
-		{
-			output_fragment.behaviour = stringUtil::extractSection(file, '{', '}', locations.fragment);
-
-			FragmentShaderCode =
-				output_fragment.version + '\n' +
-				output_fragment.include + '\n' +
-				output_fragment.input + '\n' +
-				output_fragment.output + '\n' +
-				output_fragment.behaviour;
-		}
-
-		// Create Shaders
-		std::vector<Shader*> shaders;
-
-		if (!VertexShaderCode.empty())
-		{
-			ShaderIndex _ShaderIndex = createShader(name + "_vert", VertexShaderCode, ShaderType::VERTEX);
-			shaders.push_back(Assets::getShader(_ShaderIndex));
-		}
-		if (!GeometryShaderCode.empty())
-		{
-			ShaderIndex _ShaderIndex = createShader(name + "_geom", GeometryShaderCode, ShaderType::GEOMETRY);
-			shaders.push_back(Assets::getShader(_ShaderIndex));
-		}
-		if (!FragmentShaderCode.empty())
-		{
-			ShaderIndex _ShaderIndex = createShader(name + "_frag", FragmentShaderCode, ShaderType::FRAGMENT);
-			shaders.push_back(Assets::getShader(_ShaderIndex));
-		}
-
-		if (shaders.empty())
-			return -1;
-
-		// Create Program
-		ShaderProgramIndex _ShaderProgramIndex = createShaderProgram(name + "_program", shaders);
-
-		// Create Material with Program
-		MaterialIndex _MaterialIndex = createMaterial(name + "_material");
-		Material* _Mat = Assets::getMaterial(_MaterialIndex);
-		_Mat->setShader(_ShaderProgramIndex);
-		_Mat->m_targetLevels = targetLevels;
-
-		// Result
-		return _MaterialIndex;
+		// Create New Data
+		ShaderMaterial* object = new ShaderMaterial(filePath);
+		// Store Data and Return index
+		return m_shaderMaterial_storage.Add(object, m_creationType);
 	}
 }

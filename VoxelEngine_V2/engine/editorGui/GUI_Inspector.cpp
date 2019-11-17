@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "Inspector.h"
+#include "GUI_Inspector.h"
 
 #ifdef GLOBAL_IMGUI
 #include "../imgui/imgui.h"

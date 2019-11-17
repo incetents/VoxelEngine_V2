@@ -2,16 +2,18 @@
 #include "Precompiled.h"
 #include "Material.h"
 
-#include "../textures/Texture2D.h"
+#include "../math/Transform.h"
+
+#include "../modules/Entity.h"
 
 #include "../rendering/Shader.h"
 #include "../rendering/Debug.h"
 #include "../rendering/Mesh.h"
+#include "../rendering/RenderManager.h"
 
-#include "../modules/Entity.h"
+#include "../textures/Texture2D.h"
+
 #include "../objects/GameObject.h"
-
-#include "../math/Transform.h"
 
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
@@ -21,49 +23,66 @@ namespace Vxl
 {
 	std::set<uint32_t> Material::m_allSequenceNumbers;
 
-	void Material::setupCommonUniform(const ShaderProgram& program, const std::string& name, std::optional<Graphics::Uniform>& uniform)
+	Material::~Material()
 	{
-		auto useModel = program.m_uniforms.find(name);
-		if (useModel != program.m_uniforms.end())
-			uniform = useModel->second;
-		else
-			uniform = std::nullopt;
+		if (m_sequenceNumber != -1)
+		{
+			m_allSequenceNumbers.erase(m_sequenceNumber);
+			// Rendermanager must resort materials
+			RenderManager.m_materialSequenceDirty = true;
+		}
 	}
 
-	void Material::setShader(ShaderProgramIndex index)
+	bool Material::setSequenceID(uint32_t sequence)
 	{
-		ShaderProgram* program = Assets::getShaderProgram(index);
-		// Check if valid
-		if (program)
+		// check if number is free
+		if (m_allSequenceNumbers.find(sequence) == m_allSequenceNumbers.end())
 		{
-			m_shader = index;
+			m_sequenceNumber = sequence;
 
-			setupCommonUniform(*program, "VXL_useModel", m_uniform_useModel);
-			setupCommonUniform(*program, "VXL_model", m_uniform_model);
-			setupCommonUniform(*program, "VXL_normalMatrix", m_uniform_normalMatrix);
-			setupCommonUniform(*program, "VXL_useInstancing", m_uniform_useInstancing);
-			setupCommonUniform(*program, "VXL_useTexture", m_uniform_useTexture);
-			setupCommonUniform(*program, "VXL_color", m_uniform_color);
-			setupCommonUniform(*program, "VXL_tint", m_uniform_tint);
-			setupCommonUniform(*program, "VXL_viewport", m_uniform_viewport);
-			setupCommonUniform(*program, "VXL_alpha", m_uniform_alpha);
-			setupCommonUniform(*program, "VXL_output", m_uniform_output);
+			if(sequence != -1)
+				m_allSequenceNumbers.insert(sequence);
+
+			// Rendermanager must resort materials
+			RenderManager.m_materialSequenceDirty = true;
+			return true;
 		}
-		else
-			m_shader = -1;
+		return false;
+	}
+	void Material::eraseSequenceID(void)
+	{
+		if (m_sequenceNumber == -1)
+			return;
+
+		m_allSequenceNumbers.erase(m_sequenceNumber);
+		m_sequenceNumber = -1;
+		// Rendermanager must resort materials
+		RenderManager.m_materialSequenceDirty = true;
+	}
+
+	void Material::setShaderMaterial(ShaderMaterialIndex index)
+	{
+		ShaderMaterial* _shaderMat = Assets::getShaderMaterial(index);
+		if (_shaderMat)
+		{
+			m_shaderMaterial = index;
+		}
 	}
 
 	Graphics::Uniform Material::getUniform(const std::string& name)
 	{
-		ShaderProgram* program = Assets::getShaderProgram(m_shader);
-		// Check if valid
-		if (program)
+		ShaderMaterial* _shaderMat = Assets::getShaderMaterial(m_shaderMaterial);
+		if (_shaderMat)
 		{
-			// find uniform
-			auto it = program->m_uniforms.find(name);
-			if (it != program->m_uniforms.end())
+			ShaderProgram* program = Assets::getShaderProgram(_shaderMat->m_coreProgram);
+			if (program)
 			{
-				return it->second;
+				// find uniform
+				auto it = program->m_uniforms.find(name);
+				if (it != program->m_uniforms.end())
+				{
+					return it->second;
+				}
 			}
 		}
 		
@@ -73,15 +92,35 @@ namespace Vxl
 		return empty_uni;
 	}
 
-	bool Material::bindProgram()
+	ShaderProgram* Material::getCoreProgram(void) const
 	{
-		ShaderProgram* program = Assets::getShaderProgram(m_shader);
-		if (program && program->isLinked())
+		ShaderMaterial* _shaderMat = Assets::getShaderMaterial(m_shaderMaterial);
+		if (_shaderMat)
 		{
-			program->bind();
+			return Assets::getShaderProgram(_shaderMat->m_coreProgram);
+		}
+		return nullptr;
+	}
+
+	bool Material::bindCoreProgram()
+	{
+		ShaderProgram* corePogram = getCoreProgram();
+		if (corePogram)
+		{
+			corePogram->bind();
 			return true;
 		}
 		return false;
+	}
+	void Material::bindCoreProgramCommonUniforms(EntityIndex _entity)
+	{
+		ShaderMaterial* _shaderMaterial = Assets::getShaderMaterial(m_shaderMaterial);
+		if (_shaderMaterial)
+		{
+			ShaderProgram* _shaderProgram = Assets::getShaderProgram(_shaderMaterial->m_coreProgram);
+			if (_shaderProgram)
+				_shaderProgram->bindCommonUniforms(_entity);
+		}
 	}
 	void Material::bindStates()
 	{
@@ -108,8 +147,19 @@ namespace Vxl
 		if (m_wireframe)
 			return;
 
-		for (const auto& level : m_targetLevels)
+		const std::vector<TextureLevel>& targetLevels = Assets::getShaderMaterial(m_shaderMaterial)->m_targetLevels;
+
+		for (const auto& level : targetLevels)
 		{
+			// Check if material doesn't have the texture location
+			if (m_textures.find(level) == m_textures.end())
+			{
+				if (level == TextureLevel::LEVEL0)
+					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+				else
+					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
+			}
+
 			TextureIndex index = m_textures[level];
 			BaseTexture* _tex = Assets::getBaseTexture(index);
 
@@ -133,8 +183,19 @@ namespace Vxl
 		if (m_wireframe)
 			return;
 
-		for (const auto& level : m_targetLevels)
+		const std::vector<TextureLevel>& targetLevels = Assets::getShaderMaterial(m_shaderMaterial)->m_targetLevels;
+
+		for (const auto& level : targetLevels)
 		{
+			// Check if entity doesn't have the texture location
+			if (_entity->m_textures.find(level) == _entity->m_textures.end())
+			{
+				if (level == TextureLevel::LEVEL0)
+					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+				else
+					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
+			}
+
 			TextureIndex index = _entity->m_textures[level];
 			BaseTexture* _tex = Assets::getBaseTexture(index);
 
@@ -153,67 +214,19 @@ namespace Vxl
 			}
 		}
 	}
-	void Material::bindCommonUniforms(Entity* _entity)
-	{
-		// ~ Model ~ //
-		if (m_uniform_useModel.has_value())
-		{
-			m_uniform_useModel.value().send(_entity->m_useTransform);
-		
-			if (_entity->m_useTransform)
-			{
-				if (m_uniform_model.has_value())
-					m_uniform_model.value().sendMatrix(_entity->m_transform.getModel(), true);
-		
-				if(m_uniform_normalMatrix.has_value())
-					m_uniform_normalMatrix.value().sendMatrix(_entity->m_transform.getNormalMatrix(), true);
-			}
-		}
-		
-		// ~ Instancing ~ //
-		if (m_uniform_useInstancing.has_value())
-		{
-			Mesh* _mesh = Assets::getMesh(_entity->getMesh());
 
-			m_uniform_useInstancing.value().send(_mesh && _mesh->m_instances.GetDrawCount() > 0);
-		}
-		
-		// ~ Texture ~ //
-		if (m_uniform_useTexture.has_value())
-		{
-			if(m_sharedTextures)
-				m_uniform_useTexture.value().send(m_textures.find(TextureLevel::LEVEL0) != m_textures.end());
-			else
-				m_uniform_useTexture.value().send(_entity->m_textures.find(TextureLevel::LEVEL0) != _entity->m_textures.end());
-		}
-		
-		// ~ Colors ~ //
-		if (m_uniform_color.has_value())
-		{
-			m_uniform_color.value().send(_entity->m_Color);
-		}
-		// ~ Tint ~ //
-		if (m_uniform_tint.has_value())
-		{
-			m_uniform_tint.value().send(_entity->m_Tint);
-		}
-		
-		// ~ Alpha ~ //
-		if (m_uniform_alpha.has_value())
-		{
-			if (m_renderMode == MaterialRenderMode::Transparent)
-				m_uniform_alpha.value().send(_entity->m_alpha);
-			else
-				m_uniform_alpha.value().send(1.0f);
-		}
-		
-		// ~ ColorID ~ //
-		//	if (m_uniform_output.has_value())
-		//	{
-		//		m_uniform_output.value
-		//	
-		//		m_material->m_property_output.SetProperty(m_colorID);
-		//	}
-		
-	}
+	//void Material::bindCommonUniforms(Entity* _entity)
+	//{
+	//	
+	//	
+	//	// ~ ColorID ~ //
+	//	//	if (m_uniform_output.has_value())
+	//	//	{
+	//	//		m_uniform_output.value
+	//	//	
+	//	//		m_material->m_property_output.SetProperty(m_colorID);
+	//	//	}
+	//	
+	//}
+
 }

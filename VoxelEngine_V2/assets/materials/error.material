@@ -1,3 +1,4 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
 
 #Name { error }
 
@@ -13,55 +14,40 @@
 	_Uniforms.glsl
 }
 
+#Link
+{
+	vec3 pos;
+}
+
+#RenderTargets
+{
+	vec4 output_albedo 		: 0
+}
+
 #Vertex
 {
-	// Output
-	out vertex_data
+	// Model
+	if(VXL_useModel)
 	{
-		vec3 pos;
+		mat4 model = VXL_model;
 		
-	} v_data;
+		// Instance matrix occurs before model matrix (if applicable)
+		if(VXL_useInstancing)
+			model *= instanceMatrix;
 
-	// Main
-	void main()
-	{
-		// Model
-		if(VXL_useModel)
-		{
-			mat4 model = VXL_model;
-			
-			// Instance matrix occurs before model matrix (if applicable)
-			if(VXL_useInstancing)
-				model *= instanceMatrix;
-
-			// Position
-			v_data.pos = vec3(model * vec4(m_position, 1.0));
-		}
-		// Passthrough
-		else
-		{
-			v_data.pos = m_position;
-		}
-		
-		gl_Position = UBO_viewProjection * vec4(v_data.pos, 1); 
+		// Position
+		io.pos = vec3(model * vec4(m_position, 1.0));
 	}
+	// Passthrough
+	else
+	{
+		io.pos = m_position;
+	}
+	
+	gl_Position = UBO_viewProjection * vec4(io.pos, 1); 
 }
 
 #Fragment
 {
-	// Input
-	in vertex_data
-	{
-		vec3 pos;
-
-	} v_data;
-
-	// Output
-	layout (location = 0) out vec4 output_albedo;
-
-	//Main
-	void main()
-	{
-		output_albedo = vec4(1,0,1,1);
-	}
+	output_albedo = vec4(1,0,1,1);
 }

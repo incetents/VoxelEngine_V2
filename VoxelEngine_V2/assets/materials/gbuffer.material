@@ -1,5 +1,12 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
 
 #Name { gbuffer }
+
+#Include
+{
+	_UBO.glsl,
+	_Uniforms.glsl
+}
 
 #Attributes
 {
@@ -10,10 +17,20 @@
 	mat4 instanceMatrix : 8
 }
 
-#Include
+#Link
 {
-	_UBO.glsl,
-	_Uniforms.glsl
+	vec3 pos;
+	vec2 uv;
+	vec3 normal;
+	vec3 tangent;
+	vec3 bitangent;
+}
+
+#RenderTargets
+{
+	vec4 output_albedo 		: 0
+	vec4 output_normal 		: 1
+	vec4 output_reflection 	: 2
 }
 
 #Samplers
@@ -22,94 +39,57 @@
 	sampler2D albedo_handler : 0
 }
 
-#Uniforms
+#Properties // Uniforms and Functions
 {
-	// No uniforms here
 }
 
-#Vertex
+#Vertex // Main
 {
-	// Output
-	out vertex_data
+	// Model
+	if(VXL_useModel)
 	{
-		vec3 pos;
-		vec2 uv;
-		vec3 normal;
-		vec3 tangent;
-		vec3 bitangent;
-
-	} v_data;
-
-	// Main
-	void main()
-	{
-		// Model
-		if(VXL_useModel)
+		if(VXL_useInstancing)
 		{
-			mat4 model = VXL_model;
-			
-			// Instance matrix occurs before model matrix (if applicable)
-			if(VXL_useInstancing)
-				model *= instanceMatrix;
-
-			// Position
-			v_data.pos = vec3(model * vec4(m_position, 1.0));
-			// Normals
-			v_data.normal = VXL_normalMatrix * m_normal;
-			v_data.tangent = VXL_normalMatrix * m_tangent;
+			gl_Position = VXL_mvp * instanceMatrix * vec4(m_position, 1); 
+			io.pos = vec3(VXL_model * instanceMatrix * vec4(m_position, 1.0));
 		}
-		// Passthrough
 		else
 		{
-			// Position
-			v_data.pos = m_position;
-			// Normal
-			v_data.normal = m_normal;
-			v_data.tangent = m_tangent;
+			gl_Position = VXL_mvp * vec4(m_position, 1); 
+			io.pos = vec3(VXL_model * vec4(m_position, 1.0));
 		}
-		
-		gl_Position = UBO_viewProjection * vec4(v_data.pos, 1); 
-		
-		// Constants
-		v_data.uv = m_uv;
-		v_data.bitangent = cross(v_data.normal, v_data.tangent);
+	
+		io.normal = VXL_normalMatrix * m_normal;
+		io.tangent = VXL_normalMatrix * m_tangent;
 	}
+	// Passthrough
+	else
+	{
+		gl_Position = UBO_viewProjection * vec4(m_position, 1); 
+		io.pos = m_position;
+		
+		io.normal = m_normal;
+		io.tangent = m_tangent;
+	}
+	
+	// Constants
+	io.uv = m_uv;
+	io.bitangent = cross(io.normal, io.tangent);
 }
 
-#Fragment
+#Fragment // Main
 {
-	// Input
-	in vertex_data
+	output_albedo = vec4(0,0,0,VXL_alpha);
+
+	if(VXL_useTexture)
 	{
-		vec3 pos;
-		vec2 uv;
-		vec3 normal;
-		vec3 tangent;
-		vec3 bitangent;
-
-	} v_data;
-
-	// Output
-	layout (location = 0) out vec4 output_albedo;
-	layout (location = 1) out vec4 output_normal;
-	layout (location = 2) out vec4 output_reflection;
-	layout (location = 3) out vec4 output_colorID;
-
-	//Main
-	void main()
-	{
-		output_albedo = vec4(0,0,0,VXL_alpha);
-	
-		if(VXL_useTexture)
-		{
-			output_albedo.rgb = texture(albedo_handler, v_data.uv).rgb;
-		}
-	
-		output_albedo.rgb = output_albedo.rgb * VXL_tint + VXL_color;
-			
-		output_normal = vec4(normalize(v_data.normal), 1); // worldspace Normals
-
-		output_reflection = vec4(0,0,0,1);
-		output_colorID = VXL_output;
+		output_albedo.rgb = texture(albedo_handler, io.uv).rgb;
 	}
+	
+	output_albedo.rgb = output_albedo.rgb * VXL_tint + VXL_color;
+			
+			
+	output_normal = vec4(normalize(io.normal), 1); // worldspace Normals
+
+	output_reflection = vec4(0,0,0,1);
 }

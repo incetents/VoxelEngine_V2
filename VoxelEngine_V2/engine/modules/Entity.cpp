@@ -18,7 +18,16 @@
 
 namespace Vxl
 {
-	// Unique IDs
+	bool Entity::operator< (const Entity& other) const
+	{
+		Mesh* mesh1 = Assets::getMesh(getMesh());
+		Mesh* mesh2 = Assets::getMesh(other.getMesh());
+		if (!mesh1 || !mesh2)
+			return false;
+
+		return mesh1->GetVAOID() < mesh2->GetVAOID();
+	}
+
 	Entity::Entity(const std::string& name)
 		: m_name(name)
 	{
@@ -37,6 +46,8 @@ namespace Vxl
 	void Entity::setMaterial(MaterialIndex index)
 	{
 		m_material = index;
+		// Rendermanager must resort Entities
+		RenderManager.m_renderlistDirty = true;
 	}
 
 	bool Entity::IsFamilyActive()

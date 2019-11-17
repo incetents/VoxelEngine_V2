@@ -150,24 +150,6 @@
     <ClCompile Include="engine\editor\Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\editorGui\DevConsole.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\editorGui\Hierarchy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\editorGui\Inspector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\editorGui\Performance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\editorGui\ShaderErrors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\editorGui\GUIViewport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\editorGui\GuiWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -178,9 +160,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\utilities\Logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\editorGui\ShaderCodeViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\math\Raycast.cpp">
@@ -214,6 +193,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\objects\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\GUI_Viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\GUI_DevConsole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\GUI_ShaderErrors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\GUI_Hierarchy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\GUI_Inspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\GUI_Performance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\editorGui\GUI_ShaderCodeViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -383,24 +383,6 @@
     <ClInclude Include="engine\editor\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\editorGui\DevConsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\editorGui\GUIViewport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\editorGui\Hierarchy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\editorGui\Inspector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\editorGui\Performance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\editorGui\ShaderErrors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\editorGui\GuiWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -411,9 +393,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\editorGui\ShaderCodeViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Raycast.h">
@@ -456,6 +435,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\utilities\Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\GUI_Viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\GUI_DevConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\GUI_ShaderErrors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\GUI_Hierarchy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\GUI_Inspector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\GUI_Performance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\editorGui\GUI_ShaderCodeViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

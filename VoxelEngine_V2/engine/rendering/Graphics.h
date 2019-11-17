@@ -560,100 +560,16 @@ namespace Vxl
 			void send(float data) const;
 			void send(double data) const;
 
-			//void send(const Vector2 data) const;
-			//void send(const Vector3 data) const;
-			//void send(const Vector4 data) const;
-			//void send(const Color3F data) const;
-			//void send(const Color4F data) const;
-
 			void send(const Vector2& data) const;
 			void send(const Vector3& data) const;
 			void send(const Vector4& data) const;
 			void send(const Color3F& data) const;
 			void send(const Color4F& data) const;
 
-			//void sendMatrix(const Matrix2x2  data, bool transpose) const;
-			//void sendMatrix(const Matrix4x4  data, bool transpose) const;
-			//void sendMatrix(const Matrix3x3  data, bool transpose) const;
-
 			void sendMatrix(const Matrix2x2& data, bool transpose) const;
 			void sendMatrix(const Matrix3x3& data, bool transpose) const;
 			void sendMatrix(const Matrix4x4& data, bool transpose) const;
-
-			//	// Send Uniform to Shader
-			//	template<typename Type>
-			//	void Send(Type data)
-			//	{
-			//		VXL_ASSERT(false, "Uniform Type does not exist");
-			//	}
-			//	// Send Uniform to Shader [Matrix only Version]
-			//	template<typename Type>
-			//	void SendMatrix(Type data, bool transposeMatrix)
-			//	{
-			//		VXL_ASSERT(false, "Uniform Type does not exist");
-			//	}
-			//	
-			//	// [SLOWER BUT CAN BE CALLED OUTSIDE PROGRAM BINDING]
-			//	// Send Uniform to Shader
-			//	template<typename Type>
-			//	void Send(ShaderProgramID id, Type data)
-			//	{
-			//		VXL_ASSERT(false, "Uniform Type does not exist");
-			//	}
-			//	// [SLOWER BUT CAN BE CALLED OUTSIDE PROGRAM BINDING]
-			//	// Send Uniform to Shader [Matrix only Version]
-			//	template<typename Type>
-			//	void SendMatrix(ShaderProgramID id, Type data, bool transposeMatrix)
-			//	{
-			//		VXL_ASSERT(false, "Uniform Type does not exist");
-			//	}
 		};
-		//	// Uniform Template Specialization //
-		//	template<>void Uniform::Send<bool>    (bool data);
-		//	template<>void Uniform::Send<int>     (int data);
-		//	template<>void Uniform::Send<uint32_t>(uint32_t data);
-		//	template<>void Uniform::Send<float>   (float data);
-		//	template<>void Uniform::Send<double>  (double data);
-		//	template<>void Uniform::Send<Vector2&>(Vector2& data);
-		//	template<>void Uniform::Send<Vector2> (Vector2 data);
-		//	template<>void Uniform::Send<Vector3&>(Vector3& data);
-		//	template<>void Uniform::Send<Vector3> (Vector3 data);
-		//	template<>void Uniform::Send<Vector4&>(Vector4& data);
-		//	template<>void Uniform::Send<Vector4> (Vector4 data);
-		//	template<>void Uniform::Send<Color3F&>(Color3F& data);
-		//	template<>void Uniform::Send<Color3F> (Color3F data);
-		//	template<>void Uniform::Send<Color4F&>(Color4F& data);
-		//	template<>void Uniform::Send<Color4F> (Color4F data);
-		//	
-		//	template<>void Uniform::SendMatrix<Matrix2x2&>(Matrix2x2& data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix2x2> (Matrix2x2 data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix3x3&>(Matrix3x3& data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix3x3> (Matrix3x3 data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix4x4&>(Matrix4x4& data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix4x4> (Matrix4x4 data, bool transposeMatrix);
-		//	
-		//	template<>void Uniform::Send<bool>    (ShaderProgramID id, bool data);
-		//	template<>void Uniform::Send<int>     (ShaderProgramID id, int data);
-		//	template<>void Uniform::Send<uint32_t>(ShaderProgramID id, uint32_t data);
-		//	template<>void Uniform::Send<float>   (ShaderProgramID id, float data);
-		//	template<>void Uniform::Send<double>  (ShaderProgramID id, double data);
-		//	template<>void Uniform::Send<Vector2&>(ShaderProgramID id, Vector2& data);
-		//	template<>void Uniform::Send<Vector2> (ShaderProgramID id, Vector2 data);
-		//	template<>void Uniform::Send<Vector3&>(ShaderProgramID id, Vector3& data);
-		//	template<>void Uniform::Send<Vector3> (ShaderProgramID id, Vector3 data);
-		//	template<>void Uniform::Send<Vector4&>(ShaderProgramID id, Vector4& data);
-		//	template<>void Uniform::Send<Vector4> (ShaderProgramID id, Vector4 data);
-		//	template<>void Uniform::Send<Color3F&>(ShaderProgramID id, Color3F& data);
-		//	template<>void Uniform::Send<Color3F> (ShaderProgramID id, Color3F data);
-		//	template<>void Uniform::Send<Color4F&>(ShaderProgramID id, Color4F& data);
-		//	template<>void Uniform::Send<Color4F> (ShaderProgramID id, Color4F data);
-		//	
-		//	template<>void Uniform::SendMatrix<Matrix2x2&>(ShaderProgramID id, Matrix2x2& data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix2x2> (ShaderProgramID id, Matrix2x2 data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix3x3&>(ShaderProgramID id, Matrix3x3& data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix3x3> (ShaderProgramID id, Matrix3x3 data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix4x4&>(ShaderProgramID id, Matrix4x4& data, bool transposeMatrix);
-		//	template<>void Uniform::SendMatrix<Matrix4x4> (ShaderProgramID id, Matrix4x4 data, bool transposeMatrix);
 
 		struct UniformBlock
 		{

@@ -118,7 +118,7 @@ namespace Vxl
 		EndFrame();
 
 		// opengl error callback
-		//Graphics::InitOpenGLDebugCallback();
+		Graphics::InitOpenGLDebugCallback();
 
 		m_setup = true;
 	}
@@ -137,6 +137,8 @@ namespace Vxl
 		RenderManager.UpdateAllWindowAspectCameras();
 		// Update screen sizes for viewport rendering
 		UpdateViewport();
+		// Update all FBOs in fullscreen
+		RenderManager.ReloadViewportFBOS();
 	}
 	void Window::UpdateViewport()
 	{
@@ -226,6 +228,8 @@ namespace Vxl
 		RenderManager.UpdateAllWindowAspectCameras();
 		// Update viewport sizes
 		UpdateViewport();
+		// Update Viewport FBOs
+		RenderManager.ReloadViewportFBOS();
 	}
 	void Window::SetCursor(CursorMode mode)
 	{

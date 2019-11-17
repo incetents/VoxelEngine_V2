@@ -12,7 +12,7 @@ namespace Vxl
 	class FramebufferObject;
 	class RenderTexture;
 
-	static class GUIViewport : public Singleton<class GUIViewport>, public GuiWindow
+	static class GUI_Viewport : public Singleton<class GUI_Viewport>, public GuiWindow
 	{
 		enum RenderMode
 		{
@@ -62,5 +62,5 @@ namespace Vxl
 		void Draw() override {}
 #endif
 
-	} SingletonInstance(GUIViewport);
+	} SingletonInstance(GUI_Viewport);
 }
