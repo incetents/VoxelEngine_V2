@@ -49,7 +49,7 @@ namespace Vxl
 	}
 
 	Camera::Camera(const std::string& name, float _znear, float _zfar)
-		: m_znear(_znear), m_zfar(_zfar)
+		: SceneNode(SceneNodeType::CAMERA, name), m_znear(_znear), m_zfar(_zfar)
 	{
 		//RenderManager.AddEntity(this);
 
@@ -154,84 +154,4 @@ namespace Vxl
 		m_projectionInverse = projection.Inverse();
 	}
 
-	// Behaviour
-	//	void Camera::Update()
-	//	{
-	//		m_transform.updateValues();
-	//	}
-
-	// Special
-	//	void Camera::DrawSelection(void)
-	//	{
-	//		float Width = 5.0f;
-	//		Color4F Color = IsFamilyActive() ? Color4F::GREEN : Color4F::GREY;;
-	//	
-	//		// Draw Forward
-	//		Vector3 Position = m_transform.getWorldPosition();
-	//		Vector3 Forward = m_transform.getCameraForward();
-	//		//Debug.DrawLine(Position, Position + Forward * 10.0f, 5.0f);
-	//	
-	//		// Draw Perspective
-	//		if (m_type == CameraType::PERSPECTIVE || m_type == CameraType::PERSPECTIVE_WINDOW_ASPECT)
-	//		{
-	//			// Get ClosePlane size
-	//			float Hnear = 2 * tan(m_buffer[0] / 2) * m_znear;
-	//			float Wnear = Hnear * m_buffer[1];
-	//			Vector3 ClosePlaneCenter = Position + Forward * m_znear;
-	//			Vector3 ClosePlaneHalfUp = m_transform.getUp() * Hnear * 0.5f;
-	//			Vector3 ClosePlaneHalfRight = m_transform.getRight() * Wnear * 0.5f;
-	//	
-	//			// Get FarPlane size
-	//			float Hfar = 2 * tan(m_buffer[0] / 2) * m_zfar;
-	//			float Wfar = Hfar * m_buffer[1];
-	//			Vector3 FarPlaneCenter = Position + Forward * m_zfar;
-	//			Vector3 FarPlaneHalfUp = m_transform.getUp() * Hfar * 0.5f;
-	//			Vector3 FarPlaneHalfRight = m_transform.getRight() * Wfar * 0.5f;
-	//	
-	//			// Draw ClosePlane
-	//			Debug.DrawLineSquare(ClosePlaneCenter, ClosePlaneHalfUp, ClosePlaneHalfRight, Width, Color);
-	//	
-	//			// Draw FarPlane
-	//			Debug.DrawLineSquare(FarPlaneCenter, FarPlaneHalfUp, FarPlaneHalfRight, Width, Color);
-	//	
-	//			// Connect Planes
-	//			Debug.DrawLine(
-	//				ClosePlaneCenter - ClosePlaneHalfUp - ClosePlaneHalfRight,
-	//				FarPlaneCenter - FarPlaneHalfUp - FarPlaneHalfRight,
-	//				Width, Color, Color
-	//			);
-	//	
-	//			Debug.DrawLine(
-	//				ClosePlaneCenter - ClosePlaneHalfUp + ClosePlaneHalfRight,
-	//				FarPlaneCenter - FarPlaneHalfUp + FarPlaneHalfRight,
-	//				Width, Color, Color
-	//			);
-	//	
-	//			Debug.DrawLine(
-	//				ClosePlaneCenter + ClosePlaneHalfUp - ClosePlaneHalfRight,
-	//				FarPlaneCenter + FarPlaneHalfUp - FarPlaneHalfRight,
-	//				Width, Color, Color
-	//			);
-	//	
-	//			Debug.DrawLine(
-	//				ClosePlaneCenter + ClosePlaneHalfUp + ClosePlaneHalfRight,
-	//				FarPlaneCenter + FarPlaneHalfUp + FarPlaneHalfRight,
-	//				Width, Color, Color
-	//			);
-	//		}
-	//	}
-	//	
-	//	// Draw
-	//	void Camera::Draw()
-	//	{
-	//		// Nothing
-	//	}
-	//	
-	//	void Camera::TransformChanged()
-	//	{
-	//		m_view = Matrix4x4::LookAt(m_transform.m_position, m_transform.getForward(), m_transform.getRight(), m_transform.getUp());
-	//		m_viewInverse = m_view.Inverse();
-	//	
-	//		UpdateViewProjection();
-	//	}
 }

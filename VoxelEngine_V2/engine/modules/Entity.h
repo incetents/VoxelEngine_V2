@@ -4,9 +4,12 @@
 #include "Component.h"
 #include "../math/Transform.h"
 #include "../math/Color.h"
+
+#include "../modules/Material.h"
+#include "../modules/SceneNode.h"
+
 #include "../utilities/Types.h"
 #include "../utilities/Util.h"
-#include "../modules/Material.h"
 
 #include <map>
 #include <stack>
@@ -18,12 +21,12 @@ namespace Vxl
 {
 	class Mesh;
 
-	class Entity
+	class Entity : public SceneNode
 	{
 		DISALLOW_COPY_AND_ASSIGN(Entity);
 		friend class Assets;
 		friend class RenderManager;
-		friend class Transform;
+		friend class SceneNode;
 		friend class Editor;
 		friend class Material;
 		friend class ShaderProgram;
@@ -32,14 +35,10 @@ namespace Vxl
 		Entity(const std::string& name);
 
 		// Hidden Data
-		uint32_t		m_uniqueID;
 		Color4F			m_colorID;
 		MeshIndex		m_mesh = -1;
 		MaterialIndex	m_material = -1;
 		std::map<TextureLevel, TextureIndex> m_textures;
-		
-		// Editor Information
-		bool		m_isSelected = false;
 		
 		// Bounding Boxes
 		Vector3		m_OBB[8]; // Object Bounding Box from mesh
@@ -50,11 +49,8 @@ namespace Vxl
 
 		// Utility
 		void UpdateBoundingBoxCheap();
-		void TransformChanged()
-		{
-			UpdateBoundingBoxCheap();
-		}
 
+		// Compare
 		bool operator< (const Entity& other) const;
 
 	public:
@@ -62,15 +58,10 @@ namespace Vxl
 		virtual ~Entity();
 
 		// Data
-		std::string	m_name;
-		Transform	m_transform;
-		Color3F		m_labelColor	= Color3F(1, 1, 1); // Inspector
 		Color3F		m_Color			= Color3F(0, 0, 0);
 		Color3F		m_Tint			= Color3F(1, 1, 1);
 		float		m_alpha			= 1.0f;
 		bool		m_useTextures	= true; // Only checks if material doesn't use shared textures
-		bool		m_useTransform	= true;
-		bool		m_isActive		= true;
 		bool		m_isSelectable	= true; // for editor
 
 		// Mesh
@@ -174,15 +165,6 @@ namespace Vxl
 		{
 			return m_uniqueID;
 		}
-
-		// Check if Editor can see this
-		inline bool IsSelected(void) const
-		{
-			return m_isSelected;
-		}
-
-		// check if all parents are active
-		bool IsFamilyActive();
 
 		// Bounding Box
 		std::vector<Vector3> GetOBB(void) const

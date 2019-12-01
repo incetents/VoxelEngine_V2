@@ -37,6 +37,7 @@ namespace Vxl
 	class Material;
 	class Entity;
 	class Camera;
+	class SceneNode;
 	// Forward Declare Enums
 	enum class TextureWrapping;
 	enum class TextureFilter;
@@ -142,10 +143,7 @@ namespace Vxl
 		{
 			if (type == AssetType::GLOBAL)
 			{
-				m_storage_typeGlobal.clear();
-				m_storage = m_storage_typeScene;
-
-				if (m_storage.empty())
+				if (m_storage_typeScene.empty())
 				{
 					m_nextID = 1;
 					m_deletedIDs = std::stack<uint32_t>();
@@ -155,22 +153,25 @@ namespace Vxl
 					for (auto& data : m_storage_typeGlobal)
 						m_deletedIDs.push(data.first);
 				}
+
+				m_storage_typeGlobal.clear();
+				m_storage = m_storage_typeScene;
 			}
 			else
 			{
-				m_storage_typeScene.clear();
-				m_storage = m_storage_typeGlobal;
-
-				if (m_storage.empty())
+				if (m_storage_typeGlobal.empty())
 				{
 					m_nextID = 1;
 					m_deletedIDs = std::stack<uint32_t>();
 				}
 				else
 				{
-					for (auto& data : m_storage_typeGlobal)
+					for (auto& data : m_storage_typeScene)
 						m_deletedIDs.push(data.first);
 				}
+
+				m_storage_typeScene.clear();
+				m_storage = m_storage_typeGlobal;
 			}
 		}
 		std::map<uint32_t, Type*>& GetAll(void)
@@ -267,9 +268,13 @@ namespace Vxl
 		DISALLOW_COPY_AND_ASSIGN(Assets);
 		friend class RenderManager;
 	protected:
-		static IDStorage<BaseTexture>		 m_baseTexture_storage;
-		static IDStorage<Texture2D>			 m_texture2D_storage;
-		static IDStorage<Cubemap>			 m_cubemap_storage;
+	public:
+		// Texture2D & Cubemap Indices just BaseTexture indices
+		// Entity, Camera, Light Indices just use SceneNode indices
+
+		static IDStorage<BaseTexture>		 m_baseTexture_storage; // Set 1 - Master
+		static IDStorage<Texture2D>			 m_texture2D_storage; // Set 1
+		static IDStorage<Cubemap>			 m_cubemap_storage; // Set 1
 		static NamedStorage<File>			 m_file_storage;
 		static IDStorage<FramebufferObject>	 m_framebufferObject_storage;
 		static IDStorage<RenderTexture>		 m_renderTexture_storage;
@@ -280,8 +285,9 @@ namespace Vxl
 		static IDStorage<ShaderProgram>		 m_shaderProgram_storage;
 		static IDStorage<ShaderMaterial>	 m_shaderMaterial_storage;
 		static IDStorage<Material>			 m_material_storage;
-		static IDStorage<Entity>			 m_entity_storage;
-		static IDStorage<Camera>			 m_camera_storage;
+		static IDStorage<SceneNode>			 m_sceneNode_storage; // Set 2 - Master
+		static IDStorage<Entity>			 m_entity_storage; // Set 2
+		static IDStorage<Camera>			 m_camera_storage; // Set 2
 
 		void DestroyAndEraseAll();
 
@@ -322,6 +328,7 @@ namespace Vxl
 		static void deleteShaderProgram(ShaderProgramIndex index);
 		static void deleteShaderMaterial(ShaderMaterialIndex index);
 		static void deleteMaterial(MaterialIndex index);
+		static void deleteSceneNode(SceneNodeIndex index);
 		static void deleteEntity(EntityIndex index);
 		static void deleteCamera(CameraIndex index);
 
@@ -339,6 +346,7 @@ namespace Vxl
 		static void deleteAllShaderProgram();
 		static void deleteAllShaderMaterial();
 		static void deleteAllMaterial();
+		static void deleteAllSceneNode();
 		static void deleteAllEntity();
 		static void deleteAllCamera();
 
@@ -356,6 +364,7 @@ namespace Vxl
 		static ShaderProgram*		getShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Get(index); }
 		static ShaderMaterial*		getShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Get(index); }
 		static Material*			getMaterial(MaterialIndex index) { return m_material_storage.Get(index); }
+		static SceneNode*			getSceneNode(SceneNodeIndex index) { return m_sceneNode_storage.Get(index); }
 		static Entity*				getEntity(EntityIndex index) { return m_entity_storage.Get(index); }
 		static Camera*				getCamera(CameraIndex index) { return m_camera_storage.Get(index); }
 
@@ -373,6 +382,7 @@ namespace Vxl
 		static const std::map<uint32_t, ShaderProgram*>&		getAllShaderProgram() { return m_shaderProgram_storage.GetAll(); }
 		static const std::map<uint32_t, ShaderMaterial*>&		getAllShaderMaterial() { return m_shaderMaterial_storage.GetAll(); }
 		static const std::map<uint32_t, Material*>&				getAllMaterial() { return m_material_storage.GetAll(); }
+		static const std::map<uint32_t, SceneNode*>&			getAllSceneNode() { return m_sceneNode_storage.GetAll(); }
 		static const std::map<uint32_t, Entity*>&				getAllEntity() { return m_entity_storage.GetAll(); }
 		static const std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(); }
 
@@ -478,9 +488,9 @@ namespace Vxl
 		MaterialIndex createMaterial(const std::string& name);
 		//
 		ShaderMaterialIndex createShaderMaterial(const std::string& filePath);
-		//
+		
+		// Scene Nodes
 		EntityIndex createEntity(const std::string& name);
-		//
 		CameraIndex createCamera(const std::string& name, float znear = 0.1f, float zfar = 100.0f);
 		
 	
@@ -557,15 +567,15 @@ namespace Vxl
 		const std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(AssetType::GLOBAL); }
 
 		// Get Specific Global Data
-		Texture2D* getTex2DNullImageCheckerboard(void) const { return m_texture2D_storage.Get(texID_nullImageCheckerboard); }
-		Texture2D* getTex2DNullImageBlack(void) const { return m_texture2D_storage.Get(texID_nullImageBlack); }
-		Texture2D* getTex2DNullImagePink(void) const { return m_texture2D_storage.Get(texID_nullImagePink); }
-		Texture2D* getTex2DEditorCamera(void) const { return m_texture2D_storage.Get(texID_editor_camera); }
-		Texture2D* getTex2DEditorLight(void) const { return m_texture2D_storage.Get(texID_editor_light); }
+		Texture2D* get_Tex2DNullImageCheckerboard(void) const { return m_texture2D_storage.Get(texID_nullImageCheckerboard); }
+		Texture2D* get_Tex2DNullImageBlack(void) const { return m_texture2D_storage.Get(texID_nullImageBlack); }
+		Texture2D* get_Tex2DNullImagePink(void) const { return m_texture2D_storage.Get(texID_nullImagePink); }
+		Texture2D* get_Tex2DEditorCamera(void) const { return m_texture2D_storage.Get(texID_editor_camera); }
+		Texture2D* get_Tex2DEditorLight(void) const { return m_texture2D_storage.Get(texID_editor_light); }
 		
-		Material* getMaterialError(void) const { return m_material_storage.Get(material_error); }
+		Material* get_MaterialError(void) const { return m_material_storage.Get(material_error); }
 
-		ShaderProgram* getShader_ShowRenderTarget(void) const;
+		ShaderProgram* get_ProgramShowRenderTarget(void) const;
 
 	} SingletonInstance(GlobalAssets);
 

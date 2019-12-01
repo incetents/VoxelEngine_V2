@@ -4,7 +4,7 @@
 
 #include "../input/Input.h"
 #include "../math/Raycast.h"
-#include "../modules/Entity.h"
+#include "../modules/SceneNode.h"
 #include "../modules/Material.h"
 #include "../objects/Camera.h"
 #include "../rendering/FramebufferObject.h"
@@ -111,13 +111,13 @@ namespace Vxl
 	}
 
 	// Update
-	void Gizmo::Update(const std::vector<Entity*> _entities)
+	void Gizmo::Update(const std::vector<SceneNode*> _nodes)
 	{
 		Camera* mainCamera = Assets::getCamera(RenderManager.m_mainCamera);
 		VXL_ASSERT(mainCamera, "Missing camera for Gizmo");
 
 		// If only 1 Entity and its the EditorCamera, ignore it
-		if (_entities.size() == 0)
+		if (_nodes.size() == 0)
 		{
 			m_show = false;
 			return;
@@ -139,10 +139,10 @@ namespace Vxl
 		{
 			// Update Average Selection Position
 			Vector3 AverageSelection = Vector3::ZERO;
-			uint32_t count = (uint32_t)_entities.size();
-			for (const auto& _Entity : _entities)
+			uint32_t count = (uint32_t)_nodes.size();
+			for (const auto& _node : _nodes)
 			{
-				AverageSelection += _Entity->m_transform.getWorldPosition();
+				AverageSelection += _node->m_transform.getWorldPosition();
 			}
 
 			if (count)
@@ -167,12 +167,12 @@ namespace Vxl
 		// Set Local Pivot
 		else
 		{
-			Matrix3x3 RotationMatrix = _entities[0]->m_transform.getWorldRotation().GetMatrix3x3();
+			Matrix3x3 RotationMatrix = _nodes[0]->m_transform.getWorldRotation().GetMatrix3x3();
 
 			m_transform.Model = Matrix4x4(RotationMatrix, m_transform.WorldPosition) * m_constantScaleMatrix;
-			m_transform.Forward = _entities[0]->m_transform.getForward();
-			m_transform.Up = _entities[0]->m_transform.getUp();
-			m_transform.Right = _entities[0]->m_transform.getRight();
+			m_transform.Forward = _nodes[0]->m_transform.getForward();
+			m_transform.Up = _nodes[0]->m_transform.getUp();
+			m_transform.Right = _nodes[0]->m_transform.getRight();
 		}
 
 		// Translate XYZ Planes to be in correct position
@@ -261,10 +261,10 @@ namespace Vxl
 
 				// Store all world positions
 				m_worldPositionStorage.clear();
-				m_worldPositionStorage.reserve(_entities.size());
-				uint32_t _entityCount = (uint32_t)_entities.size();
-				for (uint32_t i = 0; i < _entityCount; i++)
-					m_worldPositionStorage.push_back(_entities[i]->m_transform.getWorldPosition());
+				m_worldPositionStorage.reserve(_nodes.size());
+				uint32_t _nodeCount = (uint32_t)_nodes.size();
+				for (uint32_t i = 0; i < _nodeCount; i++)
+					m_worldPositionStorage.push_back(_nodes[i]->m_transform.getWorldPosition());
 				m_worldPositionStorage.shrink_to_fit();
 				
 			}
@@ -298,12 +298,12 @@ namespace Vxl
 					m_dragPrev = DirectionRay.m_t;
 
 					// Store all original scales to avoid precision loss
-					uint32_t selectionCount = (uint32_t)_entities.size();
+					uint32_t selectionCount = (uint32_t)_nodes.size();
 					m_worldScaleStorage.clear();
 					m_worldScaleStorage.reserve(selectionCount);
 					
 					for (uint32_t i = 0; i < selectionCount; i++)
-						m_worldScaleStorage.push_back(_entities[i]->m_transform.getScale()[(int)m_selectedAxis]);
+						m_worldScaleStorage.push_back(_nodes[i]->m_transform.getScale()[(int)m_selectedAxis]);
 
 					m_worldScaleStorage.shrink_to_fit();
 				}
@@ -336,11 +336,11 @@ namespace Vxl
 					m_dragEnd = CameraRayHitPlane(m_targetNormal);
 
 					// Move Selected Objects
-					uint32_t _entityCount = (uint32_t)_entities.size();
-					for (uint32_t i = 0; i < _entityCount; i++)
+					uint32_t _nodeCount = (uint32_t)_nodes.size();
+					for (uint32_t i = 0; i < _nodeCount; i++)
 					{
 						Vector3 Target = m_worldPositionStorage[i] + (m_dragEnd - m_dragStart);
-						_entities[i]->m_transform.setWorldPosition(Target);
+						_nodes[i]->m_transform.setWorldPosition(Target);
 					}
 				}
 				// Translate based on Axis
@@ -362,10 +362,10 @@ namespace Vxl
 					if(m_translateSnapping)
 						totalDrag = round(totalDrag / m_translateSnapAmount) * m_translateSnapAmount;
 
-					uint32_t _entityCount = (uint32_t)_entities.size();
-					for (uint32_t i = 0; i < _entityCount; i++)
+					uint32_t _nodeCount = (uint32_t)_nodes.size();
+					for (uint32_t i = 0; i < _nodeCount; i++)
 					{
-						_entities[i]->m_transform.setWorldPosition(m_worldPositionStorage[i] - Direction.NormalizeAccurate() * totalDrag);
+						_nodes[i]->m_transform.setWorldPosition(m_worldPositionStorage[i] - Direction.NormalizeAccurate() * totalDrag);
 					}
 				}
 
@@ -387,10 +387,10 @@ namespace Vxl
 					float Distance = MouseDelta.x + MouseDelta.y;
 
 					// Scale everything based on distance
-					uint32_t selectionCount = (uint32_t)_entities.size();
+					uint32_t selectionCount = (uint32_t)_nodes.size();
 					for (uint32_t i = 0; i < selectionCount; i++)
 					{
-						_entities[i]->m_transform.increaseScale(Distance - m_dragAmount);
+						_nodes[i]->m_transform.increaseScale(Distance - m_dragAmount);
 					}
 					// Use "m_totalDrag1" similar to a "lastTime" value of a timer
 					m_dragAmount = Distance;
@@ -408,25 +408,25 @@ namespace Vxl
 					ShortestDistance(ViewRay, DirectionRay);
 					m_dragAmount = (-DirectionRay.m_t + m_dragPrev);
 
-					uint32_t selectionCount = (uint32_t)_entities.size();
+					uint32_t selectionCount = (uint32_t)_nodes.size();
 					switch (m_selectedAxis)
 					{
 					case Axis::X:
 						for (uint32_t i = 0; i < selectionCount; i++)
 						{
-							_entities[i]->m_transform.setScaleX(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
+							_nodes[i]->m_transform.setScaleX(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
 						}
 						break;
 					case Axis::Y:
 						for (uint32_t i = 0; i < selectionCount; i++)
 						{
-							_entities[i]->m_transform.setScaleY(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
+							_nodes[i]->m_transform.setScaleY(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
 						}
 						break;
 					case Axis::Z:
 						for (uint32_t i = 0; i < selectionCount; i++)
 						{
-							_entities[i]->m_transform.setScaleZ(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
+							_nodes[i]->m_transform.setScaleZ(m_worldScaleStorage[i] * (m_dragAmount / m_constantScale + 1.0f));
 						}
 						break;
 					}
@@ -465,10 +465,10 @@ namespace Vxl
 					}
 
 					// Rotate objects around selected axis
-					uint32_t selectionCount = (uint32_t)_entities.size();
+					uint32_t selectionCount = (uint32_t)_nodes.size();
 					for (uint32_t i = 0; i < selectionCount; i++)
 					{
-						_entities[i]->m_transform.rotateAroundAxis(m_targetNormal, degrees);
+						_nodes[i]->m_transform.rotateAroundAxis(m_targetNormal, degrees);
 					}
 
 					// Update previous rotation

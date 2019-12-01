@@ -29,7 +29,7 @@ protected:
 	explicit	Singleton() {}
 	Singleton(const Singleton&) = delete;
 	Singleton& operator=(const Singleton&) = delete;
-
+	virtual ~Singleton() {}
 };
 
 template<class T>

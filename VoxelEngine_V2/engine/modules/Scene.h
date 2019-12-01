@@ -15,6 +15,8 @@ namespace Vxl
 		}
 		
 	public:
+		virtual ~Scene() {}
+
 		virtual void Setup() = 0;
 		virtual void Destroy() = 0;
 		// Behaviours

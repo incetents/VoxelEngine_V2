@@ -26,8 +26,6 @@ namespace Vxl
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderManager);
 		friend class Hierarchy;
-		friend class Material;
-		friend class Entity;
 	private:
 		Scene* m_currentScene = nullptr;
 	private:
@@ -52,6 +50,15 @@ namespace Vxl
 		// Utility
 		void sortMaterials();
 		void sortEntities();
+
+		void dirtyMaterialSequence()
+		{
+			m_materialSequenceDirty = true;
+		}
+		void dirtyEntitySequence()
+		{
+			m_renderlistDirty = true;
+		}
 
 		void render(MaterialIndex _material, const std::vector<Entity*>& _entities);
 		void renderOpaque();

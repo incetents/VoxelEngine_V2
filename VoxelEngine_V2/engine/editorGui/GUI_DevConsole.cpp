@@ -28,6 +28,8 @@
 
 #include "../textures/Texture2D.h"
 
+#include "../utilities/Asset.h"
+
 #include "windows.h"
 
 namespace Vxl
@@ -78,21 +80,13 @@ namespace Vxl
 
 		ImGui::Separator();
 
-		ImGui::Text("Window Position: X=%d, Y=%d", Window.GetPositionX(), Window.GetPositionY());
+		ImGui::Text("Window Position: X=[%d], Y=[%d]", Window.GetPositionX(), Window.GetPositionY());
+		ImGui::Text("Window Size: W=[%d], H=[%d]", Window.GetWindowWidth(), Window.GetWindowHeight());
+		ImGui::Text("Window Viewport: X=[%d], Y=[%d], W=[%d], H=[%d]", Window.GetViewportOffsetX(), Window.GetViewportOffsetY(), Window.GetViewportWidth(), Window.GetViewportHeight());
 
 		ImGui::Text("Reload Window = [F5]");
 		ImGui::Text("Reload Fullscreen FBOs = [F6]");
 		ImGui::Text("Reload Shaders = [R]");
-
-		ImGui::Separator();
-
-		if (ImGui::CollapsingHeader("Window"))
-		{
-			ImGui::Text("Window Size: %d %d", Window.GetWindowWidth(), Window.GetWindowHeight());
-			ImGui::Text("Window Viewport: %d %d", Window.GetViewportWidth(), Window.GetViewportHeight());
-			ImGui::Text("Window Resolution: %d %d", Window.GetResolutionWidth(), Window.GetResolutionHeight());
-			ImGui::Text("Window Aspect: %f", Window.GetAspectRatio());
-		}
 
 		ImGui::Separator();
 

@@ -18,4 +18,5 @@ namespace Vxl
 	using MaterialIndex = uint32_t;
 	using EntityIndex = uint32_t;
 	using CameraIndex = uint32_t;
+	using SceneNodeIndex = uint32_t;
 }

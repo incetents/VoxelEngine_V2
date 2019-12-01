@@ -302,13 +302,13 @@ namespace Vxl
 
 	const std::string GLSL_VERSION = "#version 420 core";
 
-	ShaderMaterial::ShaderMaterial(const std::string& filePath)
+	ShaderMaterial::ShaderMaterial(const std::string& filePath, bool GlobalAsset)
 		: m_filePath(filePath)
 	{
-		reload();
+		reload(GlobalAsset);
 	}
 
-	void ShaderMaterial::reload()
+	void ShaderMaterial::reload(bool GlobalAsset)
 	{
 		m_targetLevels.clear();
 		m_coreProgram = -1;
@@ -601,7 +601,10 @@ namespace Vxl
 			return;
 
 		// Create Core Program
-		m_coreProgram = SceneAssets.createShaderProgram(name + "_program", shaders);
+		if(GlobalAsset)
+			m_coreProgram = GlobalAssets.createShaderProgram(name + "_program", shaders);
+		else
+			m_coreProgram = SceneAssets.createShaderProgram(name + "_program", shaders);
 
 		// Data
 		m_targetLevels = targetLevels;

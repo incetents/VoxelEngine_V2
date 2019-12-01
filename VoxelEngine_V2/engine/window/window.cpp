@@ -34,8 +34,8 @@ namespace Vxl
 
 		m_name = name;
 		UpdateSizes(width, height);
-		m_resolution[0] = width;
-		m_resolution[1] = height;
+		m_size[0] = width;
+		m_size[1] = height;
 
 		// Debug Context
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);

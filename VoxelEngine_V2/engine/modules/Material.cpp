@@ -28,8 +28,8 @@ namespace Vxl
 		if (m_sequenceNumber != -1)
 		{
 			m_allSequenceNumbers.erase(m_sequenceNumber);
-			// Rendermanager must resort materials
-			RenderManager.m_materialSequenceDirty = true;
+			// Rendermanager must re-sort materials
+			RenderManager.dirtyMaterialSequence();
 		}
 	}
 
@@ -43,8 +43,8 @@ namespace Vxl
 			if(sequence != -1)
 				m_allSequenceNumbers.insert(sequence);
 
-			// Rendermanager must resort materials
-			RenderManager.m_materialSequenceDirty = true;
+			// Rendermanager must re-sort materials
+			RenderManager.dirtyMaterialSequence();
 			return true;
 		}
 		return false;
@@ -56,8 +56,8 @@ namespace Vxl
 
 		m_allSequenceNumbers.erase(m_sequenceNumber);
 		m_sequenceNumber = -1;
-		// Rendermanager must resort materials
-		RenderManager.m_materialSequenceDirty = true;
+		// Rendermanager must re-sort materials
+		RenderManager.dirtyMaterialSequence();
 	}
 
 	void Material::setShaderMaterial(ShaderMaterialIndex index)
@@ -155,9 +155,9 @@ namespace Vxl
 			if (m_textures.find(level) == m_textures.end())
 			{
 				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
+					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->bind(level);
+					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
 			}
 
 			TextureIndex index = m_textures[level];
@@ -167,9 +167,9 @@ namespace Vxl
 			if (_tex == nullptr || !_tex->isLoaded())
 			{
 				if(level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
+					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->bind(level);
+					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
 			}
 			// bind texture normally
 			else
@@ -191,9 +191,9 @@ namespace Vxl
 			if (_entity->m_textures.find(level) == _entity->m_textures.end())
 			{
 				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
+					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->bind(level);
+					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
 			}
 
 			TextureIndex index = _entity->m_textures[level];
@@ -203,9 +203,9 @@ namespace Vxl
 			if (_tex == nullptr || !_tex->isLoaded())
 			{
 				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
+					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->bind(level);
+					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
 			}
 			// bind texture normally
 			else

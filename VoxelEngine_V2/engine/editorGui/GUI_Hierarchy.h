@@ -9,7 +9,7 @@
 
 namespace Vxl
 {
-	class Entity;
+	class SceneNode;
 
 	static class Hierarchy : public Singleton<class Hierarchy>, public GuiWindow
 	{
@@ -17,7 +17,7 @@ namespace Vxl
 		friend class Inspector;
 	private:
 		// Utility
-		void DisplayEntity(EntityIndex _entity, int _depth);
+		void DisplayNode(SceneNode* _node, int _depth);
 	public:
 
 		// Behaviour

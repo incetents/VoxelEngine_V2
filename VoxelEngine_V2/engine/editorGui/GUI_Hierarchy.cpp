@@ -27,33 +27,33 @@
 
 namespace Vxl
 {
-	void Hierarchy::DisplayEntity(EntityIndex _entity, int _depth)
+	void Hierarchy::DisplayNode(SceneNode* node, int _depth)
 	{
-		Entity* entity = Assets::getEntity(_entity);
-		VXL_ASSERT(entity, "Missing Entity");
+		//SceneNode* node = Assets::getSceneNode(_node);
+		//VXL_ASSERT(node, "Missing SceneNode");
 
 		// Display entity
 		//	-> Collapsing if it has children
 		//	-> Text if it has no children
-		auto ChildCount = entity->m_transform.getChildCount();
+		auto ChildCount = node->m_transform.getChildCount();
 		if (ChildCount == 0)
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog;
-			if (entity->IsSelected())
+			if (node->IsSelected())
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
-			if (!entity->IsFamilyActive())
+			if (!node->IsFamilyActive())
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
 			else
 			{
-				Color3F c = entity->m_labelColor;
+				Color3F c = node->m_labelColor;
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b, 1));
 			}
 
 			// Node + Name
-			std::string Name = entity->m_name;
+			std::string Name = node->m_name;
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -62,17 +62,17 @@ namespace Vxl
 			// selection case
 			if (ImGui::IsItemClicked())
 			{
-				if (Input.getKey(KeyCode::LEFT_CONTROL))
+				if (ImGui::GetIO().KeyCtrl)
 				{
-					if (!entity->IsSelected())
-						Editor.AddSelection(_entity);
+					if (!node->IsSelected())
+						Editor.AddSelection(node->m_uniqueID);
 					else
-						Editor.RemoveSelection(_entity);
+						Editor.RemoveSelection(node->m_uniqueID);
 				}
 				else
 				{
 					Editor.ClearSelection();
-					Editor.AddSelection(_entity);
+					Editor.AddSelection(node->m_uniqueID);
 				}
 			}
 
@@ -83,20 +83,20 @@ namespace Vxl
 		{
 			// flags
 			int flags = ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
-			if (entity->IsSelected())
+			if (node->IsSelected())
 				flags |= ImGuiTreeNodeFlags_Selected;
 
 			// color start
-			if (!entity->IsFamilyActive())
+			if (!node->IsFamilyActive())
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
 			else
 			{
-				Color3F c = entity->m_labelColor;
+				Color3F c = node->m_labelColor;
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b, 1));
 			}
 
 			// Node + Name
-			std::string Name = entity->m_name;
+			std::string Name = node->m_name;
 			if (Name.empty())
 				Name = "[Unnamed]";
 
@@ -105,17 +105,17 @@ namespace Vxl
 			// selection
 			if (ImGui::IsItemClicked())
 			{
-				if (Input.getKey(KeyCode::LEFT_CONTROL))
+				if (ImGui::GetIO().KeyCtrl)
 				{
-					if (!entity->IsSelected())
-						Editor.AddSelection(_entity);
+					if (!node->IsSelected())
+						Editor.AddSelection(node->m_uniqueID);
 					else
-						Editor.RemoveSelection(_entity);
+						Editor.RemoveSelection(node->m_uniqueID);
 				}
 				else
 				{
 					Editor.ClearSelection();
-					Editor.AddSelection(_entity);
+					Editor.AddSelection(node->m_uniqueID);
 				}
 			}
 
@@ -126,10 +126,12 @@ namespace Vxl
 			if (node_open)
 			{
 				ImGui::Indent();
-				auto children = entity->m_transform.getChildren();
+				auto children = node->m_transform.getChildren();
 				for (auto it = children.begin(); it != children.end(); it++)
 				{
-					DisplayEntity((*it)->m_owner, _depth + 1);
+					SceneNode* childNode = ((*it)->m_sceneNode);
+					if(childNode)
+						DisplayNode(childNode, _depth + 1);
 				}
 				ImGui::Unindent();
 			}
@@ -139,17 +141,13 @@ namespace Vxl
 
 	void Hierarchy::Draw()
 	{
-		auto Entities = Editor.m_selectedEntities;
+		
 
 		ImGui::Text("Scene Graph:\t");
 
-		if (ImGui::Button("Delete") || Input.getKeyDown(KeyCode::DELETEKEY))
+		if (ImGui::Button("Delete"))
 		{
-			for (auto Entity : Entities)
-			{
-				Assets::deleteEntity(Entity);
-			}
-			Editor.ClearSelection();
+			Editor.DeleteSelection();
 		}
 		//	ImGui::SameLine();
 		//	if (ImGui::Button("Add Sphere"))
@@ -185,12 +183,13 @@ namespace Vxl
 		//	}
 
 		// Display Hierarchy with selected entities
-		auto& entities = SceneAssets.getAllEntity();
-		for (auto& entity : entities)
+		auto& nodes = SceneAssets.getAllSceneNode();
+		for (auto& node : nodes)
 		{
-			if (entity.second->m_transform.getParent() == nullptr)
-				DisplayEntity(entity.first, 0);
+			if (node.second->m_transform.getParent() == nullptr)
+				DisplayNode(node.second, 0);
 		}
+		
 		//
 
 		//	// Move Selection

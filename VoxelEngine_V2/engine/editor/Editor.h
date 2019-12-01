@@ -11,14 +11,16 @@ namespace Vxl
 	static class Editor : public Singleton<class Editor>
 	{
 	public:
-		std::vector<EntityIndex>	m_selectedEntities;
+		std::vector<SceneNodeIndex>	m_selectedNodes;
 
 		// [true] if at least one object is selected
 		bool HasSelection(void) const;
-		void RemoveSelection(EntityIndex _entity);
-		void AddSelection(EntityIndex _entity);
+		void RemoveSelection(SceneNodeIndex _node);
+		void AddSelection(SceneNodeIndex _node);
 		void ClearSelection();
+		void DeleteSelection();
 
+		void Update();
 
 	} SingletonInstance(Editor);
 }

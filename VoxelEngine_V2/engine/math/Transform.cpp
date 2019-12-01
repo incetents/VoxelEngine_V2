@@ -7,6 +7,7 @@
 #include "../math/MathCore.h"
 
 #include "../modules/Entity.h"
+#include "../modules/SceneNode.h"
 
 namespace Vxl
 {
@@ -61,11 +62,15 @@ namespace Vxl
 			// Clean
 			isDirty = false;
 
-			// Call entity about change in transform class
-			Entity* owner = Assets::getEntity(m_owner);
-			if(owner)
-				owner->TransformChanged();
+			// Use callback
+			UseCallback();
 		}
+	}
+
+	void Transform::UseCallback()
+	{
+		if(m_sceneNode)
+			callback_updater(*m_sceneNode);
 	}
 
 	Transform::Transform()
@@ -73,12 +78,16 @@ namespace Vxl
 		m_position = Vector3(0, 0, 0);
 		m_euler_rotation = Vector3(0, 0, 0);
 		m_scale = Vector3(1, 1, 1);
+
+		callback_updater = &SceneNode::TransformChanged;
 	}
 	Transform::Transform(const Vector3& position, const Vector3& euler_rotation, const Vector3& scale)
 	{
 		m_position = position;
 		m_euler_rotation = euler_rotation;
 		m_scale = scale;
+
+		callback_updater = &SceneNode::TransformChanged;
 	}
 	Transform::~Transform()
 	{
@@ -86,7 +95,8 @@ namespace Vxl
 		for (auto child : m_children)
 		{
 			child->simpleRemoveParent();
-			Assets::getEntity(child->m_owner)->TransformChanged();
+			child->UseCallback();
+
 			// Check for new parent for current children/soon-to-be orphans
 			if (m_parent)
 			{
@@ -102,7 +112,7 @@ namespace Vxl
 		if (m_parent)
 		{
 			m_parent->SimpleRemoveChild(this);
-			Assets::getEntity(m_parent->m_owner)->TransformChanged();
+			m_parent->UseCallback();
 		}
 	}
 

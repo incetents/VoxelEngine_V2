@@ -33,6 +33,7 @@
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
     <ClCompile Include="engine\math\Raycast.cpp" />
+    <ClCompile Include="engine\modules\SceneNode.cpp" />
     <ClCompile Include="engine\objects\Camera.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
     <ClCompile Include="engine\objects\GameObject.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="engine\input\XGamePad.h" />
     <ClInclude Include="engine\math\Raycast.h" />
     <ClInclude Include="engine\math\Vector.h" />
+    <ClInclude Include="engine\modules\SceneNode.h" />
     <ClInclude Include="engine\objects\Camera.h" />
     <ClInclude Include="engine\objects\LightObject.h" />
     <ClInclude Include="engine\math\Model.h" />

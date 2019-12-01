@@ -163,8 +163,8 @@ namespace Vxl
 		friend class Assets;
 		friend class RenderManager;
 	private:
-		ShaderMaterial(const std::string& filePath);
-		void reload();
+		ShaderMaterial(const std::string& filePath, bool GlobalAsset);
+		void reload(bool GlobalAsset);
 	public:
 		const std::string			m_filePath;			// File used to load
 		std::vector<TextureLevel>	m_targetLevels;		// Textures used in program

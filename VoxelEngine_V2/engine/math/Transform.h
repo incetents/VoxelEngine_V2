@@ -1,16 +1,15 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../modules/Component.h"
+#include <assert.h>
+#include <vector>
+#include <functional>
 
 #include "Matrix2x2.h"
 #include "Matrix3x3.h"
 #include "Matrix4x4.h"
 #include "Vector.h"
 #include "Quaternion.h"
-
-#include <assert.h>
-#include <vector>
 
 #include "../utilities/Macros.h"
 
@@ -22,10 +21,14 @@ namespace Vxl
 		ZYX
 	};
 
-	class Transform : public Component
+	class SceneNode;
+
+	class Transform
 	{
+		friend class SceneNode;
 		friend class Camera;
 		friend class Assets;
+		friend class Hierarchy;
 	protected:
 		// Model for transformations
 		Matrix4x4	m_modelMatrix;  // World Transformations - Row Major
@@ -96,6 +99,13 @@ namespace Vxl
 		// Update Flag
 		bool isDirty = true;
 		void updateValues();
+
+		// Scene Node (used if transform is inside scene graph)
+		SceneNode* m_sceneNode = nullptr;
+		// Update pointer
+		std::function<void(SceneNode&)> callback_updater;
+		// Send update
+		void UseCallback();
 
 	public:
 		Transform(void);

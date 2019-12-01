@@ -2,17 +2,18 @@
 #include "Precompiled.h"
 #include "Asset.h"
 
-#include "../textures/Texture2D.h"
-#include "../textures/RenderTexture.h"
-#include "../textures/Cubemap.h"
-#include "../utilities/FileIO.h"
+#include "../modules/Material.h"
+#include "../modules/Entity.h"
+#include "../objects/Camera.h"
 #include "../rendering/RenderBuffer.h"
 #include "../rendering/FramebufferObject.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/Shader.h"
-#include "../modules/Material.h"
-#include "../modules/Entity.h"
-#include "../objects/Camera.h"
+#include "../rendering/RenderManager.h"
+#include "../textures/Texture2D.h"
+#include "../textures/RenderTexture.h"
+#include "../textures/Cubemap.h"
+#include "../utilities/FileIO.h"
 
 namespace Vxl
 {
@@ -31,6 +32,7 @@ namespace Vxl
 	IDStorage<Material>			  Assets::m_material_storage;
 	IDStorage<Entity>			  Assets::m_entity_storage;
 	IDStorage<Camera>			  Assets::m_camera_storage;
+	IDStorage<SceneNode>		  Assets::m_sceneNode_storage;
 
 	void GlobalAssets::InitGLResources()
 	{
@@ -156,10 +158,10 @@ namespace Vxl
 		}
 		// Show Render Target
 		{
-			shader_showRenderTarget = SceneAssets.createShaderMaterial("./assets/materials/displayRenderTarget.material");
+			shader_showRenderTarget = createShaderMaterial("./assets/materials/displayRenderTarget.material");
 		}
 	}
-	ShaderProgram* GlobalAssets::getShader_ShowRenderTarget(void) const
+	ShaderProgram* GlobalAssets::get_ProgramShowRenderTarget(void) const
 	{
 		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shader_showRenderTarget);
 		if (shadMat)
@@ -174,6 +176,8 @@ namespace Vxl
 		auto& textures = m_baseTexture_storage.GetAll(m_creationType);
 		for (auto& texture : textures)
 			delete texture.second;
+
+		// Can ignore Texture2D and Cubemap since they are part of textures
 
 		auto& files = m_file_storage.GetAll(m_creationType);
 		for (auto& file : files)
@@ -215,13 +219,11 @@ namespace Vxl
 		for (auto& mat : materials)
 			delete mat.second;
 
-		auto& entities = m_entity_storage.GetAll(m_creationType);
-		for (auto& entity : entities)
-			delete entity.second;
+		auto& nodes = m_sceneNode_storage.GetAll(m_creationType);
+		for (auto& node : nodes)
+			delete node.second;
 
-		auto& cameras = m_camera_storage.GetAll(m_creationType);
-		for (auto& cam : cameras)
-			delete cam.second;
+		// Can ignore entities and cameras since they are part of SceneNodes
 
 		// erase All Assets
 		m_baseTexture_storage.EraseAll(m_creationType);
@@ -237,6 +239,7 @@ namespace Vxl
 		m_shaderProgram_storage.EraseAll(m_creationType);
 		m_shaderMaterial_storage.EraseAll(m_creationType);
 		m_material_storage.EraseAll(m_creationType);
+		m_sceneNode_storage.EraseAll(m_creationType);
 		m_entity_storage.EraseAll(m_creationType);
 		m_camera_storage.EraseAll(m_creationType);
 	}
@@ -308,13 +311,43 @@ namespace Vxl
 	{
 		delete m_material_storage.Erase(index);
 	}
+	void Assets::deleteSceneNode(SceneNodeIndex index)
+	{
+		SceneNode* node = m_sceneNode_storage.Get(index);
+		if (node)
+		{
+			switch (node->m_type)
+			{
+			case SceneNodeType::ENTITY:
+				m_entity_storage.Erase(index);
+				break;
+		
+			case SceneNodeType::CAMERA:
+				m_camera_storage.Erase(index);
+				break;
+			}
+			delete m_sceneNode_storage.Erase(index);
+		}
+
+		// RenderManager re-sort
+		RenderManager.dirtyEntitySequence();
+	}
 	void Assets::deleteEntity(EntityIndex index)
 	{
+		// Remove Node
+		m_sceneNode_storage.Erase(index);
+		
 		delete m_entity_storage.Erase(index);
+		
+		// RenderManager re-sort
+		RenderManager.dirtyEntitySequence();
 	}
 	void Assets::deleteCamera(CameraIndex index)
 	{
-		delete m_camera_storage.Erase(index);
+		//	// Remove Node
+		//	m_sceneNode_storage.Erase(index);
+		//	
+		//	delete m_camera_storage.Erase(index);
 	}
 
 	void Assets::deleteAllTextures()
@@ -406,20 +439,44 @@ namespace Vxl
 
 		m_material_storage.EraseAll();
 	}
+	void Assets::deleteAllSceneNode()
+	{
+		auto& nodes = m_sceneNode_storage.GetAll();
+		for (auto& node : nodes)
+		{
+			delete node.second;
+		}
+		m_sceneNode_storage.EraseAll();
+		m_entity_storage.EraseAll();
+		m_camera_storage.EraseAll();
+	}
 	void Assets::deleteAllEntity()
 	{
 		auto& entities = m_entity_storage.GetAll();
 		for (auto& ent : entities)
+		{
+			// Remove Node
+			m_sceneNode_storage.Erase(ent.first);
+		
 			delete ent.second;
-
+		}
+		
 		m_material_storage.EraseAll();
+		
+		// RenderManager re-sort
+		RenderManager.dirtyEntitySequence();
 	}
 	void Assets::deleteAllCamera()
 	{
 		auto& cameras = m_camera_storage.GetAll();
 		for (auto& cam : cameras)
+		{
+			// Remove Node
+			m_sceneNode_storage.Erase(cam.first);
+		
 			delete cam.second;
-
+		}
+		
 		m_camera_storage.EraseAll();
 	}
 
@@ -640,26 +697,40 @@ namespace Vxl
 	{
 		// Create New Data
 		Entity* object = new Entity(name);
+		
 		// Store Data
-		EntityIndex index	= m_entity_storage.Add(object, m_creationType);
-		object->m_uniqueID	= index;
+		SceneNodeIndex nodeIndex = m_sceneNode_storage.Add(dynamic_cast<SceneNode*>(object), m_creationType);
+		m_entity_storage.AddCustom(object, m_creationType, nodeIndex);
+		object->m_uniqueID	= nodeIndex;
+
+		// Special
 		object->m_colorID	= Util::Conversion::uint_to_color4(object->m_uniqueID);
+		
+		// Rendermanager must re-sort Entities
+		RenderManager.dirtyEntitySequence();
+		
 		// Return index
-		return index;
+		return nodeIndex;
 	}
 	CameraIndex Assets::createCamera(const std::string& name, float znear, float zfar)
 	{
 		// Create New Data
 		Camera* object = new Camera(name, znear, zfar);
 		object->m_transform.m_rotationOrder = EulerRotationOrder::YXZ;
-		// Store Data and Return index
-		return m_camera_storage.Add(object, m_creationType);
+		
+		// Store Data
+		SceneNodeIndex nodeIndex = m_sceneNode_storage.Add(dynamic_cast<SceneNode*>(object), m_creationType);
+		m_camera_storage.AddCustom(object, m_creationType, nodeIndex);
+		object->m_uniqueID = nodeIndex;
+
+		// Return index
+		return nodeIndex;
 	}
 	
 	ShaderMaterialIndex Assets::createShaderMaterial(const std::string& filePath)
 	{
 		// Create New Data
-		ShaderMaterial* object = new ShaderMaterial(filePath);
+		ShaderMaterial* object = new ShaderMaterial(filePath, m_creationType == AssetType::GLOBAL);
 		// Store Data and Return index
 		return m_shaderMaterial_storage.Add(object, m_creationType);
 	}

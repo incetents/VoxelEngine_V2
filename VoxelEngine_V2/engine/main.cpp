@@ -11,6 +11,7 @@
 #include "modules/Material.h"
 #include "../game/Scene_Game.h"
 #include "rendering/RenderManager.h"
+#include "editor/Editor.h"
 
 /**/
 using namespace Vxl;
@@ -33,6 +34,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	RenderManager.InitGlobalGLResources();
 	Scene_Game* _scene = new Scene_Game();
 	RenderManager.SetNewScene(_scene);
+
+	// Quickly check if scene change works
+	Scene_Game* _scene2 = new Scene_Game(); 
+	RenderManager.SetNewScene(_scene2);
 
 	/* ~ */
 	while (!Window.GetClosed())
@@ -68,6 +73,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		RenderManager.DrawImGui();
 
 		// End of frame update
+		Editor.Update();
 		Input.Update();
 		Window.EndFrame();
 		TimeController.EndFrame();

@@ -8,11 +8,14 @@
 #include "../imgui/imgui_colors.h"
 
 #include "../editor/Editor.h"
-#include "../modules/Entity.h"
+
+#include "../input/Input.h"
 
 #include "../math/Vector.h"
 
-#include "../input/Input.h"
+#include "../modules/Entity.h"
+
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {
@@ -44,12 +47,12 @@ namespace Vxl
 	{
 		if (Editor.HasSelection())
 		{
-			EntityIndex index = Editor.m_selectedEntities[0];
-			Entity* entity = Assets::getEntity(index);
+			SceneNodeIndex index = Editor.m_selectedNodes[0];
+			SceneNode* node = Assets::getSceneNode(index);
 
 			// Name
 			static char Name[MAX_ENTITY_NAME_LENGTH];
-			strcpy_s(Name, entity->m_name.c_str());
+			strcpy_s(Name, node->m_name.c_str());
 
 			ImGui::Text("Name: "); ImGui::SameLine();
 
@@ -59,21 +62,21 @@ namespace Vxl
 			// New Name
 			if (ImGui::InputText("input text", Name, IM_ARRAYSIZE(Name), ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				entity->m_name = std::string(Name);
+				node->m_name = std::string(Name);
 			}
 
 			// ID
-			ImGui::TextColored(ImGuiColor::Orange, "ID: %d", entity->getUniqueID());
+			ImGui::TextColored(ImGuiColor::Orange, "ID: %d", node->m_uniqueID);
 
 			// Color
 			ImGui::TextColored(ImGuiColor::Orange, "Label Color:");
 			ImGui::SameLine();
 
-			float EntityColor[3] = { entity->m_labelColor.r, entity->m_labelColor.g, entity->m_labelColor.b };
+			float EntityColor[3] = { node->m_labelColor.r, node->m_labelColor.g, node->m_labelColor.b };
 
 			if (ImGui::ColorEdit3("Label Color", EntityColor, ImGuiColorEditFlags_NoInputs))
 			{
-				entity->m_labelColor = Color3F(EntityColor[0], EntityColor[1], EntityColor[2]);
+				node->m_labelColor = Color3F(EntityColor[0], EntityColor[1], EntityColor[2]);
 			}
 
 			// ~ Naming Scheme
@@ -88,7 +91,7 @@ namespace Vxl
 			ImGui::SameLine();
 			if (ImGui::Button("Paste Color"))
 			{
-				entity->m_labelColor = LabelColorClipboard;
+				node->m_labelColor = LabelColorClipboard;
 			}
 			ImGui::PushItemWidth(-1);
 
@@ -100,18 +103,18 @@ namespace Vxl
 			ImGui::Separator();
 
 			// Active
-			ImGui::Checkbox("Active", &entity->m_isActive);
+			ImGui::Checkbox("Active", &node->m_isActive);
 
 			// Transform
 			if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				float p[3] = { entity->m_transform.getPosition().x, entity->m_transform.getPosition().y, entity->m_transform.getPosition().z };
-				float r[3] = { entity->m_transform.getRotationEuler().x, entity->m_transform.getRotationEuler().y, entity->m_transform.getRotationEuler().z };
-				float s[3] = { entity->m_transform.getScale().x, entity->m_transform.getScale().y, entity->m_transform.getScale().z };
+				float p[3] = { node->m_transform.getPosition().x, node->m_transform.getPosition().y, node->m_transform.getPosition().z };
+				float r[3] = { node->m_transform.getRotationEuler().x, node->m_transform.getRotationEuler().y, node->m_transform.getRotationEuler().z };
+				float s[3] = { node->m_transform.getScale().x, node->m_transform.getScale().y, node->m_transform.getScale().z };
 
-				float pw[3] = { entity->m_transform.getWorldPosition().x, entity->m_transform.getWorldPosition().y, entity->m_transform.getWorldPosition().z };
-				float rw[3] = { entity->m_transform.getForward().x, entity->m_transform.getForward().y, entity->m_transform.getForward().z };
-				float sw[3] = { entity->m_transform.getWorldScale().x, entity->m_transform.getWorldScale().y, entity->m_transform.getWorldScale().z };
+				float pw[3] = { node->m_transform.getWorldPosition().x, node->m_transform.getWorldPosition().y, node->m_transform.getWorldPosition().z };
+				float rw[3] = { node->m_transform.getForward().x, node->m_transform.getForward().y, node->m_transform.getForward().z };
+				float sw[3] = { node->m_transform.getWorldScale().x, node->m_transform.getWorldScale().y, node->m_transform.getWorldScale().z };
 
 				//	// Camera has reversed forward
 				//	if (entity->GetType() == EntityType::CAMERA)
@@ -123,15 +126,15 @@ namespace Vxl
 
 				ImGui::PushItemWidth(-1);
 
-				ImGui::TextColored(ImGuiColor::Orange, entity->m_useTransform ? "Local:" : "Local: [LOCKED]");
+				ImGui::TextColored(ImGuiColor::Orange, node->m_useTransform ? "Local:" : "Local: [LOCKED]");
 
 				// Lock if transform is not used
-				if (!entity->m_useTransform)
+				if (!node->m_useTransform)
 					DisableStart();
 
 				ImGui::Text("Position:"); ImGui::SameLine();
 				if (ImGui::DragFloat3("Position", p, DragSpeed))
-					entity->m_transform.setPosition(p[0], p[1], p[2]);
+					node->m_transform.setPosition(p[0], p[1], p[2]);
 
 				// NO LOCAL EFFECT
 				//if (entity->GetType() == EntityType::LIGHT)
@@ -139,7 +142,7 @@ namespace Vxl
 
 				ImGui::Text("Rotation:"); ImGui::SameLine();
 				if (ImGui::DragFloat3("Rotation", r, DragSpeed))
-					entity->m_transform.setRotation(r[0], r[1], r[2]);
+					node->m_transform.setRotation(r[0], r[1], r[2]);
 
 				// ~~~
 				//if (entity->GetType() == EntityType::LIGHT)
@@ -152,14 +155,14 @@ namespace Vxl
 
 				ImGui::Text("Scale:   "); ImGui::SameLine();
 				if (ImGui::DragFloat3("Scale", s, DragSpeed))
-					entity->m_transform.setScale(s[0], s[1], s[2]);
+					node->m_transform.setScale(s[0], s[1], s[2]);
 
 				// ~~~
 				//if (entity->GetType() == EntityType::LIGHT || Entity->GetType() == EntityType::CAMERA)
 				//	ImGui::PopStyleColor();
 
 				// Lock if transform is not used
-				if (!entity->m_useTransform)
+				if (!node->m_useTransform)
 					DisableEnd();
 
 				ImGui::Separator();
@@ -170,7 +173,7 @@ namespace Vxl
 				ImGui::Text("Position:");
 				ImGui::SameLine();
 				if (ImGui::DragFloat3("PositionW", pw, DragSpeed))
-					entity->m_transform.setWorldPosition(Vector3(pw[0], pw[1], pw[2]));
+					node->m_transform.setWorldPosition(Vector3(pw[0], pw[1], pw[2]));
 				
 				// Forward / Scale [READ ONLY]
 				DisableStart();

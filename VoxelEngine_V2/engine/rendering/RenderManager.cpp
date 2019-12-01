@@ -94,12 +94,25 @@ namespace Vxl
 	// Reload Shader System
 	void RenderManager::ReloadShaders()
 	{
-		Assets::deleteAllShaderProgram();
-
-		const auto& shaderMaterials = Assets::getAllShaderMaterial();
-		for (auto& shaderMaterial : shaderMaterials)
+		// Reload Global Shaders
 		{
-			shaderMaterial.second->reload();
+			GlobalAssets.deleteAllShaderProgram();
+
+			const auto& shaderMaterials = GlobalAssets.getAllShaderMaterial();
+			for (auto& shaderMaterial : shaderMaterials)
+			{
+				shaderMaterial.second->reload(false);
+			}
+		}
+		// Reload Scene Shaders
+		{
+			SceneAssets.deleteAllShaderProgram();
+
+			const auto& shaderMaterials = SceneAssets.getAllShaderMaterial();
+			for (auto& shaderMaterial : shaderMaterials)
+			{
+				shaderMaterial.second->reload(false);
+			}
 		}
 	}
 	void RenderManager::ReloadWindow()
@@ -387,7 +400,7 @@ namespace Vxl
 		{
 			if (!material->bindCoreProgram())
 			{
-				material = GlobalAssets.getMaterialError();
+				material = GlobalAssets.get_MaterialError();
 				if (!material->bindCoreProgram())
 					VXL_ERROR("Material used for Error doesn't work");
 			}

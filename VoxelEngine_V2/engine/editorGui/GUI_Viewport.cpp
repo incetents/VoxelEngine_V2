@@ -45,6 +45,9 @@ namespace Vxl
 			fbo->getWidth(), fbo->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
 		);
+		RenderTexture* rt = Assets::getRenderTexture(m_renderTexture);
+		rt->bind();
+		rt->setWrapMode(TextureWrapping::CLAMP_BORDER);
 
 		fbo->setRenderTexture(0, m_renderTexture);
 		fbo->checkFBOStatus();
@@ -60,9 +63,8 @@ namespace Vxl
 	{
 		FramebufferObject*	fbo = Assets::getFramebufferObject(m_fbo);
 		RenderTexture*		fbo_rt = Assets::getRenderTexture(m_renderTexture);
-		ShaderProgram*		program_showRenderTarget = GlobalAssets.getShader_ShowRenderTarget();
+		ShaderProgram*		program_showRenderTarget = GlobalAssets.get_ProgramShowRenderTarget();
 		
-
 		if (!fbo || !fbo_rt || !program_showRenderTarget)
 			return;
 
@@ -152,6 +154,7 @@ namespace Vxl
 					if (ImGui::MenuItem("None"))
 					{
 						m_outputRTName = -1;
+						m_outputRTName = "RenderTarget[None]";
 					}
 					// Attachments
 					const auto& attachments = selected_fbo->getAttachments();
@@ -236,36 +239,40 @@ namespace Vxl
 		DrawRenderTarget();
 
 		// Vertical Window Padding
-		static float WindowVerticalPadding = 38.0f;
+		static float WindowVerticalPadding = 38.0f; // Title + menu bar
 
 		// Get Correct Size for texture
 		ImVec2 size = ImGui::GetWindowSize();
 		size.y -= (WindowVerticalPadding); // Padding from "name bar" and "menu bar"
 
-		//	if (m_xrayMode)
-		//	{
-		//		//	ImVec2 guiSize = ImGui::GetWindowSize();
-		//		//	guiSize.y -= WindowVerticalPadding; // Fix padding
-		//		//	ImVec2 guiPos = ImGui::GetWindowPos();
-		//		//	guiPos.y += WindowVerticalPadding; // Offset due to padding
-		//		//	ImVec2 windowSize = ImVec2((float)Window.GetWindowWidth(), (float)Window.GetWindowHeight());
-		//		//	
-		//		//	ImVec2 uv_x = ImVec2(guiPos.x / windowSize.x, (guiPos.x + guiSize.x) / windowSize.x);
-		//		//	ImVec2 uv_y = ImVec2(guiPos.y / windowSize.y, (guiPos.y + guiSize.y) / windowSize.y);
-		//		//	uv_y.x = 1.0f - uv_y.x;
-		//		//	uv_y.y = 1.0f - uv_y.y;
-		//		//	
-		//		//	//if(m_renderTexture)
-		//		//	//	ImGui::Image((void*)(intptr_t)m_renderTexture->getID(), size, ImVec2(uv_x.x, uv_y.x), ImVec2(uv_x.y, uv_y.y));
-		//	}
-		//	else
+		if (m_xrayMode)
+		{
+			ImVec2 guiSize = ImGui::GetWindowSize();
+			guiSize.y -= WindowVerticalPadding; // Fix padding
+			ImVec2 guiPos = ImGui::GetWindowPos();
+			guiPos.y += WindowVerticalPadding; // Offset due to padding
+			ImVec2 windowPos = ImVec2((float)(Window.GetPositionX() + Window.GetViewportOffsetX()), (float)(Window.GetPositionY() + Window.GetViewportOffsetY()));
+			ImVec2 windowSize = ImVec2((float)Window.GetViewportWidth(), (float)Window.GetViewportHeight());
+			
+			// Calculate UVS
+			ImVec2 uv_x = ImVec2((guiPos.x - windowPos.x) / windowSize.x, (guiPos.x - windowPos.x + guiSize.x) / windowSize.x);
+			ImVec2 uv_y = ImVec2((guiPos.y - windowPos.y) / windowSize.y, (guiPos.y - windowPos.y + guiSize.y) / windowSize.y);
+
+			// Flip upside down
+			uv_y.x = 1.0f - uv_y.x;
+			uv_y.y = 1.0f - uv_y.y;
+			
+			// Display
+			RenderTexture* renderTexture = Assets::getRenderTexture(m_renderTexture);
+			if(renderTexture)
+				ImGui::Image((void*)(intptr_t)renderTexture->getID(), size, ImVec2(uv_x.x, uv_y.x), ImVec2(uv_x.y, uv_y.y));
+		}
+		else
 		{
 			// Display 
 			RenderTexture* renderTexture = Assets::getRenderTexture(m_renderTexture);
 			if (renderTexture)
 				ImGui::Image((void*)(intptr_t)renderTexture->getID(), size, ImVec2(0, 1), ImVec2(1, 0));
-			else
-				ImGui::Image((void*)(intptr_t)0, size);
 		}
 	}
 }

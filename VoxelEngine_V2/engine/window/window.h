@@ -32,7 +32,6 @@ namespace Vxl
 		std::string  m_name;
 		uint32_t 	 m_position[2]; // Window position
 		uint32_t 	 m_size[2]; // Window Size that can change
-		uint32_t 	 m_resolution[2]; // Window Resolution (fbos and cameras will use this)
 		uint32_t 	 m_viewportSize[2]; // Same as Window size except it can be smaller if custom aspect ratio makes the view smaller
 		int			 m_viewportOffset[2];
 		float		 m_aspectRatio = 1.0f; // Based on Window size (resolution shouldn't affect this)
@@ -142,17 +141,6 @@ namespace Vxl
 		Vector4  GetViewport(void) const
 		{
 			return Vector4((float)m_viewportOffset[0], (float)m_viewportOffset[1], (float)m_viewportSize[0], (float)m_viewportSize[1]);
-		}
-
-		// Returns Width of backbuffer resolution
-		uint32_t GetResolutionWidth(void) const
-		{
-			return m_resolution[0];
-		}
-		// Returns Height of backbuffer resolution
-		uint32_t GetResolutionHeight(void) const
-		{
-			return m_resolution[1];
 		}
 
 		// Get Cursors active mode

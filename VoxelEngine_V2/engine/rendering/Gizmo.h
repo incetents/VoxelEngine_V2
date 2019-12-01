@@ -11,7 +11,7 @@
 namespace Vxl
 {
 	class FramebufferObject;
-	class Entity;
+	class SceneNode;
 	class Mesh;
 
 	class Gizmo
@@ -101,7 +101,7 @@ namespace Vxl
 		}
 
 		// Update
-		void Update(const std::vector<Entity*> _entities);
+		void Update(const std::vector<SceneNode*> _nodes);
 
 		// Render
 		void RenderOnScreen(MaterialIndex _gizmoMaterial); // Display it Visually

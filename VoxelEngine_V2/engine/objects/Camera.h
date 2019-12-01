@@ -2,6 +2,8 @@
 #pragma once
 
 #include "../modules/Entity.h"
+#include "../modules/SceneNode.h"
+
 #include "../rendering/UBO.h"
 
 namespace Vxl
@@ -17,7 +19,7 @@ namespace Vxl
 		CUSTOM
 	};
 
-	class Camera //: public Entity //, public Asset<Camera>
+	class Camera : public SceneNode
 	{
 		DISALLOW_COPY_AND_ASSIGN(Camera);
 		friend class Assets;
@@ -60,9 +62,6 @@ namespace Vxl
 
 		// Destructor
 		~Camera();
-
-		// Data
-		Transform		m_transform;
 
 		void update();
 

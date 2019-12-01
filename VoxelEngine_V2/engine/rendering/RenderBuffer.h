@@ -34,7 +34,7 @@ namespace Vxl
 		void UpdateStorage();
 
 	public:
-		~RenderBuffer();
+		virtual ~RenderBuffer();
 
 		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format);
 		void setGLName(const std::string& name);

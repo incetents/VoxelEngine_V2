@@ -29,9 +29,8 @@ namespace Vxl
 	}
 
 	Entity::Entity(const std::string& name)
-		: m_name(name)
+		: SceneNode(SceneNodeType::ENTITY, name)
 	{
-		addComponent(&m_transform);
 	}
 	Entity::~Entity()
 	{
@@ -47,33 +46,7 @@ namespace Vxl
 	{
 		m_material = index;
 		// Rendermanager must resort Entities
-		RenderManager.m_renderlistDirty = true;
-	}
-
-	bool Entity::IsFamilyActive()
-	{
-		// if no parent, check normal active state
-		Transform* parent = m_transform.getParent();
-		if (parent == nullptr)
-			return m_isActive;
-
-		// auto fail if off
-		if (!m_isActive)
-			return false;
-
-		// iterate through all parents
-		while (parent != nullptr)
-		{
-			Entity* owner = Assets::getEntity(parent->m_owner);
-			VXL_ASSERT(owner, "Component not attached to entity");
-			if (!owner->m_isActive)
-				return false;
-			// Acquire new parent
-			else
-				parent = owner->m_transform.getParent();
-		}
-		// If no parents failed, that means it's all good
-		return true;
+		RenderManager.dirtyEntitySequence();
 	}
 
 	// Update Bounding Box from Mesh

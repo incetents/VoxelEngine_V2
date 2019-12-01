@@ -570,7 +570,7 @@ namespace Vxl
 			Entity* entity_ptr = Assets::getEntity(entity_error_cube);
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(Geometry.GetCube());
-			entity_ptr->m_transform.setPosition(Vector3(0, 0, 0));
+			entity_ptr->m_transform.setPosition(Vector3(0, 2, 0));
 		}
 		entity_beato_cube = SceneAssets.createEntity("_beato_cube");
 		{
@@ -579,6 +579,8 @@ namespace Vxl
 			entity_ptr->setMesh(Geometry.GetCube());
 			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
+
+			entity_ptr->m_transform.setParent(&Assets::getEntity(entity_error_cube)->m_transform);
 		}
 		entity_jiggy = SceneAssets.createEntity("_jiggy");
 		{
@@ -589,6 +591,8 @@ namespace Vxl
 			entity_ptr->m_useTextures = false;
 			entity_ptr->m_transform.setPosition(Vector3(0, 0, -7));
 		}
+		
+		
 
 		//			_errorCube2->m_transform.setParent(&_errorCube->m_transform);
 		//			
@@ -778,6 +782,10 @@ namespace Vxl
 		if (Input.getKeyDown(KeyCode::ESCAPE))
 			Window.Close();
 
+		//if (Input.getKeyDown(KeyCode::DELETEKEY))
+		if (ImGui::GetIO().KeysDown[(int)KeyCode::DELETEKEY] || ImGui::GetIO().KeysDown[(int)KeyCode::BACKSPACE]) // Delete or Backspace
+			Editor.DeleteSelection();
+
 		if (DEVCONSOLE_GET_BOOL("Camera Keyboard Controls", true))
 		{
 			// Camera Movement
@@ -896,14 +904,14 @@ namespace Vxl
 			gizmo.m_mode = Gizmo::Mode::ROTATE;
 
 		// Gizmo
-		std::vector<Entity*> selectedEntities;
-		selectedEntities.reserve(Editor.m_selectedEntities.size());
-		for (const auto& id : Editor.m_selectedEntities)
+		std::vector<SceneNode*> selectedNodes;
+		selectedNodes.reserve(Editor.m_selectedNodes.size());
+		for (const auto& id : Editor.m_selectedNodes)
 		{
-			selectedEntities.push_back(Assets::getEntity(id));
+			selectedNodes.push_back(Assets::getSceneNode(id));
 		}
 
-		gizmo.Update(selectedEntities);
+		gizmo.Update(selectedNodes);
 	}
 
 	// DO NOT DRAW IN HERE //
@@ -1105,7 +1113,6 @@ namespace Vxl
 
 		// ~~ //
 
-
 		// ~~~~
 		Graphics::SetBlendState(false);
 		Graphics::SetWireframeState(false);
@@ -1117,13 +1124,13 @@ namespace Vxl
 		fbo_composite->clearBuffers();
 
 		// Display Final Image
-		ShaderProgram* shaderShowRenderTarget = GlobalAssets.getShader_ShowRenderTarget();
+		ShaderProgram* shaderShowRenderTarget = GlobalAssets.get_ProgramShowRenderTarget();
 		shaderShowRenderTarget->bind();
 		shaderShowRenderTarget->sendUniform("channelOutput", 0);
 		shaderShowRenderTarget->sendUniform("outputMode", 0);
 
 		fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
-		fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
+		//fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
 		
 		RenderManager.RenderFullScreen();
 		//////////////////////

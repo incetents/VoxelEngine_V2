@@ -43,7 +43,7 @@ namespace Vxl
 
 		void InitGLResources();
 		void DestroyGLResources();
-		// Render showrendertarget
+		//
 		void DrawRenderTarget();
 	public:
 
