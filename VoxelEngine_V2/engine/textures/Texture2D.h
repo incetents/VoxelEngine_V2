@@ -74,7 +74,7 @@ namespace Vxl
 			const std::string& filePath
 		);
 		
-		inline bool IsLoaded(void) const override
+		inline bool isLoaded(void) const override
 		{
 			return m_loaded;
 		}

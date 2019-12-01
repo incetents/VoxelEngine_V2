@@ -28,7 +28,7 @@ namespace Vxl
 
 		LineMesh(bool isVec3);
 
-		void Bind(DrawType type = DrawType::LINES);
+		void bind(DrawType type = DrawType::LINES);
 		void Draw();
 	};
 }

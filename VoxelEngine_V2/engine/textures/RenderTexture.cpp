@@ -5,6 +5,7 @@
 namespace Vxl
 {
 	RenderTexture::RenderTexture(
+		const std::string& name,
 		int Width,
 		int Height,
 		TextureFormat FormatType,
@@ -14,25 +15,26 @@ namespace Vxl
 		: BaseTexture(TextureType::TEX_2D, TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST,
 			FormatType, Graphics::GetChannelType(FormatType), PixelType, AnisotropicMode::NONE, MipMapping)
 	{
+		m_name = name;
 		m_width = Width;
 		m_height = Height;
 
 		// Storage
-		CreateStorage();
-		Unbind();
+		createStorage();
+		unbind();
 	}
 
 	// Utility
 	void RenderTexture::RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType)
 	{
 		// Texture is immutable, destroy it and create a new one
-		Unbind();
+		unbind();
 		{
 			auto newID = Graphics::Texture::Create();
 			Graphics::Texture::Delete(m_id);
 			m_id = newID;
 		}
-		Bind();
+		bind();
 
 		// Fix values
 		m_width = (int)width;
@@ -41,14 +43,14 @@ namespace Vxl
 		m_pixelType = pixelType;
 		
 		// Update gl values
-		UpdateParameters();
-		CreateStorage();
-		Unbind();
+		updateParameters();
+		createStorage();
+		unbind();
 	}
 	void RenderTexture::UpdateMipmapping()
 	{
 		VXL_ASSERT(m_mipMapping, "Cannot update RenderTexture mipmaps because it needs to be created with the mipmap flag");
-		BaseTexture::UpdateMipmapping();
+		BaseTexture::updateMipmapping();
 	}
 	void RenderTexture::setGLName(const std::string& name)
 	{
@@ -60,6 +62,6 @@ namespace Vxl
 		int Height,
 		TextureDepthFormat FormatType
 	)
-		: RenderTexture(Width, Height, Graphics::GetFormat(FormatType), Graphics::GetPixelData(FormatType)), m_depthFormat(FormatType)
+		: RenderTexture("Depth", Width, Height, Graphics::GetFormat(FormatType), Graphics::GetPixelData(FormatType)), m_depthFormat(FormatType)
 	{}
 }

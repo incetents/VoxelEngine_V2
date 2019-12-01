@@ -522,7 +522,7 @@ namespace Vxl
 
 			// TEST IMAGE
 			//	Texture2D* tex = Texture2D::GetAsset("beato");
-			//	ImGui::Image((void*)tex->GetID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+			//	ImGui::Image((void*)tex->getID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
 
 			switch (m_State)
 			{

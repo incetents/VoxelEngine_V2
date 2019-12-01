@@ -178,7 +178,7 @@ namespace Vxl
 
 	public:
 
-		inline UINT		GetID(void) const
+		inline UINT		getID(void) const
 		{
 			return m_ID;
 		}

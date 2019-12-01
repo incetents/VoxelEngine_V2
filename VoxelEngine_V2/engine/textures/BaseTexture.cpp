@@ -23,18 +23,18 @@ namespace Vxl
 		VXL_ASSERT(m_id == -1, "Cannot call load on Texture that is alread loaded");
 
 		m_id = Graphics::Texture::Create();
-		Bind();
+		bind();
 	}
 	void BaseTexture::unload()
 	{
 		VXL_ASSERT(m_id != -1, "Cannot call load on Texture that is alread loaded");
 
-		Unbind();
+		unbind();
 		Graphics::Texture::Delete(m_id);
 		m_id = -1;
 	}
 
-	void BaseTexture::UpdateParameters()
+	void BaseTexture::updateParameters()
 	{
 		VXL_ASSERT(Graphics::Texture::GetCurrentlyBound() == m_id, "Texture must be bound to Update its Parameters")
 
@@ -47,16 +47,16 @@ namespace Vxl
 		Graphics::Texture::SetAnistropic(m_type, m_anisotropicMode);
 		
 	}
-	void BaseTexture::CreateStorage()
+	void BaseTexture::createStorage()
 	{
 		Graphics::Texture::CreateStorage(m_type, m_mipMapping ? 3 : 1, m_formatType, m_width, m_height);
 	}
-	void BaseTexture::SetStorage(const void* pixels)
+	void BaseTexture::setStorage(const void* pixels)
 	{
 		Graphics::Texture::SetStorage(m_type, m_width, m_height, m_channelType, m_pixelType, pixels);
 	}
 
-	void BaseTexture::UpdateMipmapping()
+	void BaseTexture::updateMipmapping()
 	{
 		VXL_ASSERT(Graphics::Texture::GetCurrentlyBound() == m_id, "Texture must be bound to update its mipmaps");
 
@@ -65,7 +65,7 @@ namespace Vxl
 			Graphics::Texture::GenerateMipmap(m_type);
 		}
 	}
-	void BaseTexture::FlipImageVertically(uint8_t* imagePixels)
+	void BaseTexture::flipImageVertically(uint8_t* imagePixels)
 	{
 		VXL_ASSERT(imagePixels, "Cannot flip texture/image if pixels are not stored");
 
@@ -108,77 +108,77 @@ namespace Vxl
 		if (m_channelCount == -1)
 			m_channelCount = Graphics::GetChannelCount(FormatType);
 
-		UpdateParameters();
+		updateParameters();
 	}
 	BaseTexture::~BaseTexture()
 	{
 		unload();
 	}
 
-	void BaseTexture::Bind(TextureLevel layer) const
+	void BaseTexture::bind(TextureLevel layer) const
 	{
 		Graphics::Texture::SetActiveLevel(layer);
-		Graphics::Texture::Bind(m_type, m_id);
+		Graphics::Texture::bind(m_type, m_id);
 	}
-	void BaseTexture::Bind() const
+	void BaseTexture::bind() const
 	{
-		Graphics::Texture::Bind(m_type, m_id);
+		Graphics::Texture::bind(m_type, m_id);
 	}
-	void BaseTexture::Unbind() const
+	void BaseTexture::unbind() const
 	{
 		Graphics::Texture::Unbind(m_type);
 	}
 
-	void BaseTexture::Copy(const BaseTexture& _texture)
-	{
-		// Sizes and Formats must be identical
-		VXL_ASSERT((int)m_width == (int)_texture.m_width, "Copy Texture Error [Widths do not match]");
-		VXL_ASSERT((int)m_height == (int)_texture.m_height, "Copy Texture Error [Heights do not match]");
-		VXL_ASSERT(m_formatType == _texture.m_formatType, "Copy Texture Error [Formats do not match]");
-
-		Graphics::CopyTexture(
-			m_id, m_type,
-			_texture.m_id, _texture.m_type,
-			m_width, m_height
-		);
-	}
-	void BaseTexture::Copy(const RenderBuffer& _texture)
-	{
-		// Sizes and Formats must be identical
-		VXL_ASSERT((int)m_width == (int)_texture.GetWidth(), "Copy Texture Error [Widths do not match]");
-		VXL_ASSERT((int)m_height == (int)_texture.GetHeight(), "Copy Texture Error [Heights do not match]");
-		VXL_ASSERT(m_formatType == _texture.GetFormatType(), "Copy Texture Error [Formats do not match]");
-
-		Graphics::CopyTexture(
-			m_id, m_type,
-			_texture.GetID(), TextureType::RENDERBUFFER,
-			m_width, m_height
-		);
-	}
+	//	void BaseTexture::copy(const BaseTexture& _texture)
+	//	{
+	//		// Sizes and Formats must be identical
+	//		VXL_ASSERT((int)m_width == (int)_texture.m_width, "Copy Texture Error [Widths do not match]");
+	//		VXL_ASSERT((int)m_height == (int)_texture.m_height, "Copy Texture Error [Heights do not match]");
+	//		VXL_ASSERT(m_formatType == _texture.m_formatType, "Copy Texture Error [Formats do not match]");
+	//	
+	//		Graphics::CopyTexture(
+	//			m_id, m_type,
+	//			_texture.m_id, _texture.m_type,
+	//			m_width, m_height
+	//		);
+	//	}
+	//	void BaseTexture::copy(const RenderBuffer& _texture)
+	//	{
+	//		// Sizes and Formats must be identical
+	//		VXL_ASSERT((int)m_width == (int)_texture.getWidth(), "Copy Texture Error [Widths do not match]");
+	//		VXL_ASSERT((int)m_height == (int)_texture.getHeight(), "Copy Texture Error [Heights do not match]");
+	//		VXL_ASSERT(m_formatType == _texture.getFormatType(), "Copy Texture Error [Formats do not match]");
+	//	
+	//		Graphics::CopyTexture(
+	//			m_id, m_type,
+	//			_texture.getID(), TextureType::RENDERBUFFER,
+	//			m_width, m_height
+	//		);
+	//	}
 
 	void BaseTexture::setWrapMode(TextureWrapping W)
 	{
 		m_wrapMode = W;
 
-		UpdateParameters();
+		updateParameters();
 	}
 	void BaseTexture::setFilterMode(TextureFilter filter)
 	{
 		m_filterMode = filter;
 
-		UpdateParameters();
+		updateParameters();
 	}
 	void BaseTexture::setAnistropicMode(AnisotropicMode Anso)
 	{
 		m_anisotropicMode = Anso;
 
-		UpdateParameters();
+		updateParameters();
 	}
 	void BaseTexture::setBorderColor(Color4F color)
 	{
 		m_borderColor = color;
 
-		UpdateParameters();
+		updateParameters();
 	}
 	void BaseTexture::setGLName(const std::string& glName)
 	{

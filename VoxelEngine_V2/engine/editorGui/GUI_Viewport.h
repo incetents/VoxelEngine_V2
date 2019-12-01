@@ -14,16 +14,6 @@ namespace Vxl
 
 	static class GUI_Viewport : public Singleton<class GUI_Viewport>, public GuiWindow
 	{
-		enum RenderMode
-		{
-			NONE,
-			COMPOSITE,
-			ALBEDO,
-			NORMAL,
-			DEPTH,
-			EDITOR,
-			COLOR_PICKER
-		};
 		enum ChannelOutput
 		{
 			RGBA = 0,
@@ -32,28 +22,30 @@ namespace Vxl
 			BLUE = 3,
 			ALPHA = 4
 		};
+		static const char* ChannelOutputNames[];
 
 #ifdef GLOBAL_IMGUI
 		friend class RenderManager;
 	private:
-		bool		m_xrayMode = false;
-		RenderMode	m_renderMode = RenderMode::NONE;
+		bool		  m_xrayMode = false;
 		ChannelOutput m_channelOut = ChannelOutput::RGBA;
 
 		// Gl Resources
-		//FramebufferObjectIndex	m_fbo;
-		//RenderTextureIndex		m_renderTexture;
-		//ShaderProgram*		m_shader_showRenderTarget = nullptr;
+		FramebufferObjectIndex	m_fbo;
+		RenderTextureIndex		m_renderTexture;
+
+		// Output
+		FramebufferObjectIndex m_outputFBO = -1;
+		std::string m_outputFBOName = "FBO[None]";
+		RenderTextureIndex m_outputRT = -1;
+		std::string m_outputRTName = "RenderTarget[None]";
+		bool m_outputRTIsDepth = false;
 
 		void InitGLResources();
 		void DestroyGLResources();
 		// Render showrendertarget
 		void DrawRenderTarget();
 	public:
-
-		// Scene Data
-		FramebufferObjectIndex fboIndex_gbuffer;
-		FramebufferObjectIndex fboIndex_editor;
 
 		// Behaviour
 		void Draw() override;

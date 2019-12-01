@@ -10,8 +10,12 @@ namespace Vxl
 		DISALLOW_COPY_AND_ASSIGN(RenderTexture);
 		friend class Assets;
 	protected:
+		// Name
+		std::string m_name;
+
 		// Channel/Pixel used only for reading
 		RenderTexture(
+			const std::string& name,
 			int Width,
 			int Height,
 			TextureFormat FormatType = TextureFormat::RGBA8,
@@ -25,6 +29,12 @@ namespace Vxl
 		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType);
 		void UpdateMipmapping();
 		void setGLName(const std::string& name);
+		
+		// Getters
+		inline std::string getName(void) const
+		{
+			return m_name;
+		}
 	};
 
 	class RenderTextureDepth : public RenderTexture

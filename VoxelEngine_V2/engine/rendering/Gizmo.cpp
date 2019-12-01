@@ -82,12 +82,13 @@ namespace Vxl
 		m_mesh_ScaleCube[2] = Geometry.GenerateCube("", 0.25f, Vector3(0, 0, 1));
 
 		// FBO
-		auto fbo_id = GlobalAssets.createFramebuffer();
+		auto fbo_id = GlobalAssets.createFramebuffer("gizmo");
 		m_fbo = GlobalAssets.getFramebufferObject(fbo_id);
 		m_fbo->setSizeToViewportSize();
 		m_fbo->bind();
 		//
 		auto id = SceneAssets.createRenderTexture(
+			"albedo",
 			m_fbo->getWidth(), m_fbo->getHeight(), 
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
 		);
@@ -96,8 +97,8 @@ namespace Vxl
 			TextureDepthFormat::DEPTH16
 		);
 
-		m_fbo->setAttachment(0, SceneAssets.getRenderTexture(id));
-		m_fbo->setDepth(SceneAssets.getRenderBufferDepth(id_depth));
+		m_fbo->setRenderTexture(0, id);
+		m_fbo->setRenderBufferDepth(id_depth);
 		//
 		m_fbo->checkFBOStatus();
 		m_fbo->unbind();

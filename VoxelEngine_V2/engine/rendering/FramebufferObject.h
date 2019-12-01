@@ -21,74 +21,46 @@ namespace Vxl
 
 	class RenderTarget
 	{
-	public:
-		// Type
+		DISALLOW_COPY_AND_ASSIGN(RenderTarget);
+		friend class FramebufferObject;
+	private:
 		enum class Type
 		{
-			// ERROR
-			NONE = 0,
-			// Render Buffer [Cannot bind like a texture]
-			BUFFER,
-			// Render Texture
-			TEXTURE
+			NONE,
+			RENDERTEXTURE,
+			RENDERBUFFER
 		};
 
-	private:
-		// Data
-		Type m_type = Type::NONE;
-
-		union // [ Can only be one object ]
-		{
-			RenderTexture* m_renderTexture;
-			RenderBuffer*  m_renderBuffer;
-		};
-
+		uint32_t	m_assetIndex = -1;
+		Type		m_type = Type::NONE;
 	public:
-		void Set(RenderTexture* _renderTexture)
+		RenderTarget(bool isDepth = false)
+			: m_isDepth(isDepth)
+		{}
+
+		const bool			m_isDepth = false;
+		
+		bool isEmpty(void) const
 		{
-			m_type = Type::TEXTURE;
-			m_renderTexture = _renderTexture;
+			return m_assetIndex == -1;
 		}
-		void Set(RenderBuffer* _renderBuffer)
+		bool isRenderTexture(void) const
 		{
-			m_type = Type::BUFFER;
-			m_renderBuffer = _renderBuffer;
+			return m_type == Type::RENDERTEXTURE;
 		}
-		void Remove()
+		bool isRenderBuffer(void) const
 		{
-			m_type = Type::NONE;
-			m_renderTexture = nullptr;
+			return m_type == Type::RENDERBUFFER;
 		}
 
-		RenderTexture* GetRenderTexture(void) const
+		RenderTexture*		getRenderTexture(void) const;
+		RenderTextureDepth*	getRenderTextureDepth(void) const;
+		RenderBuffer*		getRenderBuffer(void) const;
+		RenderBufferDepth*	getRenderBufferDepth(void) const;
+		TextureFormat		getFormatType(void) const;
+		inline uint32_t		getAssetIndex(void) const
 		{
-			VXL_ASSERT(m_type == Type::TEXTURE, "Incorrect FBO Attachment Type for Getter");
-			return m_renderTexture;
-		}
-		RenderBuffer* GetRenderBuffer(void) const
-		{
-			VXL_ASSERT(m_type == Type::BUFFER, "Incorrect FBO Attachment Type for Getter");
-			return m_renderBuffer;
-		}
-		uint32_t GetID(void) const;
-
-		TextureFormat GetFormatType(void) const;
-
-		Type GetType(void) const
-		{
-			return m_type;
-		}
-		bool IsRenderTexture(void) const
-		{
-			return m_type == Type::TEXTURE;
-		}
-		bool IsRenderBuffer(void) const
-		{
-			return m_type == Type::BUFFER;
-		}
-		bool IsUnused(void) const
-		{
-			return m_type == Type::NONE;
+			return m_assetIndex;
 		}
 	};
 
@@ -97,7 +69,7 @@ namespace Vxl
 		DISALLOW_COPY_AND_ASSIGN(FramebufferObject);
 		friend class Assets;
 	private:
-		
+
 		enum class ClearMode
 		{
 			COLOR,
@@ -109,6 +81,7 @@ namespace Vxl
 	private:
 
 		// Fbo
+		std::string			m_name;
 		FramebufferObjectID	m_id = -1;
 		Color4F				m_clearColor = Color4F(0,0,0,0);
 		ClearMode			m_clearMode = ClearMode::COLOR;
@@ -117,8 +90,8 @@ namespace Vxl
 		bool				m_fullscreen = false; // Width/Height will attempt to match screen's resolution
 		// Attachments
 		mutable std::map<uint32_t, RenderTarget>	m_textures;
-		std::vector<uint32_t>				m_attachmentOrder;
-		RenderTarget						m_depth;
+		RenderTarget			m_depth = RenderTarget(true);
+		std::vector<uint32_t>	m_attachmentOrder;
 
 		// Utility
 		void updateAttachmentOrder();
@@ -128,7 +101,7 @@ namespace Vxl
 		void unload();
 
 		// Constructor
-		FramebufferObject();
+		FramebufferObject(const std::string& name);
 
 	public:
 		// ~
@@ -147,49 +120,37 @@ namespace Vxl
 		}
 		void		setSizeToViewportSize(); // Size will copy Window's resolution
 		void		setGLName(const std::string& name);
-		bool		hasAttachment(uint32_t _attachmentIndex) const
+		inline bool isFullscreen(void) const { return m_fullscreen; }
+		bool		checkFBOStatus();
+		inline std::string getName(void) const
 		{
-			return m_textures.find(_attachmentIndex) != m_textures.end();
+			return m_name;
 		}
 
 		// Binding related
 		void bind();
-		//void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 		static void unbind();
+
+		void bindTexture(uint32_t index, TextureLevel layer);
+		void bindDepth(TextureLevel layer);
 
 		// Clears the color from an entire Texture
 		void clearBuffers();
 		void clearBuffer(uint32_t attachmentIndex);
 
-		// Editing Attachment Info
-		void setAttachment(
+		// Attachments
+		void setRenderTexture(
 			uint32_t _attachmentIndex,
-			RenderTexture* _renderTexture
+			RenderTextureIndex _index
 		);
-		void setAttachment(
+		void setRenderBuffer(
 			uint32_t _attachmentIndex,
-			RenderBuffer* _renderbuffer
+			RenderBufferIndex _index
 		);
-		void removeAttachment(
-			uint32_t _attachmentIndex
-		);
+		void removeAttachment(uint32_t _attachmentIndex);
 		// Re-attaches all textures/buffers back to current FBO
 		void reloadAttachments();
 		void reloadDepth();
-		// Get Attachment Info
-		RenderTexture* getAttachmentRenderTexture(
-			uint32_t _attachmentIndex
-		);
-		RenderBuffer* getAttachmentRenderBuffer(
-			uint32_t _attachmentIndex
-		);
-		uint32_t getAttachmentTextureID(
-			uint32_t _attachmentIndex
-		);
-		inline const std::vector<uint32_t>& getAttachmentIndices()
-		{
-			return m_attachmentOrder;
-		}
 		// Attachment is still part of FBO class, it just doesn't get drawn to
 		void disableAttachment(
 			uint32_t _attachmentIndex
@@ -199,25 +160,15 @@ namespace Vxl
 		);
 
 		// Editing Depth Info
-		void setDepth(
-			RenderTextureDepth* _depth
+		void setRenderTextureDepth(
+			RenderTextureDepthIndex _index
 		);
-		void setDepth(
-			RenderBufferDepth* _depth
+		void setRenderBufferDepth(
+			RenderBufferDepthIndex _index
 		);
 		void removeDepth(void);
-		// Get Depth Info
-		RenderTexture* getDepthRenderTexture();
-		RenderBuffer* getDepthRenderBuffer();
-		uint32_t getDepthTextureID();
 
 		// Utility //
-		bool checkFBOStatus();
-		inline bool isFullscreen(void) const { return m_fullscreen; }
-
-		void bindTexture(uint32_t index, TextureLevel layer);
-		void bindDepth(TextureLevel layer);
-
 		void blitColor(const FramebufferObject& destFBO, uint32_t srcAttachment, uint32_t destAttachment);
 		void blitDepth(const FramebufferObject& destFBO);
 
@@ -242,6 +193,37 @@ namespace Vxl
 		{
 			return m_height;
 		}
+
+		bool isAttachmentRenderTexture(uint32_t _attachmentIndex) const;
+		bool isAttachmentRenderBuffer(uint32_t _attachmentIndex) const;
+		bool isDepthRenderTexture(void) const;
+		bool isDepthRenderBuffer(void) const;
+
+		inline const std::vector<uint32_t>&				getAttachmentIndices()
+		{
+			return m_attachmentOrder;
+		}
+		inline const std::map<uint32_t, RenderTarget>&	getAttachments()
+		{
+			return m_textures;
+		}
+		inline const RenderTarget&						getDepth()
+		{
+			return m_depth;
+		}
+
+		bool hasAttachment(uint32_t _attachmentIndex) const;
+		bool hasDepth(void) const;
+
+		RenderTextureIndex getRenderTexture(
+			uint32_t _attachmentIndex
+		);
+		RenderBufferIndex getRenderBuffer(
+			uint32_t _attachmentIndex
+		);
+		RenderTextureDepthIndex getRenderTextureDepth();
+		RenderBufferDepthIndex getRenderBufferDepth();
+		
 	};
 
 }

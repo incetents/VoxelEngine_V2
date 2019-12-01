@@ -15,6 +15,7 @@ namespace Vxl
 		friend class Assets;
 	protected:
 		// Data
+		std::string			m_name;
 		uint32_t			m_id = -1;
 		int					m_width;
 		int					m_height;
@@ -24,6 +25,7 @@ namespace Vxl
 		int					m_channelCount;
 
 		RenderBuffer(
+			const std::string& name,
 			int Width,
 			int Height,
 			TextureFormat FormatType = TextureFormat::RGBA8,
@@ -37,37 +39,42 @@ namespace Vxl
 		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format);
 		void setGLName(const std::string& name);
 
-		void Bind(void) const;
+		void bind(void) const;
 		static void Unbind(void);
 		
-		void Copy(const BaseTexture& _texture);
-		void Copy(const RenderBuffer& _texture);
+		//void Copy(const BaseTexture& _texture);
+		//void Copy(const RenderBuffer& _texture);
 
-		inline uint32_t	GetID(void) const
+		// Getters
+		inline std::string getName(void) const
+		{
+			return m_name;
+		}
+		inline uint32_t	getID(void) const
 		{
 			return m_id;
 		}
-		inline int		GetWidth(void) const
+		inline int		getWidth(void) const
 		{
 			return m_width;
 		}
-		inline int		GetHeight(void) const
+		inline int		getHeight(void) const
 		{
 			return m_height;
 		}
-		inline TextureFormat		GetFormatType(void) const
+		inline TextureFormat		getFormatType(void) const
 		{
 			return m_formatType;
 		}
-		inline TextureChannelType	GetChannelType(void) const
+		inline TextureChannelType	getChannelType(void) const
 		{
 			return m_channelType;
 		}
-		inline TexturePixelType		GetPixelType(void) const
+		inline TexturePixelType		getPixelType(void) const
 		{
 			return m_pixelType;
 		}
-		inline int					GetChannelCount(void) const
+		inline int					getChannelCount(void) const
 		{
 			return m_channelCount;
 		}

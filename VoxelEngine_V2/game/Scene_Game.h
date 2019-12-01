@@ -47,12 +47,12 @@ namespace Vxl
 		// Shader Material Assets
 		ShaderMaterialIndex sMat_gbuffer;
 		ShaderMaterialIndex sMat_skybox;
-		ShaderMaterialIndex sMat_displayRenderTarget;
+		//ShaderMaterialIndex sMat_displayRenderTarget;
 
 		// Materials
 		MaterialIndex material_gbuffer = -1;
 		MaterialIndex material_skybox = -1;
-		MaterialIndex material_displayRenderTarget = -1;
+		//MaterialIndex material_displayRenderTarget = -1;
 
 
 		//	MaterialIndex material_gbuffer_transparent;
@@ -78,7 +78,7 @@ namespace Vxl
 		FramebufferObjectIndex fboIndex_editor2;
 		FramebufferObjectIndex fboIndex_colorpicker;
 		FramebufferObjectIndex fboIndex_composite;
-		FramebufferObjectIndex fboIndex_showRenderTarget;
+		//FramebufferObjectIndex fboIndex_showRenderTarget;
 		// Render Textures/Bufers
 		RenderTextureIndex fbotex_gbuffer_albedo;
 		RenderTextureIndex fbotex_gbuffer_normal;
@@ -93,7 +93,7 @@ namespace Vxl
 
 		RenderTextureIndex fbotex_composite_albedo;
 
-		RenderTextureIndex fbotex_showRenderTarget_albedo;
+		//RenderTextureIndex fbotex_showRenderTarget_albedo;
 
 		// Cameras
 		CameraIndex camera_main;

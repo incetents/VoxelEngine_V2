@@ -41,7 +41,7 @@ namespace Vxl
 			unload();
 		}
 
-		void Bind();
+		void bind();
 		void Unbind() const;
 
 		void* GetBufferLocation(unsigned int byteOffset) const;

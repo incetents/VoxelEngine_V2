@@ -531,11 +531,11 @@ namespace Vxl
 		TextureFormat GetFormat(TextureDepthFormat format);
 
 		// ~ Copy Texture ~ //
-		void CopyTexture(
-			TextureID src, TextureType srcType,
-			TextureID dest, TextureType destType,
-			uint32_t width, uint32_t height
-		);
+		//	void CopyTexture(
+		//		TextureID src, TextureType srcType,
+		//		TextureID dest, TextureType destType,
+		//		uint32_t width, uint32_t height
+		//	);
 
 		// ~ Attributes ~ //
 		struct Attribute
@@ -588,7 +588,7 @@ namespace Vxl
 			std::map<std::string, uint32_t> functions;
 
 			void Connect(const std::string& UniformName, const std::string& FunctionName);
-			void Bind() const;
+			void bind() const;
 		};
 
 		// ~ Shader ~ //
@@ -626,14 +626,14 @@ namespace Vxl
 		{
 			VAOID	Create(void);
 			void	Delete(VAOID id);
-			void	Bind(VAOID id);
+			void	bind(VAOID id);
 			void	Unbind();
 		}
 		namespace VBO
 		{
 			VBOID	Create(void);
 			void	Delete(VBOID id);
-			void	Bind(VBOID id);
+			void	bind(VBOID id);
 			void	Unbind(void);
 			void	BindData(ptrdiff_t length, void* data, BufferUsage usage);
 			void	BindSubData(int OffsetBytes, int SizeBytes, void* data);
@@ -646,7 +646,7 @@ namespace Vxl
 		{
 			EBOID	Create(void);
 			void	Delete(EBOID id);
-			void	Bind(EBOID id);
+			void	bind(EBOID id);
 			void	Unbind(void);
 			void	BindData(ptrdiff_t length, void* data, BufferUsage usage);
 			void	BindSubData(int OffsetBytes, int SizeBytes, void* data);
@@ -666,7 +666,7 @@ namespace Vxl
 		{
 			TextureID	Create(void);
 			void		Delete(TextureID id);
-			void		Bind(TextureType type, TextureID textureID);
+			void		bind(TextureType type, TextureID textureID);
 			void		Unbind(TextureType type);
 			TextureID	GetCurrentlyBound(void);
 			void		SetActiveLevel(TextureLevel level);
@@ -691,7 +691,7 @@ namespace Vxl
 		{
 			RenderBufferID	Create(void);
 			void			Delete(RenderBufferID id);
-			void			Bind(RenderBufferID id);
+			void			bind(RenderBufferID id);
 			void			Unbind(void);
 			void			SetStorage(TextureFormat format, int width, int height);
 			RenderBufferID	GetCurrentlyBound(void);
@@ -702,7 +702,7 @@ namespace Vxl
 		{
 			FramebufferObjectID Create(void);
 			void				Delete(FramebufferObjectID id);
-			void				Bind(FramebufferObjectID id);
+			void				bind(FramebufferObjectID id);
 			void				DrawBuffers(std::vector<uint32_t> attachments);
 			//void				DrawBuffers(uint32_t attachmentCount);
 			void				DrawBuffer(uint32_t attachmentIndex);
@@ -727,7 +727,7 @@ namespace Vxl
 		{
 			UBOID	Create(uint32_t slot, uint32_t totalBytes, BufferUsage usage);
 			void	Delete(UBOID id);
-			void	Bind(UBOID id);
+			void	bind(UBOID id);
 			void	Unbind(void);
 			void	UpdateBuffer(void* buffer, uint32_t totalBytes, uint32_t offset);
 		}

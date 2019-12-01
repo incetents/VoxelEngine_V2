@@ -9,11 +9,12 @@
 namespace Vxl
 {
 	RenderBuffer::RenderBuffer(
+		const std::string& name,
 		int Width, int Height,
 		TextureFormat FormatType,
 		TexturePixelType PixelType
 	)
-		: m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(Graphics::GetChannelType(FormatType)), m_pixelType(PixelType)
+		: m_name(name), m_width(Width), m_height(Height), m_formatType(FormatType), m_channelType(Graphics::GetChannelType(FormatType)), m_pixelType(PixelType)
 	{
 		m_channelCount = Graphics::GetChannelCount(FormatType);
 		if (m_channelCount == -1)
@@ -22,7 +23,7 @@ namespace Vxl
 		m_id = Graphics::RenderBuffer::Create();
 
 		// Storage
-		Bind();
+		bind();
 		UpdateStorage();
 		Unbind();
 	}
@@ -46,7 +47,7 @@ namespace Vxl
 			Graphics::RenderBuffer::Delete(m_id);
 			m_id = newID;
 		}
-		Bind();
+		bind();
 
 		// Fix values
 		m_width = (int)width;
@@ -62,47 +63,47 @@ namespace Vxl
 		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Renderbuffer_" + name);
 	}
 
-	void RenderBuffer::Bind(void) const
+	void RenderBuffer::bind(void) const
 	{
-		Graphics::RenderBuffer::Bind(m_id);
+		Graphics::RenderBuffer::bind(m_id);
 	}
 	void RenderBuffer::Unbind(void)
 	{
 		Graphics::RenderBuffer::Unbind();
 	}
 
-	void RenderBuffer::Copy(const BaseTexture& _texture)
-	{
-		// Sizes and Formats must be identical
-		VXL_ASSERT((int)m_width == (int)_texture.GetWidth(), "Copy Texture Error [Widths do not match]");
-		VXL_ASSERT((int)m_height == (int)_texture.GetHeight(), "Copy Texture Error [Heights do not match]");
-		VXL_ASSERT(m_formatType == _texture.GetFormatType(), "Copy Texture Error [Formats do not match]");
-
-		Graphics::CopyTexture(
-			m_id, TextureType::RENDERBUFFER,
-			_texture.GetID(), _texture.GetType(),
-			m_width, m_height
-		);
-	}
-	void RenderBuffer::Copy(const RenderBuffer& _texture)
-	{
-		// Sizes and Formats must be identical
-		VXL_ASSERT((int)m_width == (int)_texture.GetWidth(), "Copy Texture Error [Widths do not match]");
-		VXL_ASSERT((int)m_height == (int)_texture.GetHeight(), "Copy Texture Error [Heights do not match]");
-		VXL_ASSERT(m_formatType == _texture.GetFormatType(), "Copy Texture Error [Formats do not match]");
-
-		Graphics::CopyTexture(
-			m_id, TextureType::RENDERBUFFER,
-			_texture.GetID(), TextureType::RENDERBUFFER,
-			m_width, m_height
-		);
-	}
+	//	void RenderBuffer::Copy(const BaseTexture& _texture)
+	//	{
+	//		// Sizes and Formats must be identical
+	//		VXL_ASSERT((int)m_width == (int)_texture.getWidth(), "Copy Texture Error [Widths do not match]");
+	//		VXL_ASSERT((int)m_height == (int)_texture.getHeight(), "Copy Texture Error [Heights do not match]");
+	//		VXL_ASSERT(m_formatType == _texture.getFormatType(), "Copy Texture Error [Formats do not match]");
+	//	
+	//		Graphics::CopyTexture(
+	//			m_id, TextureType::RENDERBUFFER,
+	//			_texture.getID(), _texture.GetType(),
+	//			m_width, m_height
+	//		);
+	//	}
+	//	void RenderBuffer::Copy(const RenderBuffer& _texture)
+	//	{
+	//		// Sizes and Formats must be identical
+	//		VXL_ASSERT((int)m_width == (int)_texture.getWidth(), "Copy Texture Error [Widths do not match]");
+	//		VXL_ASSERT((int)m_height == (int)_texture.getHeight(), "Copy Texture Error [Heights do not match]");
+	//		VXL_ASSERT(m_formatType == _texture.getFormatType(), "Copy Texture Error [Formats do not match]");
+	//	
+	//		Graphics::CopyTexture(
+	//			m_id, TextureType::RENDERBUFFER,
+	//			_texture.getID(), TextureType::RENDERBUFFER,
+	//			m_width, m_height
+	//		);
+	//	}
 
 	RenderBufferDepth::RenderBufferDepth(
 		int Width,
 		int Height,
 		TextureDepthFormat FormatType
 	)
-		: RenderBuffer(Width, Height, Graphics::GetFormat(FormatType), Graphics::GetPixelData(FormatType)), m_depthFormat(FormatType)
+		: RenderBuffer("Depth", Width, Height, Graphics::GetFormat(FormatType), Graphics::GetPixelData(FormatType)), m_depthFormat(FormatType)
 	{}
 }

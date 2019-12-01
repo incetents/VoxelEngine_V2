@@ -168,7 +168,7 @@ namespace Vxl
 			m_worldLines->m_mesh->m_buffer.setVerticesDirty(m_worldLines->m_mesh->m_resizeDirty);
 			m_worldLines->m_mesh->m_resizeDirty = false;
 
-			m_worldLines->m_mesh->Bind();
+			m_worldLines->m_mesh->bind();
 
 			m_worldLines->m_mesh->Draw();
 		}
@@ -182,7 +182,7 @@ namespace Vxl
 			m_worldLinesNoDepth->m_mesh->m_buffer.setVerticesDirty(m_worldLinesNoDepth->m_mesh->m_resizeDirty);
 			m_worldLinesNoDepth->m_mesh->m_resizeDirty = false;
 
-			m_worldLinesNoDepth->m_mesh->Bind();
+			m_worldLinesNoDepth->m_mesh->bind();
 
 			m_worldLinesNoDepth->m_mesh->Draw();
 		}
@@ -196,7 +196,7 @@ namespace Vxl
 			m_screenLines->m_mesh->m_buffer.setVerticesDirty(m_screenLines->m_mesh->m_resizeDirty);
 			m_screenLines->m_mesh->m_resizeDirty = false;
 
-			m_screenLines->m_mesh->Bind();
+			m_screenLines->m_mesh->bind();
 
 			m_screenLines->m_mesh->Draw();
 		}

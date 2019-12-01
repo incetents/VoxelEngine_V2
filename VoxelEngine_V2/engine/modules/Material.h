@@ -139,8 +139,8 @@ namespace Vxl
 		bool bindCoreProgram();
 		void bindCoreProgramCommonUniforms(EntityIndex _entity);
 		void bindStates();
-		void bindTextures(); // Bind material textures
-		void bindTextures(Entity* _entity); // Bind entity textures
+		void bindTextures(); // bind material textures
+		void bindTextures(Entity* _entity); // bind entity textures
 	};
 
 }

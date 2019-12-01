@@ -26,14 +26,14 @@ namespace Vxl
 			Graphics::VAO::Delete(m_VAO);
 		}
 
-		inline uint32_t GetID(void) const
+		inline uint32_t getID(void) const
 		{
 			return m_VAO;
 		}
 
 		void bind(void) const
 		{
-			Graphics::VAO::Bind(m_VAO);
+			Graphics::VAO::bind(m_VAO);
 		}
 		void unbind(void) const
 		{
@@ -96,7 +96,7 @@ namespace Vxl
 			m_empty = false;
 			m_Size = _count * sizeof(Type);
 
-			Graphics::VBO::Bind(m_VBO);
+			Graphics::VBO::bind(m_VBO);
 			Graphics::VBO::BindData(m_Size, (void*)_arr, _mode);
 
 			UpdateDrawCount();
@@ -110,7 +110,7 @@ namespace Vxl
 		template<typename Type = float>
 		void UpdateVertices(Type* _arr, int offset)
 		{
-			Graphics::VBO::Bind(m_VBO);
+			Graphics::VBO::bind(m_VBO);
 			Graphics::VBO::BindSubData(offset, m_Size, (void*)_arr);
 		}
 
@@ -119,7 +119,7 @@ namespace Vxl
 		{
 			VXL_ASSERT(size + offset <= m_Size, "VBO: Size + Offset too large for updating vertices");
 
-			Graphics::VBO::Bind(m_VBO);
+			Graphics::VBO::bind(m_VBO);
 			Graphics::VBO::BindSubData(offset, size, (void*)_arr);
 		}
 
@@ -150,7 +150,7 @@ namespace Vxl
 			return m_bindMode;
 		}
 
-		void Bind() const;
+		void bind() const;
 	};
 
 	// Element Buffer Object
@@ -181,14 +181,14 @@ namespace Vxl
 
 		void UpdateIndices(uint32_t* _arr, int offset)
 		{
-			Graphics::EBO::Bind(m_EBO);
+			Graphics::EBO::bind(m_EBO);
 			Graphics::EBO::BindSubData(offset, m_Size, _arr);
 		}
 		void UpdateIndices(uint32_t* _arr, int offset, uint32_t size)
 		{
 			VXL_ASSERT(size + offset <= m_Size, "VBO: Size + Offset too large for updating vertices");
 
-			Graphics::EBO::Bind(m_EBO);
+			Graphics::EBO::bind(m_EBO);
 			Graphics::EBO::BindSubData(offset, size, (void*)_arr);
 		}
 
@@ -214,7 +214,7 @@ namespace Vxl
 			return m_bindMode;
 		}
 
-		void Bind() const;
+		void bind() const;
 	};
 }
 

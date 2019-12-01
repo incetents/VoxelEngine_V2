@@ -48,6 +48,7 @@ AssertFail(std::string(message) + "\n\nFile: " + Vxl::stringUtil::extractNameFro
 #define VXL_ASSERT(expression, message) if(!(expression)) { VXL_ERROR(message); }
 #define VXL_RETURN_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return; }
 #define VXL_RETURN_NULLPTR_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return nullptr; }
+#define VXL_RETURN_ZERO_ON_FAIL(expression, message) if(!(expression)) { VXL_ERROR(message); return 0; }
 //
 #else
 // ~~~ //

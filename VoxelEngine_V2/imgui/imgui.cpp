@@ -2532,7 +2532,7 @@ ImGuiWindow::ImGuiWindow(ImGuiContext* context, const char* name)
     WindowRounding = 0.0f;
     WindowBorderSize = 0.0f;
     NameBufLen = (int)strlen(name) + 1;
-    MoveId = GetID("#MOVE");
+    MoveId = getID("#MOVE");
     ChildId = 0;
     Scroll = ImVec2(0.0f, 0.0f);
     ScrollTarget = ImVec2(FLT_MAX, FLT_MAX);
@@ -2601,7 +2601,7 @@ ImGuiWindow::~ImGuiWindow()
         ColumnsStorage[i].~ImGuiColumns();
 }
 
-ImGuiID ImGuiWindow::GetID(const char* str, const char* str_end)
+ImGuiID ImGuiWindow::getID(const char* str, const char* str_end)
 {
     ImGuiID seed = IDStack.back();
     ImGuiID id = ImHashStr(str, str_end ? (str_end - str) : 0, seed);
@@ -2609,7 +2609,7 @@ ImGuiID ImGuiWindow::GetID(const char* str, const char* str_end)
     return id;
 }
 
-ImGuiID ImGuiWindow::GetID(const void* ptr)
+ImGuiID ImGuiWindow::getID(const void* ptr)
 {
     ImGuiID seed = IDStack.back();
     ImGuiID id = ImHashData(&ptr, sizeof(void*), seed);
@@ -2617,7 +2617,7 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
     return id;
 }
 
-ImGuiID ImGuiWindow::GetID(int n)
+ImGuiID ImGuiWindow::getID(int n)
 {
     ImGuiID seed = IDStack.back();
     ImGuiID id = ImHashData(&n, sizeof(n), seed);
@@ -4939,7 +4939,7 @@ static bool ImGui::BeginChildEx(const char* name, ImGuiID id, const ImVec2& size
 bool ImGui::BeginChild(const char* str_id, const ImVec2& size_arg, bool border, ImGuiWindowFlags extra_flags)
 {
     ImGuiWindow* window = GetCurrentWindow();
-    return BeginChildEx(str_id, window->GetID(str_id), size_arg, border, extra_flags);
+    return BeginChildEx(str_id, window->getID(str_id), size_arg, border, extra_flags);
 }
 
 bool ImGui::BeginChild(ImGuiID id, const ImVec2& size_arg, bool border, ImGuiWindowFlags extra_flags)
@@ -5309,7 +5309,7 @@ static bool ImGui::UpdateManualResize(ImGuiWindow* window, const ImVec2& size_au
         if (resize_rect.Min.y > resize_rect.Max.y) ImSwap(resize_rect.Min.y, resize_rect.Max.y);
         resize_rect.ClipWith(clip_viewport_rect);
         bool hovered, held;
-        ButtonBehavior(resize_rect, window->GetID((void*)(intptr_t)resize_grip_n), &hovered, &held, ImGuiButtonFlags_FlattenChildren | ImGuiButtonFlags_NoNavFocus);
+        ButtonBehavior(resize_rect, window->getID((void*)(intptr_t)resize_grip_n), &hovered, &held, ImGuiButtonFlags_FlattenChildren | ImGuiButtonFlags_NoNavFocus);
         //GetForegroundDrawList(window)->AddRect(resize_rect.Min, resize_rect.Max, IM_COL32(255, 255, 0, 255));
         if (hovered || held)
             g.MouseCursor = (resize_grip_n & 1) ? ImGuiMouseCursor_ResizeNESW : ImGuiMouseCursor_ResizeNWSE;
@@ -5336,7 +5336,7 @@ static bool ImGui::UpdateManualResize(ImGuiWindow* window, const ImVec2& size_au
         bool hovered, held;
         ImRect border_rect = GetResizeBorderRect(window, border_n, grip_hover_inner_size, WINDOWS_RESIZE_FROM_EDGES_HALF_THICKNESS);
         border_rect.ClipWith(clip_viewport_rect);
-        ButtonBehavior(border_rect, window->GetID((void*)(intptr_t)(border_n + 4)), &hovered, &held, ImGuiButtonFlags_FlattenChildren);
+        ButtonBehavior(border_rect, window->getID((void*)(intptr_t)(border_n + 4)), &hovered, &held, ImGuiButtonFlags_FlattenChildren);
         //GetForegroundDrawList(window)->AddRect(border_rect.Min, border_rect.Max, IM_COL32(255, 255, 0, 255));
         if ((hovered && g.HoveredIdTimer > WINDOWS_RESIZE_FROM_EDGES_FEEDBACK_TIMER) || held)
         {
@@ -5521,7 +5521,7 @@ void ImGui::RenderWindowDecorations(ImGuiWindow* window, const ImRect& title_bar
             ImVec2 p = window->DockNode->Pos;
             ImRect r(p, p + ImVec2(unhide_sz_hit, unhide_sz_hit));
             bool hovered, held;
-            if (ButtonBehavior(r, window->GetID("#UNHIDE"), &hovered, &held, ImGuiButtonFlags_FlattenChildren))
+            if (ButtonBehavior(r, window->getID("#UNHIDE"), &hovered, &held, ImGuiButtonFlags_FlattenChildren))
                 window->DockNode->WantHiddenTabBarToggle = true;
             // FIXME-DOCK: Ideally we'd use ImGuiCol_TitleBgActive/ImGuiCol_TitleBg here, but neither is guaranteed to be visible enough at this sort of size..
             ImU32 col = GetColorU32(((held && hovered) || (window->DockNode->IsFocused && !hovered)) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
@@ -5596,12 +5596,12 @@ void ImGui::RenderWindowTitleBarContents(ImGuiWindow* window, const ImRect& titl
 
     // Collapse button (submitting first so it gets priority when choosing a navigation init fallback)
     if (has_collapse_button)
-        if (CollapseButton(window->GetID("#COLLAPSE"), collapse_button_pos, NULL))
+        if (CollapseButton(window->getID("#COLLAPSE"), collapse_button_pos, NULL))
             window->WantCollapseToggle = true; // Defer actual collapsing to next frame as we are too far in the Begin() function
 
     // Close button
     if (has_close_button)
-        if (CloseButton(window->GetID("#CLOSE"), close_button_pos))
+        if (CloseButton(window->getID("#CLOSE"), close_button_pos))
             *p_open = false;
 
     window->DC.NavLayerCurrent = ImGuiNavLayer_Main;
@@ -7566,22 +7566,22 @@ void ImGui::PopID()
     window->IDStack.pop_back();
 }
 
-ImGuiID ImGui::GetID(const char* str_id)
+ImGuiID ImGui::getID(const char* str_id)
 {
     ImGuiWindow* window = GImGui->CurrentWindow;
-    return window->GetID(str_id);
+    return window->getID(str_id);
 }
 
-ImGuiID ImGui::GetID(const char* str_id_begin, const char* str_id_end)
+ImGuiID ImGui::getID(const char* str_id_begin, const char* str_id_end)
 {
     ImGuiWindow* window = GImGui->CurrentWindow;
-    return window->GetID(str_id_begin, str_id_end);
+    return window->getID(str_id_begin, str_id_end);
 }
 
-ImGuiID ImGui::GetID(const void* ptr_id)
+ImGuiID ImGui::getID(const void* ptr_id)
 {
     ImGuiWindow* window = GImGui->CurrentWindow;
-    return window->GetID(ptr_id);
+    return window->getID(ptr_id);
 }
 
 bool ImGui::IsRectVisible(const ImVec2& size)
@@ -7974,7 +7974,7 @@ bool ImGui::IsPopupOpen(ImGuiID id)
 bool ImGui::IsPopupOpen(const char* str_id)
 {
     ImGuiContext& g = *GImGui;
-    return g.OpenPopupStack.Size > g.BeginPopupStack.Size && g.OpenPopupStack[g.BeginPopupStack.Size].PopupId == g.CurrentWindow->GetID(str_id);
+    return g.OpenPopupStack.Size > g.BeginPopupStack.Size && g.OpenPopupStack[g.BeginPopupStack.Size].PopupId == g.CurrentWindow->getID(str_id);
 }
 
 ImGuiWindow* ImGui::GetTopMostPopupModal()
@@ -7990,7 +7990,7 @@ ImGuiWindow* ImGui::GetTopMostPopupModal()
 void ImGui::OpenPopup(const char* str_id)
 {
     ImGuiContext& g = *GImGui;
-    OpenPopupEx(g.CurrentWindow->GetID(str_id));
+    OpenPopupEx(g.CurrentWindow->getID(str_id));
 }
 
 // Mark popup as open (toggle toward open state).
@@ -8164,7 +8164,7 @@ bool ImGui::BeginPopup(const char* str_id, ImGuiWindowFlags flags)
         return false;
     }
     flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings;
-    return BeginPopupEx(g.CurrentWindow->GetID(str_id), flags);
+    return BeginPopupEx(g.CurrentWindow->getID(str_id), flags);
 }
 
 // If 'p_open' is specified for a modal popup window, the popup will have a regular close button which will close the popup.
@@ -8173,7 +8173,7 @@ bool ImGui::BeginPopupModal(const char* name, bool* p_open, ImGuiWindowFlags fla
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
-    const ImGuiID id = window->GetID(name);
+    const ImGuiID id = window->getID(name);
     if (!IsPopupOpen(id))
     {
         g.NextWindowData.ClearFlags(); // We behave like Begin() and need to consume those values
@@ -8217,7 +8217,7 @@ bool ImGui::OpenPopupOnItemClick(const char* str_id, int mouse_button)
     ImGuiWindow* window = GImGui->CurrentWindow;
     if (IsMouseReleased(mouse_button) && IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
     {
-        ImGuiID id = str_id ? window->GetID(str_id) : window->DC.LastItemId; // If user hasn't passed an ID, we can use the LastItemID. Using LastItemID as a Popup ID won't conflict!
+        ImGuiID id = str_id ? window->getID(str_id) : window->DC.LastItemId; // If user hasn't passed an ID, we can use the LastItemID. Using LastItemID as a Popup ID won't conflict!
         IM_ASSERT(id != 0);                                                  // You cannot pass a NULL str_id if the last item has no identifier (e.g. a Text() item)
         OpenPopupEx(id);
         return true;
@@ -8233,7 +8233,7 @@ bool ImGui::BeginPopupContextItem(const char* str_id, int mouse_button)
     ImGuiWindow* window = GImGui->CurrentWindow;
     if (window->SkipItems)
         return false;
-    ImGuiID id = str_id ? window->GetID(str_id) : window->DC.LastItemId; // If user hasn't passed an ID, we can use the LastItemID. Using LastItemID as a Popup ID won't conflict!
+    ImGuiID id = str_id ? window->getID(str_id) : window->DC.LastItemId; // If user hasn't passed an ID, we can use the LastItemID. Using LastItemID as a Popup ID won't conflict!
     IM_ASSERT(id != 0);                                                  // You cannot pass a NULL str_id if the last item has no identifier (e.g. a Text() item)
     if (IsMouseReleased(mouse_button) && IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
         OpenPopupEx(id);
@@ -8244,7 +8244,7 @@ bool ImGui::BeginPopupContextWindow(const char* str_id, int mouse_button, bool a
 {
     if (!str_id)
         str_id = "window_context";
-    ImGuiID id = GImGui->CurrentWindow->GetID(str_id);
+    ImGuiID id = GImGui->CurrentWindow->getID(str_id);
     if (IsMouseReleased(mouse_button) && IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
         if (also_over_items || !IsAnyItemHovered())
             OpenPopupEx(id);
@@ -8255,7 +8255,7 @@ bool ImGui::BeginPopupContextVoid(const char* str_id, int mouse_button)
 {
     if (!str_id)
         str_id = "void_context";
-    ImGuiID id = GImGui->CurrentWindow->GetID(str_id);
+    ImGuiID id = GImGui->CurrentWindow->getID(str_id);
     if (IsMouseReleased(mouse_button) && !IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
         OpenPopupEx(id);
     return BeginPopupEx(id, ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoSavedSettings);
@@ -9966,7 +9966,7 @@ ImGuiWindowSettings* ImGui::CreateNewWindowSettings(const char* name)
     g.SettingsWindows.push_back(ImGuiWindowSettings());
     ImGuiWindowSettings* settings = &g.SettingsWindows.back();
 #if !IMGUI_DEBUG_INI_SETTINGS
-    // Skip to the "###" marker if any. We don't skip past to match the behavior of GetID()
+    // Skip to the "###" marker if any. We don't skip past to match the behavior of getID()
     // Preserve the full string when IMGUI_DEBUG_INI_SETTINGS is set to make .ini inspection easier.
     if (const char* p = strstr(name, "###"))
         name = p;
@@ -11469,7 +11469,7 @@ static void ImGui::DockContextBuildNodesFromSettings(ImGuiContext* ctx, ImGuiDoc
         node->SplitAxis = settings->SplitAxis;
         node->LocalFlags |= (settings->Flags & ImGuiDockNodeFlags_SavedFlagsMask_);
 
-        // Bind host window immediately if it already exist (in case of a rebuild)
+        // bind host window immediately if it already exist (in case of a rebuild)
         // This is useful as the RootWindowForTitleBarHighlight links necessary to highlight the currently focused node requires node->HostWindow to be set.
         char host_window_title[20];
         ImGuiDockNode* root_node = DockNodeGetRootNode(node);
@@ -12249,7 +12249,7 @@ static void ImGui::DockNodeUpdate(ImGuiDockNode* node)
 
     const ImGuiDockNodeFlags node_flags = node->GetMergedFlags();
 
-    // Bind or create host window
+    // bind or create host window
     ImGuiWindow* host_window = NULL;
     bool beginned_into_host_window = false;
     if (node->IsDockSpace())
@@ -12574,7 +12574,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
     // Docking/Collapse button
     if (has_window_menu_button)
     {
-        if (CollapseButton(host_window->GetID("#COLLAPSE"), window_menu_button_pos, node))
+        if (CollapseButton(host_window->getID("#COLLAPSE"), window_menu_button_pos, node))
             OpenPopup("#WindowMenu");
         if (IsItemActive())
             focus_tab_id = tab_bar->SelectedTabId;
@@ -12669,7 +12669,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
             PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_Text] * ImVec4(1.0f,1.0f,1.0f,0.5f));
         }
         const float button_sz = g.FontSize;
-        if (CloseButton(host_window->GetID("#CLOSE"), title_bar_rect.GetTR() + ImVec2(-style.FramePadding.x * 2.0f - button_sz, 0.0f)))
+        if (CloseButton(host_window->getID("#CLOSE"), title_bar_rect.GetTR() + ImVec2(-style.FramePadding.x * 2.0f - button_sz, 0.0f)))
             if (ImGuiTabItem* tab = TabBarFindTabByID(tab_bar, tab_bar->VisibleTabId))
             {
                 node->WantCloseTabID = tab->ID;
@@ -12686,7 +12686,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
 
     // When clicking on the title bar outside of tabs, we still focus the selected tab for that node
     // FIXME: TabItem use AllowItemOverlap so we manually perform a more specific test for now (hovered || held)
-    ImGuiID title_bar_id = host_window->GetID("#TITLEBAR");
+    ImGuiID title_bar_id = host_window->getID("#TITLEBAR");
     if (g.HoveredId == 0 || g.HoveredId == title_bar_id || g.ActiveId == title_bar_id)
     {
         bool held;
@@ -13307,7 +13307,7 @@ void ImGui::DockNodeTreeUpdateSplitter(ImGuiDockNode* node)
             resize_limits[0] = node->ChildNodes[0]->Pos[axis] + min_size;
             resize_limits[1] = node->ChildNodes[1]->Pos[axis] + node->ChildNodes[1]->Size[axis] - min_size;
 
-            ImGuiID splitter_id = GetID("##Splitter");
+            ImGuiID splitter_id = getID("##Splitter");
             if (g.ActiveId == splitter_id)
             {
                 // Only process when splitter is active
@@ -13334,7 +13334,7 @@ void ImGui::DockNodeTreeUpdateSplitter(ImGuiDockNode* node)
             float cur_size_1 = child_1->Size[axis];
             float min_size_0 = resize_limits[0] - child_0->Pos[axis];
             float min_size_1 = child_1->Pos[axis] + child_1->Size[axis] - resize_limits[1];
-            if (SplitterBehavior(bb, GetID("##Splitter"), axis, &cur_size_0, &cur_size_1, min_size_0, min_size_1, WINDOWS_RESIZE_FROM_EDGES_HALF_THICKNESS, WINDOWS_RESIZE_FROM_EDGES_FEEDBACK_TIMER))
+            if (SplitterBehavior(bb, getID("##Splitter"), axis, &cur_size_0, &cur_size_1, min_size_0, min_size_1, WINDOWS_RESIZE_FROM_EDGES_HALF_THICKNESS, WINDOWS_RESIZE_FROM_EDGES_FEEDBACK_TIMER))
             {
                 if (touching_nodes[0].Size > 0 && touching_nodes[1].Size > 0)
                 {
@@ -13539,7 +13539,7 @@ void ImGui::DockSpace(ImGuiID id, const ImVec2& size_arg, ImGuiDockNodeFlags fla
 
     ImGuiWindow* host_window = g.CurrentWindow;
     host_window->DockNodeAsHost = node;
-    host_window->ChildId = window->GetID(title);
+    host_window->ChildId = window->getID(title);
     node->HostWindow = host_window;
     node->OnlyNodeWithWindows = NULL;
 
@@ -13577,7 +13577,7 @@ ImGuiID ImGui::DockSpaceOverViewport(ImGuiViewport* viewport, ImGuiDockNodeFlags
     Begin(label, NULL, host_window_flags);
     PopStyleVar(3);
 
-    ImGuiID dockspace_id = GetID("DockSpace");
+    ImGuiID dockspace_id = getID("DockSpace");
     DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags, window_class);
     End();
 
@@ -14078,7 +14078,7 @@ void ImGui::BeginDocked(ImGuiWindow* window, bool* p_open)
         }
     }
 
-    // Bind to our dock node
+    // bind to our dock node
     ImGuiDockNode* node = window->DockNode;
     if (node != NULL)
         IM_ASSERT(window->DockId == node->ID);
@@ -14169,7 +14169,7 @@ void ImGui::BeginDocked(ImGuiWindow* window, bool* p_open)
 
     // Update ChildId to allow returning from Child to Parent with Escape
     ImGuiWindow* parent_window = window->DockNode->HostWindow;
-    window->ChildId = parent_window->GetID(window->Name);
+    window->ChildId = parent_window->getID(window->Name);
 }
 
 void ImGui::BeginAsDockableDragDropSource(ImGuiWindow* window)

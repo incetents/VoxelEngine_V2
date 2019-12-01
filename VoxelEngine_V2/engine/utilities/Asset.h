@@ -437,14 +437,17 @@ namespace Vxl
 			const std::string& filepath
 		);
 		//
-		FramebufferObjectIndex createFramebuffer();
+		FramebufferObjectIndex createFramebuffer(
+			const std::string& name
+		);
 		//
 		RenderTextureIndex createRenderTexture(
+			const std::string& name,
 			int Width,
 			int Height,
 			TextureFormat FormatType,
 			TexturePixelType PixelType,
-			bool MipMapping
+			bool MipMapping = false
 		);
 		//
 		RenderTextureDepthIndex createRenderTextureDepth(
@@ -454,6 +457,7 @@ namespace Vxl
 		);
 		//
 		RenderBufferIndex createRenderBuffer(
+			const std::string& name,
 			int Width,
 			int Height,
 			TextureFormat FormatType,
@@ -524,8 +528,10 @@ namespace Vxl
 		TextureIndex texID_editor_camera;
 		TextureIndex texID_editor_light;
 
-		ShaderMaterialIndex shader_error;
-		MaterialIndex material_error;
+		ShaderMaterialIndex shaderMaterial_error;
+		MaterialIndex		material_error;
+
+		ShaderMaterialIndex	shader_showRenderTarget;
 
 	public:
 		GlobalAssets()
@@ -558,6 +564,8 @@ namespace Vxl
 		Texture2D* getTex2DEditorLight(void) const { return m_texture2D_storage.Get(texID_editor_light); }
 		
 		Material* getMaterialError(void) const { return m_material_storage.Get(material_error); }
+
+		ShaderProgram* getShader_ShowRenderTarget(void) const;
 
 	} SingletonInstance(GlobalAssets);
 

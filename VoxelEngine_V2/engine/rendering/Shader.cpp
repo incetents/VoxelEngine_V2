@@ -194,11 +194,11 @@ namespace Vxl
 		{
 			Graphics::ShaderProgram::Enable(m_id);
 
-			// Bind subroutines
+			// bind subroutines
 			if (!m_subroutines.empty())
 			{
 				for (const auto& s : m_subroutines)
-					s.second.Bind();
+					s.second.bind();
 			}
 		}
 	}

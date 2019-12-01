@@ -156,9 +156,9 @@ namespace Vxl
 		Debug.DestroyGLResources();
 		//GlobalRenderText.DestoryGLResources();
 
-#ifdef GLOBAL_IMGUI
-		GUI_Viewport.DestroyGLResources();
-#endif
+//#ifdef GLOBAL_IMGUI
+//		GUI_Viewport.DestroyGLResources();
+//#endif
 
 		Gizmo::DestroyGLResources();
 
@@ -563,7 +563,7 @@ namespace Vxl
 	//			{
 	//				billboard->m_property_model.SetPropertyMatrix(light->second->m_transform.getModel(), true);
 	//				
-	//				GlobalData.tex_editor_light->Bind(TextureLevel::LEVEL0);
+	//				GlobalData.tex_editor_light->bind(TextureLevel::LEVEL0);
 	//	
 	//				Geometry.GetQuadZ()->Draw();
 	//			}
@@ -574,7 +574,7 @@ namespace Vxl
 	//			{
 	//				billboard->m_property_model.SetPropertyMatrix(camera->second->m_transform.getModel(), true);
 	//				
-	//				GlobalData.tex_editor_camera->Bind(TextureLevel::LEVEL0);
+	//				GlobalData.tex_editor_camera->bind(TextureLevel::LEVEL0);
 	//	
 	//				Geometry.GetQuadZ()->Draw();
 	//			}

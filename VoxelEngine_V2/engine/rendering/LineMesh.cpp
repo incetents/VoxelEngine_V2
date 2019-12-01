@@ -32,7 +32,7 @@ namespace Vxl
 		}
 	}
 
-	void LineMesh::Bind(DrawType type)
+	void LineMesh::bind(DrawType type)
 	{
 		m_type = type;
 		m_drawCount = m_buffer.GetDrawCount();

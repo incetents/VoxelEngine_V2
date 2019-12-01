@@ -260,7 +260,7 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
     glBindVertexArray(vertex_array_object);
 #endif
 
-    // Bind vertex/index buffers and setup attributes for ImDrawVert
+    // bind vertex/index buffers and setup attributes for ImDrawVert
     glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ElementsHandle);
     glEnableVertexAttribArray(g_AttribLocationVtxPos);
@@ -367,7 +367,7 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                     else
                         glScissor((int)clip_rect.x, (int)clip_rect.y, (int)clip_rect.z, (int)clip_rect.w); // Support for GL 4.5 rarely used glClipControl(GL_UPPER_LEFT)
 
-                    // Bind texture, Draw
+                    // bind texture, Draw
                     glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
 #if IMGUI_IMPL_OPENGL_MAY_HAVE_VTX_OFFSET
                     if (g_GlVersion >= 3200)

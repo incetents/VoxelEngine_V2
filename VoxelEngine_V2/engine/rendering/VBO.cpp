@@ -10,12 +10,12 @@ namespace Vxl
 		m_DrawCount = m_Size / m_layout.m_stride;
 	}
 
-	void VBO::Bind() const
+	void VBO::bind() const
 	{
 		if (m_empty)
 			return;
 
-		Graphics::VBO::Bind(m_VBO);
+		Graphics::VBO::bind(m_VBO);
 
 		uint32_t elementCount = (uint32_t)m_layout.m_elements.size();
 		VXL_ASSERT(elementCount > 0, "Layout requires at least one Element");
@@ -62,17 +62,17 @@ namespace Vxl
 
 		m_Size = _count * sizeof(uint32_t);
 		m_DrawCount = _count;
-		Graphics::EBO::Bind(m_EBO);
+		Graphics::EBO::bind(m_EBO);
 		Graphics::EBO::BindData(m_Size, _arr, _mode);
 	}
 	void EBO::SetIndices(std::vector<uint32_t> _arr, BufferUsage _mode)
 	{
 		SetIndices(&_arr[0], (uint32_t)_arr.size(), _mode);
 	}
-	void EBO::Bind() const
+	void EBO::bind() const
 	{
 		if (m_EBO != -1)
-			Graphics::EBO::Bind(m_EBO);
+			Graphics::EBO::bind(m_EBO);
 	}
 }
 

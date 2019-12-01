@@ -36,13 +36,13 @@ namespace Vxl
 		void unload();
 
 		// Storage
-		virtual void CreateStorage(); // Create space for texture [immutable, cannot be resized]
-		virtual void SetStorage(const void* pixels);
+		virtual void createStorage(); // Create space for texture [immutable, cannot be resized]
+		virtual void setStorage(const void* pixels);
 
 		// Utility
-		void UpdateParameters();
-		void UpdateMipmapping();
-		void FlipImageVertically(uint8_t* imagePixels);
+		void updateParameters();
+		void updateMipmapping();
+		void flipImageVertically(uint8_t* imagePixels);
 
 	public:
 		BaseTexture(const BaseTexture&) = delete;
@@ -58,12 +58,12 @@ namespace Vxl
 		);
 		virtual ~BaseTexture();
 
-		void Bind(TextureLevel layer) const;
-		void Bind() const;
-		void Unbind() const;
+		void bind(TextureLevel layer) const;
+		void bind() const;
+		void unbind() const;
 
-		void Copy(const BaseTexture& _texture);
-		void Copy(const RenderBuffer& _texture);
+		//void copy(const BaseTexture& _texture);
+		//void copy(const RenderBuffer& _texture);
 
 		void setWrapMode(TextureWrapping W);
 		void setFilterMode(TextureFilter filter);
@@ -73,56 +73,56 @@ namespace Vxl
 
 		void setGLName(const std::string& glName);
 
-		inline TextureID	GetID(void) const
+		inline TextureID	getID(void) const
 		{
 			return m_id;
 		}
-		inline bool			IsMipMapping(void) const
+		inline bool			isMipMapping(void) const
 		{
 			return m_mipMapping;
 		}
-		inline int			GetWidth(void) const
+		inline int			getWidth(void) const
 		{
 			return m_width;
 		}
-		inline int			GetHeight(void) const
+		inline int			getHeight(void) const
 		{
 			return m_height;
 		}
-		inline int			GetChannelCount(void) const
+		inline int			getChannelCount(void) const
 		{
 			return m_channelCount;
 		}
-		inline Color4F		GetBorderColor(void) const
+		inline Color4F		getBorderColor(void) const
 		{
 			return m_borderColor;
 		}
-		inline TextureType			GetType(void) const
+		inline TextureType			getType(void) const
 		{
 			return m_type;
 		}
-		inline TextureWrapping		GetWrapMode(void) const
+		inline TextureWrapping		getWrapMode(void) const
 		{
 			return m_wrapMode;
 		}
-		inline TextureFilter		GetFilterMode(void) const
+		inline TextureFilter		getFilterMode(void) const
 		{
 			return m_filterMode;
 		}
-		inline TextureFormat		GetFormatType(void) const
+		inline TextureFormat		getFormatType(void) const
 		{
 			return m_formatType;
 		}
-		inline TextureChannelType	GetChannelType(void) const
+		inline TextureChannelType	getChannelType(void) const
 		{
 			return m_channelType;
 		}
-		inline TexturePixelType		GetPixelType(void) const
+		inline TexturePixelType		getPixelType(void) const
 		{
 			return m_pixelType;
 		}
 
-		virtual bool IsLoaded(void) const
+		virtual bool isLoaded(void) const
 		{
 			return true;
 		}

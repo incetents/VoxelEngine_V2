@@ -117,20 +117,23 @@ namespace Vxl
 		);
 
 		// FBO Gbuffer
-		fboIndex_gbuffer = SceneAssets.createFramebuffer();
+		fboIndex_gbuffer = SceneAssets.createFramebuffer("gbuffer");
 		FramebufferObject* fbo_gbuffer_ptr = Assets::getFramebufferObject(fboIndex_gbuffer);
 		fbo_gbuffer_ptr->setSizeToViewportSize();
 
 		// render targets
 		fbotex_gbuffer_albedo = SceneAssets.createRenderTexture(
+			"albedo",
 			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::SRGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_normal = SceneAssets.createRenderTexture(
+			"normal",
 			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA16_SNORM, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_gbuffer_reflection = SceneAssets.createRenderTexture(
+			"reflection",
 			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
@@ -141,32 +144,33 @@ namespace Vxl
 
 		//fbo_gbuffer_ptr->setClearColor(Color4F(0.2f, 0.2f, 0.2f, 1));
 		fbo_gbuffer_ptr->bind();
-		fbo_gbuffer_ptr->setAttachment(0, Assets::getRenderTexture(fbotex_gbuffer_albedo));
-		fbo_gbuffer_ptr->setAttachment(1, Assets::getRenderTexture(fbotex_gbuffer_normal));
-		fbo_gbuffer_ptr->setAttachment(2, Assets::getRenderTexture(fbotex_gbuffer_reflection));
-		fbo_gbuffer_ptr->setDepth(Assets::getRenderTextureDepth(fbotex_gbuffer_depth));
+		fbo_gbuffer_ptr->setRenderTexture(0, fbotex_gbuffer_albedo);
+		fbo_gbuffer_ptr->setRenderTexture(1, fbotex_gbuffer_normal);
+		fbo_gbuffer_ptr->setRenderTexture(2, fbotex_gbuffer_reflection);
+		fbo_gbuffer_ptr->setRenderTextureDepth(fbotex_gbuffer_depth);
 		fbo_gbuffer_ptr->checkFBOStatus();
 		fbo_gbuffer_ptr->unbind();
 
 		// FBO Editor Post
-		fboIndex_editor = SceneAssets.createFramebuffer();
+		fboIndex_editor = SceneAssets.createFramebuffer("editor");
 		FramebufferObject* fbo_editor_ptr = Assets::getFramebufferObject(fboIndex_editor);
 		fbo_editor_ptr->setSizeToViewportSize();
 
 		// render targets
 		fbotex_editor_albedo = SceneAssets.createRenderTexture(
+			"albedo",
 			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
-		//fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
-		fbotex_editor_depth = SceneAssets.createRenderTextureDepth(
+		fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
+		//fbotex_editor_depth = SceneAssets.createRenderTextureDepth(
 			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
 			TextureDepthFormat::DEPTH32
 		);
 
 		fbo_editor_ptr->bind();
-		fbo_editor_ptr->setAttachment(0, Assets::getRenderTexture(fbotex_editor_albedo));
-		fbo_editor_ptr->setDepth(Assets::getRenderTextureDepth(fbotex_editor_depth));
+		fbo_editor_ptr->setRenderTexture(0, fbotex_editor_albedo);
+		fbo_editor_ptr->setRenderBufferDepth(fbotex_editor_depth);
 		fbo_editor_ptr->checkFBOStatus();
 		fbo_editor_ptr->unbind();
 
@@ -205,12 +209,13 @@ namespace Vxl
 
 
 		// FBO Color Picker
-		fboIndex_colorpicker = SceneAssets.createFramebuffer();
+		fboIndex_colorpicker = SceneAssets.createFramebuffer("colorPicker");
 		FramebufferObject* fbo_colorPicker_ptr = Assets::getFramebufferObject(fboIndex_colorpicker);
 		fbo_colorPicker_ptr->setSizeToViewportSize();
 
 		// render targets
 		fbotex_colorPicker_albedo = SceneAssets.createRenderTexture(
+			"albedo",
 			fbo_colorPicker_ptr->getWidth(), fbo_colorPicker_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
@@ -220,40 +225,42 @@ namespace Vxl
 		);
 
 		fbo_colorPicker_ptr->bind();
-		fbo_colorPicker_ptr->setAttachment(0, Assets::getRenderTexture(fbotex_colorPicker_albedo));
-		fbo_colorPicker_ptr->setDepth(Assets::getRenderBufferDepth(fbotex_colorPicker_depth));
+		fbo_colorPicker_ptr->setRenderTexture(0, fbotex_colorPicker_albedo);
+		fbo_colorPicker_ptr->setRenderBufferDepth(fbotex_colorPicker_depth);
 		fbo_colorPicker_ptr->checkFBOStatus();
 		fbo_colorPicker_ptr->unbind();
 
 		// FBO Composite
-		fboIndex_composite = SceneAssets.createFramebuffer();
+		fboIndex_composite = SceneAssets.createFramebuffer("composite");
 		FramebufferObject* fbo_composite_ptr = Assets::getFramebufferObject(fboIndex_composite);
 		fbo_composite_ptr->setSizeToViewportSize();
 
 		// render targets
 		fbotex_composite_albedo = SceneAssets.createRenderTexture(
+			"albedo",
 			fbo_composite_ptr->getWidth(), fbo_composite_ptr->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbo_composite_ptr->bind();
-		fbo_composite_ptr->setAttachment(0, Assets::getRenderTexture(fbotex_composite_albedo));
+		fbo_composite_ptr->setRenderTexture(0, fbotex_composite_albedo);
 		fbo_composite_ptr->checkFBOStatus();
 		fbo_composite_ptr->unbind();
 
-		// FBO Show Render Target
-		fboIndex_showRenderTarget = SceneAssets.createFramebuffer();
-		FramebufferObject* fbo_showRenderTarget_ptr = Assets::getFramebufferObject(fboIndex_showRenderTarget);
-		fbo_showRenderTarget_ptr->setSizeToViewportSize();
+		//	// FBO Show Render Target
+		//	fboIndex_showRenderTarget = SceneAssets.createFramebuffer("showRenderTarget");
+		//	FramebufferObject* fbo_showRenderTarget_ptr = Assets::getFramebufferObject(fboIndex_showRenderTarget);
+		//	fbo_showRenderTarget_ptr->setSizeToViewportSize();
 
-		// render targets
-		fbotex_showRenderTarget_albedo = SceneAssets.createRenderTexture(
-			fbo_showRenderTarget_ptr->getWidth(), fbo_showRenderTarget_ptr->getHeight(),
-			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
-
-		fbo_showRenderTarget_ptr->bind();
-		fbo_showRenderTarget_ptr->setAttachment(0, Assets::getRenderTexture(fbotex_showRenderTarget_albedo));
-		fbo_showRenderTarget_ptr->checkFBOStatus();
-		fbo_showRenderTarget_ptr->unbind();
+		//	// render targets
+		//	fbotex_showRenderTarget_albedo = SceneAssets.createRenderTexture(
+		//		"albedo",
+		//		fbo_showRenderTarget_ptr->getWidth(), fbo_showRenderTarget_ptr->getHeight(),
+		//		TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+		//	
+		//	fbo_showRenderTarget_ptr->bind();
+		//	fbo_showRenderTarget_ptr->setRenderTexture(0, fbotex_showRenderTarget_albedo);
+		//	fbo_showRenderTarget_ptr->checkFBOStatus();
+		//	fbo_showRenderTarget_ptr->unbind();
 
 		//	// Shaders
 		//	gbuffer_vert = SceneAssets.createShader("gbuffer_vert", FileIO::readFile("./assets/shaders/gbuffer.vert"), ShaderType::VERTEX);
@@ -332,7 +339,7 @@ namespace Vxl
 		// Shader Materials
 		sMat_skybox = SceneAssets.createShaderMaterial("./assets/materials/skybox.material");
 		sMat_gbuffer = SceneAssets.createShaderMaterial("./assets/materials/gbuffer.material");
-		sMat_displayRenderTarget = SceneAssets.createShaderMaterial("./assets/materials/displayRenderTarget.material");
+		//sMat_displayRenderTarget = SceneAssets.createShaderMaterial("./assets/materials/displayRenderTarget.material");
 
 		// Materials
 		material_skybox = SceneAssets.createMaterial("skybox");
@@ -353,14 +360,14 @@ namespace Vxl
 			mat->m_blendFunc.source = BlendSource::ONE;
 			mat->m_blendFunc.destination = BlendDestination::ZERO;
 		}
-		material_displayRenderTarget = SceneAssets.createMaterial("displayRenderTarget");
-		{
-			auto mat = Assets::getMaterial(material_displayRenderTarget);
-			mat->setShaderMaterial(sMat_displayRenderTarget);
-			mat->setSequenceID(10000);
-			mat->m_blendFunc.source = BlendSource::ONE;
-			mat->m_blendFunc.destination = BlendDestination::ZERO;
-		}
+		//	material_displayRenderTarget = SceneAssets.createMaterial("displayRenderTarget");
+		//	{
+		//		auto mat = Assets::getMaterial(material_displayRenderTarget);
+		//		mat->setShaderMaterial(sMat_displayRenderTarget);
+		//		mat->setSequenceID(10000);
+		//		mat->m_blendFunc.source = BlendSource::ONE;
+		//		mat->m_blendFunc.destination = BlendDestination::ZERO;
+		//	}
 
 		//	material_gbuffer_transparent = SceneAssets.createMaterial("gbuffer_transparent");
 		//	{
@@ -492,7 +499,7 @@ namespace Vxl
 		mesh_jiggy = Model::LoadMesh("jiggy", "./assets/models/jiggy.obj", true, 0.2f);
 
 		mesh_manyQuads = SceneAssets.createMesh();
-		auto* _mesh = Assets::getMesh(mesh_manyQuads);
+		Mesh* _mesh = Assets::getMesh(mesh_manyQuads);
 		
 		Vector3 pos[] = {
 			Vector3(-0.5f, -0.5f, 0.0f),
@@ -526,7 +533,7 @@ namespace Vxl
 		
 		_mesh->m_instances = m_models;
 		
-		_mesh->Bind();
+		_mesh->bind();
 		
 		// Camera
 		camera_main = SceneAssets.createCamera("_camera_editor", 0.01f, 5000.0f);
@@ -935,12 +942,11 @@ namespace Vxl
 		auto* fbo_editor = Assets::getFramebufferObject(fboIndex_editor);
 		auto* fbo_colorPicker = Assets::getFramebufferObject(fboIndex_colorpicker);
 		auto* fbo_composite = Assets::getFramebufferObject(fboIndex_composite);
-		auto* fbo_showRenderTarget = Assets::getFramebufferObject(fboIndex_showRenderTarget);
 
 		// GUI Setup [needs to be changed]
 #ifdef GLOBAL_IMGUI
-		GUI_Viewport.fboIndex_gbuffer = this->fboIndex_gbuffer;
-		GUI_Viewport.fboIndex_editor = this->fboIndex_editor;
+		//GUI_Viewport.fboIndex_gbuffer = this->fboIndex_gbuffer;
+		//GUI_Viewport.fboIndex_editor = this->fboIndex_editor;
 #endif
 
 		// UBO BINDING per frame
@@ -1009,7 +1015,7 @@ namespace Vxl
 		//	// Render GIZMO ID [Changes FBO bound]
 		//	gizmo.RenderIDCapture();
 		//	
-		//	fbo_editor->Bind();
+		//	fbo_editor->bind();
 		//	fbo_editor->ClearBuffers();
 		//	
 		//	
@@ -1058,7 +1064,7 @@ namespace Vxl
 		//	{
 		//		if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 		//		{
-		//			fbo_gbuffer->Bind();
+		//			fbo_gbuffer->bind();
 		//	
 		//			RawArray<uint8_t> data = fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
 		//			if (!data.IsEmpty())
@@ -1104,16 +1110,17 @@ namespace Vxl
 		Graphics::SetBlendState(false);
 		Graphics::SetWireframeState(false);
 		Graphics::SetDepthPassRule(DepthPassRule::ALWAYS);
+		Graphics::SetBlendMode(BlendSource::ONE, BlendDestination::ZERO);
 
 		//////////////////////
 		fbo_composite->bind();
 		fbo_composite->clearBuffers();
 
 		// Display Final Image
-		Material* mat_displayRenderTarget = Assets::getMaterial(material_displayRenderTarget);
-		mat_displayRenderTarget->bindCoreProgram();
-		mat_displayRenderTarget->sendUniform("channelOutput", 0);
-		mat_displayRenderTarget->sendUniform("outputMode", 0);
+		ShaderProgram* shaderShowRenderTarget = GlobalAssets.getShader_ShowRenderTarget();
+		shaderShowRenderTarget->bind();
+		shaderShowRenderTarget->sendUniform("channelOutput", 0);
+		shaderShowRenderTarget->sendUniform("outputMode", 0);
 
 		fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
 		fbo_editor->bindTexture(0, TextureLevel::LEVEL1);

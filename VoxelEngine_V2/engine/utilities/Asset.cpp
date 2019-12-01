@@ -146,14 +146,26 @@ namespace Vxl
 		}
 		// Error Material
 		{
-			shader_error = createShaderMaterial("./assets/materials/error.material");
+			shaderMaterial_error = createShaderMaterial("./assets/materials/error.material");
 			material_error = createMaterial("error");
 			{
 				auto mat = Assets::getMaterial(material_error);
-				mat->setShaderMaterial(shader_error);
+				mat->setShaderMaterial(shaderMaterial_error);
 				mat->setSequenceID(999999u);
 			}
 		}
+		// Show Render Target
+		{
+			shader_showRenderTarget = SceneAssets.createShaderMaterial("./assets/materials/displayRenderTarget.material");
+		}
+	}
+	ShaderProgram* GlobalAssets::getShader_ShowRenderTarget(void) const
+	{
+		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shader_showRenderTarget);
+		if (shadMat)
+			return m_shaderProgram_storage.Get(shadMat->m_coreProgram);
+
+		return nullptr;
 	}
 
 	void Assets::DestroyAndEraseAll()
@@ -532,14 +544,17 @@ namespace Vxl
 		// Store Data and Return index
 		m_file_storage.Add(stringUtil::toLowerCopy(name), _file, m_creationType);
 	}
-	FramebufferObjectIndex Assets::createFramebuffer()
+	FramebufferObjectIndex Assets::createFramebuffer(
+		const std::string& name
+	)
 	{
 		// Create New Data
-		FramebufferObject* _fbo = new FramebufferObject();
+		FramebufferObject* _fbo = new FramebufferObject(name);
 		// Store Data and Return index
 		return m_framebufferObject_storage.Add(_fbo, m_creationType);
 	}
 	RenderTextureIndex Assets::createRenderTexture(
+		const std::string& name,
 		int Width,
 		int Height,
 		TextureFormat FormatType,
@@ -548,7 +563,7 @@ namespace Vxl
 	)
 	{
 		// Create New Data
-		RenderTexture* _texture = new RenderTexture(Width, Height, FormatType, PixelType, MipMapping);
+		RenderTexture* _texture = new RenderTexture(name, Width, Height, FormatType, PixelType, MipMapping);
 		// Store Data and Return index
 		return m_renderTexture_storage.Add(_texture, m_creationType);
 	}
@@ -564,6 +579,7 @@ namespace Vxl
 		return m_renderTextureDepth_storage.Add(_texture, m_creationType);
 	}
 	RenderBufferIndex Assets::createRenderBuffer(
+		const std::string& name,
 		int Width,
 		int Height,
 		TextureFormat FormatType,
@@ -571,7 +587,7 @@ namespace Vxl
 	)
 	{
 		// Create New Data
-		RenderBuffer* _buffer = new RenderBuffer(Width, Height, FormatType, PixelType);
+		RenderBuffer* _buffer = new RenderBuffer(name, Width, Height, FormatType, PixelType);
 		// Store Data and Return index
 		return m_renderBuffer_storage.Add(_buffer, m_creationType);
 	}

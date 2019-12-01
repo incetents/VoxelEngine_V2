@@ -127,12 +127,12 @@ namespace Vxl
 		m_tangents.set(_model.tangents);
 		m_indices.set(_model.indices);
 
-		Bind();
+		bind();
 	}
 
 	void Mesh::setGLName(const std::string& name)
 	{
-		Graphics::SetGLName(ObjectType::VERTEX_ARRAY, m_VAO.GetID(), "Mesh_" + name);
+		Graphics::SetGLName(ObjectType::VERTEX_ARRAY, m_VAO.getID(), "Mesh_" + name);
 	}
 
 	void Mesh::GenerateNormals(
@@ -460,7 +460,7 @@ namespace Vxl
 		}
 	}
 
-	void Mesh::Bind(DrawType type)
+	void Mesh::bind(DrawType type)
 	{
 		m_type = type;
 		m_subtype = Graphics::GetDrawSubType(type);
@@ -494,7 +494,7 @@ namespace Vxl
 #endif
 		
 
-		/*	Bind Data	*/
+		/*	bind Data	*/
 		m_VAO.bind();
 
 		m_positions.bind();

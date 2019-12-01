@@ -90,7 +90,7 @@
 //	{
 //		if (m_mesh && m_material->IsValid())
 //		{
-//			//	// Bind Textures (ignore if wireframe mode is ON)
+//			//	// bind Textures (ignore if wireframe mode is ON)
 //			//	if (m_material->m_Wireframe == false && !m_material->HasSharedTextures())
 //			//	{
 //			//		TextureBinder::BindTextures();

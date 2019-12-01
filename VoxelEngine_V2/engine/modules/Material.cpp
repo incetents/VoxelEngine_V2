@@ -124,7 +124,7 @@ namespace Vxl
 	}
 	void Material::bindStates()
 	{
-		// Bind Modes
+		// bind Modes
 		Graphics::SetCullMode(m_cullType);
 		Graphics::SetBlendState(m_blendState);
 		if (m_blendState)
@@ -155,26 +155,26 @@ namespace Vxl
 			if (m_textures.find(level) == m_textures.end())
 			{
 				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
+					GlobalAssets.getTex2DNullImageBlack()->bind(level);
 			}
 
 			TextureIndex index = m_textures[level];
 			BaseTexture* _tex = Assets::getBaseTexture(index);
 
-			// Bind error texture
-			if (_tex == nullptr || !_tex->IsLoaded())
+			// bind error texture
+			if (_tex == nullptr || !_tex->isLoaded())
 			{
 				if(level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
+					GlobalAssets.getTex2DNullImageBlack()->bind(level);
 			}
-			// Bind texture normally
+			// bind texture normally
 			else
 			{
-				_tex->Bind(level);
+				_tex->bind(level);
 			}
 		}
 	}
@@ -191,26 +191,26 @@ namespace Vxl
 			if (_entity->m_textures.find(level) == _entity->m_textures.end())
 			{
 				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
+					GlobalAssets.getTex2DNullImageBlack()->bind(level);
 			}
 
 			TextureIndex index = _entity->m_textures[level];
 			BaseTexture* _tex = Assets::getBaseTexture(index);
 
-			// Bind error texture
-			if (_tex == nullptr || !_tex->IsLoaded())
+			// bind error texture
+			if (_tex == nullptr || !_tex->isLoaded())
 			{
 				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.getTex2DNullImageCheckerboard()->Bind(level);
+					GlobalAssets.getTex2DNullImageCheckerboard()->bind(level);
 				else
-					GlobalAssets.getTex2DNullImageBlack()->Bind(level);
+					GlobalAssets.getTex2DNullImageBlack()->bind(level);
 			}
-			// Bind texture normally
+			// bind texture normally
 			else
 			{
-				_tex->Bind(level);
+				_tex->bind(level);
 			}
 		}
 	}

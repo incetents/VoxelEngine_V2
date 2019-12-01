@@ -42,12 +42,12 @@ namespace Vxl
 
 		// Invert Y
 		if (InvertY)
-			FlipImageVertically(m_image);
+			flipImageVertically(m_image);
 
 		// Storage
-		CreateStorage();
-		SetStorage(&m_image[0]);
-		UpdateMipmapping();
+		createStorage();
+		setStorage(&m_image[0]);
+		updateMipmapping();
 
 		// glName
 		auto name = stringUtil::nameFromFilepath(filePath);
@@ -55,7 +55,7 @@ namespace Vxl
 			setGLName("Tex2D_" + name);
 
 		// finished
-		Unbind();
+		unbind();
 		m_loaded = true;
 	}
 	// [ Create Custom ] // 1 Channel
@@ -90,12 +90,12 @@ namespace Vxl
 		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
 
 		// Storage
-		CreateStorage();
-		SetStorage(&m_image[0]);
-		UpdateMipmapping();
+		createStorage();
+		setStorage(&m_image[0]);
+		updateMipmapping();
 
 		// finished
-		Unbind();
+		unbind();
 		m_loaded = true;
 	}
 	// [ Create Custom ] // 3 Channels
@@ -132,12 +132,12 @@ namespace Vxl
 		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
 		
 		// Storage
-		CreateStorage();
-		SetStorage(&m_image[0]);
-		UpdateMipmapping();
+		createStorage();
+		setStorage(&m_image[0]);
+		updateMipmapping();
 
 		// finished
-		Unbind();
+		unbind();
 		m_loaded = true;
 	}
 	// [ Create Custom ] // 4 Channels
@@ -175,12 +175,12 @@ namespace Vxl
 		memcpy(m_image, &fixed_pixels[0], fixed_pixels.size() * sizeof(UCHAR));
 
 		// Storage
-		CreateStorage();
-		SetStorage(&m_image[0]);
-		UpdateMipmapping();
+		createStorage();
+		setStorage(&m_image[0]);
+		updateMipmapping();
 
 		// finished
-		Unbind();
+		unbind();
 		m_loaded = true;
 	}
 
@@ -209,12 +209,12 @@ namespace Vxl
 		m_image = new uint8_t[pixelCount];
 		memcpy(m_image, pixels, pixelCount * sizeof(uint8_t));
 
-		CreateStorage();
-		SetStorage(&m_image[0]);
-		UpdateMipmapping();
+		createStorage();
+		setStorage(&m_image[0]);
+		updateMipmapping();
 
 		// finished
-		Unbind();
+		unbind();
 		m_loaded = true;
 	}
 

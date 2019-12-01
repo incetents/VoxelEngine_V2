@@ -88,14 +88,14 @@ namespace Vxl
 		}
 		inline VAOID		GetVAOID(void) const
 		{
-			return m_VAO.GetID();
+			return m_VAO.getID();
 		}
 
 		void GenerateNormals(bool Smooth);
 		void GenerateTangents();
 		void RecalculateMinMax();
 
-		void Bind(DrawType type = DrawType::TRIANGLES);
+		void bind(DrawType type = DrawType::TRIANGLES);
 		void Draw();
 	};
 }

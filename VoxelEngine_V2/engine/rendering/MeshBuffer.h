@@ -33,7 +33,7 @@ namespace Vxl
 		virtual void bind(void) const
 		{
 			VXL_ASSERT(m_hasLayout, "VBO Requires Layout before binding");
-			m_vbo.Bind();
+			m_vbo.bind();
 		}
 
 		virtual void set(Type* arr, uint32_t size)
@@ -148,7 +148,7 @@ namespace Vxl
 					m_vbo.UpdateVertices(vertices.data(), 0);
 			}
 
-			m_vbo.Bind();
+			m_vbo.bind();
 
 			dirtyVertices = false;
 			resizedVertices = false;
@@ -262,7 +262,7 @@ namespace Vxl
 					m_ebo.UpdateIndices(indices.data(), 0);
 			}
 
-			m_ebo.Bind();
+			m_ebo.bind();
 
 			dirtyVertices = false;
 			resizedVertices = false;
@@ -342,7 +342,7 @@ namespace Vxl
 
 		void bind(void) const
 		{
-			m_vbo.Bind();
+			m_vbo.bind();
 		}
 
 		void setAlloc(std::vector<Matrix4x4>* arr)

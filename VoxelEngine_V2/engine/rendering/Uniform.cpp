@@ -34,7 +34,7 @@ namespace Vxl
 	//		VXL_ASSERT(FALSE, "Subroutine Name or Function not found");
 	//	}
 	//	
-	//	void glSubroutine::Bind()
+	//	void glSubroutine::bind()
 	//	{
 	//		glUniformSubroutinesuiv((GLenum)m_type, m_locationCount, m_locations);
 	//	}

@@ -355,7 +355,7 @@ namespace Vxl
 		NewMesh->GenerateNormals(true);
 		NewMesh->GenerateTangents();
 		//
-		NewMesh->Bind();
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -446,7 +446,7 @@ namespace Vxl
 		NewMesh->m_normals.set(normals);
 		NewMesh->GenerateTangents();
 		//
-		NewMesh->Bind();
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -466,7 +466,7 @@ namespace Vxl
 		NewMesh->GenerateNormals(true);
 		NewMesh->GenerateTangents();
 		//
-		NewMesh->Bind();
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -486,7 +486,7 @@ namespace Vxl
 		NewMesh->GenerateNormals(true);
 		NewMesh->GenerateTangents();
 		//
-		NewMesh->Bind();
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -519,7 +519,7 @@ namespace Vxl
 		NewMesh->GenerateNormals(true);
 		NewMesh->GenerateTangents();
 		//
-		NewMesh->Bind();
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -640,7 +640,7 @@ namespace Vxl
 		NewMesh->m_indices.set(indices, 36);
 		NewMesh->GenerateTangents();
 		//
-		NewMesh->Bind();
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -718,7 +718,7 @@ namespace Vxl
 		NewMesh->m_indices.set(indices, 6);
 		NewMesh->GenerateTangents();
 		//
-		NewMesh->Bind();
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -778,7 +778,7 @@ namespace Vxl
 		NewMesh->m_positions.set(positions);
 		NewMesh->m_uvs.set(uvs);
 		NewMesh->m_normals.set(normals);
-		NewMesh->Bind(DrawType::TRIANGLE_FAN);
+		NewMesh->bind(DrawType::TRIANGLE_FAN);
 		//
 		return NewMeshIndex;
 	}
@@ -875,7 +875,7 @@ namespace Vxl
 		NewMesh->m_uvs.set(uvs);
 		NewMesh->m_normals.set(normals);
 		NewMesh->m_indices.set(indices);
-		NewMesh->Bind(DrawType::TRIANGLE_STRIP);
+		NewMesh->bind(DrawType::TRIANGLE_STRIP);
 		//
 		return NewMeshIndex;
 	}
@@ -912,7 +912,7 @@ namespace Vxl
 		//m_fullQuad->m_normals.set(normals, 4);
 		fullQuad->m_indices.set(indices, 6);
 		//
-		fullQuad->Bind();
+		fullQuad->bind();
 	}
 	void Geometry::CreateFullTriangle()
 	{
@@ -941,7 +941,7 @@ namespace Vxl
 		//m_fullTriangle->m_normals.set(normals, 3);
 		fullTriangle->m_indices.set(indices, 6);
 		//
-		fullTriangle->Bind();
+		fullTriangle->bind();
 	}
 
 	void Geometry::CreateQuad()
@@ -1077,7 +1077,7 @@ namespace Vxl
 		inverseCube->m_indices.set(indices, 36);
 		inverseCube->GenerateTangents();
 		//
-		inverseCube->Bind();
+		inverseCube->bind();
 	}
 
 	void Geometry::CreateOctahedron()
@@ -1131,7 +1131,7 @@ namespace Vxl
 		octahedron->m_indices.set(indices, 24);
 		octahedron->GenerateTangents();
 		//
-		octahedron->Bind();
+		octahedron->bind();
 	}
 
 	void Geometry::CreateIcosahedron()

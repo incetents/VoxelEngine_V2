@@ -1208,18 +1208,18 @@ namespace Vxl
 	}
 
 	// Copy Texture
-	void Graphics::CopyTexture(
-		TextureID src, TextureType srcType,
-		TextureID dest, TextureType destType,
-		uint32_t width, uint32_t height
-	)
-	{
-		glCopyImageSubData(
-			src, GL_TextureType[(int)srcType], 0, 0, 0, 0,
-			dest, GL_TextureType[(int)destType], 0, 0, 0, 0,
-			width, height, 1
-		);
-	}
+	//	void Graphics::CopyTexture(
+	//		TextureID src, TextureType srcType,
+	//		TextureID dest, TextureType destType,
+	//		uint32_t width, uint32_t height
+	//	)
+	//	{
+	//		glCopyImageSubData(
+	//			src, GL_TextureType[(int)srcType], 0, 0, 0, 0,
+	//			dest, GL_TextureType[(int)destType], 0, 0, 0, 0,
+	//			width, height, 1
+	//		);
+	//	}
 
 	// ~ Sends Uniforms to Shader ~ //
 	void Graphics::Uniform::send(bool data) const
@@ -1258,42 +1258,6 @@ namespace Vxl
 		glUniform1d(location, data);
 	}
 
-	//void Graphics::Uniform::send(const Vector2 data) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniform2f(location, data.x, data.y);
-	//}
-	//void Graphics::Uniform::send(const Vector3 data) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniform3f(location, data.x, data.y, data.z);
-	//}
-	//void Graphics::Uniform::send(const Vector4 data) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniform4f(location, data.x, data.y, data.z, data.w);
-	//}
-	//void Graphics::Uniform::send(const Color3F data) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniform3f(location, data.r, data.g, data.b);
-	//}
-	//void Graphics::Uniform::send(const Color4F data) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniform4f(location, data.r, data.g, data.b, data.a);
-	//}
-
 	void Graphics::Uniform::send(const Vector2& data) const
 	{
 		if (location == -1)
@@ -1330,28 +1294,6 @@ namespace Vxl
 		glUniform4f(location, data.r, data.g, data.b, data.a);
 	}
 
-	//void Graphics::Uniform::sendMatrix(const Matrix2x2 data, bool transpose) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniformMatrix2fv(location, 1, transpose, data.GetStartPointer());
-	//}
-	//void Graphics::Uniform::sendMatrix(const Matrix3x3 data, bool transpose) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniformMatrix3fv(location, 1, transpose, data.GetStartPointer());
-	//}
-	//void Graphics::Uniform::sendMatrix(const Matrix4x4 data, bool transpose) const
-	//{
-	//	if (location == -1)
-	//		return;
-
-	//	glUniformMatrix4fv(location, 1, transpose, data.GetStartPointer());
-	//}
-
 	void Graphics::Uniform::sendMatrix(const Matrix2x2& data, bool transpose) const
 	{
 		if (location == -1)
@@ -1374,220 +1316,6 @@ namespace Vxl
 		glUniformMatrix4fv(location, 1, transpose, data.GetStartPointer());
 	}
 
-	/*template<>
-	void Graphics::Uniform::Send<bool>(bool data)
-	{
-		glUniform1i(location, (int)data);
-	}
-	template<>
-	void Graphics::Uniform::Send<int>(int data)
-	{
-		glUniform1i(location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<uint32_t>(uint32_t data)
-	{
-		glUniform1ui(location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<float>(float data)
-	{
-		glUniform1f(location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<double>(double data)
-	{
-		glUniform1d(location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector2>(Vector2 data)
-	{
-		glUniform2f(location, data.x, data.y);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector2&>(Vector2& data)
-	{
-		glUniform2f(location, data.x, data.y);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector3>(Vector3 data)
-	{
-		glUniform3f(location, data.x, data.y, data.z);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector3&>(Vector3& data)
-	{
-		glUniform3f(location, data.x, data.y, data.z);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector4>(Vector4 data)
-	{
-		glUniform4f(location, data.x, data.y, data.z, data.w);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector4&>(Vector4& data)
-	{
-		glUniform4f(location, data.x, data.y, data.z, data.w);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color3F>(Color3F data)
-	{
-		glUniform3f(location, data.r, data.g, data.b);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color3F&>(Color3F& data)
-	{
-		glUniform3f(location, data.r, data.g, data.b);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color4F>(Color4F data)
-	{
-		glUniform4f(location, data.r, data.g, data.b, data.a);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color4F&>(Color4F& data)
-	{
-		glUniform4f(location, data.r, data.g, data.b, data.a);
-	}
-
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix2x2>(Matrix2x2 data, bool transposeMatrix)
-	{
-		glUniformMatrix2fv(location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix2x2&>(Matrix2x2& data, bool transposeMatrix)
-	{
-		glUniformMatrix2fv(location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix3x3>(Matrix3x3 data, bool transposeMatrix)
-	{
-		glUniformMatrix3fv(location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix3x3&>(Matrix3x3& data, bool transposeMatrix)
-	{
-		glUniformMatrix3fv(location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix4x4>(Matrix4x4 data, bool transposeMatrix)
-	{
-		glUniformMatrix4fv(location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix4x4&>(Matrix4x4& data, bool transposeMatrix)
-	{
-		glUniformMatrix4fv(location, 1, transposeMatrix, data.GetStartPointer());
-	}
-
-	template<>
-	void Graphics::Uniform::Send<bool>(ShaderProgramID id, bool data)
-	{
-		glProgramUniform1i(id, location, (int)data);
-	}
-	template<>
-	void Graphics::Uniform::Send<int>(ShaderProgramID id, int data)
-	{
-		glProgramUniform1i(id, location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<uint32_t>(ShaderProgramID id, uint32_t data)
-	{
-		glProgramUniform1ui(id, location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<float>(ShaderProgramID id, float data)
-	{
-		glProgramUniform1f(id, location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<double>(ShaderProgramID id, double data)
-	{
-		glProgramUniform1d(id, location, data);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector2>(ShaderProgramID id, Vector2 data)
-	{
-		glProgramUniform2f(id, location, data.x, data.y);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector2&>(ShaderProgramID id, Vector2& data)
-	{
-		glProgramUniform2f(id, location, data.x, data.y);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector3>(ShaderProgramID id, Vector3 data)
-	{
-		glProgramUniform3f(id, location, data.x, data.y, data.z);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector3&>(ShaderProgramID id, Vector3& data)
-	{
-		glProgramUniform3f(id, location, data.x, data.y, data.z);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector4>(ShaderProgramID id, Vector4 data)
-	{
-		glProgramUniform4f(id, location, data.x, data.y, data.z, data.w);
-	}
-	template<>
-	void Graphics::Uniform::Send<Vector4&>(ShaderProgramID id, Vector4& data)
-	{
-		glProgramUniform4f(id, location, data.x, data.y, data.z, data.w);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color3F>(ShaderProgramID id, Color3F data)
-	{
-		glProgramUniform3f(id, location, data.r, data.g, data.b);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color3F&>(ShaderProgramID id, Color3F& data)
-	{
-		glProgramUniform3f(id, location, data.r, data.g, data.b);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color4F>(ShaderProgramID id, Color4F data)
-	{
-		glProgramUniform4f(id, location, data.r, data.g, data.b, data.a);
-	}
-	template<>
-	void Graphics::Uniform::Send<Color4F&>(ShaderProgramID id, Color4F& data)
-	{
-		glProgramUniform4f(id, location, data.r, data.g, data.b, data.a);
-	}
-
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix2x2>(ShaderProgramID id, Matrix2x2 data, bool transposeMatrix)
-	{
-		glProgramUniformMatrix4fv(id, location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix2x2&>(ShaderProgramID id, Matrix2x2& data, bool transposeMatrix)
-	{
-		glProgramUniformMatrix4fv(id, location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix3x3>(ShaderProgramID id, Matrix3x3 data, bool transposeMatrix)
-	{
-		glProgramUniformMatrix4fv(id, location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix3x3&>(ShaderProgramID id, Matrix3x3& data, bool transposeMatrix)
-	{
-		glProgramUniformMatrix4fv(id, location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix4x4>(ShaderProgramID id, Matrix4x4 data, bool transposeMatrix)
-	{
-		glProgramUniformMatrix4fv(id, location, 1, transposeMatrix, data.GetStartPointer());
-	}
-	template<>
-	void Graphics::Uniform::SendMatrix<Matrix4x4&>(ShaderProgramID id, Matrix4x4& data, bool transposeMatrix)
-	{
-		glProgramUniformMatrix4fv(id, location, 1, transposeMatrix, data.GetStartPointer());
-	}*/
-
 	// ~ Subroutine Functions ~ //
 	void Graphics::UniformSubroutine::Connect(const std::string& UniformName, const std::string& FunctionName)
 	{
@@ -1596,11 +1324,10 @@ namespace Vxl
 
 		indices[uniforms[UniformName]] = functions[FunctionName];
 	}
-	void Graphics::UniformSubroutine::Bind() const
+	void Graphics::UniformSubroutine::bind() const
 	{
 		glUniformSubroutinesuiv(shaderType, indexCount, &indices[0]);
 	}
-
 
 	// ~ Shader ~ //
 	ShaderID Graphics::Shader::Create(ShaderType shaderType)
@@ -1937,7 +1664,7 @@ namespace Vxl
 
 		glDeleteVertexArrays(1, &id);
 	}
-	void Graphics::VAO::Bind(VAOID id)
+	void Graphics::VAO::bind(VAOID id)
 	{
 		if (gl_activeVAO == id)
 			return;
@@ -1970,7 +1697,7 @@ namespace Vxl
 
 		glDeleteBuffers(1, &id);
 	}
-	void Graphics::VBO::Bind(VBOID id)
+	void Graphics::VBO::bind(VBOID id)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, id);
 	}
@@ -2019,7 +1746,7 @@ namespace Vxl
 
 		glDeleteBuffers(1, &id);
 	}
-	void Graphics::EBO::Bind(EBOID id)
+	void Graphics::EBO::bind(EBOID id)
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
 	}
@@ -2070,7 +1797,7 @@ namespace Vxl
 
 		glDeleteTextures(1, &id);
 	}
-	void Graphics::Texture::Bind(TextureType type, TextureID textureID)
+	void Graphics::Texture::bind(TextureType type, TextureID textureID)
 	{
 		if(gl_activeTextureIds[gl_activeTextureLayer] == textureID)
 			return;
@@ -2196,11 +1923,11 @@ namespace Vxl
 	//		RawArray<uint8_t> Array;
 	//		Array.Allocate(w * h * texture.GetChannelCount());
 	//		glGetTextureSubImage(
-	//			texture.GetID(), 0,
+	//			texture.getID(), 0,
 	//			x, y, 0,
 	//			w, h, 1,
 	//			GL_TextureChannelType[(int)texture.GetChannelType()],
-	//			GL_TexturePixelType[(int)texture.GetPixelType()],
+	//			GL_TexturePixelType[(int)texture.getPixelType()],
 	//			w * h * texture.GetChannelCount(),
 	//			Array.start
 	//		);
@@ -2224,7 +1951,7 @@ namespace Vxl
 
 		glDeleteRenderbuffers(1, &id);
 	}
-	void Graphics::RenderBuffer::Bind(RenderBufferID id)
+	void Graphics::RenderBuffer::bind(RenderBufferID id)
 	{
 		if (gl_activeBufferId == id)
 			return;
@@ -2265,7 +1992,7 @@ namespace Vxl
 
 		glDeleteFramebuffers(1, &id);
 	}
-	void Graphics::FramebufferObject::Bind(FramebufferObjectID id)
+	void Graphics::FramebufferObject::bind(FramebufferObjectID id)
 	{
 		if (gl_activeFBO == id)
 			return;
@@ -2340,12 +2067,12 @@ namespace Vxl
 	void Graphics::FramebufferObject::AttachRenderTexture(const Vxl::RenderTexture& texture, uint32_t attachmentIndex)
 	{
 		VXL_ASSERT(attachmentIndex < (uint32_t)GLMaxFBOColorAttachments, "attachmentIndex too high for AttachRenderTexture()");
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, texture.GetID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_TEXTURE_2D, texture.getID(), 0);
 	}
 	void Graphics::FramebufferObject::AttachRenderTextureAsDepth(const Vxl::RenderTexture& texture)
 	{
 		GLenum AttachmentType;
-		switch (texture.GetChannelType())
+		switch (texture.getChannelType())
 		{
 		case TextureChannelType::STENCIL:
 			AttachmentType = GL_STENCIL_ATTACHMENT;
@@ -2360,7 +2087,7 @@ namespace Vxl
 			VXL_ERROR("Invalid ChannelType for FBO Depth Attachment");
 		}
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentType, GL_TEXTURE_2D, texture.GetID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentType, GL_TEXTURE_2D, texture.getID(), 0);
 	}
 	void Graphics::FramebufferObject::DetachRenderTexture(uint32_t attachmentIndex)
 	{
@@ -2369,12 +2096,12 @@ namespace Vxl
 	void Graphics::FramebufferObject::AttachRenderBuffer(const Vxl::RenderBuffer& texture, uint32_t attachmentIndex)
 	{
 		VXL_ASSERT(attachmentIndex < (uint32_t)GLMaxFBOColorAttachments, "attachmentIndex too high for AttachRenderTexture()");
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_RENDERBUFFER, texture.GetID());
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, GL_RENDERBUFFER, texture.getID());
 	}
 	void Graphics::FramebufferObject::AttachRenderBufferAsDepth(const Vxl::RenderBuffer& texture)
 	{
 		GLenum AttachmentType;
-		switch (texture.GetChannelType())
+		switch (texture.getChannelType())
 		{
 		case TextureChannelType::STENCIL:
 			AttachmentType = GL_STENCIL_ATTACHMENT;
@@ -2389,7 +2116,7 @@ namespace Vxl
 			VXL_ERROR("Invalid ChannelType for FBO Depth Attachment");
 		}
 
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, AttachmentType, GL_RENDERBUFFER, texture.GetID());
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, AttachmentType, GL_RENDERBUFFER, texture.getID());
 	}
 	void Graphics::FramebufferObject::DetachRenderBuffer(uint32_t attachmentIndex)
 	{
@@ -2402,11 +2129,11 @@ namespace Vxl
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 
 		RawArray<uint8_t> Array;
-		Array.Allocate(w * h * texture.GetChannelCount());
+		Array.Allocate(w * h * texture.getChannelCount());
 		glReadPixels(
 			x, y, w, h,
-			GL_TextureChannelType[(int)texture.GetChannelType()],
-			GL_TexturePixelType[(int)texture.GetPixelType()],
+			GL_TextureChannelType[(int)texture.getChannelType()],
+			GL_TexturePixelType[(int)texture.getPixelType()],
 			Array.start
 		);
 
@@ -2418,11 +2145,11 @@ namespace Vxl
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 
 		RawArray<uint8_t> Array;
-		Array.Allocate(w * h * texture.GetChannelCount());
+		Array.Allocate(w * h * texture.getChannelCount());
 		glReadPixels(
 			x, y, w, h,
-			GL_TextureChannelType[(int)texture.GetChannelType()],
-			GL_TexturePixelType[(int)texture.GetPixelType()],
+			GL_TextureChannelType[(int)texture.getChannelType()],
+			GL_TexturePixelType[(int)texture.getPixelType()],
 			Array.start
 		);
 		
@@ -2478,8 +2205,8 @@ namespace Vxl
 
 		VXL_ASSERT(id != -1, "GL ERROR: glGenBuffers()");
 
-		// Bind
-		Bind(id);
+		// bind
+		bind(id);
 
 		// Allocate size
 		glBufferData(GL_UNIFORM_BUFFER, totalBytes, NULL, GL_BufferUsage[(int)usage]);
@@ -2495,7 +2222,7 @@ namespace Vxl
 
 		glDeleteBuffers(1, &id);
 	}
-	void Graphics::UBO::Bind(UBOID id)
+	void Graphics::UBO::bind(UBOID id)
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, id);
 	}

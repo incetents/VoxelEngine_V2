@@ -22,7 +22,7 @@ namespace Vxl
 		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getViewProjection().Transpose(), 0);
 		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getView().Transpose(), 64);
 		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getProjection().Transpose(), 128);
-		m_ubos[UBOID::CAMERA]->Bind();
+		m_ubos[UBOID::CAMERA]->bind();
 	}
 	void UBOManager::BindTime()
 	{
@@ -31,13 +31,13 @@ namespace Vxl
 		m_ubos[UBOID::TIME]->sendVector(Vector4(_time[0], _time[1], _time[2], _time[3]), 0);
 		m_ubos[UBOID::TIME]->sendVector(Vector4(sinf(_time[0]), sinf(_time[1]), sinf(_time[2]), sinf(_time[3])), 16);
 		m_ubos[UBOID::TIME]->sendVector(Vector4(cosf(_time[0]), cosf(_time[1]), cosf(_time[2]), cosf(_time[3])), 32);
-		m_ubos[UBOID::TIME]->Bind();
+		m_ubos[UBOID::TIME]->bind();
 	}
 	void UBOManager::BindFBOSize(const FramebufferObject& _fbo)
 	{
 		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2((float)_fbo.getWidth(), (float)_fbo.getHeight()), 0);
 		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(1.0f / (float)_fbo.getWidth(), 1.0f / (float)_fbo.getHeight()), 8);
-		m_ubos[UBOID::FBO_SIZE]->Bind();
+		m_ubos[UBOID::FBO_SIZE]->bind();
 	}
 
 	// UBO //
@@ -70,9 +70,9 @@ namespace Vxl
 		return static_cast<char*>(m_buffer) + byteOffset;
 	}
 
-	void UniformBufferObject::Bind()
+	void UniformBufferObject::bind()
 	{
-		Graphics::UBO::Bind(m_id);
+		Graphics::UBO::bind(m_id);
 
 		if (m_bufferDirty)
 		{

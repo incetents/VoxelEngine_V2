@@ -1470,7 +1470,7 @@ struct IMGUI_API ImGuiWindow
     float                   WindowRounding;                     // Window rounding at the time of Begin().
     float                   WindowBorderSize;                   // Window border size at the time of Begin().
     int                     NameBufLen;                         // Size of buffer storing Name. May be larger than strlen(Name)!
-    ImGuiID                 MoveId;                             // == window->GetID("#MOVE")
+    ImGuiID                 MoveId;                             // == window->getID("#MOVE")
     ImGuiID                 ChildId;                            // ID of corresponding item in parent window (for navigation to return from child window to parent window)
     ImVec2                  Scroll;
     ImVec2                  ScrollMax;
@@ -1562,9 +1562,9 @@ public:
     ImGuiWindow(ImGuiContext* context, const char* name);
     ~ImGuiWindow();
 
-    ImGuiID     GetID(const char* str, const char* str_end = NULL);
-    ImGuiID     GetID(const void* ptr);
-    ImGuiID     GetID(int n);
+    ImGuiID     getID(const char* str, const char* str_end = NULL);
+    ImGuiID     getID(const void* ptr);
+    ImGuiID     getID(int n);
     ImGuiID     GetIDNoKeepAlive(const char* str, const char* str_end = NULL);
     ImGuiID     GetIDNoKeepAlive(const void* ptr);
     ImGuiID     GetIDNoKeepAlive(int n);

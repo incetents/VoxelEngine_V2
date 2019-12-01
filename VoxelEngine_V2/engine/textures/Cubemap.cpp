@@ -40,26 +40,26 @@ namespace Vxl
 				return;
 
 			else if (InvertY)
-				FlipImageVertically(m_image[i]);
+				flipImageVertically(m_image[i]);
 		}
 
 		m_channelType = Graphics::GetChannelType(m_channelCount);
 
-		CreateStorage();
+		createStorage();
 
 		// Storage
 		for (uint32_t i = 0; i < 6; i++)
 		{
 			SetStorageCubemap((CubemapFace)(i + 1), m_image[i]);
 		}
-		UpdateMipmapping();
+		updateMipmapping();
 
 		// glName
 		auto Name = stringUtil::nameFromFilepath(filePath1);
 		Graphics::SetGLName(ObjectType::TEXTURE, m_id, "Cubemap_" + Name);
 
 		// finished
-		Unbind();
+		unbind();
 		m_loaded = true;
 	}
 	Cubemap::~Cubemap()

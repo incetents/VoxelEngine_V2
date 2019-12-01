@@ -187,7 +187,7 @@
 //		// FBO
 //		GlobalRenderText.m_FBO->SetSize(m_renderTextureTargetSize.x, m_renderTextureTargetSize.y);
 //		GlobalRenderText.m_FBO->SetClearColor(Color4F(0, 0, 0, 0));
-//		GlobalRenderText.m_FBO->Bind();
+//		GlobalRenderText.m_FBO->bind();
 //		GlobalRenderText.m_FBO->SetAttachment(0, m_renderTexture);
 //		GlobalRenderText.m_FBO->ClearBuffers();
 //
@@ -257,7 +257,7 @@
 //				GlobalRenderText.m_buffer->bind();
 //		
 //				// Texture
-//				ch.m_texture->Bind();
+//				ch.m_texture->bind();
 //		
 //				// Render
 //				Graphics::Draw::Array(DrawType::TRIANGLES, 6);
@@ -363,7 +363,7 @@
 //		m_mesh->GenerateNormals(false);
 //		m_mesh->GenerateTangents();
 //
-//		m_mesh->Bind();
+//		m_mesh->bind();
 //	}
 //
 //	void TextObject::Update()

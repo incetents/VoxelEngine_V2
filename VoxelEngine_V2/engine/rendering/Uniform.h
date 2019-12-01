@@ -39,7 +39,7 @@ namespace Vxl
 	//		}
 	//	
 	//		void Set(const std::string& UniformName, const std::string& FunctionName);
-	//		void Bind();
+	//		void bind();
 	//	};
 
 }
