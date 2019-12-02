@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #include "Precompiled.h"
-#include "Geometry.h"
+#include "Primitives.h"
 
 #include "Mesh.h"
 
@@ -10,7 +10,7 @@
 namespace Vxl
 {
 	// Vertex Maker
-	void Geometry::CreateCylinder(
+	void Primitives::CreateCylinder(
 		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
 		Axis axis, UINT slices, float height, float radius_top, float radius_bot,
 		const Vector3& offset
@@ -104,7 +104,7 @@ namespace Vxl
 			for (auto& p : pos)
 				p += offset;
 	}
-	void Geometry::CreateCone(
+	void Primitives::CreateCone(
 		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
 		Axis axis, UINT slices, float height, float radius,
 		const Vector3& offset
@@ -179,7 +179,7 @@ namespace Vxl
 	}
 
 	// Generators
-	MeshIndex Geometry::GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale)
+	MeshIndex Primitives::GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale)
 	{
 		float t = (1.0f + sqrt(5.0f)) / 2.0f;
 
@@ -359,7 +359,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice)
+	MeshIndex Primitives::GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice)
 	{
 		std::vector<Vector3> positions;
 		positions.reserve(xSlice * ySlice * 6);
@@ -450,7 +450,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot)
+	MeshIndex Primitives::GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot)
 	{
 		std::vector<Vector3> positions;
 		std::vector<Vector2> uvs;
@@ -470,7 +470,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius)
+	MeshIndex Primitives::GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius)
 	{
 		std::vector<Vector3> positions;
 		std::vector<Vector2> uvs;
@@ -490,7 +490,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset)
+	MeshIndex Primitives::GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset)
 	{
 		std::vector<Vector3> positions;
 		std::vector<Vector3> positions2;
@@ -523,7 +523,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateCube(const std::string& MeshName, float unitSize, const Vector3& offset)
+	MeshIndex Primitives::GenerateCube(const std::string& MeshName, float unitSize, const Vector3& offset)
 	{
 		Vector3 pos[] = {
 			// Front Face
@@ -644,7 +644,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateQuad(const std::string& MeshName, Axis axis, float unitSize, const Vector3& offset)
+	MeshIndex Primitives::GenerateQuad(const std::string& MeshName, Axis axis, float unitSize, const Vector3& offset)
 	{
 		Vector2 uvs[] = {
 			Vector2(0, 0),
@@ -722,7 +722,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
+	MeshIndex Primitives::GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
 	{
 		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
@@ -782,7 +782,7 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Geometry::GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices, float exteriorUnitSize, float interiorUnitSize)
+	MeshIndex Primitives::GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices, float exteriorUnitSize, float interiorUnitSize)
 	{
 		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
@@ -881,7 +881,7 @@ namespace Vxl
 	}
 
 	// Creators
-	void Geometry::CreateFullQuad()
+	void Primitives::CreateFullQuad()
 	{
 		Vector3 pos[] = {
 			Vector3(-1, -1, +0),
@@ -914,7 +914,7 @@ namespace Vxl
 		//
 		fullQuad->bind();
 	}
-	void Geometry::CreateFullTriangle()
+	void Primitives::CreateFullTriangle()
 	{
 		Vector3 pos[] = {
 			Vector3(-1, -1, +0),
@@ -944,7 +944,7 @@ namespace Vxl
 		fullTriangle->bind();
 	}
 
-	void Geometry::CreateQuad()
+	void Primitives::CreateQuad()
 	{
 		m_quad_x = GenerateQuad("Quad_X", Axis::X, 1.0f);
 		m_quad_y = GenerateQuad("Quad_Y", Axis::Y, 1.0f);
@@ -955,13 +955,13 @@ namespace Vxl
 		m_halfquad_z = GenerateQuad("HalfQuad_Z", Axis::Z, 0.5f);
 	}	
 
-	void Geometry::CreateCube()
+	void Primitives::CreateCube()
 	{
 		m_cube = GenerateCube("Cube", 1.0f);
 		m_cube_small = GenerateCube("Cube_small", 0.25f);
 	}
 
-	void Geometry::CreateInverseCube()
+	void Primitives::CreateInverseCube()
 	{
 		Vector3 pos[] = {
 			// Front Face
@@ -1080,7 +1080,7 @@ namespace Vxl
 		inverseCube->bind();
 	}
 
-	void Geometry::CreateOctahedron()
+	void Primitives::CreateOctahedron()
 	{
 		Vector3 pos[] = {
 			// Edge
@@ -1134,28 +1134,28 @@ namespace Vxl
 		octahedron->bind();
 	}
 
-	void Geometry::CreateIcosahedron()
+	void Primitives::CreateIcosahedron()
 	{
 		m_icosahedron = GenerateIcosahdron("Icosahedron [Radius=0.5]", 0, 0.5f);
 	}
 
-	void Geometry::CreateIcosphere()
+	void Primitives::CreateIcosphere()
 	{
 		m_icoSphere = GenerateIcosahdron("Icosphere [Radius=0.5]", 1, 0.5f);
 	}
 
-	void Geometry::CreateSphere()
+	void Primitives::CreateSphere()
 	{
 		m_sphere = GenerateIcosahdron("Sphere [Radius=0.5]", 2, 0.5f);
 	}
 
-	void Geometry::CreateSphereUV()
+	void Primitives::CreateSphereUV()
 	{
 		m_sphereUV_16 = GenerateSphereUV("UVSphere16 [Radius= [Radius=0.5]]", 16, 16);
 		m_sphereUV_64 = GenerateSphereUV("UVSphere64 [Radius= [Radius=0.5]]", 64, 64);
 	}
 
-	void Geometry::CreateCylinders()
+	void Primitives::CreateCylinders()
 	{
 		//
 		m_cylinder_x = GenerateCylinder("CylinderX [16] [Radius=0.5]", Axis::X, 16, 1.0f, 0.5f, 0.5f);
@@ -1164,7 +1164,7 @@ namespace Vxl
 		//
 	}
 
-	void Geometry::CreateCones()
+	void Primitives::CreateCones()
 	{
 		//
 		m_cone_x = GenerateCone("Cone X-axis [16]", Axis::X, 16, 1.0f, 0.5f);
@@ -1173,14 +1173,14 @@ namespace Vxl
 		//
 	}
 
-	void Geometry::CreateArrows()
+	void Primitives::CreateArrows()
 	{
 		m_arrow_x = GenerateArrow("ArrowX", Axis::X, 1.0f, Vector3::ZERO);
 		m_arrow_y = GenerateArrow("ArrowY", Axis::Y, 1.0f, Vector3::ZERO);
 		m_arrow_z = GenerateArrow("ArrowZ", Axis::Z, 1.0f, Vector3::ZERO);
 	}
 
-	void Geometry::CreateCircles()
+	void Primitives::CreateCircles()
 	{
 		m_circleUnit_x = GenerateCircle("CircleUnitX", Axis::X, 32u, 1.0f);
 		m_circleUnit_y = GenerateCircle("CircleUnitY", Axis::Y, 32u, 1.0f);

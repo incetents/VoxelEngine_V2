@@ -4,7 +4,7 @@
 //
 //#include "../rendering/RenderManager.h"
 //#include "../rendering/Mesh.h"
-//#include "../rendering/Geometry.h"
+//#include "../rendering/Primitives.h"
 //#include "../rendering/Debug.h"
 //
 //namespace Vxl

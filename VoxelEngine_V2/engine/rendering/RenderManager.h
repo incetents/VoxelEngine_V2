@@ -26,6 +26,7 @@ namespace Vxl
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderManager);
 		friend class Hierarchy;
+		friend class Editor;
 	private:
 		Scene* m_currentScene = nullptr;
 	private:
@@ -37,9 +38,6 @@ namespace Vxl
 		std::map<MaterialIndex, std::vector<Entity*>> m_renderlist_opaque;
 		std::map<MaterialIndex, std::vector<Entity*>> m_renderlist_transparent;
 		bool m_renderlistDirty = false;
-
-		// Imgui render window
-		std::vector<GuiWindow*> m_guiWindows;
 
 	public:
 		RenderManager();
@@ -79,8 +77,6 @@ namespace Vxl
 		void Update();
 		void UpdateFixed();
 		void Draw();
-		void InitImGui();
-		void DrawImGui();
 		// Special Resources allocated untraditionally
 		void InitGlobalGLResources();
 		void DestroyGlobalGLResources();

@@ -8,18 +8,24 @@
 
 namespace Vxl
 {
+	class GuiWindow;
+
 	static class Editor : public Singleton<class Editor>
 	{
 	public:
+		// Selection
 		std::vector<SceneNodeIndex>	m_selectedNodes;
-
-		// [true] if at least one object is selected
 		bool HasSelection(void) const;
 		void RemoveSelection(SceneNodeIndex _node);
 		void AddSelection(SceneNodeIndex _node);
 		void ClearSelection();
 		void DeleteSelection();
 
+		// Imgui render window
+		std::vector<GuiWindow*> m_guiWindows;
+
+		// Behaviour
+		void Init();
 		void Update();
 
 	} SingletonInstance(Editor);

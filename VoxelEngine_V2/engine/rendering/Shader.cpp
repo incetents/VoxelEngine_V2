@@ -297,7 +297,7 @@ namespace Vxl
 	const char* SECTION_PROPERTIES = "#Properties";
 	const char* SECTION_SAMPLERS = "#Samplers";
 	const char* SECTION_VERTEX = "#Vertex";
-	const char* SECTION_GEOMETRY = "#Geometry";
+	const char* SECTION_GEOMETRY = "#Primitives";
 	const char* SECTION_FRAGMENT = "#Fragment";
 
 	const std::string GLSL_VERSION = "#version 420 core";
@@ -548,7 +548,7 @@ namespace Vxl
 				output_vertex.input_output + '\n' +
 				output_vertex.behaviour;
 		}
-		// Geometry
+		// Primitives
 		if (output_geometry.active)
 		{
 			output_geometry.behaviour =

@@ -30,8 +30,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	Window.SetIcon("./assets/applogo/logo_32.png");
 
 	/* Initial Call */
-	RenderManager.InitImGui();
+	Editor.Init();
 	RenderManager.InitGlobalGLResources();
+
 	Scene_Game* _scene = new Scene_Game();
 	RenderManager.SetNewScene(_scene);
 
@@ -70,7 +71,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 		RenderManager.Update();
 		RenderManager.Draw();
-		RenderManager.DrawImGui();
 
 		// End of frame update
 		Editor.Update();

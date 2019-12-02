@@ -10,7 +10,7 @@ namespace Vxl
 	class Mesh;
 	enum class Axis;
 
-	static class Geometry : public Singleton<class Geometry>
+	static class Primitives : public Singleton<class Primitives>
 	{
 	private:
 		// Vertex Creation
@@ -159,6 +159,6 @@ namespace Vxl
 		inline MeshIndex GetDoughtnutY_2D() const { return m_doughtnut2D_y; }
 		inline MeshIndex GetDoughtnutZ_2D() const { return m_doughtnut2D_z; }
 
-	} SingletonInstance(Geometry);
+	} SingletonInstance(Primitives);
 }
 

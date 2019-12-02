@@ -14,7 +14,7 @@
 #include "../objects/Camera.h"
 #include "../objects/LightObject.h"
 
-#include "../rendering/Geometry.h"
+#include "../rendering/Primitives.h"
 
 #include "../input/Input.h"
 
@@ -153,7 +153,7 @@ namespace Vxl
 		//	if (ImGui::Button("Add Sphere"))
 		//	{
 		//		auto object = GameObject::Create("Generic Object");
-		//		object->SetMesh(Geometry.GetSphereUV_Good());
+		//		object->SetMesh(Primitives.GetSphereUV_Good());
 		//		object->SetMaterial(Material::GetAsset("gbuffer"));
 		//		object->SetColor(Color3F(1, 0, 0));
 		//	}

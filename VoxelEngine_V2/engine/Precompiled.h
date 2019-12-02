@@ -46,7 +46,7 @@
 
 #include "rendering/Debug.h"
 #include "rendering/FramebufferObject.h"
-#include "rendering/Geometry.h"
+#include "rendering/Primitives.h"
 #include "rendering/Graphics.h"
 #include "rendering/LineMesh.h"
 #include "rendering/Mesh.h"

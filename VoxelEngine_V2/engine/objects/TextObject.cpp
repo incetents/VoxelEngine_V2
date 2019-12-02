@@ -5,7 +5,7 @@
 //#include <ft2build.h>
 //#include FT_FREETYPE_H
 //
-//#include "../rendering/Geometry.h"
+//#include "../rendering/Primitives.h"
 //#include "../rendering/FramebufferObject.h"
 //#include "../rendering/VBO.h"
 //#include "../rendering/MeshBuffer.h"

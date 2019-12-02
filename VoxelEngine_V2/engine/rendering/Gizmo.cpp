@@ -8,7 +8,7 @@
 #include "../modules/Material.h"
 #include "../objects/Camera.h"
 #include "../rendering/FramebufferObject.h"
-#include "../rendering/Geometry.h"
+#include "../rendering/Primitives.h"
 #include "../rendering/Mesh.h"
 #include "../rendering/Debug.h"
 #include "../utilities/Asset.h"
@@ -62,24 +62,24 @@ namespace Vxl
 	void Gizmo::InitGLResources()
 	{
 		// Mesh
-		m_mesh_HalfQuadAxisX[0] = Geometry.GenerateQuad("", Axis::X, 0.5f, Vector3(0, -0.25f, -0.25f));
-		m_mesh_HalfQuadAxisX[1] = Geometry.GenerateQuad("", Axis::X, 0.5f, Vector3(0, +0.25f, -0.25f));
-		m_mesh_HalfQuadAxisX[2] = Geometry.GenerateQuad("", Axis::X, 0.5f, Vector3(0, -0.25f, +0.25f));
-		m_mesh_HalfQuadAxisX[3] = Geometry.GenerateQuad("", Axis::X, 0.5f, Vector3(0, +0.25f, +0.25f));
+		m_mesh_HalfQuadAxisX[0] = Primitives.GenerateQuad("", Axis::X, 0.5f, Vector3(0, -0.25f, -0.25f));
+		m_mesh_HalfQuadAxisX[1] = Primitives.GenerateQuad("", Axis::X, 0.5f, Vector3(0, +0.25f, -0.25f));
+		m_mesh_HalfQuadAxisX[2] = Primitives.GenerateQuad("", Axis::X, 0.5f, Vector3(0, -0.25f, +0.25f));
+		m_mesh_HalfQuadAxisX[3] = Primitives.GenerateQuad("", Axis::X, 0.5f, Vector3(0, +0.25f, +0.25f));
 		//
-		m_mesh_HalfQuadAxisY[0] = Geometry.GenerateQuad("", Axis::Y, 0.5f, Vector3(-0.25f, 0, -0.25f));
-		m_mesh_HalfQuadAxisY[1] = Geometry.GenerateQuad("", Axis::Y, 0.5f, Vector3(+0.25f, 0, -0.25f));
-		m_mesh_HalfQuadAxisY[2] = Geometry.GenerateQuad("", Axis::Y, 0.5f, Vector3(-0.25f, 0, +0.25f));
-		m_mesh_HalfQuadAxisY[3] = Geometry.GenerateQuad("", Axis::Y, 0.5f, Vector3(+0.25f, 0, +0.25f));
+		m_mesh_HalfQuadAxisY[0] = Primitives.GenerateQuad("", Axis::Y, 0.5f, Vector3(-0.25f, 0, -0.25f));
+		m_mesh_HalfQuadAxisY[1] = Primitives.GenerateQuad("", Axis::Y, 0.5f, Vector3(+0.25f, 0, -0.25f));
+		m_mesh_HalfQuadAxisY[2] = Primitives.GenerateQuad("", Axis::Y, 0.5f, Vector3(-0.25f, 0, +0.25f));
+		m_mesh_HalfQuadAxisY[3] = Primitives.GenerateQuad("", Axis::Y, 0.5f, Vector3(+0.25f, 0, +0.25f));
 		//
-		m_mesh_HalfQuadAxisZ[0] = Geometry.GenerateQuad("", Axis::Z, 0.5f, Vector3(-0.25f, -0.25f, 0));
-		m_mesh_HalfQuadAxisZ[1] = Geometry.GenerateQuad("", Axis::Z, 0.5f, Vector3(+0.25f, -0.25f, 0));
-		m_mesh_HalfQuadAxisZ[2] = Geometry.GenerateQuad("", Axis::Z, 0.5f, Vector3(-0.25f, +0.25f, 0));
-		m_mesh_HalfQuadAxisZ[3] = Geometry.GenerateQuad("", Axis::Z, 0.5f, Vector3(+0.25f, +0.25f, 0));
+		m_mesh_HalfQuadAxisZ[0] = Primitives.GenerateQuad("", Axis::Z, 0.5f, Vector3(-0.25f, -0.25f, 0));
+		m_mesh_HalfQuadAxisZ[1] = Primitives.GenerateQuad("", Axis::Z, 0.5f, Vector3(+0.25f, -0.25f, 0));
+		m_mesh_HalfQuadAxisZ[2] = Primitives.GenerateQuad("", Axis::Z, 0.5f, Vector3(-0.25f, +0.25f, 0));
+		m_mesh_HalfQuadAxisZ[3] = Primitives.GenerateQuad("", Axis::Z, 0.5f, Vector3(+0.25f, +0.25f, 0));
 		//
-		m_mesh_ScaleCube[0] = Geometry.GenerateCube("", 0.25f, Vector3(1, 0, 0));
-		m_mesh_ScaleCube[1] = Geometry.GenerateCube("", 0.25f, Vector3(0, 1, 0));
-		m_mesh_ScaleCube[2] = Geometry.GenerateCube("", 0.25f, Vector3(0, 0, 1));
+		m_mesh_ScaleCube[0] = Primitives.GenerateCube("", 0.25f, Vector3(1, 0, 0));
+		m_mesh_ScaleCube[1] = Primitives.GenerateCube("", 0.25f, Vector3(0, 1, 0));
+		m_mesh_ScaleCube[2] = Primitives.GenerateCube("", 0.25f, Vector3(0, 0, 1));
 
 		// FBO
 		auto fbo_id = GlobalAssets.createFramebuffer("gizmo");
@@ -519,7 +519,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::RED);
 
-				Assets::getMesh(Geometry.GetArrowX())->Draw();
+				Assets::getMesh(Primitives.GetArrowX())->Draw();
 
 				// Y Axis //
 				if (m_selectedAxis == Axis::Y)
@@ -530,7 +530,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::GREEN);
 
-				Assets::getMesh(Geometry.GetArrowY())->Draw();
+				Assets::getMesh(Primitives.GetArrowY())->Draw();
 
 				// Z Axis //
 				if (m_selectedAxis == Axis::Z)
@@ -541,7 +541,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::BLUE);
 
-				Assets::getMesh(Geometry.GetArrowZ())->Draw();
+				Assets::getMesh(Primitives.GetArrowZ())->Draw();
 
 				// Cull
 				Graphics::SetCullMode(CullMode::NO_CULL);
@@ -598,7 +598,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::WHITE);
 				//
-				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
+				Assets::getMesh(Primitives.GetCubeSmall())->Draw();
 
 			}
 			else if (m_mode == Mode::SCALE)
@@ -666,7 +666,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::WHITE);
 
-				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
+				Assets::getMesh(Primitives.GetCubeSmall())->Draw();
 
 				// revert
 				uniform_alpha.send(1.0f);
@@ -705,7 +705,7 @@ namespace Vxl
 					else
 						uniform_color.send(Color3F::RED);
 
-					Assets::getMesh(Geometry.GetDoughtnutX_2D())->Draw();
+					Assets::getMesh(Primitives.GetDoughtnutX_2D())->Draw();
 				}
 
 				// Y Circle //
@@ -719,7 +719,7 @@ namespace Vxl
 					else
 						uniform_color.send(Color3F::GREEN);
 
-					Assets::getMesh(Geometry.GetDoughtnutY_2D())->Draw();
+					Assets::getMesh(Primitives.GetDoughtnutY_2D())->Draw();
 				}
 
 				// Z Circle //
@@ -733,7 +733,7 @@ namespace Vxl
 					else
 						uniform_color.send(Color3F::BLUE);
 
-					Assets::getMesh(Geometry.GetDoughtnutZ_2D())->Draw();
+					Assets::getMesh(Primitives.GetDoughtnutZ_2D())->Draw();
 				}
 
 				// revert
@@ -774,17 +774,17 @@ namespace Vxl
 				// X-arrow
 				color = Util::Conversion::uint_to_color4(1u);
 				uniform_output.send(color);
-				Assets::getMesh(Geometry.GetArrowX())->Draw();
+				Assets::getMesh(Primitives.GetArrowX())->Draw();
 
 				// Y-arrow
 				color = Util::Conversion::uint_to_color4(2u);
 				uniform_output.send(color);
-				Assets::getMesh(Geometry.GetArrowY())->Draw();
+				Assets::getMesh(Primitives.GetArrowY())->Draw();
 
 				// Z-arrow
 				color = Util::Conversion::uint_to_color4(3u);
 				uniform_output.send(color);
-				Assets::getMesh(Geometry.GetArrowZ())->Draw();
+				Assets::getMesh(Primitives.GetArrowZ())->Draw();
 
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
@@ -808,7 +808,7 @@ namespace Vxl
 				// Cube (ignored)
 				color = Util::Conversion::uint_to_color4(7u);
 				uniform_output.send(color);
-				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
+				Assets::getMesh(Primitives.GetCubeSmall())->Draw();
 
 				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
@@ -888,7 +888,7 @@ namespace Vxl
 				color = Util::Conversion::uint_to_color4(4u);
 				uniform_model.sendMatrix(m_transform.Model, true);
 				uniform_output.send(color);
-				Assets::getMesh(Geometry.GetCubeSmall())->Draw();
+				Assets::getMesh(Primitives.GetCubeSmall())->Draw();
 
 				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
@@ -933,7 +933,7 @@ namespace Vxl
 				{
 					color = Util::Conversion::uint_to_color4(1u);
 					uniform_output.send(color);
-					Assets::getMesh(Geometry.GetDoughtnutX_2D())->Draw();
+					Assets::getMesh(Primitives.GetDoughtnutX_2D())->Draw();
 				}
 
 				// Y Circle
@@ -941,7 +941,7 @@ namespace Vxl
 				{
 					color = Util::Conversion::uint_to_color4(2u);
 					uniform_output.send(color);
-					Assets::getMesh(Geometry.GetDoughtnutY_2D())->Draw();
+					Assets::getMesh(Primitives.GetDoughtnutY_2D())->Draw();
 				}
 
 				// Z Circle
@@ -949,7 +949,7 @@ namespace Vxl
 				{
 					color = Util::Conversion::uint_to_color4(3u);
 					uniform_output.send(color);
-					Assets::getMesh(Geometry.GetDoughtnutZ_2D())->Draw();
+					Assets::getMesh(Primitives.GetDoughtnutZ_2D())->Draw();
 				}
 
 				// Revert

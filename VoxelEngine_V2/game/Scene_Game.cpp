@@ -15,7 +15,7 @@
 #include "../engine/utilities/Asset.h"
 
 #include "../engine/rendering/FramebufferObject.h"
-#include "../engine/rendering/Geometry.h"
+#include "../engine/rendering/Primitives.h"
 #include "../engine/rendering/Mesh.h"
 #include "../engine/rendering/Shader.h"
 #include "../engine/rendering/Debug.h"
@@ -561,7 +561,7 @@ namespace Vxl
 		{
 			Entity* entity_ptr = Assets::getEntity(entity_skybox);
 			entity_ptr->setMaterial(material_skybox);
-			entity_ptr->setMesh(Geometry.GetInverseCube());
+			entity_ptr->setMesh(Primitives.GetInverseCube());
 			entity_ptr->m_useTransform = false;
 			entity_ptr->m_isSelectable = false;
 		}
@@ -569,14 +569,14 @@ namespace Vxl
 		{
 			Entity* entity_ptr = Assets::getEntity(entity_error_cube);
 			entity_ptr->setMaterial(material_gbuffer);
-			entity_ptr->setMesh(Geometry.GetCube());
+			entity_ptr->setMesh(Primitives.GetCube());
 			entity_ptr->m_transform.setPosition(Vector3(0, 2, 0));
 		}
 		entity_beato_cube = SceneAssets.createEntity("_beato_cube");
 		{
 			Entity* entity_ptr = Assets::getEntity(entity_beato_cube);
 			entity_ptr->setMaterial(material_gbuffer);
-			entity_ptr->setMesh(Geometry.GetCube());
+			entity_ptr->setMesh(Primitives.GetCube());
 			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 
@@ -609,7 +609,7 @@ namespace Vxl
 		//			GameObject* _entity2 = GameObject::Create("_entity2");
 		//			_entity2->SetMaterial(material_gbuffer);
 		//			//_entity2->m_material.SetTexture(_tex_crate, ActiveTexture::LEVEL0);
-		//			_entity2->SetMesh(jiggyMesh);// Geometry.GetIcoSphere();
+		//			_entity2->SetMesh(jiggyMesh);// Primitives.GetIcoSphere();
 		//			_entity2->m_transform.setPosition(Vector3(+1.5f, 0, -3.0f));
 		//			_entity2->SetColor(Color3F(1, 1, 0));
 		//			
@@ -619,28 +619,28 @@ namespace Vxl
 		//			_alphaCube1->SetMaterial(material_transparent_gbuffer);
 		//			_alphaCube1->SetColor(Color3F(1, 0, 0));
 		//			_alphaCube1->SetAlpha(0.5f);
-		//			_alphaCube1->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_alphaCube1->SetMesh(Primitives.GetCube());// Primitives.GetIcoSphere();
 		//			_alphaCube1->m_transform.setPosition(Vector3(-0.5f, -2, -3.0f));
 		//			
 		//			GameObject* _alphaCube2 = GameObject::Create("_alphaCube2");
 		//			_alphaCube2->SetMaterial(material_transparent_gbuffer);
 		//			_alphaCube2->SetColor(Color3F(0, 1, 0));
 		//			_alphaCube2->SetAlpha(0.5f);
-		//			_alphaCube2->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_alphaCube2->SetMesh(Primitives.GetCube());// Primitives.GetIcoSphere();
 		//			_alphaCube2->m_transform.setPosition(Vector3(-1.5f, -2, -3.0f));
 		//			
 		//			GameObject* _alphaCube3 = GameObject::Create("_alphaCube3");
 		//			_alphaCube3->SetMaterial(material_transparent_gbuffer);
 		//			_alphaCube3->SetColor(Color3F(0, 0, 1));
 		//			_alphaCube3->SetAlpha(0.5f);
-		//			_alphaCube3->SetMesh(Geometry.GetCube());// Geometry.GetIcoSphere();
+		//			_alphaCube3->SetMesh(Primitives.GetCube());// Primitives.GetIcoSphere();
 		//			_alphaCube3->m_transform.setPosition(Vector3(-2.5f, -2, -3.0f));
 		//			
 		//			
 		//			GameObject* _entity3 = GameObject::Create("_entity3");
 		//			_entity3->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
 		//			_entity3->SetMaterial(material_gbuffer);
-		//			_entity3->SetMesh(Geometry.GetIcosahedron());
+		//			_entity3->SetMesh(Primitives.GetIcosahedron());
 		//			_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
 		//			
 		//			
@@ -648,26 +648,26 @@ namespace Vxl
 		//			GameObject* _entity5 = GameObject::Create("_entity5");
 		//			_entity5->SetMaterial(material_gbuffer);
 		//			_entity5->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		//			_entity5->SetMesh(Geometry.GetSphereUV_Good());
+		//			_entity5->SetMesh(Primitives.GetSphereUV_Good());
 		//			_entity5->m_transform.setPosition(Vector3(0, -4, 0));
 		//			
 		//			GameObject* _entity6 = GameObject::Create("_entity6");
 		//			_entity6->SetMaterial(material_gbuffer);
 		//			_entity6->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		//			_entity6->SetMesh(Geometry.GetCube());
+		//			_entity6->SetMesh(Primitives.GetCube());
 		//			_entity6->m_transform.setPosition(Vector3(5, -4, 0));
 		//			
 		//			GameObject* _entity6_b = GameObject::Create("_entity6_normals");
 		//			_entity6_b->SetMaterial(material_showNormals);
 		//			_entity6_b->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		//			_entity6_b->SetMesh(Geometry.GetCube());
+		//			_entity6_b->SetMesh(Primitives.GetCube());
 		//			_entity6_b->m_transform.setPosition(Vector3(5, -4, 0));
 		//			
 		//			
 		//			GameObject* _entity7 = GameObject::Create("_entity7");
 		//			_entity7->SetMaterial(material_gbuffer);
 		//			_entity7->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
-		//			_entity7->SetMesh(Geometry.GetQuadY());
+		//			_entity7->SetMesh(Primitives.GetQuadY());
 		//			_entity7->m_transform.setPosition(Vector3(0, -10, 0));
 		//			_entity7->m_transform.setScale(Vector3(20, 1, 20));
 		//			//_entity5->SetColor(Color3F(1, 1, 1));
@@ -679,7 +679,7 @@ namespace Vxl
 		//			GameObject* _crate1 = GameObject::Create("_crate1");
 		//			_crate1->SetMaterial(material_gbuffer);
 		//			_crate1->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
-		//			_crate1->SetMesh(Geometry.GetCylinderX());
+		//			_crate1->SetMesh(Primitives.GetCylinderX());
 		//			_crate1->m_transform.setPosition(1, 3, 2);
 		//			_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
 		//			
@@ -687,7 +687,7 @@ namespace Vxl
 		//			GameObject* _crate2 = GameObject::Create("_crate2");
 		//			_crate2->SetMaterial(material_gbuffer);
 		//			_crate2->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
-		//			_crate2->SetMesh(Geometry.GetCylinderY());
+		//			_crate2->SetMesh(Primitives.GetCylinderY());
 		//			//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		//			_crate2->m_transform.setPosition(0, 2, 0);
 		//			
@@ -695,7 +695,7 @@ namespace Vxl
 		//			GameObject* _crate3 = GameObject::Create("_crate3");
 		//			_crate3->SetMaterial(material_gbuffer);
 		//			_crate3->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
-		//			_crate3->SetMesh(Geometry.GetCylinderZ());
+		//			_crate3->SetMesh(Primitives.GetCylinderZ());
 		//			//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		//			_crate3->m_transform.setPosition(1, 2, 0);
 		//			
@@ -712,28 +712,28 @@ namespace Vxl
 		//			
 		//			GameObject* _octo1 = GameObject::Create("_octo1");
 		//			_octo1->SetMaterial(material_gbuffer);
-		//			_octo1->SetMesh(Geometry.GetOctahedron());
+		//			_octo1->SetMesh(Primitives.GetOctahedron());
 		//			_octo1->m_transform.setPosition(0, 0, 0);
 		//			_octo1->m_transform.setScale(0.5f);
 		//			_octo1->SetColor(Color3F(1, 1, 1));
 		//			
 		//			GameObject* _octo2 = GameObject::Create("_octo2");
 		//			_octo2->SetMaterial(material_gbuffer);
-		//			_octo2->SetMesh(Geometry.GetOctahedron());
+		//			_octo2->SetMesh(Primitives.GetOctahedron());
 		//			_octo2->m_transform.setPosition(1, 0, 0);
 		//			_octo2->m_transform.setScale(0.5f);
 		//			_octo2->SetColor(Color3F(1, 0, 0));
 		//			
 		//			GameObject* _octo3 = GameObject::Create("_octo3");
 		//			_octo3->SetMaterial(material_gbuffer);
-		//			_octo3->SetMesh(Geometry.GetOctahedron());
+		//			_octo3->SetMesh(Primitives.GetOctahedron());
 		//			_octo3->m_transform.setPosition(0, 1, 0);
 		//			_octo3->m_transform.setScale(0.5f);
 		//			_octo3->SetColor(Color3F(0, 1, 0));
 		//			
 		//			GameObject* _octo4 = GameObject::Create("_octo4");
 		//			_octo4->SetMaterial(material_gbuffer);
-		//			_octo4->SetMesh(Geometry.GetOctahedron());
+		//			_octo4->SetMesh(Primitives.GetOctahedron());
 		//			_octo4->m_transform.setPosition(0, 0, 1);
 		//			_octo4->m_transform.setScale(0.5f);
 		//			_octo4->SetColor(Color3F(0, 0, 1));
@@ -744,7 +744,7 @@ namespace Vxl
 		//			GameObject* _billboard1 = GameObject::Create("_quad1");
 		//			_billboard1->SetMaterial(material_opaque_billboard);
 		//			_billboard1->SetTexture(Assets::getTexture2D(tex_beato), TextureLevel::LEVEL0);
-		//			_billboard1->SetMesh(Geometry.GetQuadZ());
+		//			_billboard1->SetMesh(Primitives.GetQuadZ());
 		//			_billboard1->m_transform.setPosition(7, 3, -3);
 		//			
 		//			TextObject::LoadFont("arial", "assets/fonts/arial.ttf");
@@ -783,8 +783,7 @@ namespace Vxl
 			Window.Close();
 
 		//if (Input.getKeyDown(KeyCode::DELETEKEY))
-		if (ImGui::GetIO().KeysDown[(int)KeyCode::DELETEKEY] || ImGui::GetIO().KeysDown[(int)KeyCode::BACKSPACE]) // Delete or Backspace
-			Editor.DeleteSelection();
+		
 
 		if (DEVCONSOLE_GET_BOOL("Camera Keyboard Controls", true))
 		{

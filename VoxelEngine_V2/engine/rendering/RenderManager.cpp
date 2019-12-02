@@ -3,7 +3,7 @@
 #include "RenderManager.h"
 
 #include "Debug.h"
-#include "Geometry.h"
+#include "Primitives.h"
 #include "Mesh.h"
 #include "FramebufferObject.h"
 #include "Graphics.h"
@@ -31,20 +31,9 @@
 #include "../objects/Camera.h"
 #include "../objects/TextObject.h"
 
-#include "../editorGui/GUI_DevConsole.h"
 #include "../editorGui/GUI_Viewport.h"
-#include "../editorGui/GUI_Hierarchy.h"
-#include "../editorGui/GUI_Inspector.h"
-#include "../editorGui/GUI_Performance.h"
-#include "../editorGui/GUI_ShaderErrors.h"
-#include "../editorGui/GUI_ShaderCodeViewer.h"
 
 #include "../utilities/Asset.h"
-
-#ifdef GLOBAL_IMGUI
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_colors.h"
-#endif
 
 #include <algorithm>
 
@@ -159,7 +148,7 @@ namespace Vxl
 
 		Gizmo::InitGLResources();
 		
-		Geometry.InitGLResources();
+		Primitives.InitGLResources();
 
 		GlobalAssets.InitGLResources();
 	}
@@ -215,105 +204,15 @@ namespace Vxl
 		m_currentScene->Draw();
 		Debug.End();
 	}
-	void RenderManager::InitImGui()
-	{
-#ifdef GLOBAL_IMGUI
-		// Imgui Initial Values
-		DevConsole.Init("DevConsole", Vector2(280.f, 380.f), 0.9f, ImGuiWindowFlags_MenuBar);
-		ShaderErrors.Init("ShaderErrors", Vector2(700.f, 400.f), 0.9f);
-		ShaderErrors.SetOpen(false);
-		Inspector.Init("Inspector", Vector2(380, 280), 0.9f);
-		Hierarchy.Init("Hierarchy", Vector2(280, 380), 0.9f);
-		Performance.Init("Performance", Vector2(280, 680), 0.9f);
-		GUI_Viewport.Init("Viewport", Vector2(500, 500), 0.9f, ImGuiWindowFlags_MenuBar);
-		GUI_Viewport.SetPadding(false);
-		GUI_Viewport.SetOpen(false);
-		ShaderCodeViewer.Init("ShaderCodeViewer", Vector2(700, 400), 0.9f);
-		ShaderCodeViewer.SetOpen(false);
-
-		m_guiWindows.push_back(&DevConsole.instanceRef);
-		m_guiWindows.push_back(&ShaderErrors.instanceRef);
-		m_guiWindows.push_back(&Inspector.instanceRef);
-		m_guiWindows.push_back(&Hierarchy.instanceRef);
-		m_guiWindows.push_back(&Performance.instanceRef);
-		m_guiWindows.push_back(&GUI_Viewport.instanceRef);
-		m_guiWindows.push_back(&ShaderCodeViewer.instanceRef);
-#endif
-	}
-	void RenderManager::DrawImGui()
-	{
-		
-
-#ifdef GLOBAL_IMGUI
-		ImGui::NewFrame();
-
-		if (ImGui::BeginMainMenuBar())
-		{
-			// VIEW //
-			if (ImGui::BeginMenu("View"))
-			{
-				for (GuiWindow* window : m_guiWindows)
-				{
-					if (ImGui::MenuItem(window->GetName().c_str(), "", window->IsOpen()))
-					{ 
-						window->ToggleOpen();
-					}
-				}
-				//	if (ImGui::MenuItem(DevConsole.GetName().c_str(), "", DevConsole.IsOpen()))
-				//	{ 
-				//		DevConsole.ToggleOpen();
-				//	}
-
-				ImGui::EndMenu();
-			}
-
-			// SHADER ERRORS //
-			{
-				bool hasErrors = ShaderErrors.HasErrors();
-
-				if (hasErrors)
-					ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::RedLight);
-				else
-					ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Grey);
-
-				if (ImGui::MenuItem(hasErrors ? "Shader Errors !" : "Shader Errors"))
-				{
-					ShaderErrors.ToggleOpen();
-				}
-
-				ImGui::PopStyleColor();
-			}
-		}
-		ImGui::EndMainMenuBar();
-
-		// Drawing All Imgui Windows here
-		for (auto& GUI : m_guiWindows)
-		{
-			if (!GUI->IsOpen())
-				continue;
-
-			GUI->SetScene(m_currentScene);
-			if (GUI->Begin())
-			{
-				GUI->Draw();
-			}
-			GUI->End();
-		}
-
-		//m_currentScene->DrawImGui();
-
-		ImGui::Render();
-#endif
-	}
 
 	void RenderManager::RenderFullScreen()
 	{
 #define FULLSCREEN_TRIANGLE
 
 #ifdef FULLSCREEN_TRIANGLE
-			Assets::getMesh(Geometry.GetFullTriangle())->Draw();
+			Assets::getMesh(Primitives.GetFullTriangle())->Draw();
 #else
-			Assets::getMesh(Geometry.GetFullQuad())->Draw();
+			Assets::getMesh(Primitives.GetFullQuad())->Draw();
 #endif
 	
 	}
@@ -544,7 +443,7 @@ namespace Vxl
 	//				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getModel(), true);
 	//				gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
 	//	
-	//				Geometry.GetSphere()->Draw();
+	//				Primitives.GetSphere()->Draw();
 	//			}
 	//			// Render LightObjects
 	//			auto Lights = LightObject::GetAllNamedAssets();
@@ -553,7 +452,7 @@ namespace Vxl
 	//				gbuffer_mat->m_property_model.SetPropertyMatrix(it->second->m_transform.getModel(), true);
 	//				gbuffer_mat->m_property_output.SetProperty(it->second->m_colorID);
 	//	
-	//				Geometry.GetSphere()->Draw();
+	//				Primitives.GetSphere()->Draw();
 	//			}
 	//		}
 	//	}
@@ -578,7 +477,7 @@ namespace Vxl
 	//				
 	//				GlobalData.tex_editor_light->bind(TextureLevel::LEVEL0);
 	//	
-	//				Geometry.GetQuadZ()->Draw();
+	//				Primitives.GetQuadZ()->Draw();
 	//			}
 	//	
 	//			// Draw Cameras
@@ -589,7 +488,7 @@ namespace Vxl
 	//				
 	//				GlobalData.tex_editor_camera->bind(TextureLevel::LEVEL0);
 	//	
-	//				Geometry.GetQuadZ()->Draw();
+	//				Primitives.GetQuadZ()->Draw();
 	//			}
 	//		}
 	//	
@@ -636,7 +535,7 @@ namespace Vxl
 	//				gbuffer->m_property_alpha.SetProperty(cube.m_color.a);
 	//				gbuffer->m_property_model.SetPropertyMatrix(cube.m_model, true);
 	//	
-	//				Geometry.GetCube()->Draw();
+	//				Primitives.GetCube()->Draw();
 	//			}
 	//		}
 	//		Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
@@ -662,7 +561,7 @@ namespace Vxl
 	//				passthrough->m_property_color.SetProperty(sphere.m_color.getRGB());
 	//				passthrough->m_property_alpha.SetProperty(sphere.m_color.a);
 	//				passthrough->m_property_model.SetPropertyMatrix(sphere.m_model, true);
-	//				Geometry.GetIcoSphere()->Draw();
+	//				Primitives.GetIcoSphere()->Draw();
 	//			}
 	//			Graphics::SetLineWidth(1.0f);
 	//	

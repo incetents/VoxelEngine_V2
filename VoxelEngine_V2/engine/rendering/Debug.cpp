@@ -4,7 +4,7 @@
 
 #include "../math/Color.h"
 #include "../modules/Entity.h"
-#include "../rendering/Geometry.h"
+#include "../rendering/Primitives.h"
 #include "../rendering/Mesh.h"
 #include "../textures/Texture2D.h"
 #include "../utilities/Asset.h"
