@@ -50,12 +50,12 @@
 	{
 		if(VXL_useInstancing)
 		{
-			gl_Position = VXL_mvp * instanceMatrix * vec4(m_position, 1); 
+			gl_Position = VXL_mvp * instanceMatrix * vec4(m_position, 1.0); 
 			io.pos = vec3(VXL_model * instanceMatrix * vec4(m_position, 1.0));
 		}
 		else
 		{
-			gl_Position = VXL_mvp * vec4(m_position, 1); 
+			gl_Position = VXL_mvp * vec4(m_position, 1.0); 
 			io.pos = vec3(VXL_model * vec4(m_position, 1.0));
 		}
 	
@@ -65,7 +65,7 @@
 	// Passthrough
 	else
 	{
-		gl_Position = UBO_viewProjection * vec4(m_position, 1); 
+		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
 		io.pos = m_position;
 		
 		io.normal = m_normal;

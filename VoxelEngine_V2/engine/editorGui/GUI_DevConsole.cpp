@@ -92,7 +92,7 @@ namespace Vxl
 
 		if (ImGui::CollapsingHeader("Camera"))
 		{
-			Camera* camera = Assets::getCamera(Game->camera_main);
+			Camera* camera = Assets.getCamera(Game->camera_main);
 
 			if (camera)
 			{

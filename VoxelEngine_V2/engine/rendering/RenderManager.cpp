@@ -68,7 +68,7 @@ namespace Vxl
 
 	void RenderManager::UpdateAllWindowAspectCameras()
 	{
-		auto AllCameras = Assets::getAllCamera();
+		auto AllCameras = Assets.getAllCamera();
 
 		for (auto camera = AllCameras.begin(); camera != AllCameras.end(); camera++)
 		{
@@ -83,25 +83,10 @@ namespace Vxl
 	// Reload Shader System
 	void RenderManager::ReloadShaders()
 	{
-		// Reload Global Shaders
+		const auto& shaderMaterials = Assets.getAllShaderMaterial();
+		for (auto& shaderMaterial : shaderMaterials)
 		{
-			GlobalAssets.deleteAllShaderProgram();
-
-			const auto& shaderMaterials = GlobalAssets.getAllShaderMaterial();
-			for (auto& shaderMaterial : shaderMaterials)
-			{
-				shaderMaterial.second->reload(false);
-			}
-		}
-		// Reload Scene Shaders
-		{
-			SceneAssets.deleteAllShaderProgram();
-
-			const auto& shaderMaterials = SceneAssets.getAllShaderMaterial();
-			for (auto& shaderMaterial : shaderMaterials)
-			{
-				shaderMaterial.second->reload(false);
-			}
+			shaderMaterial.second->reload(false);
 		}
 	}
 	void RenderManager::ReloadWindow()
@@ -210,9 +195,9 @@ namespace Vxl
 #define FULLSCREEN_TRIANGLE
 
 #ifdef FULLSCREEN_TRIANGLE
-			Assets::getMesh(Primitives.GetFullTriangle())->Draw();
+			Assets.getMesh(Primitives.GetFullTriangle())->Draw();
 #else
-			Assets::getMesh(Primitives.GetFullQuad())->Draw();
+			Assets.getMesh(Primitives.GetFullQuad())->Draw();
 #endif
 	
 	}
@@ -225,7 +210,7 @@ namespace Vxl
 		m_materialSequenceDirty = false;
 
 		// Data
-		const auto& materials = Assets::getAllMaterial();
+		const auto& materials = Assets.getAllMaterial();
 
 		// Material Sequence
 		m_materialSequence.clear();
@@ -247,8 +232,8 @@ namespace Vxl
 		m_renderlistDirty = false;
 
 		// Data
-		const auto& materials = Assets::getAllMaterial();
-		const auto& entities = Assets::getAllEntity();
+		const auto& materials = Assets.getAllMaterial();
+		const auto& entities = Assets.getAllEntity();
 
 		// Material/Entity match
 		m_renderlist_opaque.clear();
@@ -269,7 +254,7 @@ namespace Vxl
 			if (entity.second->getMaterial() == -1)
 				continue;
 
-			Material* mat = Assets::getMaterial(entity.second->m_material);
+			Material* mat = Assets.getMaterial(entity.second->m_material);
 			MaterialRenderMode mode = mat->m_renderMode;
 
 			if (mode == MaterialRenderMode::Opaque)
@@ -292,7 +277,7 @@ namespace Vxl
 
 	void RenderManager::render(MaterialIndex _material, const std::vector<Entity*>& _entities)
 	{
-		Material* material = Assets::getMaterial(_material);
+		Material* material = Assets.getMaterial(_material);
 
 		// If material program didn't link, use error material instead
 		if (material)
@@ -300,8 +285,9 @@ namespace Vxl
 			if (!material->bindCoreProgram())
 			{
 				material = GlobalAssets.get_MaterialError();
-				if (!material->bindCoreProgram())
-					VXL_ERROR("Material used for Error doesn't work");
+				material->bindCoreProgram();
+				//if (!material->bindCoreProgram())
+				//	VXL_ERROR("Material used for Error doesn't work");
 			}
 
 			material->bindStates();
@@ -313,7 +299,7 @@ namespace Vxl
 			{
 				if (ent->IsFamilyActive())
 				{
-					Mesh* mesh = Assets::getMesh(ent->m_mesh);
+					Mesh* mesh = Assets.getMesh(ent->m_mesh);
 					if (mesh)
 					{
 						if (!material->m_sharedTextures)

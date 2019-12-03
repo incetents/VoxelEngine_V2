@@ -36,7 +36,7 @@ namespace Vxl
 	void GUI_Viewport::InitGLResources()
 	{
 		m_fbo = GlobalAssets.createFramebuffer("GUI_Viewport");
-		FramebufferObject* fbo = Assets::getFramebufferObject(m_fbo);
+		FramebufferObject* fbo = Assets.getFramebufferObject(m_fbo);
 		fbo->setSizeToViewportSize();
 		fbo->bind();
 
@@ -45,7 +45,7 @@ namespace Vxl
 			fbo->getWidth(), fbo->getHeight(),
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
 		);
-		RenderTexture* rt = Assets::getRenderTexture(m_renderTexture);
+		RenderTexture* rt = Assets.getRenderTexture(m_renderTexture);
 		rt->bind();
 		rt->setWrapMode(TextureWrapping::CLAMP_BORDER);
 
@@ -61,8 +61,8 @@ namespace Vxl
 
 	void GUI_Viewport::DrawRenderTarget()
 	{
-		FramebufferObject*	fbo = Assets::getFramebufferObject(m_fbo);
-		RenderTexture*		fbo_rt = Assets::getRenderTexture(m_renderTexture);
+		FramebufferObject*	fbo = Assets.getFramebufferObject(m_fbo);
+		RenderTexture*		fbo_rt = Assets.getRenderTexture(m_renderTexture);
 		ShaderProgram*		program_showRenderTarget = GlobalAssets.get_ProgramShowRenderTarget();
 		
 		if (!fbo || !fbo_rt || !program_showRenderTarget)
@@ -74,7 +74,7 @@ namespace Vxl
 		bool outputFound = false;
 		if (m_outputRTIsDepth)
 		{
-			RenderTextureDepth* outputRT = Assets::getRenderTextureDepth(m_outputRT);
+			RenderTextureDepth* outputRT = Assets.getRenderTextureDepth(m_outputRT);
 			if (outputRT)
 			{
 				outputRT->bind(TextureLevel::LEVEL0);
@@ -83,7 +83,7 @@ namespace Vxl
 		}
 		else
 		{
-			RenderTexture* outputRT = Assets::getRenderTexture(m_outputRT);
+			RenderTexture* outputRT = Assets.getRenderTexture(m_outputRT);
 			if (outputRT)
 			{
 				outputRT->bind(TextureLevel::LEVEL0);
@@ -125,7 +125,7 @@ namespace Vxl
 					m_outputRTName = "RenderTarget[None]";
 				}
 				// FBO Choices
-				auto fbos = Assets::getAllFramebufferObject();
+				auto fbos = Assets.getAllFramebufferObject();
 				for (const auto& fbo : fbos)
 				{
 					if (ImGui::MenuItem(fbo.second->getName().c_str()))
@@ -134,7 +134,7 @@ namespace Vxl
 						m_outputRT = -1;
 						m_outputRTName = "RenderTarget[None]";
 
-						FramebufferObject* fbo = Assets::getFramebufferObject(m_outputFBO);
+						FramebufferObject* fbo = Assets.getFramebufferObject(m_outputFBO);
 						if (fbo)
 							m_outputFBOName = "FBO:[" + fbo->getName() + ']';
 						else
@@ -145,7 +145,7 @@ namespace Vxl
 			}
 
 			// Render Target
-			FramebufferObject* selected_fbo = Assets::getFramebufferObject(m_outputFBO);
+			FramebufferObject* selected_fbo = Assets.getFramebufferObject(m_outputFBO);
 			if (selected_fbo)
 			{
 				if (ImGui::BeginMenu(m_outputRTName.c_str()))
@@ -167,7 +167,7 @@ namespace Vxl
 								m_outputRT = attachment.second.getAssetIndex();
 								m_outputRTIsDepth = false;
 
-								RenderTexture* rt = Assets::getRenderTexture(m_outputRT);
+								RenderTexture* rt = Assets.getRenderTexture(m_outputRT);
 								if (rt)
 									m_outputRTName = "RenderTarget[" + rt->getName() + "]";
 								else
@@ -190,7 +190,7 @@ namespace Vxl
 								m_outputRT = RenderDepth.getAssetIndex();
 								m_outputRTIsDepth = true;
 
-								RenderTextureDepth* rt = Assets::getRenderTextureDepth(m_outputRT);
+								RenderTextureDepth* rt = Assets.getRenderTextureDepth(m_outputRT);
 								if (rt)
 									m_outputRTName = "RenderTarget[" + rt->getName() + "]";
 								else
@@ -263,14 +263,14 @@ namespace Vxl
 			uv_y.y = 1.0f - uv_y.y;
 			
 			// Display
-			RenderTexture* renderTexture = Assets::getRenderTexture(m_renderTexture);
+			RenderTexture* renderTexture = Assets.getRenderTexture(m_renderTexture);
 			if(renderTexture)
 				ImGui::Image((void*)(intptr_t)renderTexture->getID(), size, ImVec2(uv_x.x, uv_y.x), ImVec2(uv_x.y, uv_y.y));
 		}
 		else
 		{
 			// Display 
-			RenderTexture* renderTexture = Assets::getRenderTexture(m_renderTexture);
+			RenderTexture* renderTexture = Assets.getRenderTexture(m_renderTexture);
 			if (renderTexture)
 				ImGui::Image((void*)(intptr_t)renderTexture->getID(), size, ImVec2(0, 1), ImVec2(1, 0));
 		}

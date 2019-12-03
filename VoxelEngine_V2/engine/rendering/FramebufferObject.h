@@ -67,7 +67,7 @@ namespace Vxl
 	class FramebufferObject
 	{
 		DISALLOW_COPY_AND_ASSIGN(FramebufferObject);
-		friend class Assets;
+		friend class _Assets;
 	private:
 
 		enum class ClearMode

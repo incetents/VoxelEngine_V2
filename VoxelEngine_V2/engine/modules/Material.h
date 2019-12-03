@@ -6,6 +6,7 @@
 #include "../rendering/Graphics.h"
 #include "../rendering/Shader.h"
 #include "../utilities/Types.h"
+#include "../utilities/Asset.h"
 
 #include <unordered_map>
 #include <vector>
@@ -31,7 +32,7 @@ namespace Vxl
 	class Material
 	{
 		DISALLOW_COPY_AND_ASSIGN(Material);
-		friend class Assets;
+		friend class _Assets;
 		friend class ShaderProgram;
 	private:
 		// Data
@@ -99,10 +100,10 @@ namespace Vxl
 		template<typename Type>
 		void sendUniform(const std::string& name, Type data) const
 		{
-			ShaderMaterial* _shaderMat = Assets::getShaderMaterial(m_shaderMaterial);
+			ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
 			if (_shaderMat)
 			{
-				ShaderProgram* program = Assets::getShaderProgram(_shaderMat->m_coreProgram);
+				ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
 				if (program)
 				{
 					auto it = program->m_uniforms.find(name);
@@ -116,10 +117,10 @@ namespace Vxl
 		template<typename Type>
 		void sendUniformMatrix(const std::string& name, Type data, bool transpose) const
 		{
-			ShaderMaterial* _shaderMat = Assets::getShaderMaterial(m_shaderMaterial);
+			ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
 			if (_shaderMat)
 			{
-				ShaderProgram* program = Assets::getShaderProgram(_shaderMat->m_coreProgram);
+				ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
 				if (program)
 				{
 					auto it = program->m_uniforms.find(name);

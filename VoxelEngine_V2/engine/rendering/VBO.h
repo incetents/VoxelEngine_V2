@@ -145,6 +145,10 @@ namespace Vxl
 			return m_empty;
 		}
 		
+		inline BufferLayout GetLayout(void) const
+		{
+			return m_layout;
+		}
 		inline BufferUsage GetBindMode(void) const
 		{
 			return m_bindMode;

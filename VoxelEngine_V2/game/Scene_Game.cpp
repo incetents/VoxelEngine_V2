@@ -118,7 +118,7 @@ namespace Vxl
 
 		// FBO Gbuffer
 		fboIndex_gbuffer = SceneAssets.createFramebuffer("gbuffer");
-		FramebufferObject* fbo_gbuffer_ptr = Assets::getFramebufferObject(fboIndex_gbuffer);
+		FramebufferObject* fbo_gbuffer_ptr = Assets.getFramebufferObject(fboIndex_gbuffer);
 		fbo_gbuffer_ptr->setSizeToViewportSize();
 
 		// render targets
@@ -153,7 +153,7 @@ namespace Vxl
 
 		// FBO Editor Post
 		fboIndex_editor = SceneAssets.createFramebuffer("editor");
-		FramebufferObject* fbo_editor_ptr = Assets::getFramebufferObject(fboIndex_editor);
+		FramebufferObject* fbo_editor_ptr = Assets.getFramebufferObject(fboIndex_editor);
 		fbo_editor_ptr->setSizeToViewportSize();
 
 		// render targets
@@ -184,7 +184,7 @@ namespace Vxl
 		//	{
 		//		// FBO Editor Post
 		//		fboIndex_editor2 = SceneAssets.createFramebuffer();
-		//		FramebufferObject* fbo_editor_ptr = Assets::getFramebufferObject(fboIndex_editor2);
+		//		FramebufferObject* fbo_editor_ptr = Assets.getFramebufferObject(fboIndex_editor2);
 		//		fbo_editor_ptr->setSizeToViewportSize();
 		//	
 		//		// render targets
@@ -198,8 +198,8 @@ namespace Vxl
 		//		);
 		//	
 		//		fbo_editor_ptr->bind();
-		//		fbo_editor_ptr->setAttachment(0, Assets::getRenderTexture(fbotex_editor_albedo));
-		//		fbo_editor_ptr->setDepth(Assets::getRenderBufferDepth(fbotex_editor_depth));
+		//		fbo_editor_ptr->setAttachment(0, Assets.getRenderTexture(fbotex_editor_albedo));
+		//		fbo_editor_ptr->setDepth(Assets.getRenderBufferDepth(fbotex_editor_depth));
 		//		fbo_editor_ptr->checkFBOStatus();
 		//		fbo_editor_ptr->unbind();
 		//	}
@@ -210,7 +210,7 @@ namespace Vxl
 
 		// FBO Color Picker
 		fboIndex_colorpicker = SceneAssets.createFramebuffer("colorPicker");
-		FramebufferObject* fbo_colorPicker_ptr = Assets::getFramebufferObject(fboIndex_colorpicker);
+		FramebufferObject* fbo_colorPicker_ptr = Assets.getFramebufferObject(fboIndex_colorpicker);
 		fbo_colorPicker_ptr->setSizeToViewportSize();
 
 		// render targets
@@ -232,7 +232,7 @@ namespace Vxl
 
 		// FBO Composite
 		fboIndex_composite = SceneAssets.createFramebuffer("composite");
-		FramebufferObject* fbo_composite_ptr = Assets::getFramebufferObject(fboIndex_composite);
+		FramebufferObject* fbo_composite_ptr = Assets.getFramebufferObject(fboIndex_composite);
 		fbo_composite_ptr->setSizeToViewportSize();
 
 		// render targets
@@ -248,7 +248,7 @@ namespace Vxl
 
 		//	// FBO Show Render Target
 		//	fboIndex_showRenderTarget = SceneAssets.createFramebuffer("showRenderTarget");
-		//	FramebufferObject* fbo_showRenderTarget_ptr = Assets::getFramebufferObject(fboIndex_showRenderTarget);
+		//	FramebufferObject* fbo_showRenderTarget_ptr = Assets.getFramebufferObject(fboIndex_showRenderTarget);
 		//	fbo_showRenderTarget_ptr->setSizeToViewportSize();
 
 		//	// render targets
@@ -291,49 +291,49 @@ namespace Vxl
 		//	
 		//	// Shader Programs
 		//	shader_gbuffer = SceneAssets.createShaderProgram("gbuffer", {
-		//		Assets::getShader(gbuffer_vert),
-		//		Assets::getShader(gbuffer_frag)
+		//		Assets.getShader(gbuffer_vert),
+		//		Assets.getShader(gbuffer_frag)
 		//		});
 		//	
 		//	shader_passthroughWorld = SceneAssets.createShaderProgram("passthroughWorld", {
-		//		Assets::getShader(passthrough_vert),
-		//		Assets::getShader(passthrough_frag)
+		//		Assets.getShader(passthrough_vert),
+		//		Assets.getShader(passthrough_frag)
 		//		});
 		//	
 		//	shader_skybox = SceneAssets.createShaderProgram("skybox", {
-		//		Assets::getShader(skybox_vert),
-		//		Assets::getShader(skybox_frag)
+		//		Assets.getShader(skybox_vert),
+		//		Assets.getShader(skybox_frag)
 		//		});
 		//	
 		//	shader_lines = SceneAssets.createShaderProgram("lines", {
-		//		Assets::getShader(lines_vert),
-		//		Assets::getShader(lines_geom),
-		//		Assets::getShader(lines_frag)
+		//		Assets.getShader(lines_vert),
+		//		Assets.getShader(lines_geom),
+		//		Assets.getShader(lines_frag)
 		//		});
 		//	
 		//	shader_colorPicker = SceneAssets.createShaderProgram("colorPicker", {
-		//		Assets::getShader(gbuffer_vert),
-		//		Assets::getShader(colorPicker_frag)
+		//		Assets.getShader(gbuffer_vert),
+		//		Assets.getShader(colorPicker_frag)
 		//		});
 		//	
 		//	shader_gizmo = SceneAssets.createShaderProgram("gizmo", {
-		//		Assets::getShader(gizmo_vert),
-		//		Assets::getShader(gizmo_frag)
+		//		Assets.getShader(gizmo_vert),
+		//		Assets.getShader(gizmo_frag)
 		//		});
 		//	
 		//	shader_showRenderTarget = SceneAssets.createShaderProgram("showRenderTarget", {
-		//		Assets::getShader(passthrough_vert),
-		//		Assets::getShader(showRenderTarget)
+		//		Assets.getShader(passthrough_vert),
+		//		Assets.getShader(showRenderTarget)
 		//		});
 		//	
 		//	shader_billboard = SceneAssets.createShaderProgram("billboard", {
-		//		Assets::getShader(billboard_vert),
-		//		Assets::getShader(billboard_frag)
+		//		Assets.getShader(billboard_vert),
+		//		Assets.getShader(billboard_frag)
 		//		});
 		//	
 		//	shader_font = SceneAssets.createShaderProgram("font", {
-		//		Assets::getShader(font_vert),
-		//		Assets::getShader(font_frag)
+		//		Assets.getShader(font_vert),
+		//		Assets.getShader(font_frag)
 		//		});
 
 		// Shader Materials
@@ -344,7 +344,7 @@ namespace Vxl
 		// Materials
 		material_skybox = SceneAssets.createMaterial("skybox");
 		{
-			auto mat = Assets::getMaterial(material_skybox);
+			auto mat = Assets.getMaterial(material_skybox);
 			mat->setShaderMaterial(sMat_skybox);
 			mat->setTexture(cubemap_craterlake, TextureLevel::LEVEL0);
 			mat->setSequenceID(1);
@@ -353,7 +353,7 @@ namespace Vxl
 		}
 		material_gbuffer = SceneAssets.createMaterial("gbuffer");
 		{
-			auto mat = Assets::getMaterial(material_gbuffer);
+			auto mat = Assets.getMaterial(material_gbuffer);
 			mat->setShaderMaterial(sMat_gbuffer);
 			mat->m_sharedTextures = false;
 			mat->setSequenceID(2);
@@ -362,7 +362,7 @@ namespace Vxl
 		}
 		//	material_displayRenderTarget = SceneAssets.createMaterial("displayRenderTarget");
 		//	{
-		//		auto mat = Assets::getMaterial(material_displayRenderTarget);
+		//		auto mat = Assets.getMaterial(material_displayRenderTarget);
 		//		mat->setShaderMaterial(sMat_displayRenderTarget);
 		//		mat->setSequenceID(10000);
 		//		mat->m_blendFunc.source = BlendSource::ONE;
@@ -371,7 +371,7 @@ namespace Vxl
 
 		//	material_gbuffer_transparent = SceneAssets.createMaterial("gbuffer_transparent");
 		//	{
-		//		auto mat = Assets::getMaterial(material_gbuffer_transparent);
+		//		auto mat = Assets.getMaterial(material_gbuffer_transparent);
 		//		mat->setSceneShader(shader_gbuffer);
 		//		mat->m_renderMode = MaterialRenderMode::Transparent;
 		//		mat->m_depthWrite = false;
@@ -383,13 +383,13 @@ namespace Vxl
 		//	}
 		//	material_passthroughWorld = SceneAssets.createMaterial("passthrough");
 		//	{
-		//		auto mat = Assets::getMaterial(material_passthroughWorld);
+		//		auto mat = Assets.getMaterial(material_passthroughWorld);
 		//		mat->setSceneShader(shader_passthroughWorld);
 		//		mat->m_blendState = false;
 		//	}
 		//	material_passthroughWorld_transparent = SceneAssets.createMaterial("passthrough_transparent");
 		//	{
-		//		auto mat = Assets::getMaterial(material_passthroughWorld_transparent);
+		//		auto mat = Assets.getMaterial(material_passthroughWorld_transparent);
 		//		mat->setSceneShader(shader_passthroughWorld);
 		//		mat->m_depthWrite = false;
 		//		mat->m_blendFunc.source = BlendSource::ONE;
@@ -400,33 +400,33 @@ namespace Vxl
 		
 		//	material_lines = SceneAssets.createMaterial("lines");
 		//	{
-		//		auto mat = Assets::getMaterial(material_lines);
+		//		auto mat = Assets.getMaterial(material_lines);
 		//		mat->setSceneShader(shader_lines);
 		//	}
 		//	material_colorPicker = SceneAssets.createMaterial("colorPicker");
 		//	{
-		//		auto mat = Assets::getMaterial(material_colorPicker);
+		//		auto mat = Assets.getMaterial(material_colorPicker);
 		//		mat->setSceneShader(shader_colorPicker);
 		//	}
 		//	material_gizmo = SceneAssets.createMaterial("gizmo");
 		//	{
-		//		auto mat = Assets::getMaterial(material_gizmo);
+		//		auto mat = Assets.getMaterial(material_gizmo);
 		//		mat->setSceneShader(shader_gizmo);
 		//	}
 		//	material_showRenderTarget = SceneAssets.createMaterial("showRenderTarget");
 		//	{
-		//		auto mat = Assets::getMaterial(material_showRenderTarget);
+		//		auto mat = Assets.getMaterial(material_showRenderTarget);
 		//		mat->setSceneShader(shader_showRenderTarget);
 		//	}
 		//	material_billboard = SceneAssets.createMaterial("billboard");
 		//	{
-		//		auto mat = Assets::getMaterial(material_billboard);
+		//		auto mat = Assets.getMaterial(material_billboard);
 		//		mat->setSceneShader(shader_billboard);
 		//		mat->m_blendState = false;
 		//	}
 		//	material_font = SceneAssets.createMaterial("font");
 		//	{
-		//		auto mat = Assets::getMaterial(material_font);
+		//		auto mat = Assets.getMaterial(material_font);
 		//		mat->setSceneShader(shader_font);
 		//		mat->m_depthRead = false;
 		//		mat->m_depthWrite = false;
@@ -499,7 +499,7 @@ namespace Vxl
 		mesh_jiggy = Model::LoadMesh("jiggy", "./assets/models/jiggy.obj", true, 0.2f);
 
 		mesh_manyQuads = SceneAssets.createMesh();
-		Mesh* _mesh = Assets::getMesh(mesh_manyQuads);
+		Mesh* _mesh = Assets.getMesh(mesh_manyQuads);
 		
 		Vector3 pos[] = {
 			Vector3(-0.5f, -0.5f, 0.0f),
@@ -515,6 +515,8 @@ namespace Vxl
 		};
 		uint32_t indices[6] = { 0, 1, 2, 0, 2, 3 };
 		
+		//_mesh->positions = std::vector<Vector3>(pos, pos + 4);
+
 		_mesh->m_positions.set(pos, 4);
 		_mesh->m_uvs.set(uvs, 4);
 		_mesh->m_indices.set(indices, 6);
@@ -538,7 +540,7 @@ namespace Vxl
 		// Camera
 		camera_main = SceneAssets.createCamera("_camera_editor", 0.01f, 5000.0f);
 		{
-			Camera* camera_ptr = Assets::getCamera(camera_main);
+			Camera* camera_ptr = Assets.getCamera(camera_main);
 			camera_ptr->m_transform.setPosition(3.5f, 2.8f, 0.3f);
 			camera_ptr->m_transform.setCameraForward(Vector3(-1, 0, -1));
 			camera_ptr->SetPerspectiveWindowAspect(110.0f);
@@ -546,7 +548,7 @@ namespace Vxl
 		}
 		camera_side = SceneAssets.createCamera("_camera_side", 0.5, 10.0f);
 		{
-			Camera* camera_ptr = Assets::getCamera(camera_side);
+			Camera* camera_ptr = Assets.getCamera(camera_side);
 			camera_ptr->m_transform.setPosition(2.9f, 2.1f, -2.5f);
 			camera_ptr->m_transform.setForward(Vector3(0, 0, 1));
 			camera_ptr->SetPerspectiveWindowAspect(140.0f);
@@ -559,7 +561,7 @@ namespace Vxl
 		// Entities
 		entity_skybox = SceneAssets.createEntity("_skybox");
 		{
-			Entity* entity_ptr = Assets::getEntity(entity_skybox);
+			Entity* entity_ptr = Assets.getEntity(entity_skybox);
 			entity_ptr->setMaterial(material_skybox);
 			entity_ptr->setMesh(Primitives.GetInverseCube());
 			entity_ptr->m_useTransform = false;
@@ -567,29 +569,37 @@ namespace Vxl
 		}
 		entity_error_cube = SceneAssets.createEntity("_errorCube");
 		{
-			Entity* entity_ptr = Assets::getEntity(entity_error_cube);
+			Entity* entity_ptr = Assets.getEntity(entity_error_cube);
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(Primitives.GetCube());
 			entity_ptr->m_transform.setPosition(Vector3(0, 2, 0));
 		}
 		entity_beato_cube = SceneAssets.createEntity("_beato_cube");
 		{
-			Entity* entity_ptr = Assets::getEntity(entity_beato_cube);
+			Entity* entity_ptr = Assets.getEntity(entity_beato_cube);
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(Primitives.GetCube());
 			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
-
-			entity_ptr->m_transform.setParent(&Assets::getEntity(entity_error_cube)->m_transform);
+		
+			entity_ptr->m_transform.setParent(&Assets.getEntity(entity_error_cube)->m_transform);
 		}
 		entity_jiggy = SceneAssets.createEntity("_jiggy");
 		{
-			Entity* entity_ptr = Assets::getEntity(entity_jiggy);
+			Entity* entity_ptr = Assets.getEntity(entity_jiggy);
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(mesh_jiggy);
 			entity_ptr->m_Color = Color3F(1, 1, 0);
 			entity_ptr->m_useTextures = false;
 			entity_ptr->m_transform.setPosition(Vector3(0, 0, -7));
+		}
+		entity_instance_beato = SceneAssets.createEntity("_instance_beato");
+		{
+			Entity* entity_ptr = Assets.getEntity(entity_instance_beato);
+			entity_ptr->setMaterial(material_gbuffer);
+			entity_ptr->setMesh(mesh_manyQuads);
+			entity_ptr->m_transform.setPosition(Vector3(-2, 2, -6.6f));
+			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 		}
 		
 		
@@ -598,13 +608,13 @@ namespace Vxl
 		//			
 		//			GameObject* _entity1 = GameObject::Create("_entity1");
 		//			_entity1->SetMaterial(material_gbuffer);
-		//			_entity1->SetTexture(Assets::getTexture2D(tex_beato), TextureLevel::LEVEL0);
+		//			_entity1->SetTexture(Assets.getTexture2D(tex_beato), TextureLevel::LEVEL0);
 		//			_entity1->SetMesh(_mesh);
 		//			_entity1->m_transform.setScale(1.0f);
 		//			_entity1->m_transform.setPositionZ(-7.0f);
 		//			
 		//			//Loader::Load_Model("jiggy1", "./assets/models/jiggy.obj", false, true);
-		//			Mesh* jiggyMesh = Assets::getMesh(mesh_jiggy);
+		//			Mesh* jiggyMesh = Assets.getMesh(mesh_jiggy);
 		//			
 		//			GameObject* _entity2 = GameObject::Create("_entity2");
 		//			_entity2->SetMaterial(material_gbuffer);
@@ -638,7 +648,7 @@ namespace Vxl
 		//			
 		//			
 		//			GameObject* _entity3 = GameObject::Create("_entity3");
-		//			_entity3->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_entity3->SetTexture(Assets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
 		//			_entity3->SetMaterial(material_gbuffer);
 		//			_entity3->SetMesh(Primitives.GetIcosahedron());
 		//			_entity3->m_transform.setPosition(Vector3(-2.5f, 0, -3.0f));
@@ -647,26 +657,26 @@ namespace Vxl
 		//			
 		//			GameObject* _entity5 = GameObject::Create("_entity5");
 		//			_entity5->SetMaterial(material_gbuffer);
-		//			_entity5->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity5->SetTexture(Assets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
 		//			_entity5->SetMesh(Primitives.GetSphereUV_Good());
 		//			_entity5->m_transform.setPosition(Vector3(0, -4, 0));
 		//			
 		//			GameObject* _entity6 = GameObject::Create("_entity6");
 		//			_entity6->SetMaterial(material_gbuffer);
-		//			_entity6->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity6->SetTexture(Assets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
 		//			_entity6->SetMesh(Primitives.GetCube());
 		//			_entity6->m_transform.setPosition(Vector3(5, -4, 0));
 		//			
 		//			GameObject* _entity6_b = GameObject::Create("_entity6_normals");
 		//			_entity6_b->SetMaterial(material_showNormals);
-		//			_entity6_b->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity6_b->SetTexture(Assets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
 		//			_entity6_b->SetMesh(Primitives.GetCube());
 		//			_entity6_b->m_transform.setPosition(Vector3(5, -4, 0));
 		//			
 		//			
 		//			GameObject* _entity7 = GameObject::Create("_entity7");
 		//			_entity7->SetMaterial(material_gbuffer);
-		//			_entity7->SetTexture(Assets::getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
+		//			_entity7->SetTexture(Assets.getTexture2D(tex_grid_test), TextureLevel::LEVEL0);
 		//			_entity7->SetMesh(Primitives.GetQuadY());
 		//			_entity7->m_transform.setPosition(Vector3(0, -10, 0));
 		//			_entity7->m_transform.setScale(Vector3(20, 1, 20));
@@ -678,7 +688,7 @@ namespace Vxl
 		//			//
 		//			GameObject* _crate1 = GameObject::Create("_crate1");
 		//			_crate1->SetMaterial(material_gbuffer);
-		//			_crate1->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_crate1->SetTexture(Assets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
 		//			_crate1->SetMesh(Primitives.GetCylinderX());
 		//			_crate1->m_transform.setPosition(1, 3, 2);
 		//			_crate1->SetTint(Color3F(0.4f, 0.1f, 0.9f));
@@ -686,7 +696,7 @@ namespace Vxl
 		//			
 		//			GameObject* _crate2 = GameObject::Create("_crate2");
 		//			_crate2->SetMaterial(material_gbuffer);
-		//			_crate2->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_crate2->SetTexture(Assets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
 		//			_crate2->SetMesh(Primitives.GetCylinderY());
 		//			//_crate2->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		//			_crate2->m_transform.setPosition(0, 2, 0);
@@ -694,7 +704,7 @@ namespace Vxl
 		//			
 		//			GameObject* _crate3 = GameObject::Create("_crate3");
 		//			_crate3->SetMaterial(material_gbuffer);
-		//			_crate3->SetTexture(Assets::getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
+		//			_crate3->SetTexture(Assets.getTexture2D(tex_crate_diffuse), TextureLevel::LEVEL0);
 		//			_crate3->SetMesh(Primitives.GetCylinderZ());
 		//			//_crate3->SetColor(Color3F(0.4f, 0.7f, 0.3f));
 		//			_crate3->m_transform.setPosition(1, 2, 0);
@@ -743,7 +753,7 @@ namespace Vxl
 		//			
 		//			GameObject* _billboard1 = GameObject::Create("_quad1");
 		//			_billboard1->SetMaterial(material_opaque_billboard);
-		//			_billboard1->SetTexture(Assets::getTexture2D(tex_beato), TextureLevel::LEVEL0);
+		//			_billboard1->SetTexture(Assets.getTexture2D(tex_beato), TextureLevel::LEVEL0);
 		//			_billboard1->SetMesh(Primitives.GetQuadZ());
 		//			_billboard1->m_transform.setPosition(7, 3, -3);
 		//			
@@ -791,7 +801,7 @@ namespace Vxl
 			Vector3 CamMove;
 			float CamSpeed = 0.1f;
 
-			Camera* _cameraObject = Assets::getCamera(camera_main);
+			Camera* _cameraObject = Assets.getCamera(camera_main);
 
 			if (Input.getKey(KeyCode::W))
 				CamMove += _cameraObject->m_transform.getCameraForward();
@@ -907,7 +917,7 @@ namespace Vxl
 		selectedNodes.reserve(Editor.m_selectedNodes.size());
 		for (const auto& id : Editor.m_selectedNodes)
 		{
-			selectedNodes.push_back(Assets::getSceneNode(id));
+			selectedNodes.push_back(Assets.getSceneNode(id));
 		}
 
 		gizmo.Update(selectedNodes);
@@ -945,10 +955,10 @@ namespace Vxl
 		//	
 
 		// FBOS
-		auto* fbo_gbuffer = Assets::getFramebufferObject(fboIndex_gbuffer);
-		auto* fbo_editor = Assets::getFramebufferObject(fboIndex_editor);
-		auto* fbo_colorPicker = Assets::getFramebufferObject(fboIndex_colorpicker);
-		auto* fbo_composite = Assets::getFramebufferObject(fboIndex_composite);
+		auto* fbo_gbuffer = Assets.getFramebufferObject(fboIndex_gbuffer);
+		auto* fbo_editor = Assets.getFramebufferObject(fboIndex_editor);
+		auto* fbo_colorPicker = Assets.getFramebufferObject(fboIndex_colorpicker);
+		auto* fbo_composite = Assets.getFramebufferObject(fboIndex_composite);
 
 		// GUI Setup [needs to be changed]
 #ifdef GLOBAL_IMGUI
@@ -957,7 +967,7 @@ namespace Vxl
 #endif
 
 		// UBO BINDING per frame
-		auto _cameraObject = Assets::getCamera(RenderManager.m_mainCamera);
+		auto _cameraObject = Assets.getCamera(RenderManager.m_mainCamera);
 
 		if(_cameraObject)
 			UBOManager.BindCamera(*_cameraObject);

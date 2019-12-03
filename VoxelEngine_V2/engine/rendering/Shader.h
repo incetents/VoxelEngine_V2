@@ -23,7 +23,7 @@ namespace Vxl
 	class Shader
 	{
 		DISALLOW_COPY_AND_ASSIGN(Shader);
-		friend class Assets;
+		friend class _Assets;
 		friend class ShaderMaterial;
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
@@ -70,7 +70,7 @@ namespace Vxl
 	class ShaderProgram
 	{
 		DISALLOW_COPY_AND_ASSIGN(ShaderProgram);
-		friend class Assets;
+		friend class _Assets;
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
 		friend class Material;
@@ -160,7 +160,7 @@ namespace Vxl
 	class ShaderMaterial
 	{
 		DISALLOW_COPY_AND_ASSIGN(ShaderMaterial);
-		friend class Assets;
+		friend class _Assets;
 		friend class RenderManager;
 	private:
 		ShaderMaterial(const std::string& filePath, bool GlobalAsset);
@@ -168,9 +168,9 @@ namespace Vxl
 	public:
 		const std::string			m_filePath;			// File used to load
 		std::vector<TextureLevel>	m_targetLevels;		// Textures used in program
-		ShaderProgramIndex			m_coreProgram;		// Main Program used for rendering
-		ShaderProgramIndex			m_colorIDProgram;	// Alternate program used only for ColorID output
-		ShaderProgramIndex			m_depthOnlyProgram;	// Alternate program only outputting depth
+		ShaderProgramIndex			m_coreProgram = -1;		// Main Program used for rendering
+		ShaderProgramIndex			m_colorIDProgram = -1;	// Alternate program used only for ColorID output
+		ShaderProgramIndex			m_depthOnlyProgram = -1;	// Alternate program only outputting depth
 	};
 }
 

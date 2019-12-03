@@ -12,7 +12,7 @@ namespace Vxl
 	class RenderBuffer
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderBuffer);
-		friend class Assets;
+		friend class _Assets;
 	protected:
 		// Data
 		std::string			m_name;
@@ -84,7 +84,7 @@ namespace Vxl
 	class RenderBufferDepth : public RenderBuffer
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderBufferDepth);
-		friend class Assets;
+		friend class _Assets;
 	protected:
 		// Created using only depth format
 		RenderBufferDepth(

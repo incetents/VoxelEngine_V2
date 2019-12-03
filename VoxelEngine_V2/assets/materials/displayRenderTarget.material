@@ -90,7 +90,7 @@
 	}
 	else if(outputMode == 4)
 	{
-		// convert to readable HSL regardless of color
+		// COLOR // convert to readable HSL regardless of color
 		float Hue = dot(_texture.rgb, vec3(8794.0f)); 
 		output_color = vec4(HSV_TO_RGB(Hue, 0.75f, 1),1);
 	}
@@ -117,9 +117,9 @@
 	}
 	
 	// gamma fix
-	output_color.r = linear_to_srgb(output_color.r);
-	output_color.g = linear_to_srgb(output_color.g);
-	output_color.b = linear_to_srgb(output_color.b);
+	//output_color.r = linear_to_srgb(output_color.r);
+	//output_color.g = linear_to_srgb(output_color.g);
+	//output_color.b = linear_to_srgb(output_color.b);
 	
 	output_color.a = 1.0;
 }

@@ -20,8 +20,8 @@ namespace Vxl
 {
 	bool Entity::operator< (const Entity& other) const
 	{
-		Mesh* mesh1 = Assets::getMesh(getMesh());
-		Mesh* mesh2 = Assets::getMesh(other.getMesh());
+		Mesh* mesh1 = Assets.getMesh(getMesh());
+		Mesh* mesh2 = Assets.getMesh(other.getMesh());
 		if (!mesh1 || !mesh2)
 			return false;
 

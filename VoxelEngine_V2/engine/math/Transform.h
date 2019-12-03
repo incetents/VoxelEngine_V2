@@ -27,8 +27,8 @@ namespace Vxl
 	{
 		friend class SceneNode;
 		friend class Camera;
-		friend class Assets;
 		friend class Hierarchy;
+		friend class _Assets;
 	protected:
 		// Model for transformations
 		Matrix4x4	m_modelMatrix;  // World Transformations - Row Major

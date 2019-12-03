@@ -214,11 +214,11 @@ namespace Vxl
 	// Common Uniforms
 	void ShaderProgram::bindCommonUniforms(EntityIndex _entity)
 	{
-		Entity* entity = Assets::getEntity(_entity);
+		Entity* entity = Assets.getEntity(_entity);
 		if (!entity)
 			return;
 
-		Material* material = Assets::getMaterial(entity->m_material);
+		Material* material = Assets.getMaterial(entity->m_material);
 		if (!material)
 			return;
 
@@ -238,7 +238,7 @@ namespace Vxl
 		// ~ MVP Matrix ~ //
 		if (m_uniform_mvp.has_value() && entity->m_useTransform)
 		{
-			Camera* camera = Assets::getCamera(RenderManager.m_mainCamera);
+			Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
 			if (camera)
 				m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * entity->m_transform.getModel(), true);
 		}
@@ -252,7 +252,7 @@ namespace Vxl
 		// ~ Instancing ~ //
 		if (m_uniform_useInstancing.has_value())
 		{
-			Mesh* mesh = Assets::getMesh(entity->getMesh());
+			Mesh* mesh = Assets.getMesh(entity->getMesh());
 
 			m_uniform_useInstancing.value().send(mesh && mesh->m_instances.GetDrawCount() > 0);
 		}
@@ -294,10 +294,10 @@ namespace Vxl
 	const char* SECTION_ATTRIBUTE = "#Attributes";
 	const char* SECTION_LINK = "#Link";
 	const char* SECTION_RENDERTARGETS = "#RenderTargets";
-	const char* SECTION_PROPERTIES = "#Properties";
 	const char* SECTION_SAMPLERS = "#Samplers";
+	const char* SECTION_PROPERTIES = "#Properties";
 	const char* SECTION_VERTEX = "#Vertex";
-	const char* SECTION_GEOMETRY = "#Primitives";
+	const char* SECTION_GEOMETRY = "#Geometry";
 	const char* SECTION_FRAGMENT = "#Fragment";
 
 	const std::string GLSL_VERSION = "#version 420 core";
@@ -310,6 +310,11 @@ namespace Vxl
 
 	void ShaderMaterial::reload(bool GlobalAsset)
 	{
+		// Delete existing ShaderPrograms
+		Assets.deleteShaderProgram(m_coreProgram);
+		Assets.deleteShaderProgram(m_colorIDProgram);
+		Assets.deleteShaderProgram(m_depthOnlyProgram);
+
 		m_targetLevels.clear();
 		m_coreProgram = -1;
 		m_colorIDProgram = -1;
@@ -385,7 +390,7 @@ namespace Vxl
 			for (auto& include : includes)
 			{
 				stringUtil::trim(include);
-				File* _fileStorage = Assets::getFile(include);
+				File* _fileStorage = Assets.getFile(include);
 				if (_fileStorage)
 				{
 					std::string file = _fileStorage->file + '\n';

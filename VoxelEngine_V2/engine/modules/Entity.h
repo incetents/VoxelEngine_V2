@@ -24,7 +24,7 @@ namespace Vxl
 	class Entity : public SceneNode
 	{
 		DISALLOW_COPY_AND_ASSIGN(Entity);
-		friend class Assets;
+		friend class _Assets;
 		friend class RenderManager;
 		friend class SceneNode;
 		friend class Editor;

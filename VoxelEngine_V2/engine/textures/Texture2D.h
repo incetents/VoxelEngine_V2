@@ -10,7 +10,7 @@ namespace Vxl
 	class Texture2D : public BaseTexture
 	{
 		DISALLOW_COPY_AND_ASSIGN(Texture2D);
-		friend class Assets;
+		friend class _Assets;
 	protected:
 		uint8_t* m_image = nullptr;
 

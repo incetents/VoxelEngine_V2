@@ -12,7 +12,7 @@ namespace Vxl
 {
 	void ShaderCodeViewer::Draw()
 	{
-		auto _ShaderPrograms = Assets::getAllShaderProgram();
+		auto _ShaderPrograms = Assets.getAllShaderProgram();
 		for (const auto& _Program : _ShaderPrograms)
 		{
 			if (ImGui::CollapsingHeader(_Program.second->m_name.c_str()))

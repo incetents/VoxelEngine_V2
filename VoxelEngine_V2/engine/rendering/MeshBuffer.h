@@ -8,6 +8,106 @@
 
 namespace Vxl
 {
+	// MeshBuffer
+	template<typename Type>
+	class _MeshBuffer
+	{
+		DISALLOW_COPY_AND_ASSIGN(_MeshBuffer);
+	private:
+		VBO			m_vbo;
+		BufferUsage m_bindMode;
+		uint32_t	m_storedVertexSize = 0;
+	public:
+
+		std::vector<Type> vertices;
+
+		_MeshBuffer<Type>& operator=(const std::vector<Type>& _vector)
+		{
+			vertices = _vector;
+			return *this;
+		}
+
+		void setLayout(const BufferLayout& layout)
+		{
+			m_vbo.SetLayout(layout);
+		}
+
+		void bind()
+		{
+			uint32_t verticesCount = (uint32_t)vertices.size();
+
+			// VBO does nothing and receives nothing
+			if (verticesCount == 0 && m_storedVertexSize == 0)
+				return;
+
+			// Check if size has changed
+			if (m_storedVertexSize != verticesCount)
+			{
+				m_vbo.SetVertices(vertices.data(), (uint32_t)vertices.size(), m_bindMode);
+			}
+			// Size hasn't changed, just update vertices
+			else
+			{
+				m_vbo.UpdateVertices(vertices.data(), 0);
+			}
+			m_storedVertexSize = verticesCount;
+
+			m_vbo.bind();
+		}
+
+		_MeshBuffer(const BufferLayout& layout, BufferUsage bindMode)
+		{
+			m_bindMode = bindMode;
+			m_vbo.SetLayout(layout);
+		}
+	};
+
+	class _MeshBufferIndices
+	{
+		DISALLOW_COPY_AND_ASSIGN(_MeshBufferIndices);
+	private:
+		EBO			m_ebo;
+		BufferUsage m_bindMode;
+		uint32_t	m_storedVertexSize = 0;
+	public:
+
+		std::vector<uint32_t> vertices;
+
+		_MeshBufferIndices& operator=(const std::vector<uint32_t>& _vector)
+		{
+			vertices = _vector;
+			return *this;
+		}
+
+		void bind()
+		{
+			uint32_t verticesCount = (uint32_t)vertices.size();
+
+			// VBO does nothing and receives nothing
+			if (verticesCount == 0 && m_storedVertexSize == 0)
+				return;
+
+			// Check if size has changed
+			if (m_storedVertexSize != verticesCount)
+			{
+				m_ebo.SetIndices(vertices.data(), (uint32_t)vertices.size(), m_bindMode);
+			}
+			// Size hasn't changed, just update vertices
+			else
+			{
+				m_ebo.UpdateIndices(vertices.data(), 0);
+			}
+			m_storedVertexSize = verticesCount;
+
+			m_ebo.bind();
+		}
+
+		_MeshBufferIndices(BufferUsage bindMode)
+		{
+			m_bindMode = bindMode;
+		}
+	};
+
 	// Contains VBO [doesn't remember any vertices sent]
 	template<typename Type>
 	class MeshBuffer

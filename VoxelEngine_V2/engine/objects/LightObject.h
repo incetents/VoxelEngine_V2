@@ -59,7 +59,7 @@
 //	class LightObject : public Entity //, public Asset<LightObject>
 //	{
 //		DISALLOW_COPY_AND_ASSIGN(LightObject);
-//		friend class Assets;
+//		friend class _Assets;
 //	private:
 //		LightObject(const std::string& name, LightType type);
 //

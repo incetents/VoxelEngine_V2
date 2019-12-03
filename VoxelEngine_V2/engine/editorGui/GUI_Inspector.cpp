@@ -48,7 +48,7 @@ namespace Vxl
 		if (Editor.HasSelection())
 		{
 			SceneNodeIndex index = Editor.m_selectedNodes[0];
-			SceneNode* node = Assets::getSceneNode(index);
+			SceneNode* node = Assets.getSceneNode(index);
 
 			// Name
 			static char Name[MAX_ENTITY_NAME_LENGTH];

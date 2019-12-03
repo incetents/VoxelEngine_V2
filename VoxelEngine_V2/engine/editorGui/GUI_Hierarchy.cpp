@@ -29,7 +29,7 @@ namespace Vxl
 {
 	void Hierarchy::DisplayNode(SceneNode* node, int _depth)
 	{
-		//SceneNode* node = Assets::getSceneNode(_node);
+		//SceneNode* node = Assets.getSceneNode(_node);
 		//VXL_ASSERT(node, "Missing SceneNode");
 
 		// Display entity

@@ -22,7 +22,7 @@ namespace Vxl
 	class Camera : public SceneNode
 	{
 		DISALLOW_COPY_AND_ASSIGN(Camera);
-		friend class Assets;
+		friend class _Assets;
 		friend class RenderManager;
 	private:
 		Camera(const std::string& name, float _znear, float _zfar);

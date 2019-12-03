@@ -28,7 +28,7 @@ namespace Vxl
 		Util::RemoveFromVector(m_selectedNodes, _node);
 
 		// Internally remembers
-		SceneNode* node = Assets::getSceneNode(_node);
+		SceneNode* node = Assets.getSceneNode(_node);
 		if(node)
 			node->m_isSelected = false;
 	}
@@ -41,7 +41,7 @@ namespace Vxl
 		m_selectedNodes.push_back(_node);
 
 		// Internally remembers
-		SceneNode* node = Assets::getSceneNode(_node);
+		SceneNode* node = Assets.getSceneNode(_node);
 		if(node)
 			node->m_isSelected = true;
 	}
@@ -49,7 +49,7 @@ namespace Vxl
 	{
 		for (const auto& _node : m_selectedNodes)
 		{
-			SceneNode* node = Assets::getSceneNode(_node);
+			SceneNode* node = Assets.getSceneNode(_node);
 			if(node)
 				node->m_isSelected = false;
 		}
@@ -59,7 +59,7 @@ namespace Vxl
 	{
 		for (SceneNodeIndex _node : m_selectedNodes)
 		{
-			Assets::deleteSceneNode(_node);
+			Assets.deleteSceneNode(_node);
 		}
 		m_selectedNodes.clear();
 	}

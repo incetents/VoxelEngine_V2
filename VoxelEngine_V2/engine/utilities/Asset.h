@@ -50,6 +50,7 @@ namespace Vxl
 
 	enum class AssetType
 	{
+		NONE,
 		GLOBAL,
 		SCENE
 	};
@@ -74,7 +75,7 @@ namespace Vxl
 
 			if (type == AssetType::GLOBAL)
 				m_storage_typeGlobal[customID] = data;
-			else
+			else if (type == AssetType::SCENE)
 				m_storage_typeScene[customID] = data;
 
 			return customID;
@@ -97,7 +98,7 @@ namespace Vxl
 			m_storage[NewID] = data;
 			if (type == AssetType::GLOBAL)
 				m_storage_typeGlobal[NewID] = data;
-			else
+			else if (type == AssetType::SCENE)
 				m_storage_typeScene[NewID] = data;
 
 			// Get ID
@@ -157,7 +158,7 @@ namespace Vxl
 				m_storage_typeGlobal.clear();
 				m_storage = m_storage_typeScene;
 			}
-			else
+			else if (type == AssetType::SCENE)
 			{
 				if (m_storage_typeGlobal.empty())
 				{
@@ -172,6 +173,12 @@ namespace Vxl
 
 				m_storage_typeScene.clear();
 				m_storage = m_storage_typeGlobal;
+			}
+			else
+			{
+				m_storage.clear();
+				m_storage_typeGlobal.clear();
+				m_storage_typeScene.clear();
 			}
 		}
 		std::map<uint32_t, Type*>& GetAll(void)
@@ -209,7 +216,7 @@ namespace Vxl
 
 			if (type == AssetType::GLOBAL)
 				m_storage_typeGlobal[name] = data;
-			else
+			else if (type == AssetType::SCENE)
 				m_storage_typeScene[name] = data;
 		}
 		Type*		Get(const std::string& name)
@@ -242,10 +249,16 @@ namespace Vxl
 				m_storage_typeGlobal.clear();
 				m_storage = m_storage_typeScene;
 			}
-			else
+			else if (type == AssetType::SCENE)
 			{
 				m_storage_typeScene.clear();
 				m_storage = m_storage_typeGlobal;
+			}
+			else
+			{
+				m_storage.clear();
+				m_storage_typeGlobal.clear();
+				m_storage_typeScene.clear();
 			}
 		}
 		std::map<std::string, Type*>& GetAll(void)
@@ -263,12 +276,12 @@ namespace Vxl
 		}
 	};
 
-	class Assets
+	class _Assets
 	{
-		DISALLOW_COPY_AND_ASSIGN(Assets);
+		DISALLOW_COPY_AND_ASSIGN(_Assets);
 		friend class RenderManager;
 	protected:
-	public:
+
 		// Texture2D & Cubemap Indices just BaseTexture indices
 		// Entity, Camera, Light Indices just use SceneNode indices
 
@@ -291,100 +304,102 @@ namespace Vxl
 
 		void DestroyAndEraseAll();
 
-		AssetType m_creationType;
+		const AssetType m_creationType;
 
 		// Protected
-		Assets() {}
+		_Assets(AssetType creationType)
+			: m_creationType(creationType)
+		{}
 
 	public:
 		// Remove from Asset Management [Still needs to be deleted manually]
-		static BaseTexture*			eraseBaseTexture(TextureIndex index);
-		static Texture2D*			eraseTexture2D(TextureIndex index) { m_baseTexture_storage.Erase(index); return m_texture2D_storage.Erase(index); }
-		static Cubemap*				eraseCubemap(TextureIndex index) { m_baseTexture_storage.Erase(index); return m_cubemap_storage.Erase(index); }
-		static File*				eraseFile(const std::string& name) { return m_file_storage.Erase(name); }
-		static FramebufferObject*	eraseFramebufferObject(FramebufferObjectIndex index) { return m_framebufferObject_storage.Erase(index);  }
-		static RenderTexture*		eraseRenderTexture(RenderTextureIndex index) { return m_renderTexture_storage.Erase(index); }
-		static RenderTextureDepth*	eraseRenderTextureDepth(RenderTextureDepthIndex index) { return m_renderTextureDepth_storage.Erase(index); }
-		static RenderBuffer*		eraseRenderBuffer(RenderBufferIndex index) { return m_renderBuffer_storage.Erase(index); }
-		static RenderBufferDepth*	eraseRenderBufferDepth(RenderBufferDepthIndex index) { return m_renderBufferDepth_storage.Erase(index); }
-		static Mesh*				eraseMesh(MeshIndex index) { return m_mesh_storage.Erase(index); }
-		static ShaderProgram*		eraseShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Erase(index); }
-		static ShaderMaterial*		eraseShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Erase(index); }
-		static Material*			eraseMaterial(MaterialIndex index) { return m_material_storage.Erase(index); }
-		static Entity*				eraseEntity(EntityIndex index) { return m_entity_storage.Erase(index); }
-		static Camera*				eraseCamera(CameraIndex index) { return m_camera_storage.Erase(index); }
+		BaseTexture*		eraseBaseTexture(TextureIndex index);
+		Texture2D*			eraseTexture2D(TextureIndex index) { m_baseTexture_storage.Erase(index); return m_texture2D_storage.Erase(index); }
+		Cubemap*			eraseCubemap(TextureIndex index) { m_baseTexture_storage.Erase(index); return m_cubemap_storage.Erase(index); }
+		File*				eraseFile(const std::string& name) { return m_file_storage.Erase(name); }
+		FramebufferObject*	eraseFramebufferObject(FramebufferObjectIndex index) { return m_framebufferObject_storage.Erase(index);  }
+		RenderTexture*		eraseRenderTexture(RenderTextureIndex index) { return m_renderTexture_storage.Erase(index); }
+		RenderTextureDepth*	eraseRenderTextureDepth(RenderTextureDepthIndex index) { return m_renderTextureDepth_storage.Erase(index); }
+		RenderBuffer*		eraseRenderBuffer(RenderBufferIndex index) { return m_renderBuffer_storage.Erase(index); }
+		RenderBufferDepth*	eraseRenderBufferDepth(RenderBufferDepthIndex index) { return m_renderBufferDepth_storage.Erase(index); }
+		Mesh*				eraseMesh(MeshIndex index) { return m_mesh_storage.Erase(index); }
+		ShaderProgram*		eraseShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Erase(index); }
+		ShaderMaterial*		eraseShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Erase(index); }
+		Material*			eraseMaterial(MaterialIndex index) { return m_material_storage.Erase(index); }
+		Entity*				eraseEntity(EntityIndex index) { return m_entity_storage.Erase(index); }
+		Camera*				eraseCamera(CameraIndex index) { return m_camera_storage.Erase(index); }
 
 		// Delete [Remove and delete from Asset Management]
-		static void deleteBaseTexture(TextureIndex index);
-		static void deleteTexture2D(TextureIndex index);
-		static void deleteCubemap(TextureIndex index);
-		static void deleteFile(const std::string& name);
-		static void deleteFramebufferObject(FramebufferObjectIndex index);
-		static void deleteRenderTexture(RenderTextureIndex index);
-		static void deleteRenderTextureDepth(RenderTextureDepthIndex index);
-		static void deleteRenderBuffer(RenderBufferIndex index);
-		static void deleteRenderBufferDepth(RenderBufferDepthIndex index);
-		static void deleteMesh(MeshIndex index);
-		static void deleteShaderProgram(ShaderProgramIndex index);
-		static void deleteShaderMaterial(ShaderMaterialIndex index);
-		static void deleteMaterial(MaterialIndex index);
-		static void deleteSceneNode(SceneNodeIndex index);
-		static void deleteEntity(EntityIndex index);
-		static void deleteCamera(CameraIndex index);
+		void deleteBaseTexture(TextureIndex index);
+		void deleteTexture2D(TextureIndex index);
+		void deleteCubemap(TextureIndex index);
+		void deleteFile(const std::string& name);
+		void deleteFramebufferObject(FramebufferObjectIndex index);
+		void deleteRenderTexture(RenderTextureIndex index);
+		void deleteRenderTextureDepth(RenderTextureDepthIndex index);
+		void deleteRenderBuffer(RenderBufferIndex index);
+		void deleteRenderBufferDepth(RenderBufferDepthIndex index);
+		void deleteMesh(MeshIndex index);
+		void deleteShaderProgram(ShaderProgramIndex index);
+		void deleteShaderMaterial(ShaderMaterialIndex index);
+		void deleteMaterial(MaterialIndex index);
+		void deleteSceneNode(SceneNodeIndex index);
+		void deleteEntity(EntityIndex index);
+		void deleteCamera(CameraIndex index);
 
 		// Delete All [Remove and delete from Asset Management]
-		static void deleteAllTextures();
-		//static void deleteAllTexture2D();
-		//static void deleteAllCubemap();
-		static void deleteAllFile();
-		static void deleteAllFramebufferObject();
-		static void deleteAllRenderTexture();
-		static void deleteAllRenderTextureDepth();
-		static void deleteAllRenderBuffer();
-		static void deleteAllRenderBufferDepth();
-		static void deleteAllMesh();
-		static void deleteAllShaderProgram();
-		static void deleteAllShaderMaterial();
-		static void deleteAllMaterial();
-		static void deleteAllSceneNode();
-		static void deleteAllEntity();
-		static void deleteAllCamera();
+		void deleteAllTextures();
+		void deleteAllTexture2D();
+		void deleteAllCubemap();
+		void deleteAllFile();
+		void deleteAllFramebufferObject();
+		void deleteAllRenderTexture();
+		void deleteAllRenderTextureDepth();
+		void deleteAllRenderBuffer();
+		void deleteAllRenderBufferDepth();
+		void deleteAllMesh();
+		void deleteAllShaderProgram();
+		void deleteAllShaderMaterial();
+		void deleteAllMaterial();
+		void deleteAllSceneNode();
+		void deleteAllEntity();
+		void deleteAllCamera();
 
 		// Getters
-		static BaseTexture*			getBaseTexture(TextureIndex index) { return m_baseTexture_storage.Get(index); }
-		static Texture2D*			getTexture2D(TextureIndex index) { return m_texture2D_storage.Get(index); }
-		static Cubemap*				getCubemap(TextureIndex index) { return m_cubemap_storage.Get(index); }
-		static File*				getFile(const std::string& name) { return m_file_storage.Get(stringUtil::toLowerCopy(name)); }
-		static FramebufferObject*	getFramebufferObject(FramebufferObjectIndex index) { return m_framebufferObject_storage.Get(index); }
-		static RenderTexture*		getRenderTexture(RenderTextureIndex index) { return m_renderTexture_storage.Get(index); }
-		static RenderTextureDepth*	getRenderTextureDepth(RenderTextureDepthIndex index) { return m_renderTextureDepth_storage.Get(index); }
-		static RenderBuffer*		getRenderBuffer(RenderBufferIndex index) { return m_renderBuffer_storage.Get(index); }
-		static RenderBufferDepth*	getRenderBufferDepth(RenderBufferDepthIndex index) { return m_renderBufferDepth_storage.Get(index); }
-		static Mesh*				getMesh(MeshIndex index) { return m_mesh_storage.Get(index); }
-		static ShaderProgram*		getShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Get(index); }
-		static ShaderMaterial*		getShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Get(index); }
-		static Material*			getMaterial(MaterialIndex index) { return m_material_storage.Get(index); }
-		static SceneNode*			getSceneNode(SceneNodeIndex index) { return m_sceneNode_storage.Get(index); }
-		static Entity*				getEntity(EntityIndex index) { return m_entity_storage.Get(index); }
-		static Camera*				getCamera(CameraIndex index) { return m_camera_storage.Get(index); }
+		BaseTexture*		getBaseTexture(TextureIndex index) { return m_baseTexture_storage.Get(index); }
+		Texture2D*			getTexture2D(TextureIndex index) { return m_texture2D_storage.Get(index); }
+		Cubemap*			getCubemap(TextureIndex index) { return m_cubemap_storage.Get(index); }
+		File*				getFile(const std::string& name) { return m_file_storage.Get(stringUtil::toLowerCopy(name)); }
+		FramebufferObject*	getFramebufferObject(FramebufferObjectIndex index) { return m_framebufferObject_storage.Get(index); }
+		RenderTexture*		getRenderTexture(RenderTextureIndex index) { return m_renderTexture_storage.Get(index); }
+		RenderTextureDepth*	getRenderTextureDepth(RenderTextureDepthIndex index) { return m_renderTextureDepth_storage.Get(index); }
+		RenderBuffer*		getRenderBuffer(RenderBufferIndex index) { return m_renderBuffer_storage.Get(index); }
+		RenderBufferDepth*	getRenderBufferDepth(RenderBufferDepthIndex index) { return m_renderBufferDepth_storage.Get(index); }
+		Mesh*				getMesh(MeshIndex index) { return m_mesh_storage.Get(index); }
+		ShaderProgram*		getShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Get(index); }
+		ShaderMaterial*		getShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Get(index); }
+		Material*			getMaterial(MaterialIndex index) { return m_material_storage.Get(index); }
+		SceneNode*			getSceneNode(SceneNodeIndex index) { return m_sceneNode_storage.Get(index); }
+		Entity*				getEntity(EntityIndex index) { return m_entity_storage.Get(index); }
+		Camera*				getCamera(CameraIndex index) { return m_camera_storage.Get(index); }
 
 		// Get All
-		static const std::map<uint32_t, BaseTexture*>&			getAllBaseTexture() { return m_baseTexture_storage.GetAll(); }
-		static const std::map<uint32_t, Texture2D*>&			getAllTexture2D() { return m_texture2D_storage.GetAll(); }
-		static const std::map<uint32_t, Cubemap*>&				getAllCubemap() { return m_cubemap_storage.GetAll(); }
-		static const std::map<std::string, File*>&				getAllFiles() { return m_file_storage.GetAll(); }
-		static const std::map<uint32_t, FramebufferObject*>&	getAllFramebufferObject() { return m_framebufferObject_storage.GetAll(); }
-		static const std::map<uint32_t, RenderTexture*>&		getAllRenderTexture() { return m_renderTexture_storage.GetAll(); }
-		static const std::map<uint32_t, RenderTextureDepth*>&	getAllRenderTextureDepth() { return m_renderTextureDepth_storage.GetAll(); }
-		static const std::map<uint32_t, RenderBuffer*>&			getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(); }
-		static const std::map<uint32_t, RenderBufferDepth*>&	getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(); }
-		static const std::map<uint32_t, Mesh*>&					getAllMesh() { return m_mesh_storage.GetAll(); }
-		static const std::map<uint32_t, ShaderProgram*>&		getAllShaderProgram() { return m_shaderProgram_storage.GetAll(); }
-		static const std::map<uint32_t, ShaderMaterial*>&		getAllShaderMaterial() { return m_shaderMaterial_storage.GetAll(); }
-		static const std::map<uint32_t, Material*>&				getAllMaterial() { return m_material_storage.GetAll(); }
-		static const std::map<uint32_t, SceneNode*>&			getAllSceneNode() { return m_sceneNode_storage.GetAll(); }
-		static const std::map<uint32_t, Entity*>&				getAllEntity() { return m_entity_storage.GetAll(); }
-		static const std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(); }
+		const std::map<uint32_t, BaseTexture*>&			getAllBaseTexture() { return m_baseTexture_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, Texture2D*>&			getAllTexture2D() { return m_texture2D_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, Cubemap*>&				getAllCubemap() { return m_cubemap_storage.GetAll(m_creationType); }
+		const std::map<std::string, File*>&				getAllFiles() { return m_file_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, FramebufferObject*>&	getAllFramebufferObject() { return m_framebufferObject_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, RenderTexture*>&		getAllRenderTexture() { return m_renderTexture_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, RenderTextureDepth*>&	getAllRenderTextureDepth() { return m_renderTextureDepth_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, RenderBuffer*>&		getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, RenderBufferDepth*>&	getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, Mesh*>&				getAllMesh() { return m_mesh_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, ShaderProgram*>&		getAllShaderProgram() { return m_shaderProgram_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, ShaderMaterial*>&		getAllShaderMaterial() { return m_shaderMaterial_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, Material*>&			getAllMaterial() { return m_material_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, SceneNode*>&			getAllSceneNode() { return m_sceneNode_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, Entity*>&				getAllEntity() { return m_entity_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(m_creationType); }
 
 		//
 		TextureIndex loadTexture2D(
@@ -495,36 +510,31 @@ namespace Vxl
 		
 	
 	};
-	
-	static class SceneAssets : public Assets, public Singleton<class SceneAssets>
+
+	// Access all Assets
+	static class Assets : public _Assets, public Singleton<class Assets>
+	{
+		DISALLOW_COPY_AND_ASSIGN(Assets);
+	public:
+		Assets()
+			: _Assets(AssetType::NONE)
+		{}
+
+	} SingletonInstance(Assets);
+
+	// Access only SceneAssets of all Assets
+	static class SceneAssets : public _Assets, public Singleton<class SceneAssets>
 	{
 		DISALLOW_COPY_AND_ASSIGN(SceneAssets);
 	public:
 		SceneAssets()
-		{
-			m_creationType = AssetType::SCENE;
-		}
-
-		// Get All
-		const std::map<uint32_t, BaseTexture*>&			getAllBaseTexture() { return m_baseTexture_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, Texture2D*>&			getAllTexture2D() { return m_texture2D_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, Cubemap*>&				getAllCubemap() { return m_cubemap_storage.GetAll(AssetType::SCENE); }
-		const std::map<std::string, File*>&				getAllFiles() { return m_file_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, FramebufferObject*>&	getAllFramebufferObject() { return m_framebufferObject_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, RenderTexture*>&		getAllRenderTexture() { return m_renderTexture_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, RenderTextureDepth*>&	getAllRenderTextureDepth() { return m_renderTextureDepth_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, RenderBuffer*>&		getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, RenderBufferDepth*>&	getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, Mesh*>&				getAllMesh() { return m_mesh_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, ShaderProgram*>&		getAllShaderProgram() { return m_shaderProgram_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, ShaderMaterial*>&		getAllShaderMaterial() { return m_shaderMaterial_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, Material*>&			getAllMaterial() { return m_material_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, Entity*>&				getAllEntity() { return m_entity_storage.GetAll(AssetType::SCENE); }
-		const std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(AssetType::SCENE); }
+			: _Assets(AssetType::SCENE)
+		{}
 
 	} SingletonInstance(SceneAssets);
 
-	static class GlobalAssets : public Assets, public Singleton<class GlobalAssets>
+	// Access only GlobalAssets of all Assets
+	static class GlobalAssets : public _Assets, public Singleton<class GlobalAssets>
 	{
 		DISALLOW_COPY_AND_ASSIGN(GlobalAssets);
 
@@ -545,26 +555,8 @@ namespace Vxl
 
 	public:
 		GlobalAssets()
-		{
-			m_creationType = AssetType::GLOBAL;
-		}
-
-		// Get All
-		const std::map<uint32_t, BaseTexture*>&			getAllBaseTexture() { return m_baseTexture_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, Texture2D*>&			getAllTexture2D() { return m_texture2D_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, Cubemap*>&				getAllCubemap() { return m_cubemap_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<std::string, File*>&				getAllFiles() { return m_file_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, FramebufferObject*>&	getAllFramebufferObject() { return m_framebufferObject_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, RenderTexture*>&		getAllRenderTexture() { return m_renderTexture_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, RenderTextureDepth*>&	getAllRenderTextureDepth() { return m_renderTextureDepth_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, RenderBuffer*>&		getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, RenderBufferDepth*>&	getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, Mesh*>&				getAllMesh() { return m_mesh_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, ShaderProgram*>&		getAllShaderProgram() { return m_shaderProgram_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, ShaderMaterial*>&		getAllShaderMaterial() { return m_shaderMaterial_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, Material*>&			getAllMaterial() { return m_material_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, Entity*>&				getAllEntity() { return m_entity_storage.GetAll(AssetType::GLOBAL); }
-		const std::map<uint32_t, Camera*>&				getAllCamera() { return m_camera_storage.GetAll(AssetType::GLOBAL); }
+			: _Assets(AssetType::GLOBAL)
+		{}
 
 		// Get Specific Global Data
 		Texture2D* get_Tex2DNullImageCheckerboard(void) const { return m_texture2D_storage.Get(texID_nullImageCheckerboard); }

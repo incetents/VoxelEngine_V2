@@ -8,7 +8,7 @@ namespace Vxl
 	class Cubemap : public BaseTexture
 	{
 		DISALLOW_COPY_AND_ASSIGN(Cubemap);
-		friend class Assets;
+		friend class _Assets;
 	protected:
 		UCHAR**		m_image = new UCHAR*[6];
 

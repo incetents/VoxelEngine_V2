@@ -62,7 +62,7 @@ namespace Vxl
 
 	void Material::setShaderMaterial(ShaderMaterialIndex index)
 	{
-		ShaderMaterial* _shaderMat = Assets::getShaderMaterial(index);
+		ShaderMaterial* _shaderMat = Assets.getShaderMaterial(index);
 		if (_shaderMat)
 		{
 			m_shaderMaterial = index;
@@ -71,10 +71,10 @@ namespace Vxl
 
 	Graphics::Uniform Material::getUniform(const std::string& name)
 	{
-		ShaderMaterial* _shaderMat = Assets::getShaderMaterial(m_shaderMaterial);
+		ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
 		if (_shaderMat)
 		{
-			ShaderProgram* program = Assets::getShaderProgram(_shaderMat->m_coreProgram);
+			ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
 			if (program)
 			{
 				// find uniform
@@ -94,10 +94,10 @@ namespace Vxl
 
 	ShaderProgram* Material::getCoreProgram(void) const
 	{
-		ShaderMaterial* _shaderMat = Assets::getShaderMaterial(m_shaderMaterial);
+		ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
 		if (_shaderMat)
 		{
-			return Assets::getShaderProgram(_shaderMat->m_coreProgram);
+			return Assets.getShaderProgram(_shaderMat->m_coreProgram);
 		}
 		return nullptr;
 	}
@@ -105,7 +105,7 @@ namespace Vxl
 	bool Material::bindCoreProgram()
 	{
 		ShaderProgram* corePogram = getCoreProgram();
-		if (corePogram)
+		if (corePogram && corePogram->isLinked())
 		{
 			corePogram->bind();
 			return true;
@@ -114,10 +114,10 @@ namespace Vxl
 	}
 	void Material::bindCoreProgramCommonUniforms(EntityIndex _entity)
 	{
-		ShaderMaterial* _shaderMaterial = Assets::getShaderMaterial(m_shaderMaterial);
+		ShaderMaterial* _shaderMaterial = Assets.getShaderMaterial(m_shaderMaterial);
 		if (_shaderMaterial)
 		{
-			ShaderProgram* _shaderProgram = Assets::getShaderProgram(_shaderMaterial->m_coreProgram);
+			ShaderProgram* _shaderProgram = Assets.getShaderProgram(_shaderMaterial->m_coreProgram);
 			if (_shaderProgram)
 				_shaderProgram->bindCommonUniforms(_entity);
 		}
@@ -147,7 +147,7 @@ namespace Vxl
 		if (m_wireframe)
 			return;
 
-		const std::vector<TextureLevel>& targetLevels = Assets::getShaderMaterial(m_shaderMaterial)->m_targetLevels;
+		const std::vector<TextureLevel>& targetLevels = Assets.getShaderMaterial(m_shaderMaterial)->m_targetLevels;
 
 		for (const auto& level : targetLevels)
 		{
@@ -161,7 +161,7 @@ namespace Vxl
 			}
 
 			TextureIndex index = m_textures[level];
-			BaseTexture* _tex = Assets::getBaseTexture(index);
+			BaseTexture* _tex = Assets.getBaseTexture(index);
 
 			// bind error texture
 			if (_tex == nullptr || !_tex->isLoaded())
@@ -183,7 +183,7 @@ namespace Vxl
 		if (m_wireframe)
 			return;
 
-		const std::vector<TextureLevel>& targetLevels = Assets::getShaderMaterial(m_shaderMaterial)->m_targetLevels;
+		const std::vector<TextureLevel>& targetLevels = Assets.getShaderMaterial(m_shaderMaterial)->m_targetLevels;
 
 		for (const auto& level : targetLevels)
 		{
@@ -197,7 +197,7 @@ namespace Vxl
 			}
 
 			TextureIndex index = _entity->m_textures[level];
-			BaseTexture* _tex = Assets::getBaseTexture(index);
+			BaseTexture* _tex = Assets.getBaseTexture(index);
 
 			// bind error texture
 			if (_tex == nullptr || !_tex->isLoaded())
@@ -214,19 +214,5 @@ namespace Vxl
 			}
 		}
 	}
-
-	//void Material::bindCommonUniforms(Entity* _entity)
-	//{
-	//	
-	//	
-	//	// ~ ColorID ~ //
-	//	//	if (m_uniform_output.has_value())
-	//	//	{
-	//	//		m_uniform_output.value
-	//	//	
-	//	//		m_material->m_property_output.SetProperty(m_colorID);
-	//	//	}
-	//	
-	//}
 
 }

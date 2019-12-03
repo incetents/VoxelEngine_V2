@@ -11,7 +11,7 @@
 //	class GameObject : public Entity //, public Asset<GameObject>
 //	{
 //		DISALLOW_COPY_AND_ASSIGN(GameObject);
-//		friend class Assets;
+//		friend class _Assets;
 //	protected:
 //		GameObject(const std::string& name);
 //

@@ -18,7 +18,7 @@ namespace Vxl
 	class Mesh
 	{
 		DISALLOW_COPY_AND_ASSIGN(Mesh);
-		friend class Assets;
+		friend class _Assets;
 	private:
 		VAO m_VAO;
 
@@ -50,6 +50,13 @@ namespace Vxl
 	public:
 
 		virtual ~Mesh() {}
+
+		//	_MeshBuffer<Vector3> positions = _MeshBuffer<Vector3>(BufferLayout({ {BufferType::POSITION, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		//	_MeshBuffer<Vector2> uvs = _MeshBuffer<Vector2>(BufferLayout({ {BufferType::UV, AttributeType::VEC2} }), BufferUsage::STATIC_DRAW);
+		//	_MeshBuffer<Vector3> normals = _MeshBuffer<Vector3>(BufferLayout({ {BufferType::NORMAL, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		//	_MeshBuffer<Vector3> tangents = _MeshBuffer<Vector3>(BufferLayout({ {BufferType::TANGENT, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		//	
+		//	_MeshBufferIndices indices = _MeshBufferIndices(BufferUsage::STATIC_DRAW);
 
 		MeshBufferMem<Vector3>	m_positions;
 		MeshBufferMem<Vector2>	m_uvs;

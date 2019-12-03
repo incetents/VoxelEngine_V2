@@ -8,7 +8,7 @@ namespace Vxl
 	class RenderTexture : public BaseTexture
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderTexture);
-		friend class Assets;
+		friend class _Assets;
 	protected:
 		// Name
 		std::string m_name;
@@ -40,7 +40,7 @@ namespace Vxl
 	class RenderTextureDepth : public RenderTexture
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderTextureDepth);
-		friend class Assets;
+		friend class _Assets;
 	protected:
 		// Created using only depth format
 		RenderTextureDepth(
