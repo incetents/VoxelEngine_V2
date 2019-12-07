@@ -551,6 +551,8 @@ namespace Vxl
 		ShaderMaterialIndex shaderMaterial_error;
 		MaterialIndex		material_error;
 
+		ShaderMaterialIndex shaderMaterial_lineRender;
+
 		ShaderMaterialIndex	shader_showRenderTarget;
 
 	public:
@@ -568,6 +570,7 @@ namespace Vxl
 		Material* get_MaterialError(void) const { return m_material_storage.Get(material_error); }
 
 		ShaderProgram* get_ProgramShowRenderTarget(void) const;
+		ShaderProgram* get_ProgramLineRender(void) const;
 
 	} SingletonInstance(GlobalAssets);
 

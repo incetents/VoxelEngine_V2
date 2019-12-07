@@ -5,6 +5,8 @@
 #include "Graphics.h"
 
 #include "../math/Model.h"
+#include "../math/Vector.h"
+#include "../math/Color.h"
 
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
@@ -18,20 +20,20 @@ namespace Vxl
 	void Mesh::UpdateDrawInfo()
 	{
 		// Set Base Mode
-		m_mode = (m_indices.GetDrawCount() == 0) ? DrawMode::ARRAY : DrawMode::INDEXED;
+		m_mode = (m_indices.getDrawCount() == 0) ? DrawMode::ARRAY : DrawMode::INDEXED;
 		
 		// Set Draw Count
 		if (m_mode == DrawMode::ARRAY)
 		{
-			m_drawCount = m_positions.GetDrawCount();
+			m_drawCount = m_positions.getDrawCount();
 		}
 		else
 		{
-			m_drawCount = m_indices.GetDrawCount();
+			m_drawCount = m_indices.getDrawCount();
 		}
 
 		// Instance
-		if (m_instances.GetDrawCount() > 1)
+		if (m_instances.getDrawCount() > 1)
 		{
 			if (m_mode == DrawMode::ARRAY)
 				m_mode = DrawMode::ARRAY_INSTANCED;
@@ -110,22 +112,13 @@ namespace Vxl
 		
 	}
 
-	Mesh::Mesh()
+	void Mesh::set(const Model& _model)
 	{
-		// Default Buffer Layouts
-		m_positions.setLayout(BufferLayout({ {BufferType::POSITION, AttributeType::VEC3} }));
-		m_uvs.setLayout(BufferLayout({ {BufferType::UV, AttributeType::VEC2} }));
-		m_normals.setLayout(BufferLayout({ {BufferType::NORMAL, AttributeType::VEC3} }));
-		m_tangents.setLayout(BufferLayout({ {BufferType::TANGENT, AttributeType::VEC3} }));
-	}
-
-	void Mesh::Set(const Model& _model)
-	{
-		m_positions.set(_model.positions);
-		m_uvs.set(_model.uvs);
-		m_normals.set(_model.normals);
-		m_tangents.set(_model.tangents);
-		m_indices.set(_model.indices);
+		m_positions = (_model.positions);
+		m_uvs = (_model.uvs);
+		m_normals = (_model.normals);
+		m_tangents = (_model.tangents);
+		m_indices = (_model.indices);
 
 		bind();
 	}
@@ -298,7 +291,7 @@ namespace Vxl
 
 
 		//
-		m_normals.set(Normals);
+		m_normals = (Normals);
 	}
 
 	void Mesh::GenerateTangents(
@@ -432,30 +425,30 @@ namespace Vxl
 			Tangents[i].NormalizeSelf();
 		}
 		//
-		m_tangents.set(Tangents);
+		m_tangents = (Tangents);
 	}
 
-	void Mesh::GenerateNormals(bool Smooth)
+	void Mesh::generateNormals(bool Smooth)
 	{
 		// Generate Missing Normals
-		if (m_normals.IsEmpty() && !m_positions.IsEmpty())
+		if (m_normals.isEmpty() && !m_positions.isEmpty())
 		{
 			GenerateNormals(
-				m_positions.getVertices().data(), m_positions.getVertexCount(),
-				m_indices.getIndices().data(), (uint32_t)m_indices.getIndices().size(),
+				m_positions.vertices.data(), m_positions.size(),
+				m_indices.vertices.data(), (uint32_t)m_indices.size(),
 				Smooth
 			);
 		}
 	}
-	void Mesh::GenerateTangents()
+	void Mesh::generateTangents()
 	{
 		// Generate Missing Tangents
-		if ((m_tangents.IsEmpty()) && !m_positions.IsEmpty() && !m_uvs.IsEmpty())
+		if ((m_tangents.isEmpty()) && !m_positions.isEmpty() && !m_uvs.isEmpty())
 		{
 			GenerateTangents(
-				m_positions.getVertices().data(), m_positions.getVertexCount(),
-				m_uvs.getVertices().data(), m_uvs.getVertexCount(),
-				m_indices.getIndices().data(), (uint32_t)m_indices.getIndices().size()
+				m_positions.vertices.data(), m_positions.size(),
+				m_uvs.vertices.data(), m_uvs.size(),
+				m_indices.vertices.data(), (uint32_t)m_indices.size()
 			);
 		}
 	}
@@ -467,7 +460,7 @@ namespace Vxl
 
 		// SIZE Assert Check //
 #ifdef _DEBUG
-		uint32_t indicesCount = m_indices.GetDrawCount();
+		uint32_t indicesCount = m_indices.getDrawCount();
 		if (indicesCount)
 		{
 			if(m_subtype == DrawSubType::TRIANGLES)
@@ -481,7 +474,7 @@ namespace Vxl
 		}
 		else
 		{
-			uint32_t posCount = m_positions.GetDrawCount();
+			uint32_t posCount = m_positions.getDrawCount();
 			if (m_subtype == DrawSubType::TRIANGLES)
 			{
 				VXL_ASSERT(posCount % 3 == 0, "Vertices are not multiple of 3");
@@ -507,25 +500,24 @@ namespace Vxl
 		m_VAO.unbind();
 		/*				*/	
 
-		UpdateDrawInfo(); // Must be called after data is bound
-		RecalculateMinMax();
+		UpdateDrawInfo();
+		recalculateMinMax();
 	}
 
-	void Mesh::RecalculateMinMax()
+	void Mesh::recalculateMinMax()
 	{
 		// Min/Max
 		m_min = Vector3::ZERO;
 		m_max = Vector3::ZERO;
-		uint32_t PosCount = (uint32_t)m_positions.getVertexCount();
-		auto& PosVertices = m_positions.getVertices();
+		uint32_t PosCount = (uint32_t)m_positions.size();
 		for (uint32_t i = 0; i < PosCount; i++)
 		{
-			m_min = Vector3::Min(m_min, PosVertices[i]);
-			m_max = Vector3::Max(m_max, PosVertices[i]);
+			m_min = Vector3::Min(m_min, m_positions.vertices[i]);
+			m_max = Vector3::Max(m_max, m_positions.vertices[i]);
 		}
 	}
 
-	void Mesh::Draw()
+	void Mesh::draw()
 	{
 		m_VAO.bind();
 
@@ -535,15 +527,127 @@ namespace Vxl
 			Graphics::Draw::Array(m_type, m_drawCount);
 			break;
 		case DrawMode::ARRAY_INSTANCED:
-			Graphics::Draw::ArrayInstanced(m_type, m_drawCount, m_instances.GetDrawCount());
+			Graphics::Draw::ArrayInstanced(m_type, m_drawCount, m_instances.getDrawCount());
 			break;
 
 		case DrawMode::INDEXED:
 			Graphics::Draw::Indexed(m_type, m_drawCount);
 			break;
 		case DrawMode::INDEXED_INSTANCED:
-			Graphics::Draw::IndexedInstanced(m_type, m_drawCount, m_instances.GetDrawCount());
+			Graphics::Draw::IndexedInstanced(m_type, m_drawCount, m_instances.getDrawCount());
 			break;
 		}
+	}
+
+	//
+	void LineMesh3D::addLine(const Vector3& P1, const Vector3& P2, float Width, const Color3F& C1, const Color3F& C2)
+	{
+		// Allocate necessary room
+		if (m_index + m_indexIncrement > m_points.size())
+		{
+			m_points.vertices.resize(m_index + m_indexIncrement);
+		}
+
+		// Set Vertices
+		m_points.vertices[m_index + 0] = P1.x;
+		m_points.vertices[m_index + 1] = P1.y;
+		m_points.vertices[m_index + 2] = P1.z;
+		m_points.vertices[m_index + 3] = C1.r;
+		m_points.vertices[m_index + 4] = C1.g;
+		m_points.vertices[m_index + 5] = C1.b;
+		m_points.vertices[m_index + 6] = Width;
+
+		m_points.vertices[m_index + 7] = P2.x;
+		m_points.vertices[m_index + 8] = P2.y;
+		m_points.vertices[m_index + 9] = P2.z;
+		m_points.vertices[m_index + 10] = C2.r;
+		m_points.vertices[m_index + 11] = C2.g;
+		m_points.vertices[m_index + 12] = C2.b;
+		m_points.vertices[m_index + 13] = Width;
+
+		// Increment Index
+		m_index += m_indexIncrement;
+	}
+
+	void LineMesh3D::bind(DrawType type)
+	{
+		// Data
+		m_type = type;
+		m_subtype = Graphics::GetDrawSubType(type);
+
+		m_drawCount = m_points.getDrawCount();
+
+		// Buffers
+		m_VAO.bind();
+
+		m_points.bind();
+
+		// Reset
+		m_index = 0;
+		m_points.vertices.clear();
+
+		m_VAO.unbind();
+	}
+
+	void LineMesh3D::draw()
+	{
+		m_VAO.bind();
+
+		Graphics::Draw::Array(m_type, m_drawCount);
+	}
+
+
+	void LineMesh2D::addLine(const Vector2& P1, const Vector2& P2, float Width, const Color3F& C1, const Color3F& C2)
+	{
+		// Allocate necessary room
+		if (m_index + m_indexIncrement > m_points.size())
+		{
+			m_points.vertices.resize(m_index + m_indexIncrement);
+		}
+
+		// Set Vertices
+		m_points.vertices[m_index + 0] = P1.x;
+		m_points.vertices[m_index + 1] = P1.y;
+		m_points.vertices[m_index + 2] = C1.r;
+		m_points.vertices[m_index + 3] = C1.g;
+		m_points.vertices[m_index + 4] = C1.b;
+		m_points.vertices[m_index + 5] = Width;
+
+		m_points.vertices[m_index + 6] = P2.x;
+		m_points.vertices[m_index + 7] = P2.y;
+		m_points.vertices[m_index + 8] = C2.r;
+		m_points.vertices[m_index + 9] = C2.g;
+		m_points.vertices[m_index + 10] = C2.b;
+		m_points.vertices[m_index + 11] = Width;
+
+		// Increment Index
+		m_index += m_indexIncrement;
+	}
+
+	void LineMesh2D::bind(DrawType type)
+	{
+		// Data
+		m_type = type;
+		m_subtype = Graphics::GetDrawSubType(type);
+
+		m_drawCount = m_points.getDrawCount();
+
+		// Buffers
+		m_VAO.bind();
+
+		m_points.bind();
+
+		// Reset
+		m_index = 0;
+		m_points.vertices.clear();
+
+		m_VAO.unbind();
+	}
+
+	void LineMesh2D::draw()
+	{
+		m_VAO.bind();
+
+		Graphics::Draw::Array(m_type, m_drawCount);
 	}
 }

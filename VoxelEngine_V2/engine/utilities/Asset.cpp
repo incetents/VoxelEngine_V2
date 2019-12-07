@@ -153,8 +153,12 @@ namespace Vxl
 			{
 				auto mat = _Assets::getMaterial(material_error);
 				mat->setShaderMaterial(shaderMaterial_error);
-				mat->setSequenceID(999999u);
+				mat->setSequenceID(9000);
 			}
+		}
+		// Line Render Material
+		{
+			shaderMaterial_lineRender = createShaderMaterial("./assets/materials/lineRender.material");
 		}
 		// Show Render Target
 		{
@@ -164,6 +168,14 @@ namespace Vxl
 	ShaderProgram* GlobalAssets::get_ProgramShowRenderTarget(void) const
 	{
 		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shader_showRenderTarget);
+		if (shadMat)
+			return m_shaderProgram_storage.Get(shadMat->m_coreProgram);
+
+		return nullptr;
+	}
+	ShaderProgram* GlobalAssets::get_ProgramLineRender(void) const
+	{
+		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shaderMaterial_lineRender);
 		if (shadMat)
 			return m_shaderProgram_storage.Get(shadMat->m_coreProgram);
 

@@ -7,10 +7,12 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "../rendering/Mesh.h"
+
 #include "../utilities/stringUtil.h"
 #include "../utilities/Logger.h"
 #include "../utilities/Types.h"
-#include "../rendering/Mesh.h"
+#include "../utilities/Asset.h"
 
 namespace Vxl
 {
@@ -179,7 +181,7 @@ namespace Vxl
 
 			// Mesh Data
 			Mesh* _mesh = SceneAssets.getMesh(NewMeshIndex);
-			_mesh->Set(*Models[i]);
+			_mesh->set(*Models[i]);
 			_mesh->setGLName(_name);
 		}
 
@@ -198,7 +200,7 @@ namespace Vxl
 
 		MeshIndex NewMeshIndex = SceneAssets.createMesh();
 		Mesh* _mesh = SceneAssets.getMesh(NewMeshIndex);
-		_mesh->Set(*Models[0]);
+		_mesh->set(*Models[0]);
 		_mesh->setGLName(name);
 
 		return NewMeshIndex;

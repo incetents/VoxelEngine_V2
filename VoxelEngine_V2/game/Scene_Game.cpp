@@ -66,7 +66,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGBA8,
+			TextureFormat::SRGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 			);
@@ -76,7 +76,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGBA8,
+			TextureFormat::SRGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -86,7 +86,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGBA8,
+			TextureFormat::SRGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -97,7 +97,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGBA8,
+			TextureFormat::SRGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -111,7 +111,7 @@ namespace Vxl
 			false, true,
 			TextureWrapping::CLAMP_STRETCH,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGBA8,
+			TextureFormat::SRGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -163,7 +163,6 @@ namespace Vxl
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
-		//fbotex_editor_depth = SceneAssets.createRenderTextureDepth(
 			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
 			TextureDepthFormat::DEPTH32
 		);
@@ -515,13 +514,12 @@ namespace Vxl
 		};
 		uint32_t indices[6] = { 0, 1, 2, 0, 2, 3 };
 		
-		//_mesh->positions = std::vector<Vector3>(pos, pos + 4);
+		_mesh->m_positions = std::vector<Vector3>(pos, pos + 4);
+		_mesh->m_uvs = std::vector<Vector2>(uvs, uvs + 4);
+		_mesh->m_indices = std::vector<uint32_t>(indices, indices + 6);
 
-		_mesh->m_positions.set(pos, 4);
-		_mesh->m_uvs.set(uvs, 4);
-		_mesh->m_indices.set(indices, 6);
-		_mesh->GenerateNormals(false);
-		_mesh->GenerateTangents();
+		_mesh->generateNormals(false);
+		_mesh->generateTangents();
 		
 		std::vector<Matrix4x4> m_models;
 		for (float x = 0; x < 5.0f; x++)
@@ -889,8 +887,33 @@ namespace Vxl
 		//			_Entity->DrawSelection();
 		//	}
 
+		// Debug Lines
+		Debug.DrawLine(
+			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
+			10.0f,
+			Color3F(0, 1, 0), Color3F(1, 0, 1)
+		);
+		static float time = 0.0f;
+		time += 0.2f;
+		Debug.DrawLine(
+			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
+			10.0f,
+			Color3F(1, 1, 0), Color3F(0, 1, 1)
+		);
+		Debug.DrawLineNoDepth(
+			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
+			10.0f,
+			Color3F(0, 0, 0), Color3F(0, 0, 0)
+		);
+
+		Debug.DrawLineScreenSpace(
+			Vector2(-1, -1), Vector2(0, 0),
+			5.0f,
+			Color3F(1, 0, 0), Color3F(0, 1, 0)
+		);
+
 		// End Frame Updates
-		XGamePadManager.Update();
+		
 
 		// Imgui Specials
 		//	if (material_gbuffer)
@@ -931,19 +954,7 @@ namespace Vxl
 
 	void Scene_Game::Draw()
 	{
-		// Debug Lines
-		Debug.DrawLine(
-			Vector3(-1, -1, -1), Vector3(+1, +1, -1),
-			10.0f,
-			Color4F(0, 1, 0, 0.25f), Color4F(1, 0, 1, 1)
-		);
-		static float time = 0.0f;
-		time += 0.2f;
-		Debug.DrawLine(
-			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
-			10.0f,
-			Color4F(1, 1, 0, 0.25f), Color4F(0, 1, 1, 1)
-		);
+		
 
 		//ShaderProgram* _shader_gbuffer = ShaderProgram::GetAsset("gbuffer");
 		//	auto& sub = _shader_gbuffer->GetSubroutine(ShaderType::FRAGMENT);
@@ -974,23 +985,60 @@ namespace Vxl
 
 		UBOManager.BindTime();
 
-		fbo_gbuffer->bind();
-		fbo_gbuffer->clearBuffers();
-		//
-		GPUTimer::StartTimer("Gbuffer");
-		CPUTimer::StartTimer("Gbuffer");
-		//
-		// Sort Objects
-		RenderManager.sortMaterials();
-		RenderManager.sortEntities();
-		//
-		RenderManager.renderOpaque();
-		RenderManager.renderTransparent();
-		//RenderManager.RenderSceneGameObjects_Opaque();
+		// Render Gbuffer Information
+		{
+			GPUTimer::StartTimer("Gbuffer");
+			CPUTimer::StartTimer("Gbuffer");
+			//
+			fbo_gbuffer->bind();
+			fbo_gbuffer->clearBuffers();
+			//
+			RenderManager.sortMaterials();
+			RenderManager.sortEntities();
+			//
+			RenderManager.renderOpaque();
+			RenderManager.renderTransparent();
+			//
+			CPUTimer::EndTimer("Gbuffer");
+			GPUTimer::EndTimer();
+		}
 
-		// Editor 
-		fbo_editor->bind();
-		fbo_editor->clearBuffers();
+
+		// Render Debugging Information
+		{
+			GPUTimer::StartTimer("Editor");
+			CPUTimer::StartTimer("Editor");
+			//
+			fbo_editor->bind();
+			fbo_editor->clearBuffers();
+
+			ShaderProgram* programRenderLines = GlobalAssets.get_ProgramLineRender();
+			programRenderLines->bind();
+			programRenderLines->bindCommonUniforms(-1);
+			// Depth
+			Graphics::SetDepthWrite(false);
+			Graphics::SetDepthRead(true);
+
+			programRenderLines->m_uniform_useModel.value().send(true);
+
+			// Ignore current depth
+			Debug.RenderWorldLinesNoDepth();
+
+			// Get Gbuffer depth
+			fbo_gbuffer->blitDepth(*fbo_editor);
+
+			// Read current depth
+			Debug.RenderWorldLines();
+
+			// Screenspace
+			Graphics::SetDepthRead(false);
+			programRenderLines->m_uniform_useModel.value().send(false);
+			Debug.RenderScreenLines();
+
+			//
+			CPUTimer::EndTimer("Editor");
+			GPUTimer::EndTimer();
+		}
 
 		//	// Remember Depth gbuffer depth
 		//	fbo_gbuffer->GetDepthRenderTexture()->Copy(*fbo_colorPicker->GetDepthRenderBuffer());
@@ -1026,8 +1074,7 @@ namespace Vxl
 		//	
 		//	
 		//	//
-		CPUTimer::EndTimer("Gbuffer");
-		GPUTimer::EndTimer();
+		
 		//	
 		//	// Render GIZMO ID [Changes FBO bound]
 		//	gizmo.RenderIDCapture();
@@ -1125,6 +1172,8 @@ namespace Vxl
 		// ~~~~
 		Graphics::SetBlendState(false);
 		Graphics::SetWireframeState(false);
+		Graphics::SetDepthWrite(true);
+		Graphics::SetDepthRead(true);
 		Graphics::SetDepthPassRule(DepthPassRule::ALWAYS);
 		Graphics::SetBlendMode(BlendSource::ONE, BlendDestination::ZERO);
 
@@ -1136,10 +1185,10 @@ namespace Vxl
 		ShaderProgram* shaderShowRenderTarget = GlobalAssets.get_ProgramShowRenderTarget();
 		shaderShowRenderTarget->bind();
 		shaderShowRenderTarget->sendUniform("channelOutput", 0);
-		shaderShowRenderTarget->sendUniform("outputMode", 0);
+		shaderShowRenderTarget->sendUniform("outputMode", 3);
 
 		fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
-		//fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
+		fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
 		
 		RenderManager.RenderFullScreen();
 		//////////////////////

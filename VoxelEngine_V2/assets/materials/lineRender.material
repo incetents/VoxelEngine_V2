@@ -1,0 +1,161 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
+
+#Name { lineRender }
+
+#Include
+{
+	_UBO.glsl,
+	_Uniforms.glsl
+}
+
+#Attributes
+{
+	vec3  m_position 	: 0
+	float m_width 		: 1
+	vec4  m_color 		: 3
+}
+
+#Link
+{
+	float v_width;
+	vec4 v_color;
+}
+
+#RenderTargets
+{
+	vec4 output_albedo 		: 0
+}
+
+#Samplers
+{
+	// Uniform Textures
+	sampler2D albedo_handler : 0
+}
+
+#Properties // Uniforms and Functions
+{
+}
+
+#Vertex // Main
+{
+	vert_out.v_width = m_width;
+	vert_out.v_color = m_color;
+	
+	if(VXL_useModel)
+		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
+	else
+		gl_Position = vec4(m_position, 1.0); 
+}
+
+#DefinesGeometry
+{
+	#define SHOW_DEBUG_LINES        0
+	#define PASSTHROUGH_BASIC_LINES 0
+	#define STRIP                   1
+	
+	layout(lines) in;
+	
+	#if SHOW_DEBUG_LINES || PASSTHROUGH_BASIC_LINES
+	layout(line_strip, max_vertices = 10) out;
+	#else 
+	layout(triangle_strip, max_vertices = 6) out;
+	#endif
+}
+#Geometry // Main
+{
+	//  a - - - - - - - - - - - - - - - - b
+    //  |      |                   |      |
+    //  |      |                   |      |
+    //  |      |                   |      |
+    //  | - - -start - - - - - - end- - - |
+    //  |      |                   |      |
+    //  |      |                   |      |
+    //  |      |                   |      |
+    //  d - - - - - - - - - - - - - - - - c
+
+    vec4 start  = gl_in[0].gl_Position;
+    vec4 end    = gl_in[1].gl_Position;
+
+#if PASSTHROUGH_BASIC_LINES
+	gl_Position = start; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+	gl_Position = end;   geom_out.v_color = geom_in[1].v_color; EmitVertex();
+	EndPrimitive();
+	return;
+#endif
+
+    // It is necessary to manually clip the line before homogenization.
+    // Compute line start and end distances to nearplane in clipspace
+    // Distances are t0 = dot(start, plane) and t1 = dot(end, plane)
+    // If signs are not equal then clip
+    float t0 = start.z + start.w;
+    float t1 = end.z + end.w;
+    if(t0 < 0.0)
+    {
+        if(t1 < 0.0)
+        {
+            return;
+        }
+        start = mix(start, end, (0 - t0) / (t1 - t0));
+    }
+    if(t1 < 0.0)
+    {
+        end = mix(start, end, (0 - t0) / (t1 - t0));
+    }
+
+    vec2 vpSize         = VXL_viewport.zw;
+
+    //  Compute line axis and side vector in screen space
+    vec2 startInNDC     = start.xy / start.w;       //  clip to NDC: homogenize and drop z
+    vec2 endInNDC       = end.xy / end.w;
+    vec2 lineInNDC      = endInNDC - startInNDC;
+    vec2 startInScreen  = (0.5 * startInNDC + vec2(0.5)) * vpSize + VXL_viewport.xy;
+    vec2 endInScreen    = (0.5 * endInNDC   + vec2(0.5)) * vpSize + VXL_viewport.xy;
+    vec2 lineInScreen   = lineInNDC * vpSize;       //  ndc to screen (direction vector)
+    vec2 axisInScreen   = normalize(lineInScreen);
+    vec2 sideInScreen   = vec2(-axisInScreen.y, axisInScreen.x);    // rotate
+    vec2 axisInNDC      = axisInScreen / vpSize;                    // screen to NDC
+    vec2 sideInNDC      = sideInScreen / vpSize;
+    vec4 axis           = vec4(axisInNDC, 0.0, 0.0) * geom_in[0].v_width;//_line_width.x;  // NDC to clip (delta vector)
+    vec4 side           = vec4(sideInNDC, 0.0, 0.0) * geom_in[1].v_width;//_line_width.x;
+
+    vec4 a = (start + (side - axis) * start.w); 
+    vec4 b = (end   + (side + axis) * end.w);
+    vec4 c = (end   - (side - axis) * end.w);
+    vec4 d = (start - (side + axis) * start.w);
+
+#if SHOW_DEBUG_LINES
+    gl_Position = gl_in[0].gl_Position; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = gl_in[1].gl_Position; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+    EndPrimitive();
+
+    gl_Position = a; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = b; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+    EndPrimitive();
+
+    gl_Position = b; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = c; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+    EndPrimitive();
+
+    gl_Position = c; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = d; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+    EndPrimitive();
+
+    gl_Position = d; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = a; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+    EndPrimitive();
+
+#elif STRIP
+
+	gl_Position = a; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = d; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = b; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+    gl_Position = c; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+	EndPrimitive();
+
+#endif
+}
+
+#Fragment // Main
+{
+	output_albedo = frag_in.v_color;
+}

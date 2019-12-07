@@ -15,6 +15,7 @@ namespace Vxl
 {
 	class Model;
 
+	//
 	class Mesh
 	{
 		DISALLOW_COPY_AND_ASSIGN(Mesh);
@@ -46,64 +47,129 @@ namespace Vxl
 			const uint32_t* _indices = nullptr, uint32_t _indexCount = 0
 		);
 
-		Mesh();
+		// Protected, created through assets
+		Mesh() {}
 	public:
 
 		virtual ~Mesh() {}
 
-		//	_MeshBuffer<Vector3> positions = _MeshBuffer<Vector3>(BufferLayout({ {BufferType::POSITION, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
-		//	_MeshBuffer<Vector2> uvs = _MeshBuffer<Vector2>(BufferLayout({ {BufferType::UV, AttributeType::VEC2} }), BufferUsage::STATIC_DRAW);
-		//	_MeshBuffer<Vector3> normals = _MeshBuffer<Vector3>(BufferLayout({ {BufferType::NORMAL, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
-		//	_MeshBuffer<Vector3> tangents = _MeshBuffer<Vector3>(BufferLayout({ {BufferType::TANGENT, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
-		//	
-		//	_MeshBufferIndices indices = _MeshBufferIndices(BufferUsage::STATIC_DRAW);
+		MeshBuffer<Vector3> m_positions =	MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC0, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Vector2> m_uvs =		MeshBuffer<Vector2>(BufferLayout({ {AttributeLocation::LOC1, AttributeType::VEC2} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Vector3> m_normals =	MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC2, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Vector3> m_tangents =	MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC6, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Matrix4x4> m_instances = MeshBuffer<Matrix4x4>(BufferLayout(
+			{
+				{AttributeLocation::LOC8, AttributeType::VEC4, false, 1},
+				{AttributeLocation::LOC9, AttributeType::VEC4, false, 1},
+				{AttributeLocation::LOC10, AttributeType::VEC4, false, 1},
+				{AttributeLocation::LOC11, AttributeType::VEC4, false, 1}
+			}), BufferUsage::STATIC_DRAW);
 
-		MeshBufferMem<Vector3>	m_positions;
-		MeshBufferMem<Vector2>	m_uvs;
-		MeshBuffer<Vector3>		m_normals;
-		MeshBuffer<Vector3>		m_tangents;
-		MeshBufferInstancing	m_instances;
-		MeshBufferIndices		m_indices;
+		MeshBufferIndices m_indices = MeshBufferIndices(BufferUsage::STATIC_DRAW);
 
 		// Update all data from model
-		void Set(const Model& _model);
+		void set(const Model& _model);
 		void setGLName(const std::string& name);
 
-		inline uint32_t		GetDrawCount(void)	 const
+		inline uint32_t		getDrawCount(void)	 const
 		{
 			return m_drawCount;
 		}
-		inline DrawType		GetDrawType(void)	 const
+		inline DrawType		getDrawType(void)	 const
 		{
 			return m_type;
 		}
-		inline DrawSubType	GetDrawSubType(void) const
+		inline DrawSubType	getDrawSubType(void) const
 		{
 			return m_subtype;
 		}
-		inline DrawMode		GetDrawMode(void)	 const
+		inline DrawMode		getDrawMode(void)	 const
 		{
 			return m_mode;
 		}
-		inline Vector3		GetVertexMin(void)	 const
+		inline Vector3		getVertexMin(void)	 const
 		{
 			return m_min;
 		}
-		inline Vector3		GetVertexMax(void)	 const
+		inline Vector3		getVertexMax(void)	 const
 		{
 			return m_max;
 		}
-		inline VAOID		GetVAOID(void) const
+		inline VAOID		getVAOID(void) const
 		{
 			return m_VAO.getID();
 		}
 
-		void GenerateNormals(bool Smooth);
-		void GenerateTangents();
-		void RecalculateMinMax();
+		void generateNormals(bool Smooth);
+		void generateTangents();
+		void recalculateMinMax();
 
 		void bind(DrawType type = DrawType::TRIANGLES);
-		void Draw();
+		void draw();
 	};
+
+	//
+	class LineMesh3D
+	{
+	private:
+		VAO m_VAO;
+
+		DrawType	m_type;
+		DrawSubType m_subtype; // points, lines, or triangles
+		uint32_t	m_drawCount = 0;	// Vertices Drawn
+
+		const static uint32_t m_indexIncrement; // Floats per line set
+
+	public:
+		MeshBuffer<float> m_points = MeshBuffer<float>(BufferLayout(
+			{
+				{AttributeLocation::LOC0, AttributeType::VEC3 }, // Position
+				{AttributeLocation::LOC3, AttributeType::VEC3 }, // Color
+				{AttributeLocation::LOC1, AttributeType::FLOAT}  // Width
+			}),
+			BufferUsage::DYNAMIC_DRAW
+			);
+		
+		// Used to reference where in points the vertices is being used
+		uint32_t m_index = 0;
+
+		void addLine(const Vector3& P1, const Vector3& P2, float Width, const Color3F& C1, const Color3F& C2);
+
+		void bind(DrawType type = DrawType::LINES);
+		void draw();
+	};
+	const uint32_t LineMesh3D::m_indexIncrement = 14;
+
+	//
+	class LineMesh2D
+	{
+	private:
+		VAO m_VAO;
+
+		DrawType	m_type;
+		DrawSubType m_subtype; // points, lines, or triangles
+		uint32_t	m_drawCount = 0;	// Vertices Drawn
+
+		const static uint32_t m_indexIncrement; // Floats per line set
+
+	public:
+		MeshBuffer<float> m_points = MeshBuffer<float>(BufferLayout(
+			{
+				{AttributeLocation::LOC0, AttributeType::VEC2 }, // Position
+				{AttributeLocation::LOC3, AttributeType::VEC3 }, // Color
+				{AttributeLocation::LOC1, AttributeType::FLOAT}  // Width
+			}),
+			BufferUsage::DYNAMIC_DRAW
+			);
+
+		// Used to reference where in points the vertices is being used
+		uint32_t m_index = 0;
+
+		void addLine(const Vector2& P1, const Vector2& P2, float Width, const Color3F& C1, const Color3F& C2);
+
+		void bind(DrawType type = DrawType::LINES);
+		void draw();
+	};
+	const uint32_t LineMesh2D::m_indexIncrement = 12;
 }
 

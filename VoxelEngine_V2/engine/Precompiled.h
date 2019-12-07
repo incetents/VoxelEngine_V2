@@ -48,7 +48,6 @@
 #include "rendering/FramebufferObject.h"
 #include "rendering/Primitives.h"
 #include "rendering/Graphics.h"
-#include "rendering/LineMesh.h"
 #include "rendering/Mesh.h"
 #include "rendering/MeshBuffer.h"
 #include "rendering/RenderBuffer.h"

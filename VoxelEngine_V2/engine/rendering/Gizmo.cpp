@@ -519,7 +519,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::RED);
 
-				Assets.getMesh(Primitives.GetArrowX())->Draw();
+				Assets.getMesh(Primitives.GetArrowX())->draw();
 
 				// Y Axis //
 				if (m_selectedAxis == Axis::Y)
@@ -530,7 +530,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::GREEN);
 
-				Assets.getMesh(Primitives.GetArrowY())->Draw();
+				Assets.getMesh(Primitives.GetArrowY())->draw();
 
 				// Z Axis //
 				if (m_selectedAxis == Axis::Z)
@@ -541,7 +541,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::BLUE);
 
-				Assets.getMesh(Primitives.GetArrowZ())->Draw();
+				Assets.getMesh(Primitives.GetArrowZ())->draw();
 
 				// Cull
 				Graphics::SetCullMode(CullMode::NO_CULL);
@@ -558,7 +558,7 @@ namespace Vxl
 					uniform_color.send(Color3F::RED);
 
 				Mesh* mesh_HalfQuadAxisX = Assets.getMesh(m_mesh_HalfQuadAxisX[(m_camAxisSide[1] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]);
-				mesh_HalfQuadAxisX->Draw();
+				mesh_HalfQuadAxisX->draw();
 				
 				// Y Plane
 				if (m_selectedPlane == Axis::Y)
@@ -570,7 +570,7 @@ namespace Vxl
 					uniform_color.send(Color3F::GREEN);
 
 				Mesh* mesh_HalfQuadAxisY = Assets.getMesh(m_mesh_HalfQuadAxisY[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)]);
-				mesh_HalfQuadAxisY->Draw();
+				mesh_HalfQuadAxisY->draw();
 
 				// Z Plane
 				if (m_selectedPlane == Axis::Z)
@@ -582,7 +582,7 @@ namespace Vxl
 					uniform_color.send(Color3F::BLUE);
 
 				Mesh* mesh_HalfQuadAxisZ = Assets.getMesh(m_mesh_HalfQuadAxisZ[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[1] ? 2 : 0)]);
-				mesh_HalfQuadAxisZ->Draw();
+				mesh_HalfQuadAxisZ->draw();
 
 				// Cull
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
@@ -598,7 +598,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::WHITE);
 				//
-				Assets.getMesh(Primitives.GetCubeSmall())->Draw();
+				Assets.getMesh(Primitives.GetCubeSmall())->draw();
 
 			}
 			else if (m_mode == Mode::SCALE)
@@ -610,9 +610,9 @@ namespace Vxl
 				float YLineLength = (m_clicked && (m_selectedAxis == Axis::Y || m_selectedAxis == Axis::ALL)) ? m_constantScale + m_dragAmount - 0.0f : m_constantScale;
 				float ZLineLength = (m_clicked && (m_selectedAxis == Axis::Z || m_selectedAxis == Axis::ALL)) ? m_constantScale + m_dragAmount - 0.0f : m_constantScale;
 
-				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Right * XLineLength, 5.0f, Color4F::RED, Color4F::RED);
-				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Up * YLineLength, 5.0f, Color4F::GREEN, Color4F::GREEN);
-				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Forward * ZLineLength, 5.0f, Color4F::BLUE, Color4F::BLUE);
+				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Right * XLineLength, 5.0f, Color3F::RED, Color3F::RED);
+				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Up * YLineLength, 5.0f, Color3F::GREEN, Color3F::GREEN);
+				Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_transform.Forward * ZLineLength, 5.0f, Color3F::BLUE, Color3F::BLUE);
 				
 
 				// X Cube //
@@ -626,7 +626,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::RED);
 
-				Assets.getMesh(m_mesh_ScaleCube[0])->Draw();
+				Assets.getMesh(m_mesh_ScaleCube[0])->draw();
 
 				// Y Cube //
 				Matrix4x4 Y_Model = m_transform.Model * Matrix4x4::GetTranslate(Y_Offset);
@@ -639,7 +639,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::GREEN);
 
-				Assets.getMesh(m_mesh_ScaleCube[1])->Draw();
+				Assets.getMesh(m_mesh_ScaleCube[1])->draw();
 
 				// Z Cube //
 				Matrix4x4 Z_Model = m_transform.Model * Matrix4x4::GetTranslate(Z_Offset);
@@ -652,7 +652,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::BLUE);
 
-				Assets.getMesh(m_mesh_ScaleCube[2])->Draw();
+				Assets.getMesh(m_mesh_ScaleCube[2])->draw();
 
 				// Small cube in the middle //
 				uniform_model.sendMatrix(m_transform.Model, true);
@@ -666,7 +666,7 @@ namespace Vxl
 				else
 					uniform_color.send(Color3F::WHITE);
 
-				Assets.getMesh(Primitives.GetCubeSmall())->Draw();
+				Assets.getMesh(Primitives.GetCubeSmall())->draw();
 
 				// revert
 				uniform_alpha.send(1.0f);
@@ -676,14 +676,14 @@ namespace Vxl
 			{
 				gizmoMaterial->sendUniform("ignoreLight", true);
 
-				// Draw Drag Directions
+				// draw Drag Directions
 				if (m_clicked)
 				{
-					Color4F LineColor = Color4F::RED;
+					Color3F LineColor = Color3F::RED;
 					if (m_selectedPlane == Axis::Y)
-						LineColor = Color4F::GREEN;
+						LineColor = Color3F::GREEN;
 					else if (m_selectedPlane == Axis::Z)
-						LineColor = Color4F::BLUE;
+						LineColor = Color3F::BLUE;
 
 					Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_rotationDragStart * m_constantScale, 5.0f, LineColor, LineColor);
 					Debug.DrawLineNoDepth(m_transform.WorldPosition, m_transform.WorldPosition + m_dragEnd * m_constantScale, 5.0f, LineColor, LineColor);
@@ -705,7 +705,7 @@ namespace Vxl
 					else
 						uniform_color.send(Color3F::RED);
 
-					Assets.getMesh(Primitives.GetDoughtnutX_2D())->Draw();
+					Assets.getMesh(Primitives.GetDoughtnutX_2D())->draw();
 				}
 
 				// Y Circle //
@@ -719,7 +719,7 @@ namespace Vxl
 					else
 						uniform_color.send(Color3F::GREEN);
 
-					Assets.getMesh(Primitives.GetDoughtnutY_2D())->Draw();
+					Assets.getMesh(Primitives.GetDoughtnutY_2D())->draw();
 				}
 
 				// Z Circle //
@@ -733,7 +733,7 @@ namespace Vxl
 					else
 						uniform_color.send(Color3F::BLUE);
 
-					Assets.getMesh(Primitives.GetDoughtnutZ_2D())->Draw();
+					Assets.getMesh(Primitives.GetDoughtnutZ_2D())->draw();
 				}
 
 				// revert
@@ -774,41 +774,41 @@ namespace Vxl
 				// X-arrow
 				color = Util::Conversion::uint_to_color4(1u);
 				uniform_output.send(color);
-				Assets.getMesh(Primitives.GetArrowX())->Draw();
+				Assets.getMesh(Primitives.GetArrowX())->draw();
 
 				// Y-arrow
 				color = Util::Conversion::uint_to_color4(2u);
 				uniform_output.send(color);
-				Assets.getMesh(Primitives.GetArrowY())->Draw();
+				Assets.getMesh(Primitives.GetArrowY())->draw();
 
 				// Z-arrow
 				color = Util::Conversion::uint_to_color4(3u);
 				uniform_output.send(color);
-				Assets.getMesh(Primitives.GetArrowZ())->Draw();
+				Assets.getMesh(Primitives.GetArrowZ())->draw();
 
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
 				// X Plane
 				color = Util::Conversion::uint_to_color4(4u);
 				uniform_output.send(color);
-				Assets.getMesh(m_mesh_HalfQuadAxisX[(m_camAxisSide[1] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)])->Draw();
+				Assets.getMesh(m_mesh_HalfQuadAxisX[(m_camAxisSide[1] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)])->draw();
 
 				// Y Plane
 				color = Util::Conversion::uint_to_color4(5u);
 				uniform_output.send(color);
-				Assets.getMesh(m_mesh_HalfQuadAxisY[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)])->Draw();
+				Assets.getMesh(m_mesh_HalfQuadAxisY[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[2] ? 2 : 0)])->draw();
 
 				// Z Plane
 				color = Util::Conversion::uint_to_color4(6u);
 				uniform_output.send(color);
-				Assets.getMesh(m_mesh_HalfQuadAxisZ[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[1] ? 2 : 0)])->Draw();
+				Assets.getMesh(m_mesh_HalfQuadAxisZ[(m_camAxisSide[0] ? 1 : 0) + (m_camAxisSide[1] ? 2 : 0)])->draw();
 
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
 				// Cube (ignored)
 				color = Util::Conversion::uint_to_color4(7u);
 				uniform_output.send(color);
-				Assets.getMesh(Primitives.GetCubeSmall())->Draw();
+				Assets.getMesh(Primitives.GetCubeSmall())->draw();
 
 				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
@@ -868,27 +868,27 @@ namespace Vxl
 				Matrix4x4 X_Model = m_transform.Model * Matrix4x4::GetTranslate(X_Offset);
 				uniform_model.sendMatrix(X_Model, true);
 				uniform_output.send(color);
-				Assets.getMesh(m_mesh_ScaleCube[0])->Draw();
+				Assets.getMesh(m_mesh_ScaleCube[0])->draw();
 
 				// Y Cube
 				color = Util::Conversion::uint_to_color4(2u);
 				Matrix4x4 Y_Model = m_transform.Model * Matrix4x4::GetTranslate(Y_Offset);
 				uniform_model.sendMatrix(Y_Model, true);
 				uniform_output.send(color);
-				Assets.getMesh(m_mesh_ScaleCube[1])->Draw();
+				Assets.getMesh(m_mesh_ScaleCube[1])->draw();
 
 				// Z Cube
 				color = Util::Conversion::uint_to_color4(3u);
 				Matrix4x4 Z_Model = m_transform.Model * Matrix4x4::GetTranslate(Z_Offset);
 				uniform_model.sendMatrix(Z_Model, true);
 				uniform_output.send(color);
-				Assets.getMesh(m_mesh_ScaleCube[2])->Draw();
+				Assets.getMesh(m_mesh_ScaleCube[2])->draw();
 
 				// Center Cube
 				color = Util::Conversion::uint_to_color4(4u);
 				uniform_model.sendMatrix(m_transform.Model, true);
 				uniform_output.send(color);
-				Assets.getMesh(Primitives.GetCubeSmall())->Draw();
+				Assets.getMesh(Primitives.GetCubeSmall())->draw();
 
 				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
@@ -923,7 +923,7 @@ namespace Vxl
 			{
 				Color4F color;
 
-				// Draw both sides
+				// draw both sides
 				Graphics::SetCullMode(CullMode::NO_CULL);
 
 				uniform_model.sendMatrix(m_transform.Model, true);
@@ -933,7 +933,7 @@ namespace Vxl
 				{
 					color = Util::Conversion::uint_to_color4(1u);
 					uniform_output.send(color);
-					Assets.getMesh(Primitives.GetDoughtnutX_2D())->Draw();
+					Assets.getMesh(Primitives.GetDoughtnutX_2D())->draw();
 				}
 
 				// Y Circle
@@ -941,7 +941,7 @@ namespace Vxl
 				{
 					color = Util::Conversion::uint_to_color4(2u);
 					uniform_output.send(color);
-					Assets.getMesh(Primitives.GetDoughtnutY_2D())->Draw();
+					Assets.getMesh(Primitives.GetDoughtnutY_2D())->draw();
 				}
 
 				// Z Circle
@@ -949,7 +949,7 @@ namespace Vxl
 				{
 					color = Util::Conversion::uint_to_color4(3u);
 					uniform_output.send(color);
-					Assets.getMesh(Primitives.GetDoughtnutZ_2D())->Draw();
+					Assets.getMesh(Primitives.GetDoughtnutZ_2D())->draw();
 				}
 
 				// Revert

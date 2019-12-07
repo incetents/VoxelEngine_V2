@@ -25,7 +25,7 @@ namespace Vxl
 		if (!mesh1 || !mesh2)
 			return false;
 
-		return mesh1->GetVAOID() < mesh2->GetVAOID();
+		return mesh1->getVAOID() < mesh2->getVAOID();
 	}
 
 	Entity::Entity(const std::string& name)
@@ -59,7 +59,7 @@ namespace Vxl
 		if (_mesh != nullptr)
 		{
 			// Update OBB
-			Vector3 _scale = m_transform.getWorldScale() * (_mesh->GetVertexMax() - _mesh->GetVertexMin());
+			Vector3 _scale = m_transform.getWorldScale() * (_mesh->getVertexMax() - _mesh->getVertexMin());
 			Vector3 _right = m_transform.getRight() * _scale.x * 0.5f;
 			Vector3 _up = m_transform.getUp() * _scale.y * 0.5f;
 			Vector3 _forward = m_transform.getForward() * _scale.z * 0.5f;

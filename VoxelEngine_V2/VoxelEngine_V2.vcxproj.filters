@@ -114,9 +114,6 @@
     <ClCompile Include="engine\rendering\FramebufferObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\rendering\LineMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\rendering\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -217,6 +214,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\rendering\Primitives.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\VBOLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -339,9 +339,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\rendering\FramebufferObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\rendering\LineMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\rendering\Mesh.h">

@@ -75,6 +75,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		// End of frame update
 		Editor.Update();
 		Input.Update();
+		XGamePadManager.Update();
 		Window.EndFrame();
 		TimeController.EndFrame();
 

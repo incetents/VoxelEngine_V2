@@ -195,9 +195,9 @@ namespace Vxl
 #define FULLSCREEN_TRIANGLE
 
 #ifdef FULLSCREEN_TRIANGLE
-			Assets.getMesh(Primitives.GetFullTriangle())->Draw();
+			Assets.getMesh(Primitives.GetFullTriangle())->draw();
 #else
-			Assets.getMesh(Primitives.GetFullQuad())->Draw();
+			Assets.getMesh(Primitives.GetFullQuad())->draw();
 #endif
 	
 	}
@@ -285,9 +285,8 @@ namespace Vxl
 			if (!material->bindCoreProgram())
 			{
 				material = GlobalAssets.get_MaterialError();
-				material->bindCoreProgram();
-				//if (!material->bindCoreProgram())
-				//	VXL_ERROR("Material used for Error doesn't work");
+				if (!material->bindCoreProgram())
+					VXL_ERROR("Error Material failed to compile");
 			}
 
 			material->bindStates();
@@ -307,7 +306,7 @@ namespace Vxl
 
 						material->bindCoreProgramCommonUniforms(ent->m_uniqueID);
 
-						mesh->Draw();
+						mesh->draw();
 					}
 				}
 			}

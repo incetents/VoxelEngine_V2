@@ -51,30 +51,30 @@
 		if(VXL_useInstancing)
 		{
 			gl_Position = VXL_mvp * instanceMatrix * vec4(m_position, 1.0); 
-			io.pos = vec3(VXL_model * instanceMatrix * vec4(m_position, 1.0));
+			vert_out.pos = vec3(VXL_model * instanceMatrix * vec4(m_position, 1.0));
 		}
 		else
 		{
 			gl_Position = VXL_mvp * vec4(m_position, 1.0); 
-			io.pos = vec3(VXL_model * vec4(m_position, 1.0));
+			vert_out.pos = vec3(VXL_model * vec4(m_position, 1.0));
 		}
 	
-		io.normal = VXL_normalMatrix * m_normal;
-		io.tangent = VXL_normalMatrix * m_tangent;
+		vert_out.normal = VXL_normalMatrix * m_normal;
+		vert_out.tangent = VXL_normalMatrix * m_tangent;
 	}
 	// Passthrough
 	else
 	{
 		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
-		io.pos = m_position;
+		vert_out.pos = m_position;
 		
-		io.normal = m_normal;
-		io.tangent = m_tangent;
+		vert_out.normal = m_normal;
+		vert_out.tangent = m_tangent;
 	}
 	
 	// Constants
-	io.uv = m_uv;
-	io.bitangent = cross(io.normal, io.tangent);
+	vert_out.uv = m_uv;
+	vert_out.bitangent = cross(vert_out.normal, vert_out.tangent);
 }
 
 #Fragment // Main
@@ -83,13 +83,13 @@
 
 	if(VXL_useTexture)
 	{
-		output_albedo.rgb = texture(albedo_handler, io.uv).rgb;
+		output_albedo.rgb = texture(albedo_handler, frag_in.uv).rgb;
 	}
 	
 	output_albedo.rgb = output_albedo.rgb * VXL_tint + VXL_color;
 			
 			
-	output_normal = vec4(normalize(io.normal), 1); // worldspace Normals
+	output_normal = vec4(normalize(frag_in.normal), 1); // worldspace Normals
 
 	output_reflection = vec4(0,0,0,1);
 }

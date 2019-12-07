@@ -23,24 +23,24 @@ namespace Vxl
 		// If only 1 element, stride and offset can be set to zero for efficient packing
 		if (elementCount == 1)
 		{
-			const auto& element = m_layout.m_elements[0];
+			const BufferElement& element = m_layout.m_elements[0];
 
-			Graphics::VBO::SetVertexAttribState((UINT)element.m_bufferType, true);
-			Graphics::VBO::SetVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, 0, 0, element.m_normalized);
+			Graphics::VBO::SetVertexAttribState((uint32_t)element.m_attributeLocation, true);
+			Graphics::VBO::SetVertexAttrib((uint32_t)element.m_attributeLocation, element.m_valueCount, element.m_dataType, 0, 0, element.m_normalized);
 
 			if (element.m_divisor > 0)
-				Graphics::VBO::SetVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
+				Graphics::VBO::SetVertexAttribDivisor((uint32_t)element.m_attributeLocation, element.m_divisor);
 		}
 		// Normal layout
 		else
 		{
 			for (const auto& element : m_layout.m_elements)
 			{
-				Graphics::VBO::SetVertexAttribState((UINT)element.m_bufferType, true);
-				Graphics::VBO::SetVertexAttrib((UINT)element.m_bufferType, element.m_valueCount, element.m_dataType, m_layout.m_stride, element.m_offset, element.m_normalized);
+				Graphics::VBO::SetVertexAttribState((uint32_t)element.m_attributeLocation, true);
+				Graphics::VBO::SetVertexAttrib((uint32_t)element.m_attributeLocation, element.m_valueCount, element.m_dataType, m_layout.m_stride, element.m_offset, element.m_normalized);
 
 				if (element.m_divisor > 0)
-					Graphics::VBO::SetVertexAttribDivisor((UINT)element.m_bufferType, element.m_divisor);
+					Graphics::VBO::SetVertexAttribDivisor((uint32_t)element.m_attributeLocation, element.m_divisor);
 			}
 		}
 	}

@@ -42,17 +42,37 @@ namespace Vxl
 	{
 		if (m_type == Type::RENDERTEXTURE)
 		{
-			RenderTexture* rt = Assets.getRenderTexture(m_assetIndex);
-			VXL_ASSERT(rt, "Missing RenderTexture");
-			if (rt)
-				return rt->getFormatType();
+			if (m_isDepth)
+			{
+				RenderTextureDepth* rt = Assets.getRenderTextureDepth(m_assetIndex);
+				VXL_ASSERT(rt, "Missing RenderTextureDepth");
+				if (rt)
+					return rt->getFormatType();
+			}
+			else
+			{
+				RenderTexture* rt = Assets.getRenderTexture(m_assetIndex);
+				VXL_ASSERT(rt, "Missing RenderTexture");
+				if (rt)
+					return rt->getFormatType();
+			}
 		}
 		else if (m_type == Type::RENDERBUFFER)
 		{
-			RenderBuffer* rb = Assets.getRenderBuffer(m_assetIndex);
-			VXL_ASSERT(rb, "Missing RenderTexture");
-			if (rb)
-				return rb->getFormatType();
+			if (m_isDepth)
+			{
+				RenderBufferDepth* rb = Assets.getRenderBufferDepth(m_assetIndex);
+				VXL_ASSERT(rb, "Missing RenderBufferDepth");
+				if (rb)
+					return rb->getFormatType();
+			}
+			else
+			{
+				RenderBuffer* rb = Assets.getRenderBuffer(m_assetIndex);
+				VXL_ASSERT(rb, "Missing RenderBuffer");
+				if (rb)
+					return rb->getFormatType();
+			}
 		}
 	
 		return TextureFormat::RGBA8;

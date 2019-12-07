@@ -2,16 +2,18 @@
 #include "Precompiled.h"
 #include "Shader.h"
 
-#include "../utilities/Logger.h"
-#include "../utilities/FileIO.h"
-#include "../utilities/Asset.h"
-
 #include "../modules/Entity.h"
 
 #include "../objects/Camera.h"
 
 #include "../rendering/Mesh.h"
 #include "../rendering/RenderManager.h"
+
+#include "../utilities/Logger.h"
+#include "../utilities/FileIO.h"
+#include "../utilities/Asset.h"
+
+#include "../window/window.h"
 
 namespace Vxl
 {
@@ -214,6 +216,12 @@ namespace Vxl
 	// Common Uniforms
 	void ShaderProgram::bindCommonUniforms(EntityIndex _entity)
 	{
+		// Non entity - required
+		if (m_uniform_viewport.has_value())
+		{
+			m_uniform_viewport.value().send(Vector4((float)Window.GetViewportOffsetX(), (float)Window.GetViewportOffsetY(), (float)Window.GetViewportWidth(), (float)Window.GetViewportHeight()));
+		}
+
 		Entity* entity = Assets.getEntity(_entity);
 		if (!entity)
 			return;
@@ -254,7 +262,7 @@ namespace Vxl
 		{
 			Mesh* mesh = Assets.getMesh(entity->getMesh());
 
-			m_uniform_useInstancing.value().send(mesh && mesh->m_instances.GetDrawCount() > 0);
+			m_uniform_useInstancing.value().send(mesh && mesh->m_instances.getDrawCount() > 0);
 		}
 
 		// ~ Texture ~ //
@@ -299,6 +307,9 @@ namespace Vxl
 	const char* SECTION_VERTEX = "#Vertex";
 	const char* SECTION_GEOMETRY = "#Geometry";
 	const char* SECTION_FRAGMENT = "#Fragment";
+	const char* SECTION_VERTEX_DEFINES = "#DefinesVertex";
+	const char* SECTION_GEOMETRY_DEFINES = "#DefinesGeometry";
+	const char* SECTION_FRAGMENT_DEFINES = "#DefinesFragment";
 
 	const std::string GLSL_VERSION = "#version 420 core";
 
@@ -352,6 +363,9 @@ namespace Vxl
 			std::size_t vertex;
 			std::size_t geometry;
 			std::size_t fragment;
+			std::size_t vertex_defines;
+			std::size_t geometry_defines;
+			std::size_t fragment_defines;
 		} locations;
 
 		locations.name = file.find(SECTION_NAME);
@@ -364,6 +378,9 @@ namespace Vxl
 		locations.vertex = file.find(SECTION_VERTEX);
 		locations.geometry = file.find(SECTION_GEOMETRY);
 		locations.fragment = file.find(SECTION_FRAGMENT);
+		locations.vertex_defines = file.find(SECTION_VERTEX_DEFINES);
+		locations.geometry_defines = file.find(SECTION_GEOMETRY_DEFINES);
+		locations.fragment_defines = file.find(SECTION_FRAGMENT_DEFINES);
 
 		// Quick active state check
 		output_vertex.active = (locations.vertex != std::string::npos);
@@ -380,6 +397,29 @@ namespace Vxl
 		else
 		{
 			name = stringUtil::extractNameFromPath(m_filePath);
+		}
+
+		// Defines
+		if (locations.vertex_defines != std::string::npos)
+		{
+			std::string section = stringUtil::extractSection(file, '{', '}', locations.vertex_defines);
+
+			if (output_vertex.active)
+				output_vertex.include += "// Defines\n" + section + "\n\n";
+		}
+		if (locations.geometry_defines != std::string::npos)
+		{
+			std::string section = stringUtil::extractSection(file, '{', '}', locations.geometry_defines);
+
+			if (output_geometry.active)
+				output_geometry.include += "// Defines\n" + section + "\n\n";
+		}
+		if (locations.fragment_defines != std::string::npos)
+		{
+			std::string section = stringUtil::extractSection(file, '{', '}', locations.fragment_defines);
+
+			if (output_fragment.active)
+				output_fragment.include += "// Defines\n" + section + "\n\n";
 		}
 
 		// Include
@@ -444,14 +484,26 @@ namespace Vxl
 				output_vertex.input_output += "// Output\n";
 				output_vertex.input_output += "out LinkData\n{";
 				output_vertex.input_output += section;
-				output_vertex.input_output += "\n} io;\n";
+				output_vertex.input_output += "\n} vert_out;\n";
 			}
 			if (output_fragment.active)
 			{
 				output_fragment.input_output += "// Input\n";
-				output_fragment.input_output += "in LinkData\n{";
+				output_fragment.input_output += output_geometry.active ? "in LinkData_2\n{" : "in LinkData\n{";
 				output_fragment.input_output += section;
-				output_fragment.input_output += "\n} io;\n";
+				output_fragment.input_output += "\n} frag_in;\n";
+			}
+			if (output_geometry.active)
+			{
+				output_geometry.input_output += "// Input\n";
+				output_geometry.input_output += "in LinkData\n{";
+				output_geometry.input_output += section;
+				output_geometry.input_output += "\n} geom_in[];\n";
+
+				output_geometry.input_output += "// Output\n";
+				output_geometry.input_output += "out LinkData_2\n{";
+				output_geometry.input_output += section;
+				output_geometry.input_output += "\n} geom_out;\n";
 			}
 		}
 
@@ -553,7 +605,7 @@ namespace Vxl
 				output_vertex.input_output + '\n' +
 				output_vertex.behaviour;
 		}
-		// Primitives
+		// Geometry
 		if (output_geometry.active)
 		{
 			output_geometry.behaviour =

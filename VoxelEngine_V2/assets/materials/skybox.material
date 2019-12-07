@@ -30,7 +30,7 @@
 
 #Vertex
 {
-	io.uvw = m_position;
+	vert_out.uvw = m_position;
 	
 	// Remove position from view matrix since skybox doesn't move
 	mat4 viewStill = UBO_view;
@@ -45,8 +45,8 @@
 
 #Fragment
 {
-	//output_color = vec4(io.uvw * 0.5 + 0.5, 1);
-	output_albedo = texture(skybox_handler, io.uvw);
+	//output_color = vec4(frag_in.uvw * 0.5 + 0.5, 1);
+	output_albedo = texture(skybox_handler, frag_in.uvw);
 	output_normal = vec4(0,0,1,1); // worldspace Normals
 	
 	

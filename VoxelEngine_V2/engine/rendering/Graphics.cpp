@@ -601,7 +601,7 @@ namespace Vxl
 		Graphics::Texture::SetPixelPackAlignment(PixelAlignment::ALIGN_4);
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_4);
 
-		// Allow SRG Framebuffers
+		// Allow SRGB Framebuffers
 		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		// Enable Debug Outputs // Important for queries

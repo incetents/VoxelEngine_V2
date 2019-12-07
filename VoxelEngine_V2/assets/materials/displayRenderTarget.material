@@ -61,14 +61,14 @@
 
 #Vertex
 {
-	io.pos = m_position;
-	io.uv = m_uv;
+	vert_out.pos = m_position;
+	vert_out.uv = m_uv;
 	gl_Position = vec4(m_position, 1.0);
 }
 
 #Fragment
 {
-	vec4 _texture = texture(texture1, io.uv);
+	vec4 _texture = texture(texture1, frag_in.uv);
 	// Output Mode
 	if(outputMode == 1)
 	{
@@ -85,7 +85,7 @@
 	else if(outputMode == 3)
 	{
 		// composite 2 textures
-		vec4 _texture2 = texture(texture2, io.uv);
+		vec4 _texture2 = texture(texture2, frag_in.uv);
 		output_color = vec4(mix(_texture.rgb, _texture2.rgb, _texture2.a), 1);
 	}
 	else if(outputMode == 4)

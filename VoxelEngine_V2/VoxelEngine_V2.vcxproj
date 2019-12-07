@@ -47,11 +47,11 @@
     <ClCompile Include="engine\rendering\Primitives.cpp" />
     <ClCompile Include="engine\rendering\Gizmo.cpp" />
     <ClCompile Include="engine\rendering\Graphics.cpp" />
-    <ClCompile Include="engine\rendering\LineMesh.cpp" />
     <ClCompile Include="engine\rendering\RenderBuffer.cpp" />
     <ClCompile Include="engine\rendering\RenderManager.cpp" />
     <ClCompile Include="engine\rendering\UBO.cpp" />
     <ClCompile Include="engine\rendering\VBO.cpp" />
+    <ClCompile Include="engine\rendering\VBOLayout.cpp" />
     <ClCompile Include="engine\textures\BaseTexture.cpp" />
     <ClCompile Include="engine\textures\Cubemap.cpp" />
     <ClCompile Include="engine\textures\RenderTexture.cpp" />
@@ -161,7 +161,6 @@
     <ClInclude Include="engine\rendering\Debug.h" />
     <ClInclude Include="engine\rendering\Gizmo.h" />
     <ClInclude Include="engine\rendering\Graphics.h" />
-    <ClInclude Include="engine\rendering\LineMesh.h" />
     <ClInclude Include="engine\rendering\RenderBuffer.h" />
     <ClInclude Include="engine\rendering\RenderManager.h" />
     <ClInclude Include="engine\rendering\UBO.h" />

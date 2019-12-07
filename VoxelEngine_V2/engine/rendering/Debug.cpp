@@ -11,29 +11,27 @@
 
 namespace Vxl
 {
-	const UINT Debug::VertexIncrementAmount = 16;
-
 	void Debug::DrawLine(
 		const Vector3& P1, const Vector3& P2,
 		float Width,
-		const Color4F& C1, const Color4F& C2
+		const Color3F& C1, const Color3F& C2
 	)
 	{
-		m_worldLines->AddLine_Vec3(P1, P2, Width, C1, C2);
+		m_worldLines->addLine(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawLineNoDepth(
 		const Vector3& P1, const Vector3& P2,
 		float Width,
-		const Color4F& C1, const Color4F& C2
+		const Color3F& C1, const Color3F& C2
 	)
 	{
-		m_worldLinesNoDepth->AddLine_Vec3(P1, P2, Width, C1, C2);
+		m_worldLinesNoDepth->addLine(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawLineAABB(
 		const Vector3& Min, const Vector3& Max,
 		const Vector3& OffsetAll,
 		float Width,
-		const Color4F& C
+		const Color3F& C
 	)
 	{
 		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), Width, C, C);
@@ -55,7 +53,7 @@ namespace Vxl
 		const Entity& entity,
 		const Vector3& OffsetAll,
 		float Width,
-		const Color4F& C
+		const Color3F& C
 	)
 	{
 		auto OBB = entity.GetOBB();
@@ -82,7 +80,7 @@ namespace Vxl
 		const Vector3& up,
 		const Vector3& right,
 		float Width,
-		const Color4F& C
+		const Color3F& C
 	)
 	{
 		DrawLine(position + up - right, position + up + right, Width, C, C);
@@ -94,7 +92,7 @@ namespace Vxl
 	void Debug::DrawCube(
 		const Vector3& position,
 		const Vector3& scale,
-		const Color4F& C
+		const Color3F& C
 	)
 	{
 		ColoredModel _object;
@@ -106,7 +104,7 @@ namespace Vxl
 	}
 	void Debug::DrawCube(
 		const Matrix4x4& model,
-		const Color4F& C
+		const Color3F& C
 	)
 	{
 		ColoredModel _object;
@@ -118,7 +116,7 @@ namespace Vxl
 	void Debug::DrawWireframeSphere(
 		const Vector3& position,
 		const Vector3& scale,
-		const Color4F& C
+		const Color3F& C
 	)
 	{
 		ColoredModel _object;
@@ -130,7 +128,7 @@ namespace Vxl
 	}
 	void Debug::DrawWireframeSphere(
 		const Matrix4x4& model,
-		const Color4F& C
+		const Color3F& C
 	)
 	{
 		ColoredModel _object;
@@ -143,77 +141,43 @@ namespace Vxl
 	void Debug::DrawLineScreenSpace(
 		const Vector2& P1, const Vector2& P2,
 		float Width,
-		const Color4F& C1, const Color4F& C2
+		const Color3F& C1, const Color3F& C2
 	){
-		m_screenLines->AddLine_Vec2(P1, P2, Width, C1, C2);
+		m_screenLines->addLine(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawLineSquareScreenSpace(
 		const Vector2& P, const Vector2& Size,
 		float LineWidth,
-		const Color4F& Color
+		const Color3F& Color
 	){
 		float halfW = Size.x * 0.5f;
 		float halfH = Size.y * 0.5f;
-		m_screenLines->AddLine_Vec2(P + vec2(+halfW, +halfH), P + vec2(-halfW, +halfH), LineWidth, Color, Color);
-		m_screenLines->AddLine_Vec2(P + vec2(-halfW, +halfH), P + vec2(-halfW, -halfH), LineWidth, Color, Color);
-		m_screenLines->AddLine_Vec2(P + vec2(-halfW, -halfH), P + vec2(+halfW, -halfH), LineWidth, Color, Color);
-		m_screenLines->AddLine_Vec2(P + vec2(+halfW, -halfH), P + vec2(+halfW, +halfH), LineWidth, Color, Color);
+		m_screenLines->addLine(P + vec2(+halfW, +halfH), P + vec2(-halfW, +halfH), LineWidth, Color, Color);
+		m_screenLines->addLine(P + vec2(-halfW, +halfH), P + vec2(-halfW, -halfH), LineWidth, Color, Color);
+		m_screenLines->addLine(P + vec2(-halfW, -halfH), P + vec2(+halfW, -halfH), LineWidth, Color, Color);
+		m_screenLines->addLine(P + vec2(+halfW, -halfH), P + vec2(+halfW, +halfH), LineWidth, Color, Color);
 	}
 
 	void Debug::RenderWorldLines()
 	{
-		// If vertex index is at start, nothing is being drawn anyways
-		if (m_worldLines->m_mesh->m_vertexIndex > 0)
-		{
-			m_worldLines->m_mesh->m_buffer.setVerticesDirty(m_worldLines->m_mesh->m_resizeDirty);
-			m_worldLines->m_mesh->m_resizeDirty = false;
-
-			m_worldLines->m_mesh->bind();
-
-			m_worldLines->m_mesh->Draw();
-		}
+		m_worldLines->bind();
+		m_worldLines->draw();
 	}
 
 	void Debug::RenderWorldLinesNoDepth()
 	{
-		// If vertex index is at start, nothing is being drawn anyways
-		if (m_worldLinesNoDepth->m_mesh->m_vertexIndex > 0)
-		{
-			m_worldLinesNoDepth->m_mesh->m_buffer.setVerticesDirty(m_worldLinesNoDepth->m_mesh->m_resizeDirty);
-			m_worldLinesNoDepth->m_mesh->m_resizeDirty = false;
-
-			m_worldLinesNoDepth->m_mesh->bind();
-
-			m_worldLinesNoDepth->m_mesh->Draw();
-		}
+		m_worldLinesNoDepth->bind();
+		m_worldLinesNoDepth->draw();
 	}
 
 	void Debug::RenderScreenLines()
 	{
-		// If vertex index is at start, nothing is being drawn anyways
-		if (m_screenLines->m_mesh->m_vertexIndex > 0)
-		{
-			m_screenLines->m_mesh->m_buffer.setVerticesDirty(m_screenLines->m_mesh->m_resizeDirty);
-			m_screenLines->m_mesh->m_resizeDirty = false;
-
-			m_screenLines->m_mesh->bind();
-
-			m_screenLines->m_mesh->Draw();
-		}
+		m_screenLines->bind();
+		m_screenLines->draw();
 	}
 
 	void Debug::End()
 	{
-		// reset index flag
-		m_worldLines->m_mesh->m_vertexIndex = 0;
-		m_worldLines->m_mesh->m_buffer.setZeroes();
-
-		m_worldLinesNoDepth->m_mesh->m_vertexIndex = 0;
-		m_worldLinesNoDepth->m_mesh->m_buffer.setZeroes();
-
-		m_screenLines->m_mesh->m_vertexIndex = 0;
-		m_screenLines->m_mesh->m_buffer.setZeroes();
-
 		// reset ColoredModels
 		m_wireframeSpheres.clear();
 		m_cubes.clear();
