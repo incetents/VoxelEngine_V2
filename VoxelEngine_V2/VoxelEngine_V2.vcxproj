@@ -32,6 +32,7 @@
     <ClCompile Include="engine\input\XGamePad.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
+    <ClCompile Include="engine\math\Random.cpp" />
     <ClCompile Include="engine\math\Raycast.cpp" />
     <ClCompile Include="engine\modules\SceneNode.cpp" />
     <ClCompile Include="engine\objects\Camera.cpp" />

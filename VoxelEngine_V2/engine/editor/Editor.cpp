@@ -64,7 +64,7 @@ namespace Vxl
 		m_selectedNodes.clear();
 	}
 
-	void Editor::Init()
+	void Editor::init()
 	{
 		// GL Resources
 
@@ -92,7 +92,7 @@ namespace Vxl
 #endif
 	}
 
-	void Editor::Update()
+	void Editor::update()
 	{
 		// Imgui
 #ifdef GLOBAL_IMGUI

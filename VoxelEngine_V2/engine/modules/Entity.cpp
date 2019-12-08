@@ -16,6 +16,9 @@
 #include <algorithm>
 #include <limits>
 
+#undef max
+#undef min
+
 namespace Vxl
 {
 	bool Entity::operator< (const Entity& other) const
@@ -73,12 +76,8 @@ namespace Vxl
 			m_OBB[6] = - _right + _up + _forward; // x0 y1 z1
 			m_OBB[7] =   _right + _up + _forward; // x1 y1 z1
 
-#pragma push_macro("MACRONAME")
-#undef max
-#undef min
 			m_AABB[0] = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
 			m_AABB[1] = Vector3(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-#pragma pop_macro("MACRONAME")
 
 			for (UINT i = 0; i < 8; i++)
 			{

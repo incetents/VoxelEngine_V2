@@ -25,8 +25,8 @@ namespace Vxl
 		std::vector<GuiWindow*> m_guiWindows;
 
 		// Behaviour
-		void Init();
-		void Update();
+		void init();
+		void update();
 
 	} SingletonInstance(Editor);
 }

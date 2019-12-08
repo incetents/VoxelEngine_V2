@@ -4,14 +4,15 @@
 #include "window/window.h"
 #include "input/Input.h"
 
+#include "editor/Editor.h"
+#include "math/Random.h"
+#include "modules/Material.h"
+#include "rendering/RenderManager.h"
 #include "utilities/Logger.h"
 #include "utilities/Time.h"
 #include "utilities/Macros.h"
 
-#include "modules/Material.h"
 #include "../game/Scene_Game.h"
-#include "rendering/RenderManager.h"
-#include "editor/Editor.h"
 
 /**/
 using namespace Vxl;
@@ -24,13 +25,16 @@ int main()
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 #endif
 {
+	// Misc CPU Setup
+	Random.init();
+
 	// Window
 	Window.Setup("Vxl Engine", SCREEN_WIDTH, SCREEN_HEIGHT);
 	//Window.SetCustomAspectRatio(true, 1.0f);
 	Window.SetIcon("./assets/applogo/logo_32.png");
 
 	/* Initial Call */
-	Editor.Init();
+	Editor.init();
 	RenderManager.InitGlobalGLResources();
 
 	Scene_Game* _scene = new Scene_Game();
@@ -73,7 +77,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		RenderManager.Draw();
 
 		// End of frame update
-		Editor.Update();
+		Editor.update();
 		Input.Update();
 		XGamePadManager.Update();
 		Window.EndFrame();
