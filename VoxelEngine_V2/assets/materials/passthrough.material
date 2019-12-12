@@ -1,0 +1,52 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
+
+#Name { passthrough }
+
+#Include
+{
+	_Math.glsl
+}
+
+#Attributes
+{
+	vec3 m_position 	: 0
+	vec2 m_uv 			: 1
+}
+
+#Link
+{
+	vec3 pos;
+	vec2 uv;
+}
+
+#RenderTargets
+{
+	vec4 output_albedo 		: 0
+}
+
+#Samplers
+{
+	// Uniform Textures
+	sampler2D albedo_handler : 0
+}
+
+#Properties // Uniforms and Functions
+{
+}
+
+#Vertex // Main
+{
+	gl_Position = vec4(m_position, 1.0); 
+	vert_out.pos = m_position;
+	vert_out.uv = m_uv;
+}
+
+#Fragment // Main
+{
+	output_albedo = texture(albedo_handler, frag_in.uv);
+	
+	// Linear to SRGB
+	output_albedo.r = linear_to_srgb(output_albedo.r);
+	output_albedo.g = linear_to_srgb(output_albedo.g);
+	output_albedo.b = linear_to_srgb(output_albedo.b);
+}

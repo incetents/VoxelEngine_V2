@@ -1,0 +1,65 @@
+// Copyright(c) 2019 Emmanuel Lajeunesse
+
+#Name { debugRender }
+
+#Include
+{
+	_UBO.glsl,
+	_Uniforms.glsl
+}
+
+#Attributes
+{
+	vec3 m_position 	: 0
+	vec2 m_uv 			: 1
+	vec3 m_normal 		: 2
+}
+
+#Link
+{
+	vec3 pos;
+	vec2 uv;
+	vec3 normal;
+}
+
+#RenderTargets
+{
+	vec4 output_albedo 		: 0
+}
+
+#Samplers
+{
+}
+
+#Properties // Uniforms and Functions
+{
+}
+
+#Vertex // Main
+{
+	// Model
+	if(VXL_useModel)
+	{
+		gl_Position = VXL_mvp * vec4(m_position, 1.0); 
+		vert_out.pos = vec3(VXL_model * vec4(m_position, 1.0));
+	}
+	// Passthrough
+	else
+	{
+		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
+		vert_out.pos = m_position;
+	}
+	
+	// Constants
+	vert_out.uv = m_uv;
+	vert_out.normal = m_normal;
+}
+
+#Fragment // Main
+{
+	vec3 lightDir = getCameraForwad();
+	float NDotL = dot(frag_in.normal, -lightDir);
+	NDotL = NDotL * 0.5 + 0.5;
+
+	output_albedo = vec4(VXL_color * NDotL,1);
+}

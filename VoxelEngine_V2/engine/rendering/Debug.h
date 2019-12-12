@@ -19,15 +19,23 @@ namespace Vxl
 {
 	class Texture2D;
 
-	struct ColoredModel
-	{
-		Color4F		m_color;
-		Matrix4x4	m_model;
-	};
-
 	static class Debug : public Singleton<class Debug>
 	{
 		friend class RenderManager;
+
+	public:
+		// Debug Object
+		struct Object
+		{
+			Color3F		color;
+			Matrix4x4	model;
+		};
+
+		// Storage
+		std::vector<Object> m_spheres;
+		std::vector<Object> m_spheresLines;
+		std::vector<Object> m_cubes;
+		std::vector<Object> m_cubesLines;
 
 	private:
 		// Debug Lines in world space
@@ -35,11 +43,6 @@ namespace Vxl
 		LineMesh3D* m_worldLinesNoDepth;
 		// Debug Lines in screen space
 		LineMesh2D* m_screenLines;
-
-		// Debug Wireframe Spheres
-		std::vector<ColoredModel> m_wireframeSpheres;
-		// Debug Cubes
-		std::vector<ColoredModel> m_cubes;
 
 	public:
 		void InitGLResources()
@@ -66,25 +69,6 @@ namespace Vxl
 			float Width,
 			const Color3F& C1 = Color3F(1, 1, 1), const Color3F& C2 = Color3F(1, 1, 1)
 		);
-		void DrawLineAABB(
-			const Vector3& Min, const Vector3& Max,
-			const Vector3& OffsetAll = Vector3(0, 0, 0),
-			float Width = 1.0f,
-			const Color3F& C = Color3F(1, 1, 1)
-		);
-		void DrawLineOBB(
-			const Entity& entity,
-			const Vector3& OffsetAll,
-			float Width = 1.0f,
-			const Color3F& C = Color3F(1, 1, 1)
-		);
-		void DrawLineSquare(
-			const Vector3& position,
-			const Vector3& up,
-			const Vector3& right,
-			float Width = 1.0f,
-			const Color3F& C = Color3F(1, 1, 1)
-		);
 		void DrawLineScreenSpace(
 			const Vector2& P1, const Vector2& P2,
 			float Width,
@@ -95,25 +79,68 @@ namespace Vxl
 			float LineWidth,
 			const Color3F& Color = Color3F(1, 1, 1)
 		);
-
-		// Triangle Drawing
-		void DrawCube(
+		void DrawLineCube(
+			const Vector3& position,
+			float width,
+			const Vector3& scale = Vector3(1, 1, 1),
+			const Vector3& eulerRotation = Vector3(0, 0, 0),
+			const Color3F& C = Color3F(1, 1, 1)
+		);
+		void DrawLineSphere(
 			const Vector3& position,
 			const Vector3& scale,
+			const Color3F& C = Color3F(1, 1, 1)
+		);
+
+		//	void DrawLineAABB(
+		//		const Vector3& Min, const Vector3& Max,
+		//		const Vector3& OffsetAll = Vector3(0, 0, 0),
+		//		float Width = 1.0f,
+		//		const Color3F& C = Color3F(1, 1, 1)
+		//	);
+		//	void DrawLineOBB(
+		//		const Entity& entity,
+		//		const Vector3& OffsetAll,
+		//		float Width = 1.0f,
+		//		const Color3F& C = Color3F(1, 1, 1)
+		//	);
+		//	void DrawLineSquare(
+		//		const Vector3& position,
+		//		const Vector3& up,
+		//		const Vector3& right,
+		//		float Width = 1.0f,
+		//		const Color3F& C = Color3F(1, 1, 1)
+		//	);
+		
+
+		// Outlines
+		
+
+		//	void DrawAABBOutline(
+		//		const Vector3& position,
+		//		const Vector3& min,
+		//		const Vector3& max,
+		//		const Color3F& C = Color3F(1, 1, 1)
+		//	);
+
+		// 3D Drawing
+		void DrawCube(
+			const Vector3& position,
+			const Vector3& scale = Vector3(1, 1, 1),
+			const Vector3& eulerRotation = Vector3(0, 0, 0),
 			const Color3F& C = Color3F(1, 1, 1)
 		);
 		void DrawCube(
 			const Matrix4x4& model,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
-
-		// Triangle Wireframe Drawing
-		void DrawWireframeSphere(
+		void DrawSphere(
 			const Vector3& position,
-			const Vector3& scale,
+			const Vector3& scale = Vector3(1, 1, 1),
+			const Vector3& eulerRotation = Vector3(0, 0, 0),
 			const Color3F& C = Color3F(1, 1, 1)
 		);
-		void DrawWireframeSphere(
+		void DrawSphere(
 			const Matrix4x4& model,
 			const Color3F& C = Color3F(1, 1, 1)
 		);

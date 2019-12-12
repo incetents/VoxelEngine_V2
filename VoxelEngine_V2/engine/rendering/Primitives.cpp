@@ -16,7 +16,7 @@ namespace Vxl
 		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
 		Axis axis, UINT slices, float height, float radius_top, float radius_bot,
 		const Vector3& offset
-	){
+	) {
 		if (axis != Axis::Y)
 			std::swap(radius_top, radius_bot);
 
@@ -110,7 +110,7 @@ namespace Vxl
 		std::vector<Vector3>& pos, std::vector<Vector2>& uvs,
 		Axis axis, UINT slices, float height, float radius,
 		const Vector3& offset
-	){
+	) {
 		pos.clear();
 		uvs.clear();
 		pos.reserve(12 * slices);
@@ -757,7 +757,7 @@ namespace Vxl
 		for (uint32_t i = 0; i < vertices; i++)
 		{
 			float t1 = TWO_PI * (float)i / f_vertices;
-			
+
 			if (axis == Axis::X)
 			{
 				positions.push_back(Vector3(0, cosf(t1) * halfSize, sinf(t1) * halfSize));
@@ -775,7 +775,7 @@ namespace Vxl
 			}
 			uvs.push_back(Vector2(cosf(t1) * 0.5f + 0.5f, sinf(t1) * 0.5f + 0.5f));
 		}
-		
+
 		NewMesh->setGLName(MeshName);
 		NewMesh->m_positions = (positions);
 		NewMesh->m_uvs = (uvs);
@@ -882,6 +882,130 @@ namespace Vxl
 		return NewMeshIndex;
 	}
 
+	MeshIndex Primitives::GenerateLinesCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
+	{
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
+
+		float f_vertices = (float)vertices - 1.f;
+		float halfSize = unitSize * 0.5f;
+
+		std::vector<Vector3> positions;
+
+		if (axis == Axis::ALL)
+		{
+			positions.reserve(vertices * 3u);
+
+			uint32_t i;
+			for (i = 0; i < vertices; i++)
+			{
+				float t1 = TWO_PI * (float)(i) / f_vertices;
+				float t2 = TWO_PI * (float)(i + 1) / f_vertices;
+				positions.push_back(Vector3(0, cosf(t1) * halfSize, sinf(t1) * halfSize));
+				positions.push_back(Vector3(0, cosf(t2) * halfSize, sinf(t2) * halfSize));
+			}
+			for (i = 0; i < vertices; i++)
+			{
+				float t1 = TWO_PI * (float)i / f_vertices;
+				float t2 = TWO_PI * (float)(i + 1) / f_vertices;
+				positions.push_back(Vector3(sinf(t1) * halfSize, 0, cosf(t1) * halfSize));
+				positions.push_back(Vector3(sinf(t2) * halfSize, 0, cosf(t2) * halfSize));
+			}
+			for (i = 0; i < vertices; i++)
+			{
+				float t1 = TWO_PI * (float)i / f_vertices;
+				float t2 = TWO_PI * (float)(i + 1) / f_vertices;
+				positions.push_back(Vector3(cosf(t1) * halfSize, sinf(t1) * halfSize, 0));
+				positions.push_back(Vector3(cosf(t2) * halfSize, sinf(t2) * halfSize, 0));
+			}
+		}
+		else
+		{
+			positions.reserve(vertices);
+
+			for (uint32_t i = 0; i < vertices; i++)
+			{
+				float t1 = TWO_PI * (float)i / f_vertices;
+
+				switch (axis)
+				{
+				case Axis::X:
+					positions.push_back(Vector3(0, cosf(t1) * halfSize, sinf(t1) * halfSize));
+					break;
+
+				case Axis::Y:
+					positions.push_back(Vector3(sinf(t1) * halfSize, 0, cosf(t1) * halfSize));
+					break;
+
+				case Axis::Z:
+					positions.push_back(Vector3(cosf(t1) * halfSize, sinf(t1) * halfSize, 0));
+					break;
+				}
+			}
+		}
+
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions = (positions);
+		NewMesh->bind(axis == Axis::ALL ? DrawType::LINES : DrawType::LINE_LOOP);
+		//
+		return NewMeshIndex;
+	}
+	MeshIndex Primitives::GenerateLinesCube(const std::string& MeshName, float unitSize)
+	{
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
+
+		std::vector<Vector3> positions;
+		positions.reserve(24);
+
+		float h = unitSize * 0.5f;
+
+		// Top Quad
+		positions.push_back(Vector3(-h, +h, -h));
+		positions.push_back(Vector3(+h, +h, -h));
+
+		positions.push_back(Vector3(+h, +h, -h));
+		positions.push_back(Vector3(+h, +h, +h));
+
+		positions.push_back(Vector3(+h, +h, +h));
+		positions.push_back(Vector3(-h, +h, +h));
+
+		positions.push_back(Vector3(-h, +h, +h));
+		positions.push_back(Vector3(-h, +h, -h));
+
+		// Bottom Quad
+		positions.push_back(Vector3(-h, -h, -h));
+		positions.push_back(Vector3(+h, -h, -h));
+
+		positions.push_back(Vector3(+h, -h, -h));
+		positions.push_back(Vector3(+h, -h, +h));
+
+		positions.push_back(Vector3(+h, -h, +h));
+		positions.push_back(Vector3(-h, -h, +h));
+
+		positions.push_back(Vector3(-h, -h, +h));
+		positions.push_back(Vector3(-h, -h, -h));
+
+		// Center Lines
+		positions.push_back(Vector3(-h, -h, -h));
+		positions.push_back(Vector3(-h, +h, -h));
+
+		positions.push_back(Vector3(+h, -h, -h));
+		positions.push_back(Vector3(+h, +h, -h));
+
+		positions.push_back(Vector3(+h, -h, +h));
+		positions.push_back(Vector3(+h, +h, +h));
+
+		positions.push_back(Vector3(-h, -h, +h));
+		positions.push_back(Vector3(-h, +h, +h));
+
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions = (positions);
+		NewMesh->bind(DrawType::LINES);
+		//
+		return NewMeshIndex;
+	}
+
 	// Creators
 	void Primitives::CreateFullQuad()
 	{
@@ -961,6 +1085,8 @@ namespace Vxl
 	{
 		m_cube = GenerateCube("Cube", 1.0f);
 		m_cube_small = GenerateCube("Cube_small", 0.25f);
+
+		m_lines_cube = GenerateLinesCube("LinesCube", 1.0f);
 	}
 
 	void Primitives::CreateInverseCube()
@@ -1195,5 +1321,10 @@ namespace Vxl
 		m_doughtnut2D_x = GenerateDoughtnut2D("Doughtnut2DX", Axis::X, 32u, 2.0f, 1.5f);
 		m_doughtnut2D_y = GenerateDoughtnut2D("Doughtnut2DY", Axis::Y, 32u, 2.0f, 1.5f);
 		m_doughtnut2D_z = GenerateDoughtnut2D("Doughtnut2DZ", Axis::Z, 32u, 2.0f, 1.5f);
+
+		m_lines_circleX = GenerateLinesCircle("LinesCircleUnitX", Axis::X, 32u, 1.0f);
+		m_lines_circleY = GenerateLinesCircle("LinesCircleUnitY", Axis::Y, 32u, 1.0f);
+		m_lines_circleZ = GenerateLinesCircle("LinesCircleUnitZ", Axis::Z, 32u, 1.0f);
+		m_lines_circleAllAxis = GenerateLinesCircle("LinesCircleUnitAllAxis", Axis::ALL, 32u, 1.0f);
 	}
 }

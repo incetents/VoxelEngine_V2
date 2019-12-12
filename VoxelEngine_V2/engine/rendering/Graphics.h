@@ -479,6 +479,7 @@ namespace Vxl
 		void SetWireframeState(bool state);
 		void SetDepthWrite(bool state);
 		void SetSeamlessCubemap(bool state);
+		void SetSRGBMode(bool state);
 
 		// ~ State Getters ~ //
 		bool GetDepthRead();

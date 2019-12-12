@@ -82,6 +82,7 @@ namespace Vxl
 	float				gl_lineWidth = 1.0f;
 	PixelAlignment		gl_pixelPackAlignment = PixelAlignment::ALIGN_4;
 	PixelAlignment		gl_pixelUnpackAlignment = PixelAlignment::ALIGN_4;
+	bool				gl_srgbMode = false;
 
 	// ~ Graphics Enums ~ //
 	const int GL_ObjectType[] =
@@ -584,6 +585,8 @@ namespace Vxl
 		gl_pixelPackAlignment = PixelAlignment::NONE;
 		gl_pixelUnpackAlignment = PixelAlignment::NONE;
 
+		gl_srgbMode = false;
+
 		// Set Default Cull Mode
 		SetCullMode(CullMode::COUNTER_CLOCKWISE);
 		// Set Default Blend info
@@ -600,9 +603,6 @@ namespace Vxl
 		// Pixel pack/unpack
 		Graphics::Texture::SetPixelPackAlignment(PixelAlignment::ALIGN_4);
 		Graphics::Texture::SetPixelUnpackAlignment(PixelAlignment::ALIGN_4);
-
-		// Allow SRGB Framebuffers
-		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		// Enable Debug Outputs // Important for queries
 		glEnable(GL_DEBUG_OUTPUT);
@@ -673,7 +673,6 @@ namespace Vxl
 		return false;
 	}
 
-	
 	// ~ GPU Name ~ //
 	void Graphics::SetGLName(ObjectType identifier, uint32_t id, const std::string &label)
 	{
@@ -769,6 +768,18 @@ namespace Vxl
 			glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		gl_seamlessCubemaps = state;
+	}
+	void Graphics::SetSRGBMode(bool state)
+	{
+		if (gl_srgbMode == state)
+			return;
+
+		if (state)
+			glEnable(GL_FRAMEBUFFER_SRGB);
+		else
+			glDisable(GL_FRAMEBUFFER_SRGB);
+
+		gl_srgbMode = state;
 	}
 
 	// ~ State Getters ~ //

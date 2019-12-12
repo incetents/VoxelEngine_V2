@@ -115,6 +115,7 @@ namespace Vxl
 		ImGui::NewFrame();
 		ImGui::Render();
 #endif
+
 		EndFrame();
 
 		// opengl error callback

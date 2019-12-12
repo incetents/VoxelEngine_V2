@@ -1,0 +1,323 @@
+
+TODO:
+
+! Macro everywhere -> DISALLOW_COPY_AND_ASSIGN(ClassName);
+
+- debug draw lines -> don't constantly resize array
+	- index offset
+
+- debug draw other common objects
+	-> aabb box, obb box
+
+- VAO global version
+	-> vbos bind when mesh is bound
+	-> no more sorting by VAO
+	-> global VAO is bound and always used for everything
+
+- VBO Meshbuffer -> inside mesh.h, linemesh.h
+	-> Make the formatting more readable
+
+- model class, just loads directly into a mesh?
+	-> inside asset class instead of model class holding intermediate buffers
+
+- replace UBO with VXL for uniform blocks
+
+- check if UBO refactor is needed to remove _# appended to all UBO'same
+https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+
+- fix other missing materials
+
+- colorID/depth programs generated from shaderMaterial
+	- test both programs on viewport
+- colorID selection for objects
+
+- GUI_viewport has output modes
+	-> NORMAL
+	-> COLORFUL -> used for displaying color ID
+	-> ABSOLUTE -> abs(result)
+
+
+- fix line mesh -> simplification
+	
+- outline effect on selected entities
+	-> OBB/AABB lines
+	
+- Camera screen controls similar to Maya software?
+	- click drag instead of WASD movement
+
+- remove uniform class
+	- integrate subroutines into shader class
+
+- fix gizmo color ID clicking system
+
+[ noted global changes ]
+	-> gizmo fbo is now global
+	
+- text object is broken
+
+- gizmo selections, if selection fails ray to plane intersection, don't update anything
+
+- inspector, if values go to nand or inf, set them to zero
+
+- inspector, state when multi-objects selected
+	- transform shows -- but allows setting value for multi objects
+
+
+
+- bound texture id in graphics should be map<int, boundtextureID> so that the same texture can be bound on multiple active layers
+
+- imgui x-ray now broken because of viewport mode
+
+- shader builder
+	- enables vertex attrib locations based on vertex attribs used
+
+- imgui window for render view
+	
+
+	
+TEXTURES:
+bilinear=false, mipmaps=false, trilinear=false [min: NEAREST               , mag: NEAREST]
+bilinear=false, mipmaps=false, trilinear=true  [min: NEAREST               , mag: NEAREST]
+bilinear=false, mipmaps=true , trilinear=false [min: NEAREST_MIPMAP_NEAREST, mag: NEAREST]
+bilinear=false, mipmaps=true , trilinear=true  [min: NEAREST_MIPMAP_LINEAR , mag: NEAREST]
+bilinear=true , mipmaps=false, trilinear=false [min: LINEAR                , mag: LINEAR ]
+bilinear=true , mipmaps=false, trilinear=true  [min: LINEAR                , mag: LINEAR ]
+bilinear=true , mipmaps=true , trilinear=false [min: LINEAR_MIPMAP_NEAREST , mag: LINEAR ]
+bilinear=true , mipmaps=true , trilinear=true  [min: LINEAR_MIPMAP_LINEAR  , mag: LINEAR ]
+
+- add children/set parent
+	-> preserve world position as parameter
+
+- Debug Value, keep track of total draw calls per frame
+
+- UBO default binding
+	layout(std140,binding=0) uniform matrixBuffer {
+		mat4 matrix_world;
+		mat4 matrix_worldIT;
+	};
+
+- inspector showcases uniforms from material properties
+	 -> VXL values should not be part of properties for .material
+		-> VXL values should be automatically added for the material
+		-> properties have a flag so that they can be changed in the inspector
+
+- fun snake shader on sphere
+	https://youtu.be/2R7h76GoIJM
+
+- Send MVP to the Shaders, isntead of doinv VP * M per vertex
+
+- editor stuff arrows for 2D mode
+
+- make a small 2D pacman game
+	- ortho camera
+	- background is one giant mesh with tilemap
+	- sprites and sprite animation classes
+
+- Main Camera in rendermanager -> Editor Camera setting up for render pass
+
+- RenderPass class instead of relying on global gbuffer
+- look at Emi's Renderpass/Rendering stuff
+- Renderpass useful for drawing frame to 1 output in a compact method.
+	-> This way when the reflection probes need to take 6 snapshots of a scene
+	from a point, this process can be simplified
+https://github.com/EmilianC/Jewel3D/blob/master/Engine/Jewel3D/Rendering/Rendering.h
+https://github.com/EmilianC/Jewel3D/blob/master/Engine/Jewel3D/Rendering/RenderPass.h
+
+- normal mapping
+	- http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
+	- link has useful optimization technique
+
+- order independant transparency
+	- normals, depth, reflection gbuffer
+
+- Some good BRDF [Physically based lighting] = (Cook-Torrance with GGX distribution, Schlick Fresnel, Walter GGX Geometric Attenuation and modified energy conserving Lambert):
+	
+
+- asset classes has new/delete in protected so only
+	asset base class can call new/delete
+
+- main loop in main.cpp goes into application.cpp
+	- effectively if you made a small project somewhere else,
+		it would use its own main.
+- scene_game stuff should go into into your own application.
+- rendermanager should take care of current scene
+
+- get world position from clicking screen
+	https://stackoverflow.com/questions/7692988/opengl-math-projecting-screen-space-to-world-space-coords
+	
+! - render texture needs mipmapping flag before being allowed to call its generate mipmap version later
+
+- debug lines have depth test for themselves so that they don't have weird depth sorting issues
+
+- debug lines having a gl_greater depth pass that makes them slightly faded
+	(similar to mario in mario sunshine being obscured by world geometry)
+^ v ^ v
+- debug lines having Line Stipple effect as a type of line being added
+	if (step(sin(scale * input.param), 0.5f)) discard;
+
+- transform arrows,rotate,scale will ignore position of EditorCamera
+	-> when selecting editor camera in hierarchy
+
+
+
+
+**unload models in engine, since it stores unnecessary information, even if it means losing all of its data. The data can be re-obtained by reloading the files**
+-> load model, store in mesh, clear model
+
+- imgui drag and drop hierarchy
+https://github.com/ocornut/imgui/issues/1931
+
+- Check if stencil works in engine
+
+- particle emitter
+
+- For model loading, instead of creating temp vectors for vertex information,
+pass vector pointers with flags to load function
+
+- inspector shows light settings for lightObject
+
+- inspector has tab of multiple meshes to choose from
+
+- inspector has material tab
+	- material tab shows current shader + custom uniforms
+	- custom uniforms can be edited
+
+- inspector supports multiple objects
+	- transform just adds to increases,
+	- transform sets all to the same value when entering numbers
+
+- move VBO.h crap into VBO.cpp cpp for better etiquette.
+- replace gl calls in VBO class with glutil version too
+
+- when inside hierarchy menu:
+	- shift+click to select multiple things in a row
+	- up and down can iterate through children
+	
+- Ability to clone Entity/GameObjects easily
+
+- Use PhysX for physics. Basic example from Deccer
+https://github.com/deccer/emptyspace/blob/master/emptyspace/source/physics.cpp
+
+- create binary version of meshes/models
+
+- Reverse Z depth from suff for Emmanuel tutorial.
+
+- look into blitting function working with different sized fbos
+
+- ToHash function
+	- Hash Class -> converts strings into numbers
+	- now maps/unordered maps can use Hash numbers instead of long strings
+
+- copy math formulas from:
+	http://math2.org/
+
+- ability to swap between cameras [Display Camera]
+- when camera is selected, show fbo of what it is rendering inside imgui window?
+- fake editor objects [camera + light]
+- draw camera frustum when selecting it but not rendering from it
+
+- Emi's rendering class
+- emi's renderpass
+
+- entity should no longer inheriting asset?
+	- look into this
+
+- meshbuffers, find way to inherit similar properties
+
+**glBlendFunci different blend modes for different targets**
+
+**Entity has visible flag
+-> active off = disable children
+-> visible off = no render self
+
+Keep track of OpenGL/GLSL version to check if certain actions are compatible
+GLSL Version      OpenGL Version
+1.10              2.0
+1.20              2.1
+1.30              3.0
+1.40              3.1
+1.50              3.2
+3.30              3.3
+4.00              4.0
+4.10              4.1
+4.20              4.2
+4.30              4.3
+4.40              4.4
+4.50              4.5
+
+
+**gbuffer output material ID -> Layer ID to mask specific layers**
+
+- shader to draw lines for normals,tangents,bitangents (to see if they are okay)
+
+**System for choosing either cheap or expensive AABB rebuilding depending on a flag***
+**Inverse Raycasts to hit rotated AABB bounding boxes intead**
+
+**Template Vector for float/double, use typdef at bottom to differentiate both types**
+
+- clock for game time (not program time)
+	- clock class inherits from base clock that sets time from glfwgettime or some other method
+	depending if its system clock or game clock
+
+- imgui system that shows sliders/buttons for uniforms for every material being used
+	- only custom ones
+
+**generate cylinder geometry + cone + weird cylinder cone for volumetric spotlights**
+
+- tommy (guy who coded super meat boy)
+	-> talks about framerate method something about (1/59 with 1/61)
+	-> helps framerate approx
+
+- transparent objects rendered forward after gbuffer
+- entity flag for opaque or transparent in material render (so that it nows if it should re-order front to back, back to front or don't care)
+
+- camera frustum culling
+- counter in render manager for objects rendered/culled
+	
+- post processing fbo/shaders
+
+**reverse SSAO to make outer edges brighter**
+
+- geometry class: wireframe cube
+
+- import files, flags are order independant
+
+- lights
+
+**Ability to have camera entities, ability to draw their frustums, when testing out another cameras frustum, darken all objects that aren't seen**
+
+**file import, PBR texture info ("abledo texture", "roughness texture", "metallic texture", "normal map texture", "roughness value", "metallic value", "AO maps", "Displacement maps");**
+
+- sprite system (2D orthographic)
+- texture atlas creator/generator
+
+
+**Basic raycast to primitive shape collision**
+
+- use pbr textures along with uv sphere to check pbr lighting
+
+- test scene for rendering pbr models on uv sphere
+
+- layer system for render manager
+
+- particle system, send buffer of vec3 positions for instancing
+
+- noise class for terrain generation
+- raycasting for terrain
+	
+- 3d axis arrows for orientation
+- LOD System
+- install nvidia nsight
+- mesh (stride position/normals)?
+- Look into SSBOO
+
+ - GLSL function pack 2 or more floats into one
+https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/packHalf2x16.xhtml
+
+- discord -> stuff for emmanuel
+
+! - macro for removing copy constructors -> put it everywhere
+! - replace parameters of obj* with const obj& = good code etiquette
+
+Cool dungeon models:
+https://www.gamedevmarket.net/asset/lowpoly-dungeon-pack-1-6681/

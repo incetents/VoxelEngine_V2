@@ -135,6 +135,7 @@ namespace Vxl
 
 		void addLine(const Vector3& P1, const Vector3& P2, float Width, const Color3F& C1, const Color3F& C2);
 
+		void clear();
 		void bind(DrawType type = DrawType::LINES);
 		void draw();
 	};
@@ -167,6 +168,7 @@ namespace Vxl
 
 		void addLine(const Vector2& P1, const Vector2& P2, float Width, const Color3F& C1, const Color3F& C2);
 
+		void clear();
 		void bind(DrawType type = DrawType::LINES);
 		void draw();
 	};

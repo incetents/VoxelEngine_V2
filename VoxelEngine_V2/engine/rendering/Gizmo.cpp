@@ -83,16 +83,16 @@ namespace Vxl
 
 		// FBO
 		auto fbo_id = GlobalAssets.createFramebuffer("gizmo");
-		m_fbo = GlobalAssets.getFramebufferObject(fbo_id);
+		m_fbo = Assets.getFramebufferObject(fbo_id);
 		m_fbo->setSizeToViewportSize();
 		m_fbo->bind();
 		//
-		auto id = SceneAssets.createRenderTexture(
+		auto id = GlobalAssets.createRenderTexture(
 			"albedo",
 			m_fbo->getWidth(), m_fbo->getHeight(), 
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
 		);
-		auto id_depth = SceneAssets.createRenderBufferDepth(
+		auto id_depth = GlobalAssets.createRenderBufferDepth(
 			m_fbo->getWidth(), m_fbo->getHeight(),
 			TextureDepthFormat::DEPTH16
 		);

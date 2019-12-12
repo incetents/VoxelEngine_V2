@@ -32,6 +32,7 @@ namespace Vxl
 	protected:
 		// Model for transformations
 		Matrix4x4	m_modelMatrix;  // World Transformations - Row Major
+		
 		// Model for normals
 		Matrix3x3	m_normalMatrix; // Normal Transformations - Row Major
 

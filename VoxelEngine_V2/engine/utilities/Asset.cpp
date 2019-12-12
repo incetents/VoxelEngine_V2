@@ -156,13 +156,21 @@ namespace Vxl
 				mat->setSequenceID(9000);
 			}
 		}
-		// Line Render Material
-		{
-			shaderMaterial_lineRender = createShaderMaterial("./assets/materials/lineRender.material");
-		}
 		// Show Render Target
 		{
 			shader_showRenderTarget = createShaderMaterial("./assets/materials/displayRenderTarget.material");
+		}
+		// Line Render Material
+		{
+			shader_lineRender = createShaderMaterial("./assets/materials/lineRender.material");
+		}
+		// Simple Light Material
+		{
+			shader_debugRender = createShaderMaterial("./assets/materials/debugRender.material");
+		}
+		// Passthrough Material
+		{
+			shader_passthrough = createShaderMaterial("./assets/materials/passthrough.material");
 		}
 	}
 	ShaderProgram* GlobalAssets::get_ProgramShowRenderTarget(void) const
@@ -175,7 +183,23 @@ namespace Vxl
 	}
 	ShaderProgram* GlobalAssets::get_ProgramLineRender(void) const
 	{
-		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shaderMaterial_lineRender);
+		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shader_lineRender);
+		if (shadMat)
+			return m_shaderProgram_storage.Get(shadMat->m_coreProgram);
+
+		return nullptr;
+	}
+	ShaderProgram* GlobalAssets::get_ProgramDebugRender(void) const
+	{
+		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shader_debugRender);
+		if (shadMat)
+			return m_shaderProgram_storage.Get(shadMat->m_coreProgram);
+
+		return nullptr;
+	}
+	ShaderProgram* GlobalAssets::get_ProgramPassthrough(void) const
+	{
+		ShaderMaterial* shadMat = m_shaderMaterial_storage.Get(shader_passthrough);
 		if (shadMat)
 			return m_shaderProgram_storage.Get(shadMat->m_coreProgram);
 

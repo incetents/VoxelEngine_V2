@@ -12,13 +12,13 @@
 {
 	vec3  m_position 	: 0
 	float m_width 		: 1
-	vec4  m_color 		: 3
+	vec3  m_color 		: 3
 }
 
 #Link
 {
 	float v_width;
-	vec4 v_color;
+	vec3 v_color;
 }
 
 #RenderTargets
@@ -34,17 +34,34 @@
 
 #Properties // Uniforms and Functions
 {
+	uniform bool useViewProjection = false;
+	uniform bool useVertexColors = true;
+	uniform bool useVertexWidth = false;
+	uniform float globalWidth = 1.0;
 }
 
 #Vertex // Main
 {
-	vert_out.v_width = m_width;
-	vert_out.v_color = m_color;
+	if(useVertexWidth)
+		vert_out.v_width = m_width * globalWidth;
+	else
+		vert_out.v_width = globalWidth;
+	
+	if(useVertexColors)
+		vert_out.v_color = m_color;
+	else
+		vert_out.v_color = VXL_color;
 	
 	if(VXL_useModel)
-		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
+		if(useViewProjection)
+			gl_Position = VXL_mvp * vec4(m_position, 1.0); 
+		else
+			gl_Position = VXL_model * vec4(m_position, 1.0); 
 	else
-		gl_Position = vec4(m_position, 1.0); 
+		if(useViewProjection)
+			gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
+		else
+			gl_Position = vec4(m_position, 1.0); 
 }
 
 #DefinesGeometry
@@ -124,8 +141,8 @@
     vec4 d = (start - (side + axis) * start.w);
 
 #if SHOW_DEBUG_LINES
-    gl_Position = gl_in[0].gl_Position; geom_out.v_color = geom_in[0].v_color; EmitVertex();
-    gl_Position = gl_in[1].gl_Position; geom_out.v_color = geom_in[1].v_color; EmitVertex();
+    gl_Position = start; geom_out.v_color = geom_in[0].v_color; EmitVertex();
+    gl_Position = end;   geom_out.v_color = geom_in[1].v_color; EmitVertex();
     EndPrimitive();
 
     gl_Position = a; geom_out.v_color = geom_in[0].v_color; EmitVertex();
@@ -157,5 +174,5 @@
 
 #Fragment // Main
 {
-	output_albedo = frag_in.v_color;
+	output_albedo = vec4(frag_in.v_color, 1);
 }

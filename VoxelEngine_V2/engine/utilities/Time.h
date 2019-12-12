@@ -67,6 +67,10 @@ namespace Vxl
 		{
 			return m_time;
 		}
+		inline float GetTimef() const
+		{
+			return (float)m_time;
+		}
 		inline UINT GetFrameCount(void) const
 		{
 			return m_frames;

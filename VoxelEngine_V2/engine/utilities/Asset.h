@@ -551,9 +551,10 @@ namespace Vxl
 		ShaderMaterialIndex shaderMaterial_error;
 		MaterialIndex		material_error;
 
-		ShaderMaterialIndex shaderMaterial_lineRender;
-
+		ShaderMaterialIndex shader_lineRender;
 		ShaderMaterialIndex	shader_showRenderTarget;
+		ShaderMaterialIndex	shader_debugRender;
+		ShaderMaterialIndex	shader_passthrough;
 
 	public:
 		GlobalAssets()
@@ -571,6 +572,8 @@ namespace Vxl
 
 		ShaderProgram* get_ProgramShowRenderTarget(void) const;
 		ShaderProgram* get_ProgramLineRender(void) const;
+		ShaderProgram* get_ProgramDebugRender(void) const;
+		ShaderProgram* get_ProgramPassthrough(void) const;
 
 	} SingletonInstance(GlobalAssets);
 

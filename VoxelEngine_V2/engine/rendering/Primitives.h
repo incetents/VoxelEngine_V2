@@ -63,6 +63,13 @@ namespace Vxl
 		MeshIndex m_doughtnut2D_y; // Radius = 1.0f
 		MeshIndex m_doughtnut2D_z; // Radius = 1.0f
 
+		// Lines
+		MeshIndex m_lines_circleX;
+		MeshIndex m_lines_circleY;
+		MeshIndex m_lines_circleZ;
+		MeshIndex m_lines_circleAllAxis;
+		MeshIndex m_lines_cube;
+
 		void CreateFullQuad();
 		void CreateFullTriangle();
 		void CreateQuad();
@@ -107,6 +114,9 @@ namespace Vxl
 		MeshIndex GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f, const Vector3& offset = Vector3(0,0,0));
 		MeshIndex GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
 		MeshIndex GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
+
+		MeshIndex GenerateLinesCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
+		MeshIndex GenerateLinesCube(const std::string& MeshName, float unitSize = 1.0f);
 
 		// Vertices are from -1 to +1
 		inline MeshIndex GetFullQuad() const { return m_fullQuad; }
@@ -158,6 +168,14 @@ namespace Vxl
 		inline MeshIndex GetDoughtnutX_2D() const { return m_doughtnut2D_x; }
 		inline MeshIndex GetDoughtnutY_2D() const { return m_doughtnut2D_y; }
 		inline MeshIndex GetDoughtnutZ_2D() const { return m_doughtnut2D_z; }
+
+		// LINES //
+
+		inline MeshIndex GetLines_CircleX_Unit() const { return m_lines_circleX; }
+		inline MeshIndex GetLines_CircleY_Unit() const { return m_lines_circleY; }
+		inline MeshIndex GetLines_CircleZ_Unit() const { return m_lines_circleZ; }
+		inline MeshIndex GetLines_CircleAllAxis_Unit() const { return m_lines_circleAllAxis; }
+		inline MeshIndex GetLines_Cube() const { return m_lines_cube; }
 
 	} SingletonInstance(Primitives);
 }

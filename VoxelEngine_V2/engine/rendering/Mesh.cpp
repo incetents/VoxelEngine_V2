@@ -569,6 +569,12 @@ namespace Vxl
 		m_index += m_indexIncrement;
 	}
 
+	void LineMesh3D::clear()
+	{
+		// Reset
+		m_index = 0;
+		m_points.vertices.clear();
+	}
 	void LineMesh3D::bind(DrawType type)
 	{
 		// Data
@@ -581,10 +587,7 @@ namespace Vxl
 		m_VAO.bind();
 
 		m_points.bind();
-
-		// Reset
-		m_index = 0;
-		m_points.vertices.clear();
+		
 
 		m_VAO.unbind();
 	}
@@ -624,6 +627,12 @@ namespace Vxl
 		m_index += m_indexIncrement;
 	}
 
+	void LineMesh2D::clear()
+	{
+		// Reset
+		m_index = 0;
+		m_points.vertices.clear();
+	}
 	void LineMesh2D::bind(DrawType type)
 	{
 		// Data
@@ -636,10 +645,6 @@ namespace Vxl
 		m_VAO.bind();
 
 		m_points.bind();
-
-		// Reset
-		m_index = 0;
-		m_points.vertices.clear();
 
 		m_VAO.unbind();
 	}

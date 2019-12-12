@@ -66,7 +66,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGB8,
+			TextureFormat::RGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 			);
@@ -76,7 +76,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGB8,
+			TextureFormat::RGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -86,7 +86,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGB8,
+			TextureFormat::RGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -97,7 +97,7 @@ namespace Vxl
 			true,
 			TextureWrapping::REPEAT,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGB8,
+			TextureFormat::RGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -111,7 +111,7 @@ namespace Vxl
 			false, true,
 			TextureWrapping::CLAMP_STRETCH,
 			TextureFilter::LINEAR,
-			TextureFormat::SRGB8,
+			TextureFormat::RGB8,
 			TexturePixelType::UNSIGNED_BYTE,
 			AnisotropicMode::NONE
 		);
@@ -142,7 +142,6 @@ namespace Vxl
 			TextureDepthFormat::DEPTH32
 		);
 
-		//fbo_gbuffer_ptr->setClearColor(Color4F(0.2f, 0.2f, 0.2f, 1));
 		fbo_gbuffer_ptr->bind();
 		fbo_gbuffer_ptr->setRenderTexture(0, fbotex_gbuffer_albedo);
 		fbo_gbuffer_ptr->setRenderTexture(1, fbotex_gbuffer_normal);
@@ -160,7 +159,7 @@ namespace Vxl
 		fbotex_editor_albedo = SceneAssets.createRenderTexture(
 			"albedo",
 			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
-			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			TextureFormat::SRGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
 		fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
 			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
@@ -900,17 +899,29 @@ namespace Vxl
 			10.0f,
 			Color3F(1, 1, 0), Color3F(0, 1, 1)
 		);
-		Debug.DrawLineNoDepth(
-			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
-			10.0f,
-			Color3F(0, 0, 0), Color3F(0, 0, 0)
-		);
+		//	Debug.DrawLineNoDepth(
+		//		Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
+		//		10.0f,
+		//		Color3F(0, 0, 0), Color3F(0, 0, 0)
+		//	);
+		
+		//	Debug.DrawLineSquareScreenSpace(
+		//		Vector2(0, 0), Vector2(1, 1),
+		//		5.0f,
+		//		Color3F(1, 0, 0)
+		//	);
 
-		Debug.DrawLineScreenSpace(
-			Vector2(-1, -1), Vector2(0, 0),
+		Debug.DrawLineCube(
+			Vector3(0, 0,0),
 			5.0f,
-			Color3F(1, 0, 0), Color3F(0, 1, 0)
+			Vector3(1,1,1),
+			Vector3(time, 0, time*2.0f),
+			Color3F::PURPLE
 		);
+		Debug.DrawLineSphere(Vector3(-3, 0, 0), Vector3(cosf(Time.GetTimef()) + 2), Color3F::YELLOW);
+
+		Debug.DrawCube(Vector3(0, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::BLUE);
+		Debug.DrawSphere(Vector3(-3, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::RED);
 
 		// End Frame Updates
 		
@@ -1003,7 +1014,6 @@ namespace Vxl
 			GPUTimer::EndTimer();
 		}
 
-
 		// Render Debugging Information
 		{
 			GPUTimer::StartTimer("Editor");
@@ -1011,29 +1021,160 @@ namespace Vxl
 			//
 			fbo_editor->bind();
 			fbo_editor->clearBuffers();
-
-			ShaderProgram* programRenderLines = GlobalAssets.get_ProgramLineRender();
-			programRenderLines->bind();
-			programRenderLines->bindCommonUniforms(-1);
-			// Depth
-			Graphics::SetDepthWrite(false);
-			Graphics::SetDepthRead(true);
-
-			programRenderLines->m_uniform_useModel.value().send(true);
-
-			// Ignore current depth
-			Debug.RenderWorldLinesNoDepth();
-
 			// Get Gbuffer depth
 			fbo_gbuffer->blitDepth(*fbo_editor);
 
-			// Read current depth
-			Debug.RenderWorldLines();
+			// Shapes
+			{
+				ShaderProgram* programDebugRender = GlobalAssets.get_ProgramDebugRender();
+				programDebugRender->bind();
+				programDebugRender->bindCommonUniforms(-1);
+				
+				// States
+				Graphics::SetDepthWrite(true);
+				Graphics::SetDepthRead(true);
 
-			// Screenspace
-			Graphics::SetDepthRead(false);
-			programRenderLines->m_uniform_useModel.value().send(false);
-			Debug.RenderScreenLines();
+				if(programDebugRender->m_uniform_useModel.has_value())
+					programDebugRender->m_uniform_useModel.value().send(true);
+				
+				// Spheres
+				Mesh* meshSphere = Assets.getMesh(Primitives.GetSphere());
+				if (meshSphere)
+				{
+					for (const auto& object : Debug.m_spheres)
+					{
+						if(programDebugRender->m_uniform_color.has_value())
+							programDebugRender->m_uniform_color.value().send(object.color);
+
+						if (programDebugRender->m_uniform_mvp.has_value())
+						{
+							Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
+							if(camera)
+								programDebugRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
+						}
+
+						if(programDebugRender->m_uniform_model.has_value())
+							programDebugRender->m_uniform_model.value().sendMatrix(object.model, true);
+						
+						meshSphere->draw();
+					}
+				}
+
+				// Cubes
+				Mesh* meshCube = Assets.getMesh(Primitives.GetCube());
+				if (meshCube)
+				{
+					for (const auto& object : Debug.m_cubes)
+					{
+						if (programDebugRender->m_uniform_color.has_value())
+							programDebugRender->m_uniform_color.value().send(object.color);
+
+						if (programDebugRender->m_uniform_mvp.has_value())
+						{
+							Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
+							if (camera)
+								programDebugRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
+						}
+
+						if (programDebugRender->m_uniform_model.has_value())
+							programDebugRender->m_uniform_model.value().sendMatrix(object.model, true);
+
+						meshCube->draw();
+					}
+				}
+
+			}
+			// Lines
+			{
+				ShaderProgram* programLineRender = GlobalAssets.get_ProgramLineRender();
+				programLineRender->bind();
+				programLineRender->bindCommonUniforms(-1);
+				
+				// State
+				if(programLineRender->m_uniform_useModel.has_value())
+					programLineRender->m_uniform_useModel.value().send(false);
+			
+				// State
+				programLineRender->sendUniform("useViewProjection", true);
+				programLineRender->sendUniform("useVertexColors", true);
+				programLineRender->sendUniform("useVertexWidth", true);
+				programLineRender->sendUniform("globalWidth", 1.0f);
+				Graphics::SetDepthRead(false);
+			
+				// Ignore current depth
+				Debug.RenderWorldLinesNoDepth();
+			
+				// State
+				Graphics::SetDepthRead(true);
+			
+				// Normal lines
+				Debug.RenderWorldLines();
+			
+				// State
+				Graphics::SetDepthRead(false);
+				programLineRender->sendUniform("useViewProjection", false);
+			
+				// Screenspace Lines
+				Debug.RenderScreenLines();
+
+				// State
+				Graphics::SetDepthRead(true);
+
+				// Objects
+				if (programLineRender->m_uniform_useModel.has_value())
+					programLineRender->m_uniform_useModel.value().send(true);
+
+				programLineRender->sendUniform("useViewProjection", true);
+				programLineRender->sendUniform("useVertexColors", false);
+				programLineRender->sendUniform("useVertexWidth", false);
+				programLineRender->sendUniform("globalWidth", 3.0f);
+
+				// Spheres Outline
+				Mesh* meshLines_CircleAllAxis = Assets.getMesh(Primitives.GetLines_CircleAllAxis_Unit());
+				if (meshLines_CircleAllAxis)
+				{
+					for (const auto& object : Debug.m_spheresLines)
+					{
+						if (programLineRender->m_uniform_color.has_value())
+							programLineRender->m_uniform_color.value().send(object.color);
+
+						if (programLineRender->m_uniform_mvp.has_value())
+						{
+							Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
+							if (camera)
+								programLineRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
+						}
+
+						if (programLineRender->m_uniform_model.has_value())
+							programLineRender->m_uniform_model.value().sendMatrix(object.model, true);
+
+						meshLines_CircleAllAxis->draw();
+					}
+				}
+
+				// Cubes Outline
+				Mesh* meshLines_Cube = Assets.getMesh(Primitives.GetLines_Cube());
+				if (meshLines_Cube)
+				{
+					for (const auto& object : Debug.m_cubesLines)
+					{
+						if (programLineRender->m_uniform_color.has_value())
+							programLineRender->m_uniform_color.value().send(object.color);
+
+						if (programLineRender->m_uniform_mvp.has_value())
+						{
+							Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
+							if (camera)
+								programLineRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
+						}
+
+						if (programLineRender->m_uniform_model.has_value())
+							programLineRender->m_uniform_model.value().sendMatrix(object.model, true);
+
+						meshLines_Cube->draw();
+					}
+				}
+			}
 
 			//
 			CPUTimer::EndTimer("Editor");
@@ -1208,6 +1349,13 @@ namespace Vxl
 
 		Graphics::SetClearColor(0, 0, 0, 0);
 		Graphics::ClearAllBuffers();
+
+		ShaderProgram* programPassthrough = GlobalAssets.get_ProgramPassthrough();
+		if (programPassthrough)
+		{
+			programPassthrough->bind();
+			programPassthrough->bindCommonUniforms(-1);
+		}
 
 		fbo_composite->bindTexture(0, TextureLevel::LEVEL0);
 		RenderManager.RenderFullScreen();
