@@ -95,6 +95,17 @@ namespace Vxl
 
 		m_spheresLines.push_back(_object);
 	}
+	void Debug::DrawLineAABB(
+		const Vector3& Min, const Vector3& Max,
+		const Color3F& C
+	)
+	{
+		Object _object;
+		_object.model = Matrix4x4(Matrix3x3::GetScale(Max - Min), (Min + Max) * 0.5f);
+		_object.color = C;
+
+		m_cubesLines.push_back(_object);
+	}
 
 	//	void Debug::DrawLineAABB(
 	//		const Vector3& Min, const Vector3& Max,
@@ -118,32 +129,32 @@ namespace Vxl
 	//		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
 	//		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Max.z), Width, C, C);
 	//	}
-	//	void Debug::DrawLineOBB(
-	//		const Entity& entity,
-	//		const Vector3& OffsetAll,
-	//		float Width,
-	//		const Color3F& C
-	//	)
-	//	{
-	//		auto OBB = entity.GetOBB();
-	//		// Bot
-	//		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[1], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[5], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[4], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[0], Width, C, C);
-	//	
-	//		// Top
-	//		DrawLine(OffsetAll + OBB[2], OffsetAll + OBB[3], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[3], OffsetAll + OBB[7], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[7], OffsetAll + OBB[6], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[6], OffsetAll + OBB[2], Width, C, C);
-	//	
-	//		// Mid
-	//		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[2], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[3], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[6], Width, C, C);
-	//		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[7], Width, C, C);
-	//	}
+	void Debug::DrawLineOBB(
+		const Entity& entity,
+		const Vector3& OffsetAll,
+		float Width,
+		const Color3F& C
+	)
+	{
+		auto OBB = entity.GetOBB();
+		// Bot
+		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[1], Width, C, C);
+		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[5], Width, C, C);
+		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[4], Width, C, C);
+		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[0], Width, C, C);
+	
+		// Top
+		DrawLine(OffsetAll + OBB[2], OffsetAll + OBB[3], Width, C, C);
+		DrawLine(OffsetAll + OBB[3], OffsetAll + OBB[7], Width, C, C);
+		DrawLine(OffsetAll + OBB[7], OffsetAll + OBB[6], Width, C, C);
+		DrawLine(OffsetAll + OBB[6], OffsetAll + OBB[2], Width, C, C);
+	
+		// Mid
+		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[2], Width, C, C);
+		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[3], Width, C, C);
+		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[6], Width, C, C);
+		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[7], Width, C, C);
+	}
 	//	void Debug::DrawLineSquare(
 	//		const Vector3& position,
 	//		const Vector3& up,

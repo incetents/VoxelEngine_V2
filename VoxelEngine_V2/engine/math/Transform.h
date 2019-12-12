@@ -29,6 +29,7 @@ namespace Vxl
 		friend class Camera;
 		friend class Hierarchy;
 		friend class _Assets;
+		friend class Entity;
 	protected:
 		// Model for transformations
 		Matrix4x4	m_modelMatrix;  // World Transformations - Row Major

@@ -923,6 +923,22 @@ namespace Vxl
 		Debug.DrawCube(Vector3(0, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::BLUE);
 		Debug.DrawSphere(Vector3(-3, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::RED);
 
+		// Draw Jiggy outline
+		Entity* jiggy_entity = Assets.getEntity(entity_jiggy);
+		if (jiggy_entity)
+		{
+			// AABB
+			Debug.DrawLineAABB(
+				jiggy_entity->m_transform.getWorldPosition() + jiggy_entity->GetAABBMin(),
+				jiggy_entity->m_transform.getWorldPosition() + jiggy_entity->GetAABBMax(),
+				Color3F::RED
+			);
+			// OBB
+			Debug.DrawLineOBB(*jiggy_entity, jiggy_entity->m_transform.getWorldPosition(), 1.0f, Color3F::BLUE);
+		//
+		}
+
+
 		// End Frame Updates
 		
 

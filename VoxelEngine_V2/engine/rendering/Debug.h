@@ -91,19 +91,17 @@ namespace Vxl
 			const Vector3& scale,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
+		void DrawLineAABB(
+			const Vector3& Min, const Vector3& Max,
+			const Color3F& C = Color3F(1, 1, 1)
+		);
 
-		//	void DrawLineAABB(
-		//		const Vector3& Min, const Vector3& Max,
-		//		const Vector3& OffsetAll = Vector3(0, 0, 0),
-		//		float Width = 1.0f,
-		//		const Color3F& C = Color3F(1, 1, 1)
-		//	);
-		//	void DrawLineOBB(
-		//		const Entity& entity,
-		//		const Vector3& OffsetAll,
-		//		float Width = 1.0f,
-		//		const Color3F& C = Color3F(1, 1, 1)
-		//	);
+		void DrawLineOBB(
+			const Entity& entity,
+			const Vector3& OffsetAll,
+			float Width = 1.0f,
+			const Color3F& C = Color3F(1, 1, 1)
+		);
 		//	void DrawLineSquare(
 		//		const Vector3& position,
 		//		const Vector3& up,

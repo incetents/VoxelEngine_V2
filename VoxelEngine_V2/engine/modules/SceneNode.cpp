@@ -56,8 +56,8 @@ namespace Vxl
 		{
 		case SceneNodeType::ENTITY:
 		{
-			//Entity* _entity = (Entity*)this;
-			//_entity->UpdateBoundingBoxCheap();
+			Entity* _entity = (Entity*)this;
+			_entity->UpdateBoundingBoxCheap();
 			break;
 		}
 		}

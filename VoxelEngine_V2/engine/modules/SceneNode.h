@@ -1,6 +1,7 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
+#include "../math/Color.h"
 #include "../math/Transform.h"
 
 namespace Vxl

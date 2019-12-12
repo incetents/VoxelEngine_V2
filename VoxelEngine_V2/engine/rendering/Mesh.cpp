@@ -15,6 +15,9 @@
 #include <assert.h>
 #include <iostream>
 
+#undef max
+#undef min
+
 namespace Vxl
 {
 	void Mesh::UpdateDrawInfo()
@@ -507,14 +510,18 @@ namespace Vxl
 	void Mesh::recalculateMinMax()
 	{
 		// Min/Max
-		m_min = Vector3::ZERO;
-		m_max = Vector3::ZERO;
+		m_max = Vector3(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+		m_min = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+
 		uint32_t PosCount = (uint32_t)m_positions.size();
 		for (uint32_t i = 0; i < PosCount; i++)
 		{
 			m_min = Vector3::Min(m_min, m_positions.vertices[i]);
 			m_max = Vector3::Max(m_max, m_positions.vertices[i]);
 		}
+
+		m_center = (m_max + m_min) * 0.5f;
+		m_scale = (m_max - m_min);
 	}
 
 	void Mesh::draw()

@@ -31,6 +31,8 @@ namespace Vxl
 		uint32_t	m_lines = 0;		// Lines Drawn
 		Vector3		m_min; // smallest vertices of mesh
 		Vector3		m_max; // largest vertices of mesh
+		Vector3		m_center; // (max + min) / 2
+		Vector3		m_scale;  // (max - min)
 
 		void UpdateDrawInfo();
 
@@ -94,6 +96,14 @@ namespace Vxl
 		inline Vector3		getVertexMax(void)	 const
 		{
 			return m_max;
+		}
+		inline Vector3		getCenter(void)const
+		{
+			return m_center;
+		}
+		inline Vector3		getScale(void)const
+		{
+			return m_scale;
 		}
 		inline VAOID		getVAOID(void) const
 		{

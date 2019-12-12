@@ -3,11 +3,12 @@ TODO:
 
 ! Macro everywhere -> DISALLOW_COPY_AND_ASSIGN(ClassName);
 
+- debug draw lines
+	-> draw OBB generic from Entity
+	-> widths of line objects
+
 - debug draw lines -> don't constantly resize array
 	- index offset
-
-- debug draw other common objects
-	-> aabb box, obb box
 
 - VAO global version
 	-> vbos bind when mesh is bound
