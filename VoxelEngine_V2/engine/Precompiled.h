@@ -20,6 +20,7 @@
 
 #include "math/Color.h"
 #include "math/Lerp.h"
+#include "math/Collision.h"
 #include "math/MathCore.h"
 #include "math/Matrix2x2.h"
 #include "math/Matrix3x3.h"
@@ -30,7 +31,6 @@
 #include "math/Random.h"
 #include "math/Transform.h"
 #include "math/Vector.h"
-#include "math/Raycast.h"
 
 #include "modules/Component.h"
 #include "modules/Entity.h"

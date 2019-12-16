@@ -48,18 +48,22 @@ namespace Vxl
 		// Become default empty matrix
 		void BeIdentity();
 
+		// Creation from Vectors
+		static Matrix4x4 createFromRows(const Vector4& Row1, const Vector4& Row2, const Vector4& Row3, const Vector4& Row4);
+		static Matrix4x4 createFromColumns(const Vector4& Column1, const Vector4& Column2, const Vector4& Column3, const Vector4& Column4);
+
 		// View Matrix
-		static	Matrix4x4  LookAt(const Vector3& Eye, const Vector3& Forward, const Vector3& Right, const Vector3& Up);
+		static Matrix4x4  LookAt(const Vector3& Eye, const Vector3& Forward, const Vector3& Right, const Vector3& Up);
 		// Perspective Matrix
-		static	Matrix4x4  Perspective(float fovy, float aspect, float near, float far);
-		static	Matrix4x4  PerspectiveInverse(float fovy, float aspect, float near, float far);
+		static Matrix4x4  Perspective(float fovy, float aspect, float near, float far);
+		static Matrix4x4  PerspectiveInverse(float fovy, float aspect, float near, float far);
 		static void Perspective_UpdateFov(Matrix4x4&, float fovy, float aspect);
 		static void Perspective_UpdateZ(Matrix4x4&, float znear, float zfar);
 		static void PerspectiveInverse_UpdateFov(Matrix4x4&, float fovy, float aspect);
 		static void PerspectiveInverse_UpdateZ(Matrix4x4&, float znear, float zfar);
 		// Orthographic Matrix
-		static	Matrix4x4  Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
-		static	Matrix4x4  OrthographicInverse(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
+		static Matrix4x4  Orthographic(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
+		static Matrix4x4  OrthographicInverse(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
 		static void Orthographic_UpdateX(Matrix4x4&, float xmin, float xmax);
 		static void Orthographic_UpdateY(Matrix4x4&, float ymin, float ymax);
 		static void Orthographic_UpdateZ(Matrix4x4&, float zmin, float zmax);

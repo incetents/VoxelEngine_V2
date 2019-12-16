@@ -2,8 +2,10 @@
 #pragma once
 
 #include "Component.h"
+
 #include "../math/Transform.h"
 #include "../math/Color.h"
+#include "../math/Collision.h"
 
 #include "../modules/Material.h"
 #include "../modules/SceneNode.h"
@@ -41,8 +43,8 @@ namespace Vxl
 		std::map<TextureLevel, TextureIndex> m_textures;
 		
 		// Bounding Boxes
-		Vector3		m_OBB[8]; // Object Bounding Box from mesh
-		Vector3		m_AABB[2]; // AABB based on OBB
+		AABB	col_AABB;
+		OBB		col_OBB;
 
 		// Component
 		std::map<const std::type_info*, Component*> m_components;
@@ -167,17 +169,13 @@ namespace Vxl
 		}
 
 		// Bounding Box
-		std::vector<Vector3> GetOBB(void) const
+		const OBB& 		 GetOBB(void) const
 		{
-			return std::vector<Vector3>(m_OBB, m_OBB + 8);
+			return col_OBB;
 		}
-		Vector3				 GetAABBMin(void) const
+		const AABB& 	 GetAABB(void) const
 		{
-			return m_AABB[0];
-		}
-		Vector3				 GetAABBMax(void) const
-		{
-			return m_AABB[1];
+			return col_AABB;
 		}
 	};
 }

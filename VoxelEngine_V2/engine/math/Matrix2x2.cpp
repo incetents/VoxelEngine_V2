@@ -61,6 +61,22 @@ namespace Vxl
 		*this = Matrix2x2::Identity;
 	}
 
+	// Creation from Vectors
+	Matrix2x2 Matrix2x2::createFromRows(const Vector2& Row1, const Vector2& Row2)
+	{
+		return Matrix2x2(
+			Row1.x, Row1.y,
+			Row2.x, Row2.y
+		);
+	}
+	Matrix2x2 Matrix2x2::createFromColumns(const Vector2& Column1, const Vector2& Column2)
+	{
+		return Matrix2x2(
+			Column1.x, Column2.x,
+			Column1.y, Column2.y
+		);
+	}
+
 	// Become Rotation Matrix
 	Matrix2x2 Matrix2x2::Rotation(float _radians, bool _CCW)
 	{

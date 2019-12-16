@@ -492,25 +492,33 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Primitives::GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset)
+	MeshIndex Primitives::GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset, bool tail)
 	{
 		std::vector<Vector3> positions;
-		std::vector<Vector3> positions2;
 		std::vector<Vector2> uvs;
-		std::vector<Vector2> uvs2;
+		
 		// RESERVE
 		Vector3 p1Offset;
-		Vector3 p2Offset;
 		float stemHeight = 0.66f;
 		float tipHeight = 0.33f;
-		p1Offset[(int)axis] = stemHeight * 0.5f;
-		p2Offset[(int)axis] = stemHeight + tipHeight * 0.5f;;
 
-		CreateCylinder(positions, uvs, axis, 16, stemHeight, 0.08f, 0.08f, p1Offset);
-		CreateCone(positions2, uvs2, axis, 16, tipHeight, 0.2f, p2Offset);
+		if(tail)
+			p1Offset[(int)axis] = stemHeight + tipHeight * 0.5f;;
 
-		positions.insert(positions.end(), positions2.begin(), positions2.end());
-		uvs.insert(uvs.end(), uvs2.begin(), uvs2.end());
+		CreateCone(positions, uvs, axis, 16, tipHeight, 0.2f, p1Offset);
+
+		if (tail)
+		{
+			std::vector<Vector3> positions2;
+			std::vector<Vector2> uvs2;
+
+			Vector3 p2Offset;
+			p2Offset[(int)axis] = stemHeight * 0.5f;
+			
+			CreateCylinder(positions2, uvs2, axis, 16, stemHeight, 0.08f, 0.08f, p2Offset);
+			positions.insert(positions.end(), positions2.begin(), positions2.end());
+			uvs.insert(uvs.end(), uvs2.begin(), uvs2.end());
+		}
 
 		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
@@ -1005,326 +1013,335 @@ namespace Vxl
 		//
 		return NewMeshIndex;
 	}
-
-	// Creators
-	void Primitives::CreateFullQuad()
+	MeshIndex Primitives::GenerateLinesArrow(const std::string& MeshName, Axis axis, float unitSize)
 	{
-		Vector3 pos[] = {
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
+
+		float tipWidth = 0.1f;
+		std::vector<Vector3> positions =
+		{
+			// Line
+			Vector3::ZERO,
+			Vector3(0, 0, 1),
+			// End to tip
+			Vector3(0, 0, 1),
+			Vector3(0, +tipWidth, 0.75f),
+			Vector3(0, 0, 1),
+			Vector3(0, -tipWidth, 0.75f),
+			Vector3(0, 0, 1),
+			Vector3(+tipWidth, 0, 0.75f),
+			Vector3(0, 0, 1),
+			Vector3(-tipWidth, 0, 0.75f),
+			// Bottom of tip
+			Vector3(0, +tipWidth, 0.75f),
+			Vector3(+tipWidth, 0, 0.75f),
+			Vector3(+tipWidth, 0, 0.75f),
+			Vector3(0, -tipWidth, 0.75f),
+			Vector3(0, -tipWidth, 0.75f),
+			Vector3(-tipWidth, 0, 0.75f),
+			Vector3(-tipWidth, 0, 0.75f),
+			Vector3(0, +tipWidth, 0.75f)
+		};
+
+		NewMesh->setGLName(MeshName);
+		NewMesh->m_positions = (positions);
+		NewMesh->bind(DrawType::LINES);
+		//
+		return NewMeshIndex;
+	}
+
+	// Create all Primitives
+	void Primitives::InitGLResources()
+	{
+		// Full Quad
+		{
+			Vector3 pos[] = {
 			Vector3(-1, -1, +0),
 			Vector3(+1, -1, +0),
 			Vector3(+1, +1, +0),
 			Vector3(-1, +1, +0),
-		};
-		Vector2 uvs[] = {
-			Vector2(0, 0),
-			Vector2(1, 0),
-			Vector2(1, 1),
-			Vector2(0, 1)
-		};
-		//Vector3 normals[] = {
-		//	Vector3(0, 0, +1),
-		//	Vector3(0, 0, +1),
-		//	Vector3(0, 0, +1),
-		//	Vector3(0, 0, +1)
-		//};
-		uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+			};
+			Vector2 uvs[] = {
+				Vector2(0, 0),
+				Vector2(1, 0),
+				Vector2(1, 1),
+				Vector2(0, 1)
+			};
+			//Vector3 normals[] = {
+			//	Vector3(0, 0, +1),
+			//	Vector3(0, 0, +1),
+			//	Vector3(0, 0, +1),
+			//	Vector3(0, 0, +1)
+			//};
+			uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
 
-		m_fullQuad = GlobalAssets.createMesh();
-		auto* fullQuad = GlobalAssets.getMesh(m_fullQuad);
-		//
-		fullQuad->m_positions = std::vector<Vector3>(pos, pos + 4);
-		fullQuad->m_uvs = std::vector<Vector2>(uvs, uvs + 4);
-		//fullQuad->m_normals.set(normals, 4);
-		fullQuad->m_indices = std::vector<uint32_t>(indices, indices + 6);
-		//
-		fullQuad->bind();
-	}
-	void Primitives::CreateFullTriangle()
-	{
-		Vector3 pos[] = {
+			m_fullQuad = GlobalAssets.createMesh();
+			auto* fullQuad = GlobalAssets.getMesh(m_fullQuad);
+			//
+			fullQuad->m_positions = std::vector<Vector3>(pos, pos + 4);
+			fullQuad->m_uvs = std::vector<Vector2>(uvs, uvs + 4);
+			//fullQuad->m_normals.set(normals, 4);
+			fullQuad->m_indices = std::vector<uint32_t>(indices, indices + 6);
+			//
+			fullQuad->bind();
+		}
+		// Full Triangle
+		{
+			Vector3 pos[] = {
 			Vector3(-1, -1, +0),
 			Vector3(+3, -1, +0),
 			Vector3(-1, +3, +0)
-		};
-		Vector2 uvs[] = {
-			Vector2(0, 0),
-			Vector2(2, 0),
-			Vector2(0, 2)
-		};
-		//Vector3 normals[] = {
-		//	Vector3(0, 0, +1),
-		//	Vector3(0, 0, +1),
-		//	Vector3(0, 0, +1)
-		//};
-		uint32_t indices[] = { 0, 1, 2 };
+			};
+			Vector2 uvs[] = {
+				Vector2(0, 0),
+				Vector2(2, 0),
+				Vector2(0, 2)
+			};
+			//Vector3 normals[] = {
+			//	Vector3(0, 0, +1),
+			//	Vector3(0, 0, +1),
+			//	Vector3(0, 0, +1)
+			//};
+			uint32_t indices[] = { 0, 1, 2 };
 
-		m_fullTriangle = GlobalAssets.createMesh();
-		auto* fullTriangle = GlobalAssets.getMesh(m_fullTriangle);
-		//
-		fullTriangle->m_positions = std::vector<Vector3>(pos, pos + 4);
-		fullTriangle->m_uvs = std::vector<Vector2>(uvs, uvs + 4);
-		//fullTriangle->m_normals.set(normals, 4);
-		fullTriangle->m_indices = std::vector<uint32_t>(indices, indices + 6);
-		//
-		fullTriangle->bind();
-	}
-
-	void Primitives::CreateQuad()
-	{
-		m_quad_x = GenerateQuad("Quad_X", Axis::X, 1.0f);
-		m_quad_y = GenerateQuad("Quad_Y", Axis::Y, 1.0f);
-		m_quad_z = GenerateQuad("Quad_Z", Axis::Z, 1.0f);
-
-		m_halfquad_x = GenerateQuad("HalfQuad_X", Axis::X, 0.5f);
-		m_halfquad_y = GenerateQuad("HalfQuad_Y", Axis::Y, 0.5f);
-		m_halfquad_z = GenerateQuad("HalfQuad_Z", Axis::Z, 0.5f);
-	}	
-
-	void Primitives::CreateCube()
-	{
-		m_cube = GenerateCube("Cube", 1.0f);
-		m_cube_small = GenerateCube("Cube_small", 0.25f);
-
-		m_lines_cube = GenerateLinesCube("LinesCube", 1.0f);
-	}
-
-	void Primitives::CreateInverseCube()
-	{
-		Vector3 pos[] = {
-			// Front Face
-			Vector3(-0.5f, -0.5f, +0.5f),
-			Vector3(+0.5f, -0.5f, +0.5f),
-			Vector3(+0.5f, +0.5f, +0.5f),
-			Vector3(-0.5f, +0.5f, +0.5f),
+			m_fullTriangle = GlobalAssets.createMesh();
+			auto* fullTriangle = GlobalAssets.getMesh(m_fullTriangle);
 			//
-			Vector3(-0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, -0.5f),
-			Vector3(-0.5f, +0.5f, -0.5f),
+			fullTriangle->m_positions = std::vector<Vector3>(pos, pos + 4);
+			fullTriangle->m_uvs = std::vector<Vector2>(uvs, uvs + 4);
+			//fullTriangle->m_normals.set(normals, 4);
+			fullTriangle->m_indices = std::vector<uint32_t>(indices, indices + 6);
 			//
-			Vector3(-0.5f, +0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, +0.5f),
-			Vector3(-0.5f, +0.5f, +0.5f),
-			//
-			Vector3(-0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, -0.5f, +0.5f),
-			Vector3(-0.5f, -0.5f, +0.5f),
-			//
-			Vector3(-0.5f, -0.5f, -0.5f),
-			Vector3(-0.5f, +0.5f, -0.5f),
-			Vector3(-0.5f, +0.5f, +0.5f),
-			Vector3(-0.5f, -0.5f, +0.5f),
-			//
-			Vector3(+0.5f, -0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, -0.5f),
-			Vector3(+0.5f, +0.5f, +0.5f),
-			Vector3(+0.5f, -0.5f, +0.5f),
-		};
-		Vector2 uvs[] = {
-			//
-			Vector2(0, 0),
-			Vector2(1, 0),
-			Vector2(1, 1),
-			Vector2(0, 1),
-			//
-			Vector2(1, 0),
-			Vector2(0, 0),
-			Vector2(0, 1),
-			Vector2(1, 1),
-			//
-			Vector2(0, 1),
-			Vector2(1, 1),
-			Vector2(1, 0),
-			Vector2(0, 0),
-			//
-			Vector2(1, 0),
-			Vector2(0, 0),
-			Vector2(0, 1),
-			Vector2(1, 1),
-			//
-			Vector2(0, 0),
-			Vector2(0, 1),
-			Vector2(1, 1),
-			Vector2(1, 0),
-			//
-			Vector2(1, 0),
-			Vector2(1, 1),
-			Vector2(0, 1),
-			Vector2(0, 0),
-		};
-		Vector3 normals[] = {
-			//
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			Vector3(0, 0, -1),
-			//
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			Vector3(0, 0, +1),
-			//
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			Vector3(0, -1, 0),
-			//
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			Vector3(0, +1, 0),
-			//
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-			Vector3(+1, 0, 0),
-			//
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-			Vector3(-1, 0, 0),
-		};
-		uint32_t indices[] = {
-			1, 0, 2, 2, 0, 3,
-			6, 4, 5, 4, 6, 7,
-			8, 9, 10, 8, 10, 11,
-			13, 12, 14, 14, 12, 15,
-			16, 17, 18, 16, 18, 19,
-			22, 21, 20, 23, 22, 20
-		};
+			fullTriangle->bind();
+		}
+		// Inverse Cube
+		{
+			Vector3 pos[] = {
+				// Front Face
+				Vector3(-0.5f, -0.5f, +0.5f),
+				Vector3(+0.5f, -0.5f, +0.5f),
+				Vector3(+0.5f, +0.5f, +0.5f),
+				Vector3(-0.5f, +0.5f, +0.5f),
+				//
+				Vector3(-0.5f, -0.5f, -0.5f),
+				Vector3(+0.5f, -0.5f, -0.5f),
+				Vector3(+0.5f, +0.5f, -0.5f),
+				Vector3(-0.5f, +0.5f, -0.5f),
+				//
+				Vector3(-0.5f, +0.5f, -0.5f),
+				Vector3(+0.5f, +0.5f, -0.5f),
+				Vector3(+0.5f, +0.5f, +0.5f),
+				Vector3(-0.5f, +0.5f, +0.5f),
+				//
+Vector3(-0.5f, -0.5f, -0.5f),
+Vector3(+0.5f, -0.5f, -0.5f),
+Vector3(+0.5f, -0.5f, +0.5f),
+Vector3(-0.5f, -0.5f, +0.5f),
+//
+Vector3(-0.5f, -0.5f, -0.5f),
+Vector3(-0.5f, +0.5f, -0.5f),
+Vector3(-0.5f, +0.5f, +0.5f),
+Vector3(-0.5f, -0.5f, +0.5f),
+//
+Vector3(+0.5f, -0.5f, -0.5f),
+Vector3(+0.5f, +0.5f, -0.5f),
+Vector3(+0.5f, +0.5f, +0.5f),
+Vector3(+0.5f, -0.5f, +0.5f),
+			};
+			Vector2 uvs[] = {
+				//
+				Vector2(0, 0),
+				Vector2(1, 0),
+				Vector2(1, 1),
+				Vector2(0, 1),
+				//
+				Vector2(1, 0),
+				Vector2(0, 0),
+				Vector2(0, 1),
+				Vector2(1, 1),
+				//
+				Vector2(0, 1),
+				Vector2(1, 1),
+				Vector2(1, 0),
+				Vector2(0, 0),
+				//
+				Vector2(1, 0),
+				Vector2(0, 0),
+				Vector2(0, 1),
+				Vector2(1, 1),
+				//
+				Vector2(0, 0),
+				Vector2(0, 1),
+				Vector2(1, 1),
+				Vector2(1, 0),
+				//
+				Vector2(1, 0),
+				Vector2(1, 1),
+				Vector2(0, 1),
+				Vector2(0, 0),
+			};
+			Vector3 normals[] = {
+				//
+				Vector3(0, 0, -1),
+				Vector3(0, 0, -1),
+				Vector3(0, 0, -1),
+				Vector3(0, 0, -1),
+				//
+				Vector3(0, 0, +1),
+				Vector3(0, 0, +1),
+				Vector3(0, 0, +1),
+				Vector3(0, 0, +1),
+				//
+				Vector3(0, -1, 0),
+				Vector3(0, -1, 0),
+				Vector3(0, -1, 0),
+				Vector3(0, -1, 0),
+				//
+				Vector3(0, +1, 0),
+				Vector3(0, +1, 0),
+				Vector3(0, +1, 0),
+				Vector3(0, +1, 0),
+				//
+				Vector3(+1, 0, 0),
+				Vector3(+1, 0, 0),
+				Vector3(+1, 0, 0),
+				Vector3(+1, 0, 0),
+				//
+				Vector3(-1, 0, 0),
+				Vector3(-1, 0, 0),
+				Vector3(-1, 0, 0),
+				Vector3(-1, 0, 0),
+			};
+			uint32_t indices[] = {
+				1, 0, 2, 2, 0, 3,
+				6, 4, 5, 4, 6, 7,
+				8, 9, 10, 8, 10, 11,
+				13, 12, 14, 14, 12, 15,
+				16, 17, 18, 16, 18, 19,
+				22, 21, 20, 23, 22, 20
+			};
 
-		m_inverseCube = GlobalAssets.createMesh();
-		auto* inverseCube = GlobalAssets.getMesh(m_inverseCube);
-		//
-		inverseCube->m_positions = std::vector<Vector3>(pos, pos + 24);
-		inverseCube->m_uvs = std::vector<Vector2>(uvs, uvs + 24);
-		inverseCube->m_normals = std::vector<Vector3>(normals, normals + 24);
-		inverseCube->m_indices = std::vector<uint32_t>(indices, indices + 36);
-		inverseCube->generateTangents();
-		//
-		inverseCube->bind();
-	}
+			m_inverseCube = GlobalAssets.createMesh();
+			auto* inverseCube = GlobalAssets.getMesh(m_inverseCube);
+			//
+			inverseCube->m_positions = std::vector<Vector3>(pos, pos + 24);
+			inverseCube->m_uvs = std::vector<Vector2>(uvs, uvs + 24);
+			inverseCube->m_normals = std::vector<Vector3>(normals, normals + 24);
+			inverseCube->m_indices = std::vector<uint32_t>(indices, indices + 36);
+			inverseCube->generateTangents();
+			//
+			inverseCube->bind();
+		}
+		// Octahedron
+		{
+			Vector3 pos[] = {
+				// Edge
+				Vector3(-SQRT_HALF, 0, -SQRT_HALF) / 2,
+				Vector3(+SQRT_HALF, 0, -SQRT_HALF) / 2,
+				Vector3(+SQRT_HALF, 0, +SQRT_HALF) / 2,
+				Vector3(-SQRT_HALF, 0, +SQRT_HALF) / 2,
+				// Top Bottom
+				Vector3(0, +0.5f, 0.0f),
+				Vector3(0, -0.5f, 0.0f)
+			};
+			Vector3 normals[] = {
+				// Edge
+				Vector3(-SQRT_HALF, 0, -SQRT_HALF),
+				Vector3(+SQRT_HALF, 0, -SQRT_HALF),
+				Vector3(+SQRT_HALF, 0, +SQRT_HALF),
+				Vector3(-SQRT_HALF, 0, +SQRT_HALF),
+				// Top Bottom
+				Vector3(0, +1.0f, 0.0f),
+				Vector3(0, -1.0f, 0.0f)
+			};
+			Vector2 uvs[] = {
+				Vector2(0.00f, 0.5f),
+				Vector2(0.25f, 0.5f),
+				Vector2(0.50f, 0.5f),
+				Vector2(1.00f, 0.5f),
 
-	void Primitives::CreateOctahedron()
-	{
-		Vector3 pos[] = {
-			// Edge
-			Vector3(-SQRT_HALF, 0, -SQRT_HALF)/2,
-			Vector3(+SQRT_HALF, 0, -SQRT_HALF)/2,
-			Vector3(+SQRT_HALF, 0, +SQRT_HALF)/2,
-			Vector3(-SQRT_HALF, 0, +SQRT_HALF)/2,
-			// Top Bottom
-			Vector3(0, +0.5f, 0.0f),
-			Vector3(0, -0.5f, 0.0f)
-		};
-		Vector3 normals[] = {
-			// Edge
-			Vector3(-SQRT_HALF, 0, -SQRT_HALF),
-			Vector3(+SQRT_HALF, 0, -SQRT_HALF),
-			Vector3(+SQRT_HALF, 0, +SQRT_HALF),
-			Vector3(-SQRT_HALF, 0, +SQRT_HALF),
-			// Top Bottom
-			Vector3(0, +1.0f, 0.0f),
-			Vector3(0, -1.0f, 0.0f)
-		};
-		Vector2 uvs[] = {
-			Vector2(0.00f, 0.5f),
-			Vector2(0.25f, 0.5f),
-			Vector2(0.50f, 0.5f),
-			Vector2(1.00f, 0.5f),
+				Vector2(0.5f, 1.0f),
+				Vector2(0.5f, 0.0f)
+			};
+			uint32_t indices[] = {
+				0, 4, 1,
+				1, 4, 2,
+				2, 4, 3,
+				3, 4, 0,
+				1, 5, 0,
+				2, 5, 1,
+				3, 5, 2,
+				0, 5, 3
+			};
 
-			Vector2(0.5f, 1.0f),
-			Vector2(0.5f, 0.0f)
-		};
-		uint32_t indices[] = {
-			0, 4, 1,
-			1, 4, 2,
-			2, 4, 3,
-			3, 4, 0,
-			1, 5, 0,
-			2, 5, 1,
-			3, 5, 2,
-			0, 5, 3
-		};
+			m_octahedron = GlobalAssets.createMesh();
+			auto* octahedron = GlobalAssets.getMesh(m_octahedron);
+			//
+			octahedron->m_positions = std::vector<Vector3>(pos, pos + 6);
+			octahedron->m_uvs = std::vector<Vector2>(uvs, uvs + 6);
+			octahedron->m_normals = std::vector<Vector3>(normals, normals + 6);
+			octahedron->m_indices = std::vector<uint32_t>(indices, indices + 24);
+			octahedron->generateTangents();
+			//
+			octahedron->bind();
+		}
+		// Generate Shapes
+		{
+			m_quad_x = GenerateQuad("Quad_X", Axis::X, 1.0f);
+			m_quad_y = GenerateQuad("Quad_Y", Axis::Y, 1.0f);
+			m_quad_z = GenerateQuad("Quad_Z", Axis::Z, 1.0f);
 
-		m_octahedron = GlobalAssets.createMesh();
-		auto* octahedron = GlobalAssets.getMesh(m_octahedron);
-		//
-		octahedron->m_positions = std::vector<Vector3>(pos, pos + 6);
-		octahedron->m_uvs = std::vector<Vector2>(uvs, uvs + 6);
-		octahedron->m_normals = std::vector<Vector3>(normals, normals + 6);
-		octahedron->m_indices = std::vector<uint32_t>(indices, indices + 24);
-		octahedron->generateTangents();
-		//
-		octahedron->bind();
-	}
+			m_halfquad_x = GenerateQuad("HalfQuad_X", Axis::X, 0.5f);
+			m_halfquad_y = GenerateQuad("HalfQuad_Y", Axis::Y, 0.5f);
+			m_halfquad_z = GenerateQuad("HalfQuad_Z", Axis::Z, 0.5f);
 
-	void Primitives::CreateIcosahedron()
-	{
-		m_icosahedron = GenerateIcosahdron("Icosahedron [Radius=0.5]", 0, 0.5f);
-	}
+			m_cube = GenerateCube("Cube", 1.0f);
+			m_cube_small = GenerateCube("Cube_small", 0.25f);
 
-	void Primitives::CreateIcosphere()
-	{
-		m_icoSphere = GenerateIcosahdron("Icosphere [Radius=0.5]", 1, 0.5f);
-	}
+			m_lines_cube = GenerateLinesCube("LinesCube", 1.0f);
 
-	void Primitives::CreateSphere()
-	{
-		m_sphere = GenerateIcosahdron("Sphere [Radius=0.5]", 2, 0.5f);
-	}
+			m_icosahedron = GenerateIcosahdron("Icosahedron [Radius=0.5]", 0, 0.5f);
+			m_icoSphere = GenerateIcosahdron("Icosphere [Radius=0.5]", 1, 0.5f);
+			m_sphere = GenerateIcosahdron("Sphere [Radius=0.5]", 2, 0.5f);
+			m_sphereUV_16 = GenerateSphereUV("UVSphere16 [Radius=0.5]]", 16, 16);
+			m_sphereUV_32 = GenerateSphereUV("UVSphere32 [Radius=0.5]]", 32, 32);
+			m_sphereUV_64 = GenerateSphereUV("UVSphere64 [Radius=0.5]]", 64, 64);
 
-	void Primitives::CreateSphereUV()
-	{
-		m_sphereUV_16 = GenerateSphereUV("UVSphere16 [Radius= [Radius=0.5]]", 16, 16);
-		m_sphereUV_64 = GenerateSphereUV("UVSphere64 [Radius= [Radius=0.5]]", 64, 64);
-	}
+			m_cylinder_x = GenerateCylinder("CylinderX [16] [Radius=0.5]", Axis::X, 16, 1.0f, 0.5f, 0.5f);
+			m_cylinder_y = GenerateCylinder("CylinderY [16] [Radius=0.5]", Axis::Y, 16, 1.0f, 0.5f, 0.5f);
+			m_cylinder_z = GenerateCylinder("CylinderZ [16] [Radius=0.5]", Axis::Z, 16, 1.0f, 0.5f, 0.5f);
 
-	void Primitives::CreateCylinders()
-	{
-		//
-		m_cylinder_x = GenerateCylinder("CylinderX [16] [Radius=0.5]", Axis::X, 16, 1.0f, 0.5f, 0.5f);
-		m_cylinder_y = GenerateCylinder("CylinderY [16] [Radius=0.5]", Axis::Y, 16, 1.0f, 0.5f, 0.5f);
-		m_cylinder_z = GenerateCylinder("CylinderZ [16] [Radius=0.5]", Axis::Z, 16, 1.0f, 0.5f, 0.5f);
-		//
-	}
+			m_cone_x = GenerateCone("Cone X-axis [16]", Axis::X, 16, 1.0f, 0.5f);
+			m_cone_y = GenerateCone("Cone Y-axis [16]", Axis::Y, 16, 1.0f, 0.5f);
+			m_cone_z = GenerateCone("Cone Z-axis [16]", Axis::Z, 16, 1.0f, 0.5f);
 
-	void Primitives::CreateCones()
-	{
-		//
-		m_cone_x = GenerateCone("Cone X-axis [16]", Axis::X, 16, 1.0f, 0.5f);
-		m_cone_y = GenerateCone("Cone Y-axis [16]", Axis::Y, 16, 1.0f, 0.5f);
-		m_cone_z = GenerateCone("Cone Z-axis [16]", Axis::Z, 16, 1.0f, 0.5f);
-		//
-	}
+			m_arrow_x = GenerateArrow("ArrowX", Axis::X, 1.0f, Vector3::ZERO, true);
+			m_arrow_y = GenerateArrow("ArrowY", Axis::Y, 1.0f, Vector3::ZERO, true);
+			m_arrow_z = GenerateArrow("ArrowZ", Axis::Z, 1.0f, Vector3::ZERO, true);
 
-	void Primitives::CreateArrows()
-	{
-		m_arrow_x = GenerateArrow("ArrowX", Axis::X, 1.0f, Vector3::ZERO);
-		m_arrow_y = GenerateArrow("ArrowY", Axis::Y, 1.0f, Vector3::ZERO);
-		m_arrow_z = GenerateArrow("ArrowZ", Axis::Z, 1.0f, Vector3::ZERO);
-	}
+			m_arrow_x_notail = GenerateArrow("ArrowXNoTail", Axis::X, 1.0f, Vector3::ZERO, false);
+			m_arrow_y_notail = GenerateArrow("ArrowYNoTail", Axis::Y, 1.0f, Vector3::ZERO, false);
+			m_arrow_z_notail = GenerateArrow("ArrowZNoTail", Axis::Z, 1.0f, Vector3::ZERO, false);
 
-	void Primitives::CreateCircles()
-	{
-		m_circleUnit_x = GenerateCircle("CircleUnitX", Axis::X, 32u, 1.0f);
-		m_circleUnit_y = GenerateCircle("CircleUnitY", Axis::Y, 32u, 1.0f);
-		m_circleUnit_z = GenerateCircle("CircleUnitZ", Axis::Z, 32u, 1.0f);
+			m_circleUnit_x = GenerateCircle("CircleUnitX", Axis::X, 32u, 1.0f);
+			m_circleUnit_y = GenerateCircle("CircleUnitY", Axis::Y, 32u, 1.0f);
+			m_circleUnit_z = GenerateCircle("CircleUnitZ", Axis::Z, 32u, 1.0f);
 
-		m_circleDouble_x = GenerateCircle("CircleDoubleX", Axis::X, 32u, 2.0f);
-		m_circleDouble_y = GenerateCircle("CircleDoubleY", Axis::Y, 32u, 2.0f);
-		m_circleDouble_z = GenerateCircle("CircleDoubleZ", Axis::Z, 32u, 2.0f);
+			m_circleDouble_x = GenerateCircle("CircleDoubleX", Axis::X, 32u, 2.0f);
+			m_circleDouble_y = GenerateCircle("CircleDoubleY", Axis::Y, 32u, 2.0f);
+			m_circleDouble_z = GenerateCircle("CircleDoubleZ", Axis::Z, 32u, 2.0f);
 
-		m_doughtnut2D_x = GenerateDoughtnut2D("Doughtnut2DX", Axis::X, 32u, 2.0f, 1.5f);
-		m_doughtnut2D_y = GenerateDoughtnut2D("Doughtnut2DY", Axis::Y, 32u, 2.0f, 1.5f);
-		m_doughtnut2D_z = GenerateDoughtnut2D("Doughtnut2DZ", Axis::Z, 32u, 2.0f, 1.5f);
+			m_doughtnut2D_x = GenerateDoughtnut2D("Doughtnut2DX", Axis::X, 32u, 2.0f, 1.5f);
+			m_doughtnut2D_y = GenerateDoughtnut2D("Doughtnut2DY", Axis::Y, 32u, 2.0f, 1.5f);
+			m_doughtnut2D_z = GenerateDoughtnut2D("Doughtnut2DZ", Axis::Z, 32u, 2.0f, 1.5f);
 
-		m_lines_circleX = GenerateLinesCircle("LinesCircleUnitX", Axis::X, 32u, 1.0f);
-		m_lines_circleY = GenerateLinesCircle("LinesCircleUnitY", Axis::Y, 32u, 1.0f);
-		m_lines_circleZ = GenerateLinesCircle("LinesCircleUnitZ", Axis::Z, 32u, 1.0f);
-		m_lines_circleAllAxis = GenerateLinesCircle("LinesCircleUnitAllAxis", Axis::ALL, 32u, 1.0f);
+			m_lines_circleX = GenerateLinesCircle("LinesCircleUnitX", Axis::X, 32u, 1.0f);
+			m_lines_circleY = GenerateLinesCircle("LinesCircleUnitY", Axis::Y, 32u, 1.0f);
+			m_lines_circleZ = GenerateLinesCircle("LinesCircleUnitZ", Axis::Z, 32u, 1.0f);
+			m_lines_circleAllAxis = GenerateLinesCircle("LinesCircleUnitAllAxis", Axis::ALL, 32u, 1.0f);
+
+		}
 	}
 }

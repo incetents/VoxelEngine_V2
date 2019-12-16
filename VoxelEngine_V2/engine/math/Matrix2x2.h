@@ -34,6 +34,10 @@ namespace Vxl
 		// Become default empty matrix
 		void BeIdentity();
 
+		// Creation from Vectors
+		static Matrix2x2 createFromRows(const Vector2& Row1, const Vector2& Row2);
+		static Matrix2x2 createFromColumns(const Vector2& Column1, const Vector2& Column2);
+
 		// Create Rotation Matrix
 		static	Matrix2x2 Rotation(float _radians, bool _CCW = true);
 

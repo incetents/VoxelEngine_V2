@@ -37,9 +37,8 @@ namespace Vxl
 	void GlobalAssets::InitGLResources()
 	{
 		// Load files
-		loadFile("_UBO.glsl", "./assets/files/_UBO.glsl");
+		loadFile("_Core.glsl", "./assets/files/_Core.glsl");
 		loadFile("_Math.glsl", "./assets/files/_Math.glsl");
-		loadFile("_Uniforms.glsl", "./assets/files/_Uniforms.glsl");
 
 		// Editor Textures
 		texID_editor_camera = loadTexture2D(
@@ -167,6 +166,12 @@ namespace Vxl
 		// Simple Light Material
 		{
 			shader_debugRender = createShaderMaterial("./assets/materials/debugRender.material");
+			material_debugRender = createMaterial("error");
+			{
+				auto mat = _Assets::getMaterial(material_debugRender);
+				mat->setShaderMaterial(shader_debugRender);
+				mat->setSequenceID(9001);
+			}
 		}
 		// Passthrough Material
 		{

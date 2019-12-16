@@ -4,8 +4,7 @@
 
 #Include
 {
-	_UBO.glsl,
-	_Uniforms.glsl
+	_Core.glsl
 }
 
 #Attributes
@@ -33,6 +32,7 @@
 
 #Properties // Uniforms and Functions
 {
+	uniform vec3 lightDirection;
 }
 
 #Vertex // Main
@@ -46,7 +46,7 @@
 	// Passthrough
 	else
 	{
-		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
+		gl_Position = VXL_viewProjection * vec4(m_position, 1.0); 
 		vert_out.pos = m_position;
 	}
 	
@@ -57,8 +57,7 @@
 
 #Fragment // Main
 {
-	vec3 lightDir = getCameraForwad();
-	float NDotL = dot(frag_in.normal, -lightDir);
+	float NDotL = dot(frag_in.normal, -lightDirection);
 	NDotL = NDotL * 0.5 + 0.5;
 
 	output_albedo = vec4(VXL_color * NDotL,1);

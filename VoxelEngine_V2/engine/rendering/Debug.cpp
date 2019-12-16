@@ -3,11 +3,13 @@
 #include "Debug.h"
 
 #include "../math/Color.h"
+#include "../math/Collision.h"
 #include "../modules/Entity.h"
 #include "../rendering/Primitives.h"
 #include "../rendering/Mesh.h"
 #include "../textures/Texture2D.h"
 #include "../utilities/Asset.h"
+#include "../utilities/Time.h"
 
 namespace Vxl
 {
@@ -58,33 +60,13 @@ namespace Vxl
 		Quaternion rotation = Quaternion::ToQuaternion_ZYX(ToRadians(eulerRotation.x), ToRadians(eulerRotation.y), ToRadians(eulerRotation.z));
 		_object.model = Matrix4x4(rotation.GetMatrix3x3() * Matrix3x3::GetScale(scale), position);
 		_object.color = C;
+		_object.width = width;
 
 		m_cubesLines.push_back(_object);
-
-		//	Quaternion rotation = Quaternion::ToQuaternion_ZYX(ToRadians(eulerRotation.x), ToRadians(eulerRotation.y), ToRadians(eulerRotation.z));
-		//	Matrix3x3 RotScale = rotation.GetMatrix3x3() * Matrix3x3::GetScale(scale * 0.5f);
-		//	
-		//	Vector3 Right = RotScale.GetColumn(0);
-		//	Vector3 Up = RotScale.GetColumn(1);
-		//	Vector3 Forward = RotScale.GetColumn(2);
-		//	
-		//	m_worldLines->addLine(position + Right + Up + Forward, position - Right + Up + Forward, width, C, C);
-		//	m_worldLines->addLine(position - Right + Up + Forward, position - Right + Up - Forward, width, C, C);
-		//	m_worldLines->addLine(position - Right + Up - Forward, position + Right + Up - Forward, width, C, C);
-		//	m_worldLines->addLine(position + Right + Up - Forward, position + Right + Up + Forward, width, C, C);
-		//	
-		//	m_worldLines->addLine(position + Right - Up + Forward, position - Right - Up + Forward, width, C, C);
-		//	m_worldLines->addLine(position - Right - Up + Forward, position - Right - Up - Forward, width, C, C);
-		//	m_worldLines->addLine(position - Right - Up - Forward, position + Right - Up - Forward, width, C, C);
-		//	m_worldLines->addLine(position + Right - Up - Forward, position + Right - Up + Forward, width, C, C);
-		//	
-		//	m_worldLines->addLine(position - Right - Up - Forward, position - Right + Up - Forward, width, C, C);
-		//	m_worldLines->addLine(position + Right - Up - Forward, position + Right + Up - Forward, width, C, C);
-		//	m_worldLines->addLine(position + Right - Up + Forward, position + Right + Up + Forward, width, C, C);
-		//	m_worldLines->addLine(position - Right - Up + Forward, position - Right + Up + Forward, width, C, C);
 	}
 	void Debug::DrawLineSphere(
 		const Vector3& position,
+		float width,
 		const Vector3& scale,
 		const Color3F& C
 	)
@@ -92,83 +74,85 @@ namespace Vxl
 		Object _object;
 		_object.model = Matrix4x4(Matrix3x3::GetScale(scale), position);
 		_object.color = C;
+		_object.width = width;
 
 		m_spheresLines.push_back(_object);
 	}
+
 	void Debug::DrawLineAABB(
 		const Vector3& Min, const Vector3& Max,
+		float width,
 		const Color3F& C
 	)
 	{
 		Object _object;
 		_object.model = Matrix4x4(Matrix3x3::GetScale(Max - Min), (Min + Max) * 0.5f);
 		_object.color = C;
+		_object.width = width;
 
 		m_cubesLines.push_back(_object);
 	}
+	void Debug::DrawLineAABB(
+		const AABB& aabb,
+		float width,
+		const Color3F& C
+	)
+	{
+		Object _object;
+		_object.model = Matrix4x4(Matrix3x3::GetScale(aabb.max - aabb.min), (aabb.max + aabb.min) * 0.5f);
+		_object.color = C;
+		_object.width = width;
 
-	//	void Debug::DrawLineAABB(
-	//		const Vector3& Min, const Vector3& Max,
-	//		const Vector3& OffsetAll,
-	//		float Width,
-	//		const Color3F& C
-	//	)
-	//	{
-	//		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Min.x, Min.y, Max.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Min.y, Min.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Min.x, Min.y, Max.z), Width, C, C);
-	//	
-	//		DrawLine(OffsetAll + Vector3(Min.x, Max.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Min.x, Max.y, Min.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Max.x, Max.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Max.x, Max.y, Max.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), Width, C, C);
-	//	
-	//		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Min.z), OffsetAll + Vector3(Min.x, Max.y, Min.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Min.x, Min.y, Max.z), OffsetAll + Vector3(Min.x, Max.y, Max.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Min.z), OffsetAll + Vector3(Max.x, Max.y, Min.z), Width, C, C);
-	//		DrawLine(OffsetAll + Vector3(Max.x, Min.y, Max.z), OffsetAll + Vector3(Max.x, Max.y, Max.z), Width, C, C);
-	//	}
+		m_cubesLines.push_back(_object);
+	}
 	void Debug::DrawLineOBB(
-		const Entity& entity,
-		const Vector3& OffsetAll,
+		const OBB& obb,
 		float Width,
 		const Color3F& C
 	)
 	{
-		auto OBB = entity.GetOBB();
-		// Bot
-		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[1], Width, C, C);
-		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[5], Width, C, C);
-		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[4], Width, C, C);
-		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[0], Width, C, C);
-	
-		// Top
-		DrawLine(OffsetAll + OBB[2], OffsetAll + OBB[3], Width, C, C);
-		DrawLine(OffsetAll + OBB[3], OffsetAll + OBB[7], Width, C, C);
-		DrawLine(OffsetAll + OBB[7], OffsetAll + OBB[6], Width, C, C);
-		DrawLine(OffsetAll + OBB[6], OffsetAll + OBB[2], Width, C, C);
-	
-		// Mid
-		DrawLine(OffsetAll + OBB[0], OffsetAll + OBB[2], Width, C, C);
-		DrawLine(OffsetAll + OBB[1], OffsetAll + OBB[3], Width, C, C);
-		DrawLine(OffsetAll + OBB[4], OffsetAll + OBB[6], Width, C, C);
-		DrawLine(OffsetAll + OBB[5], OffsetAll + OBB[7], Width, C, C);
+		Object _object;
+		Matrix3x3 rotScale = Matrix3x3::createFromColumns(obb.right, obb.up, obb.forward);
+		_object.model = Matrix4x4(rotScale, obb.position);
+		_object.color = C;
+		_object.width = Width;
+
+		m_cubesLines.push_back(_object);
 	}
-	//	void Debug::DrawLineSquare(
-	//		const Vector3& position,
-	//		const Vector3& up,
-	//		const Vector3& right,
-	//		float Width,
-	//		const Color3F& C
-	//	)
-	//	{
-	//		DrawLine(position + up - right, position + up + right, Width, C, C);
-	//		DrawLine(position + up + right, position - up + right, Width, C, C);
-	//		DrawLine(position - up + right, position - up - right, Width, C, C);
-	//		DrawLine(position - up - right, position + up - right, Width, C, C);
-	//	}
-	
+	void Debug::DrawLineArrow(
+		const Vector3& p1, const Vector3& p2,
+		float Width,
+		float ArrowTipSize,
+		const Color3F& C
+	)
+	{
+		// Base line
+		DrawLine(p1, p2, Width, C, C);
+
+		Object _object;
+
+		// Non rotation Forward is (0,0,1)
+		Vector3 direction = (p2 - p1);
+
+		// Y Rotation
+		Vector2 directionXZ = Vector2(direction.x, direction.z);
+		float YrotationRad = Vector2::GetAngleRadians(Vector2(directionXZ).NormalizeAccurate(), Vector2(0, 1));
+		if (direction.x > 0)
+			YrotationRad = -YrotationRad;
+
+		// X Rotation
+		float XrotationRad = -Vector3::GetAngleRadians(direction.NormalizeAccurate(), Vector3::UP) + HALF_PI;//
+
+		// Rotation Result
+		Quaternion QY = Quaternion::AngleAxis(YrotationRad, Vector3::UP);
+		Quaternion QX = Quaternion::AngleAxis(XrotationRad, Vector3::RIGHT);
+
+		_object.model = Matrix4x4((QY * QX).GetMatrix3x3() * Matrix3x3::GetScale(ArrowTipSize), p2);
+		_object.color = C;
+		_object.width = Width;
+
+		m_arrowLines.push_back(_object);
+	}
 
 	void Debug::DrawCube(
 		const Vector3& position,
@@ -241,14 +225,16 @@ namespace Vxl
 
 	void Debug::End()
 	{
-		m_worldLines->clear();
-		m_worldLinesNoDepth->clear();
-		m_screenLines->clear();
+		m_worldLines->resetIndex();
+		m_worldLinesNoDepth->resetIndex();
+		m_screenLines->resetIndex();
 
 		m_spheres.clear();
 		m_cubes.clear();
 
 		m_spheresLines.clear();
 		m_cubesLines.clear();
+
+		m_arrowLines.clear();
 	}
 }

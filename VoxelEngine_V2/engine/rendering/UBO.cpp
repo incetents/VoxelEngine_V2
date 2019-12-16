@@ -19,9 +19,9 @@ namespace Vxl
 	void UBOManager::BindCamera(const Camera& _camera)
 	{
 		// Transpose Matrices so that they are Column Major
-		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getViewProjection().Transpose(), 0);
-		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getView().Transpose(), 64);
-		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getProjection().Transpose(), 128);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getViewProjection(), 0);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getView(), 64);
+		m_ubos[UBOID::CAMERA]->sendMatrix(_camera.getProjection(), 128);
 		m_ubos[UBOID::CAMERA]->bind();
 	}
 	void UBOManager::BindTime()

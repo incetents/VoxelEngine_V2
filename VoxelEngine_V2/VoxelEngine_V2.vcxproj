@@ -30,10 +30,10 @@
     <ClCompile Include="engine\editor\Editor.cpp" />
     <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\input\XGamePad.cpp" />
+    <ClCompile Include="engine\math\Collision.cpp" />
     <ClCompile Include="engine\math\MathCore.cpp" />
     <ClCompile Include="engine\math\Model.cpp" />
     <ClCompile Include="engine\math\Random.cpp" />
-    <ClCompile Include="engine\math\Raycast.cpp" />
     <ClCompile Include="engine\modules\SceneNode.cpp" />
     <ClCompile Include="engine\objects\Camera.cpp" />
     <ClCompile Include="engine\modules\Entity.cpp" />
@@ -146,7 +146,7 @@
     <ClInclude Include="engine\editor\Editor.h" />
     <ClInclude Include="engine\editor\GUIViewport.h" />
     <ClInclude Include="engine\input\XGamePad.h" />
-    <ClInclude Include="engine\math\Raycast.h" />
+    <ClInclude Include="engine\math\Collision.h" />
     <ClInclude Include="engine\math\Vector.h" />
     <ClInclude Include="engine\modules\SceneNode.h" />
     <ClInclude Include="engine\objects\Camera.h" />

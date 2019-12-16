@@ -18,6 +18,8 @@
 namespace Vxl
 {
 	class Texture2D;
+	struct OBB;
+	struct AABB;
 
 	static class Debug : public Singleton<class Debug>
 	{
@@ -29,6 +31,7 @@ namespace Vxl
 		{
 			Color3F		color;
 			Matrix4x4	model;
+			float		width;
 		};
 
 		// Storage
@@ -36,6 +39,7 @@ namespace Vxl
 		std::vector<Object> m_spheresLines;
 		std::vector<Object> m_cubes;
 		std::vector<Object> m_cubesLines;
+		std::vector<Object> m_arrowLines;
 
 	private:
 		// Debug Lines in world space
@@ -88,38 +92,32 @@ namespace Vxl
 		);
 		void DrawLineSphere(
 			const Vector3& position,
+			float width,
 			const Vector3& scale,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
+
 		void DrawLineAABB(
 			const Vector3& Min, const Vector3& Max,
+			float width,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
-
+		void DrawLineAABB(
+			const AABB& aabb,
+			float width,
+			const Color3F& C = Color3F(1, 1, 1)
+		);
 		void DrawLineOBB(
-			const Entity& entity,
-			const Vector3& OffsetAll,
+			const OBB& obb,
 			float Width = 1.0f,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
-		//	void DrawLineSquare(
-		//		const Vector3& position,
-		//		const Vector3& up,
-		//		const Vector3& right,
-		//		float Width = 1.0f,
-		//		const Color3F& C = Color3F(1, 1, 1)
-		//	);
-		
-
-		// Outlines
-		
-
-		//	void DrawAABBOutline(
-		//		const Vector3& position,
-		//		const Vector3& min,
-		//		const Vector3& max,
-		//		const Color3F& C = Color3F(1, 1, 1)
-		//	);
+		void DrawLineArrow(
+			const Vector3& p1, const Vector3& p2,
+			float Width = 1.0f,
+			float ArrowTipSize = 1.0f,
+			const Color3F& C = Color3F(1, 1, 1)
+		);
 
 		// 3D Drawing
 		void DrawCube(

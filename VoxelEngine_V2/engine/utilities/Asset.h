@@ -551,9 +551,11 @@ namespace Vxl
 		ShaderMaterialIndex shaderMaterial_error;
 		MaterialIndex		material_error;
 
+		ShaderMaterialIndex	shader_debugRender;
+		MaterialIndex		material_debugRender;
+
 		ShaderMaterialIndex shader_lineRender;
 		ShaderMaterialIndex	shader_showRenderTarget;
-		ShaderMaterialIndex	shader_debugRender;
 		ShaderMaterialIndex	shader_passthrough;
 
 	public:
@@ -569,6 +571,10 @@ namespace Vxl
 		Texture2D* get_Tex2DEditorLight(void) const { return m_texture2D_storage.Get(texID_editor_light); }
 		
 		Material* get_MaterialError(void) const { return m_material_storage.Get(material_error); }
+		Material* get_MaterialDebugRender(void) const { return m_material_storage.Get(material_debugRender); }
+
+		MaterialIndex get_MaterialErrorID(void) const { return material_error; }
+		MaterialIndex get_MaterialDebugRenderID(void) const { return material_debugRender; }
 
 		ShaderProgram* get_ProgramShowRenderTarget(void) const;
 		ShaderProgram* get_ProgramLineRender(void) const;

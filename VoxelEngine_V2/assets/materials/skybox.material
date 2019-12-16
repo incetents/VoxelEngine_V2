@@ -4,7 +4,7 @@
 
 #Include
 {
-	_UBO.glsl
+	_Core.glsl
 }
 
 #Attributes
@@ -33,12 +33,12 @@
 	vert_out.uvw = m_position;
 	
 	// Remove position from view matrix since skybox doesn't move
-	mat4 viewStill = UBO_view;
+	mat4 viewStill = VXL_view;
 	viewStill[3][0] = 0;
 	viewStill[3][1] = 0;
 	viewStill[3][2] = 0;
 	
-	vec4 pos = UBO_projection * viewStill * vec4(m_position, 1.0);
+	vec4 pos = VXL_projection * viewStill * vec4(m_position, 1.0);
 
 	gl_Position = pos.xyww;
 }

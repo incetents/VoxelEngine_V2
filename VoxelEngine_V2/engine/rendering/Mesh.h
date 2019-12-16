@@ -55,11 +55,11 @@ namespace Vxl
 
 		virtual ~Mesh() {}
 
-		MeshBuffer<Vector3> m_positions =	MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC0, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
-		MeshBuffer<Vector2> m_uvs =		MeshBuffer<Vector2>(BufferLayout({ {AttributeLocation::LOC1, AttributeType::VEC2} }), BufferUsage::STATIC_DRAW);
-		MeshBuffer<Vector3> m_normals =	MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC2, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
-		MeshBuffer<Vector3> m_tangents =	MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC6, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
-		MeshBuffer<Matrix4x4> m_instances = MeshBuffer<Matrix4x4>(BufferLayout(
+		MeshBuffer<Vector3> m_positions		= MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC0, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Vector2> m_uvs			= MeshBuffer<Vector2>(BufferLayout({ {AttributeLocation::LOC1, AttributeType::VEC2} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Vector3> m_normals		= MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC2, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Vector3> m_tangents		= MeshBuffer<Vector3>(BufferLayout({ {AttributeLocation::LOC6, AttributeType::VEC3} }), BufferUsage::STATIC_DRAW);
+		MeshBuffer<Matrix4x4> m_instances	= MeshBuffer<Matrix4x4>(BufferLayout(
 			{
 				{AttributeLocation::LOC8, AttributeType::VEC4, false, 1},
 				{AttributeLocation::LOC9, AttributeType::VEC4, false, 1},
@@ -145,6 +145,7 @@ namespace Vxl
 
 		void addLine(const Vector3& P1, const Vector3& P2, float Width, const Color3F& C1, const Color3F& C2);
 
+		void resetIndex() { m_index = 0; }
 		void clear();
 		void bind(DrawType type = DrawType::LINES);
 		void draw();
@@ -178,6 +179,7 @@ namespace Vxl
 
 		void addLine(const Vector2& P1, const Vector2& P2, float Width, const Color3F& C1, const Color3F& C2);
 
+		void resetIndex() { m_index = 0; }
 		void clear();
 		void bind(DrawType type = DrawType::LINES);
 		void draw();

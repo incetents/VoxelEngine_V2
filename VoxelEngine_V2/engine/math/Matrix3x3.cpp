@@ -92,6 +92,25 @@ namespace Vxl
 		*this = Matrix3x3::Identity;
 	}
 
+	// Creation from Vectors
+	Matrix3x3 Matrix3x3::createFromRows(const Vector3& Row1, const Vector3& Row2, const Vector3& Row3)
+	{
+		return Matrix3x3(
+			Row1.x, Row1.y, Row1.z,
+			Row2.x, Row2.y, Row2.z,
+			Row3.x, Row3.y, Row3.z
+		);
+	}
+	Matrix3x3 Matrix3x3::createFromColumns(const Vector3& Column1, const Vector3& Column2, const Vector3& Column3)
+	{
+		return Matrix3x3(
+			Column1.x, Column2.x, Column3.x,
+			Column1.y, Column2.y, Column3.y,
+			Column1.z, Column2.z, Column3.z
+		);
+	}
+
+
 	// Become Scale Matrix
 	Matrix3x3& Matrix3x3::Scale(float size)
 	{

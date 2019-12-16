@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../math/Vector.h"
+#include "../utilities/Types.h"
 #include "../utilities/singleton.h"
 #include <string>
 
@@ -43,6 +44,7 @@ namespace Vxl
 		MeshIndex m_icoSphere;
 		MeshIndex m_sphere; // made from icosahedron subdivded
 		MeshIndex m_sphereUV_16;
+		MeshIndex m_sphereUV_32;
 		MeshIndex m_sphereUV_64;
 		MeshIndex m_cylinder_x; //
 		MeshIndex m_cylinder_y; //
@@ -53,6 +55,9 @@ namespace Vxl
 		MeshIndex m_arrow_x;
 		MeshIndex m_arrow_y;
 		MeshIndex m_arrow_z;
+		MeshIndex m_arrow_x_notail;
+		MeshIndex m_arrow_y_notail;
+		MeshIndex m_arrow_z_notail;
 		MeshIndex m_circleUnit_x; // Radius = 0.5f
 		MeshIndex m_circleUnit_y; // Radius = 0.5f
 		MeshIndex m_circleUnit_z; // Radius = 0.5f
@@ -70,46 +75,15 @@ namespace Vxl
 		MeshIndex m_lines_circleAllAxis;
 		MeshIndex m_lines_cube;
 
-		void CreateFullQuad();
-		void CreateFullTriangle();
-		void CreateQuad();
-		void CreateCube();
-		void CreateInverseCube();
-		void CreateOctahedron();
-		void CreateIcosahedron();
-		void CreateIcosphere();
-		void CreateSphere();
-		void CreateSphereUV();
-		void CreateCylinders();
-		void CreateCones();
-		void CreateArrows();
-		void CreateCircles();
-
 	public:
-		void InitGLResources()
-		{
-			CreateFullQuad();
-			CreateFullTriangle();
-			CreateQuad();
-			CreateCube();
-			CreateInverseCube();
-			CreateOctahedron();
-			CreateIcosahedron();
- 			CreateIcosphere();
-			CreateSphere();
-			CreateSphereUV();
-			CreateCylinders();
-			CreateCones();
-			CreateArrows();
-			CreateCircles();
-		}
+		void InitGLResources();
 
 		// Generate Custom Meshes
 		MeshIndex GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale = 1.0f);
 		MeshIndex GenerateSphereUV(const std::string& MeshName, unsigned int xSlice, unsigned int ySlice);
 		MeshIndex GenerateCylinder(const std::string& MeshName, Axis axis, UINT slices, float height, float radius_top, float radius_bot);
 		MeshIndex GenerateCone(const std::string& MeshName, Axis axis, UINT slices, float height, float radius);
-		MeshIndex GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset);
+		MeshIndex GenerateArrow(const std::string& MeshName, Axis axis, float tailLength, const Vector3& offset, bool tail);
 		MeshIndex GenerateCube(const std::string& MeshName, float unitSize = 1.0f, const Vector3& offset = Vector3(0, 0, 0));
 		MeshIndex GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f, const Vector3& offset = Vector3(0,0,0));
 		MeshIndex GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
@@ -117,6 +91,7 @@ namespace Vxl
 
 		MeshIndex GenerateLinesCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
 		MeshIndex GenerateLinesCube(const std::string& MeshName, float unitSize = 1.0f);
+		MeshIndex GenerateLinesArrow(const std::string& MeshName, Axis axis, float unitSize = 1.0f);
 
 		// Vertices are from -1 to +1
 		inline MeshIndex GetFullQuad() const { return m_fullQuad; }
@@ -148,6 +123,8 @@ namespace Vxl
 		inline MeshIndex GetSphere() const { return m_sphere; }
 		// Vertices are from -0.5 to +0.5
 		inline MeshIndex GetSphereUV_Cheap() const { return m_sphereUV_16; }
+		// Vertices are from - 0.5 to + 0.5
+		inline MeshIndex GetSphereUV_Medium() const { return m_sphereUV_32; }
 		// Vertices are from -0.5 to +0.5
 		inline MeshIndex GetSphereUV_Good() const { return m_sphereUV_64; }
 		inline MeshIndex GetCylinderX() const { return m_cylinder_x; }
@@ -159,6 +136,9 @@ namespace Vxl
 		inline MeshIndex GetArrowX() const { return m_arrow_x; }
 		inline MeshIndex GetArrowY() const { return m_arrow_y; }
 		inline MeshIndex GetArrowZ() const { return m_arrow_z; }
+		inline MeshIndex GetArrowXNoTail() const { return m_arrow_x_notail; }
+		inline MeshIndex GetArrowYNoTail() const { return m_arrow_y_notail; }
+		inline MeshIndex GetArrowZNoTail() const { return m_arrow_z_notail; }
 		inline MeshIndex GetCircleX_Unit() const { return m_circleUnit_x; }
 		inline MeshIndex GetCircleY_Unit() const { return m_circleUnit_y; }
 		inline MeshIndex GetCircleZ_Unit() const { return m_circleUnit_z; }

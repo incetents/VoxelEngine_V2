@@ -3,22 +3,25 @@
 
 #include "../utilities/Types.h"
 #include "../utilities/Macros.h"
+#include "../utilities/Containers.h"
 
 #include "Uniform.h"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 #include <optional>
 
 namespace Vxl
 {
-	typedef std::map<std::string, Graphics::Attribute> AttributeStorage;
-	typedef std::map<std::string, Graphics::Uniform> UniformStorage;
-	typedef std::map<std::string, Graphics::UniformBlock> UniformBlockStorage;
-	typedef std::map<ShaderType, Graphics::UniformSubroutine> SubroutineStorage;
-
 	class Entity;
+
+	// Typedefs
+	typedef std::map<std::string, Graphics::Attribute> ShaderAttributes;
+	typedef std::map<std::string, Graphics::Uniform> ShaderUniforms;
+	typedef std::map<std::string, std::pair<RawData, bool>> ShaderUniformStorage;
+	typedef std::map<std::string, Graphics::UniformBlock> ShaderUniformBlocks;
+	typedef std::map<ShaderType, Graphics::UniformSubroutine> ShaderSubroutines;
 
 	class Shader
 	{
@@ -80,13 +83,15 @@ namespace Vxl
 		const std::string			m_name;
 		bool						m_linked;
 		std::vector<Shader*>		m_shaders;
-		AttributeStorage			m_attributes;
-		UniformStorage				m_uniforms;
-		UniformBlockStorage			m_uniformBlocks;
-		SubroutineStorage			m_subroutines;
+		ShaderAttributes			m_attributes;
+		ShaderUniforms				m_uniforms;
+		ShaderUniformStorage		m_uniformStorage;
+		ShaderUniformBlocks			m_uniformBlocks;
+		ShaderSubroutines			m_subroutines;
 		std::string					m_errorMessage;
 		static std::map<ShaderProgramID, ShaderProgram*> m_brokenShaderPrograms;
 
+		//
 		void setupCommonUniform(const std::string& name, std::optional<Graphics::Uniform>& uniform);
 
 		ShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders);
@@ -102,19 +107,47 @@ namespace Vxl
 
 		// Uniforms
 		template<typename Type>
-		void sendUniform(const std::string& name, Type data)
+		void sendUniform(const std::string& name, Type data, bool storeValue = false)
 		{
-			auto it = m_uniforms.find(name);
-			if (it != m_uniforms.end()) {
-				it->second.send(data);
+			// Store Uniform Value for automation // bindCustomUniforms() will resend the same value
+			if (storeValue)
+			{
+				auto it_s = m_uniformStorage.find(name);
+				if (it_s != m_uniformStorage.end())
+				{
+					*it_s->second.first.GetData<Type>() = data;
+				}
+			}
+
+			// Send Shader if shader is currently bound
+			if (Graphics::ShaderProgram::GetCurrentlyActive() == m_id)
+			{
+				auto it = m_uniforms.find(name);
+				if (it != m_uniforms.end()) {
+					it->second.send(data);
+				}
 			}
 		}
 		template<typename Type>
-		void sendUniformMatrix(const std::string& name, Type data, bool transpose)
+		void sendUniformMatrix(const std::string& name, Type data, bool transpose, bool storeValue = false)
 		{
-			auto it = m_uniforms.find(name);
-			if (it != m_uniforms.end()) {
-				it->second.sendMatrix(data);
+			// Store Uniform Value for automation // bindCustomUniforms() will resend the same value
+			if (storeValue)
+			{
+				auto it_s = m_uniformStorage.find(name);
+				if (it_s != m_uniformStorage.end())
+				{
+					*it_s->second.first.GetData<Type>() = data;
+				}
+			}
+
+			// Send Shader if shader is currently bound
+			if (Graphics::ShaderProgram::GetCurrentlyActive() == m_id)
+			{
+				auto it = m_uniforms.find(name);
+				if (it != m_uniforms.end()) {
+					it->second.sendMatrix(data, transpose);
+				}
 			}
 		}
 
@@ -131,8 +164,11 @@ namespace Vxl
 		std::optional<Graphics::Uniform> m_uniform_alpha = std::nullopt;
 		std::optional<Graphics::Uniform> m_uniform_output = std::nullopt;
 
-		// Binding Common Uniforms
+		// Binding Common Uniforms [VXL_]
 		void bindCommonUniforms(EntityIndex _entity);
+
+		// Binding Custom Uniforms [Non VXL_]
+		void bindCustomUniforms();
 
 		// Getters
 		inline bool						isLinked(void) const

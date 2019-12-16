@@ -2,9 +2,56 @@
 #pragma once
 
 #include "Vector.h"
+#include "Matrix3x3.h"
 
 namespace Vxl
 {
+	struct AABB
+	{
+		Vector3 min;
+		Vector3 max;
+
+		AABB()
+		{
+			min = Vector3::ZERO;
+			max = Vector3::ZERO;
+		}
+		AABB(Vector3 _min, Vector3 _max)
+		{
+			min = _min;
+			max = _max;
+		}
+	};
+
+	struct OBB
+	{
+		Vector3 position;
+		Vector3 right;
+		Vector3 up;
+		Vector3 forward;
+
+		// Generate all 8 world space points for the OBB
+		std::vector<Vector3> generatePoints();
+
+		// Generate AABB from OBB points
+		AABB generateAABB();
+
+		OBB()
+		{
+			position = Vector3::ZERO;
+			right = Vector3::ZERO;
+			up = Vector3::ZERO;
+			forward = Vector3::ZERO;
+		}
+		OBB(Vector3 _position, Vector3 _right, Vector3 _up, Vector3 _forward)
+		{
+			position = _position;
+			right = _right;
+			up = _up;
+			forward = _forward;
+		}
+	};
+
 	class Plane
 	{
 	public:
@@ -19,9 +66,8 @@ namespace Vxl
 		{}
 	};
 
-	class Ray
+	struct Ray
 	{
-	public:
 		Vector3 m_origin;
 		Vector3 m_direction;
 		float   m_t = 0;
@@ -43,6 +89,4 @@ namespace Vxl
 
 	// Finds the shortest distance between two lines
 	float ShortestDistance(Ray& _ray1, Ray& _ray2);
-
-	
 }

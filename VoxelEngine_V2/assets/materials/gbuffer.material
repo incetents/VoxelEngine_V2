@@ -4,8 +4,7 @@
 
 #Include
 {
-	_UBO.glsl,
-	_Uniforms.glsl
+	_Core.glsl
 }
 
 #Attributes
@@ -65,7 +64,7 @@
 	// Passthrough
 	else
 	{
-		gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
+		gl_Position = VXL_viewProjection * vec4(m_position, 1.0); 
 		vert_out.pos = m_position;
 		
 		vert_out.normal = m_normal;

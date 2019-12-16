@@ -104,6 +104,9 @@ namespace Vxl
 		EntityIndex entity_beato_cube;
 		EntityIndex entity_instance_beato;
 		EntityIndex entity_jiggy;
+		EntityIndex entity_arrowX;
+		EntityIndex entity_arrowY;
+		EntityIndex entity_arrowZ;
 
 		// Assets Created
 		MeshIndex mesh_manyQuads;

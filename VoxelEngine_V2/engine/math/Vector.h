@@ -377,9 +377,9 @@ namespace Vxl
 		}
 
 		// ~ TOSTRING ~ //
-		std::string ToString()
+		std::string ToString(char seperator = ' ')
 		{
-			return std::to_string(x) + ' ' + std::to_string(y);
+			return std::to_string(x) + seperator + std::to_string(y);
 		}
 
 		// ~ Lerp ~ //
@@ -722,9 +722,13 @@ namespace Vxl
 		}
 		static float GetAngleRadians(const _Vector3<Type>& v1, const _Vector3<Type>& v2)
 		{
-			return acosf(
-				Dot(v1, v2) / (v1.Magnitudef() * v2.Magnitudef())
-			);
+			float dot = Dot(v1, v2);
+			float lenSq1 = Dot(v1, v1);
+			float lenSq2 = Dot(v2, v2);
+			return acosf(dot / sqrtf(lenSq1 * lenSq2));
+			//	return acosf(
+			//		Dot(v1, v2) / (v1.Magnitudef() * v2.Magnitudef())
+			//	);
 		}
 
 		// ~ Random ~ //
@@ -895,9 +899,9 @@ namespace Vxl
 		}
 
 		// ~ TOSTRING ~ //
-		std::string ToString()
+		std::string ToString(char separator = ' ')
 		{
-			return std::to_string(x) + ' ' + std::to_string(y) + ' ' + std::to_string(z);
+			return std::to_string(x) + separator + std::to_string(y) + separator + std::to_string(z);
 		}
 
 		// ~ Lerp ~ //
@@ -1378,9 +1382,9 @@ namespace Vxl
 		}
 
 		// ~ TOSTRING ~ //
-		std::string ToString()
+		std::string ToString(char separator = ' ')
 		{
-			return std::to_string(x) + ' ' + std::to_string(y) + ' ' + std::to_string(z) + ' ' + std::to_string(w);
+			return std::to_string(x) + separator + std::to_string(y) + separator + std::to_string(z) + separator + std::to_string(w);
 		}
 
 		// ~ Lerp ~ //
@@ -1879,6 +1883,9 @@ namespace Vxl
 	typedef _Vector2<char> Vector2c;
 	typedef _Vector2<char> Vec2c;
 	typedef _Vector2<char> vec2c;
+	typedef _Vector2<bool> Vector2b;
+	typedef _Vector2<bool> Vec2b;
+	typedef _Vector2<bool> vec2b;
 
 	typedef _Vector3<float> Vector3;
 	typedef _Vector3<float> Vec3;
@@ -1895,6 +1902,9 @@ namespace Vxl
 	typedef _Vector3<char> Vector3c;
 	typedef _Vector3<char> Vec3c;
 	typedef _Vector3<char> vec3c;
+	typedef _Vector3<bool> Vector3b;
+	typedef _Vector3<bool> Vec3b;
+	typedef _Vector3<bool> vec3b;
 
 	typedef _Vector4<float> Vector4;
 	typedef _Vector4<float> Vec4;
@@ -1911,4 +1921,7 @@ namespace Vxl
 	typedef _Vector4<char> Vector4c;
 	typedef _Vector4<char> Vec4c;
 	typedef _Vector4<char> vec4c;
+	typedef _Vector4<bool> Vector4b;
+	typedef _Vector4<bool> Vec4b;
+	typedef _Vector4<bool> vec4b;
 }

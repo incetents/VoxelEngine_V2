@@ -181,6 +181,26 @@ namespace Vxl
 		*this = Matrix4x4::Identity;
 	}
 
+	// Creation from Vectors
+	Matrix4x4 Matrix4x4::createFromRows(const Vector4& Row1, const Vector4& Row2, const Vector4& Row3, const Vector4& Row4)
+	{
+		return Matrix4x4(
+			Row1.x, Row1.y, Row1.z, Row1.w,
+			Row2.x, Row2.y, Row2.z, Row2.w,
+			Row3.x, Row3.y, Row3.z, Row3.w,
+			Row4.x, Row4.y, Row4.z, Row4.w
+		);
+	}
+	Matrix4x4 Matrix4x4::createFromColumns(const Vector4& Column1, const Vector4& Column2, const Vector4& Column3, const Vector4& Column4)
+	{
+		return Matrix4x4(
+			Column1.x, Column2.x, Column3.x, Column4.x,
+			Column1.y, Column2.y, Column3.y, Column4.y,
+			Column1.z, Column2.z, Column3.z, Column4.z,
+			Column1.w, Column2.w, Column3.w, Column4.w
+		);
+	}
+
 	// View Matrix [ROW MAJOR]
 	Matrix4x4 Matrix4x4::LookAt(const Vector3& Eye, const Vector3& Forward, const Vector3& Right, const Vector3& Up)
 	{

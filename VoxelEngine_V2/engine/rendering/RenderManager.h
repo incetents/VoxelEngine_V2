@@ -22,6 +22,13 @@ namespace Vxl
 	class Camera;
 	class GuiWindow;
 
+	// Special Rendering info
+	enum class FullScreenRender
+	{
+		TRIANGLE,
+		QUAD
+	};
+
 	static class RenderManager : public Singleton<class RenderManager>
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderManager);
@@ -29,7 +36,6 @@ namespace Vxl
 		friend class Editor;
 	private:
 		Scene* m_currentScene = nullptr;
-	private:
 
 		// Associate Materials with rendering sequence
 		std::map<uint32_t, MaterialIndex> m_materialSequence;
@@ -44,6 +50,9 @@ namespace Vxl
 
 		// Main Camera
 		CameraIndex m_mainCamera = -1;
+
+		FullScreenRender m_fullScreenRender = FullScreenRender::TRIANGLE;
+		bool m_globalVAO = false;
 
 		// Utility
 		void sortMaterials();

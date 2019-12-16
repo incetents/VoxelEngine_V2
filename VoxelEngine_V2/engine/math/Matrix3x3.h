@@ -41,27 +41,31 @@ namespace Vxl
 		// Become default empty matrix
 		void BeIdentity();
 
+		// Creation from Vectors
+		static Matrix3x3 createFromRows(const Vector3& Row1, const Vector3& Row2, const Vector3& Row3);
+		static Matrix3x3 createFromColumns(const Vector3& Column1, const Vector3& Column2, const Vector3& Column3);
+
 		// Become Scale Matrix
 		Matrix3x3& Scale(float size);
 		Matrix3x3& Scale(float x, float y, float z);
 		Matrix3x3& Scale(const Vector3& v);
 		// Get Scale Matrix
-		static  Matrix3x3 GetScale(float size);
-		static  Matrix3x3 GetScale(float x, float y, float z);
-		static  Matrix3x3 GetScale(const Vector3& v);
+		static Matrix3x3 GetScale(float size);
+		static Matrix3x3 GetScale(float x, float y, float z);
+		static Matrix3x3 GetScale(const Vector3& v);
 
 		// Get Rotation Matrix (Radians)
-		static	Matrix3x3 GetRotationX(float _radians, bool _CCW = true);
-		static	Matrix3x3 GetRotationY(float _radians, bool _CCW = true);
-		static	Matrix3x3 GetRotationZ(float _radians, bool _CCW = true);
-		static	Matrix3x3 GetRotation(float _radians, const Vector3& _axis, bool _CCW = true);
+		static Matrix3x3 GetRotationX(float _radians, bool _CCW = true);
+		static Matrix3x3 GetRotationY(float _radians, bool _CCW = true);
+		static Matrix3x3 GetRotationZ(float _radians, bool _CCW = true);
+		static Matrix3x3 GetRotation(float _radians, const Vector3& _axis, bool _CCW = true);
 
 		// Set Horizontal Line
 		Matrix3x3& SetRow(unsigned int index, const Vector3&);
-		static  Matrix3x3& SetRow(Matrix3x3&, unsigned int index, const Vector3&);
+		static Matrix3x3& SetRow(Matrix3x3&, unsigned int index, const Vector3&);
 		// Set Vertical Line
 		Matrix3x3& SetColumn(unsigned int index, const Vector3&);
-		static	Matrix3x3& SetColumn(Matrix3x3&, unsigned int index, const Vector3&);
+		static Matrix3x3& SetColumn(Matrix3x3&, unsigned int index, const Vector3&);
 
 		// Get Horizontal Line
 		Vector3 GetRow(unsigned int index) const;

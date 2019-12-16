@@ -105,7 +105,7 @@ namespace Vxl
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 		ImGui_ImplGlfw_InitForOpenGL(GetContext(), true);
-		ImGui_ImplOpenGL3_Init("#version 420 core");
+		ImGui_ImplOpenGL3_Init(Graphics::GLSL_Version.c_str());
 #endif
 		// Create first frame empty
 		// (so it can create all gl assets necesary here without interfering with opengl error callback)

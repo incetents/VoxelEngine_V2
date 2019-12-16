@@ -7,30 +7,28 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_colors.h"
 
-#include "../utilities/Time.h"
-#include "../utilities/Util.h"
+#include "../input/Input.h"
+#include "../input/XGamePad.h"
 
-#include "../window/window.h"
+#include "../editor/Editor.h"
 
-#include "../rendering/RenderManager.h"
+#include "../game/Scene_Game.h"
+
+#include "../math/Transform.h"
+
 #include "../modules/Entity.h"
 
 #include "../objects/Camera.h"
 
-#include "../input/Input.h"
-#include "../input/XGamePad.h"
-
-#include "../math/Transform.h"
-
-#include "../game/Scene_Game.h"
-
-#include "../editor/Editor.h"
+#include "../rendering/RenderManager.h"
 
 #include "../textures/Texture2D.h"
 
 #include "../utilities/Asset.h"
+#include "../utilities/Time.h"
+#include "../utilities/Util.h"
 
-#include "windows.h"
+#include "../window/window.h"
 
 namespace Vxl
 {
@@ -87,6 +85,18 @@ namespace Vxl
 		ImGui::Text("Reload Window = [F5]");
 		ImGui::Text("Reload Fullscreen FBOs = [F6]");
 		ImGui::Text("Reload Shaders = [R]");
+
+		if (ImGui::Button(RenderManager.m_globalVAO ? "GLOBAL VAO [ON]" : "GLOBAL VAO [OFF]"))
+		{
+			RenderManager.m_globalVAO = !RenderManager.m_globalVAO;
+		}
+		if (ImGui::Button(RenderManager.m_fullScreenRender == FullScreenRender::TRIANGLE ? "FullScreenRender = [Triangle]" : "FullScreenRender = [Quad]"))
+		{
+			if (RenderManager.m_fullScreenRender == FullScreenRender::TRIANGLE)
+				RenderManager.m_fullScreenRender = FullScreenRender::QUAD;
+			else
+				RenderManager.m_fullScreenRender = FullScreenRender::TRIANGLE;
+		}
 
 		ImGui::Separator();
 
@@ -395,11 +405,13 @@ namespace Vxl
 			ImGui::TextColored(ImGuiColor::Orange, container.first.c_str());
 			ImGui::SameLine();
 
+			const RawData* rawData = &container.second;
+
 			switch (container.second.type)
 			{
-				case GenericDataType::BOOL:
+				case UniformType::BOOL:
 				{
-					bool value = *container.second.GetData<bool>();
+					bool value = *rawData->GetData<bool>();
 					if(value)
 						ImGui::TextColored(ImGuiColor::GreenLight, "TRUE");
 					else
@@ -408,78 +420,46 @@ namespace Vxl
 					break;
 				}
 
-				case GenericDataType::INT:
+				case UniformType::INT:
 				{
-					ImGui::Text(std::to_string(*container.second.GetData<int>()).c_str());
+					ImGui::Text(std::to_string(*rawData->GetData<int>()).c_str());
 					break;
 				}
 
-				case GenericDataType::FLOAT:
+				case UniformType::FLOAT:
 				{
-					ImGui::Text(std::to_string(*container.second.GetData<float>()).c_str());
+					ImGui::Text(std::to_string(*rawData->GetData<float>()).c_str());
 					break;
 				}
 
-				case GenericDataType::DOUBLE:
+				case UniformType::DOUBLE:
 				{
-					ImGui::Text(std::to_string(*container.second.GetData<double>()).c_str());
+					ImGui::Text(std::to_string(*rawData->GetData<double>()).c_str());
 					break;
 				}
 
-				case GenericDataType::VEC2:
+				case UniformType::FLOAT_VEC2:
 				{
-					Vector2* data = container.second.GetData<Vector2>();
-					ImGui::Text(data->ToString().c_str());
+					Vector2* data = rawData->GetData<Vector2>();
+					ImGui::Text(data->ToString('|').c_str());
 					break;
 				}
 				
-				case GenericDataType::VEC3:
+				case UniformType::FLOAT_VEC3:
 				{
-					Vector3* data = container.second.GetData<Vector3>();
-					ImGui::Text(data->ToString().c_str());
+					Vector3* data = rawData->GetData<Vector3>();
+					ImGui::Text(data->ToString('|').c_str());
 					break;
 				}
 
-				case GenericDataType::VEC4:
+				case UniformType::FLOAT_VEC4:
 				{
-					Vector4* data = container.second.GetData<Vector4>();
-					ImGui::Text(data->ToString().c_str());
-					break;
-				}
-
-				case GenericDataType::COLOR3:
-				{
-					Color3F* data = container.second.GetData<Color3F>();
-					ImGui::Text(data->ToString().c_str());
-					break;
-				}
-
-				case GenericDataType::COLOR4:
-				{
-					Color4F* data = container.second.GetData<Color4F>();
-					ImGui::Text(data->ToString().c_str());
+					Vector4* data = rawData->GetData<Vector4>();
+					ImGui::Text(data->ToString('|').c_str());
 					break;
 				}
 			}
 		}
-
-		//	if (m_display_values.size() > 0)
-		//	{
-		//		for (auto it = m_display_values.begin(); it != m_display_values.end(); it++)
-		//		{
-		//			ImGui::TextColored(ImGuiColor::Orange, it->first.c_str());	ImGui::SameLine();
-		//			
-		//			ImGui::Text(": ");				ImGui::SameLine();
-		//	
-		//			if (it->second.first)
-		//				ImGui::Text(it->second.second.c_str());
-		//			else
-		//				ImGui::TextColored(ImGuiColor::Grey, it->second.second.c_str());
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
 
 		//
 		ImGui::PopItemWidth();
@@ -487,52 +467,39 @@ namespace Vxl
 
 	void DevConsole::Draw()
 	{
-		//	static bool open = true;
-		//	
-		//	if (Input.getKeyDown(KeyCode::F1))
-		//		open = !open;
-		//	
-		//	if (!open)
-		//		return;
-
-		//if (ImGui::Begin("[F1] DevConsole", &open, ImVec2(280, 380), 0.9f, ImGuiWindowFlags_MenuBar))
+		// Menu
+		if (ImGui::BeginMenuBar())
 		{
-			// Menu
-			if (ImGui::BeginMenuBar())
+			if (ImGui::BeginMenu("Mode"))
 			{
-				if (ImGui::BeginMenu("Mode"))
-				{
-					if (ImGui::MenuItem("Master", NULL, m_State == MenuState::MASTER, m_State != MenuState::MASTER))
-						m_State = MenuState::MASTER;
-					if (ImGui::MenuItem("Custom Values", NULL, m_State == MenuState::CUSTOM_VALUES, m_State != MenuState::CUSTOM_VALUES))
-						m_State = MenuState::CUSTOM_VALUES;
-					if (ImGui::MenuItem("Statistics", NULL, m_State == MenuState::STATISTICS, m_State != MenuState::STATISTICS))
-						m_State = MenuState::STATISTICS;
+				if (ImGui::MenuItem("Master", NULL, m_State == MenuState::MASTER, m_State != MenuState::MASTER))
+					m_State = MenuState::MASTER;
+				if (ImGui::MenuItem("Custom Values", NULL, m_State == MenuState::CUSTOM_VALUES, m_State != MenuState::CUSTOM_VALUES))
+					m_State = MenuState::CUSTOM_VALUES;
+				if (ImGui::MenuItem("Statistics", NULL, m_State == MenuState::STATISTICS, m_State != MenuState::STATISTICS))
+					m_State = MenuState::STATISTICS;
 
-					ImGui::EndMenu();
-				}
-				ImGui::EndMenuBar();
+				ImGui::EndMenu();
 			}
-
-			// TEST IMAGE
-			//	Texture2D* tex = Texture2D::GetAsset("beato");
-			//	ImGui::Image((void*)tex->getID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-
-			switch (m_State)
-			{
-			case MenuState::MASTER:
-				Draw_Master(m_scene);
-				break;
-			case MenuState::CUSTOM_VALUES:
-				Draw_CustomValues();
-				break;
-			case MenuState::STATISTICS:
-				Draw_Statistics();
-				break;
-			}
-
+			ImGui::EndMenuBar();
 		}
-		//ImGui::End();
+
+		// TEST IMAGE
+		//	Texture2D* tex = Texture2D::GetAsset("beato");
+		//	ImGui::Image((void*)tex->getID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+
+		switch (m_State)
+		{
+		case MenuState::MASTER:
+			Draw_Master(m_scene);
+			break;
+		case MenuState::CUSTOM_VALUES:
+			Draw_CustomValues();
+			break;
+		case MenuState::STATISTICS:
+			Draw_Statistics();
+			break;
+		}
 
 	}
 }

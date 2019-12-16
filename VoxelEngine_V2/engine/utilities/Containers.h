@@ -2,10 +2,34 @@
 #pragma once
 
 #include "../utilities/Macros.h"
+
+#include "../rendering/Graphics.h"
+
 #include <assert.h>
 
 namespace Vxl
 {
+	struct RawData
+	{
+		std::shared_ptr<void> data;
+		UniformType type;
+
+		template<typename Type>
+		RawData(UniformType _type, Type _data)
+			: type(_type)
+		{
+			data = std::make_shared<Type>(_data);
+		}
+		RawData() {}
+
+		template<typename Type>
+		Type* GetData() const
+		{
+			return static_cast<Type*>(data.get());
+		}
+	};
+
+	// RAW ARRAY CONTAINER //
 	template<typename Type>
 	class RawArray
 	{

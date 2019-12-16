@@ -2,19 +2,16 @@
 TODO:
 
 ! Macro everywhere -> DISALLOW_COPY_AND_ASSIGN(ClassName);
+! camelCase every FUNCTION
 
-- debug draw lines
-	-> draw OBB generic from Entity
-	-> widths of line objects
+- storage for uniforms was a bad idea
 
-- debug draw lines -> don't constantly resize array
-	- index offset
+- uniqueID -> assetID, every object create from Assets gets an id so they can refind themselves in the assets
+	- const so that it never changes
+	- global assets don't have a getID function, just get their ID from object itself
 
-- VAO global version
-	-> vbos bind when mesh is bound
-	-> no more sorting by VAO
-	-> global VAO is bound and always used for everything
-
+- enable vertex attrib pointer, only active by shader not by vbo
+  
 - VBO Meshbuffer -> inside mesh.h, linemesh.h
 	-> Make the formatting more readable
 
@@ -33,15 +30,15 @@ https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
 - colorID selection for objects
 
 - GUI_viewport has output modes
-	-> NORMAL
+	-> BLIT		-> no change
 	-> COLORFUL -> used for displaying color ID
 	-> ABSOLUTE -> abs(result)
-
-
-- fix line mesh -> simplification
 	
 - outline effect on selected entities
 	-> OBB/AABB lines
+	
+- inspector shows material (core program) -> shows all editable uniforms
+	- these must also modify (colorID and depth only) clones
 	
 - Camera screen controls similar to Maya software?
 	- click drag instead of WASD movement

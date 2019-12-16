@@ -4,8 +4,7 @@
 
 #Include
 {
-	_UBO.glsl,
-	_Uniforms.glsl
+	_Core.glsl
 }
 
 #Attributes
@@ -59,7 +58,7 @@
 			gl_Position = VXL_model * vec4(m_position, 1.0); 
 	else
 		if(useViewProjection)
-			gl_Position = UBO_viewProjection * vec4(m_position, 1.0); 
+			gl_Position = VXL_viewProjection * vec4(m_position, 1.0); 
 		else
 			gl_Position = vec4(m_position, 1.0); 
 }

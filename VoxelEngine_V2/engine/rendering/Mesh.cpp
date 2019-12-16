@@ -12,6 +12,8 @@
 #include "../utilities/Macros.h"
 #include "../utilities/Asset.h"
 
+#include "../rendering/RenderManager.h"
+
 #include <assert.h>
 #include <iostream>
 
@@ -526,7 +528,19 @@ namespace Vxl
 
 	void Mesh::draw()
 	{
-		m_VAO.bind();
+		if (RenderManager.m_globalVAO)
+		{
+			Graphics::VAO::bind(10);
+			m_positions.bind();
+			m_uvs.bind();
+			m_normals.bind();
+			m_tangents.bind();
+			m_instances.bind();
+			m_indices.bind();
+		}
+		else
+			m_VAO.bind();
+		
 
 		switch (m_mode)
 		{
@@ -591,17 +605,24 @@ namespace Vxl
 		m_drawCount = m_points.getDrawCount();
 
 		// Buffers
-		m_VAO.bind();
+		if (RenderManager.m_globalVAO)
+			Graphics::VAO::bind(10);
+		else
+			m_VAO.bind();
+
+		// Resize vertices if index is smaller than its size
+		if (m_index < m_points.vertices.size() - 1)
+			m_points.vertices.resize(m_index + 1);
 
 		m_points.bind();
-		
-
-		m_VAO.unbind();
 	}
 
 	void LineMesh3D::draw()
 	{
-		m_VAO.bind();
+		if (RenderManager.m_globalVAO)
+			Graphics::VAO::bind(10);
+		else
+			m_VAO.bind();
 
 		Graphics::Draw::Array(m_type, m_drawCount);
 	}
@@ -649,16 +670,25 @@ namespace Vxl
 		m_drawCount = m_points.getDrawCount();
 
 		// Buffers
-		m_VAO.bind();
+		if (RenderManager.m_globalVAO)
+			Graphics::VAO::bind(10);
+		else
+			m_VAO.bind();
+
+		// Resize vertices if index is smaller than its size
+		if (m_index < m_points.vertices.size() - 1)
+			m_points.vertices.resize(m_index + 1);
 
 		m_points.bind();
-
-		m_VAO.unbind();
 	}
 
 	void LineMesh2D::draw()
 	{
-		m_VAO.bind();
+		// Buffers
+		if (RenderManager.m_globalVAO)
+			Graphics::VAO::bind(10);
+		else
+			m_VAO.bind();
 
 		Graphics::Draw::Array(m_type, m_drawCount);
 	}

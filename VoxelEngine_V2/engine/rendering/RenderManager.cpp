@@ -265,13 +265,17 @@ namespace Vxl
 		}
 
 		// Sort each Material/Entity slots based on their VAO Id to make sure similar meshes render one after another
-		for (auto& set : m_renderlist_opaque)
+		// Ignore sorting if global VAOs are used instead
+		if (!m_globalVAO)
 		{
-			std::sort(set.second.begin(), set.second.end());
-		}
-		for (auto& set : m_renderlist_transparent)
-		{
-			std::sort(set.second.begin(), set.second.end());
+			for (auto& set : m_renderlist_opaque)
+			{
+				std::sort(set.second.begin(), set.second.end());
+			}
+			for (auto& set : m_renderlist_transparent)
+			{
+				std::sort(set.second.begin(), set.second.end());
+			}
 		}
 	}
 
@@ -304,7 +308,7 @@ namespace Vxl
 						if (!material->m_sharedTextures)
 							material->bindTextures(ent);
 
-						material->bindCoreProgramCommonUniforms(ent->m_uniqueID);
+						material->bindCoreProgramUniforms(ent->m_uniqueID);
 
 						mesh->draw();
 					}

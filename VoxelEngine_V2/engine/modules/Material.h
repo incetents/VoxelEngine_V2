@@ -106,9 +106,7 @@ namespace Vxl
 				ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
 				if (program)
 				{
-					auto it = program->m_uniforms.find(name);
-					if (it != program->m_uniforms.end())
-						it->second.send(data);
+					program->sendUniform(name, data, true);
 				}
 			}
 		}
@@ -123,22 +121,17 @@ namespace Vxl
 				ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
 				if (program)
 				{
-					auto it = program->m_uniforms.find(name);
-					if (it != program->m_uniforms.end())
-						it->second.sendMatrix(data, transpose);
+					program->sendUniformMatrix(name, data, transpose, true);
 				}
 			}
 		}
-
-		// Get Uniform
-		Graphics::Uniform getUniform(const std::string& name);
 
 		// Get Core Program
 		ShaderProgram* getCoreProgram(void) const;
 
 		// Behaviour
 		bool bindCoreProgram();
-		void bindCoreProgramCommonUniforms(EntityIndex _entity);
+		void bindCoreProgramUniforms(EntityIndex _entity);
 		void bindStates();
 		void bindTextures(); // bind material textures
 		void bindTextures(Entity* _entity); // bind entity textures

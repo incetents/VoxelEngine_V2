@@ -576,8 +576,8 @@ namespace Vxl
 			Entity* entity_ptr = Assets.getEntity(entity_beato_cube);
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(Primitives.GetCube());
-			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
+			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 		
 			entity_ptr->m_transform.setParent(&Assets.getEntity(entity_error_cube)->m_transform);
 		}
@@ -595,9 +595,40 @@ namespace Vxl
 			Entity* entity_ptr = Assets.getEntity(entity_instance_beato);
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(mesh_manyQuads);
-			entity_ptr->m_transform.setPosition(Vector3(-2, 2, -6.6f));
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
+			entity_ptr->m_transform.setPosition(Vector3(-2, 2, -6.6f));
 		}
+
+		entity_arrowX = SceneAssets.createEntity("_arrowX");
+		{
+			Entity* entity_ptr = Assets.getEntity(entity_arrowX);
+			entity_ptr->setMaterial(GlobalAssets.get_MaterialDebugRenderID());
+			entity_ptr->setMesh(Primitives.GetArrowX());
+			entity_ptr->m_Color = Color3F::RED;
+			entity_ptr->m_useTextures = false;
+			entity_ptr->m_transform.setPosition(Vector3(0, 3, 0));
+		}
+		entity_arrowY = SceneAssets.createEntity("_arrowY");
+		{
+			Entity* entity_ptr = Assets.getEntity(entity_arrowY);
+			entity_ptr->setMaterial(GlobalAssets.get_MaterialDebugRenderID());
+			entity_ptr->setMesh(Primitives.GetArrowY());
+			entity_ptr->m_Color = Color3F::GREEN;
+			entity_ptr->m_useTextures = false;
+			entity_ptr->m_transform.setPosition(Vector3(0, 3, 0));
+		}
+		entity_arrowZ = SceneAssets.createEntity("_arrowZ");
+		{
+			Entity* entity_ptr = Assets.getEntity(entity_arrowZ);
+			entity_ptr->setMaterial(GlobalAssets.get_MaterialDebugRenderID());
+			entity_ptr->setMesh(Primitives.GetArrowZ());
+			entity_ptr->m_Color = Color3F::BLUE;
+			entity_ptr->m_useTextures = false;
+			entity_ptr->m_transform.setPosition(Vector3(0, 3, 0));
+		}
+		//
+		GlobalAssets.get_MaterialDebugRender()->sendUniform("lightDirection", vec3(-1, -1, -1).NormalizeAccurate());
+		//
 		
 		
 
@@ -781,16 +812,17 @@ namespace Vxl
 
 	void Scene_Game::Update()
 	{
-		//	auto _entity5 = GameObject::GetAsset("_entity5");
-		//	_entity5->m_transform.rotateAroundAxis(Vector3(-1,-1,-1), 1);
+		DevConsole.ShowBool("bool", true);
+		DevConsole.ShowFloat("float", 5.0f);
+		DevConsole.ShowDouble("float", 8.0);
+		DevConsole.ShowVector("vec3", Vector3(1,2,3));
+		DevConsole.ShowVector("vec4", Vector4(10,20,30,40));
+		DevConsole.ShowVector("color4", Color4F(1,0,0,1));
 
 		CPUTimer::StartTimer("UPDATE");
 
 		if (Input.getKeyDown(KeyCode::ESCAPE))
 			Window.Close();
-
-		//if (Input.getKeyDown(KeyCode::DELETEKEY))
-		
 
 		if (DEVCONSOLE_GET_BOOL("Camera Keyboard Controls", true))
 		{
@@ -899,29 +931,37 @@ namespace Vxl
 			10.0f,
 			Color3F(1, 1, 0), Color3F(0, 1, 1)
 		);
-		//	Debug.DrawLineNoDepth(
-		//		Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
-		//		10.0f,
-		//		Color3F(0, 0, 0), Color3F(0, 0, 0)
-		//	);
+		Debug.DrawLineNoDepth(
+			Vector3(+3, +1, -1), Vector3(+3, +4 + cosf(time), -1),
+			10.0f,
+			Color3F(0, 0, 0), Color3F(0, 0, 0)
+		);
 		
 		//	Debug.DrawLineSquareScreenSpace(
 		//		Vector2(0, 0), Vector2(1, 1),
-		//		5.0f,
+		//		1.0f,
 		//		Color3F(1, 0, 0)
 		//	);
 
 		Debug.DrawLineCube(
-			Vector3(0, 0,0),
+			Vector3(4, 0,0),
 			5.0f,
 			Vector3(1,1,1),
 			Vector3(time, 0, time*2.0f),
 			Color3F::PURPLE
 		);
-		Debug.DrawLineSphere(Vector3(-3, 0, 0), Vector3(cosf(Time.GetTimef()) + 2), Color3F::YELLOW);
+		Debug.DrawLineSphere(
+			Vector3(-4, 0, 0),
+			5.0f,
+			Vector3(cosf(Time.GetTimef()) + 2),
+			Color3F::YELLOW
+		);
 
-		Debug.DrawCube(Vector3(0, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::BLUE);
-		Debug.DrawSphere(Vector3(-3, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::RED);
+
+		Debug.DrawCube(Vector3(4, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::BLUE);
+		Debug.DrawSphere(Vector3(-4, 0, 0), Vector3::ONE, Vector3::ZERO, Color3F::RED);
+
+		Debug.DrawLineArrow(Vector3(0, 0, 0), Vector3(sinf(Time.GetTimef()), sinf(Time.GetTimef() * 0.5f) * 2.0f * 1, cosf(Time.GetTimef())), 5.0f, 2.0f, Color3F::RED);
 
 		// Draw Jiggy outline
 		Entity* jiggy_entity = Assets.getEntity(entity_jiggy);
@@ -929,12 +969,13 @@ namespace Vxl
 		{
 			// AABB
 			Debug.DrawLineAABB(
-				jiggy_entity->m_transform.getWorldPosition() + jiggy_entity->GetAABBMin(),
-				jiggy_entity->m_transform.getWorldPosition() + jiggy_entity->GetAABBMax(),
+				jiggy_entity->GetAABB(),
+				2.0f,
 				Color3F::RED
 			);
 			// OBB
-			Debug.DrawLineOBB(*jiggy_entity, jiggy_entity->m_transform.getWorldPosition(), 1.0f, Color3F::BLUE);
+			//Debug.DrawLineOBB(*jiggy_entity, jiggy_entity->m_transform.getWorldPosition(), 1.0f, Color3F::BLUE);
+			Debug.DrawLineOBB(jiggy_entity->GetOBB(), 5.0f, Color3F::BLUE);
 		//
 		}
 
@@ -1045,6 +1086,10 @@ namespace Vxl
 				ShaderProgram* programDebugRender = GlobalAssets.get_ProgramDebugRender();
 				programDebugRender->bind();
 				programDebugRender->bindCommonUniforms(-1);
+
+				Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
+				if(camera)
+					programDebugRender->sendUniform("lightDirection", camera->m_transform.getCameraForward());
 				
 				// States
 				Graphics::SetDepthWrite(true);
@@ -1054,7 +1099,7 @@ namespace Vxl
 					programDebugRender->m_uniform_useModel.value().send(true);
 				
 				// Spheres
-				Mesh* meshSphere = Assets.getMesh(Primitives.GetSphere());
+				Mesh* meshSphere = Assets.getMesh(Primitives.GetSphereUV_Cheap());
 				if (meshSphere)
 				{
 					for (const auto& object : Debug.m_spheres)
@@ -1068,9 +1113,6 @@ namespace Vxl
 							if(camera)
 								programDebugRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
 						}
-
-						if(programDebugRender->m_uniform_model.has_value())
-							programDebugRender->m_uniform_model.value().sendMatrix(object.model, true);
 						
 						meshSphere->draw();
 					}
@@ -1092,10 +1134,28 @@ namespace Vxl
 								programDebugRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
 						}
 
-						if (programDebugRender->m_uniform_model.has_value())
-							programDebugRender->m_uniform_model.value().sendMatrix(object.model, true);
-
 						meshCube->draw();
+					}
+				}
+
+				// Lines
+				//Mesh* meshLines_Arrow = Assets.getMesh(Primitives.GetLines_ArrowZ());
+				Mesh* mesh_ArrowZ = Assets.getMesh(Primitives.GetArrowZNoTail());
+				if (mesh_ArrowZ)
+				{
+					for (const auto& object : Debug.m_arrowLines)
+					{
+						if (programDebugRender->m_uniform_color.has_value())
+							programDebugRender->m_uniform_color.value().send(object.color);
+
+						if (programDebugRender->m_uniform_mvp.has_value())
+						{
+							Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
+							if (camera)
+								programDebugRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
+						}
+
+						mesh_ArrowZ->draw();
 					}
 				}
 
@@ -1125,16 +1185,6 @@ namespace Vxl
 			
 				// Normal lines
 				Debug.RenderWorldLines();
-			
-				// State
-				Graphics::SetDepthRead(false);
-				programLineRender->sendUniform("useViewProjection", false);
-			
-				// Screenspace Lines
-				Debug.RenderScreenLines();
-
-				// State
-				Graphics::SetDepthRead(true);
 
 				// Objects
 				if (programLineRender->m_uniform_useModel.has_value())
@@ -1143,8 +1193,7 @@ namespace Vxl
 				programLineRender->sendUniform("useViewProjection", true);
 				programLineRender->sendUniform("useVertexColors", false);
 				programLineRender->sendUniform("useVertexWidth", false);
-				programLineRender->sendUniform("globalWidth", 3.0f);
-
+				
 				// Spheres Outline
 				Mesh* meshLines_CircleAllAxis = Assets.getMesh(Primitives.GetLines_CircleAllAxis_Unit());
 				if (meshLines_CircleAllAxis)
@@ -1161,8 +1210,7 @@ namespace Vxl
 								programLineRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
 						}
 
-						if (programLineRender->m_uniform_model.has_value())
-							programLineRender->m_uniform_model.value().sendMatrix(object.model, true);
+						programLineRender->sendUniform("globalWidth", object.width);
 
 						meshLines_CircleAllAxis->draw();
 					}
@@ -1184,12 +1232,17 @@ namespace Vxl
 								programLineRender->m_uniform_mvp.value().sendMatrix(camera->getViewProjection() * object.model, true);
 						}
 
-						if (programLineRender->m_uniform_model.has_value())
-							programLineRender->m_uniform_model.value().sendMatrix(object.model, true);
+						programLineRender->sendUniform("globalWidth", object.width);
 
 						meshLines_Cube->draw();
 					}
 				}
+
+				// Screenspace Lines
+				Debug.RenderScreenLines();
+
+				// State
+				Graphics::SetDepthRead(true);
 			}
 
 			//

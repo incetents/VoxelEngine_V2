@@ -1,9 +1,6 @@
 // Copyright (c) 2019 Emmanuel Lajeunesse
 #pragma once
 
-#include "../utilities/Containers.h"
-#include "../math/Vector.h"
-
 #include <stdint.h>
 #include <vector>
 #include <string>
@@ -27,6 +24,9 @@ namespace Vxl
 	class RenderTexture;
 	class RenderBuffer;
 	class BaseTexture;
+
+	template<typename Type>
+	class RawArray;
 
 	// ~ Vendor Types ~ //
 	enum class VendorType
@@ -173,19 +173,123 @@ namespace Vxl
 		UNSIGNED_INT_2_10_10_10_REV,
 		UNSIGNED_INT_10F_11F_11F_REV
 	};
-	// ~ Generic Data Type ~ //
-	enum class GenericDataType
+	// ~ Uniform Type ~~ //
+	enum class UniformType
 	{
-		BOOL,
-		INT,
+		NONE = 0, // Error (Used for placeholder)
+
+		// Data
 		FLOAT,
+		FLOAT_VEC2,
+		FLOAT_VEC3,
+		FLOAT_VEC4,
 		DOUBLE,
-		VEC2,
-		VEC3,
-		VEC4,
-		COLOR3,
-		COLOR4
+		DOUBLE_VEC2,
+		DOUBLE_VEC3,
+		DOUBLE_VEC4,
+		INT,
+		INT_VEC2,
+		INT_VEC3,
+		INT_VEC4,
+		UNSIGNED_INT,
+		UNSIGNED_INT_VEC2,
+		UNSIGNED_INT_VEC3,
+		UNSIGNED_INT_VEC4,
+		BOOL,
+		BOOL_VEC2,
+		BOOL_VEC3,
+		BOOL_VEC4,
+		FLOAT_MAT2,
+		FLOAT_MAT3,
+		FLOAT_MAT4,
+		FLOAT_MAT2x3,
+		FLOAT_MAT2x4,
+		FLOAT_MAT3x2,
+		FLOAT_MAT3x4,
+		FLOAT_MAT4x2,
+		FLOAT_MAT4x3,
+		DOUBLE_MAT2,
+		DOUBLE_MAT3,
+		DOUBLE_MAT4,
+		DOUBLE_MAT2x3,
+		DOUBLE_MAT2x4,
+		DOUBLE_MAT3x2,
+		DOUBLE_MAT3x4,
+		DOUBLE_MAT4x2,
+		DOUBLE_MAT4x3,
+
+		// non-regular data from this point on
+		__DATA_TYPE_CUTOFF__,
+
+		SAMPLER_1D,
+		SAMPLER_2D,
+		SAMPLER_3D,
+		SAMPLER_CUBE,
+		SAMPLER_1D_SHADOW,
+		SAMPLER_2D_SHADOW,
+		SAMPLER_1D_ARRAY,
+		SAMPLER_2D_ARRAY,
+		SAMPLER_1D_ARRAY_SHADOW,
+		SAMPLER_2D_ARRAY_SHADOW,
+		SAMPLER_2D_MULTISAMPLE,
+		SAMPLER_2D_MULTISAMPLE_ARRAY,
+		SAMPLER_CUBE_SHADOW,
+		SAMPLER_BUFFER,
+		SAMPLER_2D_RECT,
+		SAMPLER_2D_RECT_SHADOW,
+		INT_SAMPLER_1D,
+		INT_SAMPLER_2D,
+		INT_SAMPLER_3D,
+		INT_SAMPLER_CUBE,
+		INT_SAMPLER_1D_ARRAY,
+		INT_SAMPLER_2D_ARRAY,
+		INT_SAMPLER_2D_MULTISAMPLE,
+		INT_SAMPLER_2D_MULTISAMPLE_ARRAY,
+		INT_SAMPLER_BUFFER,
+		INT_SAMPLER_2D_RECT, 
+		UNSIGNED_INT_SAMPLER_1D,
+		UNSIGNED_INT_SAMPLER_2D,
+		UNSIGNED_INT_SAMPLER_3D,
+		UNSIGNED_INT_SAMPLER_CUBE,
+		UNSIGNED_INT_SAMPLER_1D_ARRAY,
+		UNSIGNED_INT_SAMPLER_2D_ARRAY,
+		UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE,
+		UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY,
+		UNSIGNED_INT_SAMPLER_BUFFER,
+		UNSIGNED_INT_SAMPLER_2D_RECT,
+		IMAGE_1D,
+		IMAGE_2D,
+		IMAGE_3D,
+		IMAGE_2D_RECT,
+		IMAGE_CUBE,
+		IMAGE_BUFFER,
+		IMAGE_1D_ARRAY,
+		IMAGE_2D_ARRAY,
+		IMAGE_2D_MULTISAMPLE,
+		IMAGE_2D_MULTISAMPLE_ARRAY,
+		INT_IMAGE_1D,
+		INT_IMAGE_2D,
+		INT_IMAGE_3D,
+		INT_IMAGE_2D_RECT,
+		INT_IMAGE_CUBE,
+		INT_IMAGE_BUFFER,
+		INT_IMAGE_1D_ARRAY,
+		INT_IMAGE_2D_ARRAY,
+		INT_IMAGE_2D_MULTISAMPLE,
+		INT_IMAGE_2D_MULTISAMPLE_ARRAY,
+		UNSIGNED_INT_IMAGE_1D,
+		UNSIGNED_INT_IMAGE_2D,
+		UNSIGNED_INT_IMAGE_3D,
+		UNSIGNED_INT_IMAGE_2D_RECT,
+		UNSIGNED_INT_IMAGE_CUBE,
+		UNSIGNED_INT_IMAGE_BUFFER,
+		UNSIGNED_INT_IMAGE_1D_ARRAY,
+		UNSIGNED_INT_IMAGE_2D_ARRAY,
+		UNSIGNED_INT_IMAGE_2D_MULTISAMPLE,
+		UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY,
+		UNSIGNED_INT_ATOMIC_COUNTER
 	};
+	
 	// ~ Buffer Usage ~ //
 	enum class BufferUsage
 	{
@@ -422,6 +526,9 @@ namespace Vxl
 	// Graphics Caller
 	namespace Graphics
 	{
+		// Shader Version
+		extern const std::string GLSL_Version;
+
 		// Static GPU information
 		extern int GLVersionMajor;
 		extern int GLVersionMinor;
@@ -555,18 +662,41 @@ namespace Vxl
 			int size;
 			std::string name;
 
+			// Convenient Uniform Data
+			UniformType uType;
+			bool isData;
+
+			// Sebd pure data
 			void send(bool data) const;
 			void send(int data) const;
 			void send(uint32_t data) const;
 			void send(float data) const;
 			void send(double data) const;
 
+			// Send vector data
 			void send(const Vector2& data) const;
 			void send(const Vector3& data) const;
 			void send(const Vector4& data) const;
 			void send(const Color3F& data) const;
 			void send(const Color4F& data) const;
 
+			void send(const Vector2d& data) const;
+			void send(const Vector3d& data) const;
+			void send(const Vector4d& data) const;
+
+			void send(const Vector2i& data) const;
+			void send(const Vector3i& data) const;
+			void send(const Vector4i& data) const;
+
+			void send(const Vector2ui& data) const;
+			void send(const Vector3ui& data) const;
+			void send(const Vector4ui& data) const;
+
+			void send(const Vector2b& data) const;
+			void send(const Vector3b& data) const;
+			void send(const Vector4b& data) const;
+
+			// Send matrix data
 			void sendMatrix(const Matrix2x2& data, bool transpose) const;
 			void sendMatrix(const Matrix3x3& data, bool transpose) const;
 			void sendMatrix(const Matrix4x4& data, bool transpose) const;
@@ -613,13 +743,13 @@ namespace Vxl
 			bool			Validate(ShaderProgramID program);
 			void			Enable(ShaderProgramID program);
 			void			Disable(void);
-			ShaderProgramID		GetCurrentlyActive(void);
+			ShaderProgramID	GetCurrentlyActive(void);
 			std::string		GetError(ShaderProgramID id);
 
-			std::map<std::string, Attribute> AcquireAttributes(ShaderProgramID id);
-			std::map<std::string, Uniform> AcquireUniforms(ShaderProgramID id);
-			std::map<std::string, UniformBlock> AcquireUniformBlocks(ShaderProgramID id);
-			std::map<ShaderType, UniformSubroutine> AcquireUniformSubroutines(ShaderProgramID id, const std::vector<ShaderType>& shaders);
+			std::map<std::string, Graphics::Attribute> AcquireAttributes(ShaderProgramID id);
+			std::map<std::string, Graphics::Uniform> AcquireUniforms(ShaderProgramID id);
+			std::map<std::string, Graphics::UniformBlock> AcquireUniformBlocks(ShaderProgramID id);
+			std::map<ShaderType, Graphics::UniformSubroutine> AcquireUniformSubroutines(ShaderProgramID id, const std::vector<ShaderType>& shaders);
 		}
 
 		// ~ Buffers ~ //

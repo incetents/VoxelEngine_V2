@@ -2,6 +2,8 @@
 #include "Precompiled.h"
 #include "Shader.h"
 
+#include "../math/Vector.h"
+
 #include "../modules/Entity.h"
 
 #include "../objects/Camera.h"
@@ -143,10 +145,105 @@ namespace Vxl
 		{
 			// attributes //
 			m_attributes = Graphics::ShaderProgram::AcquireAttributes(m_id);
+			
 			// uniforms //
 			m_uniforms = Graphics::ShaderProgram::AcquireUniforms(m_id);
+
+			// uniform storage // (stores intermediate values)
+			for (const auto& uniform : m_uniforms)
+			{
+				// Ignore VLX_ uniforms
+				if (uniform.first.substr(0, 4).compare("VXL_") != 0 && uniform.second.isData)
+				{
+					// Check UniformType
+					UniformType utype = uniform.second.uType;
+					switch (utype)
+					{
+					case UniformType::FLOAT:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0.f), false);
+						break;
+					case UniformType::FLOAT_VEC2:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2(0, 0)), false);
+						break;
+					case UniformType::FLOAT_VEC3:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3(0, 0, 0)), false);
+						break;
+					case UniformType::FLOAT_VEC4:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4(0, 0, 0, 0)), false);
+						break;
+
+					case UniformType::DOUBLE:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0.0), false);
+						break;
+					case UniformType::DOUBLE_VEC2:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2d(0, 0)), false);
+						break;
+					case UniformType::DOUBLE_VEC3:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3d(0, 0, 0)), false);
+						break;
+					case UniformType::DOUBLE_VEC4:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4d(0, 0, 0, 0)), false);
+						break;
+
+					case UniformType::INT:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0), false);
+						break;
+					case UniformType::INT_VEC2:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2i(0, 0)), false);
+						break;
+					case UniformType::INT_VEC3:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3i(0, 0, 0)), false);
+						break;
+					case UniformType::INT_VEC4:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4i(0, 0, 0, 0)), false);
+						break;
+
+					case UniformType::UNSIGNED_INT:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0u), false);
+						break;
+					case UniformType::UNSIGNED_INT_VEC2:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2ui(0u, 0u)), false);
+						break;
+					case UniformType::UNSIGNED_INT_VEC3:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3ui(0u, 0u, 0u)), false);
+						break;
+					case UniformType::UNSIGNED_INT_VEC4:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4ui(0u, 0u, 0u, 0u)), false);
+						break;
+
+					case UniformType::BOOL:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, false), false);
+						break;
+					case UniformType::BOOL_VEC2:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2b(false, false)), false);
+						break;
+					case UniformType::BOOL_VEC3:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3b(false, false, false)), false);
+						break;
+					case UniformType::BOOL_VEC4:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4b(false, false, false, false)), false);
+						break;
+
+					case UniformType::FLOAT_MAT2:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Matrix2x2::Identity), false);
+						break;
+					case UniformType::FLOAT_MAT3:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Matrix3x3::Identity), false);
+						break;
+					case UniformType::FLOAT_MAT4:
+						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Matrix4x4::Identity), false);
+						break;
+
+					default:
+						VXL_ERROR("Uniform Type not supported for Uniform Storage system");
+					}
+				}
+			}
+
+			// uniform blocks
 			m_uniformBlocks = Graphics::ShaderProgram::AcquireUniformBlocks(m_id);
 
+			// subroutines
 			std::vector<ShaderType> types;
 			types.reserve(shaderCount);
 			for (const auto& shader : m_shaders)
@@ -213,7 +310,7 @@ namespace Vxl
 		Graphics::SetGLName(ObjectType::PROGRAM, m_id, "Program_" + name);
 	}
 
-	// Common Uniforms
+	// Binding Common Uniforms [VXL_]
 	void ShaderProgram::bindCommonUniforms(EntityIndex _entity)
 	{
 		// Non entity - required
@@ -297,6 +394,97 @@ namespace Vxl
 		}
 	}
 
+	// Binding Custom Uniforms [Non VXL_]
+	void ShaderProgram::bindCustomUniforms()
+	{
+		for (const auto& uniformStorage : m_uniformStorage)
+		{
+			// Acquire Uniform
+			Graphics::Uniform& uniform = m_uniforms[uniformStorage.first];
+			// Acquire Data
+			switch (uniformStorage.second.first.type)
+			{
+			case UniformType::FLOAT:
+				uniform.send(*uniformStorage.second.first.GetData<float>());
+				break;
+			case UniformType::FLOAT_VEC2:
+				uniform.send(*uniformStorage.second.first.GetData<Vector2>());
+				break;
+			case UniformType::FLOAT_VEC3:
+				uniform.send(*uniformStorage.second.first.GetData<Vector3>());
+				break;
+			case UniformType::FLOAT_VEC4:
+				uniform.send(*uniformStorage.second.first.GetData<Vector4>());
+				break;
+
+			case UniformType::DOUBLE:
+				uniform.send(*uniformStorage.second.first.GetData<double>());
+				break;
+			case UniformType::DOUBLE_VEC2:
+				uniform.send(*uniformStorage.second.first.GetData<Vector2d>());
+				break;
+			case UniformType::DOUBLE_VEC3:
+				uniform.send(*uniformStorage.second.first.GetData<Vector3d>());
+				break;
+			case UniformType::DOUBLE_VEC4:
+				uniform.send(*uniformStorage.second.first.GetData<Vector4d>());
+				break;
+
+			case UniformType::INT:
+				uniform.send(*uniformStorage.second.first.GetData<int>());
+				break;
+			case UniformType::INT_VEC2:
+				uniform.send(*uniformStorage.second.first.GetData<Vector2i>());
+				break;
+			case UniformType::INT_VEC3:
+				uniform.send(*uniformStorage.second.first.GetData<Vector3i>());
+				break;
+			case UniformType::INT_VEC4:
+				uniform.send(*uniformStorage.second.first.GetData<Vector4i>());
+				break;
+
+			case UniformType::UNSIGNED_INT:
+				uniform.send(*uniformStorage.second.first.GetData<uint32_t>());
+				break;
+			case UniformType::UNSIGNED_INT_VEC2:
+				uniform.send(*uniformStorage.second.first.GetData<Vector2ui>());
+				break;
+			case UniformType::UNSIGNED_INT_VEC3:
+				uniform.send(*uniformStorage.second.first.GetData<Vector3ui>());
+				break;
+			case UniformType::UNSIGNED_INT_VEC4:
+				uniform.send(*uniformStorage.second.first.GetData<Vector4ui>());
+				break;
+
+			case UniformType::BOOL:
+				uniform.send(*uniformStorage.second.first.GetData<bool>());
+				break;
+			case UniformType::BOOL_VEC2:
+				uniform.send(*uniformStorage.second.first.GetData<Vector2b>());
+				break;
+			case UniformType::BOOL_VEC3:
+				uniform.send(*uniformStorage.second.first.GetData<Vector3b>());
+				break;
+			case UniformType::BOOL_VEC4:
+				uniform.send(*uniformStorage.second.first.GetData<Vector4b>());
+				break;
+
+			case UniformType::FLOAT_MAT2:
+				uniform.send(*uniformStorage.second.first.GetData<Matrix2x2()>());
+				break;
+			case UniformType::FLOAT_MAT3:
+				uniform.send(*uniformStorage.second.first.GetData<Matrix3x3()>());
+				break;
+			case UniformType::FLOAT_MAT4:
+				uniform.send(*uniformStorage.second.first.GetData<Matrix4x4()>());
+				break;
+
+			default:
+				VXL_ERROR("Trying to send custom uniform with non-supported type");
+			}
+		}
+	}
+
 	const char* SECTION_NAME = "#Name";
 	const char* SECTION_INCLUDE = "#Include";
 	const char* SECTION_ATTRIBUTE = "#Attributes";
@@ -311,7 +499,7 @@ namespace Vxl
 	const char* SECTION_GEOMETRY_DEFINES = "#DefinesGeometry";
 	const char* SECTION_FRAGMENT_DEFINES = "#DefinesFragment";
 
-	const std::string GLSL_VERSION = "#version 420 core";
+	//const std::string GLSL_VERSION = "#version 420 core";
 
 	ShaderMaterial::ShaderMaterial(const std::string& filePath, bool GlobalAsset)
 		: m_filePath(filePath)
@@ -436,13 +624,13 @@ namespace Vxl
 					std::string file = _fileStorage->file + '\n';
 
 					if (output_vertex.active)
-						output_vertex.include += file;
+						output_vertex.include += file + '\n';
 
 					if (output_geometry.active)
-						output_geometry.include += file;
+						output_geometry.include += file + '\n';
 
 					if (output_fragment.active)
-						output_fragment.include += file;
+						output_fragment.include += file + '\n';
 				}
 			}
 		}
@@ -472,6 +660,7 @@ namespace Vxl
 				// Add attribute information
 				output_vertex.input_output += std::string("layout (location = " + property[1] + ") in " + property[0] + ";\n");
 			}
+			output_vertex.input_output += '\n';
 		}
 
 		// Link
@@ -484,26 +673,26 @@ namespace Vxl
 				output_vertex.input_output += "// Output\n";
 				output_vertex.input_output += "out LinkData\n{";
 				output_vertex.input_output += section;
-				output_vertex.input_output += "\n} vert_out;\n";
+				output_vertex.input_output += "\n} vert_out;\n\n";
 			}
 			if (output_fragment.active)
 			{
 				output_fragment.input_output += "// Input\n";
 				output_fragment.input_output += output_geometry.active ? "in LinkData_2\n{" : "in LinkData\n{";
 				output_fragment.input_output += section;
-				output_fragment.input_output += "\n} frag_in;\n";
+				output_fragment.input_output += "\n} frag_in;\n\n";
 			}
 			if (output_geometry.active)
 			{
 				output_geometry.input_output += "// Input\n";
 				output_geometry.input_output += "in LinkData\n{";
 				output_geometry.input_output += section;
-				output_geometry.input_output += "\n} geom_in[];\n";
+				output_geometry.input_output += "\n} geom_in[];\n\n";
 
 				output_geometry.input_output += "// Output\n";
 				output_geometry.input_output += "out LinkData_2\n{";
 				output_geometry.input_output += section;
-				output_geometry.input_output += "\n} geom_out;\n";
+				output_geometry.input_output += "\n} geom_out;\n\n";
 			}
 		}
 
@@ -565,13 +754,13 @@ namespace Vxl
 			}
 
 			if (output_vertex.active)
-				output_vertex.include += sampler_info;
+				output_vertex.include += sampler_info + '\n';
 
 			if (output_geometry.active)
-				output_geometry.include += sampler_info;
+				output_geometry.include += sampler_info + '\n';
 
 			if (output_fragment.active)
-				output_fragment.include += sampler_info;
+				output_fragment.include += sampler_info + '\n';
 		}
 
 		// Properties
@@ -600,7 +789,7 @@ namespace Vxl
 			output_vertex.behaviour += "\n}";
 
 			VertexShaderCode =
-				GLSL_VERSION + '\n' +
+				Graphics::GLSL_Version + '\n' +
 				output_vertex.include + '\n' +
 				output_vertex.input_output + '\n' +
 				output_vertex.behaviour;
@@ -616,7 +805,7 @@ namespace Vxl
 			output_geometry.behaviour += "\n}";
 
 			GeometryShaderCode =
-				GLSL_VERSION + '\n' +
+				Graphics::GLSL_Version + '\n' +
 				output_geometry.include + '\n' +
 				output_geometry.input_output + '\n' +
 				output_geometry.behaviour;
@@ -632,7 +821,7 @@ namespace Vxl
 			output_fragment.behaviour += "\n}";
 
 			FragmentShaderCode =
-				GLSL_VERSION + '\n' +
+				Graphics::GLSL_Version + '\n' +
 				output_fragment.include + '\n' +
 				output_fragment.input_output + '\n' +
 				output_fragment.behaviour;

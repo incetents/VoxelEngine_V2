@@ -13,6 +13,7 @@
 
 #include "../utilities/Logger.h"
 #include "../utilities/Macros.h"
+#include "../utilities/Containers.h"
 
 #include "../math/Vector.h"
 #include "../math/Matrix2x2.h"
@@ -32,6 +33,9 @@
 
 namespace Vxl
 {
+	// Shader Version
+	const std::string Graphics::GLSL_Version = "#version 420 core";
+
 	// Global Variables //
 	int Graphics::GLVersionMajor = -1;
 	int Graphics::GLVersionMinor = -1;
@@ -59,8 +63,6 @@ namespace Vxl
 
 	bool Graphics::UsingErrorCallback = false;
 
-	
-
 	// Tracking GL States //
 	CullMode			gl_cullmode = CullMode::NONE;
 	bool				gl_blendState = false;
@@ -83,6 +85,116 @@ namespace Vxl
 	PixelAlignment		gl_pixelPackAlignment = PixelAlignment::ALIGN_4;
 	PixelAlignment		gl_pixelUnpackAlignment = PixelAlignment::ALIGN_4;
 	bool				gl_srgbMode = false;
+
+	// Uniform Type Table //
+	std::map<int, UniformType> UniformTypeTable =
+	{
+		{ GL_FLOAT, UniformType::FLOAT },
+		{ GL_FLOAT_VEC2, UniformType::FLOAT_VEC2 },
+		{ GL_FLOAT_VEC3, UniformType::FLOAT_VEC3 },
+		{ GL_FLOAT_VEC4, UniformType::FLOAT_VEC4 },
+		{ GL_DOUBLE, UniformType::DOUBLE },
+		{ GL_DOUBLE_VEC2, UniformType::DOUBLE_VEC2 },
+		{ GL_DOUBLE_VEC3, UniformType::DOUBLE_VEC3 },
+		{ GL_DOUBLE_VEC4, UniformType::DOUBLE_VEC4 },
+		{ GL_INT, UniformType::INT },
+		{ GL_INT_VEC2, UniformType::INT_VEC2 },
+		{ GL_INT_VEC3, UniformType::INT_VEC3 },
+		{ GL_INT_VEC4, UniformType::INT_VEC4 },
+		{ GL_UNSIGNED_INT, UniformType::UNSIGNED_INT },
+		{ GL_UNSIGNED_INT_VEC2, UniformType::UNSIGNED_INT_VEC2 },
+		{ GL_UNSIGNED_INT_VEC3, UniformType::UNSIGNED_INT_VEC3 },
+		{ GL_UNSIGNED_INT_VEC4, UniformType::UNSIGNED_INT_VEC4 },
+		{ GL_BOOL, UniformType::BOOL },
+		{ GL_BOOL_VEC2, UniformType::BOOL_VEC2 },
+		{ GL_BOOL_VEC3, UniformType::BOOL_VEC3 },
+		{ GL_BOOL_VEC4, UniformType::BOOL_VEC4 },
+		{ GL_FLOAT_MAT2, UniformType::FLOAT_MAT2 },
+		{ GL_FLOAT_MAT3, UniformType::FLOAT_MAT3 },
+		{ GL_FLOAT_MAT4, UniformType::FLOAT_MAT4 },
+		{ GL_FLOAT_MAT2x3, UniformType::FLOAT_MAT2x3 },
+		{ GL_FLOAT_MAT2x4, UniformType::FLOAT_MAT2x4 },
+		{ GL_FLOAT_MAT3x2, UniformType::FLOAT_MAT3x2 },
+		{ GL_FLOAT_MAT3x4, UniformType::FLOAT_MAT3x4 },
+		{ GL_FLOAT_MAT4x2, UniformType::FLOAT_MAT4x2 },
+		{ GL_FLOAT_MAT4x3, UniformType::FLOAT_MAT4x3 },
+		{ GL_DOUBLE_MAT2, UniformType::DOUBLE_MAT2 },
+		{ GL_DOUBLE_MAT3, UniformType::DOUBLE_MAT3 },
+		{ GL_DOUBLE_MAT4, UniformType::DOUBLE_MAT4 },
+		{ GL_DOUBLE_MAT2x3, UniformType::DOUBLE_MAT2x3 },
+		{ GL_DOUBLE_MAT2x4, UniformType::DOUBLE_MAT2x4 },
+		{ GL_DOUBLE_MAT3x2, UniformType::DOUBLE_MAT3x2 },
+		{ GL_DOUBLE_MAT3x4, UniformType::DOUBLE_MAT3x4 },
+		{ GL_DOUBLE_MAT4x2, UniformType::DOUBLE_MAT4x2 },
+		{ GL_DOUBLE_MAT4x3, UniformType::DOUBLE_MAT4x3 },
+		{ GL_SAMPLER_1D, UniformType::SAMPLER_1D },
+		{ GL_SAMPLER_2D, UniformType::SAMPLER_2D },
+		{ GL_SAMPLER_3D, UniformType::SAMPLER_3D },
+		{ GL_SAMPLER_CUBE, UniformType::SAMPLER_CUBE },
+		{ GL_SAMPLER_1D_SHADOW, UniformType::SAMPLER_1D_SHADOW },
+		{ GL_SAMPLER_2D_SHADOW, UniformType::SAMPLER_2D_SHADOW },
+		{ GL_SAMPLER_1D_ARRAY, UniformType::SAMPLER_1D_ARRAY },
+		{ GL_SAMPLER_2D_ARRAY, UniformType::SAMPLER_2D_ARRAY },
+		{ GL_SAMPLER_1D_ARRAY_SHADOW, UniformType::SAMPLER_1D_ARRAY_SHADOW },
+		{ GL_SAMPLER_2D_ARRAY_SHADOW, UniformType::SAMPLER_2D_ARRAY_SHADOW },
+		{ GL_SAMPLER_2D_MULTISAMPLE, UniformType::SAMPLER_2D_MULTISAMPLE },
+		{ GL_SAMPLER_2D_MULTISAMPLE_ARRAY, UniformType::SAMPLER_2D_MULTISAMPLE_ARRAY },
+		{ GL_SAMPLER_CUBE_SHADOW, UniformType::SAMPLER_CUBE_SHADOW },
+		{ GL_SAMPLER_BUFFER, UniformType::SAMPLER_BUFFER },
+		{ GL_SAMPLER_2D_RECT, UniformType::SAMPLER_2D_RECT },
+		{ GL_SAMPLER_2D_RECT_SHADOW, UniformType::SAMPLER_2D_RECT_SHADOW },
+		{ GL_INT_SAMPLER_1D, UniformType::INT_SAMPLER_1D },
+		{ GL_INT_SAMPLER_2D, UniformType::INT_SAMPLER_2D },
+		{ GL_INT_SAMPLER_3D, UniformType::INT_SAMPLER_3D },
+		{ GL_INT_SAMPLER_CUBE, UniformType::INT_SAMPLER_CUBE },
+		{ GL_INT_SAMPLER_1D_ARRAY, UniformType::INT_SAMPLER_1D_ARRAY },
+		{ GL_INT_SAMPLER_2D_ARRAY, UniformType::INT_SAMPLER_2D_ARRAY },
+		{ GL_INT_SAMPLER_2D_MULTISAMPLE, UniformType::INT_SAMPLER_2D_MULTISAMPLE },
+		{ GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY, UniformType::INT_SAMPLER_2D_MULTISAMPLE_ARRAY },
+		{ GL_INT_SAMPLER_BUFFER, UniformType::INT_SAMPLER_BUFFER },
+		{ GL_INT_SAMPLER_2D_RECT, UniformType::INT_SAMPLER_2D_RECT },
+		{ GL_UNSIGNED_INT_SAMPLER_1D, UniformType::UNSIGNED_INT_SAMPLER_1D },
+		{ GL_UNSIGNED_INT_SAMPLER_2D, UniformType::UNSIGNED_INT_SAMPLER_2D },
+		{ GL_UNSIGNED_INT_SAMPLER_3D, UniformType::UNSIGNED_INT_SAMPLER_3D },
+		{ GL_UNSIGNED_INT_SAMPLER_CUBE, UniformType::UNSIGNED_INT_SAMPLER_CUBE },
+		{ GL_UNSIGNED_INT_SAMPLER_1D_ARRAY, UniformType::UNSIGNED_INT_SAMPLER_1D_ARRAY },
+		{ GL_UNSIGNED_INT_SAMPLER_2D_ARRAY, UniformType::UNSIGNED_INT_SAMPLER_2D_ARRAY },
+		{ GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE, UniformType::UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE },
+		{ GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY, UniformType::UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY },
+		{ GL_UNSIGNED_INT_SAMPLER_BUFFER, UniformType::UNSIGNED_INT_SAMPLER_BUFFER },
+		{ GL_UNSIGNED_INT_SAMPLER_2D_RECT, UniformType::UNSIGNED_INT_SAMPLER_2D_RECT },
+		{ GL_IMAGE_1D, UniformType::IMAGE_1D },
+		{ GL_IMAGE_2D, UniformType::IMAGE_2D },
+		{ GL_IMAGE_3D, UniformType::IMAGE_3D },
+		{ GL_IMAGE_2D_RECT, UniformType::IMAGE_2D_RECT },
+		{ GL_IMAGE_CUBE, UniformType::IMAGE_CUBE },
+		{ GL_IMAGE_BUFFER, UniformType::IMAGE_BUFFER },
+		{ GL_IMAGE_1D_ARRAY, UniformType::IMAGE_1D_ARRAY },
+		{ GL_IMAGE_2D_ARRAY, UniformType::IMAGE_2D_ARRAY },
+		{ GL_IMAGE_2D_MULTISAMPLE, UniformType::IMAGE_2D_MULTISAMPLE },
+		{ GL_IMAGE_2D_MULTISAMPLE_ARRAY, UniformType::IMAGE_2D_MULTISAMPLE_ARRAY },
+		{ GL_INT_IMAGE_1D, UniformType::INT_IMAGE_1D },
+		{ GL_INT_IMAGE_2D, UniformType::INT_IMAGE_2D },
+		{ GL_INT_IMAGE_3D, UniformType::INT_IMAGE_3D },
+		{ GL_INT_IMAGE_2D_RECT, UniformType::INT_IMAGE_2D_RECT },
+		{ GL_INT_IMAGE_CUBE, UniformType::INT_IMAGE_CUBE },
+		{ GL_INT_IMAGE_BUFFER, UniformType::INT_IMAGE_BUFFER },
+		{ GL_INT_IMAGE_1D_ARRAY, UniformType::INT_IMAGE_1D_ARRAY },
+		{ GL_INT_IMAGE_2D_ARRAY, UniformType::INT_IMAGE_2D_ARRAY },
+		{ GL_INT_IMAGE_2D_MULTISAMPLE, UniformType::INT_IMAGE_2D_MULTISAMPLE },
+		{ GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY, UniformType::INT_IMAGE_2D_MULTISAMPLE_ARRAY },
+		{ GL_UNSIGNED_INT_IMAGE_1D, UniformType::UNSIGNED_INT_IMAGE_1D },
+		{ GL_UNSIGNED_INT_IMAGE_2D, UniformType::UNSIGNED_INT_IMAGE_2D },
+		{ GL_UNSIGNED_INT_IMAGE_3D, UniformType::UNSIGNED_INT_IMAGE_3D },
+		{ GL_UNSIGNED_INT_IMAGE_2D_RECT, UniformType::UNSIGNED_INT_IMAGE_2D_RECT },
+		{ GL_UNSIGNED_INT_IMAGE_CUBE, UniformType::UNSIGNED_INT_IMAGE_CUBE },
+		{ GL_UNSIGNED_INT_IMAGE_BUFFER, UniformType::UNSIGNED_INT_IMAGE_BUFFER },
+		{ GL_UNSIGNED_INT_IMAGE_1D_ARRAY, UniformType::UNSIGNED_INT_IMAGE_1D_ARRAY },
+		{ GL_UNSIGNED_INT_IMAGE_2D_ARRAY, UniformType::UNSIGNED_INT_IMAGE_2D_ARRAY },
+		{ GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE, UniformType::UNSIGNED_INT_IMAGE_2D_MULTISAMPLE },
+		{ GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY, UniformType::UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY },
+		{ GL_UNSIGNED_INT_ATOMIC_COUNTER, UniformType::UNSIGNED_INT_ATOMIC_COUNTER },
+	};
 
 	// ~ Graphics Enums ~ //
 	const int GL_ObjectType[] =
@@ -193,6 +305,119 @@ namespace Vxl
 		GL_INT_2_10_10_10_REV,
 		GL_UNSIGNED_INT_2_10_10_10_REV,
 		GL_UNSIGNED_INT_10F_11F_11F_REV
+	};
+	const int GL_UniformType[] =
+	{
+		-1, // Error (Used for placeholder)
+
+		GL_FLOAT,
+		GL_FLOAT_VEC2,
+		GL_FLOAT_VEC3,
+		GL_FLOAT_VEC4,
+		GL_DOUBLE,
+		GL_DOUBLE_VEC2,
+		GL_DOUBLE_VEC3,
+		GL_DOUBLE_VEC4,
+		GL_INT,
+		GL_INT_VEC2,
+		GL_INT_VEC3,
+		GL_INT_VEC4,
+		GL_UNSIGNED_INT,
+		GL_UNSIGNED_INT_VEC2,
+		GL_UNSIGNED_INT_VEC3,
+		GL_UNSIGNED_INT_VEC4,
+		GL_BOOL,
+		GL_BOOL_VEC2,
+		GL_BOOL_VEC3,
+		GL_BOOL_VEC4,
+		GL_FLOAT_MAT2,
+		GL_FLOAT_MAT3,
+		GL_FLOAT_MAT4,
+		GL_FLOAT_MAT2x3,
+		GL_FLOAT_MAT2x4,
+		GL_FLOAT_MAT3x2,
+		GL_FLOAT_MAT3x4,
+		GL_FLOAT_MAT4x2,
+		GL_FLOAT_MAT4x3,
+		GL_DOUBLE_MAT2,
+		GL_DOUBLE_MAT3,
+		GL_DOUBLE_MAT4,
+		GL_DOUBLE_MAT2x3,
+		GL_DOUBLE_MAT2x4,
+		GL_DOUBLE_MAT3x2,
+		GL_DOUBLE_MAT3x4,
+		GL_DOUBLE_MAT4x2,
+		GL_DOUBLE_MAT4x3,
+
+		-1,  // Error (Used for placeholder)
+
+		GL_SAMPLER_1D,
+		GL_SAMPLER_2D,
+		GL_SAMPLER_3D,
+		GL_SAMPLER_CUBE,
+		GL_SAMPLER_1D_SHADOW,
+		GL_SAMPLER_2D_SHADOW,
+		GL_SAMPLER_1D_ARRAY,
+		GL_SAMPLER_2D_ARRAY,
+		GL_SAMPLER_1D_ARRAY_SHADOW,
+		GL_SAMPLER_2D_ARRAY_SHADOW,
+		GL_SAMPLER_2D_MULTISAMPLE,
+		GL_SAMPLER_2D_MULTISAMPLE_ARRAY,
+		GL_SAMPLER_CUBE_SHADOW,
+		GL_SAMPLER_BUFFER,
+		GL_SAMPLER_2D_RECT,
+		GL_SAMPLER_2D_RECT_SHADOW,
+		GL_INT_SAMPLER_1D,
+		GL_INT_SAMPLER_2D,
+		GL_INT_SAMPLER_3D,
+		GL_INT_SAMPLER_CUBE,
+		GL_INT_SAMPLER_1D_ARRAY,
+		GL_INT_SAMPLER_2D_ARRAY,
+		GL_INT_SAMPLER_2D_MULTISAMPLE,
+		GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY,
+		GL_INT_SAMPLER_BUFFER,
+		GL_INT_SAMPLER_2D_RECT,
+		GL_UNSIGNED_INT_SAMPLER_1D,
+		GL_UNSIGNED_INT_SAMPLER_2D,
+		GL_UNSIGNED_INT_SAMPLER_3D,
+		GL_UNSIGNED_INT_SAMPLER_CUBE,
+		GL_UNSIGNED_INT_SAMPLER_1D_ARRAY,
+		GL_UNSIGNED_INT_SAMPLER_2D_ARRAY,
+		GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE,
+		GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY,
+		GL_UNSIGNED_INT_SAMPLER_BUFFER,
+		GL_UNSIGNED_INT_SAMPLER_2D_RECT,
+		GL_IMAGE_1D,
+		GL_IMAGE_2D,
+		GL_IMAGE_3D,
+		GL_IMAGE_2D_RECT,
+		GL_IMAGE_CUBE,
+		GL_IMAGE_BUFFER,
+		GL_IMAGE_1D_ARRAY,
+		GL_IMAGE_2D_ARRAY,
+		GL_IMAGE_2D_MULTISAMPLE,
+		GL_IMAGE_2D_MULTISAMPLE_ARRAY,
+		GL_INT_IMAGE_1D,
+		GL_INT_IMAGE_2D,
+		GL_INT_IMAGE_3D,
+		GL_INT_IMAGE_2D_RECT,
+		GL_INT_IMAGE_CUBE,
+		GL_INT_IMAGE_BUFFER,
+		GL_INT_IMAGE_1D_ARRAY,
+		GL_INT_IMAGE_2D_ARRAY,
+		GL_INT_IMAGE_2D_MULTISAMPLE,
+		GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY,
+		GL_UNSIGNED_INT_IMAGE_1D,
+		GL_UNSIGNED_INT_IMAGE_2D,
+		GL_UNSIGNED_INT_IMAGE_3D,
+		GL_UNSIGNED_INT_IMAGE_2D_RECT,
+		GL_UNSIGNED_INT_IMAGE_CUBE,
+		GL_UNSIGNED_INT_IMAGE_BUFFER,
+		GL_UNSIGNED_INT_IMAGE_1D_ARRAY,
+		GL_UNSIGNED_INT_IMAGE_2D_ARRAY,
+		GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE,
+		GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY,
+		GL_UNSIGNED_INT_ATOMIC_COUNTER
 	};
 	const int GL_BufferUsage[] =
 	{
@@ -1308,6 +1533,94 @@ namespace Vxl
 		glUniform4f(location, data.r, data.g, data.b, data.a);
 	}
 
+	void Graphics::Uniform::send(const Vector2d& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform2d(location, data.x, data.y);
+	}
+	void Graphics::Uniform::send(const Vector3d& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform3d(location, data.x, data.y, data.z);
+	}
+	void Graphics::Uniform::send(const Vector4d& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform4d(location, data.x, data.y, data.z, data.w);
+	}
+
+	void Graphics::Uniform::send(const Vector2i& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform2i(location, data.x, data.y);
+	}
+	void Graphics::Uniform::send(const Vector3i& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform3i(location, data.x, data.y, data.z);
+	}
+	void Graphics::Uniform::send(const Vector4i& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform4i(location, data.x, data.y, data.z, data.w);
+	}
+
+	void Graphics::Uniform::send(const Vector2ui& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform2ui(location, data.x, data.y);
+	}
+	void Graphics::Uniform::send(const Vector3ui& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform3ui(location, data.x, data.y, data.z);
+	}
+	void Graphics::Uniform::send(const Vector4ui& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform4ui(location, data.x, data.y, data.z, data.w);
+	}
+
+	void Graphics::Uniform::send(const Vector2b& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform2i(location, data.x ? 1 : 0, data.y ? 1 : 0);
+	}
+	void Graphics::Uniform::send(const Vector3b& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform3i(location, data.x ? 1 : 0, data.y ? 1 : 0, data.z ? 1 : 0);
+	}
+	void Graphics::Uniform::send(const Vector4b& data) const
+	{
+		if (location == -1)
+			return;
+
+		glUniform4i(location, data.x ? 1 : 0, data.y ? 1 : 0, data.z ? 1 : 0, data.w ? 1 : 0);
+	}
+
 	void Graphics::Uniform::sendMatrix(const Matrix2x2& data, bool transpose) const
 	{
 		if (location == -1)
@@ -1505,6 +1818,7 @@ namespace Vxl
 		if (uniform_count == 0)
 			return uniforms;
 		
+		// Store all possibilities
 		for (GLint i = 0; i < uniform_count; i++)
 		{
 			Graphics::Uniform uniform;
@@ -1515,7 +1829,16 @@ namespace Vxl
 			uniform.location = glGetUniformLocation(id, name);
 			uniform.name = std::string(name);
 
-			uniforms[uniform.name] = uniform;
+			// Check Enum Type
+			auto it = UniformTypeTable.find(uniform.type);
+			if (it != UniformTypeTable.end())
+				uniform.uType = UniformTypeTable[uniform.type];
+			else
+				uniform.uType = UniformType::NONE;
+
+			uniform.isData = (uint32_t)uniform.uType < (uint32_t)UniformType::__DATA_TYPE_CUTOFF__;
+
+			uniforms[uniform.name] = (uniform);
 		}
 
 		return uniforms;

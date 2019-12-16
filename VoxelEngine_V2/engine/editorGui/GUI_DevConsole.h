@@ -5,12 +5,11 @@
 
 #include "../utilities/singleton.h"
 #include "../utilities/Macros.h"
+#include "../utilities/Containers.h"
 
 #include "../math/Vector.h"
 #include "../math/Color.h"
 #include "../math/MathCore.h"
-
-#include "../rendering/Graphics.h"
 
 #include <map>
 #include <utility>
@@ -45,34 +44,9 @@ namespace Vxl
 		};
 		EditData m_editData;
 		
-		struct GenericData
-		{
-			std::shared_ptr<void> data;
-			GenericDataType type;
-
-			template<typename Type>
-			GenericData(GenericDataType _type, Type _data)
-				: type(_type)
-			{
-				data = std::make_shared<Type>(_data);
-			}
-			GenericData() {}
-
-			template<typename Type>
-			Type* GetData() const
-			{
-				return static_cast<Type*>(data.get());
-			}
-		};
-		std::map<std::string, GenericData> m_showData;
+		// All data to show
+		std::map<std::string, RawData> m_showData;
 		
-		// Utility 
-		template<typename Type>
-		void Write_Statistic(void* data)
-		{
-			
-			
-		}
 
 		// Menu Mode
 		enum class MenuState
@@ -196,39 +170,47 @@ namespace Vxl
 
 		void ShowBool(const std::string& name, bool _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::BOOL, _value);
+			m_showData[name] = RawData(UniformType::BOOL, _value);
 		}
+
 		void ShowInt(const std::string& name, int _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::INT, _value);
+			m_showData[name] = RawData(UniformType::INT, _value);
 		}
+
 		void ShowFloat(const std::string& name, float _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::FLOAT, _value);
+			m_showData[name] = RawData(UniformType::FLOAT, _value);
 		}
+
 		void ShowDouble(const std::string& name, double _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::DOUBLE, _value);
+			m_showData[name] = RawData(UniformType::DOUBLE, _value);
 		}
-		void ShowVec(const std::string& name, Vector2 _value)
+
+		void ShowVector(const std::string& name, const Vector2& _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::VEC2, _value);
+			m_showData[name] = RawData(UniformType::FLOAT_VEC2, _value);
 		}
-		void ShowVec(const std::string& name, Vector3 _value)
+
+		void ShowVector(const std::string& name, const Vector3& _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::VEC3, _value);
+			m_showData[name] = RawData(UniformType::FLOAT_VEC3, _value);
 		}
-		void ShowVec(const std::string& name, Vector4 _value)
+
+		void ShowVector(const std::string& name, const Vector4& _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::VEC4, _value);
+			m_showData[name] = RawData(UniformType::FLOAT_VEC4, _value);
 		}
-		void ShowColor(const std::string& name, Color3F _value)
+
+		void ShowVector(const std::string& name, const Color3F& _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::COLOR3, _value);
+			m_showData[name] = RawData(UniformType::FLOAT_VEC3, _value);
 		}
-		void ShowColor(const std::string& name, Color4F _value)
+
+		void ShowVector(const std::string& name, const Color4F& _value)
 		{
-			m_showData[name] = GenericData(GenericDataType::COLOR4, _value);
+			m_showData[name] = RawData(UniformType::FLOAT_VEC4, _value);
 		}
 
 #define DEVCONSOLE_GET_BOOL(x, y) DevConsole.GetBool(x, y)

@@ -69,28 +69,28 @@ namespace Vxl
 		}
 	}
 
-	Graphics::Uniform Material::getUniform(const std::string& name)
-	{
-		ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
-		if (_shaderMat)
-		{
-			ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
-			if (program)
-			{
-				// find uniform
-				auto it = program->m_uniforms.find(name);
-				if (it != program->m_uniforms.end())
-				{
-					return it->second;
-				}
-			}
-		}
-		
-		// Empty
-		Graphics::Uniform empty_uni;
-		empty_uni.location = -1;
-		return empty_uni;
-	}
+	//	Graphics::Uniform Material::getUniform(const std::string& name)
+	//	{
+	//		ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
+	//		if (_shaderMat)
+	//		{
+	//			ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
+	//			if (program)
+	//			{
+	//				// find uniform
+	//				auto it = program->m_uniforms.find(name);
+	//				if (it != program->m_uniforms.end())
+	//				{
+	//					return it->second.m_uniform;
+	//				}
+	//			}
+	//		}
+	//		
+	//		// Empty
+	//		Graphics::Uniform empty_uni;
+	//		empty_uni.location = -1;
+	//		return empty_uni;
+	//	}
 
 	ShaderProgram* Material::getCoreProgram(void) const
 	{
@@ -112,14 +112,17 @@ namespace Vxl
 		}
 		return false;
 	}
-	void Material::bindCoreProgramCommonUniforms(EntityIndex _entity)
+	void Material::bindCoreProgramUniforms(EntityIndex _entity)
 	{
 		ShaderMaterial* _shaderMaterial = Assets.getShaderMaterial(m_shaderMaterial);
 		if (_shaderMaterial)
 		{
 			ShaderProgram* _shaderProgram = Assets.getShaderProgram(_shaderMaterial->m_coreProgram);
 			if (_shaderProgram)
+			{
 				_shaderProgram->bindCommonUniforms(_entity);
+				_shaderProgram->bindCustomUniforms();
+			}
 		}
 	}
 	void Material::bindStates()
