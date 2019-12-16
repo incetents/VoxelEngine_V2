@@ -4,26 +4,8 @@ TODO:
 ! Macro everywhere -> DISALLOW_COPY_AND_ASSIGN(ClassName);
 ! camelCase every FUNCTION
 
-- storage for uniforms was a bad idea
-
-- uniqueID -> assetID, every object create from Assets gets an id so they can refind themselves in the assets
-	- const so that it never changes
-	- global assets don't have a getID function, just get their ID from object itself
-
-- enable vertex attrib pointer, only active by shader not by vbo
-  
-- VBO Meshbuffer -> inside mesh.h, linemesh.h
-	-> Make the formatting more readable
-
-- model class, just loads directly into a mesh?
-	-> inside asset class instead of model class holding intermediate buffers
-
-- replace UBO with VXL for uniform blocks
-
-- check if UBO refactor is needed to remove _# appended to all UBO'same
-https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
-
-- fix other missing materials
+- storage for uniforms, don't resend same data every frame unless modified
+	-> dirty flag 
 
 - colorID/depth programs generated from shaderMaterial
 	- test both programs on viewport
@@ -39,6 +21,23 @@ https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
 	
 - inspector shows material (core program) -> shows all editable uniforms
 	- these must also modify (colorID and depth only) clones
+
+- uniqueID -> assetID, every object create from Assets gets an id so they can refind themselves in the assets
+	- const so that it never changes
+	- global assets don't have a getID function, just get their ID from object itself
+
+- enable vertex attrib pointer, only active by shader not by vbo
+  
+- VBO Meshbuffer -> inside mesh.h, linemesh.h
+	-> Make the formatting more readable
+
+- model class, just loads directly into a mesh?
+	-> inside asset class instead of model class holding intermediate buffers
+
+- check if UBO refactor is needed to remove _# appended to all UBO'same
+https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+
+- fix other missing materials
 	
 - Camera screen controls similar to Maya software?
 	- click drag instead of WASD movement
@@ -48,9 +47,6 @@ https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
 
 - fix gizmo color ID clicking system
 
-[ noted global changes ]
-	-> gizmo fbo is now global
-	
 - text object is broken
 
 - gizmo selections, if selection fails ray to plane intersection, don't update anything

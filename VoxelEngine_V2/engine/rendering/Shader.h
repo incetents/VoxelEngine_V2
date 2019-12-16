@@ -160,7 +160,6 @@ namespace Vxl
 		std::optional<Graphics::Uniform> m_uniform_useTexture = std::nullopt;
 		std::optional<Graphics::Uniform> m_uniform_color = std::nullopt;
 		std::optional<Graphics::Uniform> m_uniform_tint = std::nullopt;
-		std::optional<Graphics::Uniform> m_uniform_viewport = std::nullopt;
 		std::optional<Graphics::Uniform> m_uniform_alpha = std::nullopt;
 		std::optional<Graphics::Uniform> m_uniform_output = std::nullopt;
 

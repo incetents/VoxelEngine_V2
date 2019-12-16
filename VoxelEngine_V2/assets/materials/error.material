@@ -57,7 +57,7 @@
 	vec4 clipSpacePos = VXL_viewProjection * vec4(frag_in.pos, 1.0);
 	vec3 ndcSpacePos = clipSpacePos.xyz / clipSpacePos.w;
 	vec2 windowSpacePos = ((ndcSpacePos.xy + 1.0) / 2.0);
-	vec2 pixelPos = floor(windowSpacePos * VXL_viewportSize / 10.0);
+	vec2 pixelPos = floor(windowSpacePos * VXL_fboSize / 10.0);
 	
 	if(mod(pixelPos.x + pixelPos.y, 2) == 0)
 		output_albedo = vec4(0.1 * frag_in.uv.x, 0, 0.1 * frag_in.uv.y,1);

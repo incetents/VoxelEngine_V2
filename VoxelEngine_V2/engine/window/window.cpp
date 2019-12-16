@@ -144,7 +144,7 @@ namespace Vxl
 	void Window::UpdateViewport()
 	{
 		// If using normal aspect ratio, 
-		if (!m_useCustomAspectRatio)
+ 		if (!m_useCustomAspectRatio)
 		{
 			// update viewport info to be the same as window data
 			m_viewportOffset[0] = 0;
@@ -155,10 +155,12 @@ namespace Vxl
 		// Locked Aspect Ratio (Black bars on edges)
 		else
 		{
+			uint32_t customWidth = (uint32_t)((float)m_size[1] * m_customAspectRatio);
+			uint32_t customHeight = (uint32_t)((float)m_size[0] / m_customAspectRatio);
+
 			// Width clamp
-			if (m_size[0] > m_size[1])
+			if (customWidth < m_size[0])
 			{
-				uint32_t customWidth = (uint32_t)((float)m_size[1] * m_customAspectRatio);
 				uint32_t offsetWidth = (m_size[0] >> 1) - (customWidth >> 1);
 				m_viewportOffset[0] = offsetWidth;
 				m_viewportOffset[1] = 0;
@@ -168,7 +170,7 @@ namespace Vxl
 			// Height clamp
 			else
 			{
-				uint32_t customHeight = (uint32_t)((float)m_size[0] / m_customAspectRatio);
+				
 				uint32_t offsetHeight = (m_size[1] >> 1) - (customHeight >> 1);
 				m_viewportOffset[0] = 0;
 				m_viewportOffset[1] = offsetHeight;

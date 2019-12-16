@@ -12,6 +12,7 @@
 #include "../rendering/FramebufferObject.h"
 
 #include "../utilities/Time.h"
+#include "../window/window.h"
 
 namespace Vxl
 {
@@ -35,9 +36,10 @@ namespace Vxl
 	}
 	void UBOManager::BindFBOSize(const FramebufferObject& _fbo)
 	{
-		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2((float)_fbo.getWidth(), (float)_fbo.getHeight()), 0);
-		m_ubos[UBOID::FBO_SIZE]->sendVector(Vector2(1.0f / (float)_fbo.getWidth(), 1.0f / (float)_fbo.getHeight()), 8);
-		m_ubos[UBOID::FBO_SIZE]->bind();
+		m_ubos[UBOID::FBO_DATA]->sendVector(Vector4(Window.GetViewportOffsetX(), Window.GetViewportOffsetY(), Window.GetWindowWidth(), Window.GetWindowHeight()), 0);
+		m_ubos[UBOID::FBO_DATA]->sendVector(Vector2((float)_fbo.getWidth(), (float)_fbo.getHeight()), 16);
+		m_ubos[UBOID::FBO_DATA]->sendVector(Vector2(1.0f / (float)_fbo.getWidth(), 1.0f / (float)_fbo.getHeight()), 24);
+		m_ubos[UBOID::FBO_DATA]->bind();
 	}
 
 	// UBO //

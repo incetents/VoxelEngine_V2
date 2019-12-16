@@ -1085,7 +1085,6 @@ namespace Vxl
 			{
 				ShaderProgram* programDebugRender = GlobalAssets.get_ProgramDebugRender();
 				programDebugRender->bind();
-				programDebugRender->bindCommonUniforms(-1);
 
 				Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
 				if(camera)
@@ -1164,7 +1163,6 @@ namespace Vxl
 			{
 				ShaderProgram* programLineRender = GlobalAssets.get_ProgramLineRender();
 				programLineRender->bind();
-				programLineRender->bindCommonUniforms(-1);
 				
 				// State
 				if(programLineRender->m_uniform_useModel.has_value())
@@ -1423,7 +1421,6 @@ namespace Vxl
 		if (programPassthrough)
 		{
 			programPassthrough->bind();
-			programPassthrough->bindCommonUniforms(-1);
 		}
 
 		fbo_composite->bindTexture(0, TextureLevel::LEVEL0);

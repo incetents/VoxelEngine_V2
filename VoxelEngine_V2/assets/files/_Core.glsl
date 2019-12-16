@@ -21,9 +21,10 @@ layout (std140) uniform VXL_Time_1
 };
 
 // [ FBO Size]
-layout (std140) uniform VXL_FBOSize_2
+layout (std140) uniform VXL_FBO_Data_2
 {
-	vec2 VXL_viewportSize; // Width, Height of bound FBO
+	vec4 VXL_viewport; // Viewport information (offset X, offset Y, width, height)
+	vec2 VXL_fboSize; // Width, Height of bound FBO
 	vec2 VXL_texelSize; // 1/Width, 1/Height of bound FBO
 };
 
@@ -36,6 +37,5 @@ uniform bool  VXL_useInstancing 	= false;
 uniform bool  VXL_useTexture 		= false;
 uniform vec3  VXL_color 			= vec3(1.0);
 uniform vec3  VXL_tint 				= vec3(1.0);
-uniform vec4  VXL_viewport 			= vec4(0.0);
 uniform float VXL_alpha 			= 1.0;
 uniform vec4  VXL_output 			= vec4(1.0);

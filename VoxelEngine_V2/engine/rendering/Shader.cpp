@@ -260,7 +260,6 @@ namespace Vxl
 			setupCommonUniform("VXL_useTexture", m_uniform_useTexture);
 			setupCommonUniform("VXL_color", m_uniform_color);
 			setupCommonUniform("VXL_tint", m_uniform_tint);
-			setupCommonUniform("VXL_viewport", m_uniform_viewport);
 			setupCommonUniform("VXL_alpha", m_uniform_alpha);
 			setupCommonUniform("VXL_output", m_uniform_output);
 		}
@@ -313,11 +312,8 @@ namespace Vxl
 	// Binding Common Uniforms [VXL_]
 	void ShaderProgram::bindCommonUniforms(EntityIndex _entity)
 	{
-		// Non entity - required
-		if (m_uniform_viewport.has_value())
-		{
-			m_uniform_viewport.value().send(Vector4((float)Window.GetViewportOffsetX(), (float)Window.GetViewportOffsetY(), (float)Window.GetViewportWidth(), (float)Window.GetViewportHeight()));
-		}
+		if (_entity == -1)
+			return;
 
 		Entity* entity = Assets.getEntity(_entity);
 		if (!entity)

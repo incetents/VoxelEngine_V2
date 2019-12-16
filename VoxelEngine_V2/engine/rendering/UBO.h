@@ -72,7 +72,7 @@ namespace Vxl
 		{
 			CAMERA = 0,
 			TIME = 1,
-			FBO_SIZE = 2,
+			FBO_DATA = 2,
 			TOTAL
 		};
 
@@ -86,7 +86,7 @@ namespace Vxl
 			m_ubos = new UniformBufferObject*[(int)UBOID::TOTAL];
 			m_ubos[0] = new UniformBufferObject(64 * 3, UBOID::CAMERA, "Camera");
 			m_ubos[1] = new UniformBufferObject(16 * 3, UBOID::TIME, "Time");
-			m_ubos[2] = new UniformBufferObject(16, UBOID::FBO_SIZE, "FBO_Size");
+			m_ubos[2] = new UniformBufferObject(16 * 2, UBOID::FBO_DATA, "FBO_Data");
 		}
 		void DestroyGLResources()
 		{
