@@ -23,7 +23,13 @@ namespace Vxl
 		RawData() {}
 
 		template<typename Type>
-		Type* GetData() const
+		void setData(Type newData)
+		{
+			*static_cast<Type*>(data.get()) = newData;
+		}
+
+		template<typename Type>
+		Type* getData() const
 		{
 			return static_cast<Type*>(data.get());
 		}

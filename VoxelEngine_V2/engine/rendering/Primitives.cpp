@@ -348,7 +348,7 @@ namespace Vxl
 			uvs.push_back(UVs[2]);
 		}
 
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		NewMesh->setGLName(MeshName);
@@ -439,7 +439,7 @@ namespace Vxl
 		}
 
 
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		NewMesh->setGLName(MeshName);
@@ -459,7 +459,7 @@ namespace Vxl
 
 		CreateCylinder(positions, uvs, axis, slices, height, radius_top, radius_bot, Vector3::ZERO);
 
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		NewMesh->setGLName(MeshName);
@@ -479,7 +479,7 @@ namespace Vxl
 
 		CreateCone(positions, uvs, axis, slices, height, radius, Vector3::ZERO);
 
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		NewMesh->setGLName(MeshName);
@@ -520,7 +520,7 @@ namespace Vxl
 			uvs.insert(uvs.end(), uvs2.begin(), uvs2.end());
 		}
 
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		NewMesh->setGLName(MeshName);
@@ -640,7 +640,7 @@ namespace Vxl
 			21, 22, 20, 22, 23, 20
 		};
 
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		NewMesh->setGLName(MeshName);
@@ -665,7 +665,7 @@ namespace Vxl
 
 		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 		//
 		if (axis == Axis::X)
@@ -734,7 +734,7 @@ namespace Vxl
 	}
 	MeshIndex Primitives::GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
 	{
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLE_FAN);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 
 		float f_vertices = (float)vertices - 1.f;
@@ -788,13 +788,13 @@ namespace Vxl
 		NewMesh->m_positions = (positions);
 		NewMesh->m_uvs = (uvs);
 		NewMesh->m_normals = (normals);
-		NewMesh->bind(DrawType::TRIANGLE_FAN);
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
-	MeshIndex Primitives::GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices, float exteriorUnitSize, float interiorUnitSize)
+	MeshIndex Primitives::GenerateDoughnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices, float exteriorUnitSize, float interiorUnitSize)
 	{
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::TRIANGLE_STRIP);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 
 		float exteriorHalfSize = exteriorUnitSize * 0.5f;
@@ -885,14 +885,14 @@ namespace Vxl
 		NewMesh->m_uvs = (uvs);
 		NewMesh->m_normals = (normals);
 		NewMesh->m_indices = (indices);
-		NewMesh->bind(DrawType::TRIANGLE_STRIP);
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
 
 	MeshIndex Primitives::GenerateLinesCircle(const std::string& MeshName, Axis axis, uint32_t vertices, float unitSize)
 	{
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(axis == Axis::ALL ? DrawType::LINES : DrawType::LINE_LOOP);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 
 		float f_vertices = (float)vertices - 1.f;
@@ -954,13 +954,13 @@ namespace Vxl
 
 		NewMesh->setGLName(MeshName);
 		NewMesh->m_positions = (positions);
-		NewMesh->bind(axis == Axis::ALL ? DrawType::LINES : DrawType::LINE_LOOP);
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
 	MeshIndex Primitives::GenerateLinesCube(const std::string& MeshName, float unitSize)
 	{
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::LINES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 
 		std::vector<Vector3> positions;
@@ -1009,13 +1009,13 @@ namespace Vxl
 
 		NewMesh->setGLName(MeshName);
 		NewMesh->m_positions = (positions);
-		NewMesh->bind(DrawType::LINES);
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
 	MeshIndex Primitives::GenerateLinesArrow(const std::string& MeshName, Axis axis, float unitSize)
 	{
-		MeshIndex NewMeshIndex = GlobalAssets.createMesh();
+		MeshIndex NewMeshIndex = GlobalAssets.createMesh(DrawType::LINES);
 		Mesh* NewMesh = GlobalAssets.getMesh(NewMeshIndex);
 
 		float tipWidth = 0.1f;
@@ -1046,7 +1046,7 @@ namespace Vxl
 
 		NewMesh->setGLName(MeshName);
 		NewMesh->m_positions = (positions);
-		NewMesh->bind(DrawType::LINES);
+		NewMesh->bind();
 		//
 		return NewMeshIndex;
 	}
@@ -1077,7 +1077,7 @@ namespace Vxl
 			uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
 
-			m_fullQuad = GlobalAssets.createMesh();
+			m_fullQuad = GlobalAssets.createMesh(DrawType::TRIANGLES);
 			auto* fullQuad = GlobalAssets.getMesh(m_fullQuad);
 			//
 			fullQuad->m_positions = std::vector<Vector3>(pos, pos + 4);
@@ -1106,7 +1106,7 @@ namespace Vxl
 			//};
 			uint32_t indices[] = { 0, 1, 2 };
 
-			m_fullTriangle = GlobalAssets.createMesh();
+			m_fullTriangle = GlobalAssets.createMesh(DrawType::TRIANGLES);
 			auto* fullTriangle = GlobalAssets.getMesh(m_fullTriangle);
 			//
 			fullTriangle->m_positions = std::vector<Vector3>(pos, pos + 4);
@@ -1223,7 +1223,7 @@ Vector3(+0.5f, -0.5f, +0.5f),
 				22, 21, 20, 23, 22, 20
 			};
 
-			m_inverseCube = GlobalAssets.createMesh();
+			m_inverseCube = GlobalAssets.createMesh(DrawType::TRIANGLES);
 			auto* inverseCube = GlobalAssets.getMesh(m_inverseCube);
 			//
 			inverseCube->m_positions = std::vector<Vector3>(pos, pos + 24);
@@ -1276,7 +1276,7 @@ Vector3(+0.5f, -0.5f, +0.5f),
 				0, 5, 3
 			};
 
-			m_octahedron = GlobalAssets.createMesh();
+			m_octahedron = GlobalAssets.createMesh(DrawType::TRIANGLES);
 			auto* octahedron = GlobalAssets.getMesh(m_octahedron);
 			//
 			octahedron->m_positions = std::vector<Vector3>(pos, pos + 6);
@@ -1333,9 +1333,9 @@ Vector3(+0.5f, -0.5f, +0.5f),
 			m_circleDouble_y = GenerateCircle("CircleDoubleY", Axis::Y, 32u, 2.0f);
 			m_circleDouble_z = GenerateCircle("CircleDoubleZ", Axis::Z, 32u, 2.0f);
 
-			m_doughtnut2D_x = GenerateDoughtnut2D("Doughtnut2DX", Axis::X, 32u, 2.0f, 1.5f);
-			m_doughtnut2D_y = GenerateDoughtnut2D("Doughtnut2DY", Axis::Y, 32u, 2.0f, 1.5f);
-			m_doughtnut2D_z = GenerateDoughtnut2D("Doughtnut2DZ", Axis::Z, 32u, 2.0f, 1.5f);
+			m_doughtnut2D_x = GenerateDoughnut2D("Doughnut2DX", Axis::X, 32u, 2.0f, 1.5f);
+			m_doughtnut2D_y = GenerateDoughnut2D("Doughnut2DY", Axis::Y, 32u, 2.0f, 1.5f);
+			m_doughtnut2D_z = GenerateDoughnut2D("Doughnut2DZ", Axis::Z, 32u, 2.0f, 1.5f);
 
 			m_lines_circleX = GenerateLinesCircle("LinesCircleUnitX", Axis::X, 32u, 1.0f);
 			m_lines_circleY = GenerateLinesCircle("LinesCircleUnitY", Axis::Y, 32u, 1.0f);

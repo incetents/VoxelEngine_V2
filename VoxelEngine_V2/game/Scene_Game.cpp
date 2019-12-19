@@ -496,7 +496,7 @@ namespace Vxl
 		// Import Mesh
 		mesh_jiggy = Model::LoadMesh("jiggy", "./assets/models/jiggy.obj", true, 0.2f);
 
-		mesh_manyQuads = SceneAssets.createMesh();
+		mesh_manyQuads = SceneAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* _mesh = Assets.getMesh(mesh_manyQuads);
 		
 		Vector3 pos[] = {
@@ -626,9 +626,6 @@ namespace Vxl
 			entity_ptr->m_useTextures = false;
 			entity_ptr->m_transform.setPosition(Vector3(0, 3, 0));
 		}
-		//
-		GlobalAssets.get_MaterialDebugRender()->sendUniform("lightDirection", vec3(-1, -1, -1).NormalizeAccurate());
-		//
 		
 		
 
@@ -812,19 +809,28 @@ namespace Vxl
 
 	void Scene_Game::Update()
 	{
-		DevConsole.ShowBool("bool", true);
-		DevConsole.ShowFloat("float", 5.0f);
-		DevConsole.ShowDouble("float", 8.0);
-		DevConsole.ShowVector("vec3", Vector3(1,2,3));
-		DevConsole.ShowVector("vec4", Vector4(10,20,30,40));
-		DevConsole.ShowVector("color4", Color4F(1,0,0,1));
+		DEV_SHOW_BOOL("show_bool", false);
+		DEV_SHOW_FLOAT("show_float", 5.0f);
+		DEV_SHOW_DOUBLE("show_float", 8.0);
+		DEV_SHOW_VECTOR("show_vec3", Vector3(1,2,3));
+		DEV_SHOW_VECTOR("show_vec4", Vector4(10,20,30,40));
+		DEV_SHOW_COLOR("show_color4", Color4F(1,0,0,1));
+
+		DEV_GET_BOOL("Edit_bool", false);
+		DEV_GET_FLOAT("edit_float", 2.0f);
+		DEV_GET_DOUBLE("edit_double", 2.0);
+		DEV_GET_FLOAT_RANGE("edit_float_range", 2.0f, -10.0f, 10.0f);
+		DEV_GET_DOUBLE_RANGE("edit_double_range", 1.0, 0.0, 2.0);
+		DEV_GET_VECTOR("edit_vec3", vec3(0, 1, 2));
+		DEV_GET_VECTOR("edit_vec4", vec4(0, 1, 2, 3));
+		DEV_GET_COLOR("edit_color4f", Color4F(0, 1, 0.5f, 1));
 
 		CPUTimer::StartTimer("UPDATE");
 
 		if (Input.getKeyDown(KeyCode::ESCAPE))
 			Window.Close();
 
-		if (DEVCONSOLE_GET_BOOL("Camera Keyboard Controls", true))
+		if (DEV_GET_BOOL("Camera Keyboard Controls", true))
 		{
 			// Camera Movement
 			Vector3 CamMove;
@@ -874,8 +880,8 @@ namespace Vxl
 					Window.SetCursor(CursorMode::LOCKED);
 			}
 
-			float CameraHorizontalRotation = DEVCONSOLE_GET_FLOAT("Camera Horizontal Rotation", 0.2f);
-			float CameraVerticalRotation = DEVCONSOLE_GET_FLOAT("Camera Vertical Rotation", 0.2f);
+			float CameraHorizontalRotation = DEV_GET_FLOAT("Camera Horizontal Rotation", 0.2f);
+			float CameraVerticalRotation = DEV_GET_FLOAT("Camera Vertical Rotation", 0.2f);
 
 			// Lock = mouse rotates camera
 			if (Window.GetCursor() == CursorMode::LOCKED)
@@ -991,9 +997,9 @@ namespace Vxl
 
 		CPUTimer::EndTimer("UPDATE");
 
-		gizmo.m_pivotAxisAligned = DEVCONSOLE_GET_BOOL("PivotAxisAligned", false);
-		gizmo.m_translateSnapping = DEVCONSOLE_GET_BOOL("TranslateSnapping", false);
-		gizmo.m_rotateSnapping = DEVCONSOLE_GET_BOOL("RotateSnapping", false);
+		gizmo.m_pivotAxisAligned = DEV_GET_BOOL("PivotAxisAligned", false);
+		gizmo.m_translateSnapping = DEV_GET_BOOL("TranslateSnapping", false);
+		gizmo.m_rotateSnapping = DEV_GET_BOOL("RotateSnapping", false);
 
 		// GizmoMode
 		if (Input.getKeyDown(KeyCode::Num_1))
@@ -1072,6 +1078,7 @@ namespace Vxl
 		}
 
 		// Render Debugging Information
+		if(RenderManager.m_editorMode)
 		{
 			GPUTimer::StartTimer("Editor");
 			CPUTimer::StartTimer("Editor");
@@ -1086,10 +1093,6 @@ namespace Vxl
 				ShaderProgram* programDebugRender = GlobalAssets.get_ProgramDebugRender();
 				programDebugRender->bind();
 
-				Camera* camera = Assets.getCamera(RenderManager.m_mainCamera);
-				if(camera)
-					programDebugRender->sendUniform("lightDirection", camera->m_transform.getCameraForward());
-				
 				// States
 				Graphics::SetDepthWrite(true);
 				Graphics::SetDepthRead(true);
@@ -1393,10 +1396,12 @@ namespace Vxl
 		ShaderProgram* shaderShowRenderTarget = GlobalAssets.get_ProgramShowRenderTarget();
 		shaderShowRenderTarget->bind();
 		shaderShowRenderTarget->sendUniform("channelOutput", 0);
-		shaderShowRenderTarget->sendUniform("outputMode", 3);
+		shaderShowRenderTarget->sendUniform("outputMode", RenderManager.m_editorMode ? 3 : 0);
 
 		fbo_gbuffer->bindTexture(0, TextureLevel::LEVEL0);
-		fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
+
+		if(RenderManager.m_editorMode)
+			fbo_editor->bindTexture(0, TextureLevel::LEVEL1);
 		
 		RenderManager.RenderFullScreen();
 		//////////////////////

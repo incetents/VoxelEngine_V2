@@ -19,146 +19,141 @@ namespace Vxl
 	class Scene;
 	class Camera;
 
-#define DEV_CONSOLE_MAX_ITEM_SIZE 1000
-
 	static class DevConsole : public Singleton<class DevConsole>, public GuiWindow
 	{
 #ifdef GLOBAL_IMGUI
 	private:
 		// custom data
-		struct EditData
-		{
-			std::map<std::string, bool>		m_bools;
-			std::map<std::string, int>		m_integers;
-			std::map<std::string, float>	m_floats;
-			std::map<std::string, double>	m_doubles;
-			std::map<std::string, Vector2>	m_vec2;
-			std::map<std::string, Vector3>	m_vec3;
-			std::map<std::string, Vector4>	m_vec4;
-			std::map<std::string, Color3F>	m_color3;
-			std::map<std::string, Color4F>	m_color4;
-
-			std::map<std::string, Vector3i> m_integersRanged;
-			std::map<std::string, Vector3>  m_floatsRanged;
-			std::map<std::string, Vector3d> m_doublesRanged;
-		};
-		EditData m_editData;
+		//	struct EditData
+		//	{
+		//		std::map<std::string, bool>		m_bools;
+		//		std::map<std::string, int>		m_integers;
+		//		std::map<std::string, float>	m_floats;
+		//		std::map<std::string, double>	m_doubles;
+		//		std::map<std::string, Vector2>	m_vec2;
+		//		std::map<std::string, Vector3>	m_vec3;
+		//		std::map<std::string, Vector4>	m_vec4;
+		//		std::map<std::string, Color3F>	m_color3;
+		//		std::map<std::string, Color4F>	m_color4;
+		//	
+		//		std::map<std::string, Vector3i> m_integersRanged;
+		//		std::map<std::string, Vector3>  m_floatsRanged;
+		//		std::map<std::string, Vector3d> m_doublesRanged;
+		//	};
+		//	EditData m_editData;
 		
 		// All data to show
 		std::map<std::string, RawData> m_showData;
 		
+		// All data to edit
+		struct EditData
+		{
+			RawData data;
+			bool isRange; // X is value, Y and Z are min and max (assumes it's _min vec3 of some sort)
+			bool isColor; // Vec3 -> Color3; Vec4 -> Color4
+		};
+		std::map<std::string, EditData> m_editData;
 
 		// Menu Mode
 		enum class MenuState
 		{
 			MASTER,
-			CUSTOM_VALUES,
-			STATISTICS
+			EDIT_DATA,
+			SHOW_DATA
 		};
 		MenuState m_State = MenuState::MASTER;
 		// Draw Menu Section
 		void Draw_Master(Scene* scene);
 		void Draw_CustomValues();
-		void Draw_Statistics();
+		void Draw_ShowValues();
+		void Draw_EditValues();
 	public:
 
 		// custom data
-		bool	GetBool(const std::string& str, bool _default)
+		bool	GetBool(const std::string& name, bool _default)
 		{
-			if (m_editData.m_bools.find(str) == m_editData.m_bools.end())
-				m_editData.m_bools[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::BOOL, _default), false, false };
 
-			VXL_ASSERT(m_editData.m_bools.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many bools in Custom Data"); // in case something went wrong
-			return m_editData.m_bools[str];
+			return *m_editData[name].data.getData<bool>();
 		}
-		int		GetInt(const std::string& str, int _default)
+		int		GetInt(const std::string& name, int _default)
 		{
-			if (m_editData.m_integers.find(str) == m_editData.m_integers.end())
-				m_editData.m_integers[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::INT, _default), false, false };
 
-			VXL_ASSERT(m_editData.m_integers.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many integers in Custom Data"); // in case something went wrong
-			return m_editData.m_integers[str];
+			return *m_editData[name].data.getData<int>();
 		}
-		float	GetFloat(const std::string& str, float _default)
+		float	GetFloat(const std::string& name, float _default)
 		{
-			if (m_editData.m_floats.find(str) == m_editData.m_floats.end())
-				m_editData.m_floats[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::FLOAT, _default), false, false };
 
-			VXL_ASSERT(m_editData.m_floats.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many floats in Custom Data"); // in case something went wrong
-			return m_editData.m_floats[str];
+			return *m_editData[name].data.getData<float>();
 		}
-		double	GetDouble(const std::string& str, double _default)
+		double	GetDouble(const std::string& name, double _default)
 		{
-			if (m_editData.m_doubles.find(str) == m_editData.m_doubles.end())
-				m_editData.m_doubles[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::DOUBLE, _default), false, false };
 
-			VXL_ASSERT(m_editData.m_doubles.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many doubles in Custom Data"); // in case something went wrong
-			return m_editData.m_doubles[str];
+			return *m_editData[name].data.getData<double>();
 		}
-		Vector2 GetVec2(const std::string& str, Vector2 _default)
+		Vector2 GetVector(const std::string& name, Vector2 _default)
 		{
-			if (m_editData.m_vec2.find(str) == m_editData.m_vec2.end())
-				m_editData.m_vec2[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::FLOAT_VEC2, _default), false, false };
 
-			VXL_ASSERT(m_editData.m_vec2.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec2s in Custom Data"); // in case something went wrong
-			return m_editData.m_vec2[str];
+			return *m_editData[name].data.getData<Vector2>();
 		}
-		Vector3 GetVec3(const std::string& str, Vector3 _default)
+		Vector3 GetVector(const std::string& name, Vector3 _default)
 		{
-			if (m_editData.m_vec3.find(str) == m_editData.m_vec3.end())
-				m_editData.m_vec3[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::FLOAT_VEC3, _default), false, false };
 
-			VXL_ASSERT(m_editData.m_vec3.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec3s in Custom Data"); // in case something went wrong
-			return m_editData.m_vec3[str];
+			return *m_editData[name].data.getData<Vector3>();
 		}
-		Vector4 GetVec4(const std::string& str, Vector4 _default)
+		Vector4 GetVector(const std::string& name, Vector4 _default)
 		{
-			if (m_editData.m_vec4.find(str) == m_editData.m_vec4.end())
-				m_editData.m_vec4[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::FLOAT_VEC4, _default), false, false };
 
-			VXL_ASSERT(m_editData.m_vec4.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many vec4s in Custom Data"); // in case something went wrong
-			return m_editData.m_vec4[str];
+			return *m_editData[name].data.getData<Vector4>();
 		}
-		Color3F GetColor3(const std::string& str, Color3F _default)
+		Color3F GetColor(const std::string& name, Color3F _default)
 		{
-			if (m_editData.m_color3.find(str) == m_editData.m_color3.end())
-				m_editData.m_color3[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::FLOAT_VEC3, _default), false, true };
 
-			VXL_ASSERT(m_editData.m_color3.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many Color3s in Custom Data"); // in case something went wrong
-			return m_editData.m_color3[str];
+			return *m_editData[name].data.getData<Color3F>();
 		}
-		Color4F GetColor4(const std::string& str, Color4F _default)
+		Color4F GetColor(const std::string& name, Color4F _default)
 		{
-			if (m_editData.m_color4.find(str) == m_editData.m_color4.end())
-				m_editData.m_color4[str] = _default;
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::FLOAT_VEC4, _default), false, true };
 
-			VXL_ASSERT(m_editData.m_color4.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many Color4s in Custom Data"); // in case something went wrong
-			return m_editData.m_color4[str];
+			return *m_editData[name].data.getData<Color4F>();
 		}
 
-		int		GetIntRange(const std::string& str, int _default, int _min, int _max)
+		int		GetIntRange(const std::string& name, int _default, int _min, int _max)
 		{
-			if (m_editData.m_integersRanged.find(str) == m_editData.m_integersRanged.end())
-				m_editData.m_integersRanged[str] = Vector3i(_default, _min, _max);
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::INT_VEC3, Vector3i(_default, _min, _max)), true, false };
 
-			VXL_ASSERT(m_editData.m_integersRanged.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many ranged integers in Custom Data"); // in case something went wrong
-			return MacroClamp(m_editData.m_integersRanged[str].x, _min, _max);
+			return m_editData[name].data.getData<Vector3i>()->x;
 		}
-		float	GetFloatRange(const std::string& str, float _default, float _min, float _max)
+		float	GetFloatRange(const std::string& name, float _default, float _min, float _max)
 		{
-			if (m_editData.m_floatsRanged.find(str) == m_editData.m_floatsRanged.end())
-				m_editData.m_floatsRanged[str] = Vector3(_default, _min, _max);
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::FLOAT_VEC3, Vector3(_default, _min, _max)), true, false };
 
-			VXL_ASSERT(m_editData.m_floatsRanged.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many ranged floats in Custom Data"); // in case something went wrong
-			return MacroClamp(m_editData.m_floatsRanged[str].x, _min, _max);
+			return m_editData[name].data.getData<Vector3>()->x;
 		}
-		double	GetDoubleRange(const std::string& str, double _default, double _min, double _max)
+		double	GetDoubleRange(const std::string& name, double _default, double _min, double _max)
 		{
-			if (m_editData.m_doublesRanged.find(str) == m_editData.m_doublesRanged.end())
-				m_editData.m_doublesRanged[str] = Vector3d(_default, _min, _max);
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::DOUBLE_VEC3, Vector3d(_default, _min, _max)), true, false };
 
-			VXL_ASSERT(m_editData.m_doublesRanged.size() < DEV_CONSOLE_MAX_ITEM_SIZE, "DevConsole has too many ranged doubles in Custom Data"); // in case something went wrong
-			return MacroClamp(m_editData.m_doublesRanged[str].x, _min, _max);
+			return m_editData[name].data.getData<Vector3d>()->x;
 		}
 
 		// display data
@@ -172,79 +167,74 @@ namespace Vxl
 		{
 			m_showData[name] = RawData(UniformType::BOOL, _value);
 		}
-
 		void ShowInt(const std::string& name, int _value)
 		{
 			m_showData[name] = RawData(UniformType::INT, _value);
 		}
-
 		void ShowFloat(const std::string& name, float _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT, _value);
 		}
-
 		void ShowDouble(const std::string& name, double _value)
 		{
 			m_showData[name] = RawData(UniformType::DOUBLE, _value);
 		}
-
 		void ShowVector(const std::string& name, const Vector2& _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC2, _value);
 		}
-
 		void ShowVector(const std::string& name, const Vector3& _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC3, _value);
 		}
-
 		void ShowVector(const std::string& name, const Vector4& _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC4, _value);
 		}
-
-		void ShowVector(const std::string& name, const Color3F& _value)
+		void ShowColor(const std::string& name, const Color3F& _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC3, _value);
 		}
-
-		void ShowVector(const std::string& name, const Color4F& _value)
+		void ShowColor(const std::string& name, const Color4F& _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC4, _value);
 		}
 
-#define DEVCONSOLE_GET_BOOL(x, y) DevConsole.GetBool(x, y)
-#define DEVCONSOLE_GET_INT(x, y) DevConsole.GetInt(x, y)
-#define DEVCONSOLE_GET_FLOAT(x, y) DevConsole.GetFloat(x, y)
-#define DEVCONSOLE_GET_DOUBLE(x, y) DevConsole.GetDouble(x, y)
-#define DEVCONSOLE_GET_VEC2(x, y) DevConsole.GetVec2(x, y)
-#define DEVCONSOLE_GET_VEC3(x, y) DevConsole.GetVec3(x, y)
-#define DEVCONSOLE_GET_VEC4(x, y) DevConsole.GetVec4(x, y)
-#define DEVCONSOLE_GET_COLOR3(x, y) DevConsole.GetColor3(x, y)
-#define DEVCONSOLE_GET_COLOR4(x, y) DevConsole.GetColor4(x, y)
+#define DEV_GET_BOOL(name, value) DevConsole.GetBool(name, value)
+#define DEV_GET_INT(name, value) DevConsole.GetInt(name, value)
+#define DEV_GET_FLOAT(name, value) DevConsole.GetFloat(name, value)
+#define DEV_GET_DOUBLE(name, value) DevConsole.GetDouble(name, value)
+#define DEV_GET_VECTOR(name, value) DevConsole.GetVector(name, value)
+#define DEV_GET_COLOR(name, value) DevConsole.GetColor(name, value)
 
-#define DEVCONSOLE_GET_INT_RANGE(x, y, a, b) DevConsole.GetIntRange(x, y, a, b)
-#define DEVCONSOLE_GET_FLOAT_RANGE(x, y, a, b) DevConsole.GetFloatRange(x, y, a, b)
-#define DEVCONSOLE_GET_DOUBLE_RANGE(x, y, a, b) DevConsole.GetDoubleRange(x, y, a, b)
+#define DEV_GET_INT_RANGE(name, value, _min, _max) DevConsole.GetIntRange(name, value, _min, _max)
+#define DEV_GET_FLOAT_RANGE(name, value, _min, _max) DevConsole.GetFloatRange(name, value, _min, _max)
+#define DEV_GET_DOUBLE_RANGE(name, value, _min, _max) DevConsole.GetDoubleRange(name, value, _min, _max)
+
+#define DEV_SHOW_BOOL(name, value) DevConsole.ShowBool(name, value)
+#define DEV_SHOW_INT(name, value) DevConsole.ShowInt(name, value)
+#define DEV_SHOW_FLOAT(name, value) DevConsole.ShowFloat(name, value)
+#define DEV_SHOW_DOUBLE(name, value) DevConsole.ShowDouble(name, value)
+#define DEV_SHOW_VECTOR(name, value) DevConsole.ShowVector(name, value)
+#define DEV_SHOW_COLOR(name, value) DevConsole.ShowColor(name, value)
 
 		// Draw
-		//void Draw(Scene* scene);
 		void Draw() override;
 #else
 
-#define DEVCONSOLE_GET_BOOL(x, y) y
-#define DEVCONSOLE_GET_INT(x, y) y
-#define DEVCONSOLE_GET_FLOAT(x, y) y
-#define DEVCONSOLE_GET_DOUBLE(x, y) y
-#define DEVCONSOLE_GET_VEC2(x, y) y
-#define DEVCONSOLE_GET_VEC3(x, y) y
-#define DEVCONSOLE_GET_VEC4(x, y) y
-#define DEVCONSOLE_GET_COLOR3(x, y) y
-#define DEVCONSOLE_GET_COLOR4(x, y) y
+#define DEV_GET_BOOL(x, y) y
+#define DEV_GET_INT(x, y) y
+#define DEV_GET_FLOAT(x, y) y
+#define DEV_GET_DOUBLE(x, y) y
+#define DEV_GET_VEC2(x, y) y
+#define DEV_GET_VEC3(x, y) y
+#define DEV_GET_VEC4(x, y) y
+#define DEV_GET_COLOR3(x, y) y
+#define DEV_GET_COLOR4(x, y) y
 
-#define DEVCONSOLE_GET_INT_RANGE(x, y, a, b) y
-#define DEVCONSOLE_GET_FLOAT_RANGE(x, y, a, b) y
-#define DEVCONSOLE_GET_DOUBLE_RANGE(x, y, a, b) y
+#define DEV_GET_INT_RANGE(x, y, _min, b) y
+#define DEV_GET_FLOAT_RANGE(x, y, _min, b) y
+#define DEV_GET_DOUBLE_RANGE(x, y, _min, b) y
 
 	public:
 		void Draw() override {}

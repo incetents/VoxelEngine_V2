@@ -51,8 +51,10 @@ namespace Vxl
 		// Main Camera
 		CameraIndex m_mainCamera = -1;
 
+		// Special Settings
 		FullScreenRender m_fullScreenRender = FullScreenRender::TRIANGLE;
 		bool m_globalVAO = false;
+		bool m_editorMode = true;
 
 		// Utility
 		void sortMaterials();

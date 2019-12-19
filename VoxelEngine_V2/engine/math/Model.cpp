@@ -176,7 +176,7 @@ namespace Vxl
 				_name += " (" + std::to_string(i) + ')';
 
 			// Index
-			MeshIndex NewMeshIndex = SceneAssets.createMesh();
+			MeshIndex NewMeshIndex = SceneAssets.createMesh(DrawType::TRIANGLES);
 			_meshes.push_back(NewMeshIndex);
 
 			// Mesh Data
@@ -198,7 +198,7 @@ namespace Vxl
 		if (Models.size() == 0)
 			return -1;
 
-		MeshIndex NewMeshIndex = SceneAssets.createMesh();
+		MeshIndex NewMeshIndex = SceneAssets.createMesh(DrawType::TRIANGLES);
 		Mesh* _mesh = SceneAssets.getMesh(NewMeshIndex);
 		_mesh->set(*Models[0]);
 		_mesh->setGLName(name);

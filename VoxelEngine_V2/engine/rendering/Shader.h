@@ -16,10 +16,18 @@ namespace Vxl
 {
 	class Entity;
 
+	// Data to send Shader
+	struct UniformStorage
+	{
+		RawData m_data;
+		bool	m_transpose;
+		bool	m_dirty = true;
+	};
+
 	// Typedefs
 	typedef std::map<std::string, Graphics::Attribute> ShaderAttributes;
 	typedef std::map<std::string, Graphics::Uniform> ShaderUniforms;
-	typedef std::map<std::string, std::pair<RawData, bool>> ShaderUniformStorage;
+	typedef std::map<std::string, UniformStorage> ShaderUniformStorage;
 	typedef std::map<std::string, Graphics::UniformBlock> ShaderUniformBlocks;
 	typedef std::map<ShaderType, Graphics::UniformSubroutine> ShaderSubroutines;
 
@@ -110,12 +118,13 @@ namespace Vxl
 		void sendUniform(const std::string& name, Type data, bool storeValue = false)
 		{
 			// Store Uniform Value for automation // bindCustomUniforms() will resend the same value
+			auto it_s = m_uniformStorage.find(name);
 			if (storeValue)
 			{
-				auto it_s = m_uniformStorage.find(name);
 				if (it_s != m_uniformStorage.end())
 				{
-					*it_s->second.first.GetData<Type>() = data;
+					it_s->second.m_data.setData<Type>(data);
+					it_s->second.m_dirty = true;
 				}
 			}
 
@@ -123,8 +132,12 @@ namespace Vxl
 			if (Graphics::ShaderProgram::GetCurrentlyActive() == m_id)
 			{
 				auto it = m_uniforms.find(name);
-				if (it != m_uniforms.end()) {
+				if (it != m_uniforms.end())
+				{
 					it->second.send(data);
+
+					if (it_s != m_uniformStorage.end())
+						it_s->second.m_dirty = true;
 				}
 			}
 		}
@@ -132,12 +145,14 @@ namespace Vxl
 		void sendUniformMatrix(const std::string& name, Type data, bool transpose, bool storeValue = false)
 		{
 			// Store Uniform Value for automation // bindCustomUniforms() will resend the same value
+			auto it_s = m_uniformStorage.find(name);
 			if (storeValue)
 			{
-				auto it_s = m_uniformStorage.find(name);
 				if (it_s != m_uniformStorage.end())
 				{
-					*it_s->second.first.GetData<Type>() = data;
+					it_s->second.m_data.setData<Type>(data);
+					it_s->second.m_transpose = transpose;
+					it_s->second.m_dirty = true;
 				}
 			}
 
@@ -145,8 +160,12 @@ namespace Vxl
 			if (Graphics::ShaderProgram::GetCurrentlyActive() == m_id)
 			{
 				auto it = m_uniforms.find(name);
-				if (it != m_uniforms.end()) {
+				if (it != m_uniforms.end())
+				{
 					it->second.sendMatrix(data, transpose);
+
+					if (it_s != m_uniformStorage.end())
+						it_s->second.m_dirty = true;
 				}
 			}
 		}

@@ -31,6 +31,8 @@ namespace Vxl
 	class RenderBufferDepth;
 	class FramebufferObject;
 	class Mesh;
+	class LineMesh3D;
+	class LineMesh2D;
 	class Shader;
 	class ShaderProgram;
 	class ShaderMaterial;
@@ -47,6 +49,7 @@ namespace Vxl
 	enum class AnisotropicMode;
 	enum class TextureDepthFormat;
 	enum class ShaderType;
+	enum class DrawType;
 
 	enum class AssetType
 	{
@@ -295,6 +298,8 @@ namespace Vxl
 		static IDStorage<RenderBuffer>		 m_renderBuffer_storage;
 		static IDStorage<RenderBufferDepth>	 m_renderBufferDepth_storage;
 		static IDStorage<Mesh>				 m_mesh_storage;
+		static IDStorage<LineMesh3D>		 m_lineMesh3D_storage;
+		static IDStorage<LineMesh2D>		 m_lineMesh2D_storage;
 		static IDStorage<ShaderProgram>		 m_shaderProgram_storage;
 		static IDStorage<ShaderMaterial>	 m_shaderMaterial_storage;
 		static IDStorage<Material>			 m_material_storage;
@@ -326,6 +331,8 @@ namespace Vxl
 		ShaderProgram*		eraseShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Erase(index); }
 		ShaderMaterial*		eraseShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Erase(index); }
 		Material*			eraseMaterial(MaterialIndex index) { return m_material_storage.Erase(index); }
+		LineMesh3D*			eraseLineMaterial3D(LineMesh3DIndex index) { return m_lineMesh3D_storage.Erase(index); }
+		LineMesh2D*			eraseLineMaterial2D(LineMesh2DIndex index) { return m_lineMesh2D_storage.Erase(index); }
 		Entity*				eraseEntity(EntityIndex index) { return m_entity_storage.Erase(index); }
 		Camera*				eraseCamera(CameraIndex index) { return m_camera_storage.Erase(index); }
 
@@ -340,6 +347,8 @@ namespace Vxl
 		void deleteRenderBuffer(RenderBufferIndex index);
 		void deleteRenderBufferDepth(RenderBufferDepthIndex index);
 		void deleteMesh(MeshIndex index);
+		void deleteLineMesh3D(LineMesh3DIndex index);
+		void deleteLineMesh2D(LineMesh2DIndex index);
 		void deleteShaderProgram(ShaderProgramIndex index);
 		void deleteShaderMaterial(ShaderMaterialIndex index);
 		void deleteMaterial(MaterialIndex index);
@@ -358,6 +367,8 @@ namespace Vxl
 		void deleteAllRenderBuffer();
 		void deleteAllRenderBufferDepth();
 		void deleteAllMesh();
+		void deleteAllLineMesh3D();
+		void deleteAllLineMesh2D();
 		void deleteAllShaderProgram();
 		void deleteAllShaderMaterial();
 		void deleteAllMaterial();
@@ -376,6 +387,8 @@ namespace Vxl
 		RenderBuffer*		getRenderBuffer(RenderBufferIndex index) { return m_renderBuffer_storage.Get(index); }
 		RenderBufferDepth*	getRenderBufferDepth(RenderBufferDepthIndex index) { return m_renderBufferDepth_storage.Get(index); }
 		Mesh*				getMesh(MeshIndex index) { return m_mesh_storage.Get(index); }
+		LineMesh3D*			getLineMesh3D(LineMesh3DIndex index) { return m_lineMesh3D_storage.Get(index); }
+		LineMesh2D*			getLineMesh2D(LineMesh2DIndex index) { return m_lineMesh2D_storage.Get(index); }
 		ShaderProgram*		getShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Get(index); }
 		ShaderMaterial*		getShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Get(index); }
 		Material*			getMaterial(MaterialIndex index) { return m_material_storage.Get(index); }
@@ -394,6 +407,8 @@ namespace Vxl
 		const std::map<uint32_t, RenderBuffer*>&		getAllRenderBuffer() { return m_renderBuffer_storage.GetAll(m_creationType); }
 		const std::map<uint32_t, RenderBufferDepth*>&	getAllRenderBufferDepth() { return m_renderBufferDepth_storage.GetAll(m_creationType); }
 		const std::map<uint32_t, Mesh*>&				getAllMesh() { return m_mesh_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, LineMesh3D*>&			getAllLineMesh3D() { return m_lineMesh3D_storage.GetAll(m_creationType); }
+		const std::map<uint32_t, LineMesh2D*>&			getAllLineMesh2D() { return m_lineMesh2D_storage.GetAll(m_creationType); }
 		const std::map<uint32_t, ShaderProgram*>&		getAllShaderProgram() { return m_shaderProgram_storage.GetAll(m_creationType); }
 		const std::map<uint32_t, ShaderMaterial*>&		getAllShaderMaterial() { return m_shaderMaterial_storage.GetAll(m_creationType); }
 		const std::map<uint32_t, Material*>&			getAllMaterial() { return m_material_storage.GetAll(m_creationType); }
@@ -495,7 +510,9 @@ namespace Vxl
 			TextureDepthFormat FormatType
 		);
 		//
-		MeshIndex createMesh();
+		MeshIndex createMesh(DrawType type);
+		LineMesh3DIndex createLineMesh3D(DrawType type);
+		LineMesh2DIndex createLineMesh2D(DrawType type);
 		//
 		ShaderProgramIndex createShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders);
 		ShaderProgramIndex createShaderProgram(const std::string& name, std::initializer_list<Shader*> _shaders);

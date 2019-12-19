@@ -458,11 +458,8 @@ namespace Vxl
 		}
 	}
 
-	void Mesh::bind(DrawType type)
+	void Mesh::bind()
 	{
-		m_type = type;
-		m_subtype = Graphics::GetDrawSubType(type);
-
 		// SIZE Assert Check //
 #ifdef _DEBUG
 		uint32_t indicesCount = m_indices.getDrawCount();
@@ -493,7 +490,8 @@ namespace Vxl
 		
 
 		/*	bind Data	*/
-		m_VAO.bind();
+		if (!RenderManager.m_globalVAO)
+			m_VAO.bind();
 
 		m_positions.bind();
 		m_uvs.bind();
@@ -502,7 +500,8 @@ namespace Vxl
 		m_instances.bind();
 		m_indices.bind();
 
-		m_VAO.unbind();
+		if (!RenderManager.m_globalVAO)
+			m_VAO.unbind();
 		/*				*/	
 
 		UpdateDrawInfo();
@@ -530,7 +529,6 @@ namespace Vxl
 	{
 		if (RenderManager.m_globalVAO)
 		{
-			Graphics::VAO::bind(10);
 			m_positions.bind();
 			m_uvs.bind();
 			m_normals.bind();
@@ -596,18 +594,12 @@ namespace Vxl
 		m_index = 0;
 		m_points.vertices.clear();
 	}
-	void LineMesh3D::bind(DrawType type)
+	void LineMesh3D::bind()
 	{
-		// Data
-		m_type = type;
-		m_subtype = Graphics::GetDrawSubType(type);
-
 		m_drawCount = m_points.getDrawCount();
 
 		// Buffers
-		if (RenderManager.m_globalVAO)
-			Graphics::VAO::bind(10);
-		else
+		if (!RenderManager.m_globalVAO)
 			m_VAO.bind();
 
 		// Resize vertices if index is smaller than its size
@@ -619,9 +611,7 @@ namespace Vxl
 
 	void LineMesh3D::draw()
 	{
-		if (RenderManager.m_globalVAO)
-			Graphics::VAO::bind(10);
-		else
+		if (!RenderManager.m_globalVAO)
 			m_VAO.bind();
 
 		Graphics::Draw::Array(m_type, m_drawCount);
@@ -661,18 +651,12 @@ namespace Vxl
 		m_index = 0;
 		m_points.vertices.clear();
 	}
-	void LineMesh2D::bind(DrawType type)
+	void LineMesh2D::bind()
 	{
-		// Data
-		m_type = type;
-		m_subtype = Graphics::GetDrawSubType(type);
-
 		m_drawCount = m_points.getDrawCount();
 
 		// Buffers
-		if (RenderManager.m_globalVAO)
-			Graphics::VAO::bind(10);
-		else
+		if (!RenderManager.m_globalVAO)
 			m_VAO.bind();
 
 		// Resize vertices if index is smaller than its size
@@ -685,9 +669,7 @@ namespace Vxl
 	void LineMesh2D::draw()
 	{
 		// Buffers
-		if (RenderManager.m_globalVAO)
-			Graphics::VAO::bind(10);
-		else
+		if (!RenderManager.m_globalVAO)
 			m_VAO.bind();
 
 		Graphics::Draw::Array(m_type, m_drawCount);

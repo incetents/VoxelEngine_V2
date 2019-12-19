@@ -50,7 +50,11 @@ namespace Vxl
 		);
 
 		// Protected, created through assets
-		Mesh() {}
+		Mesh(DrawType type = DrawType::TRIANGLES)
+			: m_type(type)		
+		{
+			m_subtype = Graphics::GetDrawSubType(type);
+		}
 	public:
 
 		virtual ~Mesh() {}
@@ -114,13 +118,15 @@ namespace Vxl
 		void generateTangents();
 		void recalculateMinMax();
 
-		void bind(DrawType type = DrawType::TRIANGLES);
+		void bind();
 		void draw();
 	};
 
 	//
 	class LineMesh3D
 	{
+		DISALLOW_COPY_AND_ASSIGN(LineMesh3D);
+		friend class _Assets;
 	private:
 		VAO m_VAO;
 
@@ -130,6 +136,12 @@ namespace Vxl
 
 		const static uint32_t m_indexIncrement; // Floats per line set
 
+		// Protected, created through assets
+		LineMesh3D(DrawType type = DrawType::LINES)
+			: m_type(type)
+		{
+			m_subtype = Graphics::GetDrawSubType(type);
+		}
 	public:
 		MeshBuffer<float> m_points = MeshBuffer<float>(BufferLayout(
 			{
@@ -147,7 +159,7 @@ namespace Vxl
 
 		void resetIndex() { m_index = 0; }
 		void clear();
-		void bind(DrawType type = DrawType::LINES);
+		void bind();
 		void draw();
 	};
 	const uint32_t LineMesh3D::m_indexIncrement = 14;
@@ -155,6 +167,8 @@ namespace Vxl
 	//
 	class LineMesh2D
 	{
+		DISALLOW_COPY_AND_ASSIGN(LineMesh2D);
+		friend class _Assets;
 	private:
 		VAO m_VAO;
 
@@ -164,6 +178,12 @@ namespace Vxl
 
 		const static uint32_t m_indexIncrement; // Floats per line set
 
+		// Protected, created through assets
+		LineMesh2D(DrawType type = DrawType::LINES)
+			: m_type(type)
+		{
+			m_subtype = Graphics::GetDrawSubType(type);
+		}
 	public:
 		MeshBuffer<float> m_points = MeshBuffer<float>(BufferLayout(
 			{
@@ -181,7 +201,7 @@ namespace Vxl
 
 		void resetIndex() { m_index = 0; }
 		void clear();
-		void bind(DrawType type = DrawType::LINES);
+		void bind();
 		void draw();
 	};
 	const uint32_t LineMesh2D::m_indexIncrement = 12;

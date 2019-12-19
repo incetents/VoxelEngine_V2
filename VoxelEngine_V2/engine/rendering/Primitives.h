@@ -87,7 +87,7 @@ namespace Vxl
 		MeshIndex GenerateCube(const std::string& MeshName, float unitSize = 1.0f, const Vector3& offset = Vector3(0, 0, 0));
 		MeshIndex GenerateQuad(const std::string& MeshName, Axis axis, float unitSize = 1.0f, const Vector3& offset = Vector3(0,0,0));
 		MeshIndex GenerateCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
-		MeshIndex GenerateDoughtnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
+		MeshIndex GenerateDoughnut2D(const std::string& MeshName, Axis axis, uint32_t edgeVertices = 32, float exteriorUnitSize = 1.0f, float interiorUnitSize = 1.0f);
 
 		MeshIndex GenerateLinesCircle(const std::string& MeshName, Axis axis, uint32_t vertices = 32, float unitSize = 1.0f);
 		MeshIndex GenerateLinesCube(const std::string& MeshName, float unitSize = 1.0f);

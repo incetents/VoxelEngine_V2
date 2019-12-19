@@ -27,6 +27,8 @@ namespace Vxl
 	IDStorage<RenderBuffer>		  _Assets::m_renderBuffer_storage;
 	IDStorage<RenderBufferDepth>  _Assets::m_renderBufferDepth_storage;
 	IDStorage<Mesh>				  _Assets::m_mesh_storage;
+	IDStorage<LineMesh3D>		  _Assets::m_lineMesh3D_storage;
+	IDStorage<LineMesh2D>		  _Assets::m_lineMesh2D_storage;
 	IDStorage<ShaderProgram>	  _Assets::m_shaderProgram_storage;
 	IDStorage<ShaderMaterial>	  _Assets::m_shaderMaterial_storage;
 	IDStorage<Material>			  _Assets::m_material_storage;
@@ -248,6 +250,14 @@ namespace Vxl
 		for (auto& mesh : meshes)
 			delete mesh.second;
 
+		auto& lineMeshes3D = m_lineMesh3D_storage.GetAll(m_creationType);
+		for (auto& mesh : lineMeshes3D)
+			delete mesh.second;
+
+		auto& lineMeshes2D = m_lineMesh2D_storage.GetAll(m_creationType);
+		for (auto& mesh : lineMeshes2D)
+			delete mesh.second;
+
 		auto& shaderPrograms = m_shaderProgram_storage.GetAll(m_creationType);
 		for (auto& sp : shaderPrograms)
 			delete sp.second;
@@ -277,6 +287,8 @@ namespace Vxl
 		m_renderBuffer_storage.EraseAll(m_creationType);
 		m_renderBufferDepth_storage.EraseAll(m_creationType);
 		m_mesh_storage.EraseAll(m_creationType);
+		m_lineMesh3D_storage.EraseAll(m_creationType);
+		m_lineMesh2D_storage.EraseAll(m_creationType);
 		m_shaderProgram_storage.EraseAll(m_creationType);
 		m_shaderMaterial_storage.EraseAll(m_creationType);
 		m_material_storage.EraseAll(m_creationType);
@@ -339,6 +351,14 @@ namespace Vxl
 	void _Assets::deleteMesh(MeshIndex index)
 	{
 		delete m_mesh_storage.Erase(index);
+	}
+	void _Assets::deleteLineMesh3D(LineMesh3DIndex index)
+	{
+		delete m_lineMesh3D_storage.Erase(index);
+	}
+	void _Assets::deleteLineMesh2D(LineMesh2DIndex index)
+	{
+		delete m_lineMesh2D_storage.Erase(index);
 	}
 	void _Assets::deleteShaderProgram(ShaderProgramIndex index)
 	{
@@ -475,6 +495,22 @@ namespace Vxl
 			delete mesh.second;
 
 		m_mesh_storage.EraseAll(m_creationType);
+	}
+	void _Assets::deleteAllLineMesh3D()
+	{
+		auto& Meshes = m_lineMesh3D_storage.GetAll(m_creationType);
+		for (auto& mesh : Meshes)
+			delete mesh.second;
+
+		m_lineMesh3D_storage.EraseAll(m_creationType);
+	}
+	void _Assets::deleteAllLineMesh2D()
+	{
+		auto& Meshes = m_lineMesh2D_storage.GetAll(m_creationType);
+		for (auto& mesh : Meshes)
+			delete mesh.second;
+
+		m_lineMesh2D_storage.EraseAll(m_creationType);
 	}
 	void _Assets::deleteAllShaderProgram()
 	{
@@ -720,12 +756,26 @@ namespace Vxl
 		// Store Data and Return index
 		return m_renderBufferDepth_storage.Add(_buffer, m_creationType);
 	}
-	MeshIndex _Assets::createMesh()
+	MeshIndex _Assets::createMesh(DrawType type)
 	{
 		// Create New Data
-		Mesh* _mesh = new Mesh();
+		Mesh* _mesh = new Mesh(type);
 		// Store Data and Return index
 		return m_mesh_storage.Add(_mesh, m_creationType);
+	}
+	LineMesh3DIndex _Assets::createLineMesh3D(DrawType type)
+	{
+		// Create New Data
+		LineMesh3D* _mesh = new LineMesh3D(type);
+		// Store Data and Return index
+		return m_lineMesh3D_storage.Add(_mesh, m_creationType);
+	}
+	LineMesh3DIndex _Assets::createLineMesh2D(DrawType type)
+	{
+		// Create New Data
+		LineMesh2D* _mesh = new LineMesh2D(type);
+		// Store Data and Return index
+		return m_lineMesh2D_storage.Add(_mesh, m_creationType);
 	}
 
 	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders)

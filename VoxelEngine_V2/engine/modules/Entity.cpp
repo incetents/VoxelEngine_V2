@@ -56,9 +56,8 @@ namespace Vxl
 	void Entity::UpdateBoundingBoxCheap()
 	{
 		Mesh* _mesh = SceneAssets.getMesh(m_mesh);
-		VXL_ASSERT(_mesh, "Cannot update bounding box without mesh");
 
-		// Update Bounding Box information
+		// Update Bounding Box information (mesh might be destroyed, that's why there's a nullptr check)
 		if (_mesh != nullptr)
 		{
 			// Update OBB

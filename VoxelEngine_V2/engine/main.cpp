@@ -47,6 +47,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	/* ~ */
 	while (!Window.GetClosed())
 	{
+		if(RenderManager.m_globalVAO)
+			Graphics::VAO::bind(10);
+
 		// OpenGl Reset
 		if (Input.getKeyDown(KeyCode::F5))
 		{

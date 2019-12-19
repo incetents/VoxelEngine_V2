@@ -19,7 +19,9 @@ namespace Vxl
 		const Color3F& C1, const Color3F& C2
 	)
 	{
-		m_worldLines->addLine(P1, P2, Width, C1, C2);
+		LineMesh3D* LineSet = Assets.getLineMesh3D(m_worldLines);
+		if (LineSet)
+			LineSet->addLine(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawLineNoDepth(
 		const Vector3& P1, const Vector3& P2,
@@ -27,14 +29,19 @@ namespace Vxl
 		const Color3F& C1, const Color3F& C2
 	)
 	{
-		m_worldLinesNoDepth->addLine(P1, P2, Width, C1, C2);
+		LineMesh3D* LineSet = Assets.getLineMesh3D(m_worldLinesNoDepth);
+		if (LineSet)
+			LineSet->addLine(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawLineScreenSpace(
 		const Vector2& P1, const Vector2& P2,
 		float Width,
 		const Color3F& C1, const Color3F& C2
-	) {
-		m_screenLines->addLine(P1, P2, Width, C1, C2);
+	)
+	{
+		LineMesh2D* LineSet = Assets.getLineMesh2D(m_screenLines);
+		if (LineSet)
+			LineSet->addLine(P1, P2, Width, C1, C2);
 	}
 	void Debug::DrawLineSquareScreenSpace(
 		const Vector2& P, const Vector2& Size,
@@ -43,10 +50,10 @@ namespace Vxl
 	) {
 		float halfW = Size.x * 0.5f;
 		float halfH = Size.y * 0.5f;
-		m_screenLines->addLine(P + vec2(+halfW, +halfH), P + vec2(-halfW, +halfH), LineWidth, Color, Color);
-		m_screenLines->addLine(P + vec2(-halfW, +halfH), P + vec2(-halfW, -halfH), LineWidth, Color, Color);
-		m_screenLines->addLine(P + vec2(-halfW, -halfH), P + vec2(+halfW, -halfH), LineWidth, Color, Color);
-		m_screenLines->addLine(P + vec2(+halfW, -halfH), P + vec2(+halfW, +halfH), LineWidth, Color, Color);
+		DrawLineScreenSpace(P + vec2(+halfW, +halfH), P + vec2(-halfW, +halfH), LineWidth, Color, Color);
+		DrawLineScreenSpace(P + vec2(-halfW, +halfH), P + vec2(-halfW, -halfH), LineWidth, Color, Color);
+		DrawLineScreenSpace(P + vec2(-halfW, -halfH), P + vec2(+halfW, -halfH), LineWidth, Color, Color);
+		DrawLineScreenSpace(P + vec2(+halfW, -halfH), P + vec2(+halfW, +halfH), LineWidth, Color, Color);
 	}
 	void Debug::DrawLineCube(
 		const Vector3& position,
@@ -207,27 +214,47 @@ namespace Vxl
 
 	void Debug::RenderWorldLines()
 	{
-		m_worldLines->bind();
-		m_worldLines->draw();
+		LineMesh3D* LineSet = Assets.getLineMesh3D(m_worldLines);
+		if (LineSet)
+		{
+			LineSet->bind();
+			LineSet->draw();
+		}
 	}
 
 	void Debug::RenderWorldLinesNoDepth()
 	{
-		m_worldLinesNoDepth->bind();
-		m_worldLinesNoDepth->draw();
+		LineMesh3D* LineSet = Assets.getLineMesh3D(m_worldLinesNoDepth);
+		if (LineSet)
+		{
+			LineSet->bind();
+			LineSet->draw();
+		}
 	}
 
 	void Debug::RenderScreenLines()
 	{
-		m_screenLines->bind();
-		m_screenLines->draw();
+		LineMesh2D* LineSet = Assets.getLineMesh2D(m_screenLines);
+		if (LineSet)
+		{
+			LineSet->bind();
+			LineSet->draw();
+		}
 	}
 
 	void Debug::End()
 	{
-		m_worldLines->resetIndex();
-		m_worldLinesNoDepth->resetIndex();
-		m_screenLines->resetIndex();
+		LineMesh3D* worldLines = Assets.getLineMesh3D(m_worldLines);
+		if (worldLines)
+			worldLines->resetIndex();
+
+		LineMesh3D* worldLinesNoDepth = Assets.getLineMesh3D(m_worldLinesNoDepth);
+		if (worldLinesNoDepth)
+			worldLinesNoDepth->resetIndex();
+
+		LineMesh2D* screenLines = Assets.getLineMesh2D(m_screenLines);
+		if (screenLines)
+			screenLines->resetIndex();
 
 		m_spheres.clear();
 		m_cubes.clear();

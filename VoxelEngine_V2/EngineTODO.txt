@@ -4,11 +4,11 @@ TODO:
 ! Macro everywhere -> DISALLOW_COPY_AND_ASSIGN(ClassName);
 ! camelCase every FUNCTION
 
-- storage for uniforms, don't resend same data every frame unless modified
-	-> dirty flag 
+- Imgui edit values are also sorted by name
+	-> vec3i, vec3d, vec3ui, etc.. as options
 
 - colorID/depth programs generated from shaderMaterial
-	- test both programs on viewport
+	- test both programs on gui viewport
 - colorID selection for objects
 
 - GUI_viewport has output modes

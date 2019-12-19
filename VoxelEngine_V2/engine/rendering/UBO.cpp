@@ -36,7 +36,7 @@ namespace Vxl
 	}
 	void UBOManager::BindFBOSize(const FramebufferObject& _fbo)
 	{
-		m_ubos[UBOID::FBO_DATA]->sendVector(Vector4(Window.GetViewportOffsetX(), Window.GetViewportOffsetY(), Window.GetWindowWidth(), Window.GetWindowHeight()), 0);
+		m_ubos[UBOID::FBO_DATA]->sendVector(Vector4((float)Window.GetViewportOffsetX(), (float)Window.GetViewportOffsetY(), (float)Window.GetWindowWidth(), (float)Window.GetWindowHeight()), 0);
 		m_ubos[UBOID::FBO_DATA]->sendVector(Vector2((float)_fbo.getWidth(), (float)_fbo.getHeight()), 16);
 		m_ubos[UBOID::FBO_DATA]->sendVector(Vector2(1.0f / (float)_fbo.getWidth(), 1.0f / (float)_fbo.getHeight()), 24);
 		m_ubos[UBOID::FBO_DATA]->bind();

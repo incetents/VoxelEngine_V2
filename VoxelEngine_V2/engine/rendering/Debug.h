@@ -43,23 +43,23 @@ namespace Vxl
 
 	private:
 		// Debug Lines in world space
-		LineMesh3D* m_worldLines;
-		LineMesh3D* m_worldLinesNoDepth;
+		LineMesh3DIndex m_worldLines;
+		LineMesh3DIndex m_worldLinesNoDepth;
 		// Debug Lines in screen space
-		LineMesh2D* m_screenLines;
+		LineMesh2DIndex m_screenLines;
 
 	public:
 		void InitGLResources()
 		{
-			m_worldLines = new LineMesh3D();
-			m_worldLinesNoDepth = new LineMesh3D();
-			m_screenLines = new LineMesh2D();
+			m_worldLines = GlobalAssets.createLineMesh3D(DrawType::LINES);
+			m_worldLinesNoDepth = GlobalAssets.createLineMesh3D(DrawType::LINES);
+			m_screenLines = GlobalAssets.createLineMesh2D(DrawType::LINES);
 		}
 		void DestroyGLResources()
 		{
-			delete m_worldLines;
-			delete m_worldLinesNoDepth;
-			delete m_screenLines;
+			GlobalAssets.deleteLineMesh3D(m_worldLines);
+			GlobalAssets.deleteLineMesh3D(m_worldLinesNoDepth);
+			GlobalAssets.deleteLineMesh2D(m_screenLines);
 		}
 
 		// Line Drawing

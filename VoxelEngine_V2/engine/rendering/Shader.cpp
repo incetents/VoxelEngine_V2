@@ -160,78 +160,78 @@ namespace Vxl
 					switch (utype)
 					{
 					case UniformType::FLOAT:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0.f), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0.f), false };
 						break;
 					case UniformType::FLOAT_VEC2:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2(0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2(0, 0)), false };
 						break;
 					case UniformType::FLOAT_VEC3:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3(0, 0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3(0, 0, 0)), false };
 						break;
 					case UniformType::FLOAT_VEC4:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4(0, 0, 0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4(0, 0, 0, 0)), false };
 						break;
 
 					case UniformType::DOUBLE:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0.0), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0.0), false };
 						break;
 					case UniformType::DOUBLE_VEC2:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2d(0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2d(0, 0)), false };
 						break;
 					case UniformType::DOUBLE_VEC3:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3d(0, 0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3d(0, 0, 0)), false };
 						break;
 					case UniformType::DOUBLE_VEC4:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4d(0, 0, 0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4d(0, 0, 0, 0)), false };
 						break;
 
 					case UniformType::INT:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0), false };;
 						break;
 					case UniformType::INT_VEC2:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2i(0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2i(0, 0)), false };
 						break;
 					case UniformType::INT_VEC3:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3i(0, 0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3i(0, 0, 0)), false };
 						break;
 					case UniformType::INT_VEC4:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4i(0, 0, 0, 0)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4i(0, 0, 0, 0)), false };
 						break;
 
 					case UniformType::UNSIGNED_INT:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, 0u), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0u), false };
 						break;
 					case UniformType::UNSIGNED_INT_VEC2:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2ui(0u, 0u)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2ui(0u, 0u)), false };
 						break;
 					case UniformType::UNSIGNED_INT_VEC3:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3ui(0u, 0u, 0u)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3ui(0u, 0u, 0u)), false };
 						break;
 					case UniformType::UNSIGNED_INT_VEC4:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4ui(0u, 0u, 0u, 0u)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4ui(0u, 0u, 0u, 0u)), false };
 						break;
 
 					case UniformType::BOOL:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, false), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, false), false };
 						break;
 					case UniformType::BOOL_VEC2:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector2b(false, false)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2b(false, false)), false };
 						break;
 					case UniformType::BOOL_VEC3:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector3b(false, false, false)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3b(false, false, false)), false };
 						break;
 					case UniformType::BOOL_VEC4:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Vector4b(false, false, false, false)), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4b(false, false, false, false)), false };
 						break;
 
 					case UniformType::FLOAT_MAT2:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Matrix2x2::Identity), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Matrix2x2::Identity), false };
 						break;
 					case UniformType::FLOAT_MAT3:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Matrix3x3::Identity), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Matrix3x3::Identity), false };
 						break;
 					case UniformType::FLOAT_MAT4:
-						m_uniformStorage[uniform.first] = std::make_pair(RawData(utype, Matrix4x4::Identity), false);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Matrix4x4::Identity), false };
 						break;
 
 					default:
@@ -393,86 +393,93 @@ namespace Vxl
 	// Binding Custom Uniforms [Non VXL_]
 	void ShaderProgram::bindCustomUniforms()
 	{
-		for (const auto& uniformStorage : m_uniformStorage)
+		for (auto& uniformStorage : m_uniformStorage)
 		{
+			// Don't send uniforms that haven't been modified
+			if (!uniformStorage.second.m_dirty)
+				continue;
+
+			// Dirty flag
+			uniformStorage.second.m_dirty = false;
+
 			// Acquire Uniform
 			Graphics::Uniform& uniform = m_uniforms[uniformStorage.first];
 			// Acquire Data
-			switch (uniformStorage.second.first.type)
+			switch (uniformStorage.second.m_data.type)
 			{
 			case UniformType::FLOAT:
-				uniform.send(*uniformStorage.second.first.GetData<float>());
+				uniform.send(*uniformStorage.second.m_data.getData<float>());
 				break;
 			case UniformType::FLOAT_VEC2:
-				uniform.send(*uniformStorage.second.first.GetData<Vector2>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector2>());
 				break;
 			case UniformType::FLOAT_VEC3:
-				uniform.send(*uniformStorage.second.first.GetData<Vector3>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector3>());
 				break;
 			case UniformType::FLOAT_VEC4:
-				uniform.send(*uniformStorage.second.first.GetData<Vector4>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector4>());
 				break;
 
 			case UniformType::DOUBLE:
-				uniform.send(*uniformStorage.second.first.GetData<double>());
+				uniform.send(*uniformStorage.second.m_data.getData<double>());
 				break;
 			case UniformType::DOUBLE_VEC2:
-				uniform.send(*uniformStorage.second.first.GetData<Vector2d>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector2d>());
 				break;
 			case UniformType::DOUBLE_VEC3:
-				uniform.send(*uniformStorage.second.first.GetData<Vector3d>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector3d>());
 				break;
 			case UniformType::DOUBLE_VEC4:
-				uniform.send(*uniformStorage.second.first.GetData<Vector4d>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector4d>());
 				break;
 
 			case UniformType::INT:
-				uniform.send(*uniformStorage.second.first.GetData<int>());
+				uniform.send(*uniformStorage.second.m_data.getData<int>());
 				break;
 			case UniformType::INT_VEC2:
-				uniform.send(*uniformStorage.second.first.GetData<Vector2i>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector2i>());
 				break;
 			case UniformType::INT_VEC3:
-				uniform.send(*uniformStorage.second.first.GetData<Vector3i>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector3i>());
 				break;
 			case UniformType::INT_VEC4:
-				uniform.send(*uniformStorage.second.first.GetData<Vector4i>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector4i>());
 				break;
 
 			case UniformType::UNSIGNED_INT:
-				uniform.send(*uniformStorage.second.first.GetData<uint32_t>());
+				uniform.send(*uniformStorage.second.m_data.getData<uint32_t>());
 				break;
 			case UniformType::UNSIGNED_INT_VEC2:
-				uniform.send(*uniformStorage.second.first.GetData<Vector2ui>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector2ui>());
 				break;
 			case UniformType::UNSIGNED_INT_VEC3:
-				uniform.send(*uniformStorage.second.first.GetData<Vector3ui>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector3ui>());
 				break;
 			case UniformType::UNSIGNED_INT_VEC4:
-				uniform.send(*uniformStorage.second.first.GetData<Vector4ui>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector4ui>());
 				break;
 
 			case UniformType::BOOL:
-				uniform.send(*uniformStorage.second.first.GetData<bool>());
+				uniform.send(*uniformStorage.second.m_data.getData<bool>());
 				break;
 			case UniformType::BOOL_VEC2:
-				uniform.send(*uniformStorage.second.first.GetData<Vector2b>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector2b>());
 				break;
 			case UniformType::BOOL_VEC3:
-				uniform.send(*uniformStorage.second.first.GetData<Vector3b>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector3b>());
 				break;
 			case UniformType::BOOL_VEC4:
-				uniform.send(*uniformStorage.second.first.GetData<Vector4b>());
+				uniform.send(*uniformStorage.second.m_data.getData<Vector4b>());
 				break;
 
 			case UniformType::FLOAT_MAT2:
-				uniform.send(*uniformStorage.second.first.GetData<Matrix2x2()>());
+				uniform.sendMatrix(*uniformStorage.second.m_data.getData<Matrix2x2>(), uniformStorage.second.m_transpose);
 				break;
 			case UniformType::FLOAT_MAT3:
-				uniform.send(*uniformStorage.second.first.GetData<Matrix3x3()>());
+				uniform.sendMatrix(*uniformStorage.second.m_data.getData<Matrix3x3>(), uniformStorage.second.m_transpose);
 				break;
 			case UniformType::FLOAT_MAT4:
-				uniform.send(*uniformStorage.second.first.GetData<Matrix4x4()>());
+				uniform.sendMatrix(*uniformStorage.second.m_data.getData<Matrix4x4>(), uniformStorage.second.m_transpose);
 				break;
 
 			default:
