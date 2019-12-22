@@ -24,11 +24,20 @@ namespace Vxl
 		};
 		static const char* ChannelOutputNames[];
 
+		enum OutputMode
+		{
+			BLIT,
+			ABSOLUTE_VALUE,
+			COLORFUL
+		};
+		static const char* OutputModeNames[];
+
 #ifdef GLOBAL_IMGUI
 		friend class RenderManager;
 	private:
 		bool		  m_xrayMode = false;
 		ChannelOutput m_channelOut = ChannelOutput::RGBA;
+		OutputMode	  m_outputMode = OutputMode::BLIT;
 
 		// Gl Resources
 		FramebufferObjectIndex	m_fbo;

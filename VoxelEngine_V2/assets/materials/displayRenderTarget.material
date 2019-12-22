@@ -72,7 +72,7 @@
 	// Output Mode
 	if(outputMode == 1)
 	{
-		// normal
+		// absolute value (useful for normals)
 		_texture.rgb = abs(_texture.rgb); // make it visible on both sides
 		output_color = _texture;
 	}

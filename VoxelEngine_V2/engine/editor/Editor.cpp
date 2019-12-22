@@ -154,12 +154,12 @@ namespace Vxl
 		//m_currentScene->DrawImGui();
 
 		ImGui::Render();
-#endif
 
 		// Selection
 		if (ImGui::GetIO().KeysDown[(int)KeyCode::DELETEKEY] || ImGui::GetIO().KeysDown[(int)KeyCode::BACKSPACE])
 		{
 			DeleteSelection();
 		}
+#endif
 	}
 }

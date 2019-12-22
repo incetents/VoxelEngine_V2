@@ -21,6 +21,7 @@ namespace Vxl
 	class Entity;
 	class Camera;
 	class GuiWindow;
+	enum class ShaderMaterialType;
 
 	// Special Rendering info
 	enum class FullScreenRender
@@ -70,9 +71,11 @@ namespace Vxl
 		}
 
 		void render(MaterialIndex _material, const std::vector<Entity*>& _entities);
-		void renderOpaque();
-		void renderTransparent();
-		
+		void render_ColorID(MaterialIndex _material, const std::vector<Entity*>& _entities);
+
+		void renderOpaque(ShaderMaterialType type);
+		void renderTransparent(ShaderMaterialType type);
+
 		// Utility
 		void SetNewScene(Scene* _scene);
 		//const Layer& GetLayer(uint32_t index);

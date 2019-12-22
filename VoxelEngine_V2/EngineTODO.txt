@@ -4,17 +4,29 @@ TODO:
 ! Macro everywhere -> DISALLOW_COPY_AND_ASSIGN(ClassName);
 ! camelCase every FUNCTION
 
-- Imgui edit values are also sorted by name
-	-> vec3i, vec3d, vec3ui, etc.. as options
+- renderTextures can have default GUI_Viewport::OutputMode value and ChannelOutput value
+	- so that when you view them in GUI_Viewport they start with that state
+	- set with a function call
+
+- destroy GL Resources for globals need to be fixed
 
 - colorID/depth programs generated from shaderMaterial
 	- test both programs on gui viewport
 - colorID selection for objects
 
+- material error for colorID simply returns black
+
 - GUI_viewport has output modes
 	-> BLIT		-> no change
 	-> COLORFUL -> used for displaying color ID
 	-> ABSOLUTE -> abs(result)
+
+- detect if Shader already exists using hasing,
+	- that way you can re-use existing Shaders instead of compiling a copy
+	- Shader needs a duplication flag (only deletes self if duplication counter == 0)
+
+- target levels are shader specific, not shaderMaterial
+	-> this can be verified by comparing textures specific with stored uniforms if they match
 	
 - outline effect on selected entities
 	-> OBB/AABB lines
@@ -25,6 +37,8 @@ TODO:
 - uniqueID -> assetID, every object create from Assets gets an id so they can refind themselves in the assets
 	- const so that it never changes
 	- global assets don't have a getID function, just get their ID from object itself
+	- Material::bindTextures(Entity*) -> swap to entityIndex (needs AssetID)
+
 
 - enable vertex attrib pointer, only active by shader not by vbo
   

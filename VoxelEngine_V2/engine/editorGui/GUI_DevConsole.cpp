@@ -205,213 +205,6 @@ namespace Vxl
 		ImGui::Text("Left Analog X: %f", GamePad1.GetLeftAnalogNormalized().x);
 		ImGui::Text("Left Analog Y: %f", GamePad1.GetLeftAnalogNormalized().y);
 	}
-	void DevConsole::Draw_CustomValues()
-	{
-		//	ImGui::PushItemWidth(-1);
-		//	
-		//	// Booleans
-		//	ImGui::Text("Booleans:");
-		//	if (m_editData.m_bools.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_bools.begin(); it != m_editData.m_bools.end(); it++)
-		//		{
-		//			ImGui::Checkbox(it->first.c_str(), &it->second);
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Integers
-		//	ImGui::Text("Integers:");
-		//	if (m_editData.m_integers.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_integers.begin(); it != m_editData.m_integers.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			ImGui::InputInt(it->first.c_str(), &it->second);
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Integers Ranged
-		//	ImGui::Text("Integers Ranged:");
-		//	if (m_editData.m_integersRanged.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_integersRanged.begin(); it != m_editData.m_integersRanged.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			ImGui::SliderInt(it->first.c_str(), &it->second.x, it->second.y, it->second.z);
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Floats
-		//	ImGui::Text("Floats:");
-		//	if (m_editData.m_floats.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_floats.begin(); it != m_editData.m_floats.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			ImGui::InputFloat(it->first.c_str(), &it->second);
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Floats Ranged
-		//	ImGui::Text("Floats Ranged:");
-		//	if (m_editData.m_floatsRanged.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_floatsRanged.begin(); it != m_editData.m_floatsRanged.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			ImGui::SliderFloat(it->first.c_str(), &it->second.x, it->second.y, it->second.z);
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Double
-		//	ImGui::Text("Doubles:");
-		//	if (m_editData.m_doubles.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_doubles.begin(); it != m_editData.m_doubles.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			ImGui::InputDouble(it->first.c_str(), &it->second);
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Double
-		//	ImGui::Text("Doubles Ranged:");
-		//	if (m_editData.m_doublesRanged.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_doublesRanged.begin(); it != m_editData.m_doublesRanged.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			float v = (float)it->second.x;
-		//			ImGui::SliderFloat(it->first.c_str(), &v, (float)it->second.y, (float)it->second.z);
-		//			it->second.x = (double)v;
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Vector2
-		//	ImGui::Text("Vector2s:");
-		//	if (m_editData.m_vec2.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_vec2.begin(); it !=m_editData. m_vec2.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			float val[2] = { it->second.x, it->second.y };
-		//			ImGui::InputFloat2(it->first.c_str(), val);
-		//			it->second[0] = val[0];
-		//			it->second[1] = val[1];
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Vector3
-		//	ImGui::Text("Vector3s:");
-		//	if (m_editData.m_vec3.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_vec3.begin(); it != m_editData.m_vec3.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			float val[3] = { it->second.x, it->second.y, it->second.z };
-		//			ImGui::InputFloat3(it->first.c_str(), val);
-		//			it->second[0] = val[0];
-		//			it->second[1] = val[1];
-		//			it->second[2] = val[2];
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Vector4
-		//	ImGui::Text("Vector4s:");
-		//	if (m_editData.m_vec4.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_vec4.begin(); it != m_editData.m_vec4.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			float val[4] = { it->second.x, it->second.y, it->second.z, it->second.w };
-		//			ImGui::InputFloat4(it->first.c_str(), val);
-		//			it->second[0] = val[0];
-		//			it->second[1] = val[1];
-		//			it->second[2] = val[2];
-		//			it->second[3] = val[4];
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Color3F
-		//	ImGui::Text("Color3F:");
-		//	if (m_editData.m_color3.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_color3.begin(); it != m_editData.m_color3.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			float val[3] = { it->second.r, it->second.g, it->second.b, };
-		//			ImGui::ColorEdit3(it->first.c_str(), val);
-		//			it->second[0] = val[0];
-		//			it->second[1] = val[1];
-		//			it->second[2] = val[2];
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	// Color4F
-		//	ImGui::Text("Color3F:");
-		//	if (m_editData.m_color4.size() > 0)
-		//	{
-		//		for (auto it = m_editData.m_color4.begin(); it != m_editData.m_color4.end(); it++)
-		//		{
-		//			ImGui::Text(it->first.c_str());
-		//			ImGui::SameLine();
-		//			float val[4] = { it->second.r, it->second.g, it->second.b, it->second.a };
-		//			ImGui::ColorEdit3(it->first.c_str(), val);
-		//			it->second[0] = val[0];
-		//			it->second[1] = val[1];
-		//			it->second[2] = val[2];
-		//			it->second[3] = val[3];
-		//		}
-		//	}
-		//	else
-		//		ImGui::TextColored(ImGuiColor::Orange, "~None~");
-		//	ImGui::Separator();
-		//	
-		//	ImGui::PopItemWidth();
-	}
 	void DevConsole::Draw_ShowValues()
 	{
 		//
@@ -457,6 +250,27 @@ namespace Vxl
 					break;
 				}
 
+				case UniformType::INT_VEC2:
+				{
+					Vector2i* data = rawData->getData<Vector2i>();
+					ImGui::Text(data->ToString('|').c_str());
+					break;
+				}
+
+				case UniformType::INT_VEC3:
+				{
+					Vector3i* data = rawData->getData<Vector3i>();
+					ImGui::Text(data->ToString('|').c_str());
+					break;
+				}
+
+				case UniformType::INT_VEC4:
+				{
+					Vector4i* data = rawData->getData<Vector4i>();
+					ImGui::Text(data->ToString('|').c_str());
+					break;
+				}
+
 				case UniformType::FLOAT_VEC2:
 				{
 					Vector2* data = rawData->getData<Vector2>();
@@ -474,6 +288,27 @@ namespace Vxl
 				case UniformType::FLOAT_VEC4:
 				{
 					Vector4* data = rawData->getData<Vector4>();
+					ImGui::Text(data->ToString('|').c_str());
+					break;
+				}
+
+				case UniformType::DOUBLE_VEC2:
+				{
+					Vector2d* data = rawData->getData<Vector2d>();
+					ImGui::Text(data->ToString('|').c_str());
+					break;
+				}
+
+				case UniformType::DOUBLE_VEC3:
+				{
+					Vector3d* data = rawData->getData<Vector3d>();
+					ImGui::Text(data->ToString('|').c_str());
+					break;
+				}
+
+				case UniformType::DOUBLE_VEC4:
+				{
+					Vector4d* data = rawData->getData<Vector4d>();
 					ImGui::Text(data->ToString('|').c_str());
 					break;
 				}
@@ -637,7 +472,7 @@ namespace Vxl
 				// Range Case
 				if (container.second.isRange)
 				{
-					float avg_speed = (value.z - value.y) / 1000.0f;
+					float avg_speed = (float)((value.z - value.y) / 1000.0);
 					if (ImGui::DragFloat(container.first.c_str(), &fixed.x, avg_speed, fixed.y, fixed.z))
 						rawData->setData<Vector3d>(Vector3d(fixed.x, fixed.y, fixed.z));
 				}
@@ -697,7 +532,6 @@ namespace Vxl
 			Draw_Master(m_scene);
 			break;
 		case MenuState::EDIT_DATA:
-			//Draw_CustomValues();
 			Draw_EditValues();
 			break;
 		case MenuState::SHOW_DATA:

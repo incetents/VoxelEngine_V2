@@ -491,10 +491,10 @@ namespace Vxl
 		Material* gizmoMaterial = Assets.getMaterial(_gizmoMaterial);
 		if (gizmoMaterial)
 		{
-			gizmoMaterial->bindCoreProgram();
-			gizmoMaterial->bindStates();
+			gizmoMaterial->bindProgram(ShaderMaterialType::CORE);
+			gizmoMaterial->bindProgramStates();
 
-			ShaderProgram* program_colorPicker = gizmoMaterial->getCoreProgram();
+			ShaderProgram* program_colorPicker = gizmoMaterial->getProgram(ShaderMaterialType::CORE);
 			Graphics::Uniform uniform_useModel = program_colorPicker->m_uniform_useModel.value();
 			Graphics::Uniform uniform_model = program_colorPicker->m_uniform_model.value();
 			Graphics::Uniform uniform_normalMatrix = program_colorPicker->m_uniform_normalMatrix.value();
@@ -756,10 +756,10 @@ namespace Vxl
 			if (!material_colorPicker)
 				return;
 
-			material_colorPicker->bindCoreProgram();
-			material_colorPicker->bindStates();
+			material_colorPicker->bindProgram(ShaderMaterialType::CORE);
+			material_colorPicker->bindProgramStates();
 
-			ShaderProgram* program_colorPicker = material_colorPicker->getCoreProgram();
+			ShaderProgram* program_colorPicker = material_colorPicker->getProgram(ShaderMaterialType::CORE);
 			Graphics::Uniform uniform_useModel = program_colorPicker->m_uniform_useModel.value();
 			Graphics::Uniform uniform_model = program_colorPicker->m_uniform_model.value();
 			Graphics::Uniform uniform_output = program_colorPicker->m_uniform_output.value();

@@ -23,25 +23,6 @@ namespace Vxl
 	{
 #ifdef GLOBAL_IMGUI
 	private:
-		// custom data
-		//	struct EditData
-		//	{
-		//		std::map<std::string, bool>		m_bools;
-		//		std::map<std::string, int>		m_integers;
-		//		std::map<std::string, float>	m_floats;
-		//		std::map<std::string, double>	m_doubles;
-		//		std::map<std::string, Vector2>	m_vec2;
-		//		std::map<std::string, Vector3>	m_vec3;
-		//		std::map<std::string, Vector4>	m_vec4;
-		//		std::map<std::string, Color3F>	m_color3;
-		//		std::map<std::string, Color4F>	m_color4;
-		//	
-		//		std::map<std::string, Vector3i> m_integersRanged;
-		//		std::map<std::string, Vector3>  m_floatsRanged;
-		//		std::map<std::string, Vector3d> m_doublesRanged;
-		//	};
-		//	EditData m_editData;
-		
 		// All data to show
 		std::map<std::string, RawData> m_showData;
 		
@@ -64,7 +45,6 @@ namespace Vxl
 		MenuState m_State = MenuState::MASTER;
 		// Draw Menu Section
 		void Draw_Master(Scene* scene);
-		void Draw_CustomValues();
 		void Draw_ShowValues();
 		void Draw_EditValues();
 	public:
@@ -105,6 +85,20 @@ namespace Vxl
 
 			return *m_editData[name].data.getData<Vector2>();
 		}
+		Vector2i GetVector(const std::string& name, Vector2i _default)
+		{
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::INT_VEC2, _default), false, false };
+
+			return *m_editData[name].data.getData<Vector2i>();
+		}
+		Vector2d GetVector(const std::string& name, Vector2d _default)
+		{
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::DOUBLE_VEC2, _default), false, false };
+
+			return *m_editData[name].data.getData<Vector2d>();
+		}
 		Vector3 GetVector(const std::string& name, Vector3 _default)
 		{
 			if (m_editData.find(name) == m_editData.end())
@@ -112,12 +106,40 @@ namespace Vxl
 
 			return *m_editData[name].data.getData<Vector3>();
 		}
+		Vector3i GetVector(const std::string& name, Vector3i _default)
+		{
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::INT_VEC3, _default), false, false };
+
+			return *m_editData[name].data.getData<Vector3i>();
+		}
+		Vector3d GetVector(const std::string& name, Vector3d _default)
+		{
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::DOUBLE_VEC3, _default), false, false };
+
+			return *m_editData[name].data.getData<Vector3d>();
+		}
 		Vector4 GetVector(const std::string& name, Vector4 _default)
 		{
 			if (m_editData.find(name) == m_editData.end())
 				m_editData[name] = EditData{ RawData(UniformType::FLOAT_VEC4, _default), false, false };
 
 			return *m_editData[name].data.getData<Vector4>();
+		}
+		Vector4i GetVector(const std::string& name, Vector4i _default)
+		{
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::INT_VEC4, _default), false, false };
+
+			return *m_editData[name].data.getData<Vector4i>();
+		}
+		Vector4d GetVector(const std::string& name, Vector4d _default)
+		{
+			if (m_editData.find(name) == m_editData.end())
+				m_editData[name] = EditData{ RawData(UniformType::DOUBLE_VEC4, _default), false, false };
+
+			return *m_editData[name].data.getData<Vector4d>();
 		}
 		Color3F GetColor(const std::string& name, Color3F _default)
 		{
@@ -183,13 +205,37 @@ namespace Vxl
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC2, _value);
 		}
+		void ShowVector(const std::string& name, const Vector2i& _value)
+		{
+			m_showData[name] = RawData(UniformType::INT_VEC2, _value);
+		}
+		void ShowVector(const std::string& name, const Vector2d& _value)
+		{
+			m_showData[name] = RawData(UniformType::DOUBLE_VEC2, _value);
+		}
 		void ShowVector(const std::string& name, const Vector3& _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC3, _value);
 		}
+		void ShowVector(const std::string& name, const Vector3i& _value)
+		{
+			m_showData[name] = RawData(UniformType::INT_VEC3, _value);
+		}
+		void ShowVector(const std::string& name, const Vector3d& _value)
+		{
+			m_showData[name] = RawData(UniformType::DOUBLE_VEC3, _value);
+		}
 		void ShowVector(const std::string& name, const Vector4& _value)
 		{
 			m_showData[name] = RawData(UniformType::FLOAT_VEC4, _value);
+		}
+		void ShowVector(const std::string& name, const Vector4i& _value)
+		{
+			m_showData[name] = RawData(UniformType::INT_VEC4, _value);
+		}
+		void ShowVector(const std::string& name, const Vector4d& _value)
+		{
+			m_showData[name] = RawData(UniformType::DOUBLE_VEC4, _value);
 		}
 		void ShowColor(const std::string& name, const Color3F& _value)
 		{
@@ -222,19 +268,23 @@ namespace Vxl
 		void Draw() override;
 #else
 
-#define DEV_GET_BOOL(x, y) y
-#define DEV_GET_INT(x, y) y
-#define DEV_GET_FLOAT(x, y) y
-#define DEV_GET_DOUBLE(x, y) y
-#define DEV_GET_VEC2(x, y) y
-#define DEV_GET_VEC3(x, y) y
-#define DEV_GET_VEC4(x, y) y
-#define DEV_GET_COLOR3(x, y) y
-#define DEV_GET_COLOR4(x, y) y
+#define DEV_GET_BOOL(name, value) value
+#define DEV_GET_INT(name, value) value
+#define DEV_GET_FLOAT(name, value) value
+#define DEV_GET_DOUBLE(name, value) value
+#define DEV_GET_VECTOR(name, value) value
+#define DEV_GET_COLOR(name, value) value
 
-#define DEV_GET_INT_RANGE(x, y, _min, b) y
-#define DEV_GET_FLOAT_RANGE(x, y, _min, b) y
-#define DEV_GET_DOUBLE_RANGE(x, y, _min, b) y
+#define DEV_GET_INT_RANGE(name, value, _min, _max) value
+#define DEV_GET_FLOAT_RANGE(name, value, _min, _max) value
+#define DEV_GET_DOUBLE_RANGE(name, value, _min, _max) value
+
+#define DEV_SHOW_BOOL(name, value) __noop
+#define DEV_SHOW_INT(name, value) __noop
+#define DEV_SHOW_FLOAT(name, value) __noop
+#define DEV_SHOW_DOUBLE(name, value) __noop
+#define DEV_SHOW_VECTOR(name, value) __noop
+#define DEV_SHOW_COLOR(name, value)	__noop
 
 	public:
 		void Draw() override {}

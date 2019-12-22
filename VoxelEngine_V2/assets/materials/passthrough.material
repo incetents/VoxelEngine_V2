@@ -4,6 +4,7 @@
 
 #Include
 {
+	_Core.glsl,
 	_Math.glsl
 }
 
@@ -49,4 +50,5 @@
 	output_albedo.r = linear_to_srgb(output_albedo.r);
 	output_albedo.g = linear_to_srgb(output_albedo.g);
 	output_albedo.b = linear_to_srgb(output_albedo.b);
+
 }

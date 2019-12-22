@@ -29,6 +29,7 @@ namespace Vxl
 	IDStorage<Mesh>				  _Assets::m_mesh_storage;
 	IDStorage<LineMesh3D>		  _Assets::m_lineMesh3D_storage;
 	IDStorage<LineMesh2D>		  _Assets::m_lineMesh2D_storage;
+	IDStorage<Shader>			  _Assets::m_shader_storage;
 	IDStorage<ShaderProgram>	  _Assets::m_shaderProgram_storage;
 	IDStorage<ShaderMaterial>	  _Assets::m_shaderMaterial_storage;
 	IDStorage<Material>			  _Assets::m_material_storage;
@@ -258,6 +259,10 @@ namespace Vxl
 		for (auto& mesh : lineMeshes2D)
 			delete mesh.second;
 
+		auto& shaders = m_shader_storage.GetAll(m_creationType);
+		for (auto& sp : shaders)
+			delete sp.second;
+
 		auto& shaderPrograms = m_shaderProgram_storage.GetAll(m_creationType);
 		for (auto& sp : shaderPrograms)
 			delete sp.second;
@@ -289,6 +294,7 @@ namespace Vxl
 		m_mesh_storage.EraseAll(m_creationType);
 		m_lineMesh3D_storage.EraseAll(m_creationType);
 		m_lineMesh2D_storage.EraseAll(m_creationType);
+		m_shader_storage.EraseAll(m_creationType);
 		m_shaderProgram_storage.EraseAll(m_creationType);
 		m_shaderMaterial_storage.EraseAll(m_creationType);
 		m_material_storage.EraseAll(m_creationType);
@@ -778,14 +784,21 @@ namespace Vxl
 		return m_lineMesh2D_storage.Add(_mesh, m_creationType);
 	}
 
-	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders)
+	ShaderIndex _Assets::createShader(const std::string& name, const std::string& source, ShaderType type)
+	{
+		// Create New Data
+		Shader* _shader = new Shader(name, source, type);
+		// Store Data and Return index
+		return m_shader_storage.Add(_shader, m_creationType);
+	}
+	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders)
 	{
 		// Create New Data
 		ShaderProgram* _program = new ShaderProgram(name, _shaders);
 		// Store Data and Return index
 		return m_shaderProgram_storage.Add(_program, m_creationType);
 	}
-	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, std::initializer_list<Shader*> _shaders)
+	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, std::initializer_list<ShaderIndex> _shaders)
 	{
 		// Create New Data
 		ShaderProgram* _program = new ShaderProgram(name, _shaders);

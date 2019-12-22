@@ -813,16 +813,24 @@ namespace Vxl
 		DEV_SHOW_FLOAT("show_float", 5.0f);
 		DEV_SHOW_DOUBLE("show_float", 8.0);
 		DEV_SHOW_VECTOR("show_vec3", Vector3(1,2,3));
+		DEV_SHOW_VECTOR("show_vec3i", Vector3i(1,2,3));
+		DEV_SHOW_VECTOR("show_vec3d", Vector3d(1,2,3));
 		DEV_SHOW_VECTOR("show_vec4", Vector4(10,20,30,40));
+		DEV_SHOW_VECTOR("show_vec4i", Vector4i(190, 2, 3, 4));
+		DEV_SHOW_VECTOR("show_vec4d", Vector4d(190, 2, 3, 4));
 		DEV_SHOW_COLOR("show_color4", Color4F(1,0,0,1));
-
-		DEV_GET_BOOL("Edit_bool", false);
+		
+		DEV_GET_BOOL("edit_bool", false);
 		DEV_GET_FLOAT("edit_float", 2.0f);
 		DEV_GET_DOUBLE("edit_double", 2.0);
 		DEV_GET_FLOAT_RANGE("edit_float_range", 2.0f, -10.0f, 10.0f);
 		DEV_GET_DOUBLE_RANGE("edit_double_range", 1.0, 0.0, 2.0);
 		DEV_GET_VECTOR("edit_vec3", vec3(0, 1, 2));
+		DEV_GET_VECTOR("edit_vec3i", vec3i(0, 1, 2));
+		DEV_GET_VECTOR("edit_vec3d", vec3d(0, 1, 2));
 		DEV_GET_VECTOR("edit_vec4", vec4(0, 1, 2, 3));
+		DEV_GET_VECTOR("edit_vec4i", vec4i(0, 1, 2, 3));
+		DEV_GET_VECTOR("edit_vec4d", vec4d(0, 1, 2, 3));
 		DEV_GET_COLOR("edit_color4f", Color4F(0, 1, 0.5f, 1));
 
 		CPUTimer::StartTimer("UPDATE");
@@ -1070,8 +1078,8 @@ namespace Vxl
 			RenderManager.sortMaterials();
 			RenderManager.sortEntities();
 			//
-			RenderManager.renderOpaque();
-			RenderManager.renderTransparent();
+			RenderManager.renderOpaque(ShaderMaterialType::CORE);
+			RenderManager.renderTransparent(ShaderMaterialType::CORE);
 			//
 			CPUTimer::EndTimer("Gbuffer");
 			GPUTimer::EndTimer();
@@ -1313,12 +1321,6 @@ namespace Vxl
 		//	
 		//	RenderManager.RenderEditorObjectsPostDepth();
 
-		
-
-		
-
-		
-
 
 		//
 		//GPUTimer::EndTimer();
@@ -1330,13 +1332,21 @@ namespace Vxl
 		//Editor.UpdateSelectionInfo();
 
 
-		
+		// Render ColorID Selection Information
+		if(Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		{
+			fbo_colorPicker->bind();
+			fbo_colorPicker->clearBuffers();
+			//
+			RenderManager.sortMaterials();
+			RenderManager.sortEntities();
+			//
+			RenderManager.renderOpaque(ShaderMaterialType::COLORID);
+			RenderManager.renderTransparent(ShaderMaterialType::COLORID);
+		}
 
-		// Select Object in scene
-		// ~~ //
-		//if (!Editor.m_GizmoSelected && !Editor.m_GizmoClicked && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
-		//	if (!gizmo.IsSelected() && !gizmo.IsClicked() && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
-		//	{
+		//if (!gizmo.IsSelected() && !gizmo.IsClicked() && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		{
 		//		if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
 		//		{
 		//			fbo_gbuffer->bind();
@@ -1376,7 +1386,7 @@ namespace Vxl
 		//	
 		//			}
 		//		}
-		//	}
+		}
 
 		// ~~ //
 

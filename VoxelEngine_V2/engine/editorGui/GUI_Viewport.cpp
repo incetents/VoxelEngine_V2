@@ -32,6 +32,12 @@ namespace Vxl
 		"Channel:[BLUE]",
 		"Channel:[ALPHA]"
 	};
+	const char* GUI_Viewport::OutputModeNames[] =
+	{
+		"Output:[BLIT]",
+		"Output:[ABS]",
+		"Output:[COLORFUL]"
+	};
 
 	void GUI_Viewport::InitGLResources()
 	{
@@ -96,7 +102,25 @@ namespace Vxl
 			program_showRenderTarget->bind();
 			// Uniforms
 			program_showRenderTarget->sendUniform("channelOutput", (int)m_channelOut);
-			program_showRenderTarget->sendUniform("outputMode", m_outputRTIsDepth ? 2 : 0);
+			if (m_outputRTIsDepth)
+			{
+				program_showRenderTarget->sendUniform("outputMode", 2);
+			}
+			else
+			{
+				switch (m_outputMode)
+				{
+				case OutputMode::BLIT:
+					program_showRenderTarget->sendUniform("outputMode", 0);
+					break;
+				case OutputMode::ABSOLUTE_VALUE:
+					program_showRenderTarget->sendUniform("outputMode", 1);
+					break;
+				case OutputMode::COLORFUL:
+					program_showRenderTarget->sendUniform("outputMode", 4);
+					break;
+				}
+			}
 			// Draw on screen
 			RenderManager.RenderFullScreen();
 		}
@@ -206,6 +230,7 @@ namespace Vxl
 				ImGui::MenuItem("RenderTarget[NONE]");
 			}
 
+			// Channel Output
 			if (ImGui::BeginMenu(ChannelOutputNames[(int)m_channelOut]))
 			{
 				if (ImGui::MenuItem("RGBA"))
@@ -227,6 +252,24 @@ namespace Vxl
 				if (ImGui::MenuItem("ALPHA"))
 				{
 					m_channelOut = ChannelOutput::ALPHA;
+				}
+				ImGui::EndMenu();
+			}
+
+			// Output Mode
+			if (ImGui::BeginMenu(OutputModeNames[(int)m_outputMode]))
+			{
+				if (ImGui::MenuItem("BLIT"))
+				{
+					m_outputMode = OutputMode::BLIT;
+				}
+				if (ImGui::MenuItem("ABSOLUTE_VALUE"))
+				{
+					m_outputMode = OutputMode::ABSOLUTE_VALUE;
+				}
+				if (ImGui::MenuItem("COLORFUL"))
+				{
+					m_outputMode = OutputMode::COLORFUL;
 				}
 				ImGui::EndMenu();
 			}

@@ -92,11 +92,11 @@ namespace Vxl
 		bool				m_depthWrite = true;
 		bool				m_wireframe = false;
 
-		// Set ShaderMaterial
+		//
 		void setShaderMaterial(ShaderMaterialIndex index);
 		ShaderMaterialIndex getShaderMaterial(void) const { return m_shaderMaterial; }
 
-		// Set Uniform
+		//
 		template<typename Type>
 		void sendUniform(const std::string& name, Type data) const
 		{
@@ -111,7 +111,7 @@ namespace Vxl
 			}
 		}
 		
-		// Set Uniform Matrix
+		//
 		template<typename Type>
 		void sendUniformMatrix(const std::string& name, Type data, bool transpose) const
 		{
@@ -126,13 +126,19 @@ namespace Vxl
 			}
 		}
 
-		// Get Core Program
-		ShaderProgram* getCoreProgram(void) const;
+		//
+		ShaderProgram* getProgram(ShaderMaterialType type);
 
-		// Behaviour
-		bool bindCoreProgram();
-		void bindCoreProgramUniforms(EntityIndex _entity);
-		void bindStates();
+		// Shader Binding
+		bool bindProgram(ShaderMaterialType type);
+
+		// Shader Uniform Binding
+		bool bindProgramUniforms(ShaderMaterialType type, EntityIndex _entity);
+
+		// GL States
+		void bindProgramStates();
+
+		// Texture Binding
 		void bindTextures(); // bind material textures
 		void bindTextures(Entity* _entity); // bind entity textures
 	};

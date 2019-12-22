@@ -37,8 +37,8 @@ namespace Vxl
 		m_source = FileIO::addInclude(m_source);
 
 		// Lines for source
-		uint32_t lineCount = (uint32_t)stringUtil::countChar(m_source, '\n') + 1;
-		for (uint32_t i = 1; i <= lineCount; i++)
+		m_sourceLineCount = (uint32_t)stringUtil::countChar(m_source, '\n') + 1;
+		for (uint32_t i = 1; i <= m_sourceLineCount; i++)
 			m_sourceLines += std::to_string(i) + '\n';
 
 		// Convert file to const char
@@ -107,7 +107,7 @@ namespace Vxl
 			uniform = std::nullopt;
 	}
 
-	ShaderProgram::ShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders)
+	ShaderProgram::ShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders)
 		: m_name(name), m_shaders(_shaders)
 	{
 		m_id = Graphics::ShaderProgram::Create();
@@ -120,9 +120,11 @@ namespace Vxl
 		uint32_t shaderCount = (uint32_t)m_shaders.size();
 
 		// Auto fail if any shaders aren't compiled
-		for (unsigned int i = 0; i < shaderCount; i++)
+		for (uint32_t i = 0; i < shaderCount; i++)
 		{
-			if (!m_shaders[i]->isCompiled())
+			Shader* _shader = Assets.getShader(m_shaders[i]);
+
+			if (!_shader->isCompiled())
 			{
 				m_linked = false;
 				return;
@@ -130,8 +132,12 @@ namespace Vxl
 		}
 
 		// Attach Shaders to Shader Program
-		for (unsigned int i = 0; i < shaderCount; i++)
-			Graphics::ShaderProgram::AttachShader(m_id, m_shaders[i]->getID());
+		for (uint32_t i = 0; i < shaderCount; i++)
+		{
+			Shader* _shader = Assets.getShader(m_shaders[i]);
+
+			Graphics::ShaderProgram::AttachShader(m_id, _shader->getID());
+		}
 
 		// Link
 		m_linked = Graphics::ShaderProgram::Link(m_id);
@@ -246,8 +252,11 @@ namespace Vxl
 			// subroutines
 			std::vector<ShaderType> types;
 			types.reserve(shaderCount);
-			for (const auto& shader : m_shaders)
+			for (uint32_t shaderIndex : m_shaders)
+			{
+				Shader* shader = Assets.getShader(shaderIndex);
 				types.push_back(shader->getType());
+			}
 
 			m_subroutines = Graphics::ShaderProgram::AcquireUniformSubroutines(m_id, types);
 
@@ -262,6 +271,7 @@ namespace Vxl
 			setupCommonUniform("VXL_tint", m_uniform_tint);
 			setupCommonUniform("VXL_alpha", m_uniform_alpha);
 			setupCommonUniform("VXL_output", m_uniform_output);
+			setupCommonUniform("VXL_colorID", m_uniform_colorID);
 		}
 		else
 		{
@@ -274,7 +284,10 @@ namespace Vxl
 
 		// Detach Shaders from Shader Program
 		for (unsigned int i = 0; i < shaderCount; i++)
-			Graphics::ShaderProgram::DetachShader(m_id, m_shaders[i]->getID());
+		{
+			Shader* _Shader = Assets.getShader(m_shaders[i]);
+			Graphics::ShaderProgram::DetachShader(m_id, _Shader->getID());
+		}
 
 	}
 	ShaderProgram::~ShaderProgram()
@@ -282,10 +295,8 @@ namespace Vxl
 		m_brokenShaderPrograms.erase(m_id);
 
 		Graphics::ShaderProgram::Delete(m_id);
-
-		for (Shader* shader : m_shaders)
-			delete shader;
 	}
+
 	void ShaderProgram::bind() const
 	{
 		if (m_linked)
@@ -387,6 +398,12 @@ namespace Vxl
 				m_uniform_alpha.value().send(entity->m_alpha);
 			else
 				m_uniform_alpha.value().send(1.0f);
+		}
+
+		// ~ ColorID ~ //
+		if (m_uniform_colorID.has_value())
+		{
+			m_uniform_colorID.value().send(entity->m_colorID);
 		}
 	}
 
@@ -505,12 +522,12 @@ namespace Vxl
 	//const std::string GLSL_VERSION = "#version 420 core";
 
 	ShaderMaterial::ShaderMaterial(const std::string& filePath, bool GlobalAsset)
-		: m_filePath(filePath)
+		: m_filePath(filePath), m_isGlobal(GlobalAsset)
 	{
-		reload(GlobalAsset);
+		reload();
 	}
 
-	void ShaderMaterial::reload(bool GlobalAsset)
+	void ShaderMaterial::reload()
 	{
 		// Delete existing ShaderPrograms
 		Assets.deleteShaderProgram(m_coreProgram);
@@ -526,16 +543,22 @@ namespace Vxl
 		if (file.empty())
 			return;
 
-		std::string VertexShaderCode;
-		std::string GeometryShaderCode;
-		std::string FragmentShaderCode;
+		std::string CORE_VertexShaderCode;
+		std::string CORE_GeometryShaderCode;
+		std::string CORE_FragmentShaderCode;
+		std::string COLORID_FragmentShaderCode;
 
 		struct OUTPUT
 		{
 			bool active;
-			std::string include;
-			std::string input_output;
-			std::string behaviour;
+			std::string o_defines;
+			std::string o_include;
+			std::string o_attributes;
+			std::string o_link;
+			std::string o_rendertargets;
+			std::string o_samplers;
+			std::string o_properties;
+			std::string o_main;
 		};
 
 		OUTPUT output_vertex;
@@ -551,12 +574,12 @@ namespace Vxl
 			std::size_t rendertargets;
 			std::size_t samplers;
 			std::size_t properties;
-			std::size_t vertex;
-			std::size_t geometry;
-			std::size_t fragment;
 			std::size_t vertex_defines;
 			std::size_t geometry_defines;
 			std::size_t fragment_defines;
+			std::size_t vertex;
+			std::size_t geometry;
+			std::size_t fragment;
 		} locations;
 
 		locations.name = file.find(SECTION_NAME);
@@ -596,21 +619,21 @@ namespace Vxl
 			std::string section = stringUtil::extractSection(file, '{', '}', locations.vertex_defines);
 
 			if (output_vertex.active)
-				output_vertex.include += "// Defines\n" + section + "\n\n";
+				output_vertex.o_defines += "// Defines\n" + section + "\n\n";
 		}
 		if (locations.geometry_defines != std::string::npos)
 		{
 			std::string section = stringUtil::extractSection(file, '{', '}', locations.geometry_defines);
 
 			if (output_geometry.active)
-				output_geometry.include += "// Defines\n" + section + "\n\n";
+				output_geometry.o_defines += "// Defines\n" + section + "\n\n";
 		}
 		if (locations.fragment_defines != std::string::npos)
 		{
 			std::string section = stringUtil::extractSection(file, '{', '}', locations.fragment_defines);
 
 			if (output_fragment.active)
-				output_fragment.include += "// Defines\n" + section + "\n\n";
+				output_fragment.o_defines += "// Defines\n" + section + "\n\n";
 		}
 
 		// Include
@@ -627,13 +650,13 @@ namespace Vxl
 					std::string file = _fileStorage->file + '\n';
 
 					if (output_vertex.active)
-						output_vertex.include += file + '\n';
+						output_vertex.o_include += file + '\n';
 
 					if (output_geometry.active)
-						output_geometry.include += file + '\n';
+						output_geometry.o_include += file + '\n';
 
 					if (output_fragment.active)
-						output_fragment.include += file + '\n';
+						output_fragment.o_include += file + '\n';
 				}
 			}
 		}
@@ -641,7 +664,7 @@ namespace Vxl
 		// Attributes
 		if (locations.attributes != std::string::npos && output_vertex.active)
 		{
-			output_vertex.input_output += "// Attributes\n";
+			output_vertex.o_attributes += "// Attributes\n";
 
 			// Acquire all
 			std::string section = stringUtil::extractSection(file, '{', '}', locations.attributes);
@@ -661,9 +684,9 @@ namespace Vxl
 				stringUtil::trim(property[1]);
 
 				// Add attribute information
-				output_vertex.input_output += std::string("layout (location = " + property[1] + ") in " + property[0] + ";\n");
+				output_vertex.o_attributes += std::string("layout (location = " + property[1] + ") in " + property[0] + ";\n");
 			}
-			output_vertex.input_output += '\n';
+			output_vertex.o_attributes += '\n';
 		}
 
 		// Link
@@ -673,36 +696,36 @@ namespace Vxl
 
 			if (output_vertex.active)
 			{
-				output_vertex.input_output += "// Output\n";
-				output_vertex.input_output += "out LinkData\n{";
-				output_vertex.input_output += section;
-				output_vertex.input_output += "\n} vert_out;\n\n";
+				output_vertex.o_link += "// Output\n";
+				output_vertex.o_link += "out LinkData\n{";
+				output_vertex.o_link += section;
+				output_vertex.o_link += "\n} vert_out;\n\n";
 			}
 			if (output_fragment.active)
 			{
-				output_fragment.input_output += "// Input\n";
-				output_fragment.input_output += output_geometry.active ? "in LinkData_2\n{" : "in LinkData\n{";
-				output_fragment.input_output += section;
-				output_fragment.input_output += "\n} frag_in;\n\n";
+				output_fragment.o_link += "// Input\n";
+				output_fragment.o_link += output_geometry.active ? "in LinkData_2\n{" : "in LinkData\n{";
+				output_fragment.o_link += section;
+				output_fragment.o_link += "\n} frag_in;\n\n";
 			}
 			if (output_geometry.active)
 			{
-				output_geometry.input_output += "// Input\n";
-				output_geometry.input_output += "in LinkData\n{";
-				output_geometry.input_output += section;
-				output_geometry.input_output += "\n} geom_in[];\n\n";
+				output_geometry.o_link += "// Input\n";
+				output_geometry.o_link += "in LinkData\n{";
+				output_geometry.o_link += section;
+				output_geometry.o_link += "\n} geom_in[];\n\n";
 
-				output_geometry.input_output += "// Output\n";
-				output_geometry.input_output += "out LinkData_2\n{";
-				output_geometry.input_output += section;
-				output_geometry.input_output += "\n} geom_out;\n\n";
+				output_geometry.o_link += "// Output\n";
+				output_geometry.o_link += "out LinkData_2\n{";
+				output_geometry.o_link += section;
+				output_geometry.o_link += "\n} geom_out;\n\n";
 			}
 		}
 
 		// Render Targets
 		if (locations.rendertargets != std::string::npos && output_fragment.active)
 		{
-			output_fragment.input_output += "// Render Targets\n";
+			output_fragment.o_rendertargets += "// Render Targets\n";
 
 			// Acquire all
 			std::string section = stringUtil::extractSection(file, '{', '}', locations.rendertargets);
@@ -722,7 +745,7 @@ namespace Vxl
 				stringUtil::trim(property[1]);
 
 				// Add attribute information
-				output_fragment.input_output += std::string("layout (location = " + property[1] + ") out " + property[0] + ";\n");
+				output_fragment.o_rendertargets += std::string("layout (location = " + property[1] + ") out " + property[0] + ";\n");
 			}
 		}
 
@@ -757,13 +780,13 @@ namespace Vxl
 			}
 
 			if (output_vertex.active)
-				output_vertex.include += sampler_info + '\n';
+				output_vertex.o_samplers += sampler_info + '\n';
 
 			if (output_geometry.active)
-				output_geometry.include += sampler_info + '\n';
+				output_geometry.o_samplers += sampler_info + '\n';
 
 			if (output_fragment.active)
-				output_fragment.include += sampler_info + '\n';
+				output_fragment.o_samplers += sampler_info + '\n';
 		}
 
 		// Properties
@@ -772,90 +795,187 @@ namespace Vxl
 			std::string section = "// Properties\n" + stringUtil::extractSection(file, '{', '}', locations.properties) + '\n';
 
 			if (output_vertex.active)
-				output_vertex.include += section;
+				output_vertex.o_properties += section;
 
 			if (output_geometry.active)
-				output_geometry.include += section;
+				output_geometry.o_properties += section;
 
 			if (output_fragment.active)
-				output_fragment.include += section;
+				output_fragment.o_properties += section;
 		}
 
 		// Vertex
 		if (output_vertex.active)
 		{
-			output_vertex.behaviour =
+			output_vertex.o_main =
 				"// Main\n"
 				"void main()\n"
 				"{";
-			output_vertex.behaviour += stringUtil::extractSection(file, '{', '}', locations.vertex);
-			output_vertex.behaviour += "\n}";
+			output_vertex.o_main += stringUtil::extractSection(file, '{', '}', locations.vertex);
+			output_vertex.o_main += "\n}";
 
-			VertexShaderCode =
+			CORE_VertexShaderCode =
 				Graphics::GLSL_Version + '\n' +
-				output_vertex.include + '\n' +
-				output_vertex.input_output + '\n' +
-				output_vertex.behaviour;
+				output_vertex.o_defines + '\n' +
+				output_vertex.o_include + '\n' +
+				output_vertex.o_attributes + '\n' +
+				output_vertex.o_link + '\n' +
+				// no rendertargets
+				output_vertex.o_samplers + '\n' +
+				output_vertex.o_properties + '\n' +
+				output_vertex.o_main;
 		}
 		// Geometry
 		if (output_geometry.active)
 		{
-			output_geometry.behaviour =
+			output_geometry.o_main =
 				"// Main\n"
 				"void main()\n"
 				"{";
-			output_geometry.behaviour += stringUtil::extractSection(file, '{', '}', locations.geometry);
-			output_geometry.behaviour += "\n}";
+			output_geometry.o_main += stringUtil::extractSection(file, '{', '}', locations.geometry);
+			output_geometry.o_main += "\n}";
 
-			GeometryShaderCode =
+			CORE_GeometryShaderCode =
 				Graphics::GLSL_Version + '\n' +
-				output_geometry.include + '\n' +
-				output_geometry.input_output + '\n' +
-				output_geometry.behaviour;
+				output_geometry.o_defines + '\n' +
+				output_geometry.o_include + '\n' +
+				// no attributes
+				output_geometry.o_link + '\n' +
+				// no rendertargets
+				output_geometry.o_samplers + '\n' +
+				output_geometry.o_properties + '\n' +
+				output_geometry.o_main;
 		}
 		// Fragment
 		if (output_fragment.active)
 		{
-			output_fragment.behaviour =
+			output_fragment.o_main =
 				"// Main\n"
 				"void main()\n"
 				"{";
-			output_fragment.behaviour += stringUtil::extractSection(file, '{', '}', locations.fragment);
-			output_fragment.behaviour += "\n}";
+			output_fragment.o_main += stringUtil::extractSection(file, '{', '}', locations.fragment);
+			output_fragment.o_main += "\n}";
 
-			FragmentShaderCode =
+			CORE_FragmentShaderCode =
 				Graphics::GLSL_Version + '\n' +
-				output_fragment.include + '\n' +
-				output_fragment.input_output + '\n' +
-				output_fragment.behaviour;
+				output_fragment.o_defines + '\n' +
+				output_fragment.o_include + '\n' +
+				// no attributes
+				output_fragment.o_link + '\n' +
+				output_fragment.o_rendertargets + '\n' +
+				output_fragment.o_samplers + '\n' +
+				output_fragment.o_properties + '\n' +
+				output_fragment.o_main;
+
+			COLORID_FragmentShaderCode =
+				Graphics::GLSL_Version + '\n' +
+				output_fragment.o_defines + '\n' +
+				output_fragment.o_include + '\n' +
+				// no attributes
+				output_fragment.o_link + '\n' +
+				"layout (location =  0) out vec4 FragOutput ;\n" + // Custom RenderTarget
+				output_fragment.o_samplers + '\n' +
+				output_fragment.o_properties + '\n' +
+				// Custom Main
+				"// Main\n"
+				"void main()\n"
+				"{\n"
+				"FragOutput = VXL_colorID;\n"
+				"}";
 		}
 
 		// Create Shaders
-		std::vector<Shader*> shaders;
+		ShaderIndex CORE_VertexShader = -1;
+		ShaderIndex CORE_GeometryShader = -1;
+		ShaderIndex CORE_FragmentShader = -1;
+		ShaderIndex COLORID_FragmentShader = -1;
 
-		if (!VertexShaderCode.empty())
+		if (!CORE_VertexShaderCode.empty())
 		{
-			shaders.push_back(new Shader(name + "_vert", VertexShaderCode, ShaderType::VERTEX));
-		}
-		if (!GeometryShaderCode.empty())
-		{
-			shaders.push_back(new Shader(name + "_geom", GeometryShaderCode, ShaderType::GEOMETRY));
-		}
-		if (!FragmentShaderCode.empty())
-		{
-			shaders.push_back(new Shader(name + "_frag", FragmentShaderCode, ShaderType::FRAGMENT));
+			if (m_isGlobal)
+				CORE_VertexShader = GlobalAssets.createShader(name + "_vert", CORE_VertexShaderCode, ShaderType::VERTEX);
+			else
+				CORE_VertexShader = SceneAssets.createShader(name + "_vert", CORE_VertexShaderCode, ShaderType::VERTEX);
+
 		}
 
-		if (shaders.empty())
-			return;
+		if (!CORE_GeometryShaderCode.empty())
+		{
+			if (m_isGlobal)
+				CORE_GeometryShader = GlobalAssets.createShader(name + "_geom", CORE_GeometryShaderCode, ShaderType::GEOMETRY);
+			else
+				CORE_GeometryShader = SceneAssets.createShader(name + "_geom", CORE_GeometryShaderCode, ShaderType::GEOMETRY);
+		}
+
+		if (!CORE_FragmentShaderCode.empty())
+		{
+			if (m_isGlobal)
+			{
+				CORE_FragmentShader = GlobalAssets.createShader(name + "_frag", CORE_FragmentShaderCode, ShaderType::FRAGMENT);
+				COLORID_FragmentShader = GlobalAssets.createShader(name + "_colorID_frag", COLORID_FragmentShaderCode, ShaderType::FRAGMENT);
+			}
+			else
+			{
+				CORE_FragmentShader = SceneAssets.createShader(name + "_frag", CORE_FragmentShaderCode, ShaderType::FRAGMENT);
+				COLORID_FragmentShader = SceneAssets.createShader(name + "_colorID_frag", COLORID_FragmentShaderCode, ShaderType::FRAGMENT);
+			}
+		}
+
+		// Array of Shaders
+		std::vector<ShaderIndex> CORE_Shaders;
+		std::vector<ShaderIndex> COLORID_Shaders;
+		// Vert
+		if (CORE_VertexShader != -1)
+		{
+			CORE_Shaders.push_back(CORE_VertexShader);
+			COLORID_Shaders.push_back(CORE_VertexShader);
+		}
+		// Geom
+		if (CORE_GeometryShader != -1)
+		{
+			CORE_Shaders.push_back(CORE_GeometryShader);
+			COLORID_Shaders.push_back(CORE_GeometryShader);
+		}
+		// Frag
+		if (CORE_FragmentShader != -1)
+		{
+			CORE_Shaders.push_back(CORE_FragmentShader);
+		}
+		if (COLORID_FragmentShader != -1)
+		{
+			COLORID_Shaders.push_back(COLORID_FragmentShader);
+		}
+
 
 		// Create Core Program
-		if(GlobalAsset)
-			m_coreProgram = GlobalAssets.createShaderProgram(name + "_program", shaders);
+		if (m_isGlobal)
+		{
+			m_coreProgram = GlobalAssets.createShaderProgram(name + "_program", CORE_Shaders);
+			m_colorIDProgram = GlobalAssets.createShaderProgram(name + "_colorID_program", COLORID_Shaders);
+		}
 		else
-			m_coreProgram = SceneAssets.createShaderProgram(name + "_program", shaders);
+		{
+			m_coreProgram = SceneAssets.createShaderProgram(name + "_program", CORE_Shaders);
+			m_colorIDProgram = SceneAssets.createShaderProgram(name + "_colorID_program", COLORID_Shaders);
+		}
 
 		// Data
 		m_targetLevels = targetLevels;
+	}
+
+	ShaderProgram* ShaderMaterial::getProgram(ShaderMaterialType type)
+	{
+		switch (type)
+		{
+		case ShaderMaterialType::CORE:
+			return Assets.getShaderProgram(m_coreProgram);
+		case ShaderMaterialType::COLORID:
+			return Assets.getShaderProgram(m_colorIDProgram);
+		case ShaderMaterialType::DEPTH:
+			return Assets.getShaderProgram(m_depthOnlyProgram);
+		default:
+			VXL_ERROR("Invalid Enum type for getting Program from ShaderMaterial");
+			return nullptr;
+		}
 	}
 }

@@ -92,40 +92,48 @@ namespace Vxl
 	//		return empty_uni;
 	//	}
 
-	ShaderProgram* Material::getCoreProgram(void) const
+	//	ShaderProgram* Material::getProgram(ShaderMaterialType type) const
+	//	{
+	//		ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
+	//		if (_shaderMat)
+	//		{
+	//			return Assets.getShaderProgram(_shaderMat->m_coreProgram);
+	//		}
+	//		return nullptr;
+	//	}
+
+
+	ShaderProgram* Material::getProgram(ShaderMaterialType type)
 	{
-		ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
-		if (_shaderMat)
-		{
-			return Assets.getShaderProgram(_shaderMat->m_coreProgram);
-		}
+		ShaderMaterial* _shaderMaterial = Assets.getShaderMaterial(m_shaderMaterial);
+		if (_shaderMaterial)
+			return _shaderMaterial->getProgram(type);
+
 		return nullptr;
 	}
 
-	bool Material::bindCoreProgram()
+	bool Material::bindProgram(ShaderMaterialType type)
 	{
-		ShaderProgram* corePogram = getCoreProgram();
-		if (corePogram && corePogram->isLinked())
+		ShaderProgram* _program = getProgram(type);
+		if (_program && _program->isLinked())
 		{
-			corePogram->bind();
+			_program->bind();
 			return true;
 		}
 		return false;
 	}
-	void Material::bindCoreProgramUniforms(EntityIndex _entity)
+	bool Material::bindProgramUniforms(ShaderMaterialType type, EntityIndex _entity)
 	{
-		ShaderMaterial* _shaderMaterial = Assets.getShaderMaterial(m_shaderMaterial);
-		if (_shaderMaterial)
+		ShaderProgram* _program = getProgram(type);
+		if (_program)
 		{
-			ShaderProgram* _shaderProgram = Assets.getShaderProgram(_shaderMaterial->m_coreProgram);
-			if (_shaderProgram)
-			{
-				_shaderProgram->bindCommonUniforms(_entity);
-				_shaderProgram->bindCustomUniforms();
-			}
+			_program->bindCommonUniforms(_entity);
+			_program->bindCustomUniforms();
+			return true;
 		}
+		return false;
 	}
-	void Material::bindStates()
+	void Material::bindProgramStates()
 	{
 		// bind Modes
 		Graphics::SetCullMode(m_cullType);

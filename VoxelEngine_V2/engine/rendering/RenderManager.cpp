@@ -86,7 +86,7 @@ namespace Vxl
 		const auto& shaderMaterials = Assets.getAllShaderMaterial();
 		for (auto& shaderMaterial : shaderMaterials)
 		{
-			shaderMaterial.second->reload(false);
+			shaderMaterial.second->reload();
 		}
 	}
 	void RenderManager::ReloadWindow()
@@ -143,11 +143,9 @@ namespace Vxl
 		Debug.DestroyGLResources();
 		//GlobalRenderText.DestoryGLResources();
 
-//#ifdef GLOBAL_IMGUI
-//		GUI_Viewport.DestroyGLResources();
-//#endif
+		//GUI_Viewport.DestroyGLResources();
 
-		Gizmo::DestroyGLResources();
+		//Gizmo::DestroyGLResources();
 
 		GlobalAssets.DestroyAndEraseAll();
 	}
@@ -283,17 +281,17 @@ namespace Vxl
 	{
 		Material* material = Assets.getMaterial(_material);
 
-		// If material program didn't link, use error material instead
 		if (material)
 		{
-			if (!material->bindCoreProgram())
+			if (!material->bindProgram(ShaderMaterialType::CORE))
 			{
+				// If material program didn't link, use error material instead
 				material = GlobalAssets.get_MaterialError();
-				if (!material->bindCoreProgram())
+				if (!material->bindProgram(ShaderMaterialType::CORE))
 					VXL_ERROR("Error Material failed to compile");
 			}
 
-			material->bindStates();
+			material->bindProgramStates();
 
 			if(material->m_sharedTextures)
 				material->bindTextures();
@@ -308,7 +306,7 @@ namespace Vxl
 						if (!material->m_sharedTextures)
 							material->bindTextures(ent);
 
-						material->bindCoreProgramUniforms(ent->m_uniqueID);
+						material->bindProgramUniforms(ShaderMaterialType::CORE, ent->m_uniqueID);
 
 						mesh->draw();
 					}
@@ -316,7 +314,46 @@ namespace Vxl
 			}
 		}
 	}
-	void RenderManager::renderOpaque()
+	void RenderManager::render_ColorID(MaterialIndex _material, const std::vector<Entity*>& _entities)
+	{
+		Material* material = Assets.getMaterial(_material);
+
+		if (material)
+		{
+			if (!material->bindProgram(ShaderMaterialType::COLORID))
+			{
+				return;
+				// If material program didn't link, use error material instead
+				//	material = GlobalAssets.get_MaterialError();
+				//	if (!material->bindProgram(ShaderMaterialType::CORE))
+				//		VXL_ERROR("Error Material failed to compile");
+			}
+
+			material->bindProgramStates();
+
+			if (material->m_sharedTextures)
+				material->bindTextures();
+
+			for (auto& ent : _entities)
+			{
+				if (ent->IsFamilyActive())
+				{
+					Mesh* mesh = Assets.getMesh(ent->m_mesh);
+					if (mesh)
+					{
+						if (!material->m_sharedTextures)
+							material->bindTextures(ent);
+
+						material->bindProgramUniforms(ShaderMaterialType::COLORID, ent->m_uniqueID);
+
+						mesh->draw();
+					}
+				}
+			}
+		}
+	}
+
+	void RenderManager::renderOpaque(ShaderMaterialType type)
 	{
 		// Check all materials in order
 		for (const auto& data : m_materialSequence)
@@ -325,11 +362,20 @@ namespace Vxl
 			// Render all associated entities tied to that material
 			if (m_renderlist_opaque.find(_materialIndex) != m_renderlist_opaque.end())
 			{
-				render(_materialIndex, m_renderlist_opaque[_materialIndex]);
+				switch (type)
+				{
+				case ShaderMaterialType::CORE:
+					render(_materialIndex, m_renderlist_opaque[_materialIndex]);
+					continue;
+
+				case ShaderMaterialType::COLORID:
+					render_ColorID(_materialIndex, m_renderlist_opaque[_materialIndex]);
+					continue;
+				}
 			}
 		}
 	}
-	void RenderManager::renderTransparent()
+	void RenderManager::renderTransparent(ShaderMaterialType type)
 	{
 		// Check all materials in order
 		for (const auto& data : m_materialSequence)
@@ -338,7 +384,16 @@ namespace Vxl
 			// Render all associated entities tied to that material
 			if (m_renderlist_transparent.find(_materialIndex) != m_renderlist_transparent.end())
 			{
-				render(_materialIndex, m_renderlist_transparent[_materialIndex]);
+				switch (type)
+				{
+				case ShaderMaterialType::CORE:
+					render(_materialIndex, m_renderlist_opaque[_materialIndex]);
+					continue;
+
+				case ShaderMaterialType::COLORID:
+					render_ColorID(_materialIndex, m_renderlist_opaque[_materialIndex]);
+					continue;
+				}
 			}
 		}
 	}

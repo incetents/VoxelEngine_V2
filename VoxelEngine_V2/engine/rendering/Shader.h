@@ -35,7 +35,6 @@ namespace Vxl
 	{
 		DISALLOW_COPY_AND_ASSIGN(Shader);
 		friend class _Assets;
-		friend class ShaderMaterial;
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
 	private:
@@ -45,6 +44,7 @@ namespace Vxl
 		const ShaderType	m_type;
 		std::string			m_source;
 		std::string			m_sourceLines;
+		uint32_t			m_sourceLineCount;
 		std::string			m_errorMessage;
 		static std::map<ShaderID, Shader*> m_brokenShaders;
 
@@ -90,7 +90,7 @@ namespace Vxl
 		ShaderProgramID				m_id;
 		const std::string			m_name;
 		bool						m_linked;
-		std::vector<Shader*>		m_shaders;
+		std::vector<ShaderIndex>	m_shaders;
 		ShaderAttributes			m_attributes;
 		ShaderUniforms				m_uniforms;
 		ShaderUniformStorage		m_uniformStorage;
@@ -102,7 +102,7 @@ namespace Vxl
 		//
 		void setupCommonUniform(const std::string& name, std::optional<Graphics::Uniform>& uniform);
 
-		ShaderProgram(const std::string& name, const std::vector<Shader*>& _shaders);
+		ShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders);
 	public:
 		~ShaderProgram();
 
@@ -181,6 +181,7 @@ namespace Vxl
 		std::optional<Graphics::Uniform> m_uniform_tint = std::nullopt;
 		std::optional<Graphics::Uniform> m_uniform_alpha = std::nullopt;
 		std::optional<Graphics::Uniform> m_uniform_output = std::nullopt;
+		std::optional<Graphics::Uniform> m_uniform_colorID = std::nullopt;
 
 		// Binding Common Uniforms [VXL_]
 		void bindCommonUniforms(EntityIndex _entity);
@@ -205,26 +206,36 @@ namespace Vxl
 		{
 			return m_errorMessage;
 		}
-		inline std::vector<Shader*>		getShaders(void) const
+		inline std::vector<ShaderIndex>		getShaders(void) const
 		{
 			return m_shaders;
 		}
 	};
 
+	enum class ShaderMaterialType
+	{
+		CORE,
+		COLORID,
+		DEPTH
+	};
 	class ShaderMaterial
 	{
 		DISALLOW_COPY_AND_ASSIGN(ShaderMaterial);
 		friend class _Assets;
 		friend class RenderManager;
 	private:
+		const bool m_isGlobal;
 		ShaderMaterial(const std::string& filePath, bool GlobalAsset);
-		void reload(bool GlobalAsset);
+		void reload();
 	public:
-		const std::string			m_filePath;			// File used to load
-		std::vector<TextureLevel>	m_targetLevels;		// Textures used in program
+		const std::string			m_filePath;				// File used to load
+		std::vector<TextureLevel>	m_targetLevels;			// Textures used in program
 		ShaderProgramIndex			m_coreProgram = -1;		// Main Program used for rendering
 		ShaderProgramIndex			m_colorIDProgram = -1;	// Alternate program used only for ColorID output
-		ShaderProgramIndex			m_depthOnlyProgram = -1;	// Alternate program only outputting depth
+		ShaderProgramIndex			m_depthOnlyProgram = -1;// Alternate program only outputting depth
+
+		// Utility
+		ShaderProgram* getProgram(ShaderMaterialType type);
 	};
 }
 

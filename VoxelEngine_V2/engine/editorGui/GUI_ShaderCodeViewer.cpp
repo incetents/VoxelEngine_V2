@@ -10,6 +10,14 @@
 
 namespace Vxl
 {
+	ShaderCodeViewer::ShaderCodeViewer()
+	{
+		for (uint32_t i = 1; i < SHADER_LINE_MAX; i++)
+		{
+			m_linesCounted += std::to_string(i) + '\n';
+		}
+	}
+
 	void ShaderCodeViewer::Draw()
 	{
 		auto _ShaderPrograms = Assets.getAllShaderProgram();
@@ -20,8 +28,12 @@ namespace Vxl
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::Orange);
 
 				auto& _Shaders = _Program.second->m_shaders;
-				for (const auto& _Shader : _Shaders)
+				for (uint32_t _ShaderIndex : _Shaders)
 				{
+					Shader* _Shader = Assets.getShader(_ShaderIndex);
+					if (!_Shader)
+						continue;
+
 					if (ImGui::TreeNode(_Shader->m_name.c_str()))
 					{
 						if (_Shader->m_source.empty())
@@ -34,15 +46,32 @@ namespace Vxl
 
 							ImGui::Separator();
 
-							size_t size = _Shader->m_sourceLines.size();
-							ImGui::TextColored(ImGuiColor::Orange, _Shader->m_sourceLines.c_str(), _Shader->m_sourceLines.c_str() + size);
+							// Lines
+							ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::ImGuiColor::Orange);
+							// find correct end line in a giant list of numbers (1\n2\n3\n4\n5\n...etc..)
+							uint32_t adjustedLineCount = _Shader->m_sourceLineCount * 2;
+							if (adjustedLineCount > 9)
+								adjustedLineCount += _Shader->m_sourceLineCount - 9;
+							if (adjustedLineCount > 99)
+								adjustedLineCount += _Shader->m_sourceLineCount - 99;
+							if (adjustedLineCount > 999)
+								adjustedLineCount += _Shader->m_sourceLineCount - 999;
+							if (adjustedLineCount > 9999)
+								adjustedLineCount += _Shader->m_sourceLineCount - 9999;
+							if (adjustedLineCount > 99999)
+								adjustedLineCount += _Shader->m_sourceLineCount - 99999;
+
+							ImGui::TextUnformatted(m_linesCounted.c_str(), m_linesCounted.c_str() + adjustedLineCount);
+
+							ImGui::PopStyleColor();
 
 							ImGui::NextColumn();
 
-							size = _Shader->m_source.size();
+							// Source Code
 							ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::White);
-							ImGui::TextUnformatted(_Shader->m_source.c_str(), _Shader->m_source.c_str() + size);
+							ImGui::TextUnformatted(_Shader->m_source.c_str(), _Shader->m_source.c_str() + _Shader->m_source.size());
 							ImGui::PopStyleColor();
+							
 							ImGui::NextColumn();
 
 							ImGui::Columns(1);

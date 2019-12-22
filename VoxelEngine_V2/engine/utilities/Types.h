@@ -12,6 +12,7 @@ namespace Vxl
 	using MeshIndex = uint32_t;
 	using LineMesh3DIndex = uint32_t;
 	using LineMesh2DIndex = uint32_t;
+	using ShaderIndex = uint32_t;
 	using ShaderProgramIndex = uint32_t;
 	using ShaderMaterialIndex = uint32_t;
 	using MaterialIndex = uint32_t;
