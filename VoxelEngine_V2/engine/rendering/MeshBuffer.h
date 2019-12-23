@@ -12,7 +12,6 @@ namespace Vxl
 	template<typename Type>
 	class MeshBuffer
 	{
-		DISALLOW_COPY_AND_ASSIGN(MeshBuffer);
 	private:
 		VBO			m_vbo;
 		BufferUsage m_bindMode;
@@ -79,7 +78,6 @@ namespace Vxl
 
 	class MeshBufferIndices
 	{
-		DISALLOW_COPY_AND_ASSIGN(MeshBufferIndices);
 	private:
 		EBO			m_ebo;
 		BufferUsage m_bindMode;
