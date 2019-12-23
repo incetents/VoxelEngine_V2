@@ -215,8 +215,7 @@ namespace Vxl
 	enum class ShaderMaterialType
 	{
 		CORE,
-		COLORID,
-		DEPTH
+		COLORID
 	};
 	class ShaderMaterial
 	{
@@ -232,7 +231,6 @@ namespace Vxl
 		std::vector<TextureLevel>	m_targetLevels;			// Textures used in program
 		ShaderProgramIndex			m_coreProgram = -1;		// Main Program used for rendering
 		ShaderProgramIndex			m_colorIDProgram = -1;	// Alternate program used only for ColorID output
-		ShaderProgramIndex			m_depthOnlyProgram = -1;// Alternate program only outputting depth
 
 		// Utility
 		ShaderProgram* getProgram(ShaderMaterialType type);

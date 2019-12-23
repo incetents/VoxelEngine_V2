@@ -532,12 +532,10 @@ namespace Vxl
 		// Delete existing ShaderPrograms
 		Assets.deleteShaderProgram(m_coreProgram);
 		Assets.deleteShaderProgram(m_colorIDProgram);
-		Assets.deleteShaderProgram(m_depthOnlyProgram);
 
 		m_targetLevels.clear();
 		m_coreProgram = -1;
 		m_colorIDProgram = -1;
-		m_depthOnlyProgram = -1;
 
 		std::string file = FileIO::readFile(m_filePath);
 		if (file.empty())
@@ -971,8 +969,6 @@ namespace Vxl
 			return Assets.getShaderProgram(m_coreProgram);
 		case ShaderMaterialType::COLORID:
 			return Assets.getShaderProgram(m_colorIDProgram);
-		case ShaderMaterialType::DEPTH:
-			return Assets.getShaderProgram(m_depthOnlyProgram);
 		default:
 			VXL_ERROR("Invalid Enum type for getting Program from ShaderMaterial");
 			return nullptr;
