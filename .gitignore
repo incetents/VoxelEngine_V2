@@ -36,3 +36,5 @@
 build32/
 
 build64/
+
+!assets/
