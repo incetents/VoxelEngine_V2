@@ -5,7 +5,6 @@
 *.slo
 *.lo
 *.o
-*.obj
 
 # Precompiled Headers
 *.gch
@@ -37,4 +36,4 @@ build32/
 
 build64/
 
-!assets/
+
