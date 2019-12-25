@@ -117,227 +117,113 @@ namespace Vxl
 		);
 
 		// FBO Gbuffer
-		fboIndex_gbuffer = SceneAssets.createFramebuffer("gbuffer");
-		FramebufferObject* fbo_gbuffer_ptr = Assets.getFramebufferObject(fboIndex_gbuffer);
-		fbo_gbuffer_ptr->setSizeToViewportSize();
+		{
+			fboIndex_gbuffer = SceneAssets.createFramebuffer("gbuffer");
+			FramebufferObject* fbo_gbuffer_ptr = Assets.getFramebufferObject(fboIndex_gbuffer);
+			fbo_gbuffer_ptr->setSizeToViewportSize();
 
-		// render targets
-		fbotex_gbuffer_albedo = SceneAssets.createRenderTexture(
-			"albedo",
-			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
-			TextureFormat::SRGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			// render targets
+			fbotex_gbuffer_albedo = SceneAssets.createRenderTexture(
+				"albedo",
+				fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
+				TextureFormat::SRGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
-		fbotex_gbuffer_normal = SceneAssets.createRenderTexture(
-			"normal",
-			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
-			TextureFormat::RGBA16_SNORM, TexturePixelType::UNSIGNED_BYTE, false);
+			fbotex_gbuffer_normal = SceneAssets.createRenderTexture(
+				"normal",
+				fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
+				TextureFormat::RGBA16_SNORM, TexturePixelType::UNSIGNED_BYTE, false);
+			Assets.getRenderTexture(fbotex_gbuffer_normal)->m_viewMode = RenderTexture::ViewMode::ABSOLUTE_VALUE;
 
-		fbotex_gbuffer_reflection = SceneAssets.createRenderTexture(
-			"reflection",
-			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
-			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			fbotex_gbuffer_reflection = SceneAssets.createRenderTexture(
+				"reflection",
+				fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
+				TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
-		fbotex_gbuffer_depth = SceneAssets.createRenderTextureDepth(
-			fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
-			TextureDepthFormat::DEPTH32
-		);
+			fbotex_gbuffer_depth = SceneAssets.createRenderTextureDepth(
+				fbo_gbuffer_ptr->getWidth(), fbo_gbuffer_ptr->getHeight(),
+				TextureDepthFormat::DEPTH32
+			);
 
-		fbo_gbuffer_ptr->bind();
-		fbo_gbuffer_ptr->setRenderTexture(0, fbotex_gbuffer_albedo);
-		fbo_gbuffer_ptr->setRenderTexture(1, fbotex_gbuffer_normal);
-		fbo_gbuffer_ptr->setRenderTexture(2, fbotex_gbuffer_reflection);
-		fbo_gbuffer_ptr->setRenderTextureDepth(fbotex_gbuffer_depth);
-		fbo_gbuffer_ptr->checkFBOStatus();
-		fbo_gbuffer_ptr->unbind();
+			fbo_gbuffer_ptr->bind();
+			fbo_gbuffer_ptr->setRenderTexture(0, fbotex_gbuffer_albedo);
+			fbo_gbuffer_ptr->setRenderTexture(1, fbotex_gbuffer_normal);
+			fbo_gbuffer_ptr->setRenderTexture(2, fbotex_gbuffer_reflection);
+			fbo_gbuffer_ptr->setRenderTextureDepth(fbotex_gbuffer_depth);
+			fbo_gbuffer_ptr->checkFBOStatus();
+			fbo_gbuffer_ptr->unbind();
+		}
 
 		// FBO Editor Post
-		fboIndex_editor = SceneAssets.createFramebuffer("editor");
-		FramebufferObject* fbo_editor_ptr = Assets.getFramebufferObject(fboIndex_editor);
-		fbo_editor_ptr->setSizeToViewportSize();
+		{
+			fboIndex_editor = SceneAssets.createFramebuffer("editor");
+			FramebufferObject* fbo_editor_ptr = Assets.getFramebufferObject(fboIndex_editor);
+			fbo_editor_ptr->setSizeToViewportSize();
 
-		// render targets
-		fbotex_editor_albedo = SceneAssets.createRenderTexture(
-			"albedo",
-			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
-			TextureFormat::SRGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			// render targets
+			fbotex_editor_albedo = SceneAssets.createRenderTexture(
+				"albedo",
+				fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
+				TextureFormat::SRGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
-		fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
-			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
-			TextureDepthFormat::DEPTH32
-		);
+			fbotex_editor_depth = SceneAssets.createRenderBufferDepth(
+				fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
+				TextureDepthFormat::DEPTH32
+			);
 
-		fbo_editor_ptr->bind();
-		fbo_editor_ptr->setRenderTexture(0, fbotex_editor_albedo);
-		fbo_editor_ptr->setRenderBufferDepth(fbotex_editor_depth);
-		fbo_editor_ptr->checkFBOStatus();
-		fbo_editor_ptr->unbind();
-
-
-
-
-
-
-
-
-		//	{
-		//		// FBO Editor Post
-		//		fboIndex_editor2 = SceneAssets.createFramebuffer();
-		//		FramebufferObject* fbo_editor_ptr = Assets.getFramebufferObject(fboIndex_editor2);
-		//		fbo_editor_ptr->setSizeToViewportSize();
-		//	
-		//		// render targets
-		//		SceneAssets.createRenderTexture(
-		//			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
-		//			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
-		//	
-		//		SceneAssets.createRenderBufferDepth(
-		//			fbo_editor_ptr->getWidth(), fbo_editor_ptr->getHeight(),
-		//			TextureDepthFormat::DEPTH32
-		//		);
-		//	
-		//		fbo_editor_ptr->bind();
-		//		fbo_editor_ptr->setAttachment(0, Assets.getRenderTexture(fbotex_editor_albedo));
-		//		fbo_editor_ptr->setDepth(Assets.getRenderBufferDepth(fbotex_editor_depth));
-		//		fbo_editor_ptr->checkFBOStatus();
-		//		fbo_editor_ptr->unbind();
-		//	}
-
-
-
-
+			fbo_editor_ptr->bind();
+			fbo_editor_ptr->setRenderTexture(0, fbotex_editor_albedo);
+			fbo_editor_ptr->setRenderBufferDepth(fbotex_editor_depth);
+			fbo_editor_ptr->checkFBOStatus();
+			fbo_editor_ptr->unbind();
+		}
 
 		// FBO Color Picker
-		fboIndex_colorpicker = SceneAssets.createFramebuffer("colorPicker");
-		FramebufferObject* fbo_colorPicker_ptr = Assets.getFramebufferObject(fboIndex_colorpicker);
-		fbo_colorPicker_ptr->setSizeToViewportSize();
+		{
+			fboIndex_colorpicker = SceneAssets.createFramebuffer("colorPicker");
+			FramebufferObject* fbo_colorPicker_ptr = Assets.getFramebufferObject(fboIndex_colorpicker);
+			fbo_colorPicker_ptr->setSizeToViewportSize();
 
-		// render targets
-		fbotex_colorPicker_albedo = SceneAssets.createRenderTexture(
-			"albedo",
-			fbo_colorPicker_ptr->getWidth(), fbo_colorPicker_ptr->getHeight(),
-			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			// render targets
+			fbotex_colorPicker_albedo = SceneAssets.createRenderTexture(
+				"albedo",
+				fbo_colorPicker_ptr->getWidth(), fbo_colorPicker_ptr->getHeight(),
+				TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			// Default view mode
+			Assets.getRenderTexture(fbotex_colorPicker_albedo)->m_viewMode = RenderTexture::ViewMode::COLORFUL;
 
-		fbotex_colorPicker_depth = SceneAssets.createRenderBufferDepth(
-			fbo_colorPicker_ptr->getWidth(), fbo_colorPicker_ptr->getHeight(),
-			TextureDepthFormat::DEPTH32
-		);
+			fbotex_colorPicker_depth = SceneAssets.createRenderBufferDepth(
+				fbo_colorPicker_ptr->getWidth(), fbo_colorPicker_ptr->getHeight(),
+				TextureDepthFormat::DEPTH32
+			);
 
-		fbo_colorPicker_ptr->bind();
-		fbo_colorPicker_ptr->setRenderTexture(0, fbotex_colorPicker_albedo);
-		fbo_colorPicker_ptr->setRenderBufferDepth(fbotex_colorPicker_depth);
-		fbo_colorPicker_ptr->checkFBOStatus();
-		fbo_colorPicker_ptr->unbind();
+			fbo_colorPicker_ptr->bind();
+			fbo_colorPicker_ptr->setRenderTexture(0, fbotex_colorPicker_albedo);
+			fbo_colorPicker_ptr->setRenderBufferDepth(fbotex_colorPicker_depth);
+			fbo_colorPicker_ptr->checkFBOStatus();
+			fbo_colorPicker_ptr->unbind();
+		}
 
 		// FBO Composite
-		fboIndex_composite = SceneAssets.createFramebuffer("composite");
-		FramebufferObject* fbo_composite_ptr = Assets.getFramebufferObject(fboIndex_composite);
-		fbo_composite_ptr->setSizeToViewportSize();
+		{
+			fboIndex_composite = SceneAssets.createFramebuffer("composite");
+			FramebufferObject* fbo_composite_ptr = Assets.getFramebufferObject(fboIndex_composite);
+			fbo_composite_ptr->setSizeToViewportSize();
 
-		// render targets
-		fbotex_composite_albedo = SceneAssets.createRenderTexture(
-			"albedo",
-			fbo_composite_ptr->getWidth(), fbo_composite_ptr->getHeight(),
-			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
+			// render targets
+			fbotex_composite_albedo = SceneAssets.createRenderTexture(
+				"albedo",
+				fbo_composite_ptr->getWidth(), fbo_composite_ptr->getHeight(),
+				TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
 
-		fbo_composite_ptr->bind();
-		fbo_composite_ptr->setRenderTexture(0, fbotex_composite_albedo);
-		fbo_composite_ptr->checkFBOStatus();
-		fbo_composite_ptr->unbind();
-
-		//	// FBO Show Render Target
-		//	fboIndex_showRenderTarget = SceneAssets.createFramebuffer("showRenderTarget");
-		//	FramebufferObject* fbo_showRenderTarget_ptr = Assets.getFramebufferObject(fboIndex_showRenderTarget);
-		//	fbo_showRenderTarget_ptr->setSizeToViewportSize();
-
-		//	// render targets
-		//	fbotex_showRenderTarget_albedo = SceneAssets.createRenderTexture(
-		//		"albedo",
-		//		fbo_showRenderTarget_ptr->getWidth(), fbo_showRenderTarget_ptr->getHeight(),
-		//		TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false);
-		//	
-		//	fbo_showRenderTarget_ptr->bind();
-		//	fbo_showRenderTarget_ptr->setRenderTexture(0, fbotex_showRenderTarget_albedo);
-		//	fbo_showRenderTarget_ptr->checkFBOStatus();
-		//	fbo_showRenderTarget_ptr->unbind();
-
-		//	// Shaders
-		//	gbuffer_vert = SceneAssets.createShader("gbuffer_vert", FileIO::readFile("./assets/shaders/gbuffer.vert"), ShaderType::VERTEX);
-		//	gbuffer_frag = SceneAssets.createShader("gbuffer_frag", FileIO::readFile("./assets/shaders/gbuffer.frag"), ShaderType::FRAGMENT);
-		//	
-		//	passthrough_vert = SceneAssets.createShader("passthrough_vert", FileIO::readFile("./assets/shaders/passthrough.vert"), ShaderType::VERTEX);
-		//	passthrough_frag = SceneAssets.createShader("passthrough_frag", FileIO::readFile("./assets/shaders/passthrough.frag"), ShaderType::FRAGMENT);
-		//	
-		//	skybox_vert = SceneAssets.createShader("skybox_vert", FileIO::readFile("./assets/shaders/skybox.vert"), ShaderType::VERTEX);
-		//	skybox_frag = SceneAssets.createShader("skybox_frag", FileIO::readFile("./assets/shaders/skybox.frag"), ShaderType::FRAGMENT);
-		//	
-		//	lines_vert = SceneAssets.createShader("lines_vert", FileIO::readFile("./assets/shaders/lines.vert"), ShaderType::VERTEX);
-		//	lines_geom = SceneAssets.createShader("lines_geom", FileIO::readFile("./assets/shaders/lines.geom"), ShaderType::GEOMETRY);
-		//	lines_frag = SceneAssets.createShader("lines_frag", FileIO::readFile("./assets/shaders/lines.frag"), ShaderType::FRAGMENT);
-		//	
-		//	colorPicker_frag = SceneAssets.createShader("colorPicker_frag", FileIO::readFile("./assets/shaders/colorPicker.frag"), ShaderType::FRAGMENT);
-		//	
-		//	gizmo_vert = SceneAssets.createShader("gizmo_vert", FileIO::readFile("./assets/shaders/gizmo.vert"), ShaderType::VERTEX);
-		//	gizmo_frag = SceneAssets.createShader("gizmo_frag", FileIO::readFile("./assets/shaders/gizmo.frag"), ShaderType::FRAGMENT);
-		//	
-		//	showRenderTarget = SceneAssets.createShader("showRenderTarget", FileIO::readFile("./assets/shaders/showRenderTarget.frag"), ShaderType::FRAGMENT);
-		//	
-		//	billboard_vert = SceneAssets.createShader("billboard_vert", FileIO::readFile("./assets/shaders/billboard.vert"), ShaderType::VERTEX);
-		//	billboard_frag = SceneAssets.createShader("billboard_frag", FileIO::readFile("./assets/shaders/billboard.frag"), ShaderType::FRAGMENT);
-		//	
-		//	font_vert = SceneAssets.createShader("font_vert", FileIO::readFile("./assets/shaders/font.vert"), ShaderType::VERTEX);
-		//	font_frag = SceneAssets.createShader("font_frag", FileIO::readFile("./assets/shaders/font.frag"), ShaderType::FRAGMENT);
-		//	
-		//	// Shader Programs
-		//	shader_gbuffer = SceneAssets.createShaderProgram("gbuffer", {
-		//		Assets.getShader(gbuffer_vert),
-		//		Assets.getShader(gbuffer_frag)
-		//		});
-		//	
-		//	shader_passthroughWorld = SceneAssets.createShaderProgram("passthroughWorld", {
-		//		Assets.getShader(passthrough_vert),
-		//		Assets.getShader(passthrough_frag)
-		//		});
-		//	
-		//	shader_skybox = SceneAssets.createShaderProgram("skybox", {
-		//		Assets.getShader(skybox_vert),
-		//		Assets.getShader(skybox_frag)
-		//		});
-		//	
-		//	shader_lines = SceneAssets.createShaderProgram("lines", {
-		//		Assets.getShader(lines_vert),
-		//		Assets.getShader(lines_geom),
-		//		Assets.getShader(lines_frag)
-		//		});
-		//	
-		//	shader_colorPicker = SceneAssets.createShaderProgram("colorPicker", {
-		//		Assets.getShader(gbuffer_vert),
-		//		Assets.getShader(colorPicker_frag)
-		//		});
-		//	
-		//	shader_gizmo = SceneAssets.createShaderProgram("gizmo", {
-		//		Assets.getShader(gizmo_vert),
-		//		Assets.getShader(gizmo_frag)
-		//		});
-		//	
-		//	shader_showRenderTarget = SceneAssets.createShaderProgram("showRenderTarget", {
-		//		Assets.getShader(passthrough_vert),
-		//		Assets.getShader(showRenderTarget)
-		//		});
-		//	
-		//	shader_billboard = SceneAssets.createShaderProgram("billboard", {
-		//		Assets.getShader(billboard_vert),
-		//		Assets.getShader(billboard_frag)
-		//		});
-		//	
-		//	shader_font = SceneAssets.createShaderProgram("font", {
-		//		Assets.getShader(font_vert),
-		//		Assets.getShader(font_frag)
-		//		});
+			fbo_composite_ptr->bind();
+			fbo_composite_ptr->setRenderTexture(0, fbotex_composite_albedo);
+			fbo_composite_ptr->checkFBOStatus();
+			fbo_composite_ptr->unbind();
+		}
 
 		// Shader Materials
 		sMat_skybox = SceneAssets.createShaderMaterial("./assets/materials/skybox.material");
 		sMat_gbuffer = SceneAssets.createShaderMaterial("./assets/materials/gbuffer.material");
-		//sMat_displayRenderTarget = SceneAssets.createShaderMaterial("./assets/materials/displayRenderTarget.material");
 
 		// Materials
 		material_skybox = SceneAssets.createMaterial("skybox");
@@ -598,7 +484,7 @@ namespace Vxl
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 			entity_ptr->m_transform.setPosition(Vector3(-2, 2, -6.6f));
 		}
-
+		
 		entity_arrowX = SceneAssets.createEntity("_arrowX");
 		{
 			Entity* entity_ptr = Assets.getEntity(entity_arrowX);
@@ -978,19 +864,42 @@ namespace Vxl
 		Debug.DrawLineArrow(Vector3(0, 0, 0), Vector3(sinf(Time.GetTimef()), sinf(Time.GetTimef() * 0.5f) * 2.0f * 1, cosf(Time.GetTimef())), 5.0f, 2.0f, Color3F::RED);
 
 		// Draw Jiggy outline
-		Entity* jiggy_entity = Assets.getEntity(entity_jiggy);
-		if (jiggy_entity)
+		//	Entity* jiggy_entity = Assets.getEntity(entity_jiggy);
+		//	if (jiggy_entity)
+		//	{
+		//		// AABB
+		//		Debug.DrawLineAABB(
+		//			jiggy_entity->GetAABB(),
+		//			2.0f,
+		//			Color3F::RED
+		//		);
+		//		// OBB
+		//		Debug.DrawLineOBB(jiggy_entity->GetOBB(), 5.0f, Color3F::BLUE);
+		//	//
+		//	}
+
+		// Draw Outline for all Selected Objects
+		for (SceneNodeIndex sceneNodeIndex : Editor.m_selectedNodes)
 		{
-			// AABB
-			Debug.DrawLineAABB(
-				jiggy_entity->GetAABB(),
-				2.0f,
-				Color3F::RED
-			);
-			// OBB
-			//Debug.DrawLineOBB(*jiggy_entity, jiggy_entity->m_transform.getWorldPosition(), 1.0f, Color3F::BLUE);
-			Debug.DrawLineOBB(jiggy_entity->GetOBB(), 5.0f, Color3F::BLUE);
-		//
+			SceneNode* sceneNode = Assets.getSceneNode(sceneNodeIndex);
+			//
+			switch (sceneNode->getType())
+			{
+			//
+			case SceneNodeType::ENTITY:
+			{
+				Entity* entity = sceneNode->getEntity();
+				Debug.DrawLineAABB(
+					entity->GetAABB(),
+					2.0f,
+					Color3F::RED
+				);
+				// OBB
+				Debug.DrawLineOBB(entity->GetOBB(), 5.0f, Color3F::BLUE);
+				break;
+			}
+			//
+			}
 		}
 
 
@@ -1149,7 +1058,6 @@ namespace Vxl
 				}
 
 				// Lines
-				//Mesh* meshLines_Arrow = Assets.getMesh(Primitives.GetLines_ArrowZ());
 				Mesh* mesh_ArrowZ = Assets.getMesh(Primitives.GetArrowZNoTail());
 				if (mesh_ArrowZ)
 				{
@@ -1333,7 +1241,7 @@ namespace Vxl
 
 
 		// Render ColorID Selection Information
-		if(Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
+		if (Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
 		{
 			fbo_colorPicker->bind();
 			fbo_colorPicker->clearBuffers();
@@ -1343,49 +1251,41 @@ namespace Vxl
 			//
 			RenderManager.renderOpaque(ShaderMaterialType::COLORID);
 			RenderManager.renderTransparent(ShaderMaterialType::COLORID);
-		}
 
-		//if (!gizmo.IsSelected() && !gizmo.IsClicked() && Input.getMouseButtonDown(MouseButton::LEFT) && !Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
-		{
-		//		if (DEVCONSOLE_GET_BOOL("Objects are Clickable", true))
-		//		{
-		//			fbo_gbuffer->bind();
-		//	
-		//			RawArray<uint8_t> data = fbo_gbuffer->readPixelsFromMouse(3, 1, 1);
-		//			if (!data.IsEmpty())
-		//			{
-		//	
-		//				unsigned int EntityIndex = Util::Conversion::uchars_to_uint(data.start);
-		//				data.Deallocate();
-		//	
-		//				Entity* SelectedEntity = Entity::GetEntityByID(EntityIndex);
-		//	
-		//				// Found an entity
-		//				if (SelectedEntity && SelectedEntity->IsSelectable())
-		//				{
-		//					if (Input.getKey(KeyCode::LEFT_CONTROL))
-		//					{
-		//						if (!SelectedEntity->IsSelected())
-		//							Editor.AddSelection(SelectedEntity);
-		//						else
-		//							Editor.RemoveSelection(SelectedEntity);
-		//					}
-		//					else
-		//					{
-		//						Editor.ClearSelection();
-		//						Editor.AddSelection(SelectedEntity);
-		//					}
-		//				}
-		//				else
-		//				{
-		//					Editor.ClearSelection();
-		//				}
-		//	
-		//				//if ()
-		//				//	std::cout << mem.ui_ID << ", Entity: " << Entities[mem.ui_ID]->m_name << std::endl;
-		//	
-		//			}
-		//		}
+			// Read Selected Pixel
+			RawArray<uint8_t> data = fbo_colorPicker->readPixelsFromMouse(0, 1, 1);
+			if (!data.isEmpty())
+			{
+				uint32_t sceneNodeIndex = Util::Conversion::uchars_to_uint(data.start);
+				data.deallocate();
+
+				// Toggle selection based on node state
+				SceneNode* sceneNode = Assets.getSceneNode(sceneNodeIndex);
+				if (sceneNode)
+				{
+					if (sceneNode->m_isSelectable)
+					{
+						if (Input.getKey(KeyCode::LEFT_CONTROL))
+						{
+							if (!sceneNode->IsSelected())
+								Editor.addSelection(sceneNodeIndex);
+							else
+								Editor.removeSelection(sceneNodeIndex);
+						}
+						else
+						{
+							Editor.clearSelection();
+							Editor.addSelection(sceneNodeIndex);
+						}
+					}
+					else
+						Editor.clearSelection();
+				}
+				else
+					Editor.clearSelection();
+			}
+			else
+				Editor.clearSelection();
 		}
 
 		// ~~ //

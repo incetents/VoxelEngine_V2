@@ -14,6 +14,13 @@
 
 #include "../game/Scene_Game.h"
 
+// Force Discrete Graphics Card
+extern "C"
+{
+	__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 /**/
 using namespace Vxl;
 using namespace std;

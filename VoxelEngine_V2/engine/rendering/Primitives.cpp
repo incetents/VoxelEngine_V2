@@ -1135,20 +1135,20 @@ namespace Vxl
 				Vector3(+0.5f, +0.5f, +0.5f),
 				Vector3(-0.5f, +0.5f, +0.5f),
 				//
-Vector3(-0.5f, -0.5f, -0.5f),
-Vector3(+0.5f, -0.5f, -0.5f),
-Vector3(+0.5f, -0.5f, +0.5f),
-Vector3(-0.5f, -0.5f, +0.5f),
-//
-Vector3(-0.5f, -0.5f, -0.5f),
-Vector3(-0.5f, +0.5f, -0.5f),
-Vector3(-0.5f, +0.5f, +0.5f),
-Vector3(-0.5f, -0.5f, +0.5f),
-//
-Vector3(+0.5f, -0.5f, -0.5f),
-Vector3(+0.5f, +0.5f, -0.5f),
-Vector3(+0.5f, +0.5f, +0.5f),
-Vector3(+0.5f, -0.5f, +0.5f),
+				Vector3(-0.5f, -0.5f, -0.5f),
+				Vector3(+0.5f, -0.5f, -0.5f),
+				Vector3(+0.5f, -0.5f, +0.5f),
+				Vector3(-0.5f, -0.5f, +0.5f),
+				//
+				Vector3(-0.5f, -0.5f, -0.5f),
+				Vector3(-0.5f, +0.5f, -0.5f),
+				Vector3(-0.5f, +0.5f, +0.5f),
+				Vector3(-0.5f, -0.5f, +0.5f),
+				//
+				Vector3(+0.5f, -0.5f, -0.5f),
+				Vector3(+0.5f, +0.5f, -0.5f),
+				Vector3(+0.5f, +0.5f, +0.5f),
+				Vector3(+0.5f, -0.5f, +0.5f),
 			};
 			Vector2 uvs[] = {
 				//
@@ -1343,5 +1343,53 @@ Vector3(+0.5f, -0.5f, +0.5f),
 			m_lines_circleAllAxis = GenerateLinesCircle("LinesCircleUnitAllAxis", Axis::ALL, 32u, 1.0f);
 
 		}
+	}
+	void Primitives::DestroyGLResources()
+	{
+		GlobalAssets.deleteMesh(m_fullQuad);
+		GlobalAssets.deleteMesh(m_fullTriangle);
+		GlobalAssets.deleteMesh(m_quad_x);
+		GlobalAssets.deleteMesh(m_quad_y);
+		GlobalAssets.deleteMesh(m_quad_z);
+		GlobalAssets.deleteMesh(m_halfquad_x);
+		GlobalAssets.deleteMesh(m_halfquad_y);
+		GlobalAssets.deleteMesh(m_halfquad_z);
+		GlobalAssets.deleteMesh(m_cube);
+		GlobalAssets.deleteMesh(m_cube_small);
+		GlobalAssets.deleteMesh(m_inverseCube);
+		GlobalAssets.deleteMesh(m_octahedron);
+		GlobalAssets.deleteMesh(m_icosahedron);
+		GlobalAssets.deleteMesh(m_icoSphere);
+		GlobalAssets.deleteMesh(m_sphere);
+		GlobalAssets.deleteMesh(m_sphereUV_16);
+		GlobalAssets.deleteMesh(m_sphereUV_32);
+		GlobalAssets.deleteMesh(m_sphereUV_64);
+		GlobalAssets.deleteMesh(m_cylinder_x);
+		GlobalAssets.deleteMesh(m_cylinder_y);
+		GlobalAssets.deleteMesh(m_cylinder_z);
+		GlobalAssets.deleteMesh(m_cone_x);
+		GlobalAssets.deleteMesh(m_cone_y);
+		GlobalAssets.deleteMesh(m_cone_z);
+		GlobalAssets.deleteMesh(m_arrow_x);
+		GlobalAssets.deleteMesh(m_arrow_y);
+		GlobalAssets.deleteMesh(m_arrow_z);
+		GlobalAssets.deleteMesh(m_arrow_x_notail);
+		GlobalAssets.deleteMesh(m_arrow_y_notail);
+		GlobalAssets.deleteMesh(m_arrow_z_notail);
+		GlobalAssets.deleteMesh(m_circleUnit_x);
+		GlobalAssets.deleteMesh(m_circleUnit_y);
+		GlobalAssets.deleteMesh(m_circleUnit_z);
+		GlobalAssets.deleteMesh(m_circleDouble_x);
+		GlobalAssets.deleteMesh(m_circleDouble_y);
+		GlobalAssets.deleteMesh(m_circleDouble_z);
+		GlobalAssets.deleteMesh(m_doughtnut2D_x);
+		GlobalAssets.deleteMesh(m_doughtnut2D_y);
+		GlobalAssets.deleteMesh(m_doughtnut2D_z);
+
+		GlobalAssets.deleteMesh(m_lines_circleX);
+		GlobalAssets.deleteMesh(m_lines_circleY);
+		GlobalAssets.deleteMesh(m_lines_circleZ);
+		GlobalAssets.deleteMesh(m_lines_circleAllAxis);
+		GlobalAssets.deleteMesh(m_lines_cube);
 	}
 }

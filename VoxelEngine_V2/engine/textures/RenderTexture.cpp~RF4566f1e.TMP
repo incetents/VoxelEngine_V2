@@ -4,13 +4,6 @@
 
 namespace Vxl
 {
-	const char* RenderTexture::ViewModeStr[] =
-	{
-		"[BLIT]",
-		"[ABSOLUTE]",
-		"[COLORFUL]"
-	};
-
 	RenderTexture::RenderTexture(
 		const std::string& name,
 		int Width,

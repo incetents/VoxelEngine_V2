@@ -43,11 +43,11 @@ namespace Vxl
 		Type* start = nullptr;
 		unsigned int length = 0;
 
-		bool IsEmpty(void) const
+		bool isEmpty(void) const
 		{
 			return start == nullptr;
 		}
-		void Allocate(int size)
+		void allocate(int size)
 		{
 			if (start != nullptr)
 				delete[] start;
@@ -55,7 +55,7 @@ namespace Vxl
 			start = new Type[size];
 			length = size;
 		}
-		void Deallocate()
+		void deallocate()
 		{
 			if (start != nullptr)
 			{

@@ -14,6 +14,8 @@ namespace Vxl
 
 	static class GUI_Viewport : public Singleton<class GUI_Viewport>, public GuiWindow
 	{
+		friend class RenderManager;
+	public:
 		enum ChannelOutput
 		{
 			RGBA = 0,
@@ -24,20 +26,11 @@ namespace Vxl
 		};
 		static const char* ChannelOutputNames[];
 
-		enum OutputMode
-		{
-			BLIT,
-			ABSOLUTE_VALUE,
-			COLORFUL
-		};
-		static const char* OutputModeNames[];
-
-#ifdef GLOBAL_IMGUI
-		friend class RenderManager;
 	private:
+#ifdef GLOBAL_IMGUI
 		bool		  m_xrayMode = false;
 		ChannelOutput m_channelOut = ChannelOutput::RGBA;
-		OutputMode	  m_outputMode = OutputMode::BLIT;
+		RenderTexture::ViewMode	m_viewMode = RenderTexture::ViewMode::BLIT;
 
 		// Gl Resources
 		FramebufferObjectIndex	m_fbo;

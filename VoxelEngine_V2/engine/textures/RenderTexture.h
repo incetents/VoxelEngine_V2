@@ -9,6 +9,14 @@ namespace Vxl
 	{
 		DISALLOW_COPY_AND_ASSIGN(RenderTexture);
 		friend class _Assets;
+	public:
+		enum class ViewMode
+		{
+			BLIT,
+			ABSOLUTE_VALUE,
+			COLORFUL
+		};
+		static const char* ViewModeStr[];
 	protected:
 		// Name
 		std::string m_name;
@@ -25,16 +33,20 @@ namespace Vxl
 
 	public:
 
+		// Output Type
+		ViewMode m_viewMode = ViewMode::BLIT;
+
 		// Utility
 		void RecreateStorage(uint32_t width, uint32_t height, TextureFormat format, TexturePixelType pixelType);
 		void UpdateMipmapping();
 		void setGLName(const std::string& name);
-		
+
 		// Getters
 		inline std::string getName(void) const
 		{
 			return m_name;
 		}
+
 	};
 
 	class RenderTextureDepth : public RenderTexture

@@ -133,25 +133,38 @@ namespace Vxl
 		}
 		return false;
 	}
-	void Material::bindProgramStates()
+	void Material::bindProgramStates(ShaderMaterialType type)
 	{
-		// bind Modes
+		// Gl States
 		Graphics::SetCullMode(m_cullType);
-		Graphics::SetBlendState(m_blendState);
-		if (m_blendState)
-		{
-			// Normal Blend modes
-			Graphics::SetBlendMode(m_blendFunc.source, m_blendFunc.destination);
-			// Special Blend modes
-			for (auto& blendAttach : m_blendFuncAttachments)
-				Graphics::SetBlendMode((int)blendAttach.first - 1, blendAttach.second.source, blendAttach.second.destination);
-
-			Graphics::SetBlendEquation(m_blendEq);
-		}
 		Graphics::SetDepthPassRule(m_depthFunc);
 		Graphics::SetDepthRead(m_depthRead);
 		Graphics::SetDepthWrite(m_depthWrite);
 		Graphics::SetWireframeState(m_wireframe);
+
+		// Gl States based on type
+		if (type == ShaderMaterialType::CORE)
+		{
+			Graphics::SetBlendState(m_blendState);
+			if (m_blendState)
+			{
+				// Normal Blend modes
+				Graphics::SetBlendMode(m_blendFunc.source, m_blendFunc.destination);
+				// Special Blend modes
+				for (auto& blendAttach : m_blendFuncAttachments)
+					Graphics::SetBlendMode((int)blendAttach.first - 1, blendAttach.second.source, blendAttach.second.destination);
+
+				Graphics::SetBlendEquation(m_blendEq);
+			}
+		}
+		else if (type == ShaderMaterialType::COLORID)
+		{
+			Graphics::SetBlendState(true);
+			Graphics::SetBlendMode(BlendSource::ONE, BlendDestination::ZERO);
+			Graphics::SetBlendEquation(BlendEquation::FUNC_ADD);
+		}
+		
+		
 	}
 	void Material::bindTextures()
 	{

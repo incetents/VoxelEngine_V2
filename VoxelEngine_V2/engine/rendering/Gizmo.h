@@ -23,16 +23,16 @@ namespace Vxl
 		static void DestroyGLResources();
 
 		// Internal Data
-		static FramebufferObject*	m_fbo;
-		bool						m_show = false;
-		float						m_dragPrev = 0.0f;
-		float						m_dragAmount = 0.0f;
-		Vector3						m_targetNormal;
-		Vector3						m_dragStart;
-		Vector3						m_dragEnd;
-		bool						m_selected = false;
-		bool						m_clicked = false;
-		bool						m_camAxisSide[3] = { false, false, false };
+		static FramebufferObjectIndex	m_fbo;
+		bool							m_show = false;
+		float							m_dragPrev = 0.0f;
+		float							m_dragAmount = 0.0f;
+		Vector3							m_targetNormal;
+		Vector3							m_dragStart;
+		Vector3							m_dragEnd;
+		bool							m_selected = false;
+		bool							m_clicked = false;
+		bool							m_camAxisSide[3] = { false, false, false };
 
 		// Custom Meshes
 		static MeshIndex m_mesh_HalfQuadAxisX[4];

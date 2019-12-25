@@ -29,11 +29,12 @@ namespace Vxl
 		SceneNodeIndex		m_uniqueID;
 		std::string			m_name;
 		const SceneNodeType m_type;
-		bool				m_isActive = true;
-		bool				m_isSelected = false;
-		bool				m_useTransform = true;
 		Transform			m_transform;
 		Color3F				m_labelColor = Color3F(1, 1, 1); // Inspector
+		bool				m_isActive = true;
+		bool				m_isSelected = false;  // for editor
+		bool				m_isSelectable = true; // for editor
+		bool				m_useTransform = true;
 
 		// check if all parents are active
 		bool IsFamilyActive();
@@ -47,6 +48,11 @@ namespace Vxl
 		Entity* getEntity(void) const;
 		Camera* getCamera(void) const;
 		Light*	getLight(void) const;
+		//
+		inline const SceneNodeType getType(void) const
+		{
+			return m_type;
+		}
 		//
 		SceneNode(SceneNodeType type, const std::string& name)
 			: m_type(type), m_name(name)

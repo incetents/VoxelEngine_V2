@@ -169,11 +169,13 @@ namespace Vxl
 		// Simple Light Material
 		{
 			shader_debugRender = createShaderMaterial("./assets/materials/debugRender.material");
-			material_debugRender = createMaterial("error");
+			material_debugRender = createMaterial("debugRender");
 			{
 				auto mat = _Assets::getMaterial(material_debugRender);
 				mat->setShaderMaterial(shader_debugRender);
 				mat->setSequenceID(9001);
+				mat->m_blendFunc.source = BlendSource::ONE;
+				mat->m_blendFunc.destination = BlendDestination::ZERO;
 			}
 		}
 		// Passthrough Material

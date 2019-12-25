@@ -136,7 +136,7 @@ namespace Vxl
 		bool bindProgramUniforms(ShaderMaterialType type, EntityIndex _entity);
 
 		// GL States
-		void bindProgramStates();
+		void bindProgramStates(ShaderMaterialType type);
 
 		// Texture Binding
 		void bindTextures(); // bind material textures

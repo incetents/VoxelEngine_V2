@@ -50,15 +50,15 @@ namespace Vxl
 							ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColor::ImGuiColor::Orange);
 							// find correct end line in a giant list of numbers (1\n2\n3\n4\n5\n...etc..)
 							uint32_t adjustedLineCount = _Shader->m_sourceLineCount * 2;
-							if (adjustedLineCount > 9)
+							if (_Shader->m_sourceLineCount  > 9)
 								adjustedLineCount += _Shader->m_sourceLineCount - 9;
-							if (adjustedLineCount > 99)
+							if (_Shader->m_sourceLineCount  > 99)
 								adjustedLineCount += _Shader->m_sourceLineCount - 99;
-							if (adjustedLineCount > 999)
+							if (_Shader->m_sourceLineCount  > 999)
 								adjustedLineCount += _Shader->m_sourceLineCount - 999;
-							if (adjustedLineCount > 9999)
+							if (_Shader->m_sourceLineCount  > 9999)
 								adjustedLineCount += _Shader->m_sourceLineCount - 9999;
-							if (adjustedLineCount > 99999)
+							if (_Shader->m_sourceLineCount  > 99999)
 								adjustedLineCount += _Shader->m_sourceLineCount - 99999;
 
 							ImGui::TextUnformatted(m_linesCounted.c_str(), m_linesCounted.c_str() + adjustedLineCount);

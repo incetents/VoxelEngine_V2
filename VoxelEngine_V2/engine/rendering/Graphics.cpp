@@ -2466,7 +2466,7 @@ namespace Vxl
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 
 		RawArray<uint8_t> Array;
-		Array.Allocate(w * h * texture.getChannelCount());
+		Array.allocate(w * h * texture.getChannelCount());
 		glReadPixels(
 			x, y, w, h,
 			GL_TextureChannelType[(int)texture.getChannelType()],
@@ -2482,7 +2482,7 @@ namespace Vxl
 			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 
 		RawArray<uint8_t> Array;
-		Array.Allocate(w * h * texture.getChannelCount());
+		Array.allocate(w * h * texture.getChannelCount());
 		glReadPixels(
 			x, y, w, h,
 			GL_TextureChannelType[(int)texture.getChannelType()],

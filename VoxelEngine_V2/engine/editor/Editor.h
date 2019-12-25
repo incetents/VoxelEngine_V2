@@ -15,11 +15,11 @@ namespace Vxl
 	public:
 		// Selection
 		std::vector<SceneNodeIndex>	m_selectedNodes;
-		bool HasSelection(void) const;
-		void RemoveSelection(SceneNodeIndex _node);
-		void AddSelection(SceneNodeIndex _node);
-		void ClearSelection();
-		void DeleteSelection();
+		bool hasSelection(void) const;
+		void removeSelection(SceneNodeIndex _node);
+		void addSelection(SceneNodeIndex _node);
+		void clearSelection();
+		void deleteSelection();
 
 		// Imgui render window
 		std::vector<GuiWindow*> m_guiWindows;

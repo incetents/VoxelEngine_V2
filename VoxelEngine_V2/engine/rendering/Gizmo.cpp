@@ -18,11 +18,11 @@
 namespace Vxl
 {
 	// Static
-	FramebufferObject*	Gizmo::m_fbo;
-	MeshIndex			Gizmo::m_mesh_HalfQuadAxisX[4];
-	MeshIndex			Gizmo::m_mesh_HalfQuadAxisY[4];
-	MeshIndex			Gizmo::m_mesh_HalfQuadAxisZ[4];
-	MeshIndex			Gizmo::m_mesh_ScaleCube[3];
+	FramebufferObjectIndex	Gizmo::m_fbo;
+	MeshIndex				Gizmo::m_mesh_HalfQuadAxisX[4];
+	MeshIndex				Gizmo::m_mesh_HalfQuadAxisY[4];
+	MeshIndex				Gizmo::m_mesh_HalfQuadAxisZ[4];
+	MeshIndex				Gizmo::m_mesh_ScaleCube[3];
 
 	// Utility
 	Vector3 Gizmo::CameraRayHitPlane(const Vector3& normal)
@@ -82,32 +82,47 @@ namespace Vxl
 		m_mesh_ScaleCube[2] = Primitives.GenerateCube("", 0.25f, Vector3(0, 0, 1));
 
 		// FBO
-		auto fbo_id = GlobalAssets.createFramebuffer("gizmo");
-		m_fbo = Assets.getFramebufferObject(fbo_id);
-		m_fbo->setSizeToViewportSize();
-		m_fbo->bind();
+		m_fbo = GlobalAssets.createFramebuffer("gizmo");
+		FramebufferObject* fbo = Assets.getFramebufferObject(m_fbo);
+
+		fbo->setSizeToViewportSize();
+		fbo->bind();
 		//
 		auto id = GlobalAssets.createRenderTexture(
 			"albedo",
-			m_fbo->getWidth(), m_fbo->getHeight(), 
+			fbo->getWidth(), fbo->getHeight(), 
 			TextureFormat::RGBA8, TexturePixelType::UNSIGNED_BYTE, false
 		);
 		auto id_depth = GlobalAssets.createRenderBufferDepth(
-			m_fbo->getWidth(), m_fbo->getHeight(),
+			fbo->getWidth(), fbo->getHeight(),
 			TextureDepthFormat::DEPTH16
 		);
 
-		m_fbo->setRenderTexture(0, id);
-		m_fbo->setRenderBufferDepth(id_depth);
+		fbo->setRenderTexture(0, id);
+		fbo->setRenderBufferDepth(id_depth);
 		//
-		m_fbo->checkFBOStatus();
-		m_fbo->unbind();
+		fbo->checkFBOStatus();
+		fbo->unbind();
 	}
 	void Gizmo::DestroyGLResources()
 	{
+		for (int i = 0; i < 4; i++)
+		{
+			GlobalAssets.deleteMesh(m_mesh_HalfQuadAxisX[i]);
+			m_mesh_HalfQuadAxisX[i] = -1;
+			GlobalAssets.deleteMesh(m_mesh_HalfQuadAxisY[i]);
+			m_mesh_HalfQuadAxisY[i] = -1;
+			GlobalAssets.deleteMesh(m_mesh_HalfQuadAxisZ[i]);
+			m_mesh_HalfQuadAxisZ[i] = -1;
+		}
+		for (int i = 0; i < 3; i++)
+		{
+			GlobalAssets.deleteMesh(m_mesh_ScaleCube[i]);
+			m_mesh_ScaleCube[i] = -1;
+		}
 
-		//FramebufferObject::DeleteNamedAsset(m_fbo);
-		m_fbo = nullptr;
+		GlobalAssets.deleteFramebufferObject(m_fbo);
+		m_fbo = -1;
 	}
 
 	// Update
@@ -492,7 +507,7 @@ namespace Vxl
 		if (gizmoMaterial)
 		{
 			gizmoMaterial->bindProgram(ShaderMaterialType::CORE);
-			gizmoMaterial->bindProgramStates();
+			gizmoMaterial->bindProgramStates(ShaderMaterialType::CORE);
 
 			ShaderProgram* program_colorPicker = gizmoMaterial->getProgram(ShaderMaterialType::CORE);
 			Graphics::Uniform uniform_useModel = program_colorPicker->m_uniform_useModel.value();
@@ -749,15 +764,16 @@ namespace Vxl
 		// Make sure Cursor is available
 		if (!Window.IsCursorOnImguiWindow() && Window.GetCursor() == CursorMode::NORMAL)
 		{
-			m_fbo->bind();
-			m_fbo->clearBuffers();
+			FramebufferObject* fbo = Assets.getFramebufferObject(m_fbo);
+			fbo->bind();
+			fbo->clearBuffers();
 
 			Material* material_colorPicker = Assets.getMaterial(_colorPickerMaterial);
 			if (!material_colorPicker)
 				return;
 
 			material_colorPicker->bindProgram(ShaderMaterialType::CORE);
-			material_colorPicker->bindProgramStates();
+			material_colorPicker->bindProgramStates(ShaderMaterialType::CORE);
 
 			ShaderProgram* program_colorPicker = material_colorPicker->getProgram(ShaderMaterialType::CORE);
 			Graphics::Uniform uniform_useModel = program_colorPicker->m_uniform_useModel.value();
@@ -810,11 +826,11 @@ namespace Vxl
 				uniform_output.send(color);
 				Assets.getMesh(Primitives.GetCubeSmall())->draw();
 
-				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
+				RawArray<uint8_t> data = fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
 				{
 					unsigned int EditorIndex = Util::Conversion::uchars_to_uint(data.start);
-					data.Deallocate();
+					data.deallocate();
 
 					switch (EditorIndex)
 					{
@@ -890,11 +906,11 @@ namespace Vxl
 				uniform_output.send(color);
 				Assets.getMesh(Primitives.GetCubeSmall())->draw();
 
-				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
+				RawArray<uint8_t> data = fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
 				{
 					unsigned int EditorIndex = Util::Conversion::uchars_to_uint(data.start);
-					data.Deallocate();
+					data.deallocate();
 
 					switch (EditorIndex)
 					{
@@ -955,11 +971,11 @@ namespace Vxl
 				// Revert
 				Graphics::SetCullMode(CullMode::COUNTER_CLOCKWISE);
 
-				RawArray<uint8_t> data = m_fbo->readPixelsFromMouse(0, 1, 1);
+				RawArray<uint8_t> data = fbo->readPixelsFromMouse(0, 1, 1);
 				if (data.start != nullptr)
 				{
 					unsigned int EditorIndex = Util::Conversion::uchars_to_uint(data.start);
-					data.Deallocate();
+					data.deallocate();
 
 					switch (EditorIndex)
 					{

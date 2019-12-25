@@ -19,11 +19,11 @@
 
 namespace Vxl
 {
-	bool Editor::HasSelection(void) const
+	bool Editor::hasSelection(void) const
 	{
 		return m_selectedNodes.size() > 0;
 	}
-	void Editor::RemoveSelection(SceneNodeIndex _node)
+	void Editor::removeSelection(SceneNodeIndex _node)
 	{
 		Util::RemoveFromVector(m_selectedNodes, _node);
 
@@ -32,7 +32,7 @@ namespace Vxl
 		if(node)
 			node->m_isSelected = false;
 	}
-	void Editor::AddSelection(SceneNodeIndex _node)
+	void Editor::addSelection(SceneNodeIndex _node)
 	{
 		for (const auto& node : m_selectedNodes)
 			if (node == _node)
@@ -45,7 +45,7 @@ namespace Vxl
 		if(node)
 			node->m_isSelected = true;
 	}
-	void Editor::ClearSelection()
+	void Editor::clearSelection()
 	{
 		for (const auto& _node : m_selectedNodes)
 		{
@@ -55,7 +55,7 @@ namespace Vxl
 		}
 		m_selectedNodes.clear();
 	}
-	void Editor::DeleteSelection()
+	void Editor::deleteSelection()
 	{
 		for (SceneNodeIndex _node : m_selectedNodes)
 		{
@@ -158,7 +158,7 @@ namespace Vxl
 		// Selection
 		if (ImGui::GetIO().KeysDown[(int)KeyCode::DELETEKEY] || ImGui::GetIO().KeysDown[(int)KeyCode::BACKSPACE])
 		{
-			DeleteSelection();
+			deleteSelection();
 		}
 #endif
 	}

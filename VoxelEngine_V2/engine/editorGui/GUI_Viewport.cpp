@@ -32,12 +32,6 @@ namespace Vxl
 		"Channel:[BLUE]",
 		"Channel:[ALPHA]"
 	};
-	const char* GUI_Viewport::OutputModeNames[] =
-	{
-		"Output:[BLIT]",
-		"Output:[ABS]",
-		"Output:[COLORFUL]"
-	};
 
 	void GUI_Viewport::InitGLResources()
 	{
@@ -62,7 +56,8 @@ namespace Vxl
 	}
 	void GUI_Viewport::DestroyGLResources()
 	{
-
+		GlobalAssets.deleteFramebufferObject(m_fbo);
+		GlobalAssets.deleteRenderTexture(m_renderTexture);
 	}
 
 	void GUI_Viewport::DrawRenderTarget()
@@ -108,15 +103,15 @@ namespace Vxl
 			}
 			else
 			{
-				switch (m_outputMode)
+				switch (m_viewMode)
 				{
-				case OutputMode::BLIT:
+				case RenderTexture::ViewMode::BLIT:
 					program_showRenderTarget->sendUniform("outputMode", 0);
 					break;
-				case OutputMode::ABSOLUTE_VALUE:
+				case RenderTexture::ViewMode::ABSOLUTE_VALUE:
 					program_showRenderTarget->sendUniform("outputMode", 1);
 					break;
-				case OutputMode::COLORFUL:
+				case RenderTexture::ViewMode::COLORFUL:
 					program_showRenderTarget->sendUniform("outputMode", 4);
 					break;
 				}
@@ -196,6 +191,9 @@ namespace Vxl
 									m_outputRTName = "RenderTarget[" + rt->getName() + "]";
 								else
 									m_outputRTName = "RenderTarget[None]";
+
+								// Set Default Outputmode from RenderTarget
+								m_viewMode = rt->m_viewMode;
 							}
 						}
 						else
@@ -257,19 +255,19 @@ namespace Vxl
 			}
 
 			// Output Mode
-			if (ImGui::BeginMenu(OutputModeNames[(int)m_outputMode]))
+			if (ImGui::BeginMenu(RenderTexture::ViewModeStr[(int)m_viewMode]))
 			{
 				if (ImGui::MenuItem("BLIT"))
 				{
-					m_outputMode = OutputMode::BLIT;
+					m_viewMode = RenderTexture::ViewMode::BLIT;
 				}
 				if (ImGui::MenuItem("ABSOLUTE_VALUE"))
 				{
-					m_outputMode = OutputMode::ABSOLUTE_VALUE;
+					m_viewMode = RenderTexture::ViewMode::ABSOLUTE_VALUE;
 				}
 				if (ImGui::MenuItem("COLORFUL"))
 				{
-					m_outputMode = OutputMode::COLORFUL;
+					m_viewMode = RenderTexture::ViewMode::COLORFUL;
 				}
 				ImGui::EndMenu();
 			}

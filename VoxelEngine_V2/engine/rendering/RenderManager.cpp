@@ -124,12 +124,16 @@ namespace Vxl
 	// 
 	void RenderManager::InitGlobalGLResources()
 	{
+		// UBO = first
 		UBOManager.InitGLResources();
-		Debug.InitGLResources();
-		//GlobalRenderText.InitGLResources();
+
 #ifdef GLOBAL_IMGUI
 		GUI_Viewport.InitGLResources();
 #endif
+
+		Debug.InitGLResources();
+
+		//GlobalRenderText.InitGLResources();
 
 		Gizmo::InitGLResources();
 		
@@ -139,13 +143,21 @@ namespace Vxl
 	}
 	void RenderManager::DestroyGlobalGLResources()
 	{
+		// UBO = first
 		UBOManager.DestroyGLResources();
+
+#ifdef GLOBAL_IMGUI
+		GUI_Viewport.DestroyGLResources();
+#endif
+
+
 		Debug.DestroyGLResources();
+
 		//GlobalRenderText.DestoryGLResources();
 
-		//GUI_Viewport.DestroyGLResources();
+		Gizmo::DestroyGLResources();
 
-		//Gizmo::DestroyGLResources();
+		Primitives.DestroyGLResources();
 
 		GlobalAssets.DestroyAndEraseAll();
 	}
@@ -154,7 +166,7 @@ namespace Vxl
 	void RenderManager::DestroySceneGLResources()
 	{
 		// Remove selected entity
-		Editor.ClearSelection();
+		Editor.clearSelection();
 
 		// Delete special
 		GPUTimer::DestroyTimers();
@@ -291,7 +303,7 @@ namespace Vxl
 					VXL_ERROR("Error Material failed to compile");
 			}
 
-			material->bindProgramStates();
+			material->bindProgramStates(ShaderMaterialType::CORE);
 
 			if(material->m_sharedTextures)
 				material->bindTextures();
@@ -316,6 +328,9 @@ namespace Vxl
 	}
 	void RenderManager::render_ColorID(MaterialIndex _material, const std::vector<Entity*>& _entities)
 	{
+		if (_entities.size() == 0)
+			return;
+
 		Material* material = Assets.getMaterial(_material);
 
 		if (material)
@@ -329,7 +344,7 @@ namespace Vxl
 				//		VXL_ERROR("Error Material failed to compile");
 			}
 
-			material->bindProgramStates();
+			material->bindProgramStates(ShaderMaterialType::COLORID);
 
 			if (material->m_sharedTextures)
 				material->bindTextures();

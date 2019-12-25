@@ -64,7 +64,6 @@ namespace Vxl
 		Color3F		m_Tint			= Color3F(1, 1, 1);
 		float		m_alpha			= 1.0f;
 		bool		m_useTextures	= true; // Only checks if material doesn't use shared textures
-		bool		m_isSelectable	= true; // for editor
 
 		// Mesh
 		void setMesh(MeshIndex index);

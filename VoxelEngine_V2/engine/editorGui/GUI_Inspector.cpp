@@ -45,7 +45,7 @@ namespace Vxl
 
 	void Inspector::Draw()
 	{
-		if (Editor.HasSelection())
+		if (Editor.hasSelection())
 		{
 			SceneNodeIndex index = Editor.m_selectedNodes[0];
 			SceneNode* node = Assets.getSceneNode(index);

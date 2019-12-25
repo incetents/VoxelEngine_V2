@@ -3,6 +3,7 @@
 
 #include "../rendering/Graphics.h"
 #include "../utilities/Types.h"
+#include "../utilities/Macros.h"
 #include "../math/Color.h"
 
 #include <map>

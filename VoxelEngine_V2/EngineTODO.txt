@@ -4,15 +4,17 @@ TODO:
 ! Macro everywhere -> DISALLOW_COPY_AND_ASSIGN(ClassName);
 ! camelCase every FUNCTION
 
-- renderTextures can have default GUI_Viewport::OutputMode value and ChannelOutput value
-	- so that when you view them in GUI_Viewport they start with that state
-	- set with a function call
+Complete:
+	-> rendertarget has viewmode
+		-> used for Gui_Viewport default
+	-> destroy GL Resources for globals need to be fixed
+	-> colorID selection for objects
+	-> material selection not working for DebugRender Material
+		-> colorID program binding section
+		
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- destroy GL Resources for globals need to be fixed
-
-- colorID/depth programs generated from shaderMaterial
-	- test both programs on gui viewport
-- colorID selection for objects
+- object selection for instancing also envelopes also of its instances
 
 - material error for colorID simply returns black
 

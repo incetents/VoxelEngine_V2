@@ -77,6 +77,7 @@ namespace Vxl
 
 	public:
 		void InitGLResources();
+		void DestroyGLResources();
 
 		// Generate Custom Meshes
 		MeshIndex GenerateIcosahdron(const std::string& MeshName, unsigned int subdivisions, float scale = 1.0f);

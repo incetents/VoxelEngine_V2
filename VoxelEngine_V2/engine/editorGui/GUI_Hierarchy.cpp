@@ -65,14 +65,14 @@ namespace Vxl
 				if (ImGui::GetIO().KeyCtrl)
 				{
 					if (!node->IsSelected())
-						Editor.AddSelection(node->m_uniqueID);
+						Editor.addSelection(node->m_uniqueID);
 					else
-						Editor.RemoveSelection(node->m_uniqueID);
+						Editor.removeSelection(node->m_uniqueID);
 				}
 				else
 				{
-					Editor.ClearSelection();
-					Editor.AddSelection(node->m_uniqueID);
+					Editor.clearSelection();
+					Editor.addSelection(node->m_uniqueID);
 				}
 			}
 
@@ -108,14 +108,14 @@ namespace Vxl
 				if (ImGui::GetIO().KeyCtrl)
 				{
 					if (!node->IsSelected())
-						Editor.AddSelection(node->m_uniqueID);
+						Editor.addSelection(node->m_uniqueID);
 					else
-						Editor.RemoveSelection(node->m_uniqueID);
+						Editor.removeSelection(node->m_uniqueID);
 				}
 				else
 				{
-					Editor.ClearSelection();
-					Editor.AddSelection(node->m_uniqueID);
+					Editor.clearSelection();
+					Editor.addSelection(node->m_uniqueID);
 				}
 			}
 
@@ -147,7 +147,7 @@ namespace Vxl
 
 		if (ImGui::Button("Delete"))
 		{
-			Editor.DeleteSelection();
+			Editor.deleteSelection();
 		}
 		//	ImGui::SameLine();
 		//	if (ImGui::Button("Add Sphere"))
