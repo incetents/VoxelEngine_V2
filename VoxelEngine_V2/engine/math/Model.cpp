@@ -143,6 +143,7 @@ namespace Vxl
 				for (unsigned int vertIndex = 0u; vertIndex < PositionCount; vertIndex++)
 				{
 					_models[M]->positions[vertIndex] = _models[M]->positions[vertIndex] * normalizeScale / LongestVertex;
+					_models[M]->positions[vertIndex].x += 4.0f;
 				}
 			}
 		}

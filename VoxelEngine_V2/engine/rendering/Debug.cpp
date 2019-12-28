@@ -99,7 +99,7 @@ namespace Vxl
 
 		m_cubesLines.push_back(_object);
 	}
-	void Debug::DrawLineAABB(
+	Debug::Object& Debug::DrawLineAABB(
 		const AABB& aabb,
 		float width,
 		const Color3F& C
@@ -111,8 +111,9 @@ namespace Vxl
 		_object.width = width;
 
 		m_cubesLines.push_back(_object);
+		return m_cubesLines[m_cubesLines.size() - 1];
 	}
-	void Debug::DrawLineOBB(
+	Debug::Object& Debug::DrawLineOBB(
 		const OBB& obb,
 		float Width,
 		const Color3F& C
@@ -125,6 +126,7 @@ namespace Vxl
 		_object.width = Width;
 
 		m_cubesLines.push_back(_object);
+		return m_cubesLines[m_cubesLines.size() - 1];
 	}
 	void Debug::DrawLineArrow(
 		const Vector3& p1, const Vector3& p2,

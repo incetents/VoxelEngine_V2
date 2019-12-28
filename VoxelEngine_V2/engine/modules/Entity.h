@@ -46,6 +46,11 @@ namespace Vxl
 		AABB	col_AABB;
 		OBB		col_OBB;
 
+		// Obb except the sizes are non-uniform (used to calculate real bounding boxes)
+		Vector3 obbFuzzy[8];
+
+	protected:
+
 		// Component
 		std::map<const std::type_info*, Component*> m_components;
 

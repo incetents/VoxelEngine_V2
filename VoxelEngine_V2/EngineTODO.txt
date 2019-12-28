@@ -14,7 +14,10 @@ Complete:
 		
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- Vector2::Min and ::Max (same for Vector4)
+
 - object selection for instancing also envelopes also of its instances
+	-> Generate OBB from new transform of Model * InstanceModel
 
 - material error for colorID simply returns black
 

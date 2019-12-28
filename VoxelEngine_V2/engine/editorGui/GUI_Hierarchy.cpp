@@ -141,14 +141,21 @@ namespace Vxl
 
 	void Hierarchy::Draw()
 	{
-		
-
 		ImGui::Text("Scene Graph:\t");
 
-		if (ImGui::Button("Delete"))
+		// Right Click Menu for selection
+		if (Editor.m_selectedNodes.size() > 0)
 		{
-			Editor.deleteSelection();
+			if (ImGui::BeginPopupContextWindow())
+			{
+				if (ImGui::Selectable("Delete"))
+				{
+					Editor.deleteSelection();
+				}
+				ImGui::EndPopup();
+			}
 		}
+
 		//	ImGui::SameLine();
 		//	if (ImGui::Button("Add Sphere"))
 		//	{

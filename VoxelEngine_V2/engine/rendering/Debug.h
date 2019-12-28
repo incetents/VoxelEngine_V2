@@ -102,14 +102,14 @@ namespace Vxl
 			float width,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
-		void DrawLineAABB(
+		Object& DrawLineAABB(
 			const AABB& aabb,
 			float width,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
-		void DrawLineOBB(
+		Object& DrawLineOBB(
 			const OBB& obb,
-			float Width = 1.0f,
+			float Width,
 			const Color3F& C = Color3F(1, 1, 1)
 		);
 		void DrawLineArrow(

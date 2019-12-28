@@ -511,8 +511,8 @@ namespace Vxl
 	void Mesh::recalculateMinMax()
 	{
 		// Min/Max
-		m_max = Vector3(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-		m_min = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+		m_max = Vector3::MIN;
+		m_min = Vector3::MAX;
 
 		uint32_t PosCount = (uint32_t)m_positions.size();
 		for (uint32_t i = 0; i < PosCount; i++)

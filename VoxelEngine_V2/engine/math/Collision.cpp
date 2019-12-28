@@ -2,6 +2,10 @@
 #include "Precompiled.h"
 #include "Collision.h"
 
+#include "Matrix3x3.h"
+#include "Matrix4x4.h"
+#include "Transform.h"
+
 #undef max
 
 namespace Vxl
@@ -49,6 +53,21 @@ namespace Vxl
 		}
 		return aabb;
 	}
+
+	//OBB::OBB(Transform& transform, const Vector3& meshCenter, const Vector3& meshScale)
+	//{
+	//	// Update OBB
+	//	Vector3 _center = Matrix3x3(transform.getModel()) *meshCenter;
+	//
+	//	position	= _center + transform.getWorldPosition();
+	//	// Sqrt(2) is for padding to prevent rotation/scale combinations to create an object bigger than the OBB
+	//	float padding = transform.getWorldScale().GetBiggest() * SQRT_TWO;
+	//
+	//	right		= transform.getRight()	 * meshScale.x * padding; 
+	//	up			= transform.getUp()		 * meshScale.y * padding;
+	//	forward		= transform.getForward() * meshScale.z * padding;
+	//
+	//}
 
 	RayHit Intersection(const Ray& _ray, const Plane& _plane)
 	{

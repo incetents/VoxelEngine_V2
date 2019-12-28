@@ -102,6 +102,7 @@ namespace Vxl
 		EntityIndex entity_skybox;
 		EntityIndex entity_error_cube;
 		EntityIndex entity_beato_cube;
+		EntityIndex entity_beato_cube2;
 		EntityIndex entity_instance_beato;
 		EntityIndex entity_jiggy;
 		EntityIndex entity_arrowX;

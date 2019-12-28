@@ -2,10 +2,11 @@
 #pragma once
 
 #include "Vector.h"
-#include "Matrix3x3.h"
 
 namespace Vxl
 {
+	class Transform;
+
 	struct AABB
 	{
 		Vector3 min;
@@ -50,6 +51,7 @@ namespace Vxl
 			up = _up;
 			forward = _forward;
 		}
+		//OBB(Transform& transform, const Vector3& meshCenter, const Vector3& meshScale);
 	};
 
 	class Plane

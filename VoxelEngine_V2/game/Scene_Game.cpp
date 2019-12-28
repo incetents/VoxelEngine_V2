@@ -411,7 +411,7 @@ namespace Vxl
 		{
 			for (float y = 0; y < 5.0f; y++)
 			{
-				Transform t(Vec3(x * 1.2f, y * 1.2f, 0.0f));
+				Transform t(Vec3(x * 1.2f, y * 1.2f, 1.0f));
 				m_models.push_back(t.getModel().Transpose());
 			}
 		}
@@ -424,7 +424,7 @@ namespace Vxl
 		camera_main = SceneAssets.createCamera("_camera_editor", 0.01f, 5000.0f);
 		{
 			Camera* camera_ptr = Assets.getCamera(camera_main);
-			camera_ptr->m_transform.setPosition(3.5f, 2.8f, 0.3f);
+			camera_ptr->m_transform.setPosition(2.635f, 2.8f, 2.3f);
 			camera_ptr->m_transform.setCameraForward(Vector3(-1, 0, -1));
 			camera_ptr->SetPerspectiveWindowAspect(110.0f);
 			camera_ptr->update();
@@ -456,6 +456,8 @@ namespace Vxl
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(Primitives.GetCube());
 			entity_ptr->m_transform.setPosition(Vector3(0, 2, 0));
+			entity_ptr->m_transform.setRotation(Vector3(-60.0f, -35.7f, 0.0f));
+			entity_ptr->m_transform.setScaleY(2);
 		}
 		entity_beato_cube = SceneAssets.createEntity("_beato_cube");
 		{
@@ -464,8 +466,20 @@ namespace Vxl
 			entity_ptr->setMesh(Primitives.GetCube());
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
+			entity_ptr->m_transform.setRotation(Vector3(0, 0, 48.0f));
 		
 			entity_ptr->m_transform.setParent(&Assets.getEntity(entity_error_cube)->m_transform);
+		}
+		entity_beato_cube2 = SceneAssets.createEntity("_beato_cube2");
+		{
+			Entity* entity_ptr = Assets.getEntity(entity_beato_cube2);
+			entity_ptr->setMaterial(material_gbuffer);
+			entity_ptr->setMesh(Primitives.GetCube());
+			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
+			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
+			entity_ptr->m_transform.setRotation(Vector3(0, 0, 48.0f));
+
+			entity_ptr->m_transform.setParent(&Assets.getEntity(entity_beato_cube)->m_transform);
 		}
 		entity_jiggy = SceneAssets.createEntity("_jiggy");
 		{
@@ -889,13 +903,37 @@ namespace Vxl
 			case SceneNodeType::ENTITY:
 			{
 				Entity* entity = sceneNode->getEntity();
-				Debug.DrawLineAABB(
-					entity->GetAABB(),
-					2.0f,
-					Color3F::RED
-				);
-				// OBB
-				Debug.DrawLineOBB(entity->GetOBB(), 5.0f, Color3F::BLUE);
+				// Instanced
+				Mesh* mesh = Assets.getMesh(entity->getMesh());
+				if (mesh->m_instances.getDrawCount() > 0)
+				{
+					for (const Matrix4x4& instance : mesh->m_instances.vertices)
+					{
+						// OBB
+						auto& object2 = Debug.DrawLineOBB(entity->GetOBB(), 5.0f, Color3F::BLUE);
+						object2.model = object2.model * instance.Transpose();
+						// AABB
+						auto& object1 = Debug.DrawLineAABB(entity->GetAABB(), 2.0f, Color3F::RED);
+						object1.model = object1.model * instance.Transpose();
+					}
+				}
+				// Non-instance
+				else
+				{
+					// OBB
+					Debug.DrawLineOBB(entity->GetOBB(), 5.0f, Color3F::BLUE);
+					// AABB
+					Debug.DrawLineAABB(entity->GetAABB(), 2.0f, Color3F::RED);
+
+					Debug.DrawLine(entity->m_transform.getWorldPosition(), entity->m_transform.getWorldPosition() + entity->m_transform.getRight() * 5.0f, 5.0f, Color3F::RED, Color3F::RED);
+					Debug.DrawLine(entity->m_transform.getWorldPosition(), entity->m_transform.getWorldPosition() + entity->m_transform.getUp() * 5.0f, 5.0f, Color3F::GREEN, Color3F::GREEN);
+					Debug.DrawLine(entity->m_transform.getWorldPosition(), entity->m_transform.getWorldPosition() + entity->m_transform.getForward() * 5.0f, 5.0f, Color3F::BLUE, Color3F::BLUE);
+					
+					for (int i = 0; i < 8; i++)
+					{
+						Debug.DrawCube(entity->obbFuzzy[i], Vector3::QUARTER);
+					}
+				}
 				break;
 			}
 			//
