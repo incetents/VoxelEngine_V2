@@ -107,7 +107,7 @@ namespace Vxl
 			uniform = std::nullopt;
 	}
 
-	ShaderProgram::ShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders)
+	ShaderProgram::ShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders, std::vector<std::pair<std::string, TextureLevel>> _textureLevels)
 		: m_name(name), m_shaders(_shaders)
 	{
 		m_id = Graphics::ShaderProgram::Create();
@@ -154,6 +154,17 @@ namespace Vxl
 			
 			// uniforms //
 			m_uniforms = Graphics::ShaderProgram::AcquireUniforms(m_id);
+
+			// target levels // -> requires checking uniforms
+			for (const auto& pair : _textureLevels)
+			{
+				auto it = m_uniforms.find(pair.first); // search name
+				if (it != m_uniforms.end())
+				{
+					// texture is being used
+					m_targetLevels.push_back(pair.second);
+				}
+			}
 
 			// uniform storage // (stores intermediate values)
 			for (const auto& uniform : m_uniforms)
@@ -372,10 +383,8 @@ namespace Vxl
 		// ~ Texture ~ //
 		if (m_uniform_useTexture.has_value())
 		{
-			if (material->m_sharedTextures)
-				m_uniform_useTexture.value().send(material->m_textures.find(TextureLevel::LEVEL0) != material->m_textures.end());
-			else if (entity->m_useTextures)
-				m_uniform_useTexture.value().send(entity->m_textures.find(TextureLevel::LEVEL0) != entity->m_textures.end());
+			if(material->m_sharedTextures || entity->m_useTextures)
+				m_uniform_useTexture.value().send(true);
 			else
 				m_uniform_useTexture.value().send(false);
 		}
@@ -533,7 +542,6 @@ namespace Vxl
 		Assets.deleteShaderProgram(m_coreProgram);
 		Assets.deleteShaderProgram(m_colorIDProgram);
 
-		m_targetLevels.clear();
 		m_coreProgram = -1;
 		m_colorIDProgram = -1;
 
@@ -748,7 +756,7 @@ namespace Vxl
 		}
 
 		// Samplers
-		std::vector<TextureLevel> targetLevels;
+		std::vector<std::pair<std::string, TextureLevel>> targetLevels;
 		if (locations.samplers != std::string::npos)
 		{
 			std::string section = stringUtil::extractSection(file, '{', '}', locations.samplers) + '\n';
@@ -772,7 +780,9 @@ namespace Vxl
 					{
 						sampler_info += "layout (binding = " + property[1] + ") uniform " + property[0] + ";\n";
 
-						targetLevels.push_back((TextureLevel)(std::stoi(property[1]) + 1));
+						std::vector<std::string> textureName = stringUtil::splitStr(property[0], ' ');
+						if(textureName.size() == 2)
+							targetLevels.push_back(std::make_pair(textureName[1], (TextureLevel)(std::stoi(property[1]) + 1)));
 					}
 				}
 			}
@@ -948,17 +958,14 @@ namespace Vxl
 		// Create Core Program
 		if (m_isGlobal)
 		{
-			m_coreProgram = GlobalAssets.createShaderProgram(name + "_program", CORE_Shaders);
-			m_colorIDProgram = GlobalAssets.createShaderProgram(name + "_colorID_program", COLORID_Shaders);
+			m_coreProgram = GlobalAssets.createShaderProgram(name + "_program", CORE_Shaders, targetLevels);
+			m_colorIDProgram = GlobalAssets.createShaderProgram(name + "_colorID_program", COLORID_Shaders, targetLevels);
 		}
 		else
 		{
-			m_coreProgram = SceneAssets.createShaderProgram(name + "_program", CORE_Shaders);
-			m_colorIDProgram = SceneAssets.createShaderProgram(name + "_colorID_program", COLORID_Shaders);
+			m_coreProgram = SceneAssets.createShaderProgram(name + "_program", CORE_Shaders, targetLevels);
+			m_colorIDProgram = SceneAssets.createShaderProgram(name + "_colorID_program", COLORID_Shaders, targetLevels);
 		}
-
-		// Data
-		m_targetLevels = targetLevels;
 	}
 
 	ShaderProgram* ShaderMaterial::getProgram(ShaderMaterialType type)

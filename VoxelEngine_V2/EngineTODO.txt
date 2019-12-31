@@ -11,28 +11,26 @@ Complete:
 	-> colorID selection for objects
 	-> material selection not working for DebugRender Material
 		-> colorID program binding section
+	-> object selection for instancing also envelopes also of its instances
+		-> Generate OBB from new transform of Model * InstanceModel
+	-> outline effect on selected entities
+		-> OBB/AABB lines
+	-> target levels are shader specific, not shaderMaterial
+		-> this can be verified by comparing textures specific with stored uniforms if they match
 		
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Vector2::Min and ::Max (same for Vector4)
-
-- object selection for instancing also envelopes also of its instances
-	-> Generate OBB from new transform of Model * InstanceModel
-
-- material error for colorID simply returns black
-
+- compile time string hashing (example at main.cpp)
+	-> used for shader uniforms
+	
 - detect if Shader already exists using hashing,
 	- that way you can re-use existing Shaders instead of compiling a copy
 	- Shader needs a duplication flag (only deletes self if duplication counter == 0)
 
-- target levels are shader specific, not shaderMaterial
-	-> this can be verified by comparing textures specific with stored uniforms if they match
-	
-- outline effect on selected entities
-	-> OBB/AABB lines
+- GUI Viewport, show first rendertarget by default, don't have a none-option
 	
 - inspector shows material (core program) -> shows all editable uniforms
-	- these must also modify (colorID and depth only) clones
+	- these must also modify (colorID, etc...) clones
 
 - uniqueID -> assetID, every object create from Assets gets an id so they can refind themselves in the assets
 	- const so that it never changes

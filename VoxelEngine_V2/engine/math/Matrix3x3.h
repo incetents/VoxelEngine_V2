@@ -61,43 +61,47 @@ namespace Vxl
 		static Matrix3x3 GetRotation(float _radians, const Vector3& _axis, bool _CCW = true);
 
 		// Set Horizontal Line
-		Matrix3x3& SetRow(unsigned int index, const Vector3&);
-		static Matrix3x3& SetRow(Matrix3x3&, unsigned int index, const Vector3&);
+				Matrix3x3& SetRow(unsigned int index, const Vector3&);
+		static  Matrix3x3& SetRow(Matrix3x3&, unsigned int index, const Vector3&);
 		// Set Vertical Line
-		Matrix3x3& SetColumn(unsigned int index, const Vector3&);
-		static Matrix3x3& SetColumn(Matrix3x3&, unsigned int index, const Vector3&);
+				Matrix3x3& SetColumn(unsigned int index, const Vector3&);
+		static  Matrix3x3& SetColumn(Matrix3x3&, unsigned int index, const Vector3&);
 
 		// Get Horizontal Line
-		Vector3 GetRow(unsigned int index) const;
+				Vector3 GetRow(unsigned int index) const;
 		static  Vector3 GetRow(const Matrix3x3&, unsigned int index);
+				Vector2 GetRowVec2(unsigned int index) const;
+		static  Vector2 GetRowVec2(const Matrix3x3&, unsigned int index);
 		// Get Vertical Line
-		Vector3 GetColumn(unsigned int index) const;
+				Vector3 GetColumn(unsigned int index) const;
 		static  Vector3 GetColumn(const Matrix3x3&, unsigned int index);
+				Vector2 GetColumnVec2(unsigned int index) const;
+		static  Vector2 GetColumnVec2(const Matrix3x3&, unsigned int index);
 
 		// Determinant
-		float Determinant() const;
+				float Determinant() const;
 		static  float Determinant(const Matrix3x3&);
 
 		// Transpose
-		Matrix3x3 Transpose() const;
+				Matrix3x3 Transpose() const;
 		static  Matrix3x3 Transpose(const Matrix3x3&);
 		// Transpose Self
-		Matrix3x3& TransposeSelf();
+				Matrix3x3& TransposeSelf();
 		static  Matrix3x3& TransposeSelf(Matrix3x3&);
 
 		// Inverse
-		Matrix3x3 Inverse() const;
+				Matrix3x3 Inverse() const;
 		static  Matrix3x3 Inverse(const Matrix3x3&);
 		// Inverse Self
-		Matrix3x3& InverseSelf();
+				Matrix3x3& InverseSelf();
 		static	Matrix3x3& InverseSelf(Matrix3x3&);
 
 		// Multiply
-		Matrix3x3 Multiply(const Matrix3x3&) const;
+				Matrix3x3 Multiply(const Matrix3x3&) const;
 		static	Matrix3x3 Multiply(const Matrix3x3&, const Matrix3x3&);
 
 		// Compare
-		bool Compare(const Matrix3x3&) const;
+				bool Compare(const Matrix3x3&) const;
 		static	bool Compare(const Matrix3x3&, const Matrix3x3&);
 
 		inline const float* GetStartPointer() const

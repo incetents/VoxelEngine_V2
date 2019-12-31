@@ -54,6 +54,8 @@ namespace Vxl
 		static const _Vector2<Type> LEFT;
 		static const _Vector2<Type> RIGHT;
 		static const _Vector2<Type> HALF;
+		static const _Vector2<Type> MIN;
+		static const _Vector2<Type> MAX;
 
 		// ~ Copy Constructors ~ //
 		_Vector2<Type>& operator=(const _Vector2<Type>& v) { x = v.x; y = v.y; return *this; }
@@ -1045,6 +1047,10 @@ namespace Vxl
 			return (x || y || z || w);
 		}
 
+		// Common Vector Types
+		static const _Vector4<Type> MIN;
+		static const _Vector4<Type> MAX;
+
 		// ~ Copy Constructors ~ //
 		_Vector4<Type>& operator=(const _Vector2<Type>& v) { x = v.x; y = v.y; return *this; }
 		_Vector4<Type>& operator=(const _Vector3<Type>& v) { x = v.x; y = v.y; z = v.z; return *this; }
@@ -1866,6 +1872,8 @@ namespace Vxl
 	const _Vector2<float> _Vector2<float>::LEFT = _Vector2<float>(-1,0);
 	const _Vector2<float> _Vector2<float>::RIGHT = _Vector2<float>(1,0);
 	const _Vector2<float> _Vector2<float>::HALF = _Vector2<float>(0.5f,0.5f);
+	const _Vector2<float> _Vector2<float>::MIN = _Vector2<float>((std::numeric_limits<float>::lowest)(), (std::numeric_limits<float>::lowest)());
+	const _Vector2<float> _Vector2<float>::MAX = _Vector2<float>((std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)());
 
 	const _Vector3<float> _Vector3<float>::ZERO = _Vector3<float>(0,0,0);
 	const _Vector3<float> _Vector3<float>::ONE = _Vector3<float>(1,1,1);
@@ -1882,6 +1890,9 @@ namespace Vxl
 	const _Vector3<float> _Vector3<float>::RIGHT = _Vector3<float>(1,0,0);
 	const _Vector3<float> _Vector3<float>::MAX = _Vector3<float>((std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)());
 	const _Vector3<float> _Vector3<float>::MIN = _Vector3<float>((std::numeric_limits<float>::lowest)(), (std::numeric_limits<float>::lowest)(), (std::numeric_limits<float>::lowest)());
+
+	const _Vector4<float> _Vector4<float>::MAX = _Vector4<float>((std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)());
+	const _Vector4<float> _Vector4<float>::MIN = _Vector4<float>((std::numeric_limits<float>::lowest)(), (std::numeric_limits<float>::lowest)(), (std::numeric_limits<float>::lowest)(), (std::numeric_limits<float>::lowest)());
 
 	// Vector Creation
 	typedef _Vector2<float> Vector2;

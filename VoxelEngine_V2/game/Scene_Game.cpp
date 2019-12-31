@@ -478,7 +478,7 @@ namespace Vxl
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 			entity_ptr->m_transform.setRotation(Vector3(0, 0, 48.0f));
-
+		
 			entity_ptr->m_transform.setParent(&Assets.getEntity(entity_beato_cube)->m_transform);
 		}
 		entity_jiggy = SceneAssets.createEntity("_jiggy");
@@ -489,6 +489,8 @@ namespace Vxl
 			entity_ptr->m_Color = Color3F(1, 1, 0);
 			entity_ptr->m_useTextures = false;
 			entity_ptr->m_transform.setPosition(Vector3(0, 0, -7));
+		
+			
 		}
 		entity_instance_beato = SceneAssets.createEntity("_instance_beato");
 		{
@@ -497,6 +499,8 @@ namespace Vxl
 			entity_ptr->setMesh(mesh_manyQuads);
 			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
 			entity_ptr->m_transform.setPosition(Vector3(-2, 2, -6.6f));
+		
+			//entity_ptr->m_transform.setParent(&Assets.getEntity(entity_jiggy)->m_transform);
 		}
 		
 		entity_arrowX = SceneAssets.createEntity("_arrowX");
@@ -907,14 +911,34 @@ namespace Vxl
 				Mesh* mesh = Assets.getMesh(entity->getMesh());
 				if (mesh->m_instances.getDrawCount() > 0)
 				{
+					// Base Directions
+					Vector3 right = entity->m_transform.getRight();
+					Vector3 up = entity->m_transform.getUp();
+					Vector3 forward = entity->m_transform.getForward();
+
 					for (const Matrix4x4& instance : mesh->m_instances.vertices)
 					{
+						Mesh* _mesh = Assets.getMesh(entity->getMesh());
+
+						// Base model
+						Matrix4x4 model = entity->m_transform.getModel() * instance.Transpose();
+						// Rotation/Direction
+						Matrix3x3 normal = Matrix3x3(instance).Inverse();
+						
+						// New Calculated OBB
+						OBB instanceOBB = OBB(
+							model,
+							normal * right,
+							normal * up,
+							normal * forward,
+							_mesh->getVertexMin(),
+							_mesh->getVertexMax()
+						);
+
 						// OBB
-						auto& object2 = Debug.DrawLineOBB(entity->GetOBB(), 5.0f, Color3F::BLUE);
-						object2.model = object2.model * instance.Transpose();
+						Debug.DrawLineOBB(instanceOBB, 5.0f, Color3F::BLUE);
 						// AABB
-						auto& object1 = Debug.DrawLineAABB(entity->GetAABB(), 2.0f, Color3F::RED);
-						object1.model = object1.model * instance.Transpose();
+						Debug.DrawLineAABB(instanceOBB.generateAABB(), 2.0f, Color3F::RED);
 					}
 				}
 				// Non-instance
@@ -925,14 +949,10 @@ namespace Vxl
 					// AABB
 					Debug.DrawLineAABB(entity->GetAABB(), 2.0f, Color3F::RED);
 
+					// Good Axis
 					Debug.DrawLine(entity->m_transform.getWorldPosition(), entity->m_transform.getWorldPosition() + entity->m_transform.getRight() * 5.0f, 5.0f, Color3F::RED, Color3F::RED);
 					Debug.DrawLine(entity->m_transform.getWorldPosition(), entity->m_transform.getWorldPosition() + entity->m_transform.getUp() * 5.0f, 5.0f, Color3F::GREEN, Color3F::GREEN);
 					Debug.DrawLine(entity->m_transform.getWorldPosition(), entity->m_transform.getWorldPosition() + entity->m_transform.getForward() * 5.0f, 5.0f, Color3F::BLUE, Color3F::BLUE);
-					
-					for (int i = 0; i < 8; i++)
-					{
-						Debug.DrawCube(entity->obbFuzzy[i], Vector3::QUARTER);
-					}
 				}
 				break;
 			}

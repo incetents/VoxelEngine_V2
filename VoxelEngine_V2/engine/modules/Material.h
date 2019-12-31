@@ -103,11 +103,15 @@ namespace Vxl
 			ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
 			if (_shaderMat)
 			{
-				ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
+				// Send uniform to all shaderMaterial programs
+				ShaderProgram* program;
+				program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
 				if (program)
-				{
 					program->sendUniform(name, data, true);
-				}
+
+				program = Assets.getShaderProgram(_shaderMat->m_colorIDProgram);
+				if (program)
+					program->sendUniform(name, data, true);
 			}
 		}
 		
@@ -118,11 +122,15 @@ namespace Vxl
 			ShaderMaterial* _shaderMat = Assets.getShaderMaterial(m_shaderMaterial);
 			if (_shaderMat)
 			{
-				ShaderProgram* program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
+				// Send uniform to all shaderMaterial programs
+				ShaderProgram* program;
+				program = Assets.getShaderProgram(_shaderMat->m_coreProgram);
 				if (program)
-				{
 					program->sendUniformMatrix(name, data, transpose, true);
-				}
+
+				program = Assets.getShaderProgram(_shaderMat->m_colorIDProgram);
+				if (program)
+					program->sendUniformMatrix(name, data, transpose, true);
 			}
 		}
 
@@ -139,8 +147,7 @@ namespace Vxl
 		void bindProgramStates(ShaderMaterialType type);
 
 		// Texture Binding
-		void bindTextures(); // bind material textures
-		void bindTextures(Entity* _entity); // bind entity textures
+		void bindTextures(ShaderMaterialType type, Entity* _entity); // Entity nullptr = Material textures instead
 	};
 
 }

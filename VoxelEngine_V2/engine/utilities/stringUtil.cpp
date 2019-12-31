@@ -5,7 +5,8 @@
 #include "../utilities/Logger.h"
 
 namespace Vxl
-{
+{	
+	//
 	namespace stringUtil
 	{
 		// Trim

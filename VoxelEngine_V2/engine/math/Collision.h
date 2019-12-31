@@ -5,7 +5,7 @@
 
 namespace Vxl
 {
-	class Transform;
+	class Matrix4x4;
 
 	struct AABB
 	{
@@ -51,7 +51,7 @@ namespace Vxl
 			up = _up;
 			forward = _forward;
 		}
-		//OBB(Transform& transform, const Vector3& meshCenter, const Vector3& meshScale);
+		OBB(const Matrix4x4& model, const Vector3& right, const Vector3& up, const Vector3& forward, const Vector3& meshMin, const Vector3& meshMax);
 	};
 
 	class Plane

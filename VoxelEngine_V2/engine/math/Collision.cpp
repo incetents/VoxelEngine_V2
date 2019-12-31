@@ -6,7 +6,7 @@
 #include "Matrix4x4.h"
 #include "Transform.h"
 
-#undef max
+#include "../rendering/Debug.h"
 
 namespace Vxl
 {
@@ -42,8 +42,8 @@ namespace Vxl
 	AABB OBB::generateAABB()
 	{
 		AABB aabb(
-			Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()),
-			Vector3(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest())
+			Vector3::MAX,
+			Vector3::MIN
 		);
 		std::vector<Vector3> positions = generatePoints();
 		for (const auto& pos : positions)
@@ -54,20 +54,47 @@ namespace Vxl
 		return aabb;
 	}
 
-	//OBB::OBB(Transform& transform, const Vector3& meshCenter, const Vector3& meshScale)
-	//{
-	//	// Update OBB
-	//	Vector3 _center = Matrix3x3(transform.getModel()) *meshCenter;
-	//
-	//	position	= _center + transform.getWorldPosition();
-	//	// Sqrt(2) is for padding to prevent rotation/scale combinations to create an object bigger than the OBB
-	//	float padding = transform.getWorldScale().GetBiggest() * SQRT_TWO;
-	//
-	//	right		= transform.getRight()	 * meshScale.x * padding; 
-	//	up			= transform.getUp()		 * meshScale.y * padding;
-	//	forward		= transform.getForward() * meshScale.z * padding;
-	//
-	//}
+	OBB::OBB(const Matrix4x4& model, const Vector3& right, const Vector3& up, const Vector3& forward, const Vector3& meshMin, const Vector3& meshMax)
+	{
+		Vector3 obbFuzzy[8];
+		obbFuzzy[0] = model * meshMin;
+		obbFuzzy[1] = model * Vector3(meshMax.x, meshMin.y, meshMin.z);
+		obbFuzzy[2] = model * Vector3(meshMin.x, meshMax.y, meshMin.z);
+		obbFuzzy[3] = model * Vector3(meshMax.x, meshMax.y, meshMin.z);
+		obbFuzzy[4] = model * Vector3(meshMin.x, meshMin.y, meshMax.z);
+		obbFuzzy[5] = model * Vector3(meshMax.x, meshMin.y, meshMax.z);
+		obbFuzzy[6] = model * Vector3(meshMin.x, meshMax.y, meshMax.z);
+		obbFuzzy[7] = model * meshMax;
+
+		// Project Obb Fuzzy on each axis to get largest/smallest
+		Vector3 minFuzzy = Vector3::MAX;
+		Vector3 maxFuzzy = Vector3::MIN;
+		for (int i = 0; i < 8; i++)
+		{
+			float fuzzyRight = obbFuzzy[i].ProjectLength(right);
+			float fuzzyUp = obbFuzzy[i].ProjectLength(up);
+			float fuzzyForward = obbFuzzy[i].ProjectLength(forward);
+
+			minFuzzy.x = min(minFuzzy.x, fuzzyRight);
+			maxFuzzy.x = max(maxFuzzy.x, fuzzyRight);
+
+			minFuzzy.y = min(minFuzzy.y, fuzzyUp);
+			maxFuzzy.y = max(maxFuzzy.y, fuzzyUp);
+
+			minFuzzy.z = min(minFuzzy.z, fuzzyForward);
+			maxFuzzy.z = max(maxFuzzy.z, fuzzyForward);
+		}
+		Vector3 FuzzyScale = maxFuzzy - minFuzzy;
+
+		// Update OBB
+		Vector3 _meshCenter = (meshMin + meshMax) * 0.5f;
+		Vector3 _center = model * _meshCenter;
+
+		this->position	= _center + model.GetColumnVec3(3);
+		this->right		= right	* FuzzyScale.x;
+		this->up		= up		* FuzzyScale.y;
+		this->forward	= forward * FuzzyScale.z;
+	}
 
 	RayHit Intersection(const Ray& _ray, const Plane& _plane)
 	{

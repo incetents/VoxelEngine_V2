@@ -166,75 +166,72 @@ namespace Vxl
 		
 		
 	}
-	void Material::bindTextures()
+	void Material::bindTextures(ShaderMaterialType type, Entity* _entity)
 	{
 		if (m_wireframe)
 			return;
 
-		const std::vector<TextureLevel>& targetLevels = Assets.getShaderMaterial(m_shaderMaterial)->m_targetLevels;
-
-		for (const auto& level : targetLevels)
+		ShaderMaterial* _shaderMaterial = Assets.getShaderMaterial(m_shaderMaterial);
+		if (_shaderMaterial)
 		{
-			// Check if material doesn't have the texture location
-			if (m_textures.find(level) == m_textures.end())
+			// Acquire Target Levels
+			std::vector<TextureLevel> _targetLevels;
+			switch (type)
 			{
-				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
-				else
-					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
-			}
-
-			TextureIndex index = m_textures[level];
-			BaseTexture* _tex = Assets.getBaseTexture(index);
-
-			// bind error texture
-			if (_tex == nullptr || !_tex->isLoaded())
+			case ShaderMaterialType::CORE:
 			{
-				if(level == TextureLevel::LEVEL0)
-					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
-				else
-					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
+				ShaderProgram* _program = Assets.getShaderProgram(_shaderMaterial->m_coreProgram);
+				if (_program)
+					_targetLevels = _program->m_targetLevels;
+				break;
 			}
-			// bind texture normally
+			//
+			case ShaderMaterialType::COLORID:
+			{
+				ShaderProgram* _program = Assets.getShaderProgram(_shaderMaterial->m_colorIDProgram);
+				if (_program)
+					_targetLevels = _program->m_targetLevels;
+				break;
+			}
+			}
+			
+			// Acquire Textures that are stored
+			std::map<TextureLevel, TextureIndex> _textures;
+			
+			if (_entity)
+				_textures = _entity->m_textures;
 			else
-			{
-				_tex->bind(level);
-			}
-		}
-	}
-	void Material::bindTextures(Entity* _entity)
-	{
-		if (m_wireframe)
-			return;
+				_textures = m_textures;
 
-		const std::vector<TextureLevel>& targetLevels = Assets.getShaderMaterial(m_shaderMaterial)->m_targetLevels;
-
-		for (const auto& level : targetLevels)
-		{
-			// Check if entity doesn't have the texture location
-			if (_entity->m_textures.find(level) == _entity->m_textures.end())
+			for (const auto& level : _targetLevels)
 			{
-				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
+				// Check if entity doesn't have the texture location
+				if (_textures.find(level) == _textures.end())
+				{
+					if (level == TextureLevel::LEVEL0)
+						GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
+					else
+						GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
+				}
 				else
-					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
-			}
+				{
+					TextureIndex index = _textures[level];
+					BaseTexture* _tex = Assets.getBaseTexture(index);
 
-			TextureIndex index = _entity->m_textures[level];
-			BaseTexture* _tex = Assets.getBaseTexture(index);
-
-			// bind error texture
-			if (_tex == nullptr || !_tex->isLoaded())
-			{
-				if (level == TextureLevel::LEVEL0)
-					GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
-				else
-					GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
-			}
-			// bind texture normally
-			else
-			{
-				_tex->bind(level);
+					// bind error texture
+					if (_tex == nullptr || !_tex->isLoaded())
+					{
+						if (level == TextureLevel::LEVEL0)
+							GlobalAssets.get_Tex2DNullImageCheckerboard()->bind(level);
+						else
+							GlobalAssets.get_Tex2DNullImageBlack()->bind(level);
+					}
+					// bind texture normally
+					else
+					{
+						_tex->bind(level);
+					}
+				}
 			}
 		}
 	}

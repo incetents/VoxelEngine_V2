@@ -11,6 +11,7 @@
 #include "utilities/Logger.h"
 #include "utilities/Time.h"
 #include "utilities/Macros.h"
+#include "utilities/stringUtil.h"
 
 #include "../game/Scene_Game.h"
 
@@ -32,6 +33,9 @@ int main()
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 #endif
 {
+	// String Hash Test
+	static_assert(StringHash32("a") == 3826002220U);
+
 	// Misc CPU Setup
 	Random.init();
 

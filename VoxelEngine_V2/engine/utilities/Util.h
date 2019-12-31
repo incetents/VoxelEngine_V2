@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include <utility>
+#include <stdint.h>
 
 namespace Vxl
 {
@@ -143,6 +144,5 @@ namespace Vxl
 			"1920, 1440",
 			"2048, 1536"
 		};
-
 	}
 }

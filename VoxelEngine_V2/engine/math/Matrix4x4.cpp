@@ -386,6 +386,31 @@ namespace Vxl
 	{
 		return m.GetRow(index);
 	}
+	Vector2 Matrix4x4::GetRowVec2(unsigned int index) const
+	{
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
+		return Vector2(
+			_Val[0 + (index * Matrix4x4_Length)],
+			_Val[1 + (index * Matrix4x4_Length)]
+		);
+	}
+	Vector2 Matrix4x4::GetRowVec2(const Matrix4x4& m, unsigned int index)
+	{
+		return m.GetRowVec2(index);
+	}
+	Vector3 Matrix4x4::GetRowVec3(unsigned int index) const
+	{
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
+		return Vector3(
+			_Val[0 + (index * Matrix4x4_Length)],
+			_Val[1 + (index * Matrix4x4_Length)],
+			_Val[2 + (index * Matrix4x4_Length)]
+		);
+	}
+	Vector3 Matrix4x4::GetRowVec3(const Matrix4x4& m, unsigned int index)
+	{
+		return m.GetRowVec3(index);
+	}
 	// Get Vertical Line
 	Vector4 Matrix4x4::GetColumn(unsigned int index) const
 	{
@@ -400,6 +425,31 @@ namespace Vxl
 	Vector4 Matrix4x4::GetColumn(const Matrix4x4& m, unsigned int index)
 	{
 		return m.GetColumn(index);
+	}
+	Vector2 Matrix4x4::GetColumnVec2(unsigned int index) const
+	{
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
+		return Vector2(
+			_Val[(index + 0x0)],
+			_Val[(index + 0x4)]
+		);
+	}
+	Vector2 Matrix4x4::GetColumnVec2(const Matrix4x4& m, unsigned int index)
+	{
+		return m.GetColumnVec2(index);
+	}
+	Vector3 Matrix4x4::GetColumnVec3(unsigned int index) const
+	{
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
+		return Vector3(
+			_Val[(index + 0x0)],
+			_Val[(index + 0x4)],
+			_Val[(index + 0x8)]
+		);
+	}
+	Vector3 Matrix4x4::GetColumnVec3(const Matrix4x4& m, unsigned int index)
+	{
+		return m.GetColumnVec3(index);
 	}
 
 	// Special Sets
@@ -654,21 +704,21 @@ namespace Vxl
 			m._Val[0xC] * v.x + m._Val[0xD] * v.y + m._Val[0xE] * v.z + m._Val[0xF] * v.w
 		);
 	}
-	// Treats vector lilke Vec2(x,y,z,1)
+	// Treats vector like Vec2(x,y,z,0)
 	Vector3 operator*(const Matrix4x4& m, const Vector3& v)
 	{
 		return Vector3(
-			m._Val[0x0] * v.x + m._Val[0x1] * v.y + m._Val[0x2] * v.z + m._Val[0x3],
-			m._Val[0x4] * v.x + m._Val[0x5] * v.y + m._Val[0x6] * v.z + m._Val[0x7],
-			m._Val[0x8] * v.x + m._Val[0x9] * v.y + m._Val[0xA] * v.z + m._Val[0xB]
+			m._Val[0x0] * v.x + m._Val[0x1] * v.y + m._Val[0x2] * v.z,
+			m._Val[0x4] * v.x + m._Val[0x5] * v.y + m._Val[0x6] * v.z,
+			m._Val[0x8] * v.x + m._Val[0x9] * v.y + m._Val[0xA] * v.z 
 		);
 	}
-	// Treats vector lilke Vec2(x,y,0,1)
+	// Treats vector lilke Vec2(x,y,0,0)
 	Vector2 operator*(const Matrix4x4& m, const Vector2& v)
 	{
 		return Vector2(
-			m._Val[0x0] * v.x + m._Val[0x1] * v.y + m._Val[0x3],
-			m._Val[0x4] * v.x + m._Val[0x5] * v.y + m._Val[0x7]
+			m._Val[0x0] * v.x + m._Val[0x1] * v.y,
+			m._Val[0x4] * v.x + m._Val[0x5] * v.y 
 		);
 	}
 

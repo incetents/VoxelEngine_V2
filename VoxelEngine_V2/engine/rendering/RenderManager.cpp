@@ -306,7 +306,7 @@ namespace Vxl
 			material->bindProgramStates(ShaderMaterialType::CORE);
 
 			if(material->m_sharedTextures)
-				material->bindTextures();
+				material->bindTextures(ShaderMaterialType::CORE, nullptr);
 			
 			for (auto& ent : _entities)
 			{
@@ -316,7 +316,7 @@ namespace Vxl
 					if (mesh)
 					{
 						if (!material->m_sharedTextures)
-							material->bindTextures(ent);
+							material->bindTextures(ShaderMaterialType::CORE, ent);
 
 						material->bindProgramUniforms(ShaderMaterialType::CORE, ent->m_uniqueID);
 
@@ -337,17 +337,14 @@ namespace Vxl
 		{
 			if (!material->bindProgram(ShaderMaterialType::COLORID))
 			{
-				return;
-				// If material program didn't link, use error material instead
-				//	material = GlobalAssets.get_MaterialError();
-				//	if (!material->bindProgram(ShaderMaterialType::CORE))
-				//		VXL_ERROR("Error Material failed to compile");
+				VXL_ERROR("Color ID Material failed to bind");
+				return;	
 			}
 
 			material->bindProgramStates(ShaderMaterialType::COLORID);
 
 			if (material->m_sharedTextures)
-				material->bindTextures();
+				material->bindTextures(ShaderMaterialType::COLORID, nullptr);
 
 			for (auto& ent : _entities)
 			{
@@ -357,7 +354,7 @@ namespace Vxl
 					if (mesh)
 					{
 						if (!material->m_sharedTextures)
-							material->bindTextures(ent);
+							material->bindTextures(ShaderMaterialType::COLORID, ent);
 
 						material->bindProgramUniforms(ShaderMaterialType::COLORID, ent->m_uniqueID);
 

@@ -91,18 +91,19 @@ namespace Vxl
 		const std::string			m_name;
 		bool						m_linked;
 		std::vector<ShaderIndex>	m_shaders;
-		ShaderAttributes			m_attributes;
-		ShaderUniforms				m_uniforms;
-		ShaderUniformStorage		m_uniformStorage;
-		ShaderUniformBlocks			m_uniformBlocks;
-		ShaderSubroutines			m_subroutines;
+		std::vector<TextureLevel>	m_targetLevels;	// Textures used in program
 		std::string					m_errorMessage;
+		std::map<std::string, Graphics::Attribute>			m_attributes;
+		std::map<std::string, Graphics::Uniform>			m_uniforms;		 // Uniform meta data for GPU
+		std::map<std::string, UniformStorage>				m_uniformStorage;// Uniform CPU data (float, double, vec2, matrix4x4, etc...)
+		std::map<std::string, Graphics::UniformBlock>		m_uniformBlocks;
+		std::map<ShaderType, Graphics::UniformSubroutine>	m_subroutines;
 		static std::map<ShaderProgramID, ShaderProgram*> m_brokenShaderPrograms;
 
 		//
 		void setupCommonUniform(const std::string& name, std::optional<Graphics::Uniform>& uniform);
 
-		ShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders);
+		ShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders, std::vector<std::pair<std::string, TextureLevel>> _textureLevels);
 	public:
 		~ShaderProgram();
 
@@ -228,7 +229,7 @@ namespace Vxl
 		void reload();
 	public:
 		const std::string			m_filePath;				// File used to load
-		std::vector<TextureLevel>	m_targetLevels;			// Textures used in program
+		//std::vector<TextureLevel>	m_targetLevels;			// Textures used in program
 		ShaderProgramIndex			m_coreProgram = -1;		// Main Program used for rendering
 		ShaderProgramIndex			m_colorIDProgram = -1;	// Alternate program used only for ColorID output
 

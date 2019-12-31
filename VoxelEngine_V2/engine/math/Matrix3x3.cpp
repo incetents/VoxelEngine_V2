@@ -256,6 +256,18 @@ namespace Vxl
 	{
 		return m.GetRow(index);
 	}
+	Vector2 Matrix3x3::GetRowVec2(unsigned int index) const
+	{
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
+		return Vector2(
+			_Val[0 + (index * Matrix3x3_Length)],
+			_Val[1 + (index * Matrix3x3_Length)]
+		);
+	}
+	Vector2 Matrix3x3::GetRowVec2(const Matrix3x3& m, unsigned int index)
+	{
+		return m.GetRowVec2(index);
+	}
 	// Get Vertical Line
 	Vector3 Matrix3x3::GetColumn(unsigned int index) const
 	{
@@ -269,6 +281,18 @@ namespace Vxl
 	Vector3 Matrix3x3::GetColumn(const Matrix3x3& m, unsigned int index)
 	{
 		return m.GetColumn(index);
+	}
+	Vector2 Matrix3x3::GetColumnVec2(unsigned int index) const
+	{
+		OUT_OF_RANGE_INDEX_CHECK_LENGTH(index);
+		return Vector2(
+			_Val[(index + 0)],
+			_Val[(index + 3)]
+		);
+	}
+	Vector2 Matrix3x3::GetColumnVec2(const Matrix3x3& m, unsigned int index)
+	{
+		return m.GetColumnVec2(index);
 	}
 
 	// Determinant

@@ -103,9 +103,17 @@ namespace Vxl
 		// Get Horizontal Line
 				Vector4 GetRow(unsigned int index) const;
 		static	Vector4 GetRow(const Matrix4x4&, unsigned int index);
+				Vector2 GetRowVec2(unsigned int index) const;
+		static	Vector2 GetRowVec2(const Matrix4x4&, unsigned int index);
+				Vector3 GetRowVec3(unsigned int index) const;
+		static	Vector3 GetRowVec3(const Matrix4x4&, unsigned int index);
 		// Get Vertical Line
 				Vector4 GetColumn(unsigned int index) const;
 		static	Vector4 GetColumn(const Matrix4x4&, unsigned int index);
+				Vector2 GetColumnVec2(unsigned int index) const;
+		static	Vector2 GetColumnVec2(const Matrix4x4&, unsigned int index);
+				Vector3 GetColumnVec3(unsigned int index) const;
+		static	Vector3 GetColumnVec3(const Matrix4x4&, unsigned int index);
 
 		// Determinant
 				float Determinant() const;

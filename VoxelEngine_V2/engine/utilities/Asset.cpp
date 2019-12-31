@@ -793,17 +793,10 @@ namespace Vxl
 		// Store Data and Return index
 		return m_shader_storage.Add(_shader, m_creationType);
 	}
-	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders)
+	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders, std::vector<std::pair<std::string, TextureLevel>> _textureLevels)
 	{
 		// Create New Data
-		ShaderProgram* _program = new ShaderProgram(name, _shaders);
-		// Store Data and Return index
-		return m_shaderProgram_storage.Add(_program, m_creationType);
-	}
-	ShaderProgramIndex _Assets::createShaderProgram(const std::string& name, std::initializer_list<ShaderIndex> _shaders)
-	{
-		// Create New Data
-		ShaderProgram* _program = new ShaderProgram(name, _shaders);
+		ShaderProgram* _program = new ShaderProgram(name, _shaders, _textureLevels);
 		// Store Data and Return index
 		return m_shaderProgram_storage.Add(_program, m_creationType);
 	}

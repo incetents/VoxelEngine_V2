@@ -50,6 +50,7 @@ namespace Vxl
 	enum class TextureDepthFormat;
 	enum class ShaderType;
 	enum class DrawType;
+	enum class TextureLevel;
 
 	enum class AssetType
 	{
@@ -521,8 +522,7 @@ namespace Vxl
 		LineMesh2DIndex createLineMesh2D(DrawType type);
 		//
 		ShaderIndex createShader(const std::string& name, const std::string& source, ShaderType type);
-		ShaderProgramIndex createShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders);
-		ShaderProgramIndex createShaderProgram(const std::string& name, std::initializer_list<ShaderIndex> _shaders);
+		ShaderProgramIndex createShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders, std::vector<std::pair<std::string, TextureLevel>> _textureLevels);
 		//
 		MaterialIndex createMaterial(const std::string& name);
 		//
