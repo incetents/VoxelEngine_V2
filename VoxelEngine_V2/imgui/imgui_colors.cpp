@@ -1,4 +1,4 @@
-// Copyright(c) 2019 Emmanuel Lajeunesse
+// Copyright(c) 2020 Emmanuel Lajeunesse
 #include "imgui_colors.h"
 
 ImVec4 ImGuiColor::White =		ImVec4(1, 1, 1, 1);

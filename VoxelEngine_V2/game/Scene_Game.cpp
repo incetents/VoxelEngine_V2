@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Scene_Game.h"
 
@@ -68,7 +68,7 @@ namespace Vxl
 			TextureFilter::LINEAR,
 			TextureFormat::RGB8,
 			TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode::NONE
+			AnisotropicMode::HIGH
 			);
 		tex_checkerboard = SceneAssets.loadTexture2D(
 			"./assets/textures/checkerboard.jpg",
@@ -78,7 +78,7 @@ namespace Vxl
 			TextureFilter::LINEAR,
 			TextureFormat::RGB8,
 			TexturePixelType::UNSIGNED_BYTE,
-			AnisotropicMode::NONE
+			AnisotropicMode::HIGH
 		);
 		tex_beato = SceneAssets.loadTexture2D(
 			"./assets/textures/beato.png",
@@ -470,12 +470,12 @@ namespace Vxl
 		
 			entity_ptr->m_transform.setParent(&Assets.getEntity(entity_error_cube)->m_transform);
 		}
-		entity_beato_cube2 = SceneAssets.createEntity("_beato_cube2");
+		entity_beato_crate = SceneAssets.createEntity("_beato_crate");
 		{
-			Entity* entity_ptr = Assets.getEntity(entity_beato_cube2);
+			Entity* entity_ptr = Assets.getEntity(entity_beato_crate);
 			entity_ptr->setMaterial(material_gbuffer);
 			entity_ptr->setMesh(Primitives.GetCube());
-			entity_ptr->setTexture(tex_beato, TextureLevel::LEVEL0);
+			entity_ptr->setTexture(tex_crate_diffuse, TextureLevel::LEVEL0);
 			entity_ptr->m_transform.setPosition(Vector3(-3, 0, 0));
 			entity_ptr->m_transform.setRotation(Vector3(0, 0, 48.0f));
 		
@@ -900,6 +900,9 @@ namespace Vxl
 		for (SceneNodeIndex sceneNodeIndex : Editor.m_selectedNodes)
 		{
 			SceneNode* sceneNode = Assets.getSceneNode(sceneNodeIndex);
+			// Ignore if non selectable
+			if (!sceneNode->m_isSelectable)
+				continue;
 			//
 			switch (sceneNode->getType())
 			{
@@ -993,6 +996,15 @@ namespace Vxl
 		}
 
 		gizmo.Update(selectedNodes);
+
+		// Delete Selection
+		if (Window.GetWindowFocused())
+		{
+			if (ImGui::GetIO().KeysDown[(int)KeyCode::DELETEKEY] || ImGui::GetIO().KeysDown[(int)KeyCode::BACKSPACE])
+			{
+				Editor.deleteSelection();
+			}
+		}
 	}
 
 	// DO NOT DRAW IN HERE //

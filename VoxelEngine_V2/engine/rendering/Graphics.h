@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include <stdint.h>
@@ -27,6 +27,15 @@ namespace Vxl
 
 	template<typename Type>
 	class RawArray;
+
+	template<typename Type>
+	class _Vector2;
+
+	template<typename Type>
+	class _Vector3;
+
+	template<typename Type>
+	class _Vector4;
 
 	// ~ Vendor Types ~ //
 	enum class VendorType
@@ -666,7 +675,7 @@ namespace Vxl
 			UniformType uType;
 			bool isData;
 
-			// Sebd pure data
+			// Send pure data
 			void send(bool data) const;
 			void send(int data) const;
 			void send(uint32_t data) const;
@@ -674,32 +683,61 @@ namespace Vxl
 			void send(double data) const;
 
 			// Send vector data
-			void send(const Vector2& data) const;
-			void send(const Vector3& data) const;
-			void send(const Vector4& data) const;
+			void send(const _Vector2<float>& data) const;
+			void send(const _Vector3<float>& data) const;
+			void send(const _Vector4<float>& data) const;
 			void send(const Color3F& data) const;
 			void send(const Color4F& data) const;
 
-			void send(const Vector2d& data) const;
-			void send(const Vector3d& data) const;
-			void send(const Vector4d& data) const;
+			void send(const _Vector2<double>& data) const;
+			void send(const _Vector3<double>& data) const;
+			void send(const _Vector4<double>& data) const;
 
-			void send(const Vector2i& data) const;
-			void send(const Vector3i& data) const;
-			void send(const Vector4i& data) const;
+			void send(const _Vector2<int>& data) const;
+			void send(const _Vector3<int>& data) const;
+			void send(const _Vector4<int>& data) const;
 
-			void send(const Vector2ui& data) const;
-			void send(const Vector3ui& data) const;
-			void send(const Vector4ui& data) const;
+			void send(const _Vector2<uint32_t>& data) const;
+			void send(const _Vector3<uint32_t>& data) const;
+			void send(const _Vector4<uint32_t>& data) const;
 
-			void send(const Vector2b& data) const;
-			void send(const Vector3b& data) const;
-			void send(const Vector4b& data) const;
+			void send(const _Vector2<bool>& data) const;
+			void send(const _Vector3<bool>& data) const;
+			void send(const _Vector4<bool>& data) const;
 
 			// Send matrix data
 			void sendMatrix(const Matrix2x2& data, bool transpose) const;
 			void sendMatrix(const Matrix3x3& data, bool transpose) const;
 			void sendMatrix(const Matrix4x4& data, bool transpose) const;
+
+			// Get Uniform from Shader [store data in CPU side instead, only used for getting default uniform values]
+			void getFloat(ShaderID program, float& value) const;
+			void getDouble(ShaderID program, double& value) const;
+			void getInt(ShaderID program, int& value) const;
+			void getUnsignedInt(ShaderID program, uint32_t& value) const;
+			void getBool(ShaderID program, bool& value) const;
+			
+			void getVec2(ShaderID program, Vector2& value) const;
+			void getVec2(ShaderID program, Vector2d& value) const;
+			void getVec2(ShaderID program, Vector2i& value) const;
+			void getVec2(ShaderID program, Vector2ui& value) const;
+			void getVec2(ShaderID program, Vector2b& value) const;
+			
+			void getVec3(ShaderID program, Vector3& value) const;
+			void getVec3(ShaderID program, Vector3d& value) const;
+			void getVec3(ShaderID program, Vector3i& value) const;
+			void getVec3(ShaderID program, Vector3ui& value) const;
+			void getVec3(ShaderID program, Vector3b& value) const;
+			
+			void getVec4(ShaderID program, Vector4& value) const;
+			void getVec4(ShaderID program, Vector4d& value) const;
+			void getVec4(ShaderID program, Vector4i& value) const;
+			void getVec4(ShaderID program, Vector4ui& value) const;
+			void getVec4(ShaderID program, Vector4b& value) const;
+
+			void getMat2(ShaderID program, Matrix2x2& value) const;
+			void getMat3(ShaderID program, Matrix3x3& value) const;
+			void getMat4(ShaderID program, Matrix4x4& value) const;
 		};
 
 		struct UniformBlock

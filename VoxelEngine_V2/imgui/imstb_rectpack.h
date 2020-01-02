@@ -41,8 +41,8 @@
 //
 // Version history:
 //
-//     1.00  (2019-02-25)  avoid small space waste; gracefully fail too-wide rectangles
-//     0.99  (2019-02-07)  warning fixes
+//     1.00  (2020-02-25)  avoid small space waste; gracefully fail too-wide rectangles
+//     0.99  (2020-02-07)  warning fixes
 //     0.11  (2017-03-03)  return packing success/fail result
 //     0.10  (2016-10-25)  remove cast-away-const to avoid warnings
 //     0.09  (2016-08-27)  fix compiler warnings

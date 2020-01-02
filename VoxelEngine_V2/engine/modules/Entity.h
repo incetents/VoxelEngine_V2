@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include "Component.h"
@@ -32,6 +32,7 @@ namespace Vxl
 		friend class Editor;
 		friend class Material;
 		friend class ShaderProgram;
+		friend class Inspector;
 	protected:
 		// Locked Constructor
 		Entity(const std::string& name);

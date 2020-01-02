@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include <assert.h>
@@ -394,6 +394,21 @@ namespace Vxl
 		Transform& setRotation(const Quaternion& quat);
 
 		// Increasers
+		inline Transform& increaseWorldPositionX(float value)
+		{
+			increaseWorldPosition(Vector3(value, 0, 0));
+			return *this;
+		}
+		inline Transform& increaseWorldPositionY(float value)
+		{
+			increaseWorldPosition(Vector3(0, value, 0));
+			return *this;
+		}
+		inline Transform& increaseWorldPositionZ(float value)
+		{
+			increaseWorldPosition(Vector3(0, 0, value));
+			return *this;
+		}
 		inline Transform& increaseWorldPosition(float x, float y, float z)
 		{
 			increaseWorldPosition(Vector3(x, y, z));

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include "../utilities/Types.h"
@@ -35,11 +35,13 @@ namespace Vxl
 	{
 		DISALLOW_COPY_AND_ASSIGN(Shader);
 		friend class _Assets;
+		friend class ShaderProgram;
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
 	private:
 		ShaderID			m_id;
 		const std::string   m_name;
+		uint32_t			m_uses = 0; // How many programs is using this shader
 		bool				m_compiled;
 		const ShaderType	m_type;
 		std::string			m_source;
@@ -85,14 +87,15 @@ namespace Vxl
 		friend class ShaderErrors;
 		friend class ShaderCodeViewer;
 		friend class Material;
+		friend class Inspector;
 	private:
 		// Core Data
 		ShaderProgramID				m_id;
 		const std::string			m_name;
 		bool						m_linked;
 		std::vector<ShaderIndex>	m_shaders;
-		std::vector<TextureLevel>	m_targetLevels;	// Textures used in program
 		std::string					m_errorMessage;
+		std::vector<std::pair<std::string, TextureLevel>>	m_targetLevels;	// Textures used in program
 		std::map<std::string, Graphics::Attribute>			m_attributes;
 		std::map<std::string, Graphics::Uniform>			m_uniforms;		 // Uniform meta data for GPU
 		std::map<std::string, UniformStorage>				m_uniformStorage;// Uniform CPU data (float, double, vec2, matrix4x4, etc...)
@@ -229,7 +232,6 @@ namespace Vxl
 		void reload();
 	public:
 		const std::string			m_filePath;				// File used to load
-		//std::vector<TextureLevel>	m_targetLevels;			// Textures used in program
 		ShaderProgramIndex			m_coreProgram = -1;		// Main Program used for rendering
 		ShaderProgramIndex			m_colorIDProgram = -1;	// Alternate program used only for ColorID output
 

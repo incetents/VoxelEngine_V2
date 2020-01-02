@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "GUI_Hierarchy.h"
 
@@ -153,6 +153,15 @@ namespace Vxl
 					Editor.deleteSelection();
 				}
 				ImGui::EndPopup();
+			}
+		}
+
+		if (ImGui::IsWindowFocused())
+		{
+			// Selection
+			if (ImGui::GetIO().KeysDown[(int)KeyCode::DELETEKEY] || ImGui::GetIO().KeysDown[(int)KeyCode::BACKSPACE])
+			{
+				Editor.deleteSelection();
 			}
 		}
 

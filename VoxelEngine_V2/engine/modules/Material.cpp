@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Material.h"
 
@@ -175,7 +175,7 @@ namespace Vxl
 		if (_shaderMaterial)
 		{
 			// Acquire Target Levels
-			std::vector<TextureLevel> _targetLevels;
+			std::vector<std::pair<std::string, TextureLevel>> _targetLevels;
 			switch (type)
 			{
 			case ShaderMaterialType::CORE:
@@ -203,8 +203,10 @@ namespace Vxl
 			else
 				_textures = m_textures;
 
-			for (const auto& level : _targetLevels)
+			for (const auto& pair : _targetLevels)
 			{
+				TextureLevel level = pair.second;
+
 				// Check if entity doesn't have the texture location
 				if (_textures.find(level) == _textures.end())
 				{

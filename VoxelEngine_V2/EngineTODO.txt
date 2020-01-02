@@ -17,28 +17,22 @@ Complete:
 		-> OBB/AABB lines
 	-> target levels are shader specific, not shaderMaterial
 		-> this can be verified by comparing textures specific with stored uniforms if they match
+	-> inspector shows material (core program) -> shows all editable uniforms
+		-> these must also modify (colorID, etc...) clones
 		
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- compile time string hashing (example at main.cpp)
-	-> used for shader uniforms
-	
-- detect if Shader already exists using hashing,
-	- that way you can re-use existing Shaders instead of compiling a copy
-	- Shader needs a duplication flag (only deletes self if duplication counter == 0)
+- inspector selecting multiple entities with the same material
+	-> still can edit uniforms
+	-> textures use ? if different results
 
-- GUI Viewport, show first rendertarget by default, don't have a none-option
-	
-- inspector shows material (core program) -> shows all editable uniforms
-	- these must also modify (colorID, etc...) clones
+
 
 - uniqueID -> assetID, every object create from Assets gets an id so they can refind themselves in the assets
 	- const so that it never changes
 	- global assets don't have a getID function, just get their ID from object itself
 	- Material::bindTextures(Entity*) -> swap to entityIndex (needs AssetID)
 
-- enable vertex attrib pointer, only active by shader not by vbo
-  
  -> Depth only requires Core with colormask, no need for separate Shader
 
 void glColorMask(
@@ -84,14 +78,12 @@ https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
 - inspector, state when multi-objects selected
 	- transform shows -- but allows setting value for multi objects
 
-
-
-- bound texture id in graphics should be map<int, boundtextureID> so that the same texture can be bound on multiple active layers
-
-- imgui x-ray now broken because of viewport mode
-
-- shader builder
-	- enables vertex attrib locations based on vertex attribs used
+- compile time string hashing (example at main.cpp)
+	-> used for shader uniforms
+	
+- detect if Shader already exists using hashing,
+	- that way you can re-use existing Shaders instead of compiling a copy
+	- Shader needs a duplication flag (only deletes self if duplication counter == 0)
 
 - imgui window for render view
 	
@@ -126,7 +118,8 @@ bilinear=true , mipmaps=true , trilinear=true  [min: LINEAR_MIPMAP_LINEAR  , mag
 - fun snake shader on sphere
 	https://youtu.be/2R7h76GoIJM
 
-- Send MVP to the Shaders, isntead of doinv VP * M per vertex
+- check shader outputs and see if it matches fbo attachments
+	- if an fbo attachment has no shader output to match, then de-attach that rendertarget
 
 - editor stuff arrows for 2D mode
 
@@ -335,6 +328,9 @@ GLSL Version      OpenGL Version
 
  - GLSL function pack 2 or more floats into one
 https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/packHalf2x16.xhtml
+
+- enable vertex attrib pointer, only active by shader not by vbo
+	-> might not get any benefit since it's better to just have them all enabled anyways
 
 - discord -> stuff for emmanuel
 

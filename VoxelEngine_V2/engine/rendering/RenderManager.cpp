@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "RenderManager.h"
 
@@ -88,6 +88,9 @@ namespace Vxl
 		{
 			shaderMaterial.second->reload();
 		}
+		Logger.log("~~~~~~~~~~~~~~~~~~");
+		Logger.log("Reloaded all Shaders");
+		Logger.log("~~~~~~~~~~~~~~~~~~");
 	}
 	void RenderManager::ReloadWindow()
 	{

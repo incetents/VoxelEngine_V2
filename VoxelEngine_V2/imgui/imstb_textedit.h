@@ -35,7 +35,7 @@
 //
 // VERSION HISTORY
 //
-//   1.13 (2019-02-07) fix bug in undo size management
+//   1.13 (2020-02-07) fix bug in undo size management
 //   1.12 (2018-01-29) user can change STB_TEXTEDIT_KEYTYPE, fix redo to avoid crash
 //   1.11 (2017-03-03) fix HOME on last line, dragging off single-line textfield
 //   1.10 (2016-10-25) supress warnings about casting away const with -Wcast-qual

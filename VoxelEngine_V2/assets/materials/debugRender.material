@@ -24,6 +24,7 @@
 #RenderTargets
 {
 	vec4 output_albedo 		: 0
+	vec4 output_normal 		: 1
 }
 
 #Samplers
@@ -60,4 +61,5 @@
 	NDotL = NDotL * 0.5 + 0.5;
 
 	output_albedo = vec4(VXL_color * NDotL,1);
+	output_normal = vec4(normalize(frag_in.normal), 1); // worldspace Normals
 }

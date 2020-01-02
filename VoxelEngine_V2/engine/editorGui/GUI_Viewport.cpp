@@ -1,4 +1,4 @@
-// Copyright(c) 2019 Emmanuel Lajeunesse
+// Copyright(c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "GUI_Viewport.h"
 
@@ -151,11 +151,47 @@ namespace Vxl
 					{
 						m_outputFBO = fbo.first;
 						m_outputRT = -1;
-						m_outputRTName = "RenderTarget[None]";
+						m_outputRTIsDepth = false;
+						m_outputRTName = "RenderTarget:[None]";
 
 						FramebufferObject* fbo = Assets.getFramebufferObject(m_outputFBO);
 						if (fbo)
+						{
 							m_outputFBOName = "FBO:[" + fbo->getName() + ']';
+
+							// Acquire first RenderTexture (if possible)
+							const auto& attachments = fbo->getAttachments();
+							for (const auto& attachment : attachments)
+							{
+								if (attachment.second.isRenderTexture())
+								{
+									m_outputRT = attachment.second.getAssetIndex();
+
+									RenderTexture* rt = Assets.getRenderTexture(m_outputRT);
+									if (rt)
+										m_outputRTName = "RenderTarget:[" + rt->getName() + "]";
+
+									// Set Default Outputmode from RenderTarget
+									m_viewMode = rt->m_viewMode;
+
+									break;
+								}
+							}
+							// Use Depth if no render texture available as default
+							if (m_outputRT == -1)
+							{
+								const RenderTarget& RenderDepth = fbo->getDepth();
+								if (RenderDepth.isRenderTexture())
+								{
+									m_outputRT = RenderDepth.getAssetIndex();
+									m_outputRTIsDepth = true;
+
+									RenderTextureDepth* rt = Assets.getRenderTextureDepth(m_outputRT);
+									if (rt)
+										m_outputRTName = "RenderTarget:[" + rt->getName() + "]";
+								}
+							}
+						}
 						else
 							m_outputFBOName = "FBO[None]";
 					}
@@ -169,12 +205,6 @@ namespace Vxl
 			{
 				if (ImGui::BeginMenu(m_outputRTName.c_str()))
 				{
-					// None option
-					if (ImGui::MenuItem("None"))
-					{
-						m_outputRTName = -1;
-						m_outputRTName = "RenderTarget[None]";
-					}
 					// Attachments
 					const auto& attachments = selected_fbo->getAttachments();
 					for (const auto& attachment : attachments)
@@ -188,9 +218,7 @@ namespace Vxl
 
 								RenderTexture* rt = Assets.getRenderTexture(m_outputRT);
 								if (rt)
-									m_outputRTName = "RenderTarget[" + rt->getName() + "]";
-								else
-									m_outputRTName = "RenderTarget[None]";
+									m_outputRTName = "RenderTarget:[" + rt->getName() + "]";
 
 								// Set Default Outputmode from RenderTarget
 								m_viewMode = rt->m_viewMode;
@@ -214,9 +242,7 @@ namespace Vxl
 
 								RenderTextureDepth* rt = Assets.getRenderTextureDepth(m_outputRT);
 								if (rt)
-									m_outputRTName = "RenderTarget[" + rt->getName() + "]";
-								else
-									m_outputRTName = "RenderTarget[None]";
+									m_outputRTName = "RenderTarget:[" + rt->getName() + "]";
 							}
 						}
 					}
@@ -225,7 +251,7 @@ namespace Vxl
 			}
 			else
 			{
-				ImGui::MenuItem("RenderTarget[NONE]");
+				ImGui::MenuItem("RenderTarget:[NONE]");
 			}
 
 			// Channel Output

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Editor.h"
 
@@ -155,11 +155,7 @@ namespace Vxl
 
 		ImGui::Render();
 
-		// Selection
-		if (ImGui::GetIO().KeysDown[(int)KeyCode::DELETEKEY] || ImGui::GetIO().KeysDown[(int)KeyCode::BACKSPACE])
-		{
-			deleteSelection();
-		}
+		
 #endif
 	}
 }

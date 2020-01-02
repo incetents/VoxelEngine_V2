@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include "GuiWindow.h"
@@ -14,6 +14,13 @@ namespace Vxl
 #ifdef GLOBAL_IMGUI
 	private:
 		Color3F LabelColorClipboard;
+		// Settings
+		float DragSpeed = 0.1f;
+		const float Empty3[3] = { 0, 0, 0 };
+		float ImageSize = 50.0f;
+
+		void DrawTransform();
+		void DrawMaterial();
 	public:
 		void Draw() override;
 #else

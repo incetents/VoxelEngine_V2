@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include "Component.h"
@@ -34,6 +34,7 @@ namespace Vxl
 		DISALLOW_COPY_AND_ASSIGN(Material);
 		friend class _Assets;
 		friend class ShaderProgram;
+		friend class Inspector;
 	private:
 		// Data
 		std::string					m_name;

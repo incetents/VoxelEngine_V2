@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include "../engine/modules/Scene.h"
@@ -102,7 +102,7 @@ namespace Vxl
 		EntityIndex entity_skybox;
 		EntityIndex entity_error_cube;
 		EntityIndex entity_beato_cube;
-		EntityIndex entity_beato_cube2;
+		EntityIndex entity_beato_crate;
 		EntityIndex entity_instance_beato;
 		EntityIndex entity_jiggy;
 		EntityIndex entity_arrowX;

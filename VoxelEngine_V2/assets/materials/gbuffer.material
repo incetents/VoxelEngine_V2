@@ -86,9 +86,8 @@
 	}
 	
 	output_albedo.rgb = output_albedo.rgb * VXL_tint + VXL_color;
-			
-			
+		
 	output_normal = vec4(normalize(frag_in.normal), 1); // worldspace Normals
 
-	output_reflection = vec4(0,0,0,1);
+	output_reflection = vec4(1,1,1,1);
 }

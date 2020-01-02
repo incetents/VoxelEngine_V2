@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 Emmanuel Lajeunesse
+﻿// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Shader.h"
 
@@ -110,14 +110,22 @@ namespace Vxl
 	ShaderProgram::ShaderProgram(const std::string& name, const std::vector<ShaderIndex>& _shaders, std::vector<std::pair<std::string, TextureLevel>> _textureLevels)
 		: m_name(name), m_shaders(_shaders)
 	{
+		uint32_t shaderCount = (uint32_t)m_shaders.size();
+
+		// Increment Shader Usage
+		for (uint32_t i = 0; i < shaderCount; i++)
+		{
+			Shader* _shader = Assets.getShader(m_shaders[i]);
+			_shader->m_uses++;
+		}
+
 		m_id = Graphics::ShaderProgram::Create();
 		if (m_id == -1)
 		{
 			m_linked = false;
+			m_brokenShaderPrograms[m_id] = this;
 			return;
 		}
-
-		uint32_t shaderCount = (uint32_t)m_shaders.size();
 
 		// Auto fail if any shaders aren't compiled
 		for (uint32_t i = 0; i < shaderCount; i++)
@@ -127,6 +135,7 @@ namespace Vxl
 			if (!_shader->isCompiled())
 			{
 				m_linked = false;
+				m_brokenShaderPrograms[m_id] = this;
 				return;
 			}
 		}
@@ -162,7 +171,7 @@ namespace Vxl
 				if (it != m_uniforms.end())
 				{
 					// texture is being used
-					m_targetLevels.push_back(pair.second);
+					m_targetLevels.push_back(std::make_pair(pair.first, pair.second));
 				}
 			}
 
@@ -177,79 +186,171 @@ namespace Vxl
 					switch (utype)
 					{
 					case UniformType::FLOAT:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0.f), false };
+					{
+						float defaultValue = 0.0f;
+						uniform.second.getFloat(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::FLOAT_VEC2:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2(0, 0)), false };
+					{
+						Vector2 defaultValue;
+						uniform.second.getVec2(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::FLOAT_VEC3:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3(0, 0, 0)), false };
+					{
+						Vector3 defaultValue;
+						uniform.second.getVec3(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::FLOAT_VEC4:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4(0, 0, 0, 0)), false };
+					{
+						Vector4 defaultValue;
+						uniform.second.getVec4(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 
 					case UniformType::DOUBLE:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0.0), false };
+					{
+						double defaultValue = 0.0;
+						uniform.second.getDouble(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::DOUBLE_VEC2:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2d(0, 0)), false };
+					{
+						Vector2d defaultValue;
+						uniform.second.getVec2(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::DOUBLE_VEC3:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3d(0, 0, 0)), false };
+					{
+						Vector3d defaultValue;
+						uniform.second.getVec3(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::DOUBLE_VEC4:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4d(0, 0, 0, 0)), false };
+					{
+						Vector4d defaultValue;
+						uniform.second.getVec4(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 
 					case UniformType::INT:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0), false };;
+					{
+						int defaultValue = 0;
+						uniform.second.getInt(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::INT_VEC2:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2i(0, 0)), false };
+					{
+						Vector2i defaultValue;
+						uniform.second.getVec2(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::INT_VEC3:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3i(0, 0, 0)), false };
+					{
+						Vector3i defaultValue;
+						uniform.second.getVec3(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::INT_VEC4:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4i(0, 0, 0, 0)), false };
+					{
+						Vector4i defaultValue;
+						uniform.second.getVec4(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 
 					case UniformType::UNSIGNED_INT:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, 0u), false };
+					{
+						uint32_t defaultValue = 0u;
+						uniform.second.getUnsignedInt(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::UNSIGNED_INT_VEC2:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2ui(0u, 0u)), false };
+					{
+						Vector2ui defaultValue;
+						uniform.second.getVec2(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::UNSIGNED_INT_VEC3:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3ui(0u, 0u, 0u)), false };
+					{
+						Vector3ui defaultValue;
+						uniform.second.getVec3(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::UNSIGNED_INT_VEC4:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4ui(0u, 0u, 0u, 0u)), false };
+					{
+						Vector4ui defaultValue;
+						uniform.second.getVec4(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 
 					case UniformType::BOOL:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, false), false };
+					{
+						bool defaultValue;
+						uniform.second.getBool(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::BOOL_VEC2:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector2b(false, false)), false };
+					{
+						Vector2b defaultValue;
+						uniform.second.getVec2(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::BOOL_VEC3:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector3b(false, false, false)), false };
+					{
+						Vector3b defaultValue;
+						uniform.second.getVec3(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::BOOL_VEC4:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Vector4b(false, false, false, false)), false };
+					{
+						Vector4b defaultValue;
+						uniform.second.getVec4(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 
 					case UniformType::FLOAT_MAT2:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Matrix2x2::Identity), false };
+					{
+						Matrix2x2 defaultValue;
+						uniform.second.getMat2(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::FLOAT_MAT3:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Matrix3x3::Identity), false };
+					{
+						Matrix3x3 defaultValue;
+						uniform.second.getMat3(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 					case UniformType::FLOAT_MAT4:
-						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, Matrix4x4::Identity), false };
+					{
+						Matrix4x4 defaultValue;
+						uniform.second.getMat4(m_id, defaultValue);
+						m_uniformStorage[uniform.first] = UniformStorage{ RawData(utype, defaultValue), false };
 						break;
+					}
 
 					default:
 						VXL_ERROR("Uniform Type not supported for Uniform Storage system");
@@ -306,6 +407,21 @@ namespace Vxl
 		m_brokenShaderPrograms.erase(m_id);
 
 		Graphics::ShaderProgram::Delete(m_id);
+
+		// Decrement unused Shaders
+		for (ShaderIndex index : m_shaders)
+		{
+			Shader* _shader = Assets.getShader(index);
+			if (_shader)
+			{
+				_shader->m_uses--;
+				// Delete shader is no other program is using it
+				if (_shader->m_uses == 0)
+				{
+					Assets.deleteShader(index);
+				}
+			}
+		}
 	}
 
 	void ShaderProgram::bind() const

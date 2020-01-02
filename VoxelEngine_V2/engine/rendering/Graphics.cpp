@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 Emmanuel Lajeunesse
+﻿// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Graphics.h"
 
@@ -1497,21 +1497,21 @@ namespace Vxl
 		glUniform1d(location, data);
 	}
 
-	void Graphics::Uniform::send(const Vector2& data) const
+	void Graphics::Uniform::send(const _Vector2<float>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform2f(location, data.x, data.y);
 	}
-	void Graphics::Uniform::send(const Vector3& data) const
+	void Graphics::Uniform::send(const _Vector3<float>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform3f(location, data.x, data.y, data.z);
 	}
-	void Graphics::Uniform::send(const Vector4& data) const
+	void Graphics::Uniform::send(const _Vector4<float>& data) const
 	{
 		if (location == -1)
 			return;
@@ -1533,21 +1533,21 @@ namespace Vxl
 		glUniform4f(location, data.r, data.g, data.b, data.a);
 	}
 
-	void Graphics::Uniform::send(const Vector2d& data) const
+	void Graphics::Uniform::send(const _Vector2<double>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform2d(location, data.x, data.y);
 	}
-	void Graphics::Uniform::send(const Vector3d& data) const
+	void Graphics::Uniform::send(const _Vector3<double>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform3d(location, data.x, data.y, data.z);
 	}
-	void Graphics::Uniform::send(const Vector4d& data) const
+	void Graphics::Uniform::send(const _Vector4<double>& data) const
 	{
 		if (location == -1)
 			return;
@@ -1555,21 +1555,21 @@ namespace Vxl
 		glUniform4d(location, data.x, data.y, data.z, data.w);
 	}
 
-	void Graphics::Uniform::send(const Vector2i& data) const
+	void Graphics::Uniform::send(const _Vector2<int>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform2i(location, data.x, data.y);
 	}
-	void Graphics::Uniform::send(const Vector3i& data) const
+	void Graphics::Uniform::send(const _Vector3<int>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform3i(location, data.x, data.y, data.z);
 	}
-	void Graphics::Uniform::send(const Vector4i& data) const
+	void Graphics::Uniform::send(const _Vector4<int>& data) const
 	{
 		if (location == -1)
 			return;
@@ -1577,21 +1577,21 @@ namespace Vxl
 		glUniform4i(location, data.x, data.y, data.z, data.w);
 	}
 
-	void Graphics::Uniform::send(const Vector2ui& data) const
+	void Graphics::Uniform::send(const _Vector2<uint32_t>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform2ui(location, data.x, data.y);
 	}
-	void Graphics::Uniform::send(const Vector3ui& data) const
+	void Graphics::Uniform::send(const _Vector3<uint32_t>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform3ui(location, data.x, data.y, data.z);
 	}
-	void Graphics::Uniform::send(const Vector4ui& data) const
+	void Graphics::Uniform::send(const _Vector4<uint32_t>& data) const
 	{
 		if (location == -1)
 			return;
@@ -1599,21 +1599,21 @@ namespace Vxl
 		glUniform4ui(location, data.x, data.y, data.z, data.w);
 	}
 
-	void Graphics::Uniform::send(const Vector2b& data) const
+	void Graphics::Uniform::send(const _Vector2<bool>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform2i(location, data.x ? 1 : 0, data.y ? 1 : 0);
 	}
-	void Graphics::Uniform::send(const Vector3b& data) const
+	void Graphics::Uniform::send(const _Vector3<bool>& data) const
 	{
 		if (location == -1)
 			return;
 
 		glUniform3i(location, data.x ? 1 : 0, data.y ? 1 : 0, data.z ? 1 : 0);
 	}
-	void Graphics::Uniform::send(const Vector4b& data) const
+	void Graphics::Uniform::send(const _Vector4<bool>& data) const
 	{
 		if (location == -1)
 			return;
@@ -1641,6 +1641,198 @@ namespace Vxl
 			return;
 
 		glUniformMatrix4fv(location, 1, transpose, data.GetStartPointer());
+	}
+
+	void Graphics::Uniform::getFloat(ShaderID program, float& value) const
+	{
+		glGetUniformfv(program, location, &value);
+	}
+	void Graphics::Uniform::getDouble(ShaderID program, double& value) const
+	{
+		glGetUniformdv(program, location, &value);
+	}
+	void Graphics::Uniform::getInt(ShaderID program, int& value) const
+	{
+		glGetUniformiv(program, location, &value);
+	}
+	void Graphics::Uniform::getUnsignedInt(ShaderID program, uint32_t& value) const
+	{
+		glGetUniformuiv(program, location, &value);
+	}
+	void Graphics::Uniform::getBool(ShaderID program, bool& value) const
+	{
+		int temp;
+		glGetUniformiv(program, location, &temp);
+		value = temp ? true : false;
+	}
+
+	void Graphics::Uniform::getVec2(ShaderID program, Vector2& value) const
+	{
+		float values[2];
+		glGetUniformfv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+	}
+	void Graphics::Uniform::getVec2(ShaderID program, Vector2d& value) const
+	{
+		double values[2];
+		glGetUniformdv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+	}
+	void Graphics::Uniform::getVec2(ShaderID program, Vector2i& value) const
+	{
+		int values[2];
+		glGetUniformiv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+	}
+	void Graphics::Uniform::getVec2(ShaderID program, Vector2ui& value) const
+	{
+		uint32_t values[2];
+		glGetUniformuiv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+	}
+	void Graphics::Uniform::getVec2(ShaderID program, Vector2b& value) const
+	{
+		int temp[2];
+		glGetUniformiv(program, location, temp);;
+		value.x = temp[0] ? true : false;
+		value.y = temp[1] ? true : false;
+	}
+	void Graphics::Uniform::getVec3(ShaderID program, Vector3& value) const
+	{
+		float values[3];
+		glGetUniformfv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+	}
+	void Graphics::Uniform::getVec3(ShaderID program, Vector3d& value) const
+	{
+		double values[3];
+		glGetUniformdv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+	}
+	void Graphics::Uniform::getVec3(ShaderID program, Vector3i& value) const
+	{
+		int values[3];
+		glGetUniformiv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+	}
+	void Graphics::Uniform::getVec3(ShaderID program, Vector3ui& value) const
+	{
+		uint32_t values[3];
+		glGetUniformuiv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+	}
+	void Graphics::Uniform::getVec3(ShaderID program, Vector3b& value) const
+	{
+		int temp[3];
+		glGetUniformiv(program, location, temp);;
+		value.x = temp[0] ? true : false;
+		value.y = temp[1] ? true : false;
+		value.z = temp[2] ? true : false;
+	}
+	void Graphics::Uniform::getVec4(ShaderID program, Vector4& value) const
+	{
+		float values[4];
+		glGetUniformfv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+		value.w = values[3];
+	}
+	void Graphics::Uniform::getVec4(ShaderID program, Vector4d& value) const
+	{
+		double values[4];
+		glGetUniformdv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+		value.w = values[3];
+	}
+	void Graphics::Uniform::getVec4(ShaderID program, Vector4i& value) const
+	{
+		int values[4];
+		glGetUniformiv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+		value.w = values[3];
+	}
+	void Graphics::Uniform::getVec4(ShaderID program, Vector4ui& value) const
+	{
+		uint32_t values[4];
+		glGetUniformuiv(program, location, values);;
+		value.x = values[0];
+		value.y = values[1];
+		value.z = values[2];
+		value.w = values[3];
+	}
+	void Graphics::Uniform::getVec4(ShaderID program, Vector4b& value) const
+	{
+		int temp[4];
+		glGetUniformiv(program, location, temp);;
+		value.x = temp[0] ? true : false;
+		value.y = temp[1] ? true : false;
+		value.z = temp[2] ? true : false;
+		value.w = temp[3] ? true : false;
+	}
+
+	void Graphics::Uniform::getMat2(ShaderID program, Matrix2x2& value) const
+	{
+		float values[4];
+		glGetUniformfv(program, location, values);
+		// Transposed due to Matrix in Opengl being column major
+		value[0] = values[0];
+		value[2] = values[1];
+		value[1] = values[2];
+		value[3] = values[3];
+	}
+	void Graphics::Uniform::getMat3(ShaderID program, Matrix3x3& value) const
+	{
+		float values[9];
+		glGetUniformfv(program, location, values);
+		// Transposed due to Matrix in Opengl being column major
+		value[0] = values[0];
+		value[3] = values[1];
+		value[6] = values[2];
+		value[1] = values[3];
+		value[4] = values[4];
+		value[7] = values[5];
+		value[2] = values[6];
+		value[5] = values[7];
+		value[8] = values[8];
+	}
+	void Graphics::Uniform::getMat4(ShaderID program, Matrix4x4& value) const
+	{
+		float values[16];
+		glGetUniformfv(program, location, values);
+		// Transposed due to Matrix in Opengl being column major
+		value[0] = values[0];
+		value[4] = values[1];
+		value[8] = values[2];
+		value[12] = values[3];
+		value[1] = values[4];
+		value[5] = values[5];
+		value[9] = values[6];
+		value[13] = values[7];
+		value[2] = values[8];
+		value[6] = values[9];
+		value[10] = values[10];
+		value[14] = values[11];
+		value[3] = values[12];
+		value[7] = values[13];
+		value[11] = values[14];
+		value[15] = values[15];
 	}
 
 	// ~ Subroutine Functions ~ //

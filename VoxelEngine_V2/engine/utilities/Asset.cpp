@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #include "Precompiled.h"
 #include "Asset.h"
 
@@ -146,6 +146,19 @@ namespace Vxl
 			texID_nullImagePink = createTexture2D(
 				pixels, 4, false,
 				TextureWrapping::CLAMP_STRETCH, TextureFilter::NEAREST, AnisotropicMode::NONE
+			);
+		}
+		// Question Mark Cube
+		{
+			texID_nullImageQuestionMarkCube = loadTexture2D(
+				"./assets/textures/perspective-dice-six-faces-random.png",
+				true,
+				true,
+				TextureWrapping::REPEAT,
+				TextureFilter::LINEAR,
+				TextureFormat::RGB8,
+				TexturePixelType::UNSIGNED_BYTE,
+				AnisotropicMode::NONE
 			);
 		}
 		// Error Material
@@ -367,6 +380,10 @@ namespace Vxl
 	void _Assets::deleteLineMesh2D(LineMesh2DIndex index)
 	{
 		delete m_lineMesh2D_storage.Erase(index);
+	}
+	void _Assets::deleteShader(ShaderIndex index)
+	{
+		delete m_shader_storage.Erase(index);
 	}
 	void _Assets::deleteShaderProgram(ShaderProgramIndex index)
 	{

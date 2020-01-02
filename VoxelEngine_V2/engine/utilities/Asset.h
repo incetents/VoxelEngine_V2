@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Emmanuel Lajeunesse
+// Copyright (c) 2020 Emmanuel Lajeunesse
 #pragma once
 
 #include <Windows.h>
@@ -330,7 +330,7 @@ namespace Vxl
 		RenderBuffer*		eraseRenderBuffer(RenderBufferIndex index) { return m_renderBuffer_storage.Erase(index); }
 		RenderBufferDepth*	eraseRenderBufferDepth(RenderBufferDepthIndex index) { return m_renderBufferDepth_storage.Erase(index); }
 		Mesh*				eraseMesh(MeshIndex index) { return m_mesh_storage.Erase(index); }
-		Shader*				erase(ShaderProgramIndex index) { return m_shader_storage.Erase(index); }
+		Shader*				eraseShader(ShaderProgramIndex index) { return m_shader_storage.Erase(index); }
 		ShaderProgram*		eraseShaderProgram(ShaderProgramIndex index) { return m_shaderProgram_storage.Erase(index); }
 		ShaderMaterial*		eraseShaderMaterial(ShaderMaterialIndex index) { return m_shaderMaterial_storage.Erase(index); }
 		Material*			eraseMaterial(MaterialIndex index) { return m_material_storage.Erase(index); }
@@ -569,6 +569,7 @@ namespace Vxl
 		TextureIndex texID_nullImageCheckerboard;
 		TextureIndex texID_nullImageBlack;
 		TextureIndex texID_nullImagePink;
+		TextureIndex texID_nullImageQuestionMarkCube;
 		TextureIndex texID_editor_camera;
 		TextureIndex texID_editor_light;
 
@@ -591,6 +592,7 @@ namespace Vxl
 		Texture2D* get_Tex2DNullImageCheckerboard(void) const { return m_texture2D_storage.Get(texID_nullImageCheckerboard); }
 		Texture2D* get_Tex2DNullImageBlack(void) const { return m_texture2D_storage.Get(texID_nullImageBlack); }
 		Texture2D* get_Tex2DNullImagePink(void) const { return m_texture2D_storage.Get(texID_nullImagePink); }
+		Texture2D* get_Tex2DNullImageQuestionMarkCube(void) const { return m_texture2D_storage.Get(texID_nullImageQuestionMarkCube); }
 		Texture2D* get_Tex2DEditorCamera(void) const { return m_texture2D_storage.Get(texID_editor_camera); }
 		Texture2D* get_Tex2DEditorLight(void) const { return m_texture2D_storage.Get(texID_editor_light); }
 		
