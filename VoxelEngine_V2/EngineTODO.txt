@@ -22,11 +22,12 @@ Complete:
 		
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- inspector having texture selector
+- inspector showing grid for missing texture
+
 - inspector selecting multiple entities with the same material
 	-> still can edit uniforms
 	-> textures use ? if different results
-
-
 
 - uniqueID -> assetID, every object create from Assets gets an id so they can refind themselves in the assets
 	- const so that it never changes
